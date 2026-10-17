@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1204 decisions (census stamp 54afef95443eff6e, 2026-10-17) · 671 bugs (242 open / 429 closed; highest OPEN = BUG-906) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1205 decisions (census stamp 0d4d4b6dcd9569d6, 2026-10-17) · 672 bugs (242 open / 430 closed; highest OPEN = BUG-906) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1204 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 619 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1204, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1205 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 620 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1205, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 242 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 75 · 🟩 LOW 27 · UNLABELLED 101 (BUG-757) of 242 open.
 >
@@ -9086,7 +9086,7 @@ The 25 bugs below lost their `## BUG-NNN` heading sections during the 2026-09-03
 Full history lives in `archive/governance_pre_tiered_2026-09-03/buglog.md`; these headings re-sync
 the canonical register to the verdict already recorded in each row's own prose (no re-adjudication).
 
-## BUG-099 (OPEN, 2026-08-13) — Model registry drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)
+## BUG-099 (OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)
 ## BUG-148 (CLOSED, 2026-09-13) — S2 route field stale/uniform — route deprecated as ontology carrier (D2616)
 ## BUG-151 (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases)
 ## BUG-159 (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%)
@@ -17091,7 +17091,7 @@ legacy checkpoint with no sidecar, so the edit could not refuse the next apply. 
 its first run and guards every edit after that. `pipeline/pipeline_paths.py` is in NO stage's `fingerprint_files`,
 so editing it cannot make another stage refuse to resume.
 
-### BUG-899 (MED — OPEN 2026-10-17) — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE
+### BUG-899 (MED — OPEN 2026-10-17) — `pipeline/stage0_convert.py` — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE
 
 `run_stage0` builds `existing` from the checkpoint keyed by BASENAME, and skips a candidate whose basename is in
 it. The applier invokes S0 as `stage0_convert.py --book <rel>`, which leaves `limit` as None, so the skip path is
@@ -17105,7 +17105,7 @@ broken today. It stays OPEN as a latent defect because the failure is silent and
 dropping `existing` for a single-book run would WIPE 130 records. The repair has to re-key the checkpoint by
 `source_file` merge rather than concatenation — a change to resume semantics that must be measured, not assumed.
 
-### BUG-900 (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`
+### BUG-900 (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE IN `pipeline/container_integrity.py` AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`
 
 The two failed epubs of the live apply are VALID ZIPS: HBR holds all 96 entries and Generating Sound holds 459.
 `admit-alert` reports both READABLE, because the declared probe for `.epub` is `zip` — and it is telling the truth
@@ -17158,7 +17158,7 @@ and 66 NAMED non-admissions, the first reading
 `deferred_for_identity | George Orwell - 1984 (ORIGINAL) (1949).md | collides with … .pdf`, and the source file was
 still on disk afterwards. Before this change the same call returned an empty list and said nothing.
 
-### BUG-901 (MED — OPEN 2026-10-17) — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF
+### BUG-901 (MED — OPEN 2026-10-17) — `pipeline/ingest_gate.py` — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF
 
 MEASURED 17:52Z, and it is the whole of the door's current deferral count: **all 66 deferrals are of ONE shape** —
 `same_sanitized_stem` between a container and the `.md` that S0 wrote beside it. `George Orwell - 1984 (ORIGINAL)
@@ -17196,7 +17196,7 @@ that exists; silence lets a reader believe identity is enforced twice when it is
 
 The first limb of BUG-901 is untouched by this: the door still counts a work's own `.md` as a duplicate of its
 container, and that count still grows by two per admitted book.
-### BUG-902 (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS
+### BUG-902 (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING IN `config/capability_registry.yaml` BEFORE TODAY'S FINDINGS
 
 MEASURED 18:00Z: `resolve_route.py --check` reports **228 open bugs resolving to no declared capability against a
 declared ceiling of 222**. Three of the 228 are this sitting's BUG-899/900/901; the other three predate them, so the
@@ -17273,7 +17273,7 @@ REMAINING, AND THE NEXT TASK ON THIS FILE: a `failure_class` of `code_fingerprin
 produced when the guard fires, so the receipt says "the code changed", and the applier can refuse the row WITHOUT
 quarantining a work whose bytes were never examined. Today the guard is a correct refusal reported as a wrong thing.
 
-### BUG-906 (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`
+### BUG-906 (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none`
 
 **Found while** closing the R5 review of D-3077 (`DJ-20261017T170759Z-88bc`). **Symptom:** the run completes,
 and neither closing form is accepted:
@@ -17293,7 +17293,7 @@ for the next agent: **a read-only run's artifact is its receipt, and the parent 
 D-3036's wording implies), or `--may-write none` runs are exempt from the artifact requirement. One of the two, so
 the closing form matrix has no hole.
 
-### BUG-905 (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER
+### BUG-905 (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: config/ingest_identity_gate.yaml DECLARES A KIND FOLDER THAT DOES NOT EXIST
 
 **Found by** re-deriving the plan immediately after D-3077. **Symptom:** the plan's `.mobi` rows that used to fail
 as `refused_container_no_stage_reads_it` now fail as `refused_not_in_its_kind_folder` — 51 → 58. The engine is
@@ -17313,3 +17313,27 @@ on the owner's own files (inbox 36.7 MB → 576,244 B of markdown in 2.3 s; libr
 BUG-861, applied to the placement axis). (a) is a filesystem act with a clear blast radius; (b) is a declaration
 change that affects every future Kindle file. **Not done here:** both change what the owner's library LOOKS like,
 and neither is a conversion fix.
+
+### BUG-907 (MED — CLOSED 2026-10-17) — scripts/plan_admission.py CHECKED A FIXTURE AGAINST THE LIVE TREE, SO THE ONE INVARIANT IT CLAIMED WAS ENFORCED NOWHERE IN PRODUCTION
+
+**Found by** `just health` going red at line 43 immediately after D-3077 landed and passed its own review. **Symptom:**
+`FAIL the_declared_accepted_containers_equal_the_CONVERSION_stage_declared_containers`.
+
+**Cause (two, and the second is the defect).** (1) The control compared `accepted_containers(pol)` — the value of the
+FIXTURE policy built inside the selftest — against `stage0_containers()` — a read of the LIVE
+`config/pipeline_config.yaml`. It was green only while the fixture (3 containers) happened to equal the live
+declaration; D-3077 widened the stage to 10 and the coincidence ended. (2) Because the comparison lived ONLY in the
+selftest, `build()` never checked the join: production could price a row for a container the stage cannot open (the
+389-row class D-3077 exists to end) and nothing would refuse it. The label was a promise made by a test about a
+production path no test ran.
+
+**Fix (landed with this entry).** The gate now DECLARES where its `accepts` list comes from —
+`flow.transitions.conversion.accepts_from: "config/pipeline_config.yaml#stage0.containers"` — replacing a comment
+that merely MENTIONED the origin (D-3034: only a RESOLUTION confers a fact). `stage0_containers(pol)` follows that
+reference, so the reader holds no path, key or container of its own (C12). `build()` REFUSES a disagreement in both
+directions, naming each side. The fixture names its OWN stage0 home, so the control is three-sided and decoupled from
+the live tree: it holds when equal, RAISES when the door is wider than its stage, and RAISES when the reference is
+absent.
+
+**MEASURED:** selftest 25/25 green (was 24/25); live brief reads `candidates 537, refused 512` with the join
+resolving; `just health` proceeds past line 43.

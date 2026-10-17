@@ -2,15 +2,15 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 671,
+  "total_ids": 672,
   "open_n": 242,
-  "closed_n": 429,
+  "closed_n": 430,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
     {
       "id": "BUG-099",
-      "title": "(OPEN, 2026-08-13) \u2014 Model registry drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)",
+      "title": "(OPEN, 2026-08-13) \u2014 Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)",
       "events": 1
     },
     {
@@ -1190,32 +1190,32 @@
     },
     {
       "id": "BUG-899",
-      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `pipeline/stage0_convert.py` \u2014 `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE",
       "events": 1
     },
     {
       "id": "BUG-900",
-      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE IN `pipeline/container_integrity.py` AND STILL BE UNCONVERTIBLE, AND THIS",
       "events": 1
     },
     {
       "id": "BUG-901",
-      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `pipeline/ingest_gate.py` \u2014 THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF",
       "events": 2
     },
     {
       "id": "BUG-902",
-      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING IN `config/capability_registry.yaml` BEFORE TODAY'S FINDINGS",
       "events": 1
     },
     {
       "id": "BUG-905",
-      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: config/ingest_identity_gate.yaml DECLARES A KIND FOLDER THAT",
       "events": 1
     },
     {
       "id": "BUG-906",
-      "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`",
+      "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none`",
       "events": 1
     }
   ],
@@ -1648,6 +1648,7 @@
     "BUG-897",
     "BUG-898",
     "BUG-903",
-    "BUG-904"
+    "BUG-904",
+    "BUG-907"
   ]
 }

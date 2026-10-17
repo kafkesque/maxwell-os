@@ -27765,3 +27765,35 @@ decisions:
     confirm the temp-tree cleanup from a diff; the five questions were therefore re-answered by deterministic
     controls and the one real gap (a leak inside `mobi.extract()` itself) is registered, not rounded up. Receipt:
     governance/evidence/R5_REVIEW_20261017_D3077.md.
+- id: D-3078
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ACQUISITION / KNOWLEDGE-GAP FILLING
+  supersedes: []
+  bugs: []
+  files: [governance/ACQUISITION_PIPELINE_SPEC_20261017.md, config/ingest_identity_gate.yaml, config/capability_registry.yaml]
+  decision: >-
+    AN ACQUIRER'S RECEIPT IS A FILE IN A PEN, NEVER A ROW IN THE CORPUS. The knowledge layer may DETECT that it
+    cannot back a claim (three declared classes, each with a measured trigger: discipline_starvation from
+    plan_targeted_ingestion.py — MEASURED 2026-10-17, 18 starved disciplines of which 9 are CRITICAL; primitive_absence
+    from the FAISS top-k cosine against a DECLARED τ; claim_unsupported from stage5_verify.py's fail-closed NLI), it
+    may ASK for literature (a ranked, resolver-verified JSON manifest whose scores are computed from OpenAlex/Crossref
+    percentiles and whose redundancy term is cosine against the existing corpus embeddings), and it may FETCH bytes —
+    but the fetch TERMINATES at a declared arrival pen (source_library.placement.pens). It may not write knowledge
+    pipeline/books, may not create an .md, may not sign, may not convert. WHY: the ingest door (pipeline/ingest_gate.py,
+    D-2997/D-3050) and the admission lane (T-181/T-183) already own identity, probe, owner word, digest and receipt on
+    EVERY file that becomes knowledge; a second way in would make the first one deaf, which is the measured shape of
+    BUG-851. The consequence is the reason this is a DECISION and not a design note: a bad acquisition can then only
+    ever cost a pen file the owner deletes, never a corpus object the owner cannot untangle. SECOND INVARIANT, same
+    authority: a candidate that does not RESOLVE against Crossref/OpenAlex/an ISBN registry never enters a manifest —
+    this repo has already paid for the lesson (2 fabricated arXiv citations, 2602.14862 / 2605.18796, recorded in this
+    register). THIRD: every acquisition carries a licence_class field (public_domain | open_access | publisher_licensed
+    | shadow), because the library's provenance is ALREADY mixed and already acknowledged as an accepted debt (478
+    ingest_site_marker names, owner word T-173) and a filename suffix is not a record. The lane is lawful-first by
+    declared adapter order (open_access → gutenberg/standardebooks → annas → libgen → zlibrary), opt-in per adapter by
+    OWNER WORD, and it depends on NO third-party MCP: the three published book MCPs are measured young, single-site or
+    unlicensed (annas-mcp 1,087★ with NO licence file; biblio-mcp 22★) and mirrors rename domains monthly, so the
+    durable form is one local MCP Maxwell owns behind a protocol (C21), never a pinned dependency. Full spec:
+    governance/ACQUISITION_PIPELINE_SPEC_20261017.md. NOT IMPLEMENTED and nothing may be until the owner words the
+    shadow lane; Phase 0 (the gap record) and Phase 2 (one lawful adapter) need no such word.

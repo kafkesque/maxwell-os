@@ -212,6 +212,48 @@ def convert_native_text(source_path: Path, output_path: Path) -> dict[str, Any]:
     return _ok()
 
 
+def convert_doc(source_path: Path, output_path: Path) -> dict[str, Any]:
+    """A Word 97-2003 `.doc` (an OLE Compound Document) to Markdown, via the renderer this host already ships.
+
+    WHY NOT PANDOC AND NOT DOCLING (both MEASURED 2026-10-17): `pandoc --list-input-formats` (v3.9) has no `doc`
+    reader at all, and docling ACCEPTS the container and then fails on this library's own files (`failed to convert`,
+    rc=0, no output) — a `.doc` row priced for docling is a row that can only fail, and `max_failed_ratio` is 0.0.
+    `textutil` ships with macOS: it renders the SAME bytes to text with zero new dependencies (MEASURED on the
+    library's own file: 6,397 characters from a 244 KB Word 97 document). On a host without it the row fails as
+    `converter_absent` with that word — never as a silent skip (C22 hybrid sovereignty: local-first, and the absence
+    of the local tool is NAMED rather than papered over by a cloud call).
+    """
+    renderer = shutil.which("textutil")
+    if renderer is None:
+        return _failure(
+            "converter_absent",
+            "`textutil` is not on PATH — the .doc reader is the macOS renderer this stage declares "
+            "(config/pipeline_config.yaml#stage0.containers); the work is whole and nothing was tried against it",
+        )
+    try:
+        done = subprocess.run(
+            [renderer, "-convert", "txt", "-stdout", str(source_path)],
+            capture_output=True,
+            timeout=S0_PANDOC_TIMEOUT_S,  # the same declared renderer budget: one document, one bound
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return _failure("container_unreadable", f"textutil could not run on {source_path.name}: {type(exc).__name__}: {exc}")
+    if done.returncode != 0:
+        tail = done.stderr.decode("utf-8", errors="replace").strip()[:300]
+        return _failure("container_unreadable", f"textutil rc={done.returncode} on {source_path.name}: {tail}")
+    text = done.stdout.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+    output_path.write_text(text, encoding="utf-8")
+    if output_path.stat().st_size <= MIN_OUTPUT_BYTES:
+        return _failure(
+            "no_output",
+            f"the renderer returned {len(text)} characters for {source_path.name} (below the "
+            f"{MIN_OUTPUT_BYTES}-byte floor) — a Word container that renders to nothing is a book whose text is in "
+            f"objects the renderer cannot reach",
+        )
+    return _ok()
+
+
 def convert_kindle(source_path: Path, output_path: Path) -> dict[str, Any]:
     """Convert a Kindle container (.mobi/.azw/.azw3) to Markdown: KindleUnpack first, then the SAME pandoc step.
 
@@ -317,6 +359,7 @@ _READERS: dict[str, Any] = {
     "pandoc_docx": lambda src, out: convert_document(src, out, None),
     "pandoc_pptx": lambda src, out: convert_document(src, out, None),
     "pandoc_rtf": lambda src, out: convert_document(src, out, None),
+    "textutil_doc": convert_doc,
     "native_text": convert_native_text,
 }
 _NATIVE_READER = "native_md"

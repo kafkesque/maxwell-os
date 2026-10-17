@@ -437,9 +437,15 @@ source_library:
         owed: "T-183 (the applier limb: a plan-keyed, dry-run-default, crash-safe writer) | T-176 (the rename rides BEFORE the first admit: an admitted name becomes the corpus name AND the door's key) | T-179 (the library md twin's fate). CLOSED 2026-10-17: T-181 limb 2 (a note's home) - declared as a SHARE on the corpus's own domain axis, D-3062"
       conversion:
         command: "python3 pipeline/stage0_convert.py"
-        accepts: [.epub, .pdf, .md, .mobi, .azw, .azw3, .docx, .pptx, .rtf, .txt]   # origin: config/pipeline_config.yaml#stage0.containers (D-3077; the admission plan REFUSES a container outside this set and a control in it compares the two homes)
+        accepts: [.epub, .pdf, .md, .mobi, .azw, .azw3, .docx, .pptx, .rtf, .txt, .doc]
+        #: D-3077/BUG-907 — THE ORIGIN IS A REFERENCE, NOT A SENTENCE. This line used to be a COMMENT on `accepts`
+        #: saying where the set came from, and the admission plan compared the two homes only inside its SELFTEST
+        #: (fixture against live) — so production never checked the join at all, and the control's green depended on
+        #: a fixture happening to equal the live value. A comment that MENTIONS a thing declares nothing (D-3034);
+        #: this value RESOLVES to the stage's own declaration, and plan_admission.build() refuses a disagreement.
+        accepts_from: "config/pipeline_config.yaml#stage0.containers"
         reads: "every container this stage declares (config#stage0.containers), under the corpus home, RECURSIVELY (find_books). MEASURED 2026-10-17 after D-3077: the corpus holds 982 .md, 26 .epub and 20 .pdf; a library work is admitted as its container plus the .md S0 writes beside it"
-        engines: "pandoc for .epub/.docx/.pptx/.rtf and plain text; docling for .pdf (budget derived from the work's own bytes, D-3076; NO Pandoc fallback, BUG-896); KindleUnpack then pandoc for .mobi/.azw/.azw3. MEASURED 2026-10-17: docling ACCEPTS .doc/.ppt and then fails on this library's real files, so neither is declared until a reader that opens them is installed (LibreOffice)"
+        engines: "pandoc for .epub/.docx/.pptx/.rtf and plain text; docling for .pdf (budget derived from the work's own bytes, D-3076; NO Pandoc fallback, BUG-896); KindleUnpack then pandoc for .mobi/.azw/.azw3; textutil for .doc (Word 97-2003, an OLE container: pandoc has no doc reader and docling ACCEPTS .doc and then fails on this library's real files, MEASURED 2026-10-17). .ppt/.xls are NOT declared for the same reason and are refused until a reader that opens them is installed (LibreOffice)"
         writes: "the corpus home itself - the SAME tree the S0.5 cache then stamps, so the corpus is both the input and the output of S0"
         re_conversion: "pipeline/batch_convert_epubs.py (D2134, declared in config/silent_repair.yaml) re-converts a LIBRARY epub and overwrites the matching corpus .md in place. Until D-3050 it matched by FILENAME STEM and wrote on a bare run (BUG-865); it now matches through the door's OWN comparison key, refuses an ambiguous key, refuses a work the S0.5 cache already resolves (a RE-INGEST act), and is DRY by default"
         source_roots: "config/pipeline_config.yaml#source_epub_dir and #source_pdf_dir - the library kind roots. They were DECLARED as null until D-3050, so the fallback resolved to a path that does not exist and three declared writers silently converted nothing (MEASURED 2026-10-16)"
@@ -523,6 +529,10 @@ source_library:
         azw3: mobi
         rtf: none
         txt: none
+        #: `.doc` is an OLE Compound Document: the 8-byte magic at offset 0 inside a 512-byte header. A HEAD probe,
+        #: not a truncation probe — OLE truncation lives in the FAT chain, which is a parser and belongs to the
+        #: reader, not to this module (declared limit, not an oversight).
+        doc: ole
       #: D-3075 — WHEN AN UNREADABLE CONTAINER IS NOT A DEFECT YET. The owner's rule (2026-10-17): a book that is
       #: truncated OR STILL HALF-DOWNLOADED must never be processed, and the owner must be TOLD so they can fetch
       #: it again by hand. The door already refuses the first (`refused_container_corrupt`); what it could not say

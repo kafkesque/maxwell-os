@@ -66,7 +66,7 @@
       "b_id": "767c0001e6462818",
       "a": "Centered Worlds — Things We Could Design For More Than Human",
       "b": "Centered Worlds_clean — Things We Could Design For More Than Human",
-      "similarity": 0.7768
+      "similarity": 0.7755
     },
     {
       "a_id": "ee3a49a7db0c1820",
@@ -160,25 +160,18 @@
       "similarity": 0.6109
     },
     {
-      "a_id": "3a0c20ab274efcd5",
-      "b_id": "8fbfcb06f27bf76a",
-      "a": "Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
-      "b": "Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
-      "similarity": 0.5993
-    },
-    {
       "a_id": "f88bc17efa5062c8",
       "b_id": "fb4d2ee6da031405",
       "a": "Anonymous — The Essential Guide to Business for Artists and Designers",
       "b": "Alison Branagan — The essential guide to business for artists designers",
-      "similarity": 0.5845
+      "similarity": 0.5842
     },
     {
       "a_id": "15da781a87b25405",
       "b_id": "adbfa0ad879f1034",
       "a": "Addy Osmani — Beyond Vibe Coding (for True Epub)",
       "b": "Addy Osmani — Beyond Vibe Coding",
-      "similarity": 0.5793
+      "similarity": 0.5797
     },
     {
       "a_id": "fb14eceea1857e00",
@@ -188,11 +181,18 @@
       "similarity": 0.5714
     },
     {
+      "a_id": "3a0c20ab274efcd5",
+      "b_id": "8fbfcb06f27bf76a",
+      "a": "Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "b": "Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "similarity": 0.5596
+    },
+    {
       "a_id": "ec3a3dc1ce55b4a6",
       "b_id": "b75d8f2ca67dca1f",
       "a": "Rajat Bhargava, Will Herman — The Startup Playbook",
       "b": "Rajat Bhargava — The Startup Playbook Founder-to-Founder Advice from Two Startup Veterans",
-      "similarity": 0.5444
+      "similarity": 0.5445
     },
     {
       "a_id": "265a59860aab522d",
@@ -206,7 +206,7 @@
       "b_id": "3bd6b6334463d1b0",
       "a": "Laurel Saville — 365 habits of successful graphic designers  insider secrets from top designers on working smart and staying creative",
       "b": "Joshua Berger, Steve Gordon Jr. — 365 Habits of Successful Graphic Designers",
-      "similarity": 0.5188
+      "similarity": 0.5181
     },
     {
       "a_id": "ec757000bb6be330",

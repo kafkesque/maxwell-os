@@ -2,12 +2,12 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**242 open** / 429 closed of 671 ids.
+**242 open** / 430 closed of 672 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
 |---|---|---|
-| BUG-099 | (OPEN, 2026-08-13) — Model registry drift: gpt-oss/Phi misnamed 'verifier' (rename deferred) | 1 |
+| BUG-099 | (OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred) | 1 |
 | BUG-151 | (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases) | 1 |
 | BUG-159 | (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%) | 1 |
 | BUG-160 | (OPEN, 2026-08-21) — evidence-passage topical relevance not verified | 1 |
@@ -243,9 +243,9 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-889 | (MED, OPEN 2026-10-17) — `scripts/normalise_corpus_names.py --census` CANNOT SEE THE 6 NFD NAMES IT EXISTS TO CURE: ITS DEFECT CLASSES ARE | 1 |
 | BUG-890 | (MED, ADDRESSED 2026-10-17) — `AGENTS.md#delegate_rules` STILL CARRIES DELEGATE-002's "SINGLE-SHOT ONLY / 6.8→0.4 tok/s COLLAPSE", A CLAIM | 1 |
 | BUG-891 | (MED, OPEN 2026-10-17) — `config/agent_surface.yaml`'s SWAP CHECKLIST NAMES A RENDER SOURCE THAT DOES NOT EXIST, SO EVERY CORRECTION TO | 1 |
-| BUG-899 | (MED — OPEN 2026-10-17) — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE | 1 |
-| BUG-900 | (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert` | 1 |
-| BUG-901 | (MED — OPEN 2026-10-17) — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF | 2 |
-| BUG-902 | (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS | 1 |
-| BUG-905 | (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER | 1 |
-| BUG-906 | (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done` | 1 |
+| BUG-899 | (MED — OPEN 2026-10-17) — `pipeline/stage0_convert.py` — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE | 1 |
+| BUG-900 | (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE IN `pipeline/container_integrity.py` AND STILL BE UNCONVERTIBLE, AND THIS | 1 |
+| BUG-901 | (MED — OPEN 2026-10-17) — `pipeline/ingest_gate.py` — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF | 2 |
+| BUG-902 | (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING IN `config/capability_registry.yaml` BEFORE TODAY'S FINDINGS | 1 |
+| BUG-905 | (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: config/ingest_identity_gate.yaml DECLARES A KIND FOLDER THAT | 1 |
+| BUG-906 | (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none` | 1 |

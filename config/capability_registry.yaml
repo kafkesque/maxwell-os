@@ -109,7 +109,7 @@ capabilities:
     check: python3 scripts/apply_relabel_store_write.py --selftest
     receipt: config/label_store_write_receipt.json
     cost_tier: T0
-    owns: [config/relabel_rulings.yaml, knowledge pipeline/maxwell.db]
+    owns: [config/relabel_rulings.yaml, knowledge pipeline/maxwell.db, pipeline/schemas.py]
 
   # ── the delegation fleet (D-3020/D-3028) ──
   - id: fanout
@@ -152,6 +152,7 @@ capabilities:
     #: contract rail that measures it is `fatal` in the ladder.
     owns:
     - agent/adapters/
+    - AGENTS.md
     - config/harness_policy.yaml
     - pipeline/harness_env.py
     - pipeline/harness_contract.py
@@ -291,6 +292,21 @@ capabilities:
     receipt: config/bug_recall.yaml#ceilings
     cost_tier: T0
     owns: [scripts/check_bug_recall.py, config/bug_recall.yaml]
+
+  # ── BUG-902: THE ONE CAPABILITY THAT RAN ON EVERY HEALTH PASS AND WAS DECLARED NOWHERE ──
+  #: D-3075 landed `scripts/container_alert.py` + `pipeline/container_integrity.py` and put the alert on the ladder,
+  #: but neither the capability nor its probe module was ever declared here — so a rail that runs daily had no route,
+  #: no owner and no cost, which is the exact blindness this registry exists to refuse (T-156). It WRITES NOTHING by
+  #: design (a notify, never a mover), so its receipt is the declaration whose probes it reads, not an artifact.
+  - id: container_alert
+    kind: script
+    entrypoint: python3 scripts/container_alert.py --brief
+    check: python3 scripts/container_alert.py --selftest
+    receipt: config/ingest_identity_gate.yaml#source_library
+    cost_tier: T0
+    owns:
+      - scripts/container_alert.py
+      - pipeline/container_integrity.py
 
 # ─── THE OPERATOR LANES (T-164/BUG-837's disposition) ───
 #: An operator lane is an entry point a HUMAN runs and that produces a READING or a STATE CHANGE, not a receipt —

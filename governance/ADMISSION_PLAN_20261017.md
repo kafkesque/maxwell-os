@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T17:07:17Z
+# ADMISSION PLAN — 2026-10-17T18:21:42Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -10,15 +10,15 @@
   share with the corpus or an ingest record, 973 distinct keys they do not)
 - already in the corpus by the door's key: **1734**
 - seen by an INGEST RECORD whose corpus file now carries a different key: **27** (the pipeline read the work; the name moved, T-130)
-- **admission candidates the pipeline has never seen: 536**
+- **admission candidates the pipeline has never seen: 541**
 
 ## The target rule (declared, never inferred here)
 
 a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder
 
-Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): `.azw .azw3 .docx .epub .md .mobi .pdf .pptx .rtf .txt`.
+Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): `.azw .azw3 .doc .docx .epub .md .mobi .pdf .pptx .rtf .txt`.
 
-Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->zip .pdf->pdf .md->none .docx->zip .pptx->zip .mobi->mobi .azw->mobi .azw3->mobi .rtf->none .txt->none` — a container an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with a remedy (re-download) and never a signed row.
+Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->zip .pdf->pdf .md->none .docx->zip .pptx->zip .mobi->mobi .azw->mobi .azw3->mobi .rtf->none .txt->none .doc->ole` — a container an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with a remedy (re-download) and never a signed row.
 
 ## Every decision, with the reason it is declared under
 
@@ -26,12 +26,12 @@ Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->
 |---|---|---|
 | `already_in_the_corpus` | 1734 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
 | `seen_by_an_ingest_record` | 27 | a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it |
-| `admit_candidate` | 536 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
+| `admit_candidate` | 541 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
 | `refused_no_declared_corpus_home` | 0 | its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2) |
-| `refused_container_no_stage_reads_it` | 273 | a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
+| `refused_container_no_stage_reads_it` | 268 | a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
 | `refused_container_corrupt` | 1 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
-| `refused_name_repair_first` | 181 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
-| `refused_not_in_its_kind_folder` | 58 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
+| `refused_name_repair_first` | 180 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
+| `refused_not_in_its_kind_folder` | 59 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
 | `refused_domain_not_a_corpus_domain` | 0 | the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062) |
 
 ## THE WORKLIST — every refusal, with the act it asks for
@@ -42,9 +42,9 @@ Every refusal is COUNTED above and every refused row is listed in full in the ma
 
 — (none in this reading)
 
-### `refused_container_no_stage_reads_it` — 273 row(s)
+### `refused_container_no_stage_reads_it` — 268 row(s)
 
-All 273 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 268 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
 ### `refused_container_corrupt` — 1 row(s)
 
@@ -52,19 +52,19 @@ All 273 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names 
 |---|---|---|---|
 | `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | pdf | apple_bookmark | CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused) |
 
-### `refused_name_repair_first` — 181 row(s)
+### `refused_name_repair_first` — 180 row(s)
 
-All 181 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 180 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
-### `refused_not_in_its_kind_folder` — 58 row(s)
+### `refused_not_in_its_kind_folder` — 59 row(s)
 
-All 58 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 59 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
 ### `refused_domain_not_a_corpus_domain` — 0 row(s)
 
 — (none in this reading)
 
-## The admission candidates (536)
+## The admission candidates (541)
 
 | file (below its root) | key | kind | proposed corpus path | bytes |
 |---|---|---|---|---|
@@ -175,6 +175,7 @@ All 58 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `books/pdf/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.pdf` | `rcl.11.2.07fen` | pdf | `DOMAIN 2 Design/communication+design/rcl.11.2.07fen.md` | 5493554 |
 | `books/pdf/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.pdf` | `sco-003_2002_2__442_d` | pdf | `DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.md` | 8929177 |
 | `books/pdf/DOMAIN 2 Design/communication+design/vanmulken2010.pdf` | `vanmulken2010` | pdf | `DOMAIN 2 Design/communication+design/vanmulken2010.md` | 280809 |
+| `books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and… (Michael Bierut).pdf` | `how to use graphic design to sell things, explai` | pdf | `DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and… (Michael Bierut).md` | 35705816 |
 | `books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).pdf` | `the rules we break lessons in play, thinking, an` | pdf | `DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).md` | 20052914 |
 | `books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf` | `the_creative_act_a_way_of_being_rick_rubin_2023_` | pdf | `DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.md` | 5379524 |
 | `books/pdf/DOMAIN 2 Design/practice+process/lwm_23.pdf` | `lwm_23` | pdf | `DOMAIN 2 Design/practice+process/lwm_23.md` | 14752777 |
@@ -527,6 +528,10 @@ All 58 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx` | `ic-startup-business-plan-template-9026_word` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.md` | 53463 |
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx` | `koan21 business plan` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.md` | 17933 |
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx` | `score-deluxe-startup-business-plan-template_2` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.md` | 154360 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc` | `sample business plan - wooden grain toy company(` | doc | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).md` | 244224 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc` | `sample business plan - wooden grain toy company` | doc | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.md` | 244224 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc` | `sample lean business plan - wooden grain toy com` | doc | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).md` | 247296 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc` | `sample lean business plan - wooden grain toy com` | doc | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.md` | 247296 |
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx` | `business plan marking sheet and structure` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.md` | 17836 |
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx` | `the_start_up_loans_company_business_plan_templat` | docx | `DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.md` | 1599419 |
 | `journals_notes/DOMAIN 4 Business/business-notes/docs/market research2.docx` | `market research2` | docx | `DOMAIN 4 Business/business-notes/docs/market research2.md` | 16509 |

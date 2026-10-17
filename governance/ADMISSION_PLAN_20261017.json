@@ -1,11 +1,12 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T17:07:17Z",
+  "generated": "2026-10-17T18:21:42Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".azw",
     ".azw3",
+    ".doc",
     ".docx",
     ".epub",
     ".md",
@@ -25,7 +26,8 @@
     ".azw": "mobi",
     ".azw3": "mobi",
     ".rtf": "none",
-    ".txt": "none"
+    ".txt": "none",
+    ".doc": "ole"
   },
   "target_rule": "a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder",
   "decisions_declared": {
@@ -63,12 +65,12 @@
   "counts": {
     "already_in_the_corpus": 1734,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 536,
+    "admit_candidate": 541,
     "refused_no_declared_corpus_home": 0,
-    "refused_container_no_stage_reads_it": 273,
+    "refused_container_no_stage_reads_it": 268,
     "refused_container_corrupt": 1,
-    "refused_name_repair_first": 181,
-    "refused_not_in_its_kind_folder": 58,
+    "refused_name_repair_first": 180,
+    "refused_not_in_its_kind_folder": 59,
     "refused_domain_not_a_corpus_domain": 0
   },
   "examples": {
@@ -78,10 +80,10 @@
     "refused_no_declared_corpus_home": [],
     "refused_container_no_stage_reads_it": [
       "books/pdf/DOMAIN 2 Design/Semiology of Graphics Diagrams, Networks, Maps (Jacques Bertin) (z-library.sk, 1lib.sk, z-lib.sk).djvu",
-      "books/pdf/DOMAIN 3 Art + Computational Media/plein air KEYS.doc",
       "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-10 at 18.07.26.png",
       "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-11 at 23.25.22.png",
-      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.22.png"
+      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.22.png",
+      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.39.png"
     ],
     "refused_container_corrupt": [
       "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf"
@@ -854,11 +856,6 @@
       "kind": "epub"
     },
     {
-      "rel": "books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
-      "decision": "refused_name_repair_first",
-      "kind": "pdf"
-    },
-    {
       "rel": "books/pdf/DOMAIN 2 Design/practice+process/Making Ideas Happen Overcoming the Obstacles Between Vision and Reality by Scott Belsky (z-lib.org).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
@@ -1110,7 +1107,7 @@
     },
     {
       "rel": "books/pdf/DOMAIN 3 Art + Computational Media/plein air KEYS.doc",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "doc"
     },
     {
@@ -2551,26 +2548,6 @@
       "kind": "zip"
     },
     {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "doc"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "doc"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "doc"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "doc"
-    },
-    {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/The Logo Smith Transfer of Copyright.idml",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "idml"
@@ -3635,6 +3612,15 @@
       "key": "vanmulken2010",
       "bytes": 280809,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/vanmulken2010.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "how to use graphic design to sell things, explain things, make things look better, make people laugh, make people cry, and\u2026 (michael bierut",
+      "bytes": 35705816,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut).md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).pdf",
@@ -6803,6 +6789,42 @@
       "key": "score-deluxe-startup-business-plan-template_2",
       "bytes": 154360,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
+      "root": "journals_notes",
+      "kind": "doc",
+      "key": "sample business plan - wooden grain toy company(1",
+      "bytes": 244224,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc",
+      "root": "journals_notes",
+      "kind": "doc",
+      "key": "sample business plan - wooden grain toy company",
+      "bytes": 244224,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc",
+      "root": "journals_notes",
+      "kind": "doc",
+      "key": "sample lean business plan - wooden grain toy company(1",
+      "bytes": 247296,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
+      "root": "journals_notes",
+      "kind": "doc",
+      "key": "sample lean business plan - wooden grain toy company",
+      "bytes": 247296,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",

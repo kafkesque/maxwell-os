@@ -110,10 +110,28 @@ def _mobi_readable(path: Path) -> bool:
 
 
 #: The CLOSED probe vocabulary. A declaration names one of these tokens; a token outside it is FATAL.
+OLE_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
+OLE_HEADER_BYTES = 512  # the OLE Compound Document header is one sector, so fewer bytes is not a header
+
+
+def _ole_readable(path: Path) -> bool:
+    """A `.doc`/`.xls`/`.ppt` is an OLE Compound Document: an 8-byte magic at offset 0 inside a 512-byte header.
+
+    WHAT THIS PROBE DOES NOT CLAIM: it is a HEAD probe, not a truncation probe. OLE truncation lives in the FAT
+    sector chain, which is a PARSER — and this module holds probes, never parsers (a second document parser here
+    would be a second implementation of a reader's own job). What it does assert is exact and cheap: a file that does
+    not begin with the OLE magic is not a Word/Excel/PowerPoint document at all, whatever its name says.
+    """
+    with Path(path).open("rb") as handle:
+        head = handle.read(OLE_HEADER_BYTES)
+    return len(head) >= OLE_HEADER_BYTES and head.startswith(OLE_MAGIC)
+
+
 PROBES: dict[str, Callable[[Path], bool]] = {
     "zip": _zip_readable,
     "pdf": _pdf_readable,
     "mobi": _mobi_readable,
+    "ole": _ole_readable,
     "none": _always_readable,
 }
 

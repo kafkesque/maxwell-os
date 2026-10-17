@@ -66,11 +66,15 @@ RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
 #: D-3077 — THE CONTAINER SET HAS ONE DECLARATION, AND IT IS CONFIG. It used to be an AST read of a literal set in
 #: `pipeline/stage0_convert.py`; the literal is gone, because which container this stage can open is now declared one
 #: line per container (`config/pipeline_config.yaml#stage0.containers`, naming the reader that opens it). This reader
-#: still does NOT import the pipeline (it pulls the I/O stack, and a ladder line must not pay for it) — it reads the
-#: YAML, which is the declaration of record, and the control below still refuses a disagreement with the gate's own
-#: `flow.transitions.conversion.accepts`. Two independently declared surfaces, compared: the door's policy, and the
-#: stage's capability.
-STAGE0_CONFIG = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
+#: still does NOT import the pipeline (it pulls the I/O stack, and a ladder line must not pay for it).
+#:
+#: BUG-907 (MEASURED 2026-10-17): the two homes — the door's `flow.transitions.conversion.accepts` and the stage's
+#: `stage0.containers` — were compared ONLY inside this file's selftest, and that comparison put a FIXTURE policy
+#: (3 containers) against the LIVE declaration. When D-3077 widened the stage to 10, `just health` went red and the
+#: invariant it claimed was still enforced NOWHERE in production. The join is now a DECLARED REFERENCE
+#: (`conversion.accepts_from`) that `build()` RESOLVES and refuses on, so a fixture names its own stage0 home and no
+#: control depends on a coincidence with the live tree. This reader therefore holds no path of its own (C12/D-3034).
+STAGE0_ORIGIN_KEY = "accepts_from"
 
 #: The CLOSED decision vocabulary. Every one of these must be DECLARED in the gate
 #: (`source_library.admission.decisions`), a class this reader produces that the declaration does not carry is
@@ -171,11 +175,17 @@ def home_path(homes: dict[str, Any], key: str) -> Path:
     return path
 
 
-def accepted_containers(pol: dict[str, Any]) -> set[str]:
-    """The containers the CONVERSION stage accepts, read from the declaration that names its own origin."""
+def conversion_block(pol: dict[str, Any]) -> dict[str, Any]:
+    """The CONVERSION transition as declared — the one place the door says what it accepts, and where that came from."""
     conv = ((pol["source_library"].get("flow") or {}).get("transitions") or {}).get("conversion")
     if not isinstance(conv, dict):
         raise AdmissionError(f"FATAL: {POLICY}#source_library.flow.transitions.conversion is not declared")
+    return conv
+
+
+def accepted_containers(pol: dict[str, Any]) -> set[str]:
+    """The containers the CONVERSION stage accepts, read from the declaration that names its own origin."""
+    conv = conversion_block(pol)
     declared = conv.get("accepts")
     if not isinstance(declared, list) or not declared:
         raise AdmissionError(
@@ -190,18 +200,47 @@ def _container(raw: str) -> str:
     return f".{raw.lower().lstrip('.')}"
 
 
-def stage0_containers(path: Path = STAGE0_CONFIG) -> set[str]:
-    """The stage's declared container set, READ from its declaration of record (D-3077), never imported."""
+def stage0_containers(pol: dict[str, Any]) -> set[str]:
+    """The stage's declared container set, RESOLVED from the reference the gate names (`conversion.accepts_from`).
+
+    D-3034: a value that merely MENTIONS a thing declares nothing; only a RESOLUTION confers the fact. So the door
+    points at the declaration of record and this reader follows it — it holds no path, no key and no container of its
+    own (C12), and a fixture can point at a fixture without the live tree ever being consulted.
+    """
     import yaml  # local: the ladder line does not pay for a YAML parse it does not need
 
-    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    declared = (doc.get("stage0") or {}).get("containers")
-    if not isinstance(declared, dict) or not declared:
+    origin = str(conversion_block(pol).get(STAGE0_ORIGIN_KEY) or "").strip()
+    if not origin:
         raise AdmissionError(
-            f"FATAL: {path}#stage0.containers is not declared — the set of containers the conversion stage can open "
-            f"is a declaration, and this plan refuses to guess it (C12, D-3077)"
+            f"FATAL: {POLICY}#source_library.flow.transitions.conversion.{STAGE0_ORIGIN_KEY} is not declared — the "
+            f"door's `accepts` list and the conversion stage's own declaration are two homes for ONE fact, and a home "
+            f"that only mentions where the other lives (a comment) declares nothing (D-3034, D-3077)"
         )
-    return {_container(str(item)) for item in declared}
+    path_part, _, key_path = origin.partition("#")
+    if not path_part.strip() or not key_path.strip():
+        raise AdmissionError(
+            f"FATAL: conversion.{STAGE0_ORIGIN_KEY} reads {origin!r}, which is not of the form <path>#<key.path> — "
+            f"a reference that cannot be resolved is not a reference (D-3034)"
+        )
+    path = Path(path_part.strip())
+    if not path.is_absolute():
+        path = _PROJECT_ROOT / path
+    if not path.exists():
+        raise AdmissionError(f"FATAL: conversion.{STAGE0_ORIGIN_KEY} names {path}, which does not resolve (D-795)")
+    node: Any = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    for key in key_path.strip().split("."):
+        if not isinstance(node, dict) or key not in node:
+            raise AdmissionError(
+                f"FATAL: conversion.{STAGE0_ORIGIN_KEY} names {origin}, whose key {key!r} is not declared — an "
+                f"unresolvable reference must never read as an empty set (D-795)"
+            )
+        node = node[key]
+    if not isinstance(node, dict) or not node:
+        raise AdmissionError(
+            f"FATAL: {origin} is not a mapping of container -> reader — which containers this stage can open is a "
+            f"DECLARED fact, never an inference from a literal in code (C12, D-3077)"
+        )
+    return {_container(str(item)) for item in node}
 
 
 def name_patterns(pol: dict[str, Any]) -> dict[str, re.Pattern[str]]:
@@ -277,6 +316,18 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     roots = census.roots(doc)
     raw = raw_roots(doc)
     accepted = accepted_containers(doc)
+    #: D-3077/BUG-907 — THE JOIN IS ENFORCED HERE, IN THE READING THAT RUNS. A door that accepts a container the
+    #: stage cannot open prices a copy and a conversion that can only fail (389 rows were refused for exactly this
+    #: before D-3077), and a stage that declares a container the door never admits is an engine nothing reaches.
+    #: Both directions are named, and neither is defaulted.
+    stage_declares = stage0_containers(doc)
+    if accepted != stage_declares:
+        raise AdmissionError(
+            f"FATAL: the door accepts {sorted(accepted)} while the conversion stage declares "
+            f"{sorted(stage_declares)} — admitted but no stage reads it {sorted(accepted - stage_declares)}, "
+            f"readable but never admitted {sorted(stage_declares - accepted)} "
+            f"(config/ingest_identity_gate.yaml#{STAGE0_ORIGIN_KEY} -> the stage's own declaration, D-3077)"
+        )
     axes = home_axes(doc)
     patterns = name_patterns(doc)
     #: BUG-886/D-3071: the probe each ACCEPTED kind uses, read from the gate. `accepted` is the conversion
@@ -614,6 +665,22 @@ def selftest() -> int:
             json.dumps({"source_book": "Renamed Work.md", "author": "A Voice", "title": "Renamed Work"}) + "\n",
             encoding="utf-8",
         )
+        #: BUG-907 — THE FIXTURE NAMES ITS OWN STAGE0 DECLARATION. This control used to compare the FIXTURE policy
+        #: against the LIVE `config/pipeline_config.yaml`, which read green only while the two happened to be equal and
+        #: went red the moment D-3077 widened the stage — an invariant that lived in a coincidence. Now the join is
+        #: exercised on fixture bytes, and the disagreement branch (a door wider than its stage) is proved to REFUSE.
+        import yaml as _yaml
+
+        def write_stage0(name: str, containers: dict[str, str]) -> Path:
+            target = base_dir / name
+            target.write_text(_yaml.safe_dump({"stage0": {"containers": containers}}), encoding="utf-8")
+            return target
+
+        stage0_own = write_stage0("pipeline_config_fixture.yaml",
+                                  {".epub": "pandoc_epub", ".pdf": "docling_pdf", ".md": "native_md"})
+        stage0_wider = write_stage0("pipeline_config_wider.yaml",
+                                    {".epub": "pandoc_epub", ".pdf": "docling_pdf", ".md": "native_md",
+                                     ".rtf": "pandoc_rtf"})
         pol = {
             "source_library": {
                 "roots": [
@@ -661,6 +728,7 @@ def selftest() -> int:
                         "conversion": {
                             "command": "python3 pipeline/stage0_convert.py",
                             "accepts": [".epub", ".pdf", ".md"],
+                            "accepts_from": f"{stage0_own}#stage0.containers",
                         }
                     },
                     "no_sync": {"fact": "fixture"},
@@ -761,11 +829,36 @@ def selftest() -> int:
         except AdmissionError:
             pass
 
-        # (10) the declared accepted set equals the CONVERSION stage's declared container set (two surfaces, one fact)
-        expect(CONTROL_LABELS[11], accepted_containers(pol) == stage0_containers(),
-               f"the declared containers {sorted(accepted_containers(pol))} disagree with "
-               f"{sorted(stage0_containers())} — the stage's declaration of record is "
-               f"config/pipeline_config.yaml#stage0.containers (D-3077)")
+        # (10) the declared accepted set RESOLVES to the stage's own declaration, and the join REFUSES a disagreement
+        #      (BUG-907, three-sided: it holds, a WIDER door raises, and an absent reference is never read as one)
+        expect(CONTROL_LABELS[11], accepted_containers(pol) == stage0_containers(pol),
+               f"the declared containers {sorted(accepted_containers(pol))} disagree with the stage declaration it "
+               f"names ({sorted(stage0_containers(pol))}) — the stage's declaration of record is the one the gate "
+               f"points at (D-3077)")
+        import copy
+
+        wider = copy.deepcopy(pol)
+        wider["source_library"]["flow"]["transitions"]["conversion"]["accepts_from"] = (
+            f"{stage0_wider}#stage0.containers")
+        try:
+            build(wider)
+        except AdmissionError:
+            pass
+        else:
+            mark(CONTROL_LABELS[11],
+                 "a door accepting a container the stage does not declare did NOT raise — a row priced for a "
+                 "conversion no engine would perform")
+
+        unnamed = copy.deepcopy(pol)
+        unnamed["source_library"]["flow"]["transitions"]["conversion"].pop("accepts_from")
+        try:
+            build(unnamed)
+        except AdmissionError:
+            pass
+        else:
+            mark(CONTROL_LABELS[11],
+                 "an absent accepts_from did NOT raise — a comment that MENTIONS the origin would then read as one "
+                 "(D-3034)")
 
         # (12) the key is the DOOR's own key: the same function on both sides of the join, and no second one here
         door = sanitize_source_book("Seen Book").strip().lower()

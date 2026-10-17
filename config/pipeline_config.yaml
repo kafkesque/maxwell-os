@@ -346,6 +346,7 @@ stage0:
     .pptx: pandoc_pptx
     .rtf:  pandoc_rtf
     .txt:  native_text           # no converter: pandoc's only text reader escapes the bytes (MEASURED 2026-10-17)
+    .doc:  textutil_doc          # Word 97-2003 (OLE): pandoc has NO doc reader, and docling accepts-then-fails on this library's own files (MEASURED 2026-10-17). textutil ships with macOS and is NAMED when absent
   #: BUG-898 — A RECEIPT MUST CARRY THE DIAGNOSIS, NOT THE TAIL. Four failures printed the same sentence structure, so
   #: the real causes (an epub parse error, a budget expiry, a void fallback) were unrecoverable without re-running by
   #: hand. Every failed conversion now names ONE of these, and the meaning says what the owner should do about it.

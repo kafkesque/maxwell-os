@@ -9,6 +9,7 @@ next_state:
 - owner's ANCHOR-4 depth pass (150/150, drop-in) receipted, write-locked and scored against the pre-registered references; ANCHOR-4 sheet itself STILL not written (owner gate)
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- governance/ACQUISITION_PIPELINE_SPEC_20261017.md
 - archive/evaluate_model.py.archived-2026-10-17
 - scripts/evaluate_model.py
 - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md

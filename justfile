@@ -659,5 +659,22 @@ admit-apply *ARGS:
 admit-alert *ARGS:                                # D-3075: which arrivals CANNOT BE READ, and which are still ARRIVING — every declared root AND pen probed with the door's own probe, each DAMAGED row named with its defect+remedy, each unfinished download named ARRIVING (never "re-download" a transfer that is still running). READ-ONLY: moves nothing, writes nothing
     python3 scripts/container_alert.py {{ARGS}}
 
+# ─── D-3078/D-3079: THE ACQUISITION LANE — gap → manifest → bytes in the INBOX, and it STOPS at the pen ───
+#: Every recipe here lands whatever it fetches in `education_inbox` (resolved from the ingest door's own
+#: placement declaration, never from a path typed in the command). Nothing here writes the corpus, an .md, a
+#: signature or a conversion. A shadow source needs the owner's word ON THE COMMAND, and the word is recorded.
+acq-status:                                       # where the lane stands: the pen, the ladder, the index
+    python3 scripts/acquire.py status
+
+acq-gap:                                          # what the knowledge layer cannot back, in its three declared classes
+    python3 scripts/acquire.py gap
+
+acq-map *ARGS:                                    # a gap → a ranked manifest of RESOLVER-RETURNED works (--census | --gap "topic")
+    python3 scripts/acquire.py map {{ARGS}}
+
+acq-fetch *ARGS:                                  # execute a manifest into the INBOX (--manifest <json> [--limit N] [--dry-run] [--allow-shadow "<own word>"])
+    python3 scripts/acquire.py fetch {{ARGS}}
+
+
 placement:
     python3 scripts/census_source_names.py --placement || [ $? -eq 2 ]   # T-180/D-3049: WHERE things are, against where the declaration says they belong - the misplaced kinds, the loose files, the undeclared subfolders, and what is waiting in each declared ARRIVAL PEN (how old, and how much of it the pipeline has never seen). READ-ONLY; the repair is T-180, owner-worded

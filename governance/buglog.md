@@ -8,19 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1186 decisions (census stamp f5aabc39dab97b53, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1188 decisions (census stamp 5e08aaba4af83ece, 2026-10-17) · 640 bugs (231 open / 409 closed; highest OPEN = BUG-875) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1186 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 601 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1186, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1188 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 603 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1188, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
+> Open BUGS by severity (population = the census's 231 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 231 open.
 >
-> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-186 | 🟠 SHOULD | APPLY THE EXTENSION RESIDENCY POLICY - flip the nine residents the policy does not justify, and start research | The DISPOSITION-GIVER applies the printed flips ("just extension-profi |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +36,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -16339,3 +16338,33 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   extensions ship 37 tool schemas = 31,636 B ≈ 7,909 tokens PER REQUEST (`scripts/measure_extension_cost.py`).
 - **The harness defect itself is untouched and stays OPEN:** an enabled extension that contributes zero tools still
   raises nothing to the session. The policy prevents the ROT; it does not fix the SILENCE.
+
+### BUG-053 (MEDIUM, FIXED 2026-10-17) — PHI-4-MINI ANSWERS FROM MEMORY WHEN A LOOP ASKS IT TO FETCH
+- **Status: FIXED** — the OS-side defect (routing an open-ended research ask to a model with no source text in
+  hand) is closed by a DECLARED constraint, not by a repair to the model: `config/model_assignments.yaml` carries
+  Phi-4-mini's `never_for` as "never drives a loop either", and D-3058 restates it after the D-2549 measurement.
+- **The row is written on 2026-10-17 and not before, and that is the finding.** The id was cited in prose by four
+  decisions and one task while the register carried NO header for it, so `check_register_divergence` reported it as
+  an UNDECLARED uncarried id (BUG-571/D-2660: a citation naming nothing is worse than no citation). The fix is a
+  HOME, not a re-wording: the divergence rail can now count what the prose was pointing at.
+- Evidence, MEASURED twice: BUG-053's original reading (Phi-4-mini hallucinates on open-ended research) and the
+  D-2549 loop sweep of 2026-10-17, where it was the ONLY one of eight served models to make ZERO tool calls and
+  answer from memory - the same shape, on a loop.
+
+### BUG-876 (MEDIUM, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES
+- **Status: OPEN** — `python3 scripts/lib/handoff.py --selftest` reports `1 of 4 attribution control(s) did not
+  fire`, and the one that fails is the POSITIVE control: "a governed write that IS the current bytes is attributed".
+- MEASURED, twice, either side of an append: the control compares `last_governed_write("config/decisions.yaml")
+  ["post_sha16"]` against the live `sha256_file(...)` of the registry. At 11:0x today the live digest read
+  `2257a1ebdf916274` and the control failed; after two decision appends it read `817eacbb8fd6401b` and the control
+  failed again. **No recorded post-image equals the registry's bytes at ANY reading**, so the failure is not staleness
+  introduced by one edit — the registry has no receipted post-image at all.
+- `python3 scripts/lib/handoff.py --backfill` does not close it: it appended SIX receipts (anchor4 workbook, blind
+  inputs, depth sheet) and NONE for `decisions_registry`, although `config/handoffs.yaml#artifacts` declares that id
+  with path `config/decisions.yaml`. A refresh path that silently skips the artifact the governance layer derives
+  from is the BUG-492 shape inside the tool that exists to prevent it.
+- **Why it matters, in one sentence:** every face Maxwell OS publishes (DECISION-LOG.md, the summary JSON, the
+  seeded state) is DERIVED from `config/decisions.yaml` (D-2981), so the one artifact whose provenance is
+  unattributable is the one whose provenance matters most. The control is honest - it refuses to answer - which is
+  why it must be repaired rather than quieted; a green here would be a lie.
+- NOT this sitting's doing: measured red at 11:0x, before any edit of this session.

@@ -19,6 +19,16 @@ THE TWO REALISATIONS, each printed only in the form it was MEASURED in:
       documented single-string form without a quoting assumption, so those are marked UNVERIFIED rather than
       silently emitted as if they worked (C16: a claim that has not been measured is not a claim).
 
+ADOPTION ON ARRIVAL (D-3060). An extension that arrives from the internet, or from a harness upgrade, has no
+classification - and the rail already refuses to call that clean. `--adopt` makes the REGISTRATION automatic
+(new names land in `quarantine`, refused by every profile) while leaving the DECISION to a human, because the only
+thing an arrival proves is that bytes exist. Quarantine is reported OWNER-OWED (rc 2), so it is loud on every run
+and fatal to nothing.
+
+THE SUBAGENT SURFACE. A delegate is its own session and pays its own schema tax, so `--delegate NAME` renders the
+exact `extensions:` list a delegate should be born with, checked against the harness declaration first (a name the
+harness does not declare is refused, D-3034).
+
 THREE FACTS DECIDE THE VERDICT, never a count:
   * POLICY vs STATE. config/extension_profiles.yaml classifies every extension `always` / `on_demand` / `never`;
     the harness config declares `enabled`. Agreement is rc 0. A disagreement is OWNER-OWED (rc 2), because flipping
@@ -38,10 +48,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
 import importlib.util
 import json
+import os
 import pathlib
+import re
 import sys
+import tempfile
 from typing import Any
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
@@ -49,6 +63,9 @@ POLICY = REPO / "config" / "extension_profiles.yaml"
 FLIP_WRITER = REPO / "agent" / "adapters" / "goose" / "apply_provider_flip.py"
 
 ALWAYS, ON_DEMAND, NEVER, UNCLASSIFIED = "always", "on_demand", "never", "UNCLASSIFIED"
+#: Quarantine is NOT a fourth class of residency - it is the ABSENCE of a decision, and it grants none.
+QUARANTINE = "quarantine"
+CLASSES = ((ALWAYS, "always"), (ON_DEMAND, "on_demand"), (NEVER, "never"), (QUARANTINE, "quarantine"))
 
 
 def declared_home() -> pathlib.Path:
@@ -93,18 +110,19 @@ def _yaml(path: pathlib.Path) -> dict[str, Any]:
 
 
 def classify(policy: dict[str, Any]) -> tuple[dict[str, str], list[str]]:
-    """Turn the three policy lists into one name -> class map, and report any name in two classes.
+    """Turn the policy's class lists into one name -> class map, and report any name in two classes.
 
     Args:
         policy: the parsed config/extension_profiles.yaml.
 
     Returns:
         (classes, faults) where faults names every ambiguity. A name declared twice is a FAULT, not a last-wins
-        (C12: one home means one answer).
+        (C12: one home means one answer). QUARANTINE is carried in the same map so a quarantined name RESOLVES
+        (D-3034) while granting nothing.
     """
     classes: dict[str, str] = {}
     faults: list[str] = []
-    for cls, key in ((ALWAYS, "always"), (ON_DEMAND, "on_demand"), (NEVER, "never")):
+    for cls, key in CLASSES:
         declared = policy.get(key) or []
         names = declared if isinstance(declared, list) else list(declared)
         for raw in names:
@@ -141,11 +159,16 @@ def profile_members(policy: dict[str, Any], classes: dict[str, str], profile: st
             raise SystemExit(f"REFUSED: profile {profile!r} adds {name!r}, which the policy does not classify")
         if classes[name] == NEVER:
             raise SystemExit(f"REFUSED: profile {profile!r} adds {name!r}, which the policy classifies NEVER")
+        if classes[name] == QUARANTINE:
+            raise SystemExit(
+                f"REFUSED: profile {profile!r} adds {name!r}, which is QUARANTINED - an arrival is not a decision"
+                f" (D-3060); classify it in always / on_demand / never first"
+            )
     members = [n for n, c in classes.items() if c == ALWAYS]
     return members + [n for n in adds if n not in members]
 
 
-def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str], list[str]]:
+def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str], list[str], list[str]]:
     """Compare the POLICY against the harness STATE, in the three states the rail registry can report.
 
     Args:
@@ -153,12 +176,13 @@ def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str
         config: the parsed harness config.
 
     Returns:
-        (rc, faults, drift): rc 0 agree / 1 fault / 2 owner-owed; faults are structural; drift is policy-vs-state.
+        (rc, faults, drift, pending): rc 0 agree / 1 fault / 2 owner-owed; faults are structural; drift is
+        policy-vs-state; pending is every QUARANTINED extension (registered on arrival, no decision yet).
     """
     classes, faults = classify(policy)
     extensions = config.get("extensions") or {}
     if not isinstance(extensions, dict) or not extensions:
-        return 1, ["the harness config declares no extensions - the comparison has no subject"], []
+        return 1, ["the harness config declares no extensions - the comparison has no subject"], [], []
 
     for name in sorted(classes):
         if name not in extensions:
@@ -184,8 +208,17 @@ def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str
         expected = {n for n, c in classes.items() if c == ALWAYS}
 
     drift: list[str] = []
+    pending: list[str] = []
+    quarantine = policy.get("quarantine") or {}
+    for name in sorted(quarantine if isinstance(quarantine, dict) else {n: {} for n in quarantine}):
+        entry = quarantine.get(name) if isinstance(quarantine, dict) else {}
+        stamp = (entry or {}).get("adopted") if isinstance(entry, dict) else None
+        pending.append(
+            f"{name}: QUARANTINED {stamp or '(undated)'} - registered on arrival, granted NOTHING, refused by every"
+            f" profile; classify it (always / on_demand / never) with a `why`"
+        )
     for name, cfg in sorted(extensions.items()):
-        if name not in classes:
+        if name not in classes or classes[name] == QUARANTINE:
             continue
         enabled = bool(isinstance(cfg, dict) and cfg.get("enabled"))
         if name in expected and not enabled:
@@ -194,8 +227,8 @@ def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str
             drift.append(f"{name}: classified {classes[name]}, not part of the declared default, but ENABLED")
 
     if faults:
-        return 1, faults, drift
-    return (2 if drift else 0), faults, drift
+        return 1, faults, drift, pending
+    return (2 if drift or pending else 0), faults, drift, pending
 
 
 def _costs(policy: dict[str, Any]) -> dict[str, Any]:
@@ -275,6 +308,112 @@ def render(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, st
     return "\n".join(lines)
 
 
+def undiscovered(policy: dict[str, Any], config: dict[str, Any]) -> list[str]:
+    """Every extension the harness declares that no class carries yet - what an arrival leaves behind.
+
+    Args:
+        policy: the parsed policy.
+        config: the parsed harness config.
+
+    Returns:
+        Sorted names awaiting a decision. Empty when the classification is TOTAL (C16).
+    """
+    classes, _faults = classify(policy)
+    return [name for name in sorted(config.get("extensions") or {}) if name not in classes]
+
+
+def adopt_text(text: str, names: list[str], config: dict[str, Any], today: str) -> str:
+    """Append `names` to the quarantine block WITHOUT re-serialising the file.
+
+    Args:
+        text: the policy file's current bytes.
+        names: the extensions to register.
+        config: the parsed harness config (for the `seen:` stamp - what it was on the day it arrived).
+        today: the adoption date, ISO.
+
+    Returns:
+        The new file text. Every comment and every ordering above the block survives: a re-dump would destroy the
+        `why:` prose that IS the policy, so the splicing is line-level on purpose.
+    """
+    if not names:
+        return text
+    lines = text.splitlines()
+    if not any(re.match(r"^quarantine:\s*$", line) for line in lines):
+        lines += ["quarantine:"]
+    for name in names:
+        cfg = (config.get("extensions") or {}).get(name) or {}
+        seen = f"enabled={'true' if cfg.get('enabled') else 'false'}, type={cfg.get('type') or 'unknown'}"
+        lines += [f"  {name}:", f"    adopted: '{today}'", f"    seen: {seen}"]
+    return "\n".join(lines) + "\n"
+
+
+def write_policy(text: str) -> None:
+    """Replace the policy file crash-safely (C6: tempfile -> fsync -> os.replace).
+
+    Args:
+        text: the bytes to write.
+
+    Raises:
+        SystemExit: when the written file does not parse, or an adopted name does not resolve to QUARANTINE.
+    """
+    fd, tmp = tempfile.mkstemp(dir=str(POLICY.parent), prefix=".extension_profiles.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, POLICY)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+    classes, faults = classify(_yaml(POLICY))
+    if faults:
+        raise SystemExit(f"FATAL: the adopted file reports {len(faults)} fault(s): {faults} - the write is REFUSED")
+
+
+def render_delegate(policy: dict[str, Any], classes: dict[str, str], config: dict[str, Any], name: str) -> str:
+    """Print the `extensions:` list a delegate of this class should be born with.
+
+    Args:
+        policy: the parsed policy.
+        classes: the name -> class map.
+        config: the parsed harness config.
+        name: the delegate profile.
+
+    Returns:
+        The delegate call's argument list plus what it resolved to.
+
+    Raises:
+        SystemExit: when the profile is undeclared, or names an extension the harness does not declare (D-3034).
+    """
+    profiles = policy.get("delegate_profiles") or {}
+    refused_classes = profiles.get("refused") or {}
+    if name in refused_classes:
+        raise SystemExit(f"REFUSED: delegate class {name!r} is refused by decision: {refused_classes[name]}")
+    spec = profiles.get(name)
+    if not isinstance(spec, dict):
+        raise SystemExit(
+            f"REFUSED: delegate profile {name!r} is not declared."
+            f" Declared: {', '.join(n for n, s in profiles.items() if isinstance(s, dict)) or '(none)'}"
+        )
+    declared = config.get("extensions") or {}
+    wanted = [str(x) for x in (spec.get("extensions") or [])]
+    missing = [n for n in wanted if n not in declared]
+    if missing:
+        raise SystemExit(f"REFUSED: delegate profile {name!r} names {missing}, which the harness does not declare")
+    refused = [n for n in wanted if classes.get(n) in (NEVER, QUARANTINE)]
+    if refused:
+        raise SystemExit(f"REFUSED: delegate profile {name!r} names {refused}, which is never/quarantined")
+    lines = [f"DELEGATE PROFILE {name} - {len(wanted)} extension(s)", "",
+             "      extensions=" + json.dumps(wanted) + ",",
+             f"      # {spec.get('why') or ''}"]
+    for n in wanted:
+        cfg = declared.get(n) or {}
+        lines.append(f"      # resolved: {n:16} type={cfg.get('type') or '?':9} enabled={bool(cfg.get('enabled'))}")
+    lines.append(f"      # the parent carries {len(declared)} declared extension(s); this child is born with {len(wanted)}")
+    return "\n".join(lines)
+
+
 def _selftest() -> int:
     """Known-answer controls over pure functions - no filesystem fixture, no live harness.
 
@@ -337,6 +476,41 @@ def _selftest() -> int:
     controls.append(("the render marks a whitespace-bearing stdio arg UNVERIFIED", "UNVERIFIED" in text))
     controls.append(("the render never silently enables a NEVER extension", "tom" not in text.split("(b)")[1]))
 
+    # ADOPTION ON ARRIVAL (D-3060): a new name must REGISTER itself and grant NOTHING.
+    arrived = {"extensions": dict(config["extensions"], stranger={"type": "stdio", "enabled": True})}
+    controls.append(("an arriving extension is discovered as undecided",
+                     undiscovered(policy, arrived) == ["stranger"]))
+    import yaml as _yamlmod
+
+    adopted = _yamlmod.safe_load(adopt_text("quarantine:\n  # (empty)\n", ["stranger"], arrived, "2026-10-17"))
+    controls.append(("the adoption writes a dated quarantine row and touches no class list",
+                     list(adopted.get("quarantine") or {}) == ["stranger"]
+                     and adopted["quarantine"]["stranger"]["adopted"] == "2026-10-17"
+                     and not any(k in adopted for k in ("always", "on_demand", "never"))))
+    qpolicy = dict(policy, quarantine={"stranger": {"adopted": "2026-10-17"}},
+                   profiles={"work": {"adds": ["filesystem"]}, "q": {"adds": ["stranger"]}})
+    qclasses, qfaults = classify(qpolicy)
+    controls.append(("a quarantined name RESOLVES as a class", qfaults == [] and qclasses.get("stranger") == QUARANTINE))
+    controls.append(("a profile may not add a QUARANTINED extension",
+                     _refuses(lambda: profile_members(qpolicy, qclasses, "q"))))
+    qrc, qfa, qdr, qpend = check(dict(qpolicy, profiles={"work": {"adds": ["filesystem"]}}), arrived)
+    controls.append(("quarantine is OWNER-OWED (rc 2) and never a structural fault",
+                     qrc == 2 and qfa == [] and len(qpend) == 1))
+
+    # THE SUBAGENT SURFACE: a delegate is a session, born with the smallest set that closes its task.
+    dpolicy = dict(policy, delegate_profiles={
+        "review": {"extensions": ["developer", "docguard"], "why": "x"},
+        "ghost": {"extensions": ["nope"], "why": "x"},
+        "refused": {"research": "no local model is measured on open-web synthesis"},
+    })
+    dclasses, _dfaults = classify(dpolicy)
+    controls.append(("a delegate profile resolves to its declared set",
+                     "docguard" in render_delegate(dpolicy, dclasses, config, "review")))
+    controls.append(("a delegate profile naming an undeclared extension is REFUSED",
+                     _refuses(lambda: render_delegate(dpolicy, dclasses, config, "ghost"))))
+    controls.append(("a delegate class refused by decision is REFUSED",
+                     _refuses(lambda: render_delegate(dpolicy, dclasses, config, "research"))))
+
     for label, ok in controls:
         print(f"  {'ok  ' if ok else 'FAIL'} {label}")
     passed = sum(1 for _, ok in controls if ok)
@@ -373,6 +547,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--list", action="store_true", help="print the policy and the profiles")
     parser.add_argument("--render", metavar="PROFILE", help="print the two realisations of one profile")
     parser.add_argument("--check", action="store_true", help="compare the policy against the harness state")
+    parser.add_argument("--adopt", action="store_true", help="register newly arrived extensions into quarantine")
+    parser.add_argument("--delegate", metavar="PROFILE", help="print the extensions list a delegate is born with")
     parser.add_argument("--selftest", action="store_true", help="known-answer controls only")
     args = parser.parse_args(argv)
     if args.selftest:
@@ -382,9 +558,24 @@ def main(argv: list[str] | None = None) -> int:
     classes, faults = classify(policy)
     config = _yaml(declared_home())
 
+    if args.adopt:
+        arrived = undiscovered(policy, config)
+        if not arrived:
+            print(f"ok extension-adoption: every declared extension already carries a decision ({len(classes)})")
+            return 0
+        text = adopt_text(POLICY.read_text(encoding="utf-8"), arrived, config, datetime.date.today().isoformat())
+        write_policy(text)
+        print(f"adopted {len(arrived)} extension(s) into QUARANTINE (registered, granted NOTHING): {', '.join(arrived)}")
+        print(f"   next: move each to always / on_demand / never with a `why` in {POLICY.name}, then re-run --check")
+        return 0 if not faults else 1
+
+    if args.delegate:
+        print(render_delegate(policy, classes, config, args.delegate))
+        return 0
+
     if args.list:
         costs = _costs(policy)
-        for cls in (ALWAYS, ON_DEMAND, NEVER):
+        for cls, _key in CLASSES:
             names = [n for n, c in classes.items() if c == cls]
             print(f"{cls.upper()} ({len(names)})")
             for name in names:
@@ -405,7 +596,7 @@ def main(argv: list[str] | None = None) -> int:
         print(render(policy, config, classes, args.render))
         return 0
 
-    rc, faults, drift = check(policy, config)
+    rc, faults, drift, pending = check(policy, config)
     if faults:
         print(f"FAIL extension-profiles: {len(faults)} structural fault(s)")
         for f in faults:
@@ -418,6 +609,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{verdict} policy vs live state: {len(drift)} extension(s) resident against the policy")
         for d in drift:
             print("   " + d)
+    if pending:
+        print(f"OWNER-OWED quarantine: {len(pending)} extension(s) arrived and carry no decision (D-3060)")
+        for p in pending:
+            print("   " + p)
     return rc
 
 

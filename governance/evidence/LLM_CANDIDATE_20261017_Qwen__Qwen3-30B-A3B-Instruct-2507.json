@@ -1,0 +1,69 @@
+{
+ "absent": false,
+ "candidate": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+ "fit": {
+  "best_quant": "mlx-8bit",
+  "capabilities": [
+   "Tool Use"
+  ],
+  "capability_ids": [
+   "tool_use"
+  ],
+  "category": "Chat",
+  "context_length": 262144,
+  "disk_size_gb": 30.53,
+  "effective_context_length": 8192,
+  "estimated_tps": 59.3,
+  "fit_level": "Perfect",
+  "gguf_sources": [
+   {
+    "provider": "unsloth",
+    "repo": "unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF"
+   },
+   {
+    "provider": "mradermacher",
+    "repo": "mradermacher/Qwen3-30B-A3B-Instruct-2507-GGUF"
+   }
+  ],
+  "installed": false,
+  "is_moe": true,
+  "license": "apache-2.0",
+  "memory_available_gb": 64.0,
+  "memory_required_gb": 15.6,
+  "moe_offloaded_gb": null,
+  "name": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "notes": [
+   "Context capped at 8192 tokens for estimation (model supports up to 262144; use --max-context to override)",
+   "Unified memory: GPU and CPU share the same pool",
+   "MoE: 8/128 experts active (all share unified memory pool)",
+   "Best quantization for hardware: mlx-8bit (model default: Q4_K_M)",
+   "Baseline estimated speed: 59.3 tok/s"
+  ],
+  "ollama_name": "qwen3:30b-a3b",
+  "parameter_count": "30.5B",
+  "params_b": 30.53,
+  "provider": "Alibaba",
+  "release_date": null,
+  "run_mode": "GPU",
+  "runtime": "MLX",
+  "runtime_label": "MLX",
+  "score": 88.2,
+  "score_components": {
+   "context": 100.0,
+   "fit": 100.0,
+   "quality": 70.4,
+   "speed": 100.0
+  },
+  "total_memory_gb": 15.6,
+  "usable_context": 262144,
+  "use_case": "Instruction following, chat",
+  "utilization_pct": 24.4
+ },
+ "gates_promotion": [
+  "measure_subagent_loop"
+ ],
+ "gen_model": "deterministic: llmfit llmfit 0.9.38",
+ "generated": "2026-10-17T11:43:31",
+ "pipeline_commit": "e776db4",
+ "schema_version": "1.0"
+}

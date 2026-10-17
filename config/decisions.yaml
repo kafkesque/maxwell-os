@@ -26956,7 +26956,7 @@ decisions:
   date: '2026-10-17'
   by: assistant
   category: EXTENSION RESIDENCY / THE RAIL'S SUBJECT
-  bugs: [BUG-492]
+  bugs: []
   files: [config/extension_profiles.yaml, scripts/goose_profile.py]
   title: >-
     THE RESIDENCY RAIL'S SUBJECT IS THE DECLARED DEFAULT PROFILE, NOT A MINIMUM - a rail that measures a deliberate
@@ -26975,3 +26975,98 @@ decisions:
   - 'A profile is now a declaration of INTENT with a name, so changing what a session is born with is a dated decision rather than an untracked edit.'
   - 'The rail keeps its tri-state: 1 (a fault) is still a structural break - an unclassified extension, an unresolvable name, a profile that adds what it may not add; 2 is still owner-owed.'
   - 'Known-answer control added (14/14): the same state is drift against the always minimum and CLEAN once the default names a profile that includes it.'
+- id: D-3060
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: EXTENSION RESIDENCY / THE TWO SWITCHES AND THE SUBAGENT SURFACE
+  bugs: []
+  files:
+  - config/extension_profiles.yaml
+  - scripts/goose_profile.py
+  - justfile
+  title: RESIDENCY HAS TWO SWITCHES AND ONLY ONE IS A RAIL - birth-time is the control, the runtime toggle is
+    model judgement, and an ARRIVAL registers itself into quarantine granting nothing.
+  decision: >-
+    The owner asked whether an extension can switch itself on when the work needs it and off when it does not. The
+    measured answer is that TWO mechanisms exist and they are not interchangeable. (1) BIRTH-TIME: `--no-profile`
+    plus `--with-builtin` / `--with-extension` (per-session), or the `enabled:` flag (persistent, live at the NEXT
+    session's birth and never in the running one). This is deterministic, it is the harness's own mechanism, and it
+    is THE RAIL. (2) RUNTIME: the `extensionmanager` extension exposes a ManageExtensions tool (action + name) whose
+    own strings report "The extension '<name>' has been disabled successfully" and "' has been installed
+    successfully". It can therefore change a RUNNING session's surface - but the thing that decides is the MODEL, so
+    it is a judgement, not a control (`not_a_rail: true`), and it may never be the only path.
+    The policy bounds it: `may_toggle: on_demand` only. An `always` member is a session's spine; a `never` or
+    quarantined one has nothing to switch. A model that could remove its own spine mid-task can strand the task it
+    is inside of.
+    ADOPTION ON ARRIVAL: an extension installed from the internet, or shipped by a harness upgrade, arrives with no
+    classification - and the rail already refuses to call that clean (C16). `--adopt` makes the REGISTRATION
+    automatic while leaving the DECISION to a human: the new name lands in `quarantine` with a dated `seen:` stamp,
+    is REFUSED by every profile, and is reported OWNER-OWED (rc 2 - loud, never fatal, BUG-457) on every health run
+    until it is moved to always / on_demand / never with a `why`. Registering the unknown must be cheap enough that
+    it is never skipped; granting it residency must be impossible without a reason.
+    THE SUBAGENT SURFACE: a delegate is a SESSION, not a function call - it pays its own schema tax and its own
+    tool-choice entropy. `delegate_profiles` therefore declares the SMALLEST set that closes a task class, checked
+    against the harness declaration before it is printed (an undeclared name is REFUSED, D-3034), and
+    `--delegate NAME` prints the exact `extensions:` list. A delegate whose output is JUDGED carries `skills`, or it
+    is rule-blind.
+  evidence: >-
+    MEASURED 2026-10-17. (a) The seven declared flips were applied to the live harness config at 11:40 and the rail
+    went from rc 2 (7 residents against policy) to rc 0 (26 declared, 12 enabled = exactly the workshop profile);
+    the write was line-level with a backup, and an invariant check proved every non-target body and the
+    extensionmanager entry were byte-identical. (b) The runtime lever is read from the goose 1.39.0 binary
+    (ManageExtensionAction / ManageExtensionsParams / the success and failure strings); the tool NAME is read from
+    the binary and NOT handshaken, because a platform extension is not exposed by `goose mcp` - only memory,
+    computercontroller and autovisualiser are - and that limitation is stated rather than papered over (C16).
+    (c) The adoption path was exercised end-to-end against a copy of the policy: an undeclared `shiny-new-mcp`
+    produced a dated quarantine row, the file's comments survived (the splicing is line-level BECAUSE a re-dump
+    would destroy the `why:` prose that IS the policy), the name resolved to class `quarantine`, and it was refused
+    by every profile. (d) Controls: 22/22.
+  consequences:
+  - 'A new extension can no longer be silently resident: the rail faults on an unclassified name and names the ONE command that registers it.'
+  - 'The runtime toggle is declared, bounded and labelled as judgement - so a future reader cannot mistake it for a control.'
+  - 'KNOWN GAP, RECORDED NOT PRETENDED: this harness has no read-only surface (developer = shell/edit/write, filesystem = 14 tools incl. writes), so a reviewer''s read-only constraint is DECLARED, not enforced. T-189.'
+  - 'KNOWN GAP, RECORDED: a mid-session disable/enable leaves no receipt anywhere - the config is untouched and the session surface is not journaled (D-3036 shape). T-190.'
+- id: D-3061
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: MODEL RESEARCH / THE ORACLE LADDER
+  bugs: []
+  files:
+  - config/model_oracles.yaml
+  - scripts/llm_candidate_probe.py
+  - governance/evidence/LLM_CANDIDATE_20261017_Qwen__Qwen3-30B-A3B-Instruct-2507.json
+  title: A CAPABILITY CLAIM MUST NAME ITS ORACLE - fit is not capability, an external leaderboard is a prior and
+    never a gate, and only a MEASURED loop on this machine may promote a model.
+  decision: >-
+    Every candidate model is now recorded in a fixed order, mechanically, by `scripts/llm_candidate_probe.py`:
+    (1) is it in the fit catalogue at all (absent is ABSENT, not zero, D-2957); (2) does it fit this machine;
+    (3) what does its speed estimate assume (llmfit computes estimated_tps at an effective context cap of 8192 and
+    says so in its own notes - a ceiling, never a loop time); (4) what may NOT be used as evidence, printed from
+    config/model_oracles.yaml so the refusals are declared once instead of remembered; (5) what still has to
+    happen - a measured loop. Only `measure_subagent_loop` is `gates_promotion: true`; llmfit is `scope: FIT ONLY`;
+    BFCL / tau2-bench / SWE-bench-Verified are PRIORS that decide what is worth downloading and measuring.
+    REFUSED AS EVIDENCE (registered with reasons, D-3038): parameter count (a size is not a capability), catalogue
+    capability tags, unbacked card prose, vendor demos, and estimated_tps substituted for a loop time.
+    THE ONE ROLE THAT IS EMPTY gets the download, never "a model that is newer": a download is justified only by a
+    task class this machine cannot serve today.
+  evidence: >-
+    MEASURED 2026-10-17, and it CORRECTS the evidence of D-3058 (the conclusion survives, the stated proof did
+    not). (a) llmfit covers 4,757 rows in this reading and tags 1,019 fitting rows `tool_use`. (b) Of the EIGHT
+    models this machine serves, FOUR are not in the catalogue at all - MiniCPM5-2B, Ornith-1.5-9B,
+    Ornith-1.5-35B-A3B and Qwen3.8-27B - so the fit oracle cannot read half the roster. (c) The tag is PER-REPO and
+    a quantisation DROPS it: `google/gemma-4-E4B-it` carries ['vision','tool_use'] while six quantised variants
+    including the served MLX-4bit carry caps=[]; D-3058's "gemma-4-E4B is tagged caps=[]" was true only of the
+    variant, and its "MiniCPM5 is tagged caps=[]" was an ABSENCE misread as a tag. What survives unchanged: on the
+    repos this machine actually serves, the only `tool_use` tag belongs to the SLOWEST loop driver measured
+    (Qwen3-Coder-30B, 79.9 s). (d) The catalogue's own top-50 of `tool_use` + fits + <=40B is 32 distinct families
+    in 50 rows, contains 20 distillation repos and FIVE quantisations of the same #1 row
+    (DeepSeek-R1-0528-Qwen3-8B, score 95.3) - a REASONER, the worst shape for a loop, since it spends tokens before
+    its first tool call. A ranking that is duplicate-inflated, distill-inflated and topped by a reasoner is not a
+    shortlist. (e) Controls 6/6; the first receipt is written for Qwen3-30B-A3B-Instruct-2507 (fit Perfect, 15.6 GB,
+    262k declared but 8192 for the estimate).
+  consequences:
+  - 'Research on a model now leaves a receipt that says what is MISSING from the evidence, not only what was found.'
+  - 'llmfit''s coverage of the served roster is recorded as 4/8 - a future reader may not assume the fit oracle can see the machine.'
+  - 'T-131 (the model-swap bench) now has a declared shape; T-187 remains the only gate for a promotion.'

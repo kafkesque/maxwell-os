@@ -1,0 +1,75 @@
+schema_version: "1.0"
+# config/model_oracles.yaml - WHAT MAY COUNT AS EVIDENCE THAT A MODEL CAN DO A THING (D-3061).
+#
+# THE PROBLEM. "Is model X better at tool calling?" is answered, in practice, by a leaderboard someone else ran,
+# on someone else's hardware, at someone else's context length. That is not the question Maxwell OS asks. The
+# question is "will THIS model drive a multi-call loop on THIS machine at a speed that does not cost more than the
+# work it saves?" - and no external table answers it, because the two variables that decide it (decode speed under a
+# growing context, and the served harness's tool-call format) are properties of the MACHINE and the HARNESS.
+#
+# So an oracle here is not "a good benchmark". It is a claim with a declared scope, and every claim is tagged with
+# whether it is TRUE OF THIS MACHINE. Only a machine-truthful oracle may gate a promotion.
+#
+# MEASURED ONCE, AND IT SETTLED THE QUESTION (2026-10-17). llmfit 0.9.38 carries 5,103 models and tags 1,259 of
+# them `tool_use`. Of the eight models THIS machine serves, exactly ONE carries the tag: Qwen3-Coder-30B - which is
+# the SLOWEST loop driver measured (79.9 s for the fixed 3-call loop). gemma-4-E4B and MiniCPM5-2B, the two that
+# completed the loop fastest and cleanly, carry `caps: []`. The tags are not merely imprecise here; they are inverted.
+# That is why `llmfit` below is registered as a FIT oracle with `tags: unreliable`, not as a capability oracle.
+
+authority: 'config/model_oracles.yaml (this file)'
+updated: '2026-10-17'
+
+rule: >-
+  A capability claim must name its oracle. Any candidate model is recorded with (1) a FIT reading (llmfit, this
+  machine) and (2) at most one external benchmark number WITH its oracle named - and (3) it may not be promoted into
+  any role until a machine-truthful oracle has spoken for it. A card's prose is not evidence: "excels in tool
+  calling" with no table is marketing, and it is refused as a class (D-3038).
+
+oracles:
+  measure_subagent_loop:
+    kind: local
+    measures: 'a FIXED multi-call tool loop, completed by the model, timed on this machine at temperature 0.0'
+    machine_truthful: true
+    gates_promotion: true
+    rail: 'python3 scripts/measure_subagent_loop.py'
+    caveat: >-
+      One loop shape ranks nothing by itself. The 3-call single-tool loop measured 2026-10-17 (D-2549) proves a
+      model can CALL a tool; it does not prove it can carry state across two dependent calls, ignore a distractor,
+      or recover from a refusal. T-187 adds that second fixture before any promotion.
+  llmfit:
+    kind: local
+    measures: 'hardware fit: fit_level, memory_required_gb, disk_size_gb, estimated_tps, best_quant'
+    machine_truthful: true
+    scope: 'FIT ONLY'
+    tags: unreliable
+    evidence: 'MEASURED 2026-10-17: the served roster''s capability tags are inverted (see header).'
+    caveat: >-
+      estimated_tps is computed at an EFFECTIVE CONTEXT CAP of 8192 tokens (the tool says so in its own notes:
+      "Context capped at 8192 tokens for estimation"). It therefore estimates the one regime Maxwell never runs in:
+      long-context decode is where the measured collapse lives (DELEGATE-002, ~6.8 -> 0.4 tok/s as agent context
+      grows). Treat tps as a CEILING, never as a loop time.
+  bfcl:
+    kind: external
+    measures: 'single-turn function selection and parameter fidelity (AST-matched), v3/v4'
+    machine_truthful: false
+    use_for: 'a PRIOR on which model is worth the download and the measurement - never a gate'
+  tau2_bench:
+    kind: external
+    measures: 'multi-turn agentic policy compliance against a simulated user (retail / airline / telecom)'
+    machine_truthful: false
+    use_for: 'the closest external proxy for a loop, which is why it is preferred over any single-turn score'
+  swe_bench_verified:
+    kind: external
+    measures: 'patch correctness on real repositories (coding agents)'
+    machine_truthful: false
+    use_for: 'code quality as a prior; says nothing about decode speed on this machine'
+
+refused_as_evidence:
+  parameter_count: 'a size is not a capability. 30B says how much RAM it costs, nothing about whether it can drive a loop.'
+  capability_tags: 'vendor-supplied catalogue tags - measured INVERTED on this roster (see header).'
+  card_prose: '"excels at tool calling" without a table row is marketing (D-3038: refused, with the reason recorded).'
+  vendor_demo: 'a curated transcript is not a rate. No denominator, no repetition, no failure shown.'
+  estimated_tps_as_loop_time: >-
+    llmfit's estimate is a fit-model output at an 8192-token cap. A loop is dominated by prefill and by decode
+    under a growing context; substituting one for the other produced the 79.9 s surprise on the model llmfit rates
+    fastest in its class.

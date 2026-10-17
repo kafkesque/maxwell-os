@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**232 open** / 407 closed of 639 ids.
+**231 open** / 409 closed of 640 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -196,7 +196,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-768 | (HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarde | 1 |
 | BUG-771 | (MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed | 1 |
 | BUG-772 | (HIGH - OPEN 2026-10-13) - corroboration is frozen by ONE run's clustering, so a later independent source can never raise a row's tier | 1 |
-| BUG-773 | (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert | 1 |
+| BUG-773 | (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert | 3 |
 | BUG-774 | (MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec | 1 |
 | BUG-775 | (MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares | 1 |
 | BUG-777 | (HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor row | 1 |
@@ -236,6 +236,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-864 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a  | 3 |
 | BUG-867 | (LOW — OPEN 2026-10-16) — scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders i | 1 |
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t | 1 |
-| BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 1 |
-| BUG-874 | (HIGH, OPEN) — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached) | 1 |
+| BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 3 |
 | BUG-875 | (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S  | 1 |

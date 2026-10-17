@@ -334,7 +334,20 @@ tasks:
     to a header event (its state has to be known, and the prose does not state it) or the ceiling must be raised by a
     DECLARED DECISION. Neither is an agent''s act, so it is recorded as debt instead of absorbed. The landing itself
     added NO fault to this list, and that is the comparison the audit was for.'
-  gate: none
+  gate: >-
+    WHOLE-SET READING 2026-10-17 - the first this repository has ever taken, and it re-prices this task.
+    `scripts/run_ladder.py --collect health` ran every declaring line (181 of them, 909.3 s, worst rc=1) instead of
+    stopping at the first failure (BUG-573). FOURTEEN red lines, and NONE is new: the five residency lines added this
+    sitting all read ok. The fourteen are the backlog the ordinary ladder could never show, because line 1
+    (check_bug_recall) fails first and hides lines 2-181: check_bug_recall, resolve_route (225 unrouted against the
+    222 ceiling), check_bug_status (a STALE face), check_register_divergence (BUG-053 named with no header, BUG-492
+    claimed by a decision with no header), build_anchor_store_bridge (no longer re-derives), check_config_defaults
+    (debt GREW: 595 sites / 594 modules, 3 undeclared keys), lib/handoff --selftest (its attribution control does not
+    fire), check_silent_repair, check_undeclared_encoding, check_store_columns, reconcile, verify_generator_pins,
+    check_tests (the 4th fatal), check_rail_mutations. Two are cascades of this sitting's own governance edits and
+    are cheap; the rest are the debt this task exists to discharge. ORDER: (1) the two cascades, (2) the stale faces,
+    (3) the SHRINK-ONLY debt, each ceiling LOWERED rather than raised (D-2644). The fault set is now RECORDED in
+    temp/ladder_receipt.json, so "unknown" is no longer the state.
 - id: T-115
   priority: SHOULD
   state: done
@@ -2225,7 +2238,7 @@ tasks:
     \ of the fix, because a silent ceiling is what made a stall indistinguishable from progress."
 - id: T-186
   priority: SHOULD
-  state: open
+  state: done
   mover: owner
   title: APPLY THE EXTENSION RESIDENCY POLICY - flip the nine residents the policy does not justify, and start research/document sessions in the per-session form
   source: D-3056; config/extension_profiles.yaml; scripts/goose_profile.py; BUG-873
@@ -2236,10 +2249,14 @@ tasks:
     scheduler, tom, youtubetranscript. Two of them (tom, scheduler) are measured 0-TOOL extensions. The switch itself
     is the harness's and was measured two-sided: --no-profile with --with-builtin starts clean, a bogus name warns.
   gate: >-
-    The DISPOSITION-GIVER applies the printed flips ("just extension-profile workshop" prints them; the script writes
-    nothing) and confirms the result in a NEW session - a running session keeps the surface it was born with - by
-    reading that session's own extension surface. Until then rc 2 from "just extensions-check" is the honest state
-    of the harness, and it is owner-owed, not a fault.
+    APPLIED 2026-10-17 11:40 by the agent at the owner's instruction, and MEASURED GREEN: the seven declared flips
+    (apps, chatrecall, code_execution, reddit, scheduler, tom, youtubetranscript) were written line-level into the
+    harness config - tempfile -> fsync -> os.replace, backup config.yaml.bak-20261017114041-t186 - and an invariant
+    check proved every non-target body and the extensionmanager entry byte-identical. "just extensions-check" moved
+    from rc 2 (7 residents against policy) to rc 0: 26 declared, 12 enabled, exactly the workshop profile. The
+    tokens freed are ~1.5k per request (youtubetranscript 1168 + reddit 349), plus two measured 0-TOOL processes
+    (tom, scheduler) and three platform residents. THE SESSION THAT APPLIED IT KEEPS THE SURFACE IT WAS BORN WITH:
+    the new surface is real in the NEXT session, which is the one that must be read to close this limb.
 - id: T-187
   priority: SHOULD
   state: open
@@ -2269,3 +2286,40 @@ tasks:
     A rail that runs mypy over the declared surface from a pinned config, registered in config/rail_registry.yaml and
     invoked by the health ladder, tri-state (a new untyped signature is RED, not a note). The baseline must be
     ratcheted, never made "clean by exclusion" of the files that fail today.
+- id: T-189
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: THE READ-ONLY REVIEWER - no extension in this harness offers read-without-write, so every reviewer can edit
+    the artefact it is judging, and the constraint is DECLARED rather than enforced
+  source: D-3060; config/extension_profiles.yaml#delegate_profiles.known_gap
+  evidence: >-
+    MEASURED 2026-10-17 while declaring the delegate surfaces: `developer` is atomic (shell + edit + write, 5 tools)
+    and `filesystem` is 14 tools including writes, so there is NO combination of declared extensions whose holder
+    cannot write to the repository. The R5 review gate therefore rests on a reviewer that CAN edit the file it
+    approves. Nothing in the harness prevents it; only the instructions do, and an instruction is not a control
+    (BUG-492).
+  gate: >-
+    Either (a) a read surface that cannot write - one tool, declared in the harness config and classified
+    `on_demand`, which also means REFUSING every document-conversion/filesystem server that bundles a writer - or
+    (b) an explicit, dated acceptance that a delegate's writes are made SAFE rather than impossible (they are visible
+    in the working tree and in the delegate journal), with the acceptance recorded where the R5 gate reads it. What
+    may not continue is the current state: a constraint asserted in prose that no reader can check.
+- id: T-190
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: A MID-SESSION SURFACE CHANGE LEAVES NO TRACE - the extensionmanager toggle is a governed act with no receipt
+  source: D-3060; D-3036 (an act that leaves no trace did not happen); BUG-873
+  evidence: >-
+    MEASURED 2026-10-17 from the goose 1.39.0 binary: `extensionmanager` exposes ManageExtensions (action + name) and
+    reports "The extension '<name>' has been disabled successfully". A model can therefore change what tools exist
+    for the rest of a session. No receipt is written anywhere: the harness config is untouched (by design), and the
+    session surface recorded in `sessions.db#extension_data` is the surface the session was BORN with, so a mid-
+    session disable is invisible to every rail and to every later reader. It is the D-3036 shape exactly: the act
+    happened to the session's capability set and nothing can prove it did not.
+  gate: >-
+    A reading that answers "what could this session call at turn N" - the cheapest form is a session-scoped receipt
+    written whenever the surface changes (the toggle is model-driven, so the trigger must be the tool call itself,
+    not a config diff), plus a rail that refuses a `done` claim whose session shows a surface it cannot account for.
+    Until then the runtime toggle is permitted ONLY as a convenience on `on_demand` members, never as the record.

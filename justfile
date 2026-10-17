@@ -632,6 +632,12 @@ extension-profile name:                              # T-186/D-3056: the two rea
 extensions-check:                                    # T-186/D-3056: residency policy vs live harness state - tri-state (0 agree | 1 fault | 2 owner-owed)
     python3 scripts/goose_profile.py --check
 
+extensions-adopt:                                    # D-3060: register extensions that ARRIVED with no decision - into QUARANTINE, granting nothing
+    python3 scripts/goose_profile.py --adopt
+
+extensions-delegate profile:                         # D-3060: the smallest extension set a delegate of this class is born with
+    python3 scripts/goose_profile.py --delegate {{profile}}
+
 admit-plan:
     python3 scripts/plan_admission.py --plan || [ $? -eq 2 ]   # BUG-863: rows waiting for the owner's word ARE the OWNER-OWED outcome, not a failed command - and it moves nothing
 placement:

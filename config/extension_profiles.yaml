@@ -145,3 +145,90 @@ profiles:
   everything:
     adds: [filesystem, gitmcp-mcp, youtubetranscript, reddit, pdfreader, puppeteer, chatrecall, code_execution]
     when: 'the audit profile: deliberately the whole on_demand set, used to MEASURE, never as a working default.'
+
+# ---------------------------------------------------------------------------------------------------------------------
+# THE SWITCHES - WHAT CAN ACTUALLY TURN AN EXTENSION OFF, AND WHAT EACH ONE IS WORTH (D-3060).
+# ---------------------------------------------------------------------------------------------------------------------
+# Two mechanisms exist. They are NOT interchangeable, and treating them as one is how a policy becomes a wish.
+residency:
+  authority: 'config/extension_profiles.yaml (this file)'
+  birth_time:
+    mechanism: "goose run --no-profile --with-builtin A,B --with-extension '<cmd> <args>'"
+    persistent: 'flip `enabled:` in the harness config - live at the NEXT session birth, NEVER in the running one'
+    evidence: 'MEASURED 2026-10-17 two-sided: a real name starts with zero warnings; a bogus name prints "Warning: Failed to start extension ... continuing without it".'
+    deterministic: true
+    is_the_rail: true
+  runtime:
+    mechanism: extensionmanager
+    tool: 'manage_extensions'
+    actions: [disable, install]
+    evidence: >-
+      goose 1.39.0 binary strings: "The extension '<name>' has been disabled successfully", "' has been installed
+      successfully", ManageExtensionAction / ManageExtensionsParams (action + name). The tool NAME is read from the
+      binary, not handshaken: a platform extension is not exposed by `goose mcp` (only memory, computercontroller and
+      autovisualiser are), so tools/list cannot be taken for it - stated, not assumed (C16).
+    may_toggle: on_demand
+    never_toggle: [always, never, quarantine]
+    judged_by: model
+    not_a_rail: true
+    why: >-
+      The mid-session off-switch is real, so "switch it off when the task is done" is not a fantasy - but the thing
+      that decides is the MODEL, and a model that can remove its own tools mid-task can strand the task it is in the
+      middle of. That is a judgement, not a control: it may never be the ONLY path, and it may never reach an `always`
+      member (that is a session's spine) or a `never`/quarantined one (there is nothing to switch). Birth-time is the
+      rail; runtime is the convenience.
+  never_mid_session:
+    - 'a config edit: `enabled:` is read at birth. Editing it inside a running session changes NOTHING today and is
+       indistinguishable from not editing it (AGENTS.md harness fact, measured from sessions.db extension_data).'
+
+# WHAT A SUBAGENT IS BORN WITH (the delegate() call takes an `extensions` list; omit = inherit everything).
+# A subagent is a SESSION, not a function call: it pays its own schema tax and its own tool-choice entropy. The
+# saving is not the parent's window - it is the subagent's, plus every wrong-tool choice it no longer has to make.
+delegate_profiles:
+  rule: >-
+    Give a delegate the SMALLEST set that closes its task, and never `summon`/`todo`/`memory` (a delegate does not
+    delegate, does not plan the OS, and must not write the shared memory). Every name is checked against the harness
+    declaration before it is printed - a profile that names an extension the harness does not declare is refused.
+  review:
+    extensions: [developer, analyze, skills]
+    why: >-
+      read the artefact and judge it: shell to read, the structure reader for a call graph, and `skills` because a
+      delegate whose OUTPUT IS JUDGED must be able to load the house rules - without it the reviewer judges C12/C17
+      blind and approves exactly the hardcoding it exists to catch.
+  sweep:
+    extensions: [developer, analyze, filesystem]
+    why: 'read-only repository sweep over many files: the file reader is the only addition a sweep needs.'
+  extract:
+    extensions: [developer, summarize]
+    why: 'summarise WITH source text in hand (never open-ended: BUG-053). The summariser is the harness compaction path.'
+  refused:
+    research: >-
+      Open-ended research is REFUSED as a delegation class (D-2549, BUG-053): no local model is measured on open-web
+      synthesis, and Phi-4-mini answered from memory when a loop asked it to fetch. Research runs on curl/fetch in the
+      parent, where the bytes are visible.
+    write: >-
+      No delegate profile is granted `write` as its PURPOSE. A delegate that must write is doing work that belongs to
+      the parent's plan (D-2860), with the parent's may_touch.
+  known_gap: >-
+    This harness offers NO read-only surface: `developer` (shell/edit/write) and `filesystem` (14 tools incl. writes)
+    are each atomic, so a reviewer's read-only constraint is DECLARED, not enforced. Recorded rather than pretended.
+
+# AN ARRIVAL IS NOT A DECISION - the adoption rule. An extension installed from the internet (or shipped by a harness
+# upgrade) has no classification. The rail already fails closed on that (`--check` rc 1, an unowned decision, C16).
+# `--adopt` makes the REGISTRATION automatic while leaving the DECISION where it belongs:
+adoption:
+  mechanism: 'python3 scripts/goose_profile.py --adopt'
+  lands_in: quarantine
+  grant: never_resident
+  stamp: [adopted, seen]
+  why: >-
+    Registering an unknown name must be cheap enough that it never gets skipped; granting it residency must not be
+    possible without a reason. So adoption is automatic and the grant is `never`: a quarantined extension is REFUSED
+    by every profile until someone moves it to `always` / `on_demand` / `never` with a `why`. The rail reports the
+    quarantine as OWNER-OWED (rc 2 - loud, not fatal, BUG-457), so an unclassified tenant is visible on every health
+    run instead of being discovered by a slow session.
+
+# ADOPTED AUTOMATICALLY, AWAITING A DECISION. A name here is REFUSED by every profile: quarantine is not a class of
+# residency, it is the ABSENCE of one. Populated only by `--adopt`; drained only by a human moving the name up.
+quarantine:
+  # (empty) - every declared extension currently carries a decision.

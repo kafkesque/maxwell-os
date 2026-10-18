@@ -58,6 +58,14 @@ may_touch:
 - governance/SOURCE_RENAME_PLAN_*.json
 - governance/SOURCE_RENAME_PLAN_*.md
 - governance/ADMISSION_ACCEPTED_20261017.yaml
+#: D-3068/D-3072 — THE ADMISSION PLAN AND ITS SIGNED ACCEPTANCE ARE DATED GENERATED FAMILIES, granted as one (the
+#: SOURCE_RENAME_PLAN_* shape). `just admit-plan` writes ADMISSION_PLAN_<date>.{json,md} and `just admit-sign` writes
+#: ADMISSION_ACCEPTED_<date>.yaml on every re-derivation, so a per-file grant turns each re-derivation into a NEW red
+#: line on the worktree rail (BUG-563, measured 2026-10-18 on ADMISSION_PLAN_20261018.{json,md}). Nothing outside these
+#: prefixes becomes committable.
+- governance/ADMISSION_PLAN_*.json
+- governance/ADMISSION_PLAN_*.md
+- governance/ADMISSION_ACCEPTED_*.yaml
 - temp/d3048_record.yaml
 - agent/adapters/CONTRACT.md
 - scripts/check_agent_surface.py
@@ -404,6 +412,20 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-18'
+  actor: assistant
+  owner_ack: 'owner 2026-10-18 ("I approve ... resign + apply 484 book" + "first look in general maxwell os current state ... update and synch gov dependencies")'
+  addendum: 'BUG-563 CLEAR — ADMISSION_PLAN_<date>.{json,md} and ADMISSION_ACCEPTED_<date>.yaml are DATED GENERATED FAMILIES (the SOURCE_RENAME_PLAN_* shape, D-3068/D-3072). The 20261018 plan was written by `just admit-plan` and had NO home, so rail 0 refused the tree. Widened to a prefix-family so every future re-derivation and re-sign is committable without a new red line. Nothing outside these prefixes becomes committable.'
+  additions:
+  - pattern: governance/ADMISSION_PLAN_*.json
+    why: D-3068 admission plan JSON — dated, re-derived every `just admit-plan`.
+  - pattern: governance/ADMISSION_PLAN_*.md
+    why: D-3068 admission plan human face — dated, re-derived with the JSON.
+  - pattern: governance/ADMISSION_ACCEPTED_*.yaml
+    why: D-3072 signed acceptance — dated, written every `just admit-sign`.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the three dated generated families rail 0 refused (measured 2026-10-18: ADMISSION_PLAN_20261018.json and .md had NO declared home). No pipeline/** path, no pinned artifact, and no will_not_touch family is involved.'
 - date: '2026-10-14'
   actor: assistant
   owner_ack: 'standing owner mandate (verbatim): go forward on the most consequential leverage; for any manual task give the senior recommendation (verify, never assume) AND the infrastructure and the file; senior RAG/ontological lens; forensic audit before any serious implementation; delegate to the right local LLMs and check none drifted; list the next critical step; gov dependencies synch and update. Plus the FUTURE TASK named in this turn: "How can we optimize agent harness context window for local llm so they dont run out fast - OPTIMIZE PREFILL FOR LOCAL LLMS CONTEXT WINDOW AND FIX CACHE."'

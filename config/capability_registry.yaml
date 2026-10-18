@@ -450,6 +450,7 @@ unrouted:
   BUG-917: bug_is_a_finding   # a metered counter over its ceiling is a finding about the world, not a file
   BUG-919: bug_is_a_finding   # an artefact's WHITESPACE DENSITY is a finding about pandoc's epub reader, not a file's route
   BUG-920: bug_is_a_finding   # a missing RECEIPT is a finding about when the checkpoint is written, not a file's route
+  BUG-921: bug_is_a_finding   # filename punctuation drift is a finding about the missing per-work identity, not a file's route
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 685,
-  "open_n": 250,
+  "total_ids": 686,
+  "open_n": 251,
   "closed_n": 435,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1250,12 +1250,17 @@
     },
     {
       "id": "BUG-919",
-      "title": "(MEDIUM, OPEN 2026-10-18) \u2014 A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED",
+      "title": "(MED, OPEN 2026-10-18) \u2014 A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED",
       "events": 1
     },
     {
       "id": "BUG-920",
       "title": "(HIGH, OPEN 2026-10-18) \u2014 AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END",
+      "events": 1
+    },
+    {
+      "id": "BUG-921",
+      "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
       "events": 1
     }
   ],

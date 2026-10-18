@@ -321,6 +321,10 @@ stage0:
     probe_pages: 2        # leading pages the probe reads (a cover is often a full-page image)
     min_chars: 100        # stripped selectable chars at/above this => born-digital TEXT; below => SCAN/image-heavy
     scan_policy: skip     # skip | ocr  (skip: image-heavy is a declared skip; ocr: opt-in for a rare valuable scan)
+    #: BUG-896/D-3038 REGISTERED the pandoc-for-pdf fallback as an accepted negative (pandoc has NO pdf reader, so it
+    #: was a guaranteed second failure). pdftotext IS a reader, so THIS is a real fallback and not that failure:
+    #: a born-digital PDF that Docling under-produces (< 100-byte floor) is re-read from its text layer, not lost.
+    pdf_text_fallback: true   # true | false  (born-digital pdf Docling under-produced → extract the text layer via pdftotext)
   #: BUG-918/D-3086 — THE ARTEFACT'S SHAPE IS DECLARED, AND IT IS NOT THE ENGINE'S DEFAULT.
   #: MEASURED 2026-10-18 on ONE library work (Souls Of Distortion Awakening.pdf, 4.06 MB), same file, same machine,
   #: two argv forms. With docling's shipped default `--image-export-mode embedded` the artefact was 19.371 MB and

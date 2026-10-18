@@ -293,6 +293,7 @@ S0_TEXT_LAYER=_CFG.get("stage0", {}).get("text_layer") or {}
 S0_TEXT_PROBE_PAGES=int(S0_TEXT_LAYER.get("probe_pages", 2))
 S0_TEXT_MIN_CHARS=int(S0_TEXT_LAYER.get("min_chars", 100))
 S0_TEXT_SCAN_POLICY=str(S0_TEXT_LAYER.get("scan_policy", "skip"))
+S0_PDF_TEXT_FALLBACK=str(S0_TEXT_LAYER.get("pdf_text_fallback", "false")).strip().lower() in ("1", "true", "yes", "on")
 
 #: BUG-898: the failure vocabulary, declared (not invented in the converter). The meaning is what the owner reads.
 S0_FAILURE_CLASSES={str(k): str(v) for k, v in (_CFG.get("stage0", {}).get("failure_classes") or {}).items()}

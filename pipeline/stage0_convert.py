@@ -52,6 +52,7 @@ from pipeline.pipeline_paths import (
     S0_TEXT_MIN_CHARS,
     S0_TEXT_PROBE_PAGES,
     S0_TEXT_SCAN_POLICY,
+    S0_PDF_TEXT_FALLBACK,
     S0_FAILURE_CLASSES,
     S0_MAX_FAILED_RATIO,
     S0_PANDOC_TIMEOUT_S,
@@ -136,6 +137,36 @@ def probe_text_layer(pdf_path: Path) -> int | None:
     if done.returncode != 0:
         return None
     return len("".join(done.stdout.split()))
+
+
+def convert_pdf_text_layer(pdf_path: Path, output_path: Path) -> dict[str, Any]:
+    """Extract a born-digital PDF's TEXT LAYER directly via `pdftotext` (poppler) — the fallback for the case where
+    Docling under-produces (< MIN_OUTPUT_BYTES) but the probe already certified a real text layer.
+
+    WHY THIS IS A REAL FALLBACK AND NOT THE REMOVED ONE. The pandoc-for-pdf fallback was deleted as an accepted
+    negative (BUG-896/D-3038) because pandoc has NO PDF reader, so it could only ever be a guaranteed second
+    failure wearing the first's name. `pdftotext` IS a reader, so this fallback can only fire on a PDF the probe
+    already read — and it is gated by `stage0.text_layer.pdf_text_fallback` (C12) and by the born-digital test the
+    probe already ran, so a scan is never silently flattened to a text layer it does not have (C16).
+    """
+    pdftotext = shutil.which("pdftotext")
+    if pdftotext is None:
+        return _failure("converter_absent", "pdftotext (poppler) is not installed — the text-layer fallback cannot run")
+    try:
+        done = subprocess.run(
+            [pdftotext, "-enc", "UTF-8", str(pdf_path), "-"],
+            capture_output=True, text=True, timeout=S0_PANDOC_TIMEOUT_S,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return _failure("budget_expired", f"pdftotext did not finish inside {S0_PANDOC_TIMEOUT_S}s for {pdf_path.name}")
+    if done.returncode != 0:
+        return _failure("container_unreadable", f"pdftotext rc={done.returncode}: {(done.stderr or '').strip()[:800]}")
+    text = done.stdout or ""
+    if len(text.encode("utf-8")) <= MIN_OUTPUT_BYTES:
+        return _failure("no_output", f"pdftotext read {len(text.encode('utf-8'))} bytes of text for {pdf_path.name} "
+                                     f"(below the {MIN_OUTPUT_BYTES}-byte floor) — the text layer the probe saw did not survive extraction")
+    safe_write(output_path, text, force_shrink=True)
+    return _ok()
 
 
 def docling_budget_s(pdf_path: Path) -> int:
@@ -407,19 +438,28 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
             f"Docling rc={result.returncode}: {(result.stderr or result.stdout).strip()[:800]}",
         )
     docling_output = output_path.parent / f"{pdf_path.stem}.md"
+    underproduced = False
     if not docling_output.exists():
-        return _failure(
-            "no_output",
-            f"Docling rc=0 and wrote no markdown for {pdf_path.name} — the RECEIPT is defective, not the book",
-        )
-    if docling_output != output_path:
-        docling_output.rename(output_path)
-    if output_path.stat().st_size <= MIN_OUTPUT_BYTES:
-        return _failure(
-            "no_output",
-            f"Docling rc=0 and wrote {output_path.stat().st_size} bytes of markdown for {pdf_path.name} "
-            f"(below the {MIN_OUTPUT_BYTES}-byte floor)",
-        )
+        underproduced = True
+        detail = f"Docling rc=0 and wrote no markdown for {pdf_path.name} — the RECEIPT is defective, not the book"
+    else:
+        if docling_output != output_path:
+            docling_output.rename(output_path)
+        if output_path.stat().st_size <= MIN_OUTPUT_BYTES:
+            underproduced = True
+            detail = (f"Docling rc=0 and wrote {output_path.stat().st_size} bytes of markdown for {pdf_path.name} "
+                      f"(below the {MIN_OUTPUT_BYTES}-byte floor)")
+    if underproduced:
+        #: THE TEXT-LAYER FALLBACK (stage0.text_layer.pdf_text_fallback). Gated on a born-digital probe so a scan
+        #: is never flattened to a text layer it does not have, and on the toggle so the behaviour is a DECLARED
+        #: policy, not a silent default (C12).
+        if S0_PDF_TEXT_FALLBACK and chars is not None and chars >= S0_TEXT_MIN_CHARS:
+            fallback = convert_pdf_text_layer(pdf_path, output_path)
+            if fallback.get("ok"):
+                return fallback
+            return _failure("no_output", f"{detail} AND the pdftotext text-layer fallback also failed: "
+                                         f"{fallback.get('detail', '')[:600]}")
+        return _failure("no_output", detail)
     return _ok()
 
 

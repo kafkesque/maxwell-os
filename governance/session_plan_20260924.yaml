@@ -66,6 +66,7 @@ may_touch:
 - governance/ADMISSION_PLAN_*.json
 - governance/ADMISSION_PLAN_*.md
 - governance/ADMISSION_ACCEPTED_*.yaml
+- governance/ADMISSION_PLAN_*.keep.rows
 - temp/d3048_record.yaml
 - agent/adapters/CONTRACT.md
 - scripts/check_agent_surface.py
@@ -423,6 +424,8 @@ widening_log:
     why: D-3068 admission plan human face — dated, re-derived with the JSON.
   - pattern: governance/ADMISSION_ACCEPTED_*.yaml
     why: D-3072 signed acceptance — dated, written every `just admit-sign`.
+  - pattern: governance/ADMISSION_PLAN_*.keep.rows
+    why: D-3072 folded keep-manifest — the deduped `rel` list the owner signs via `--mode listed --rows`; dated, re-derived with the fold.
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'The widened set is EXACTLY the three dated generated families rail 0 refused (measured 2026-10-18: ADMISSION_PLAN_20261018.json and .md had NO declared home). No pipeline/** path, no pinned artifact, and no will_not_touch family is involved.'

@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0",
+  "generated": "2026-10-18",
+  "plan": "governance/ADMISSION_PLAN_20261018.json",
+  "keep_count": 446,
+  "fold_count": 38,
+  "folds": [
+    {
+      "fold": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.pdf",
+      "keep": "journals_notes/DOMAIN 6 AI + Computing/electronics/IJRITCC_1349.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.pdf",
+      "keep": "journals_notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf",
+      "keep": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf",
+      "keep": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf",
+      "keep": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf",
+      "keep": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 1.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/FAB_Features_Advantages_Benefits.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/FAB_Features_Advantages_Benefits.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Inhouse_Skills_Matrix.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Inhouse_Skills_Matrix.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Mission_Vision_Statements.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Mission_Vision_Statements.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Your_ROI_Matrix.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Your_ROI_Matrix.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020(1).pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf",
+      "keep": "journals_notes/DOMAIN 6 AI + Computing/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf",
+      "reason": "byte-identical sha256"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/IdentityLectureNotes.pdf",
+      "keep": "journals_notes/DOMAIN 2 Design/IdentityLectureNotes.docx",
+      "reason": "format-variant: keep native docx over rendered pdf"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/SCORE-Deluxe-Startup-Business-Plan-Template_2.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx",
+      "reason": "format-variant: keep native docx over rendered pdf"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx",
+      "reason": "format-variant: keep rich 606KB docx over thin 15KB md"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.docx",
+      "keep": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.md",
+      "reason": "format-variant: keep native md over docx"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Sample Lean Business Plan - Wooden Grain Toy Company(1).pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
+      "reason": "format-variant: keep native doc over rendered pdf"
+    },
+    {
+      "fold": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word - Sample Business Plan - Wooden Grain Toy Company.pdf",
+      "keep": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word - Sample Business Plan - Wooden Grain Toy Company.doc.pdf",
+      "reason": "format-variant: keep richer 107KB render over 61KB"
+    }
+  ]
+}

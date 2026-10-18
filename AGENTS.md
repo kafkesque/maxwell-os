@@ -217,3 +217,13 @@ that protection is worth more than a tidy file — a silent rewrite of a loader 
 A reader must therefore treat THIS block as the operative text and the `DELEGATION STATUS` block above as history
 dated 2026-07-26. If the owner wants the stale line gone from the top of the file, that is an owner edit to a
 protected file; the correction itself is already made here.
+
+<!-- ════════════════════════════════════════════════════════════════════════════════════════════
+     WORKING RULE ADDED 2026-10-18 (D-3100): A MANUAL TASK IS HANDED OVER NOOB-PROOF.
+     Appended (AGENTS.md is append_only per D824) — same mechanism as the DELEGATE-002 block above.
+     ════════════════════════════════════════════════════════════════════════════════════════════ -->
+
+- A MANUAL TASK IS HANDED OVER NOOB-PROOF (D-3100). Any step the OWNER must perform is written as a numbered,
+  copy-paste-able procedure: the exact command, the exact file, the expected output, and the "if it differs, do this"
+  branch. A manual step named only in prose is a step the owner cannot run (BUG-588's shape applied to an instruction).
+  This rule is the user-facing face of "manual tasks → clear step-by-step instructions"; it changes no pipeline behaviour.

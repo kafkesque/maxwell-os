@@ -18447,3 +18447,22 @@ via `derived_fields`, so skipping the re-cut there loses nothing. MEASURED after
 `session_status_2026_10_06.summary` byte-identical while `session.status` still advances 1223 → 1227; the 4 faces re-derive
 equal. The historical count is restored to the HEAD value (1223); its true 2026-10-06 value was already corrupted before
 this session (earliest trace 1208), so a full re-archaeology is an OWNER call, not a fix.
+
+
+## BUG-938 (HIGH, CLOSED 2026-10-18) — duplicate_of_admitted WAS NEVER WIRED INTO decided_acts, SO A TRANCHE RE-ATTEMPTED THE SAME RESOLVED ROWS FOREVER
+
+**What was measured.** The owner's two `just admit-apply --limit 10` tranches (receipts
+`ADMISSION_APPLIED_20261018T192603Z.jsonl` and `…T193511Z.jsonl`) carried the SAME 10 `plan_row`s — the second run
+re-attempted the identical 9 `duplicate_of_admitted` rows (the Michael Janda course files, whose bytes a prior receipt
+already admitted under `… 1.md` names) instead of advancing to the 9 un-attempted rows. Cause: `decided_acts` (BUG-924)
+treated only `skipped` and `deferred` as DECIDED; `duplicate_of_admitted` was added LATER by D-3092 (same_bytes, "bytes
+beat name") and was never propagated into the convergence logic, so every `--limit N` re-walked the same prefix and the
+batch could never reach rc 0 — a state added to the vocabulary but not to the engine that consumes it (the D-3034 shape:
+a declaration with no referent downstream).
+
+**Fix.** `decided_acts` now treats `duplicate_of_admitted` as DECIDED while its twin still holds — i.e. while the record
+carries no `twin_without_bytes` — mirroring the existing "a deferral is decided only while its collision is still there"
+rule (D-3095). The one reopening is the twin vanishing (BUG-920: a receipt names a twin output that is NOT on disk), in
+which case the act is attempted again rather than written off. Two controls added (decided-while-twin-holds; reopened-when-
+twin-gone). MEASURED after: `--selftest` 81/81; `--dry-run` converges `19 outstanding -> 3 outstanding` (1 already_applied
++ 2 genuinely unadmitted: `Proposal.docx`, `pre-hire.pdf`).

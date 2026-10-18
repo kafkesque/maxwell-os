@@ -791,6 +791,12 @@ def decided_acts(decl: dict[str, Any], held: dict[str, list[str]] | None = None
     forever, the record would silently refuse to re-attempt a row that is now plainly admittable, and the owner
     would see rc 0 with a work still outside the corpus (BUG-920's shape: a claim honoured after its grounds are
     gone). So `held` — the live name index — decides it, and a reopened act is simply attempted.
+
+    A DUPLICATE-OF-ADMITTED IS DECIDED WHILE ITS TWIN STILL HOLDS (D-3092). The act — put this library file's work
+    into the corpus — is FULFILLED once a receipt proves the exact bytes already live there under another path:
+    nothing is owed and nothing can change without the act changing. The ONE reopening is the twin vanishing: a
+    receipt that names a twin output which is NOT on disk carries `twin_without_bytes` (BUG-920), and that act is
+    attempted again rather than written off.
     """
     decided: dict[tuple[str, str], dict[str, Any]] = {}
     for record in read_receipts(decl):
@@ -798,6 +804,8 @@ def decided_acts(decl: dict[str, Any], held: dict[str, list[str]] | None = None
         if state == "skipped":
             decided[(str(record.get("plan_row") or ""), str(record.get("md_target") or ""))] = record
         elif state == "deferred" and (held is None or str(record.get("key") or "") in held):
+            decided[(str(record.get("plan_row") or ""), str(record.get("md_target") or ""))] = record
+        elif state == "duplicate_of_admitted" and not record.get("twin_without_bytes"):
             decided[(str(record.get("plan_row") or ""), str(record.get("md_target") or ""))] = record
     return decided
 
@@ -1815,6 +1823,17 @@ def selftest() -> int:
                len(split_decided([held_row], decided_acts(decl, {"a held name": collision}))[0]) == 0
                and len(split_decided([held_row], decided_acts(decl, {}))[0]) == 1)
         dec_file.unlink()
+        dup_file = receipts_dir / "ADMISSION_APPLIED_DUP.jsonl"
+        dup_file.write_text(json.dumps({"state": "duplicate_of_admitted", "plan_row": held_row["rel"],
+                                        "md_target": held_row["target"]}) + "\n", encoding="utf-8")
+        expect("a_DUPLICATE_OF_ADMITTED_is_DECIDED_while_its_TWIN_holds_and_REOPENED_when_the_TWIN_is_GONE",
+               len(split_decided([held_row], decided_acts(decl, {}))[0]) == 0)
+        dup_file.write_text(json.dumps({"state": "duplicate_of_admitted", "plan_row": held_row["rel"],
+                                        "md_target": held_row["target"],
+                                        "twin_without_bytes": "/missing/twin.md"}) + "\n", encoding="utf-8")
+        expect("a_DUPLICATE_OF_ADMITTED_whose_TWIN_is_GONE_is_REOPENED",
+               len(split_decided([held_row], decided_acts(decl, {}))[0]) == 1)
+        dup_file.unlink()
         expect("the_name_held_rule_is_DECLARED_and_a_rule_whose_INDEX_no_reader_builds_is_REFUSED",
                name_held_policy(decl)["state"] == "deferred"
                and _refuses(lambda: name_held_policy({k: v for k, v in decl.items() if k != "name_held"}))

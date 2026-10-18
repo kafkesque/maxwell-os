@@ -295,6 +295,63 @@ if not S0_FAILURE_CLASSES:
     )
 
 
+def _s0_artifact_rule() -> dict:
+    """Read `config#stage0.artifact` — the DECLARED shape of an S0 artefact (BUG-918/D-3086).
+
+    WHY THE SHAPE IS NOT THE ENGINE'S DEFAULT. Docling ships `--image-export-mode embedded`, so every PDF's
+    figures are base64-inlined into the markdown. MEASURED 2026-10-18 on one 4.06 MB library work: 19.371 MB of
+    markdown carrying 95 `data:image` blobs, versus 0.538 MB carrying none in `placeholder` mode with the same
+    text. A default that multiplies an artefact by 36 is not a shape anyone chose, so it is declared here and
+    refused at import when the declaration does not RESOLVE (D-3034): an unknown mode, a non-integer ceiling or
+    a ceiling that permits nothing is a declaration with no referent.
+    """
+    block = _CFG.get("stage0", {}).get("artifact")
+    if not isinstance(block, dict) or not block:
+        raise RuntimeError(
+            "FATAL: config/pipeline_config.yaml#stage0.artifact is not declared — the shape of an S0 artefact is a "
+            "DECLARED fact, never the converter's default (C12, BUG-918)"
+        )
+    allowed_modes = {"placeholder", "embedded", "referenced"}
+    mode = str(block.get("image_export_mode", "")).strip().lower()
+    if mode not in allowed_modes:
+        raise RuntimeError(
+            f"FATAL: stage0.artifact.image_export_mode={block.get('image_export_mode')!r} is not one of "
+            f"{sorted(allowed_modes)} (docling's own closed vocabulary; C12)"
+        )
+    out = {"image_export_mode": mode}
+    for key, minimum in (("max_embedded_images", 0), ("max_artifact_mb", 1)):
+        if key not in block:
+            raise RuntimeError(
+                f"FATAL: stage0.artifact.{key} is not declared — an absent ceiling is refused, never defaulted "
+                f"(C12, BUG-918)"
+            )
+        try:
+            value = int(block[key])
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError(f"FATAL: stage0.artifact.{key}={block[key]!r} is not an integer (C12)") from exc
+        if value < minimum:
+            raise RuntimeError(
+                f"FATAL: stage0.artifact.{key}={value} is below {minimum} — a ceiling that permits nothing is a "
+                f"declaration with no referent (D-3034)"
+            )
+        out[key] = value
+    return out
+
+
+S0_ARTIFACT = _s0_artifact_rule()
+S0_ARTIFACT_IMAGE_MODE: str = S0_ARTIFACT["image_export_mode"]
+S0_ARTIFACT_MAX_EMBEDDED_IMAGES: int = S0_ARTIFACT["max_embedded_images"]
+S0_ARTIFACT_MAX_MB: int = S0_ARTIFACT["max_artifact_mb"]
+#: D-3034: the two classes the shape gate emits must EXIST in the declared vocabulary. A code path that can emit a
+#: class name the register does not carry is the tail again — the reader gets a word nobody defined.
+for _required_class in ("artifact_images_embedded", "artifact_oversize"):
+    if _required_class not in S0_FAILURE_CLASSES:
+        raise RuntimeError(
+            f"FATAL: stage0.failure_classes is missing {_required_class!r} — the shape gate emits it, so the "
+            f"vocabulary must carry it (C12/D-3034, BUG-918)"
+        )
+
+
 #: D-3077 — WHICH CONTAINERS THIS STAGE CAN OPEN, DECLARED, ONE LINE PER CONTAINER naming the reader that opens it.
 #: The CODE owns which readers EXIST (pipeline/stage0_convert.py::_READERS, where each one is a function); the CONFIG
 #: owns which container is read by which of them. Neither may name a reader the other has never heard of, and BOTH

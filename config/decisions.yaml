@@ -28098,3 +28098,117 @@ decisions:
     why `door: fatal` was kept rather than softened. And it does not touch the applier, `pipeline/stage0_convert.py`
     or any running process (BUG-614).
   supersedes: []
+- id: D-3086
+  state: ACTIVE
+  date: '2026-10-18'
+  by: assistant
+  category: "THE S0 ARTEFACT'S SHAPE IS DECLARED, VERIFIED BEFORE THE CORPUS AND NOT THE ENGINE'S DEFAULT (BUG-918) — AND THE DEFAULT WAS 97% PICTURE"
+  refines: [D-3034, D-3076, D-3077]
+  bugs: [BUG-918, BUG-919, BUG-920]
+  decision: >-
+    Docling ships `--image-export-mode embedded`, so the converter base64-inlines every figure into the markdown. In
+    one night that default wrote 100 artefacts totalling 2,599.7 MB into a DERIVED tree, of which 16 held 2,311.3 MB
+    (89%) and the largest was 895.2 MB for ONE book. Nothing between the engine and the corpus held an opinion about
+    the shape, so the only reader of those bytes was the disk. The shape is now DECLARED
+    (`config/pipeline_config.yaml#stage0.artifact`), REFUSED at import when the declaration does not resolve, and
+    VERIFIED after every conversion by `verify_artifact` BEFORE the corpus sees the bytes: the reader writes into a
+    scratch tree beside the checkpoint, the artefact is measured there, and only a conforming one is written into
+    place atomically (C6). An artefact that fails is named `artifact_oversize` or `artifact_images_embedded` — the
+    work is WHOLE and the remedy is the declared mode, never a new copy.
+    MEASURED, two-sided, on ONE real library work (Souls Of Distortion Awakening.pdf, 4.06 MB): `embedded` -> 19.371
+    MB / 95 `data:image` blobs; `placeholder` -> 0.538 MB / 0 blobs and the SAME TEXT (519,083 vs 518,893 normalised
+    chars; every difference the image marker itself plus one figure reflow). 36x smaller, no text lost.
+    The 8 MB ceiling is NOT arbitrary: across the 940 pre-existing corpus artefacts the largest text-dense one is
+    7.81 MB, and the only artefact above it (Godel, Escher, Bach at 20.62 MB) is 64% WHITESPACE — a different defect,
+    filed separately as BUG-919 rather than allowed to justify a looser wall. A ceiling that refused a legitimate
+    long work would be D-3076's mistake in a new costume.
+  files:
+    config: 'config/pipeline_config.yaml#stage0.artifact {image_export_mode, max_embedded_images, max_artifact_mb} + 2 failure_classes'
+    paths: 'pipeline/pipeline_paths.py — _s0_artifact_rule() fail-closed; S0_ARTIFACT_*; both classes must EXIST (D-3034)'
+    engine: 'pipeline/stage0_convert.py — convert_pdf argv `docling convert ... --image-export-mode`; verify_artifact(); scratch tree + safe_write(shrink_guard=False)'
+    disposal: 'scripts/dispose_s0_artifacts.py — receipted disposition with 6 closed verdicts'
+  receipts:
+    controls: '3/3 two-sided — a REAL 19.4 MB embedded artefact -> artifact_oversize; a small all-picture artefact -> artifact_images_embedded; the SAME work in placeholder -> OK'
+    e2e: 'MAXWELL_RUN_ID=selftest_bug918 against a scratch books dir: 525 KB in 60.6 s, 0 blobs, 271 headings, 1814 paragraphs'
+    corpus_before: '1,040 md / 3,114.9 MB / 5,786 blobs ; 59 tonight artefacts carried base64 ; 0 pre-existing md above 30 MB'
+    corpus_after: '982 md / 560.9 MB / 69 blobs ; largest 20.6 MB ; RED LOOP "15 md tonight; 0 above 30 MB; 0 MB of 3 MB"'
+    quarantined: '58 artefacts / 2,554.0 MB -> ~/.maxwell_quarantine/s0_artifacts/ (local, outside Dropbox, reversible)'
+    claim_store: 'fbs unchanged since 2026-10-13 20:36 ; 0 `data:image` in definition/source_text/evidence/evidence_passages/citation/keywords ; max length(definition)=417'
+  notes: >-
+    WHAT THIS DOES NOT CLAIM. It does not delete the quarantined bytes — they rest in a LOCAL pen with a one-command
+    purge, because a backup of proven-defective derived bytes inside the same Dropbox account is not a backup
+    (D-3034). It does not touch the 7 native-origin artefacts that carry 1–4 blobs and are the PROVENANCE of
+    committed claims (`keep_native` / `keep_referenced`), and it does not touch anything older than the act's 12-hour
+    window: a name-matching guard had ALREADY failed to protect `Godel, Escher, Bach` (116 claims, exact name
+    mismatch), so the boundary is TIME, which needs no name to resolve. It does not raise `docling_ceiling_s`.
+  supersedes: []
+
+- id: D-3087
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  category: 'THE CORPUS IS MD-ONLY, THE MD HOME IS ONE DECLARED TREE, AND THE MIRROR HAS ONE DECLARED DIRECTION'
+  refines: [D-3048, D-3050]
+  bugs: []
+  decision: >-
+    OWNER RULING (2026-10-18, verbatim in substance): "I don't want any other format (pdf, mobi, epub) in the
+    knowledge pipeline folder — only md files can be there", and the corpus "should mirror and be synched with
+    `education/books/md`", and any conversion of a journal/note "should go to this md folder into the right
+    subfolder". So: (1) `knowledge pipeline/books` admits `.md` and nothing else — every container currently inside
+    it (111 files / 1.56 GB) must LEAVE for the library, not be deleted; (2) there is ONE md home,
+    `education/books/md/DOMAIN/topic/`, and the corpus is its MIRROR; (3) journal/notes conversions land in the same
+    md home, i.e. the md tree is the union of both roots' derived text, and a reader never has to know which root a
+    work came from. This SUPERSEDES the arrangement `library_is_a_view` / "there is no sync and there never was"
+    (D-3048) as a DESCRIPTION of intent: the owner wants a mirror, so a mirror is declared — but with ONE direction,
+    because a two-way sync between two trees under one Dropbox account has no tie-break and drifts by construction.
+    The direction is `education/books/md -> knowledge pipeline/books`: the library tree is the ORIGIN of the md, the
+    corpus is the DERIVED copy, and a file changed in the corpus is a DRIFT READING, not a change to sync back.
+  files:
+    origin: '~/Library/CloudStorage/Dropbox/education/books/md — 860 md across 8 DOMAINs'
+    mirror: 'knowledge pipeline/books — 982 md, md-only'
+    gate: 'config/ingest_identity_gate.yaml#source_library.roots (books kinds still declare 6 containers: they are the LIBRARY''s kinds, not the corpus''s)'
+  receipts:
+    measured_2026-10-17: '852 library stems vs 1,035 corpus stems; 830 shared; 103 byte-identical; 727 differ with the corpus newer in 727/727 and the library newer in 0'
+    containers_in_corpus: '111 non-md files / 1.56 GB sitting inside the DERIVED tree'
+  notes: >-
+    WHAT THIS OWES. A `mirror_md.py` with `--check` (exit 2 on drift), a manifest, and `.DS_Store` exclusion; the
+    eviction of the 111 containers to the library structure (a MOVE with a receipt, never a delete — several have no
+    counterpart in the library and are the only copy); and the owner's word on the 22 md that exist ONLY in the
+    library (kept) versus the 830 that are superseded (T-179). NOT while the applier runs (BUG-614's class).
+  supersedes: [D-3048]
+
+- id: D-3088
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  category: 'THE LIBRARY''S PHYSICAL AXIS IS DOMAIN/topic WITH FORMATS TOGETHER (B); ONE FOLDER PER WORK IS REFUSED; THE SUB-DOMAIN LIVES IN THE LEDGER, NOT IN THE PATH'
+  refines: [D-3045, D-3050]
+  bugs: []
+  decision: >-
+    Of the three shapes put to the owner — (A) `DOMAIN/topic/WorkName/{container, work.md, work.json}`, (B)
+    `DOMAIN/topic/` with every format side by side, (C) today's format-first forests — the owner took the LEDGER half
+    of (A) ("the ideal librarian structure") and the PHYSICAL half of (B). So: the physical layout is
+    `DOMAIN/topic/` and a format is never a folder on the way to a work; the ledger that (A) put inside each work
+    folder (work_id, title, authors, year, ISBN, container sha256, md sha256, LCC/DDC/Thema/FAST, our domain+topic,
+    S0..S6 state) is kept as ONE central ledger instead, and the per-topic `_INDEX.md`/`_manifest.csv` are GENERATED
+    views of it ("a generated index costs one file and cannot drift; a copy costs two files and drifts by
+    construction"). A SUB-DOMAIN is NOT a third path level: a work routinely belongs to two or three sub-domains and
+    a path can hold exactly one, so the sub-domain is a MULTI-VALUED column in the ledger and a view, never a
+    directory. That is the ontological argument for B, and it is also why (A) was refused: one work = one folder is
+    the same claim as "one work = one path", which is true for identity and false for subject.
+  files:
+    refused: '(A) DOMAIN/topic/WorkName/ — refused as the physical shape (the ledger half is kept, centrally)'
+    refused_2: '(C) {pdf,epub,mobi,md}/DOMAIN/topic/ — today''s shape; 5–6x the folders for no semantic gain, already drifted'
+    today: 'education/books/{pdf,epub,md,mobi}/DOMAIN/topic/ — 1,348 containers over 3 format trees, 860 md in the md tree'
+  receipts:
+    folder_census_2026-10-18: 'corpus 48 DOMAIN|topic pairs over 8 DOMAINs; library books 34 pairs under 4 format roots; journals:notes 25 pairs — three vocabularies for one library'
+    defects: '2 alias pairs (decision+++strategy / llm-applications), 1 topic in two DOMAINs (ai-augmented+work; mental+models+epistemology), 11 corpus topics absent from config/domain_anchors.yaml, 14 loose files at DOMAIN level'
+    coupling: 'S0 reads by rglob (depth-free); S1.5/S2/S4/S5 hold no path knowledge; S4 classifies TEXT, never the folder — the only real couplings are S0.5''s name-keyed metadata cache and the applier''s target rule'
+  notes: >-
+    WHAT THIS OWES. ONE declared vocabulary file covering BOTH roots (`DOMAIN x topic` with an alias table, because
+    the library and the journals tree currently speak three dialects), a `--check` that is FATAL on a folder that
+    does not resolve, and the migration of 1,348 containers from three format roots into `DOMAIN/topic/` as
+    plan -> sign -> apply with copy->verify->delete receipts. The migration is NOT started: it needs the owner's word
+    on the vocabulary, and one ambiguity is explicitly his — `ai-augmented+work` currently sits in DOMAIN 5 (2 files)
+    and DOMAIN 6 (1 file); the recommendation is DOMAIN 6, but an engine may not decide placement by name (D-3045).
+  supersedes: []

@@ -39,6 +39,9 @@ from pipeline.io_guard import load_jsonl, safe_write  # D2332 fail-closed read +
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     CHECKPOINT_DIR,
+    S0_ARTIFACT_IMAGE_MODE,
+    S0_ARTIFACT_MAX_EMBEDDED_IMAGES,
+    S0_ARTIFACT_MAX_MB,
     S0_BUDGET_BASIS,
     S0_CONTAINERS,
     S0_DOCLING_CEILING_S,
@@ -314,7 +317,17 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
     size_mb = pdf_path.stat().st_size / (1024 * 1024)
     try:
         result = subprocess.run(
-            ["docling", str(pdf_path), "--to", "md", "--output", str(output_path.parent)],
+            [
+                "docling", "convert", str(pdf_path),
+                "--to", "md",
+                "--output", str(output_path.parent),
+                #: BUG-918/D-3086: THE SHAPE IS DECLARED, NOT DEFAULTED. docling ships
+                #: `--image-export-mode embedded`, which base64-inlines every figure. MEASURED 2026-10-18 on
+                #: Souls Of Distortion Awakening.pdf: embedded -> 19.371 MB / 95 `data:image` blobs;
+                #: placeholder -> 0.538 MB / 0 blobs, text identical. The subcommand form is used because the
+                #: flag belongs to `docling convert`; both forms were run on the same work that day.
+                "--image-export-mode", S0_ARTIFACT_IMAGE_MODE,
+            ],
             capture_output=True,
             text=True,
             timeout=budget,
@@ -382,6 +395,46 @@ def compute_sha256(file_path: Path) -> str:
         for chunk in iter(lambda: f.read(8192), b""):
             sha.update(chunk)
     return sha.hexdigest()
+
+
+#: BUG-918/D-3086: the byte pattern a data-URI image carries. A NAME, not a threshold — the ceiling is
+#: `stage0.artifact.max_embedded_images` in config. It lives beside the shape gate because it is that gate's vocabulary.
+EMBEDDED_IMAGE_MARKER = "data:image"
+
+
+def verify_artifact(artifact_path: Path) -> dict[str, Any]:
+    """Refuse an S0 artefact whose SHAPE is wrong, BEFORE the corpus ever sees it (BUG-918/D-3086).
+
+    WHY A GATE AND NOT A RECEIPT FIELD. Between 2026-10-17 20:00 and 2026-10-18 00:41 the converter wrote 100
+    artefacts totalling 2,599.7 MB into the DERIVED tree; 16 of them (2,311.3 MB — 89% of the night's bytes) were
+    above 30 MB, and the largest was 895.2 MB for ONE book. Nothing between the engine and the corpus held an
+    opinion about that, so the only reader of those bytes was the disk. The owner's reading — "a 895 MB .md is not a
+    book" — is the specification: a text artefact of a book is 0.3–3 MB, so a 30 MB one is a layout dump wearing a
+    book's name, and it would have been chunked into the claim store as base64.
+
+    TWO MEASUREMENTS, IN THIS ORDER. Size first, so a refused 895 MB artefact is never read into memory; then the
+    count of image markers, because an artefact under the size ceiling can still be all pictures. Returning a
+    `_failure` keeps the diagnosis inside the DECLARED vocabulary, so a receipt names the SHAPE, not the book.
+    """
+    size_bytes = artifact_path.stat().st_size
+    ceiling_bytes = S0_ARTIFACT_MAX_MB * 1024 * 1024
+    if size_bytes > ceiling_bytes:
+        return _failure(
+            "artifact_oversize",
+            f"{artifact_path.name} is {size_bytes / 1e6:.1f} MB, above the declared "
+            f"stage0.artifact.max_artifact_mb={S0_ARTIFACT_MAX_MB} MB — a TEXT conversion of a book does not reach "
+            f"this, so the engine is dumping a layout. The work is WHOLE and was not written into the corpus",
+        )
+    text = artifact_path.read_text(encoding="utf-8", errors="replace")
+    blobs = text.count(EMBEDDED_IMAGE_MARKER)
+    if blobs > S0_ARTIFACT_MAX_EMBEDDED_IMAGES:
+        return _failure(
+            "artifact_images_embedded",
+            f"{artifact_path.name} carries {blobs} inline base64 image(s) against a declared ceiling of "
+            f"{S0_ARTIFACT_MAX_EMBEDDED_IMAGES} — picture bytes that no tokenizer reads. The work is WHOLE; the "
+            f"remedy is stage0.artifact.image_export_mode, never a new copy",
+        )
+    return _ok()
 
 
 def load_existing_checkpoint() -> dict[str, dict]:
@@ -547,6 +600,13 @@ def run_stage0(
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
+    #: BUG-918/D-3086 — THE SCRATCH TREE. A reader writes HERE, never into the corpus: the artefact is verified for
+    #: shape first and only then moved into place atomically (C6). It is derived from the checkpoint's own directory
+    #: so no new path has to be declared, and it is removed in a `finally` on every path — a crash can leave one
+    #: directory behind, which is noise beside a checkpoint, never a wrong artefact inside the corpus.
+    scratch_root = Path(str(STAGE0_CHECKPOINT)).parent
+    scratch_root.mkdir(parents=True, exist_ok=True)
+
     # Find books
     if single_book:
         book_path = books_dir / single_book
@@ -647,7 +707,25 @@ def run_stage0(
                 f"(config/pipeline_config.yaml#stage0.containers)",
             )
         else:
-            outcome = reader(book_path, md_path)
+            #: BUG-918/D-3086 — THE READER NEVER WRITES INTO THE CORPUS. It writes into the scratch tree beside the
+            #: checkpoint, the artefact's SHAPE is verified there, and only a verified artefact is written into place
+            #: atomically (C6, io_guard.safe_write). Before this, docling's `--output` pointed straight at the corpus,
+            #: which is how 16 artefacts totalling 2,311 MB entered a DERIVED tree in one night with nothing standing
+            #: between the engine and the bytes. A gate that runs after the write is a receipt for the damage.
+            scratch_dir = Path(tempfile.mkdtemp(prefix="s0_artifact_", dir=str(scratch_root)))
+            try:
+                staged = scratch_dir / md_path.name
+                outcome = reader(book_path, staged)
+                if outcome["ok"]:
+                    outcome = verify_artifact(staged)
+                    if outcome["ok"]:
+                        #: shrink_guard is OFF on purpose: this artefact is DERIVED (re-derivable from its
+                        #: container) and the DECLARED shape decides its size, so a shrink IS the correction. Guarding
+                        #: an origin is right; guarding a rendering would refuse the fix that shrinks a layout dump
+                        #: (895 MB -> 0.5 MB) back into a book.
+                        safe_write(md_path, staged.read_text(encoding="utf-8"), shrink_guard=False)
+            finally:
+                shutil.rmtree(scratch_dir, ignore_errors=True)
 
         elapsed = time.time() - start
 

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1212 decisions (census stamp 47cf6924676b6ef4, 2026-10-17) · 682 bugs (248 open / 434 closed; highest OPEN = BUG-917) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1215 decisions (census stamp 5971e1f12c08ad8f, 2026-10-18) · 685 bugs (250 open / 435 closed; highest OPEN = BUG-920) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1212 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 627 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1212, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1215 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 630 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1215, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 248 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 37 · 🟨 MED 78 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 248 open.
+> Open BUGS by severity (population = the census's 250 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 79 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 250 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17698,3 +17698,138 @@ harness metered?" — and they have different answers.
 
 NOT DONE HERE: no ceiling was raised, no counter was split, no routing was changed. A measurement never mints its own
 permission.
+
+## BUG-918 (HIGH, OPEN 2026-10-18) — S0 CONVERTS PDFs INTO IMAGE DUMPS: 16 FILES HOLD 2,311 MB OF A 2,591 MB NIGHT, ONE OF THEM 895 MB
+
+    # THE RED LOOP — one command, already run once, that stays RED until this is fixed:
+    python3 - <<'PY'
+    from pathlib import Path; import os, time
+    root=Path("knowledge pipeline/books")
+    t=[p for p in root.rglob("*.md") if os.path.getmtime(p) > time.time()-8*3600]
+    big=[p for p in t if p.stat().st_size > 30_000_000]
+    print(len(t), "md tonight;", len(big), "above 30 MB;", sum(p.stat().st_size for p in big)//10**6, "MB of",
+          sum(p.stat().st_size for p in t)//10**6, "MB")
+    PY
+    # MEASURED 2026-10-18 00:52 CEST: 91 md / 2,591.5 MB; 16 files >30 MB = 2,311 MB = 89 % of the night's bytes;
+    # median 1.33 MB; largest 895.2 MB (Hungry_Minds…), then 473.5 MB (Codex Seraphinianus), 138.1 MB
+    # (The_History_Book_DK), 125.1 MB (Ayahuasca Visions), 103.1 MB (Robert Fludd), 96.3 MB (OCCLITH),
+    # 73.8 MB (Opinions on Speculative Masonry), 70.2 MB (Hallucinogens and Shamanism).
+    # A sample mid-size file (book-en-print.md, 7.0 MB) carries 565 `data:image` blobs: Docling inlines every
+    # figure as base64 into the .md, so the S0 artefact is a picture album with text inside it.
+
+WHAT IT COSTS (not opinion — the next stage's input): the corpus contract says the derived tree holds the text
+S1 chunk-and-embeds. A 895 MB .md is ~700× the median work: S1 would read, split and embed base64 payloads, the
+S0 checkpoint grows by the same factor, and the 4,516-topic / 512-d embedding path spends its whole budget on
+image bytes that carry no claim. The 1.35 GB of containers already measured inside the corpus (107 files) is a
+separate, smaller instance of the same "the derived tree is carrying what the origin side owns" shape.
+
+WHAT WAS *NOT* FOUND, stated as a negative because a claim needs its reading (D-3036): SYSTEMATIC TRUNCATION.
+Of 73 PDF rows applied tonight, every file whose last page carries extractable text (≥15 words) contains that
+text in the .md; the files where the last-page probe missed have 0–14 words on their last page (plates, blanks,
+image-only scans: The Vampire Predator Bible 0, ToV - Bloodlines 0, Cosmic Trigger I 0, Alchemy Overview 14), so
+the probe cannot decide there. What the same pass DID find is OCR quality collapse on old scans
+("mostpobertul of magicthroughYampiric citual"), which is a quality class, not a length class.
+Second negative: NO OLDER CONVERSION WAS OVERWRITTEN. Two independent readings agree — (a) the applier refuses a
+target that exists with no receipt accounting for it (scripts/apply_admission.py, the `already_applied` branch),
+and tonight produced 0 such refusals; (b) the door's OWN key over all 1,040 corpus .md yields **1,039 distinct
+keys, exactly 1 duplicate key in the whole corpus, and 0 duplicates involving a file written tonight**.
+
+OWNER ORDER, 2026-10-18 00:41 CEST: "CERTAINLY STOP CONVERSION". EXECUTED: SIGTERM to the applier (54639) and
+then to the two orphans it left behind — `stage0_convert.py` (87150) and `docling` (87153) were STILL WRITING
+into `DOMAIN 1 …/cognition+perception/` after their parent died. Verified quiet: no docling/pandoc/applier
+process remains. Crash-safety verified in the same pass: **0 orphan .md** — every corpus file touched in 10 h is
+named by a receipt target, so the killed row left no partial artefact (C6 held).
+
+STATE AT STOP: 57 applied / 7 failed over 65 receipt rows (3 receipt files tonight), plan on disk untouched, 472
+rows never attempted. The four `budget_expired` rows and two `container_unreadable` rows remain refused-by-reason.
+NEXT ACTION IS A DECISION, NOT A COMMAND: what the S0 artefact is allowed to contain (no images at all | images
+stripped-and-referenced | image pages OCR-only), and whether a per-work md ceiling is a refusal class.
+
+## BUG-918 (HIGH, FIXED 2026-10-18) — S0 CONVERTS PDFs INTO IMAGE DUMPS: 16 FILES HELD 2,311 MB OF A 2,591 MB NIGHT, ONE OF THEM 895 MB
+    # FIXED THE SAME NIGHT IT WAS FILED (D-3086). The owner's reading is the specification: "a 895 MB .md is not a
+    # book". The engine's own DEFAULT was the cause — docling ships `--image-export-mode embedded`, which base64-inlines
+    # every figure — and NOBODY between the engine and the corpus had an opinion about the shape, so the only reader of
+    # those bytes was the disk. Two-sided measurement on ONE real library work (Souls Of Distortion Awakening.pdf,
+    # 4.06 MB): embedded -> 19.371 MB / 95 `data:image` blobs; placeholder -> 0.538 MB / 0 blobs, SAME TEXT (519,083
+    # vs 518,893 normalised chars; every difference the image marker plus one figure reflow). 36x smaller, nothing lost.
+    # THE FIX, three layers: (1) the shape is DECLARED at config#stage0.artifact and refused at import when it does not
+    # resolve; (2) convert_pdf passes `--image-export-mode` and the reader writes into a SCRATCH tree, so
+    # `verify_artifact()` measures the artefact BEFORE the corpus sees it, and only a conforming one is written into
+    # place atomically (C6); (3) two declared failure classes, `artifact_oversize` / `artifact_images_embedded`, so a
+    # refusal names the SHAPE and never the book.
+    # CONTROLS (two-sided, 3/3): a REAL 19.4 MB embedded artefact -> artifact_oversize; a small all-picture artefact ->
+    # artifact_images_embedded; the SAME work in placeholder mode -> OK. E2E on the fixed engine against a scratch books
+    # dir: 525 KB in 60.6 s, 0 blobs, 271 headings, 1,814 paragraphs.
+    # THE DISPOSAL, receipted (scripts/dispose_s0_artifacts.py): 58 artefacts / 2,554.0 MB moved to a LOCAL pen
+    # (~/.maxwell_quarantine/s0_artifacts/, outside Dropbox, reversible, purge command printed on every run). SIX closed
+    # verdicts, because two of them exist purely to PREVENT A CASCADE: `keep_native` (a native .md IS the artefact —
+    # no engine produced it, so "re-convert" has no referent; 7 such files, 940 such checkpoint rows) and
+    # `keep_pre_existing` (a TIME boundary, because a name-matching guard had already failed to protect `Godel,
+    # Escher, Bach` — 116 claims, exact name mismatch). `keep_referenced` protects any name the claim store cites.
+    # WHAT THE ACT EXPOSED, and this is why it was worth doing manually rather than by a glob: `Codex Seraphinianus`
+    # held 473.5 MB with 721 blobs and appeared in NO checkpoint row at all — `run_stage0` writes its checkpoint ONCE,
+    # at the END, so every Stage-0 subprocess the stop killed wrote no record while its bytes stayed in the corpus. A
+    # receipt-driven cleanup would have declared the corpus clean with 473 MB of picture bytes still inside it. Filed
+    # as BUG-920; the disposition now scans the corpus DIRECTLY and names an unreceipted artefact `has_receipt: false`.
+    # RED LOOP, run after: "15 md tonight; 0 above 30 MB; 0 MB of 3 MB" — GREEN. Corpus 1,040 md / 3,114.9 MB / 5,786
+    # blobs -> 982 md / 560.9 MB / 69 blobs; largest 20.6 MB (a native artefact, untouched).
+    # DAMAGE TO S1-S6: NONE, and it is measured, not assumed. maxwell.db was last written 2026-10-13 20:36 and
+    # book_metadata.jsonl 2026-09-02, so no stage after S0 ran on any of it; `data:image` appears 0 times in
+    # definition, source_text, evidence, evidence_passages, citation and keywords, and max length(definition) is 417
+    # chars — the claim store never saw a byte of base64. The 7 `failed` receipt rows and the 472 never-attempted rows
+    # are untouched and still quarantined, none lost.
+    # RESIDUAL, split out rather than hidden: BUG-919 (native/whitespace artefacts: GEB 20.62 MB at 64% spaces) and
+    # BUG-920 (an artefact with no receipt). Neither is a reason to reopen this one.
+
+## BUG-919 (MED, OPEN 2026-10-18) — A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED
+    # THE RED LOOP — one command, already run once, that stays RED until this is fixed:
+    python3 - <<'PY'
+    from pathlib import Path
+    C=Path("knowledge pipeline/books")
+    thin=[]
+    for p in C.rglob("*.md"):
+        t=p.read_text(encoding="utf-8",errors="replace")
+        if t and sum(1 for c in t if not c.isspace())/len(t) < 0.5: thin.append((p.stat().st_size,p.name))
+    print(len(thin), "md below 50% non-space:", sorted(thin, reverse=True)[:5])
+    PY
+    # MEASURED 2026-10-18 01:20 CEST: 2 files of 1,040. `Godel, Escher, Bach-An Eternal Golden Braid (Douglas R.
+    # Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md` is 20.62 MB, 20,618,741 chars, 31,325 lines, mean line 658,
+    # longest line 2,241, and 13,226,396 SPACES = 64.1% of the file; a sample 60% in is a run of spaces. `Consistency
+    # and Cognition` (4.51 MB) is the second, at 27.9% dense.
+    # WHY IT IS NOT BUG-918. Zero `data:image` blobs. The defect is pandoc's epub reader preserving an indentation
+    # run, so it is a PADDING defect and not a picture defect — a different producer, a different cause, a different
+    # remedy. It has NO owner yet and is not urgent: 99% of the corpus is above 0.74 density (p1=0.747, p50=0.840).
+    # WHY IT MATTERS ANYWAY: 20.62 MB of spaces becomes chunk text, and the tokenizer pays for whitespace it cannot
+    # use. The corpus-wide density is the instrument to watch, not the one file.
+    # NOT DONE ON PURPOSE: no whitespace gate was added to `verify_artifact` in the BUG-918 fix. A gate that refused
+    # this file for SIZE would have named the wrong cause, and a new refusal class on the night of a stop is a second
+    # cascade. The 2 files are `keep_pre_existing` in the disposition receipt, named and untouched.
+
+## BUG-920 (HIGH, OPEN 2026-10-18) — AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END
+    # THE RED LOOP — one command, already run once, that stays RED until this is fixed:
+    python3 - <<'PY'
+    import json
+    from pathlib import Path
+    from pipeline.pipeline_paths import STAGE0_CHECKPOINT, BOOKS_DIR
+    recs=[json.loads(l) for l in Path(STAGE0_CHECKPOINT).read_text().splitlines() if l.strip()]
+    seen={r.get("output_path") for r in recs}
+    orphans=[p for p in Path(BOOKS_DIR).rglob("*.md") if str(p) not in seen]
+    print(len(orphans), "corpus .md with NO checkpoint record:", [p.name for p in orphans][:5])
+    PY
+    # MEASURED 2026-10-18 01:25 CEST: 1 orphan — `Codex Seraphinianus (Luigi Serafini) (Z-Library).md`, 473.5 MB,
+    # 721 `data:image` blobs. It was named by an APPLIER receipt (the row was `applied`) but by NO Stage-0 record,
+    # because `run_stage0` accumulates `converted` in memory and writes STAGE0_CHECKPOINT once, after the loop. The
+    # applier drives ONE Stage-0 subprocess per book, so every subprocess the owner's stop killed wrote nothing —
+    # while its bytes stayed in the corpus. The class is: BYTES WITHOUT A RECEIPT, produced by an ordinary Ctrl-C.
+    # WHY IT IS HIGH: every downstream reader treats the checkpoint as the truth (`existing` is what a resume SKIPS,
+    # and `load_existing_checkpoint` is what the ingest door consults). An artefact with no record is invisible to a
+    # resume AND invisible to a receipt-driven cleanup — it is only visible to a FILESYSTEM SCAN, which is the only
+    # reason it was found at all.
+    # INTERIM MITIGATION, ALREADY IN PLACE: `scripts/dispose_s0_artifacts.py` scans the corpus directly and names an
+    # unreceipted artefact `has_receipt: false` with its container guessed from the sibling name and its verdict
+    # derived from the SAME shape rule (0 orphans remain as of this filing).
+    # THE FIX (not applied — it changes the write pattern of the file that just changed, and a second change on the
+    # night of a stop is a cascade): write the record INCREMENTALLY, one crash-safe append per work, so an
+    # interruption costs at most the work in flight. That is a change to `run_stage0`'s checkpoint contract, it needs
+    # its own red loop ("kill -TERM mid-work, then count artefacts without records: must be 0"), and it should land
+    # with BUG-899 (re-key the Stage-0 checkpoint by `source_file`).

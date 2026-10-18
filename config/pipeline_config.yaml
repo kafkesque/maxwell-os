@@ -310,6 +310,20 @@ stage0:
     docling_per_mb_s: 40    # pdf: allowance per MiB of source (a scanned page is bytes; a text page is few)
     docling_ceiling_s: 1500 # pdf: the largest allowance any single work may claim
     stage_timeout_s: 1800   # the applier's per-book subprocess ceiling; MUST exceed docling_ceiling_s (checked at import)
+  #: BUG-918/D-3086 — THE ARTEFACT'S SHAPE IS DECLARED, AND IT IS NOT THE ENGINE'S DEFAULT.
+  #: MEASURED 2026-10-18 on ONE library work (Souls Of Distortion Awakening.pdf, 4.06 MB), same file, same machine,
+  #: two argv forms. With docling's shipped default `--image-export-mode embedded` the artefact was 19.371 MB and
+  #: carried 95 `data:image` base64 blobs; with `--image-export-mode placeholder` it was 0.538 MB carrying ZERO,
+  #: and the TEXT was identical (519,083 vs 518,893 normalised chars — every difference was the image marker
+  #: itself, plus one figure/table reflow). 97.2% of the artefact was PICTURE BYTES, and they were never read.
+  #: Across the stopped night that default wrote 100 artefacts = 2,599.7 MB, of which 16 files = 2,311.3 MB (89%)
+  #: were above 30 MB, the largest 895.2 MB for ONE book. A 895 MB .md is not a book: it is a picture archive no
+  #: tokenizer can read, and S1 would have chunked base64 into the claim store. So the shape is DECLARED here,
+  #: VERIFIED after every conversion, and an artefact that violates it is REFUSED before it reaches the corpus.
+  artifact:
+    image_export_mode: placeholder   # placeholder | embedded | referenced (docling --image-export-mode)
+    max_embedded_images: 0           # an artefact carrying MORE `data:image` blobs than this is refused
+    max_artifact_mb: 8               # a text artefact above this ceiling is refused; a real book is 0.3–3 MB
   #: D-3077 — A LIBRARY'S DECLARED KINDS MAY NOT EXCEED ITS STAGE'S DECLARED READERS. MEASURED 2026-10-17 on the
   #: live plan: 389 of 626 refusals were `refused_container_no_stage_reads_it` — works the door says the library OWNS
   #: (books root kinds: epub, pdf, md, mobi, azw3, djvu; journals:notes kinds: pdf, docx, md, txt) that Stage 0 could
@@ -357,6 +371,8 @@ stage0:
     no_output: "the converter reported success and wrote nothing — the RECEIPT is defective, not the book; re-run before touching the source"
     deferred_for_identity: "the INGEST DOOR refused to duplicate a work already in the corpus (D-2997/BUG-781) — the book is whole and was never converted; it needs an OWNER WORD on identity, not a new copy"
     unsupported_format: "the container is not one of the readers this stage DECLARES (config/pipeline_config.yaml#stage0.containers) — the library may own the format, but S0 has no engine for it, so this is a DOOR/PLAN fault and never a book fault. It used to print 'Unsupported format' and SKIP the file: a silent skip is indistinguishable from a conversion, which is exactly the blindness D-3077 exists to end"
+    artifact_images_embedded: "the converter produced an artefact carrying inline base64 images — the bytes are a picture archive, not a book, and no tokenizer reads them; the work is WHOLE and this is the ENGINE'S declared default, so the remedy is the declared artifact.image_export_mode, never a new copy"
+    artifact_oversize: "the artefact exceeded stage0.artifact.max_artifact_mb — a text conversion of a book does not reach this ceiling, so an artefact this large is the engine dumping a layout, and it was REFUSED before it could enter the corpus"
     #: DELIBERATELY ABSENT: `quality_failed`. D2326's quality check is a RECEIPT FIELD today
     #: (`quality_status` in the checkpoint), not an admission gate — no code path can produce that class yet, and a
     #: declared class with no producer is a declaration with no referent (D-3034). When the quality check becomes a

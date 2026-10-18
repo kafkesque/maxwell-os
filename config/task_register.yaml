@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-17'
+updated: '2026-10-18'
 tasks:
 - id: T-101
   priority: MUST
@@ -38,8 +38,11 @@ tasks:
     refused all 29 queries over a COMPLETED signed act. Both modes now resolve their inputs through ONE helper (reviewed_inputs)
     and the two files are printed. MEASURED: --check rc 0 (29/29 verdicts, 120 anchor names, 19 abstentions, every chosen
     anchor carrying a signature); --apply rc 0 -> config/golden/retrieval_queries.yaml v5 (29 queries x 120 signed anchor
-    names, C13 backup taken). Remaining: pipeline/retrieval_benchmark.py (the semantic baseline) and T-116 (this ruler
-    is saturated by construction).'
+    names, C13 backup taken). BENCHMARK RAN 2026-10-18 (python3.12 + sqlite_vec 0.1.9; NOT python3/miniforge 3.13, which
+    lacks sqlite_vec and silently degrades to FTS-only): production recall@10 = 1.000 STILL SATURATED, MRR 0.919 -> 0.954,
+    P@k 0.414; fts 0.408; vector 0.694; hybrid 0.712 - the SET re-anchor is CONFIRMED (MRR moved) but production stays
+    1.000 BY CONSTRUCTION (self-referential top-5 pool, D-2991). Remaining: T-116 (the growth instrument: harder/adversarial
+    queries + a POOLED candidate list), which has no instrument yet.'
 - id: T-102
   priority: MUST
   state: done

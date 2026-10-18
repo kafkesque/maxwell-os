@@ -176,3 +176,23 @@ D-3101 PROPOSED: split the lifetime `cloud_input_tokens`/`cloud_calls` ceilings 
 
 ### BUG-793 status (Qwen3.8-27B prefill 39 tok/s) — already at best config; measurement-gated
 The model's own `~/.omlx/model_settings.json` already has every speculative/prefill lever OFF (`specprefill`, `dflash`, `mtp`, `qwen35_ane_prefill`, `turboquant_kv` all false). So BUG-793 is NOT a config-flip. The remaining untried levers are `turboquant_kv_enabled: true` (KV 4-bit quant — the "KV memory pressure" candidate) and the `sudo sysctl iogpu.wired_limit_mb=57344` system lever (D-334). Both are MEASUREMENT-gated (D-332, never vibe-set). Resolution = a red/green prefill A/B at the class context size (26,214 tokens), not more speculation.
+
+
+## SESSION 2026-10-19 (00:27 +02:00) — D-3101 MINTED, DUST REJECTED, TREE CLEAN
+- **Commit verified**: `dbf80ff` (owner commit) landed; commit-frontier rail GREEN.
+- **Second batch committed**: `8184df8` — T-129 identity collapse applied (62 source_ids collapsed, 893 rows repointed, is_convergent 1393→896, 0 deleted), BUG-885 prefix cache PROVEN (threshold 0.8→0.94, `cache_proven`), cloud ceiling 4.6B→5.0B owner-raised, admission plan 20261018.
+- **D-3101 MINTED (PROPOSED)**: cloud-ceiling SPLIT — pipeline-ingestion vs harness-metering are two metering classes, not one lifetime counter. Discriminator must RESOLVE via model ∈ cloud_model_families + cost_source (D-3034). Cites BUG-917. Committed `a75ffeb`; census re-derived (1228 decisions). **Not yet ratified** — PROPOSED, awaiting owner word.
+- **dust (qlabs-eng/dust) REJECTED** (D-3038): backprop-free *training* algorithm, requires NVIDIA CUDA bfloat16 + 8 GPUs. Zero overlap with Maxwell (Apple M1 Max, MLX local *inference*, C1 $0 / C3 sovereign). Not inference accel, not speculative decode, not tool-calling.
+- **BUG-793 reframed by BUG-885**: prefix cache proven (22.2× on 26,240-token prefix) → the "672 s prefill per turn" is now COLD-turn-only. Remaining diagnosis is the *anomalous cold prefill rate* (39 tok/s vs gpt-oss 210), not the per-turn cost.
+
+## OWNER MANUAL STEPS (D-3100: noob-proof)
+**1. Admission rows (proposal.docx exclude / pre-hire.pdf reroute).** Source = `~/Library/CloudStorage/Dropbox/education/journals:notes` (config/ingest_identity_gate.yaml#source_library.roots.journals_notes). The two failed rows are already quarantined at `knowledge pipeline/admission_quarantine/20261018T221225Z/`.
+- *Proposal.docx* = near-empty stub (document.xml 4,048 B, no media). EXCLUDE: owner records a word that this work is not-admittable (stub), so plan_admission stops proposing it.
+- *pre-hire.pdf* = 8-page PDF with real text; Docling writes 62 B (fails 100-B floor) but `pdftotext` extracts it. REROUTE = add a pdftotext fallback to `pipeline/stage0_convert.py::convert_pdf` when Docling emits <100 B but the pdftotext probe finds real text (the probe already exists, lines 119–131). Re-run `python3 scripts/plan_admission.py --plan` after, to clear the row.
+**2. BUG-793 cold-prefill A/B (measurement-gated, D-332).** Run `scripts/agent_context_probe.py --prefill-ab` (opt-in) at 26,214 tokens on Qwen3.8-27B with `turboquant_kv_enabled` toggled true vs false; record tok/s + TTFT. Then `sudo sysctl iogpu.wired_limit_mb=57344` (D-334, system lever, not auto-applied). Receipt decides; no vibe-set.
+
+## NEXT CRITICAL (consequential order)
+1. Ratify D-3101 (owner word) → then implement the SPLIT (pipeline-ingestion vs harness-metering windowed/burn-rate ceilings).
+2. BUG-793 cold-prefill A/B (above).
+3. DFlash2 decode A/B on Qwen3.8-27B (deferred until BUG-793 diagnosed).
+4. Splash engine stays NO; Prism Bonsai 2 download stays rejected; DFlash2 via mlx-dspark is the decode-speedup path (not an engine swap).

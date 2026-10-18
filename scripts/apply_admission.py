@@ -1210,7 +1210,7 @@ def run(plan_path: Path | None, accept_path: Path | None, *, apply: bool, conver
     outstanding, decided_here = split_decided(signed, decided_acts(decl, held))
     rows = outstanding if limit is None else outstanding[:limit]
     if decided_here:
-        print(f"DECIDED  {decided_here} act(s) a prior receipt already decided (skipped/deferred) — not re-attempted; "
+        print(f"DECIDED  {decided_here} act(s) a prior receipt already decided (skipped/deferred/duplicate_of_admitted) — not re-attempted; "
               f"{len(outstanding)} outstanding, this run attempts {len(rows)}")
 
     #: BUG-930/D-3095 — THE GATE CLASSIFIES, AND A FAULT IS NOT A VERDICT ON THE WHOLE BATCH. MEASURED 2026-10-18:

@@ -196,3 +196,26 @@ The model's own `~/.omlx/model_settings.json` already has every speculative/pref
 2. BUG-793 cold-prefill A/B (above).
 3. DFlash2 decode A/B on Qwen3.8-27B (deferred until BUG-793 diagnosed).
 4. Splash engine stays NO; Prism Bonsai 2 download stays rejected; DFlash2 via mlx-dspark is the decode-speedup path (not an engine swap).
+
+## SESSION 2026-10-19 (00:43 +02:00) — ADMISSION REROUTE DONE, D-3101 DISCRIMINATOR FOUND NON-RESOLVING
+
+- **pre-hire.pdf REROUTE — DONE, committed `7346911`.** Added a pdftotext text-layer fallback to
+  `pipeline/stage0_convert.py::convert_pdf`: when Docling under-produces (< 100 B floor) but the leading-page
+  probe already certified a born-digital text layer, the work is re-read from its text layer. This is NOT the
+  removed pandoc-for-pdf fallback (BUG-896/D-3038 — pandoc has no PDF reader); pdftotext IS a reader, so this
+  is a real fallback. Gated by `stage0.text_layer.pdf_text_fallback: true` (C12). VERIFIED: pre-hire.pdf now
+  converts to 7,284 B of real text (was 62 B). `plan_admission --selftest` 26/26 green.
+- **Proposal.docx EXCLUDE — OWNER WORD RECORDED (D-3038 accepted negative).** Root cause: near-empty STUB
+  (`word/document.xml` 4,048 B, no `media/`; Pandoc writes 54 B < 100 B floor). The owner word is EXCLUDE, not
+  admit — the 100-B floor would refuse it anyway, so the word only saves a wasted conversion attempt. There is
+  no `exclude` verdict in the admission vocabulary (it is not needed for a stub the floor already refuses); it
+  stays an admit_candidate in the plan, which is content-agnostic by design.
+- **D-3101 SPLIT — BLOCKED BY A NON-RESOLVING DISCRIMINATOR (D-3034), MEASURED.** The decision's discriminator
+  is "model ∈ cloud_model_families + cost_source". MEASURED the live ledger: `cost_source` ∈
+  {`estimated` (37,839 rows), `carried_forward` (1), NULL (1,443)}. NONE of these says pipeline-ingestion vs
+  harness-metering — `cost_source` records how the COST was estimated, not which metering class issued the call.
+  So the SPLIT as drafted declares a discriminator whose values are sentences, not bytes: implementing it now
+  would mint the exact D-3034 defect the decision warns against. **D-3101 needs a discriminator amendment before
+  implementation** (the pipeline must WRITE a distinct `cost_source` when it ingests, or a different ledger field
+  is the discriminator). NOT implemented — flagged, not slopped.
+- **BUG-793 cold-prefill A/B — still OPEN, owner-runs** (server restart + sudo). Procedure below unchanged.

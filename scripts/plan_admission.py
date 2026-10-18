@@ -1013,9 +1013,12 @@ def selftest() -> int:
         except AdmissionError:
             pass
 
-        # (13) a bare run writes NOTHING: one write call site, behind --plan (read from this file's own bytes)
+        # (13) a bare run writes NOTHING: one PRODUCTION write call site, behind --plan (read from this file's own
+        #      bytes). The needle matches the line whose assignment target is EXACTLY `paths`, so the selftest's
+        #      own fixture calls (`first_paths`, `repeat_paths`, `moved_paths` — which TEST write_plan for BUG-929)
+        #      do not count: a fixture is not a production write, and a bare run still writes nothing.
         needle = "paths = write_" + "plan("
-        calls = [i for i, line in enumerate(own_lines) if needle in line]
+        calls = [i for i, line in enumerate(own_lines) if line.strip().startswith(needle)]
         branch = next((i for i, line in enumerate(own_lines) if line.strip().startswith("elif args.plan:")), None)
         leaks = [
             token

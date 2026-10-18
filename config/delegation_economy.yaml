@@ -24,7 +24,7 @@
 # as D-2941: a gate carries intent, a script applies it.)
 schema_version: '1'
 authority: D-3023
-updated: '2026-10-15'
+updated: '2026-10-19'
 state: measured
 
 #: The ledger and the local model registry are READ from the homes that already own them — never
@@ -71,8 +71,16 @@ ceiling:
   #: The margin is ~10 days of the measured burn (~$2.35/day). A ceiling is not a budget to spend up
   #: to; it is the point at which the QUESTION is asked. Raising one is an owner word with a reason.
   cloud_cost_usd: 130.00
-  cloud_input_tokens: 4600000000
-  cloud_calls: 37000
+  #: RAISED 4,600,000,000 -> 5,000,000,000 by OWNER WORD 2026-10-19 (BUG-917 token-counter leg):
+  #: the lifetime cloud_input_tokens counter (4,642,297,991) breached the 4.6B ceiling sized against the
+  #: 2026-10-15 baseline (3,981,322,921). Interim raise under D-3023 (raise-with-reason), pending the SAME
+  #: SPLIT named below — a lifetime token counter always re-breaches any flat number.
+  cloud_input_tokens: 5000000000
+  #: RAISED 37,000 -> 50,000 by OWNER WORD 2026-10-18 (BUG-917): the lifetime cloud_calls counter
+  #: (37,354) breached the 37,000 ceiling sized against the 2026-10-15 baseline (32,851). Interim
+  #: raise under D-3023, pending the SPLIT that separates pipeline-ingestion volume from harness
+  #: metering volume — the durable fix, because a lifetime counter always re-breaches any flat number.
+  cloud_calls: 50000
 
 #: The vocabulary an escalation reason is drawn FROM. The instrument never infers a reason; the
 #: CALLER records one. The route registry (T-156) holds the ROUTES, this holds the WORDS, and

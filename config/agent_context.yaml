@@ -167,16 +167,16 @@ trigger:
   max_compactions_per_session: 1
   #: THE TRIGGER IS CONDITIONAL ON THE CACHE, and this is the whole of T-132's second knob.
   #: With a PROVEN cache, growth is nearly free and the threshold may sit at the window's edge.
-  #: With the cache DISPROVEN (the measured state below), the threshold must instead satisfy the
-  #: LATENCY budget, because every turn re-prefills the whole prompt:
-  #:     threshold <= per_turn_budget_s * measured_prefill_tps / window
-  #: MEASURED 2026-10-14, the default 0.8 is right for the FASTEST local model BY COINCIDENCE
-  #: (0.8 x 32768 = 26214, and 26214 / 455 = 58 s <= 60 s) and wrong for every other: the same 0.8 on
-  #: a 210 tok/s model buys a 125-second turn, and on a 39 tok/s model a 672-second one.
+  #: HISTORY (superseded 2026-10-17 by BUG-885): while the cache was DISPROVEN the threshold had to
+  #: satisfy the LATENCY budget (threshold <= per_turn_budget_s * measured_prefill_tps / window),
+  #: because every turn re-prefilled the whole prompt. MEASURED 2026-10-14, the default 0.8 was right
+  #: for the FASTEST local model BY COINCIDENCE (0.8 x 32768 = 26214, 26214/455 = 58 s <= 60 s) and
+  #: wrong for every other. BUG-885 PROVED the prefix cache (22.2x on a 26,240-token prefix), so the
+  #: threshold now rises toward the window and is capped only by the min_headroom_tokens headroom.
   cache_conditional:
-    cache_proven: 'threshold 0.8 x window, capped by the window itself; growth is nearly free'
+    cache_proven: 'threshold = (window - min_headroom_tokens) / window = 0.94; growth is nearly free (BUG-885 PROVEN 2026-10-17)'
     cache_disproven: 'threshold = min(0.8 x window, per_turn_budget_s x measured_prefill_tps)'
-    measured_state: cache_disproven
+    measured_state: cache_proven
   #: A compaction is the MOST EXPENSIVE single act the harness performs on a local model: it rewrites
   #: the prefix, so the next turn pays a full COLD re-prefill of the summary AND the summary is lossy.
   #: A DECLARED HANDOFF read at the head of a FRESH session is a SHORTER, byte-stable prefix: cheaper,
@@ -222,8 +222,8 @@ ratified:
                                # makes Qwen3.8-27B one (26214/39 = 672 s)
     trigger:
       GOOSE_CONTEXT_LIMIT: 32768              # declare the SERVED window; never inherit 128000
-      GOOSE_AUTO_COMPACT_THRESHOLD: 0.8       # right BY COINCIDENCE at 455 tok/s (58 s <= 60 s) and for
-                                              # the right reason only while the cache is DISPROVEN
+      GOOSE_AUTO_COMPACT_THRESHOLD: 0.94      # = (32768-2048)/32768 = 0.9375; cache PROVEN (BUG-885), so the
+                                              # trigger rises to leave exactly min_headroom_tokens (2048) of cold-prefill headroom
       GOOSE_AUTO_COMPACT_TOKEN_LIMIT: 32768   # the 225000 default is a cloud price-tier artifact (C1/C22)
       # 2026-10-15 (T-132 addendum): a harness's IDENTITY is part of its context contract. Measured:
       # goose run -t answered while the local engine's counter stood still - a declared provider is not

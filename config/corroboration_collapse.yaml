@@ -125,6 +125,15 @@ semantic_limb:
   superseded_role: >-
     No longer the limb that answers T-119. It is the declared residual for the paraphrase class only.
 
+#: T-129 identity-map repair. The collapse RULING word is the owner-marks collapse vocabulary's
+#: CONFIRM-ONE-WORK (config/owner_marks.yaml). Canonical selection per duplicate-work group is
+#: declared here (C12, no hardcoded policy): prefer a member with real author+title metadata, then
+#: the member with the most rows affected, then the shortest normalised name, then lexicographic.
+identity_collapse:
+  ruling_word_from: config/owner_marks.yaml#vocabularies.collapse.words
+  ruling_word_index: 0
+  canonical_preference: [real_metadata, rows_affected_desc, shortest_normalised_name, lexicographic]
+
 #: Rail behaviour. `census_one_home` keeps this file the single home of the measured counts.
 rail:
   script: scripts/check_corroboration_collapse.py

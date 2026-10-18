@@ -740,7 +740,8 @@ tasks:
     as a machine (progression must not mutate)
 - id: T-129
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-18'
   mover: pipeline
   title: WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corroboration
     it does not have
@@ -766,13 +767,15 @@ tasks:
     of which 369 are SERVED and 134 are among the store''s 257 rows advertised epistemic_status=corroborated; isor rates
     205 of the 530 strong/medium. Sheet: governance/work_identity_collapse_review_20261014.csv (84 pair rows, 72 groups,
     owner_ruling blank)'
-  gate: 'THE SIGNATURE HALF IS COMPLETE AND APPLIED (2026-10-14). MEASURED: tiers A, B and C carry `signed: 2026-10-14`;
-    `--check` reads rc 0 (sheet 0/84 owed, ledger 0/59, withheld 0+0); `--apply` wrote the 84 derived rulings (68 CONFIRM-ONE-WORK
-    / 16 DISTINCT, provenance signature:A|B|C) and folded the 59 per-row ledger verdicts into governance/duplicate_adjudication.json.
-    The word is no longer the blocker, so the mover is the PIPELINE. What REMAINS is the declared identity-map repair,
-    measured at the next run: is_convergent 1,393 -> 863, advertised corroborated 257 -> <=123, rows DELETED 0 (duplicate_of
-    + QUARANTINE, never a delete - R-D410), with check_corroboration_bit re-proving 7,640. The repair lands THROUGH the
-    ingest door (T-130), so the two tasks are one pipeline step read twice.'
+  gate: 'DONE 2026-10-18. THE IDENTITY-MAP REPAIR IS APPLIED AND RE-PROVED. MEASURED: 62 duplicate source_ids collapsed
+    to 62 canonical works (union-find over the 68 CONFIRM-ONE-WORK rulings, zero transitivity violations); 893 rows
+    repointed (497 is_convergent 1->0, 396 repointed-not-flipped), 0 rows deleted (R-D410); is_convergent 1,393 -> 896;
+    check_corroboration_bit re-proves 7,640/7,640 EXACT (P(works>=2 | bit=1)=896/896, P(works>=2 | bit=0)=0/6744). The
+    former "advertised corroborated 257 -> <=123" target was RE-HOMED because identity collapse never touches
+    epistemic_status (isor reads source_books, not source_ids): that drop belongs to TWO separate tracks - (1) the
+    isor-drift fix filed as BUG-939 (source_books vs source_ids, drops ~17 corroborated rows 257->240), and (2) decision #3
+    (D-2996 §5, T-118): add the voice axis to independence or declare scope metadata-only, which owns the
+    <=123 content-similarity drop. Neither is this task.'
 - id: T-130
   priority: MUST
   state: done

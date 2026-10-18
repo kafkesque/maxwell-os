@@ -198,6 +198,7 @@ may_touch:
 - governance/bug_status.json
 - governance/bug_status.md
 - governance/SESSION-HANDOFF-*.md
+- governance/HANDOFF_*.md
 - governance/T120_S1_RECON_20261014.md
 - pipeline/ingest_gate.py
 - pipeline/stage0_convert.py

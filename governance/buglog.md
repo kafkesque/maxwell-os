@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1227 decisions (census stamp 0f3d618ac3272f00, 2026-10-18) · 703 bugs (251 open / 452 closed; highest OPEN = BUG-921) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1227 decisions (census stamp 0f3d618ac3272f00, 2026-10-19) · 704 bugs (252 open / 452 closed; highest OPEN = BUG-939) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1227 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1227, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 251 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 >
-> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -30,14 +30,14 @@
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
-> | T-129 | 🔴 MUST | 🔴 open | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | MEASURED 2026-10-14 read-only (governance/WORK_IDENTITY_COLLAPSE_20261014.md): 84 collapsi |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
+> | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -97,6 +97,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-939 | 2026-10-18 | **THE isor SCORE READS source_books, NOT source_ids — a collapsed work still rates on its PRE-COLLAPSE source count, so the corroboration bit and the epistemic label derive from TWO different evidence sets.** MEASURED 2026-10-18, surfaced by the T-129 identity collapse (BUG-780): `pipeline/schema_accessor.py::isor_score` (line 446) computes `n_sources = len(resolve_source_ids(source_books))` from the RAW provenance field, bypassing `fb_source_ids()` (line 106) which already prefers the canonical `source_ids` column. After T-129 collapsed 62 duplicate source_ids, 2,677 rows carry a `source_ids` column that no longer equals `resolve_source_ids(source_books)`, so `is_convergent` (from `source_ids`) now disagrees with `isor.rating` (from `source_books`): 17 rows still advertise `epistemic_status='corroborated'` (needs rating strong) that their collapsed identity no longer supports (257 -> 240). CONSEQUENCE: a served row can say 'corroborated' while its own source_ids say one source. FIX: `isor_score` reads `fb_source_ids(fb)` so both derivations share ONE evidence home (C12/D-2646). RED LOOP (D-3036): a named check that reports `source_ids != resolve_source_ids(source_books)` red now, green after. The <=123 voice-axis drop is owner decision #3 (D-2996 §5/T-118), NOT this bug. |
 | BUG-796 | 2026-10-14 | **A DECISION WRITTEN OUTSIDE THE RECEIPTING WRITER LEAVES THE ATTRIBUTION CONTROL RED, and it is red on a commit that predates this session.** MEASURED 2026-10-14: `python3 scripts/lib/handoff.py --selftest` fails 1 of 4 attribution controls - `a governed write that IS the current bytes is attributed, and the join is by CONTENT` - because the MUTATION-journal's newest record for `config/decisions.yaml` (post-image `e93a3121639d77a3`, written by `scripts/recompute_decision_summary.py` at 20261014T152011Z) is not the live digest. PROVEN PRE-EXISTING, not a cascade from this session: the SAME control reds in a clean worktree at 7ccb4cd, where the live digest was `ed47950ec8a932f0`. The gap is the one every guarded write shares: `config/decisions.yaml` is written by the mint path and by the doc guard, and NEITHER records a post-image into the journal the control reads. `--rebaseline` correctly REFUSES to move it ("nothing was rewritten"), so the honest state is RED and owner-owed. FIX: the registry's writers record the post-image they produce (the mint already has the bytes), or the control accepts a verified ancestor and says so; never a hand re-record (D-2642). |
 | BUG-793 | 2026-10-14 | **Qwen3.8-27B PREFILLS AT 39 tok/s - FOUR TIMES WORSE THAN ITS PARAMETER RATIO PREDICTS.** MEASURED 2026-10-14: 32,026-token prefill = 715.7 s (11.9 minutes), decode 1.7 tok/s, model load 26.5 s, against gpt-oss-20b's 210 tok/s at a 50,082-token prompt on the same machine and the same settings tier. The parameter ratio alone predicts ~155 tok/s. CONSEQUENCE: the 27B cannot host an agent loop at any declared budget (672 s per 26,214-token turn), and its declared 262,144-token window would cost ~1.9 hours of prefill for one turn. FIX: diagnose before using it - memory guard tier, KV memory pressure, `specprefill_enabled: False` on this model while other models have it on. |
 | BUG-789 | 2026-10-14 | **THE LOCAL MODEL SERVER'S APP CONFIG CARRIES A HUGGING FACE TOKEN IN PLAINTEXT (mode 644, world-readable, 215 bytes).** MEASURED 2026-10-14 while mapping the agent harness: the oMLX app config holds an `hf_token` field verbatim. C3 declares all data and compute sovereign and local, and a credential in a plaintext config is neither: it is a live secret with no rotation, no env indirection and no file protection. FIX (declared): move it to the environment (`HF_TOKEN`) or the keychain, revoke and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an app config. The value is deliberately NOT restated here. |
@@ -14777,6 +14778,15 @@ EVIDENCE: ~/.config/goose/config.yaml:311 and :273-276 | governance/buglog.md BU
 DECISION-LOG.md D-295 | python3 pipeline/delegation_economy.py --check (rc 0, within ceiling) |
 config/harness_policy.yaml#capability_axes.long_context_reasoning_16k.
 
+OWNER WORD 2026-10-18 (D-3038 accepted negative — the ceiling is NOT raised): the breach re-read 2026-10-18 is
+cloud input tokens 4,638,632,408 > ceiling 4,600,000,000 and cloud calls 38,690 > 37,000 (cost $120.56 < $130.00,
+NOT breached). The owner ruled: do NOT raise the ceiling — a SHRINK-ONLY ceiling must never be raised to chase
+live drift; that is the slop/drift this OS refuses. Remedy is ROUTE LOCAL (T0/T1), never a raised ceiling. The
+breach is the tripwire doing its job, and its cause is MEASURED, not historical: at 2026-10-18T22:59:59Z the
+session was consuming deepseek-v4-pro (~47K input tokens/call, several per minute) while the local engine counter
+stood still for 98.5 min — i.e. the provider flap (BUG-877), not a legitimate escalation from the reason
+vocabulary.
+
 
 ## BUG-833 (MED - CLOSED 2026-10-15) — a workstream started with an ABSENT prompt ran to completion, called NO model at all, and exited 0
 
@@ -16407,6 +16417,15 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **Remedy owed:** (a) a reproduction that names what rewrites the home (start the client, read `active_provider`
   before/after; the reading is one command); (b) a schedule, not just a reading — `check_harness_homes.py` must run
   at the point the home is written, or the rail's rc only ever describes the last time someone looked.
+- **LIVE READING 2026-10-18T23:00Z (new measured evidence, one command each):** `check_harness_homes.py` reads
+  5/5 BOUND (the home currently says `maxwell_omlx`), YET the usage ledger's newest rows (2026-10-18T22:59:59Z)
+  name `deepseek-v4-pro` consuming ~47K input tokens/call, several per minute, while the engine counter
+  (`~/.omlx/stats.json#total_requests`) stood still for 98.5 min. So the flip DOES survive in the FILE, but the
+  RUNNING session persists on its birth provider (deepseek-v4-pro) — a session does not re-read the home mid-run
+  (the harness fact: a resumed/continued session keeps the surface it was BORN with). This narrows the defect to
+  TWO independent layers: (1) the home flap, (2) the SESSION-BIRTH pin. Routing local therefore requires a NEW
+  session (`goose run`), not only a flipped config — the ceiling breach is the measured shadow of this second
+  layer.
 
 ### BUG-878 (HIGH, FIXED 2026-10-17) — `mcp_doc_guard.py` WAS DECLARED RELATIVE AND THE PER-SESSION FORM CARRIED NO CWD: the write gate could be born dead with nothing in the session saying so
 
@@ -17865,6 +17884,45 @@ stripped-and-referenced | image pages OCR-only), and whether a per-work md ceili
     # case-folded, punctuation-stripped, prefix-40 containment (the same `norm` above). BUG-899 re-keys Stage-0 by
     # `source_file`; this bug re-keys by the NORMALIZED WORK, and the Phase B ledger (one row per work) is the home for
     # the canonical copy. The 19 dup pairs are folded to 19 canonical works in Phase B, never by deleting blindly.
+
+
+## BUG-939 (HIGH, OPEN 2026-10-18) — isor_score reads source_books, not source_ids: the epistemic label and the corroboration bit derive from two different evidence sets
+    # THE RED LOOP — one command, already run once, that stays RED until isor reads the SAME evidence the bit reads:
+    python3 - <<'PY'
+    import sqlite3, json
+    from pipeline.pipeline_paths import DB_PATH
+    from pipeline.book_metadata import resolve_source_ids
+    c = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    n = 0
+    for source_ids, source_books in c.execute("SELECT source_ids, source_books FROM fbs"):
+        ids = set(json.loads(source_ids)) if source_ids else set()
+        rids = set(resolve_source_ids(json.loads(source_books))) if source_books else set()
+        if ids != rids:
+            n += 1
+    print(n, "rows where source_ids != resolve_source_ids(source_books)")
+    PY
+    #   before: prints 2,677. after: prints 0.
+    #   CORRECTED 2026-10-18 (forensic): this loop reads TWO STORED COLUMNS and never calls isor_score, so the CODE
+    #   fix (isor reads fb_source_ids) does NOT move it — the "after: 0" is unachievable and would read a false red
+    #   forever. The 2,677 is the EXPECTED post-T-129 state: source_ids collapsed to canonical identity, source_books
+    #   intentionally kept as raw provenance (R-D410). The true red loop measures the CODE path, and is one assert:
+    #   isor_score({"source_ids":["a"],"source_books":["b1.md","b2.md"],"domains":["d1","d2"]})["n_sources"] == 1
+    #   — RED now (returns 2, one WORK under two names counted twice), GREEN after isor reads source_ids.
+    # MEASURED 2026-10-18, surfaced by the T-129 identity collapse (BUG-780/D-2992): pipeline/schema_accessor.py::isor_score
+    # (line 446) computes n_sources = len(resolve_source_ids(source_books)) from the RAW provenance field, bypassing
+    # fb_source_ids() (line 106) which already prefers the canonical source_ids column. After T-129 collapsed 62 duplicate
+    # source_ids, 2,677 rows carry a source_ids column that no longer equals resolve_source_ids(source_books); the
+    # corroboration bit (is_convergent, from source_ids) now disagrees with isor.rating (from source_books). 17 rows still
+    # advertise epistemic_status='corroborated' (needs rating strong) that their collapsed identity no longer supports
+    # (257 -> 240).
+    # WHY HIGH, NOT MED: the epistemic label and the corroboration bit are two answers to ONE question (how many
+    # independent sources support this claim?) derived from TWO different evidence sets — a served row can say
+    # 'corroborated' while its own source_ids say one source. Systematic across 2,677 rows, not an edge case.
+    # THE FIX (not applied — a scoring-path change, filed separately from T-129 per D-3036): isor_score reads
+    # fb_source_ids(fb) so both derivations share ONE evidence home (C12/D-2646). The design question the fix must settle
+    # first: should isor count the collapsed IDENTITY (source_ids) or the raw PROVENANCE (source_books)? T-129 chose
+    # identity for the bit; isor must follow, else the two stay split. The <=123 voice-axis drop is decision #3
+    # (D-2996 §5/T-118), NOT this bug.
 
 
 ## BUG-922 (HIGH, CLOSED 2026-10-18) — `verify_rows` FATALs the whole tranche on rows an EARLIER tranche of the SAME signature already applied, forcing a re-derive+re-sign loop

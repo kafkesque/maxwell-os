@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1223 decisions (census stamp 70384aaad58d64c9, 2026-10-18) · 701 bugs (251 open / 450 closed; highest OPEN = BUG-921) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1227 decisions (census stamp 0f3d618ac3272f00, 2026-10-18) · 702 bugs (251 open / 451 closed; highest OPEN = BUG-921) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1223 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 638 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1223, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1227 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1227, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 251 open.
 >
@@ -18373,7 +18373,7 @@ RC_OWNER_OWED)` — plus a control that the pre-verdict line contains no `rc `, 
 owed". MEASURED after: the same dry run prints `ASKING … and this line is not that verdict`, then `ANSWERED: all 9
 name-held row(s) resolved on the digest alone … this batch owes the owner nothing`, rc 0. Selftest **78/78**.
 
-## BUG-935 (HIGH, OPEN 2026-10-18) — 57 ADMITTED WORKS ARE GONE FROM THE CORPUS AND NO RECEIPT RECORDS THE REMOVAL
+## BUG-935 (HIGH, CLOSED 2026-10-18) — 57 ADMITTED WORKS ARE GONE FROM THE CORPUS AND NO RECEIPT RECORDS THE REMOVAL (original filing — resolved by the D-3099 entry below)
 
 **What was measured, by a new instrument rather than by an author's imagination.** `scripts/audit_evidence.py`
 (`just audit-evidence`, D-3097) re-proves the ACCUMULATED evidence — 1,143 receipt rows and 2 signatures — against
@@ -18393,8 +18393,10 @@ only document writes, and D-3086's disposal of 58 wrong-shaped artefacts left no
 lose a work and the evidence cannot say who removed it.** Fix owed: a `disposed` state + a disposition act through
 `pipeline/safe_delete.py` that writes it; then the 57 are either re-admitted or formally disposed, never silent.
 
-**Status.** The instrument is landed and green (rc 2 = a reading is owed, never a batch failure). The 57/7 themselves
-are an OWNER decision (re-admit vs dispose) and are NOT closed here.
+**Status.** The instrument is landed and green (rc 2 = a reading is owed, never a batch failure). The 57 were then
+explained and CLOSED by the D-3099 entry below (they were the D-3086 disposal, receipted in a vocabulary the auditor
+did not read). The residual 7 NOTHING-LEFT + 1 GYST DISAPPEARED are a DIFFERENT class (BUG-920), tracked there as the
+owner's re-admit-vs-dispose decision — not this bug.
 
 ## BUG-936 (HIGH, CLOSED 2026-10-18) — THE QUARANTINE DROPPED THE FOLDER, SO DISTINCT WORKS DESTROYED EACH OTHER'S EVIDENCE
 
@@ -18426,3 +18428,22 @@ attempt, the bytes still exist under the run's home) — it had been measuring t
     # corpus with no receipt accounting for it (the BUG-920 orphan/failed-conversion class), and 1 GYST DISAPPEARED =
     # the BUG-936 four-way quarantine collision survivor. Re-admission of the 57 (re-convert via the FIXED engine, whose
     # checkpoint rows D-3086 already dropped) is the owner's next act, not a fix to this bug.
+
+
+## BUG-937 (HIGH, CLOSED 2026-10-18) — gov_sync --apply REWROTE A DATED SNAPSHOT'S COUNT ON EVERY RUN
+
+**What was measured.** `_recut_census()` is applied to EVERY face in `scripts/gov_sync.py --apply`, but
+`agent/session_seed.yaml` declares `history_boundary: false` (no GOV-HISTORY marker). The re-cut scopes itself with
+`text.partition(HIS)`, and with no `HIS` in that face the WHOLE file is treated as "live", so every `\b\d+ decisions` is
+re-cut to TODAY'S census count — including the DATED snapshot `session_status_2026_10_06.summary` ("FORENSIC AUDIT
+2026-10-07 v3"). MEASURED in git history: that one line's count had already been silently bumped **1208 → 1212 → 1215 →
+1223 → 1227** by successive `--apply` runs, each falsifying a dated claim — the exact drift the re-cut's own docstring
+(D-2985) forbids, and which its selftest only guards for text that CARRIES the `HIS` marker (a face without one was never
+exercised).
+
+**Fix.** Guard the re-cut to faces that DECLARE a history boundary: `if face.get("history_boundary")` around
+`_recut_census(...)`. `session_seed.yaml`'s one live census field (`session.status`) is owned by `render_seed_status()`
+via `derived_fields`, so skipping the re-cut there loses nothing. MEASURED after: `--selftest` 26/26; `--apply` leaves
+`session_status_2026_10_06.summary` byte-identical while `session.status` still advances 1223 → 1227; the 4 faces re-derive
+equal. The historical count is restored to the HEAD value (1223); its true 2026-10-06 value was already corrupted before
+this session (earliest trace 1208), so a full re-archaeology is an OWNER call, not a fix.

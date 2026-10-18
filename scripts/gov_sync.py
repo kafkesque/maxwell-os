@@ -557,7 +557,15 @@ def apply(d: dict, x: dict) -> int:
                 text = _insert_block(text, face["path"], block)
         if face.get("history_boundary") and HIS not in text:
             text = text.replace(IDX_E, IDX_E + "\n\n" + HIS, 1)
-        text, n = _recut_census(text, register_truth(d, x), d, x)
+        # D-2985 (SCOPE): the re-cut owns the LIVE region ABOVE the history marker. A face that declares NO
+        # history boundary (session_seed.yaml) has no protected region, so partition(HIS) would treat the WHOLE
+        # file as live and re-cut its DATED snapshots (session_status_2026_10_06.summary) to today's count -
+        # making historical claims FALSE. MEASURED: that one line had already been bumped 1208 -> 1212 -> 1215
+        # -> 1223 by successive --apply runs. Its live census field (session.status) is owned by
+        # render_seed_status via derived_fields, so skipping the re-cut here loses nothing and stops the drift.
+        n = 0
+        if face.get("history_boundary"):
+            text, n = _recut_census(text, register_truth(d, x), d, x)
         if face.get("derived_fields"):
             for f in face["derived_fields"]:
                 val = x["version"] if f["from"] == "manifest" else render_seed_status(d, x)

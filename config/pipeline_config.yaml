@@ -310,6 +310,17 @@ stage0:
     docling_per_mb_s: 40    # pdf: allowance per MiB of source (a scanned page is bytes; a text page is few)
     docling_ceiling_s: 1500 # pdf: the largest allowance any single work may claim
     stage_timeout_s: 1800   # the applier's per-book subprocess ceiling; MUST exceed docling_ceiling_s (checked at import)
+    docling_fast_ceiling_s: 300  # born-digital pdf (text-layer probe passes): no OCR/tables — measured 2026-10-18 a 1.3MB book still exceeded 60s, so align to the floor; still 5x under the 1500s OCR ceiling
+  #: English-only / convert-text-only (owner 2026-10-18) — THE PDF READER ROUTES BY TEXT LAYER, NOT SUFFIX.
+  #: MEASURED 2026-10-18 on the live tranche: docling's default runs --ocr + --tables on EVERY pdf, so a
+  #: born-digital book (Goffman, 3.4 MB, 142 selectable chars on page 1) burned its full 436s allowance and failed
+  #: `budget_expired`. A pdftotext probe on the leading pages splits the work: born-digital (>= min_chars) takes a
+  #: FAST path (--no-ocr --no-tables --no-enrich-formula), an image-heavy scan (< min_chars) is SKIPPED (no
+  #: extractable text; the owner declared image-heavy books need no conversion).
+  text_layer:
+    probe_pages: 2        # leading pages the probe reads (a cover is often a full-page image)
+    min_chars: 100        # stripped selectable chars at/above this => born-digital TEXT; below => SCAN/image-heavy
+    scan_policy: skip     # skip | ocr  (skip: image-heavy is a declared skip; ocr: opt-in for a rare valuable scan)
   #: BUG-918/D-3086 — THE ARTEFACT'S SHAPE IS DECLARED, AND IT IS NOT THE ENGINE'S DEFAULT.
   #: MEASURED 2026-10-18 on ONE library work (Souls Of Distortion Awakening.pdf, 4.06 MB), same file, same machine,
   #: two argv forms. With docling's shipped default `--image-export-mode embedded` the artefact was 19.371 MB and

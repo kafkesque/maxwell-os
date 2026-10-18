@@ -608,11 +608,21 @@ source_library:
     applier:
       authority: D-3068
       command: python3 scripts/apply_admission.py
-      reading: 'python3 scripts/apply_admission.py --sign --as NAME (THE OWNER WORD: pin the live plan ACTS to a name, once) | --template (print a ready-to-sign acceptance) | --dry-run (the price, writes nothing) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
+      reading: 'python3 scripts/apply_admission.py --sign --as NAME (THE OWNER WORD: pin the live plan ACTS to a name, once) | --template (print a ready-to-sign acceptance) | --dry-run (the price, writes nothing) | --apply (the act) | --limit N (a tranche: the next N acts still OUTSTANDING - repeat --apply with the SAME signature until it reports nothing outstanding; an act a receipt already decided is never re-performed) | --selftest (its known-answer controls)'
       accept_prefix: 'governance/ADMISSION_ACCEPTED_'
       accept_extension: '.yaml'
       receipt_prefix: 'governance/evidence/ADMISSION_APPLIED_'
       receipt_extension: '.jsonl'
+      #: WHERE A RECEIPTED DISPOSITION LIVES (D-3086 / D-3036): `scripts/dispose_s0_artifacts.py` writes
+      #: S0_ARTIFACT_DISPOSITION_*.applied.jsonl for every artefact its shape rule removed, so `audit_evidence.py`
+      #: reads it here as the REMOVAL record that turns a DISAPPEARED into a receipted `disposed` (BUG-935).
+      disposition_receipt_prefix: 'governance/evidence/S0_ARTIFACT_DISPOSITION_'
+      #: TERMINAL DISPOSITION (D-3086 readmit closure, BUG-923): a container whose re-conversion the FIXED engine
+      #: SKIPS (no extractable text layer, scan_policy=skip — the S0_SKIPPED_IMAGE_HEAVY token) is recorded with THIS
+      #: verdict so `readmit_disposed.py` stops re-attempting it forever. A skip is a POLICY outcome, never a fault:
+      #: the owner declared image-heavy scans need no conversion, so the re-admission of the disposed set is COMPLETE
+      #: with these named terminal, and the "missing" count is cleared by the receipt, not by another run.
+      disposition_terminal_verdict: skipped_image_heavy
       accept_modes: [all, listed]
       #: D-3072: A SIGNATURE PINS THE ACTS. `plan_sha256` is the DOCUMENT; `scope_sha256` is the ordered list of
       #: (rel, source_sha256, target, kind) — what the applier actually reads and all it reads. MEASURED 2026-10-17:
@@ -635,8 +645,80 @@ source_library:
       #: declared here, never spelled in the writer (C12), and a run appends its own stamp below it.
       quarantine_prefix: 'knowledge pipeline/admission_quarantine'
       #: THE CLOSED STATE VOCABULARY. A state this writer can produce and this list does not carry is FATAL: a
-      #: receipt line whose state nobody declared is a state no reader can classify.
-      states: [run, would_apply, applied, already_applied, refused, failed, summary]
+      #: receipt line whose state nobody declared is a state no reader can classify. ENFORCED (BUG-923): `run()`
+      #: refuses a record whose state is not on this list, so this is a gate and not a description.
+      #: `skipped` and `deferred` were MISSING while the writer emitted them MEASURED 2026-10-18 — 85 rows were
+      #: written as `skipped` against this list, and 7 rows the door had DEFERRED were written as `failed`.
+      states: [run, would_apply, applied, already_applied, duplicate_of_admitted, refused, failed, skipped, deferred, disposed, summary]
+      #: WHAT EACH STATE *ASSERTS*, not merely which names are allowed (BUG-935). The list above says what a receipt
+      #: may CALL a row; it never said which names claim BYTES ARE IN THE CORPUS, which are evidence that two works
+      #: are ONE, and which promise that NOTHING was left behind. `scripts/audit_evidence.py` re-proves the
+      #: accumulated receipts against those claims, so it reads the roles here instead of spelling state names in
+      #: code (C12) - and a role this block omits is FATAL there, never a silent "not checked" (D-3034).
+      state_roles:
+        admitted: [applied, already_applied]
+        duplicate: [duplicate_of_admitted]
+        absent: [refused, failed, skipped, deferred, would_apply]
+        #: A REMOVAL IS AN ACT (D-3036). `disposed` names an object that LEFT the corpus BY A RECEIPTED ACT — the
+        #: S0-artefact disposition (D-3086) and any future deletion through `pipeline/safe_delete.py`. MEASURED
+        #: 2026-10-18 the hard way: 57 admitted markdown files were absent with no removal state declared, so the
+        #: auditor could only report them as DISAPPEARED (BUG-935). Declaring `disposed` here is what turns "gone
+        #: and no receipt" into "gone and THIS receipt names it".
+        removal: [disposed]
+        #: the fields a receipt line needs before it can be tied to the WORD that authorised it (D-3036/BUG-925: a
+        #: signature overwritten in place left every receipt of that run pointing at a document that no longer
+        #: existed, so the receipts proved an authority that could not be produced on demand)
+        requires: [plan, plan_sha256, accept]
+      #: WHEN ARE TWO PLAN ROWS ONE WORK? By BYTES, never by name (D-3092/BUG-921). MEASURED 2026-10-18 on the
+      #: day's own receipt: of 37 rows recorded `failed`, 34 were door deferrals and 28 of those were rows whose
+      #: IDENTICAL BYTES a receipt of the SAME RUN had already admitted from another library path (the same work
+      #: held twice: `business-notes/pdf/...` admitted, `business-pdf/...` then deferred against its twin's own
+      #: output). The owner was being asked to adjudicate a question the receipts had already answered.
+      #: The evidence is the digest the receipt already carries, so this rule costs no extra read; an absent or
+      #: unproven target means the record has NO BYTES (BUG-920's mirror) and the row must be CONVERTED, never
+      #: written off as a duplicate.
+      same_bytes:
+        state: duplicate_of_admitted
+        evidence: source_sha256
+        requires: 'the prior receipt''s md_target exists AND its recorded md_sha256 still matches those bytes'
+        meaning: 'these exact bytes were already admitted under another corpus path, which is named in the reason: the work is in the corpus, this second copy is redundant, so nothing was copied, converted or quarantined - and no word is owed'
+        absent_target_means: 'the receipt names an output that is NOT on disk (S0 resumed without producing bytes, BUG-920): the row is converted again here rather than written off, and the receipt carries twin_without_bytes'
+      #: BUG-930/D-3095 — A ROW THE CORPUS HOLDS BY NAME IS A QUESTION, NOT A FAULT. MEASURED 2026-10-18, on the
+      #: owner's own 237-row signed plan: the batch-wide gate asked ONE boolean — "is this row still a candidate?"
+      #: — and turned "no" into a FATAL that aborted 109 outstanding acts. Of the 12 rows that hit it, 9 carried
+      #: bytes a receipt had ALREADY admitted (the work is in the corpus; the row is redundant, D-3092) and 3 are
+      #: the D-3045 format duplicates only the owner may name (Freelancing.docx vs FREELANCING.docx,
+      #: SCORE-…_2.pdf vs …_2.docx, Sample Lean …(1).pdf vs …(1).docx). So one question only a human can answer
+      #: aborted a tranche that was ready to work — the SAME category error BUG-923 fixed one layer down, where a
+      #: deferral drove rc 1. The corpus is the authority about what it HOLDS; the applier asks it BY NAME here and
+      #: BY BYTES in `same_bytes` above, and BYTES ANSWER FIRST: a row whose bytes are already admitted is a
+      #: duplicate and owes no word, whatever its name.
+      name_held:
+        state: deferred
+        indexes: [corpus_index, ingest_records]
+        meaning: 'the corpus (or an ingest record: the pipeline READ the work under a name the corpus has since renamed, T-130) already holds this NAME but NOT these bytes: two works of one name, or one work in two formats. Only the OWNER may say which work that is (D-3045), so the row is DEFERRED - loud, counted, and never copied, converted or quarantined - and rc 2 says a word is owed, never that the batch failed (BUG-457/BUG-923)'
+        bytes_win: 'checked AFTER same_bytes: a row whose source digest a receipt already admitted under another corpus path reads duplicate_of_admitted (the work is in the corpus, no word owed) even when its name is held - bytes are evidence, a name is only a question'
+        absent_means: 'a signed row that NO index holds and that the door no longer reads as a candidate did not become a question, it became UNREADABLE: its source is gone, its bytes moved, or the door now refuses the file itself (its folder, its name, its container). That stays a per-row REFUSAL - named, never applied - and no longer aborts the batch (a fault in one row is not a verdict on 108 others)'
+        dry_run_digest: 'a dry run takes the source digest for THESE rows only, because they are the only rows whose verdict the digest decides. The set is bounded by the world (12 of 237 on 2026-10-18), never by a row count, so BUG-882 rule (a pricing run must not read 8.0 GiB of sources) still holds'
+      #: WHAT S0 CAN CONCLUDE THAT IS NOT A CONVERSION (BUG-923). Each token is printed by
+      #: `pipeline/stage0_convert.py`; the MEANING lives here so a receipt line reads as a sentence and the applier
+      #: spells neither the token nor the story (C12). `--selftest` proves each token EXISTS in the producer's own
+      #: bytes, so a renamed token breaks a control instead of silently turning every skip back into a failure.
+      s0_outcome_tokens:
+        skipped:
+          token: S0_SKIPPED_IMAGE_HEAVY
+          meaning: 'the scan carries no extractable text layer and the owner policy is convert-text-only (no OCR), so the conversion does not apply to these bytes - a policy outcome, never a fault'
+        deferred:
+          token: deferred_for_identity
+          meaning: 'the ingest door DEFERRED this work on identity (same_sanitized_stem or byte_identical): it collides with a work the corpus already holds and needs the OWNER word on which one it is (D-3045), so nothing was converted and nothing is broken'
+      #: WHAT A BATCH'S EXIT CODE MEANS (BUG-923). MEASURED 2026-10-18: a tranche that applied 182 works and
+      #: deferred 7 exited 1, so `just` printed "Recipe `admit-apply` failed" at an owner whose batch had done
+      #: exactly what the door said. A DEFERRAL is not a failure - it is a question only the owner can answer - so
+      #: it is rc 2 (OWNER-OWED, loud, never fatal: BUG-457), and only a real `refused`/`failed` is rc 1.
+      exit_codes:
+        fatal_states: [refused, failed]
+        owner_owed_states: [deferred]
+        message: 'a batch that only DEFERRED or SKIPPED rows is not a failed batch: rc 2 means the OWNER owes a word (D-3045), and `just` reports it as owed, not as an error'
       refuses:
         a_row_absent_from_the_signed_set: 'the signature is the whole authorisation; the plan is only its subject'
         a_source_whose_bytes_are_not_a_readable_container: 'the plan may be older than the bytes it priced: a truncated or mis-renamed container is refused BEFORE a byte is copied, so a doomed 137 MB copy and its S0 run are never paid for (BUG-886, D-3071)'

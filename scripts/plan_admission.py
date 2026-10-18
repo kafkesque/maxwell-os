@@ -129,6 +129,8 @@ CONTROL_LABELS = (
     "a_defect_outside_the_declared_vocabulary_is_FATAL_and_never_printed_as_a_guess",
     #: BUG-895 — the control OF the controls.
     "EVERY_control_label_is_cited_by_INDEX_so_no_name_prints_green_with_nothing_behind_it",
+    #: BUG-929 — the plan's DAY NAME is a slot, exactly as the acceptance's was (BUG-925).
+    "a_SECOND_derivation_of_the_day_NEVER_replaces_the_plan_a_SIGNATURE_pins_and_a_REPEAT_does_not_rewrite",
 )
 
 
@@ -578,10 +580,34 @@ def render(plan: dict[str, Any], plan_name: str = "") -> str:
 
 
 def write_plan(plan: dict[str, Any], decl: dict[str, Any], root: Path = _PROJECT_ROOT) -> list[Path]:
-    """Write the plan beside its declared prefix: one human file and one machine file (a plan is a READ)."""
+    """Write the plan beside its declared prefix: one human file and one machine file (a plan is a READ).
+
+    BUG-929 — THE DAY'S NAME IS A SLOT, AND A SLOT DESTROYS WHAT A SIGNATURE PINS (the mirror of BUG-925). MEASURED
+    2026-10-18: `governance/ADMISSION_ACCEPTED_20261018.yaml` pins `ADMISSION_PLAN_20261018.json` by path AND
+    digest (`plan_sha256: 9852c484…`), and this function wrote `<prefix><YYYYMMDD>.json` UNCONDITIONALLY — so the
+    day's second derivation replaced the bytes the owner's word names. D-3072's scope proof rescues the owner only
+    while the ACTS are identical; the moment a derivation moves a row (measured: 12 rows moved once the batch had
+    applied them) the pinned digest resolves to nothing and the word is unverifiable — the exact loop, one file
+    over. So the day's name is used ONLY when it is free or when the plan repeats itself byte-for-byte in its acts:
+    a DIFFERENT plan lands in a stamped file and never replaces the one a signature names. `newest()` already sorts
+    the stamped name after the date name (`.` < `T`), so the reader needs no change.
+    """
     stamp = plan["generated"][:10].replace("-", "")
     prefix = root / str(decl["plan_prefix"])
     md, js = Path(f"{prefix}{stamp}.md"), Path(f"{prefix}{stamp}.json")
+    if js.is_file():
+        try:
+            same_acts = json.loads(js.read_text(encoding="utf-8")).get("rows") == plan["rows"]
+        except json.JSONDecodeError:
+            same_acts = False  # an unreadable plan is never "the same plan" — it is replaced by a NAMED new one
+        if same_acts:
+            return [md, js]  # idempotent: one plan, one stable digest, so every signature keeps resolving
+        moment = plan["generated"].replace("-", "").replace(":", "")
+        md, js = Path(f"{prefix}{moment}Z.md"), Path(f"{prefix}{moment}Z.json")
+        ordinal = 2
+        while js.exists():
+            md, js = Path(f"{prefix}{moment}Z-{ordinal}.md"), Path(f"{prefix}{moment}Z-{ordinal}.json")
+            ordinal += 1
     md.write_text(render(plan, js.name), encoding="utf-8")
     js.write_text(json.dumps(plan, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     return [md, js]
@@ -1028,6 +1054,28 @@ def selftest() -> int:
     cited = {int(match) for match in re.findall(r"CONTROL_LABELS\[(\d+)\]", Path(__file__).read_text("utf-8"))}
     expect(CONTROL_LABELS[24], cited == set(range(len(CONTROL_LABELS))),
            f"label index (or indices) {sorted(set(range(len(CONTROL_LABELS))) - cited)} print ok with no assertion")
+
+    # (24) BUG-929: THE PLAN'S DAY NAME IS A SLOT, EXACTLY AS THE ACCEPTANCE'S WAS (BUG-925). MEASURED 2026-10-18:
+    #      `ADMISSION_ACCEPTED_20261018.yaml` pins `ADMISSION_PLAN_20261018.json` by path AND digest, and the
+    #      writer named the plan by DATE ONLY and wrote it unconditionally — so the day's second derivation
+    #      replaced the bytes the owner's word names. Three sides: a REPEAT (same acts) does not rewrite the file
+    #      (one plan keeps one digest), a CHANGED plan lands somewhere else and leaves the pinned bytes intact, and
+    #      the changed plan is still readable (a new name is not a silent drop).
+    with tempfile.TemporaryDirectory() as plan_tmp:
+        plan_root = Path(plan_tmp)
+        plan_decl = {"plan_prefix": str(plan_root / "PLAN_")}
+        first_plan = json.loads(json.dumps(plan))  # the FIXTURE's real plan: every key the renderer needs
+        first_paths = write_plan(first_plan, plan_decl)
+        first_bytes = first_paths[1].read_bytes()
+        repeat_paths = write_plan(json.loads(json.dumps(first_plan)), plan_decl)
+        moved_plan = json.loads(json.dumps(first_plan))
+        moved_plan["rows"] = list(moved_plan["rows"]) + [dict(moved_plan["rows"][0], rel="a moved row")]
+        moved_paths = write_plan(moved_plan, plan_decl)
+        expect(CONTROL_LABELS[25],
+               repeat_paths[1] == first_paths[1] and first_paths[1].read_bytes() == first_bytes
+               and moved_paths[1] != first_paths[1] and first_paths[1].read_bytes() == first_bytes
+               and json.loads(moved_paths[1].read_text("utf-8"))["rows"] == moved_plan["rows"],
+               "a second derivation of the day replaced the plan a signature pins")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

@@ -28212,3 +28212,285 @@ decisions:
     on the vocabulary, and one ambiguity is explicitly his — `ai-augmented+work` currently sits in DOMAIN 5 (2 files)
     and DOMAIN 6 (1 file); the recommendation is DOMAIN 6, but an engine may not decide placement by name (D-3045).
   supersedes: []
+
+- id: D-3089
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  category: 'THE GYST BOILERPLATE README IS NOT A WORK — REFUSED PERMANENTLY, AND ITS BYTES DELETED (owner word 2026-10-18)'
+  refines: [D-3038, D-3072]
+  bugs: [BUG-921, BUG-923]
+  decision: >-
+    The five `*GYST_README!.rtf` files under `journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by
+    {Erica Gorochow, Harry Frank, Hasraf Dulull, Jonathan Winbush}` and `XXX_PROJECT_TITLE_000000` are ONE artefact,
+    not five works: byte-identical (md5 `0ea61080d536c5ac35a30d56cd1614f7`, 831 B each), and their whole content is the
+    template's "Get Your Shit Together" boilerplate (a thank-you paragraph, a URL, a phone number, a postal address)
+    stamped once per project folder. The `XXX_PROJECT_TITLE_000000` sibling is the proof rather than an inference: the
+    set is an UNFILLED TEMPLATE. The owner's word: REFUSE THEM PERMANENTLY as works, and DELETE the source bytes and
+    the derived `.md` rather than parking them in a pen to be re-proposed each tranche. Refusal is the accepted
+    negative, recorded here so it can never be re-proposed from memory (D-3038); the deletion runs through
+    `pipeline/safe_delete.py` with a `backup/deletions/<stamp>/` copy and this decision named as its authority (R-D410
+    — nothing is destroyed without a copy and a citation).
+  files:
+    refused: 'KEY `*gyst_readme!` — every container carrying it, in any root, is refused as a work (a class, not 5 handles)'
+    deleted_sources: 'education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by {Erica Gorochow,Harry Frank,Hasraf Dulull,Jonathan Winbush}/*GYST_README!.rtf + .../XXX_PROJECT_TITLE_000000/*GYST_README!.rtf (5 files, 831 B each)'
+    deleted_derived: 'knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.md (515 B) AND the .rtf copy beside it — the container the run itself copied in'
+    deleted_quarantine: 'knowledge pipeline/admission_quarantine/20261018T140653Z/*GYST_README!.rtf (the failed row''s copy)'
+  receipts:
+    store_2026-10-18: 'maxwell.db `fbs`: 0 rows name gyst in source_books / primary_source / citation — deleting the derived .md orphans NO committed work (this is the check that BUG-920''s mirror class demands before any bytes move)'
+    run_2026-10-18: 'ADMISSION_APPLIED_20261018T140653Z: the FIRST of the five (Erica Gorochow) was admitted `applied` at 16:40:52 local; the other four then deferred `deferred_for_identity` (same_sanitized_stem) — the collision was SELF-INFLICTED BY ONE RUN, which is BUG-921''s missing per-work key measured live, and the four deferrals were then mislabelled `failed` by BUG-923'
+    cost_deleted: '5,157 B of boilerplate across 7 files — the smallest deletion class in the corpus, and the only one whose content is a signature block'
+  notes: >-
+    WHAT THIS OWES, AND WHY IT IS NOT DONE IN THE SAME BREATH (the applier was reading `config/*.yaml` per row while
+    this decision was written — BUG-614's class). (1) A DECLARED OWNER-REFUSAL REGISTER the PLANNER READS:
+    `config/ingest_identity_gate.yaml#source_library.admission.owner_refusals.keys[] = ['*gyst_readme!']`, consulted by
+    `scripts/plan_admission.py` as a declared decision `refused_by_owner_decision`, counted and printed — because a
+    refusal that only lives in prose is a sentence, not a referent (D-3034), and the byte deletion alone leaves the KEY
+    free to be re-admitted by the next Dropbox re-sync or GYST export. (2) PURGE THE S0 CHECKPOINT RECORD whose
+    `source_path` is the corpus `.rtf` (written 16:40:52 by this run): leaving it is BUG-920's mirror exactly — a
+    receipt whose bytes are gone, which would make a future re-admit `Skipped: 1` and write no `.md`. (3) The same
+    `same_sanitized_stem` deferral is owed an owner word on TWO REAL WORKS that are NOT refused and were NOT touched:
+    `IdentityLectureNotes.pdf` (collides with the `.docx` of the same work, already admitted this run) and
+    `Interactive_documentary_and_live_perform.pdf` (collides with an existing corpus `.md`) — those are ONE WORK IN TWO
+    CONTAINERS, which is BUG-921's subject, and a format duplicate must not be resolved by an engine (D-3045).
+  supersedes: []
+
+- id: D-3090
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  category: 'A BATCH REPORTS WHAT IT DID, AND A TRANCHE COUNTS WORK — the applier''s verdict and its unit are both declared (BUG-923/BUG-924)'
+  refines: [D-3068, D-3072, D-3051]
+  bugs: [BUG-923, BUG-924]
+  decision: >-
+    The admit applier's REPORT and its UNIT are governance facts, not implementation details. (1) THE STATE
+    VOCABULARY IS A GATE: `applier.states` is enforced, so a state the declaration does not carry is FATAL rather
+    than written; `skipped` and `deferred` are now declared because the writer already emitted `skipped` 85 times
+    against a list that did not name it. (2) AN OUTCOME THAT IS NOT A CONVERSION IS DECLARED, WITH ITS SENTENCE:
+    `applier.s0_outcome_tokens` maps each S0 token to a state and to the sentence the receipt line carries, so
+    neither the token nor the story is spelled in the writer (C12), and an UNMAPPED outcome stays a FAILED
+    conversion (fail-closed). (3) THE EXIT CODE IS DECLARED: `applier.exit_codes` names the fatal states
+    (`refused`, `failed`) and the owner-owed states (`deferred`), so a batch that only DEFERRED or SKIPPED exits
+    2 (OWNER-OWED, loud, never fatal) instead of 1 — MEASURED 2026-10-18, a batch that applied 182 works, skipped
+    85 and deferred 7 reported itself as an error and the owner re-signed and re-applied four times for it.
+    (4) A TRANCHE COUNTS WORK: `--limit N` takes the next N acts still OUTSTANDING (keyed by rel+target), never the
+    first N signed rows; an act a prior receipt DECIDED (skipped/deferred) is reported and never re-performed;
+    `applied` is NOT filtered because `apply_row` re-proves a target by digest and that check is worth its read.
+    A different TARGET is a different ACT, so a re-keyed row is attempted again rather than inheriting a verdict.
+  files:
+    declaration: 'config/ingest_identity_gate.yaml#source_library.admission.applier — states, s0_outcome_tokens, exit_codes'
+    writer: 'scripts/apply_admission.py — declared_state(), s0_outcome_tokens(), batch_rc(), read_receipts(), decided_acts(), split_decided()'
+    fix_pass: 'the same pass that landed BUG-925 (D-3091): one root cause — the applier could not tell its owner what it had done'
+  receipts:
+    selftest: 'python3 scripts/apply_admission.py --selftest → 42/42 controls green (4 new: exit-code mapping, vocabulary gate, token-exists-in-producer, decided-act tranche)'
+    live_dry_run: '17:15Z against the 20261018 plan: "DECIDED 85 act(s) a prior receipt already decided (skipped/deferred) — not re-attempted; 152 outstanding, this run attempts 3"'
+    measured_rewalk: 'receipts 20261018T132104Z / T132142Z / T134204Z: 20 rows attempted in more than one tranche, one copied+converted+quarantined three times'
+    measured_loop: '~/.zsh_history 1402-1413 — four sign+apply pairs in one sitting, each after "Recipe `admit-apply` failed with exit code 1"'
+  notes: >-
+    WHAT THIS OWES OR EXPLICITLY DEFERS. (1) The 19 rows the live batch recorded as `failed` stay `failed` in ITS
+    receipt: a receipt is not rewritten (D-3036), and the correction is the next run's, which will record the same
+    acts `deferred` — the two receipts together are the record of both vocabulary versions. (2) The `deferred` rows
+    still OWE AN OWNER WORD on identity (D-3045); this decision makes the debt VISIBLE and correctly priced, it does
+    not answer it. (3) The deeper repair for repeated deferrals is BUG-921's per-work key, untouched here.
+  supersedes: []
+
+- id: D-3091
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  category: 'A SIGNATURE IS AN APPEND-ONLY ACT — the day''s name is a slot, and a slot destroys the receipt that names it (BUG-925)'
+  refines: [D-3072, D-3036, D-3034]
+  bugs: [BUG-925]
+  decision: >-
+    The acceptance file is named by UTC DATE, and `--sign` wrote it unconditionally, so the owner's second
+    signature of the day REPLACED the first. MEASURED 2026-10-18: the live batch's receipt header pins its
+    authority by path AND digest (accept_sha256 94c3c308…, 449 rows, scope 9d51674b…); after a re-derive and a
+    re-sign at 17:07 the same path hashed 941f3a6c… — the document the receipt names no longer existed anywhere,
+    and the word that authorised the rows the batch was still applying was gone. A signature is an APPEND-ONLY ACT
+    (D-3036): a file named by a date is a SLOT, and a slot is overwritten by definition, so every re-sign destroys
+    the previous authority and with it the resolution of every receipt that cites it (D-3034). Therefore: the
+    day's name is used ONLY when it is free; an IDENTICAL word is not written twice (one word, one stable digest,
+    so every receipt stays resolvable); different words land in a NEW stamped file and NEVER replace the file a
+    receipt already names. The reader needs no change: `newest()` sorts the stamped name after the date name and
+    a later date still wins.
+  files:
+    writer: 'scripts/apply_admission.py — signature_path(), called by sign()'
+    reader: 'scripts/apply_admission.py — newest() (unchanged; verified over both name forms)'
+  receipts:
+    selftest: 'a_second_word_is_APPENDED_and_an_IDENTICAL_word_is_NOT_written_twice + ONE_command_writes_the_IDENTITY_and_pins_the_LIVE_ACTS + re_signing_the_SAME_name_is_IDEMPOTENT (42/42 green)'
+    measured_before: 'receipt header accept_sha256 94c3c308… vs shasum -a 256 governance/ADMISSION_ACCEPTED_20261018.yaml 941f3a6c… (17:12Z)'
+  notes: >-
+    WHAT THIS DOES NOT DO, NAMED SO IT IS NOT MISTAKEN FOR DONE. (1) The 449-row word already lost for the batch in
+    flight cannot be restored — no copy was taken, and this decision prevents the recurrence rather than the loss.
+    (2) A re-derive whose ACTS moved still voids a word, because the acceptance carries row LABELS and not the
+    scope FIELDS per row; the principled repair (the signature carries its acts, so a plan re-derived after a
+    tranche still proves the same OUTSTANDING acts) is a schema change with a migration and is DEFERRED by
+    measurement, not by preference: with D-3090's tranche fix the owner never needs to re-derive mid-batch, so the
+    pressure that produced the loop is gone. Registered as the next refinement in BUG-925.
+  supersedes: []
+
+- id: D-3092
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  refines: [D-3045, D-3034, D-3090, D-3068]
+  bugs: [BUG-926, BUG-921, BUG-920]
+  category: 'A WORK IS ITS BYTES, NOT ITS NAME — the corpus is asked what it already HOLDS, and a second copy is NAMED rather than put to the owner (BUG-926)'
+  decision: >-
+    The ingest door decides identity from a NAME (sanitize_source_book(stem).lower()), and the applier's own
+    receipts carry the stronger fact: source_sha256, md_target and md_sha256. MEASURED 2026-10-18: of 37 rows the
+    day's batch recorded `failed`, 34 were door deferrals, and 24 of those carried bytes a receipt of the SAME RUN
+    had already admitted from ANOTHER library path (the same work held twice: business-notes/pdf/… applied,
+    business-pdf/… then deferred against its twin's own output). The owner was asked to adjudicate identities the
+    record had already resolved. Therefore identity has THREE answers, in this order, and each has exactly one
+    authority: (1) SAME BYTES = the same work, proved by the digest a receipt already carries — the second copy is
+    recorded `duplicate_of_admitted`, naming the corpus path it duplicates, and nothing is copied, converted or
+    quarantined; (2) SAME NAME, DIFFERENT BYTES = a JUDGEMENT about which work it is, and only the OWNER may make it
+    (D-3045) — the door defers, loudly, at rc 2; (3) A RECORD WHOSE NAMED OUTPUT IS ABSENT = no proof at all, so the
+    row is CONVERTED again and the line carries twin_without_bytes (BUG-920's mirror: one half may never silently
+    vouch for the other). The rule is declared, not spelled: `same_bytes` in the gate carries the state, the
+    evidence (source_sha256 ONLY — a name or a size is FATAL), the meaning and the absent-target rule, because a
+    closed vocabulary nothing enforces is a caption (D-3090).
+  files:
+    declaration: 'config/ingest_identity_gate.yaml — source_library.admission.applier.same_bytes + the state in `states`'
+    writer: 'scripts/apply_admission.py — admitted_bytes(), same_bytes_policy(), the branch in apply_row() BEFORE the copy, and the index refresh in run()'
+  receipts:
+    selftest: '46/46 green (4 new: duplicate named-and-never-copied, twin-without-bytes converted, a rule declared on a name/size refused, the run keeps its index current)'
+    measured_on_live_receipt: '428 admitted digests; of 34 deferrals — 24 duplicate / 4 twin-without-bytes (all *GYST_README!.rtf) / 6 genuine owner questions'
+    measured_class_split: '37 failed = 34 deferred_for_identity + 2 no_output_below_floor + 1 S0 markdown absent (BUG-920 mirror)'
+  notes: >-
+    WHAT THIS DOES NOT DO, NAMED SO IT IS NOT MISTAKEN FOR DONE. (1) The PLAN still proposes both copies of a work as
+    two acts; that is DEFERRED with its reason (D-3038) rather than fixed: it self-heals, because once one copy is
+    admitted a re-derive reads the other as already_in_the_corpus by key, and a plan-time digest pass would hash 237
+    cloud-backed candidates to withhold an act the owner does not need. (2) A --dry-run cannot resolve this class at
+    all — BUG-882 forbids hashing in a dry run, and hashing 8.0 GiB over this library stalled a reading for minutes
+    — so the dry run now SAYS SO in its output instead of printing a count it cannot honour. (3) BUG-921's per-work
+    key at S0/plan time is still owed: this decision removes the FALSE questions, it does not merge the two names,
+    and the 6 remaining rows (case/suffix variants and two format pairs) keep the owner's word.
+  supersedes: []
+
+- id: D-3093
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  refines: [D-3036, D-3071, D-3092]
+  bugs: [BUG-920]
+  category: 'A RECORD AND ITS BYTES ARE ONE OBJECT — a checkpoint line is a promise about an artefact, so the artefact is asked before the promise is honoured (BUG-920)'
+  decision: >-
+    Stage 0's checkpoint is a set of claims that conversions are done, and the resume honoured those claims without
+    looking. MEASURED 2026-10-18: `Semiotics-the-Basics.pdf` was SKIPPED on a checkpoint line, S0 exited 0, and no
+    markdown existed — the receipt said the work was converted while the corpus held nothing. The mirror direction
+    (bytes written, line never appended) is the same defect read from the other side: one object was being kept as
+    two independent facts. Therefore a claim about bytes is verified against bytes before it is acted on:
+    `resume_has_work()` asks whether the recorded output_path EXISTS and clears `MIN_OUTPUT_BYTES`, and a line that
+    fails is NAMED, dropped from the resume set, and re-converted in that same invocation. It is ONE home for the
+    rule, used by the resume AND by the new standing audit. Existence plus floor, not a digest: this is asked once
+    per book on every S0 invocation (the applier runs S0 PER ROW), so re-hashing 1,327 artefacts per row would cost
+    more than the conversions it protects. The phantom lines are NOT purged — they are inert, named and
+    re-convertible, and deleting a derived claim to fix a reader that no longer honours it buys nothing (D-3038).
+  files:
+    rule: 'pipeline/stage0_convert.py — resume_has_work(), used by run_stage0() and audit_checkpoint()'
+    instrument: 'pipeline/stage0_convert.py — --audit-checkpoint (read-only; rc 2 while any claim has no work)'
+  receipts:
+    measured_red: '1327 lines, 3 with no work on disk (*GYST_README!.rtf, Semiotics-the-Basics.pdf, ZZ REPRO.pdf) — rc 2'
+    measured_green: '1324 lines resolve; an artefact below the floor reads False; a line with no output_path reads False'
+  notes: >-
+    WHAT THIS DOES NOT DO. The checkpoint is still keyed by source_file NAME, so two books with one name can share a
+    line (BUG-899, open). That direction is fail-SAFE: the collision loses the recorded output_path, reads as "no
+    work", and the book is re-converted rather than wrongly skipped.
+  supersedes: []
+
+- id: D-3094
+  state: ACTIVE
+  date: '2026-10-18'
+  by: owner
+  refines: [D-3091, D-3072, D-3036]
+  bugs: [BUG-929, BUG-928]
+  category: 'WHATEVER A SIGNATURE NAMES IS APPEND-ONLY — the acceptance was a slot (BUG-925) and so was the plan it pins (BUG-929); and an index a run keeps must be current or it invents its own faults (BUG-928)'
+  decision: >-
+    D-3091 established that a signature is an append-only act because the file it writes is a SLOT that destroys
+    the authority every receipt cites. MEASURED 2026-10-18, one file over: the acceptance pins
+    `ADMISSION_PLAN_20261018.json` by PATH AND DIGEST, and `write_plan()` named the plan by DATE ONLY and wrote it
+    unconditionally — so the day's second derivation destroyed the document the owner's word names. D-3072's SCOPE
+    proof rescues the owner only while the ACTS are identical, and the live dry run showed 12 accepted rows had
+    moved, i.e. the word would have become unverifiable. The implication is therefore stated as a rule, not as a
+    second patch: WHATEVER A SIGNATURE NAMES IS APPEND-ONLY. The day's name is used only when it is free or when the
+    plan repeats itself in its acts (identical rows → no write); a plan whose acts MOVED lands in a stamped file and
+    never replaces a pinned one. Verified live: after the fix the day's plan still hashes 9852c4847ea0d92e… before
+    and after a derivation, and the fresh plan landed stamped. In the same pass, BUG-928: a run's OWN indexes
+    (`admitted` by digest, `index` by target path) were start-of-run snapshots, so two rows of one work recorded a
+    REFUSAL naming a receipt the same run had written minutes earlier — an index a run keeps must be current, or it
+    manufactures the faults it exists to prevent.
+  files:
+    writer: 'scripts/plan_admission.py — write_plan() (day name only when free or act-identical; else stamped)'
+    writer_2: 'scripts/apply_admission.py — run() refreshes `admitted` and `index` after every admitted row'
+  receipts:
+    selftest: 'a_SECOND_derivation_of_the_day_NEVER_replaces_the_plan_a_SIGNATURE_pins_and_a_REPEAT_does_not_rewrite (plan_admission: all controls green); the_run_ALSO_keeps_its_TARGET_index_current_after_every_admitted_row (49/49)'
+    measured_live: 'shasum -a 256 governance/ADMISSION_PLAN_20261018.json = 9852c4847ea0d92e… BEFORE and AFTER `--plan`; the new plan wrote ADMISSION_PLAN_20261018T153603ZZ.json'
+    measured_stale_plan: 'the live --dry-run refused 12 accepted rows as "no longer classifies as an admission candidate" — the plan is a snapshot and the tree is the authority'
+  notes: >-
+    WHAT THIS DOES NOT DO. The acceptance still carries row LABELS rather than the scope FIELDS per row, so a word
+    whose acts moved is void and a new word is owed (registered in BUG-925). The two fixes together remove the
+    reason the owner ever needed to re-derive mid-batch; the schema change that would remove the last case is
+    deferred by measurement, not by preference.
+  supersedes: []
+- id: D-3095
+  state: ACTIVE
+  refines: [D-3045, D-3092, D-3072, D-3068, D-3034]
+  bugs: [BUG-930, BUG-923, BUG-926]
+  category: 'A SIGNED ROW THE CORPUS HOLDS BY NAME IS A QUESTION, NOT A FAULT — a fault is about the row, never a verdict on the signature (BUG-930)'
+  rule: 'the door CLASSIFIES each signed row: SATISFIED (its own target is on disk) / QUESTION (no target, but the corpus or an ingest record holds that NAME -> deferred, rc 2, nothing copied) / FAULT (no target, no name held anywhere -> refused BY NAME, and the other rows still run) / KEY MOVED (the door reads it under another key -> fault). BYTES ANSWER FIRST: a name-held row whose source digest a receipt already admitted is duplicate_of_admitted, not a question. The rule is declared in ingest_identity_gate.yaml#source_library.admission.applier.name_held and the applier decides nothing.'
+  receipts:
+    measured: 'the owner 237-row signed plan: 12 rows tripped the old gate, 9 were byte-redundant (work already in the corpus) and 3 were the D-3045 format duplicates; one question aborted 109 authorised acts'
+    live_after: 'apply on the owner own signature, no re-derivation: 1 applied / 25 duplicate_of_admitted / 116 already_applied / 3 deferred / 2 failed(no_output), rc 2 for the owed word'
+    selftest: '57/57 then 63/63, all new controls two-sided'
+- id: D-3096
+  state: ACTIVE
+  refines: [D-3072, D-3094, D-3092, D-3036]
+  bugs: [BUG-931, BUG-932, BUG-933]
+  category: 'THE WORD NAMES THE DOCUMENT, AN INDEX RANKS BY EVIDENCE, AND A CODE BINDING IS RE-MADE ONLY AS A DECLARED ACT (BUG-931/932/933)'
+  rule: 'three faces of one failure mode - a derived artefact treated as if it must stay true, when only the ACTS must stay true. (1) A signature names the plan it authorises, so that IS the plan applied (newest() only when nothing is signed; an explicit --plan still has to agree). (2) An accounting index ranks by EVIDENCE: applied/already_applied outrank failed/refused, within a rank the last wins, and a target whose ONLY record is a refusal still refuses. (3) A stage-code re-bind is possible but never silent: --why is required, the act is logged beside the sidecar, and the checkpoint lines are untouched.'
+  receipts:
+    measured: 'BUG-931: the signed plan (9852c484..., scope a3166cf7...) was refused because a fresh stamped plan existed. BUG-932: applied ...-January-2013.docx (md_sha256 e7ad6ab1...) outranked into oblivion by refused ...-January-2013.md for the same target. BUG-933: stored 54c389c7357a84ec vs current d9390042be4f4d9d -> 3 rows copied, refused, quarantined, and every later row would have failed the same way'
+    live_after: 'admit-apply on the owner own signature: rc 2 (a word owed), 0 refused, 1 applied (Semiotics-the-Basics.pdf - BUG-920 phantom converted); rebind recorded in checkpoint.jsonl.code_fingerprint.rebinds.jsonl'
+    selftest: '63/63 controls (4 for evidence rank, 3 for the word naming the plan)'
+- id: D-3097
+  state: ACTIVE
+  refines: [D-3034, D-3036, D-3092, D-3095]
+  bugs: [BUG-934, BUG-935, BUG-936]
+  category: 'THE EVIDENCE IS AUDITED, NOT ONLY WRITTEN — a control written after a bug can only prevent a recurrence; the accumulated receipts are the only oracle that FINDS one (BUG-935)'
+  rule: 'three commitments. (1) A REPORT MAY NOT DISAGREE WITH ITS OWN EXIT CODE: a claim about rc can only be printed by code that is handed the same counts the exit code is computed from, and a pre-verdict line names the QUESTION, never the verdict (BUG-934). (2) THE EVIDENCE IS RE-PROVED: scripts/audit_evidence.py (`just audit-evidence`) reads every receipt, plan and signature and checks CLASSES derived from declarations, not examples derived from bugs — vocabulary, authority still on file, admitted objects still present, twins still living, one target never admitted with two digests, every signature still resolving; each state ROLE is declared in ingest_identity_gate.yaml#applier.state_roles and an undeclared role is FATAL, never a silent "not checked". (3) A REMOVAL MUST BE AN ACT: the vocabulary declares `state_roles.removal`, which is EMPTY today on purpose, so an admitted object that is gone is reported as DISAPPEARED with its ts instead of being assumed benign — the day a `disposed` state exists, declaring it there is the whole change.'
+  reasoning: 'MEASURED 2026-10-18: 63/63 controls green while ONE `--dry-run` over the owner real signed plan found four bugs (930-933), and the auditor found 64 more (57 works gone, 7 orphans) that no control could see. Detection was O(examples) and discovery was O(imagination). The auditor input GROWS with every run, so it gets stronger with use rather than merely longer; that is the only shape of "self-learning" that does not depend on the author guessing first.'
+  receipts:
+    measured: 'audit_evidence.py first run: 1143 receipt rows, 2 signatures, 64 findings (57 DISAPPEARED, 7 NOTHING-LEFT), rc 2; 0 of the 57 exist under any name in the corpus; the quarantine collision test found 398 destinations with 3 claimed by more than one source (one by four)'
+    live_after: 'the same dry run now prints ASKING (question in flight, no rc claim) then ANSWERED: all 9 name-held rows resolved on the digest alone; rc 0'
+    selftest: '78/78 applier controls (15 spanning the report/exit-code relation, 3 for the quarantine collision); plan_admission controls green'
+    review: 'verifier pass by a SECOND model (R5): 11 defects reported, 10 real and fixed (undeclared state aborting instead of reporting, Path("") becoming ".", removal over-claim, ONE-WORK wording, CLEAN over-claim, unclassified records) and 1 refuted as a hallucinated syntax error on a file that parses clean'
+- id: D-3098
+  state: ACTIVE
+  refines: [D-3071, D-3092, D-3097]
+  bugs: [BUG-936]
+  category: 'A QUARANTINE THAT DROPS THE FOLDER DESTROYS THE EVIDENCE IT EXISTS TO KEEP — the safety net may never replace a byte-source (BUG-936)'
+  rule: 'a quarantined object keeps its row own folder dimension (quarantine/<stamp>/<rel-parent>/<name>); a residual name collision is disambiguated by sha256(source path)[:8]; if even that exists the move is REFUSED rather than performed, because evidence that is overwritten cannot be recovered by any later reader. A control must assert the PROPERTY (the corpus holds no attempt, the bytes still exist under the run home), never the path SHAPE the current bug happens to produce.'
+  receipts:
+    measured: '398 quarantine destinations, 3 claimed by more than one different source; *GYST_README!.rtf claimed by FOUR distinct works and now absent; Business guide.pdf and Creative brief.docx each claimed twice with only one file surviving'
+    selftest: '78/78 (3 controls: two works keep both bytes, the folder dimension survives, a second work on the same rel does not replace the first)'
+- id: D-3099
+  state: ACTIVE
+  date: '2026-10-18'
+  by: assistant
+  category: 'A REMOVAL IS AN ACT WITH A RECEIPT — `disposed` IS A FIRST-CLASS ADMISSION STATE, AND THE DISPOSITION''S OWN RECEIPT IS THE REMOVAL RECORD (BUG-935)'
+  refines: [D-3034, D-3036, D-3086, D-3097]
+  bugs: [BUG-935]
+  decision: >-
+    The 57 "DISAPPEARED" works were never lost: they were the 57 `quarantine_and_reconvert` artefacts that D-3086's
+    shape rule deliberately moved to a local pen (their source containers are STILL in the corpus, `container_exists:
+    true`). The disposition wrote its own receipt (`S0_ARTIFACT_DISPOSITION_*.applied.jsonl`) — but in a DIFFERENT
+    vocabulary than the admission receipts, so the evidence auditor read "applied, target gone" as a silent loss.
+    The fix is two declarations, not a repair: (1) `disposed` joins the admission state vocabulary and
+    `state_roles.removal: [disposed]` — a removal is an act that must be named; (2) the disposition receipt prefix is
+    declared (`disposition_receipt_prefix`) and the auditor folds it into the `removed` set, so a disposed artefact is
+    read as `disposed`, never DISAPPEARED. First run after the fix: 57 DISAPPEARED -> 0; the 8 residual findings are a
+    DIFFERENT class (7 NOTHING-LEFT = failed rows whose container never left; 1 GYST = the BUG-936 collision survivor).
+  receipts:
+    measured: 'audit_evidence.py before: 64 findings (57 DISAPPEARED + 7 NOTHING-LEFT). After declaring disposed + reading the disposition receipt: 8 findings (0 of the 57, all 7 NOTHING-LEFT + 1 GYST DISAPPEARED). apply_admission selftest 79/79.'

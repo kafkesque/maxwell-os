@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 686,
+  "total_ids": 701,
   "open_n": 251,
-  "closed_n": 435,
+  "closed_n": 450,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1196,7 +1196,7 @@
     {
       "id": "BUG-900",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE IN `pipeline/container_integrity.py` AND STILL BE UNCONVERTIBLE, AND THIS",
-      "events": 1
+      "events": 2
     },
     {
       "id": "BUG-901",
@@ -1256,12 +1256,12 @@
     {
       "id": "BUG-920",
       "title": "(HIGH, OPEN 2026-10-18) \u2014 AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END",
-      "events": 1
+      "events": 3
     },
     {
       "id": "BUG-921",
       "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
-      "events": 1
+      "events": 3
     }
   ],
   "closed": [
@@ -1699,6 +1699,21 @@
     "BUG-910",
     "BUG-913",
     "BUG-916",
-    "BUG-918"
+    "BUG-918",
+    "BUG-922",
+    "BUG-923",
+    "BUG-924",
+    "BUG-925",
+    "BUG-926",
+    "BUG-927",
+    "BUG-928",
+    "BUG-929",
+    "BUG-930",
+    "BUG-931",
+    "BUG-932",
+    "BUG-933",
+    "BUG-934",
+    "BUG-935",
+    "BUG-936"
   ]
 }

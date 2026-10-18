@@ -23,6 +23,7 @@ import argparse
 import hashlib
 import json
 import os
+from datetime import datetime, timezone
 import shutil
 import subprocess
 import sys
@@ -45,15 +46,28 @@ from pipeline.pipeline_paths import (
     S0_BUDGET_BASIS,
     S0_CONTAINERS,
     S0_DOCLING_CEILING_S,
+    S0_DOCLING_FAST_CEILING_S,
     S0_DOCLING_FLOOR_S,
     S0_DOCLING_PER_MB_S,
+    S0_TEXT_MIN_CHARS,
+    S0_TEXT_PROBE_PAGES,
+    S0_TEXT_SCAN_POLICY,
     S0_FAILURE_CLASSES,
     S0_MAX_FAILED_RATIO,
     S0_PANDOC_TIMEOUT_S,
     SMOKE_BOOK_LIMIT,
     STAGE0_CHECKPOINT,
 )
-from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, get_pipeline_run_id, stamp_record, write_stage_code_fingerprint
+from pipeline.stamp import (
+    check_stage_code_fingerprint,
+    get_pipeline_commit,
+    get_pipeline_run_id,
+    read_stage_code_fingerprint,
+    stage_code_fingerprint,
+    stage_code_fingerprint_path,
+    stamp_record,
+    write_stage_code_fingerprint,
+)
 from pipeline.text_cleaner import check_conversion_quality
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -93,6 +107,35 @@ def _failure(failure_class: str, detail: str) -> dict[str, Any]:
         "meaning": S0_FAILURE_CLASSES[failure_class],
         "detail": " ".join(str(detail).split())[:3000],
     }
+
+
+#: English-only / convert-text-only (owner 2026-10-18) — the SKIP CONTRACT between S0 and the applier. S0 prints
+#: this token on its own line when a PDF is an image-heavy scan (no extractable text layer) and is therefore
+#: skipped rather than OCR'd; the applier reads it from S0's stdout to record the row as `skipped`, never `failed`.
+S0_SKIP_IMAGE_HEAVY = "S0_SKIPPED_IMAGE_HEAVY"
+
+
+def probe_text_layer(pdf_path: Path) -> int | None:
+    """Count selectable text chars on the leading pages via `pdftotext` (poppler), or None when it cannot be probed.
+
+    WHY pdftotext AND NOT A PYTHON PARSER. MEASURED 2026-10-18: pypdf and pymupdf are BOTH absent on this machine,
+    and the system poppler (/opt/homebrew/bin/pdftotext) is present and reads the first pages in ~1 s. A born-digital
+    book yields text (chars >= stage0.text_layer.min_chars); a scan yields none. Returning None (probe unavailable)
+    is FAIL-CLOSED: the caller falls back to the full OCR path rather than dropping a book it could not see (C16).
+    """
+    pdftotext = shutil.which("pdftotext")
+    if pdftotext is None:
+        return None
+    try:
+        done = subprocess.run(
+            [pdftotext, "-f", "1", "-l", str(S0_TEXT_PROBE_PAGES), str(pdf_path), "-"],
+            capture_output=True, text=True, timeout=25,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if done.returncode != 0:
+        return None
+    return len("".join(done.stdout.split()))
 
 
 def docling_budget_s(pdf_path: Path) -> int:
@@ -315,19 +358,36 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
     """
     budget = docling_budget_s(pdf_path)
     size_mb = pdf_path.stat().st_size / (1024 * 1024)
+    #: English-only / convert-text-only (owner 2026-10-18): route by TEXT LAYER before spending a budget. `None`
+    #: means the probe is unavailable -> the FULL OCR path below (fail-closed, never a silent drop, C16).
+    chars = probe_text_layer(pdf_path)
+    if chars is not None and chars < S0_TEXT_MIN_CHARS and S0_TEXT_SCAN_POLICY == "skip":
+        return {
+            "ok": False,
+            "skip": True,
+            "failure_class": None,
+            "meaning": "",
+            "detail": f"image-heavy scan ({chars} selectable chars on the first {S0_TEXT_PROBE_PAGES} pages) — "
+                      f"skipped by scan_policy=skip; the owner declared image-heavy books need no conversion",
+        }
+    argv = [
+        "docling", "convert", str(pdf_path),
+        "--to", "md",
+        "--output", str(output_path.parent),
+        #: BUG-918/D-3086: THE SHAPE IS DECLARED, NOT DEFAULTED. docling ships
+        #: `--image-export-mode embedded`, which base64-inlines every figure. MEASURED 2026-10-18 on
+        #: Souls Of Distortion Awakening.pdf: embedded -> 19.371 MB / 95 `data:image` blobs;
+        #: placeholder -> 0.538 MB / 0 blobs, text identical. The subcommand form is used because the
+        #: flag belongs to `docling convert`; both forms were run on the same work that day.
+        "--image-export-mode", S0_ARTIFACT_IMAGE_MODE,
+    ]
+    if chars is not None:
+        # born-digital: no OCR, no table structure, no formula enrichment — seconds, not minutes.
+        argv += ["--no-ocr", "--no-tables", "--no-enrich-formula"]
+        budget = min(budget, S0_DOCLING_FAST_CEILING_S)
     try:
         result = subprocess.run(
-            [
-                "docling", "convert", str(pdf_path),
-                "--to", "md",
-                "--output", str(output_path.parent),
-                #: BUG-918/D-3086: THE SHAPE IS DECLARED, NOT DEFAULTED. docling ships
-                #: `--image-export-mode embedded`, which base64-inlines every figure. MEASURED 2026-10-18 on
-                #: Souls Of Distortion Awakening.pdf: embedded -> 19.371 MB / 95 `data:image` blobs;
-                #: placeholder -> 0.538 MB / 0 blobs, text identical. The subcommand form is used because the
-                #: flag belongs to `docling convert`; both forms were run on the same work that day.
-                "--image-export-mode", S0_ARTIFACT_IMAGE_MODE,
-            ],
+            argv,
             capture_output=True,
             text=True,
             timeout=budget,
@@ -435,6 +495,22 @@ def verify_artifact(artifact_path: Path) -> dict[str, Any]:
             f"remedy is stage0.artifact.image_export_mode, never a new copy",
         )
     return _ok()
+
+
+def resume_has_work(record: dict[str, Any]) -> bool:
+    """Does this checkpoint line have the WORK it claims behind it? (BUG-920 — ONE home for the rule.)
+
+    A checkpoint line is a claim that a conversion is done, and a resume honours claims without looking. MEASURED
+    2026-10-18: `Semiotics-the-Basics.pdf` was skipped on such a line, S0 exited 0, and no markdown existed — the
+    pipeline believed the work was converted while the corpus held nothing (a receipt without bytes), which is the
+    mirror of the same defect in the other direction (bytes written, receipt never made).
+
+    The test is EXISTENCE plus the floor a fresh conversion must clear — deliberately not a digest: this is asked
+    once per book on every S0 invocation (the applier runs S0 per row), so a full re-hash of 1,300 artefacts per row
+    would cost more than the conversions it protects. `--audit-checkpoint` asks the same question of every line.
+    """
+    output = Path(str(record.get("output_path") or ""))
+    return output.is_file() and output.stat().st_size > MIN_OUTPUT_BYTES
 
 
 def load_existing_checkpoint() -> dict[str, dict]:
@@ -661,8 +737,23 @@ def run_stage0(
     for i, book_path in enumerate(books, 1):
         book_key = book_path.name
         if book_key in existing and not force:
-            skipped += 1
-            continue
+            #: BUG-920 — A CHECKPOINT LINE CLAIMS THE WORK IS DONE, SO THE ARTEFACT IS ASKED. MEASURED 2026-10-18:
+            #: `Semiotics-the-Basics.pdf` was SKIPPED here on a checkpoint line, S0 exited 0, and no markdown
+            #: existed anywhere: the receipt then said the work was converted (bytes without a receipt) while the
+            #: corpus held nothing (a receipt without bytes — the same defect, read from the other side). A resume
+            #: is a promise about BYTES, so the promise is checked before it is honoured: the recorded
+            #: `output_path` must EXIST and be over the same floor a fresh conversion must clear. A digest check is
+            #: deliberately NOT made here — this runs once per book on every S0 invocation and the floor plus
+            #: existence is the cheap half that catches the live defect; a full re-hash of 1,300 artefacts per row
+            #: would cost more than the conversions it protects.
+            prior = existing[book_key]
+            artefact = Path(str(prior.get("output_path") or ""))
+            if resume_has_work(prior):
+                skipped += 1
+                continue
+            print(f"  [{i}/{len(books)}] {book_path.name} — checkpoint line has NO work behind it "
+                  f"({artefact if str(artefact) else 'no output_path recorded'}) → converting again (BUG-920)")
+            existing.pop(book_key, None)
 
         ext = book_path.suffix.lower()
         md_dir = book_path.parent
@@ -726,6 +817,12 @@ def run_stage0(
                         safe_write(md_path, staged.read_text(encoding="utf-8"), shrink_guard=False)
             finally:
                 shutil.rmtree(scratch_dir, ignore_errors=True)
+
+        if outcome.get("skip"):
+            skipped += 1
+            print(f"→ ⏭️ SKIPPED (image-heavy scan)")
+            print(S0_SKIP_IMAGE_HEAVY)  # the applier reads this token to record `skipped`, never `failed`
+            continue
 
         elapsed = time.time() - start
 
@@ -812,11 +909,99 @@ def run_stage0(
     return len(failed), len(converted)
 
 
+def audit_checkpoint() -> int:
+    """RED LOOP for BUG-920, and the standing instrument: every checkpoint line must have its WORK on disk.
+
+    A checkpoint is a SET OF CLAIMS that the conversions are done, and a resume honours those claims without
+    looking. MEASURED 2026-10-18: `Semiotics-the-Basics.pdf` was skipped on such a line, S0 exited 0, and no
+    markdown existed — so the pipeline believed the work was converted while the corpus held nothing, and the
+    applier had to record the row `failed` to say so. This command answers, read-only, the one question a resume
+    must never answer on faith: DOES EACH LINE HAVE BYTES BEHIND IT?
+
+    Exit: 0 every line resolves; 2 (OWNER-OWED, loud, never fatal — BUG-457) some line does not, and each is named
+    with the path it promised. Run it after any batch that converted (the applier runs S0 once per row, so a
+    checkpoint can carry a line whose artefact was never written).
+    """
+    claims = load_existing_checkpoint()
+    missing: list[tuple[str, str]] = []
+    for source_file, record in sorted(claims.items()):
+        if not resume_has_work(record):
+            missing.append((source_file, str(record.get("output_path") or "") or "(no output_path recorded)"))
+    print(f"checkpoint: {len(claims)} line(s); {len(missing)} claim a work that is NOT on disk")
+    for source_file, output in missing:
+        print(f"  NO BYTES  {source_file} -> {output}")
+    if missing:
+        print("A resume would SKIP these on faith (BUG-920). Re-converting them needs no flag change: the resume now "
+              "asks the artefact first, so running S0 on these books converts them again.")
+        return 2
+    return 0
+
+
+def rebind_code_fingerprint(why: str) -> int:
+    """DECLARE that this code differs from the code that produced the checkpoint — and say WHY (BUG-933).
+
+    RED LOOP, MEASURED 2026-10-18. The guard is right to exist (BUG-614: a checkpoint must not be silently extended
+    by different code), but it had NO SANCTIONED REMEDY, and the pipeline's own maintenance tripped it:
+
+        stored  54c389c7357a84ec   (the code that wrote the 1,327 checkpoint lines)
+        current d9390042be4f4d9d   (after BUG-920's READER fix: when a resume may skip)
+
+    BUG-920 changed WHEN a line is skipped, never HOW a container becomes a work, so every old line still stands.
+    But `--force` DISCARDS the checkpoint (1,327 conversions) and a bare re-run raises the same guard BEFORE doing
+    anything (the guard is checked before the loop), so the admission lane was bricked by an edit to its own reader:
+    MEASURED — three rows of the owner's signed plan were copied, refused by the guard and quarantined while the
+    batch reported `failed`, and every later row would have failed the same way.
+
+    So the binding can be RE-MADE, but only as a DECLARED act: a non-empty `--why` is required (an unexplained
+    re-bind is the silent drift the guard exists to stop), the old and new ids are printed, and the act is appended
+    to a log beside the sidecar so the trace survives the operator (D-3036: an act that leaves no trace did not
+    happen).
+    """
+    reason = (why or "").strip()
+    if not reason:
+        print("FATAL: --rebind-code-fingerprint needs --why '<what changed, and why it does not change a "
+              "conversion>' — an unexplained re-bind is the silent drift the guard forbids (BUG-614/C16)")
+        return 1
+    stored = read_stage_code_fingerprint(STAGE0_CHECKPOINT) or "(no sidecar)"
+    current = stage_code_fingerprint("stage0")
+    print(f"checkpoint: {STAGE0_CHECKPOINT}")
+    print(f"stored code fingerprint : {stored}")
+    print(f"current code fingerprint: {current}")
+    if stored == current:
+        print("nothing to re-bind: the checkpoint already names this code")
+        return 0
+    #: THE TRACE IS WRITTEN FIRST, AND THE BINDING SECOND — MEASURED 2026-10-18 in this very function's first
+    #: version: it rebound the sidecar and THEN raised (a missing import), so the act happened and left no trace,
+    #: which is the one outcome D-3036 forbids. A crash between the two now leaves a trace of an act that did not
+    #: complete (visible, correctable) instead of a completed act with no record (invisible, unaccountable).
+    ledger = Path(str(stage_code_fingerprint_path(STAGE0_CHECKPOINT)) + ".rebinds.jsonl")
+    line = json.dumps({"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"), "stage": "stage0",
+                       "from": stored, "to": current, "why": reason, "commit": get_pipeline_commit()},
+                      ensure_ascii=False) + "\n"
+    ledger.parent.mkdir(parents=True, exist_ok=True)
+    with ledger.open("a", encoding="utf-8") as handle:
+        handle.write(line)
+        handle.flush()
+        os.fsync(handle.fileno())
+    write_stage_code_fingerprint(STAGE0_CHECKPOINT, "stage0")
+    print(f"REBOUND: the checkpoint now names {current}; the reason is recorded in {ledger.name}")
+    print("          the lines already in the checkpoint are UNCHANGED — this declares the new code, it does not "
+          "re-derive a single prior conversion")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description="Stage 0: Convert EPUB/PDF → Markdown")
     parser.add_argument("--book", help="Convert a single book (filename only)")
     parser.add_argument("--force", action="store_true", help="Reconvert already-converted books")
     parser.add_argument("--books-dir", help="Override books directory")
+    parser.add_argument("--audit-checkpoint", action="store_true",
+                        help="Read-only: report every checkpoint line whose work is NOT on disk (BUG-920)")
+    parser.add_argument("--rebind-code-fingerprint", action="store_true",
+                        help="Declare that this code differs from the code that produced the checkpoint (BUG-933); "
+                             "needs --why and writes a trace beside the sidecar")
+    parser.add_argument("--why", default="",
+                        help="the reason for --rebind-code-fingerprint (required, recorded, never optional)")
     parser.add_argument(
         "--limit",
         type=int,
@@ -824,6 +1009,11 @@ def main():
         help="Max books to process (auto: 3 when MAXWELL_RUN_ID=smoke)",
     )
     args = parser.parse_args()
+
+    if args.audit_checkpoint:
+        sys.exit(audit_checkpoint())
+    if args.rebind_code_fingerprint:
+        sys.exit(rebind_code_fingerprint(args.why))
 
     books_dir = Path(args.books_dir) if args.books_dir else BOOKS_DIR
     result = run_stage0(books_dir=books_dir, force=args.force, single_book=args.book, limit=args.limit)

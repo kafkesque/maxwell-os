@@ -28,6 +28,20 @@ reading: "python3 scripts/acquire.py --selftest | status | gap | map | fetch | m
 #: The lane has FOUR acts and each has its own reading. `gap` DETECTS (T0, no network). `map` ASKS for literature
 #: (T1, resolver-first). `fetch` MOVES BYTES into a pen (T0, network). `status` says what arrived and what is owed.
 
+# ─────────────────────────────────────────────────────────────────────────────── THE ONE LANGUAGE RULE ──
+#: ONLY-ENGLISH BOOKS (owner rule, 2026-10-18). The corpus is English-only for books. ONE declaration, enforced
+#: at TWO points: cartography (a book/book-chapter candidate whose resolver-reported language is not in the
+#: allowlist is refused BEFORE any download) and download (a landed book whose DETECTED language is not in the
+#: allowlist is refused to the quarantine pen with its defect named — never a silent corpus object).
+#: Papers/articles are NOT gated: a research gap may legitimately cite a non-English source. A non-English book
+#: is REFUSED, never admitted.
+language:
+  allowlist: [en]
+  scope: [book, book-chapter]
+  authority: owner_word_2026-10-18
+  state: DECLARED
+  note: enforcement reuses the existing detect_language/is_english capability; wiring the cartography+download gates is a named follow-up
+
 # ─────────────────────────────────────────────────────────────────────────────── WHERE ACQUIRED BYTES MAY LAND ──
 pens:
   #: A PEN NAME, resolved through the door's own declaration. Typing a path here would be a second home for the

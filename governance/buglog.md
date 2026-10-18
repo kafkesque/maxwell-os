@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1215 decisions (census stamp 5971e1f12c08ad8f, 2026-10-18) · 686 bugs (251 open / 435 closed; highest OPEN = BUG-921) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1223 decisions (census stamp 70384aaad58d64c9, 2026-10-18) · 701 bugs (251 open / 450 closed; highest OPEN = BUG-921) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1215 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 630 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1215, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1223 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 638 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1223, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 251 open.
 >
@@ -17865,3 +17865,564 @@ stripped-and-referenced | image pages OCR-only), and whether a per-work md ceili
     # case-folded, punctuation-stripped, prefix-40 containment (the same `norm` above). BUG-899 re-keys Stage-0 by
     # `source_file`; this bug re-keys by the NORMALIZED WORK, and the Phase B ledger (one row per work) is the home for
     # the canonical copy. The 19 dup pairs are folded to 19 canonical works in Phase B, never by deleting blindly.
+
+
+## BUG-922 (HIGH, CLOSED 2026-10-18) — `verify_rows` FATALs the whole tranche on rows an EARLIER tranche of the SAME signature already applied, forcing a re-derive+re-sign loop
+    # THE RED LOOP — one command, already run once, that stays RED until already-applied rows are skipped not fatal:
+    python3 scripts/apply_admission.py --dry-run --limit 50
+    #   before: prints `REFUSED <rel>: no longer classifies as an admission candidate (the plan is stale for this row)`
+    #           x9 then `FATAL: 9 accepted row(s) no longer read as admission candidates — re-derive the plan and re-sign`.
+    #   after:  `DRY RUN {'would_apply': 41, 'already_applied': 9}` and NO FATAL.
+    # MEASURED 2026-10-18: plan derived+signed 15:13; a `--limit 20` tranche at 15:21 CONVERTED 9 books (their .md landed
+    # 15:22-15:28, receipt ADMISSION_APPLIED_20261018T132142Z records them `applied`); the `--limit 50` run at 15:35 then
+    # refused exactly those 9 as "no longer classifies" and FATALed. The loop: every successful tranche converts books ->
+    # `derive()` drops them (they are `already_in_the_corpus`, not candidates) -> the next tranche on the SAME signature
+    # reads "stale" -> re-derive + re-sign -> convert MORE -> stale again. The source files were never touched (quarantine
+    # moves only the corpus COPY); the plan's intent for those 9 rows was FULFILLED, not contradicted.
+    # THE FIX (applied): `verify_rows` skips a row whose `row["target"]` .md already exists (intent fulfilled -> `apply_row`
+    # owns the already_applied/refused decision via the receipt index, printed not silent) and still FATALs a row whose
+    # target is ABSENT (source genuinely gone/renamed/now-refused). Genuine staleness remains fail-closed; selftest 36/36.
+
+### BUG-900 — ADDENDUM 2026-10-18 15:58Z: THE TWO INSTANCES ARE ROUTED OUT (owner chose route-out over a zip_spine probe for these two)
+
+The owner's word on the two failed epubs: ROUTE THEM OUT (option b — not "leave and keep going", and the `zip_spine`
+probe is deliberately NOT built for two books; it stays DEFERRED as this entry's remedy, sequenced AFTER the batch).
+
+THE ACT (reversible, no delete — R-D410): both SOURCE epubs were MOVED from their `books/epub/DOMAIN…/…/` folders
+into the DECLARED `education/unsorted` pen, so the plan no longer proposes them and no later run re-fails on them.
+Bytes intact (28,913,667 and 2,513,527 bytes), recoverable via Calibre `ebook-convert` normalisation if the owner
+ever wants them in the corpus.
+
+RECEIPT (D-3036 — the act leaves a trace): plan re-derived — `ADMISSION_PLAN_20261018.json` dropped 476 → 449
+candidates = −16 applied this tranche, −9 `already_in_the_corpus` (earlier tranche), −2 routed out. The refusal is
+registered HERE (D-3038) with its reason (HBR `OEBPS/cover.xhtml` vs stored `OEBPS/Cover.xhtml` case mismatch;
+Generating Sound `content.opf` carries NO `manifest` element) and its remedy. The STRUCTURAL gap (the `epub: zip`
+probe verifies the container, never the spine) remains OPEN and is the fix to sequence next — this addendum is the
+live evidence that the gap costs real books, not a hypothetical.
+
+### BUG-920 — ADDENDUM 2026-10-18 16:10Z: THE MIRROR INSTANCE — A CHECKPOINT RECORD OUTLIVES ITS ARTEFACT (`safe_delete` leaves the S0 record)
+
+The live `apply_admission --apply` (started 14:06:53Z) failed `Semiotics-the-Basics.pdf` a SECOND time (`S0 rc=0, markdown absent`), and the applier moved the fresh copy to `admission_quarantine/20261018T140653Z/`. This is NOT the one-off "race with safe_delete" filed earlier — it is REPRODUCIBLE, and the mechanism is now measured:
+
+1. `backup/deletions/20261018_153239/` holds BOTH `Semiotics-the-Basics.md` AND `.pdf` — the corpus copies were safe_deleted at 13:32:39Z because the work is a duplicate of `Semiotics The Basics Daniel Chandler liber3.md` (1.3 MB, already in the corpus).
+2. The S0 checkpoint (`rechunk-v4-20260929/checkpoint.jsonl`) STILL carries the record for `Semiotics-the-Basics.pdf` (elapsed 74.0 s, quality_status passed, 707.6 KB) — `safe_delete` (R-D410) moved the bytes but did NOT purge the checkpoint record.
+3. On re-derive the `.md` is gone, so the row is NOT `already_in_the_corpus` → it is re-admitted as a candidate.
+4. On apply, S0's resume path sees the `source_file` in the checkpoint → treats it as already-converted → emits `Skipped: 1` and writes NO `.md` → the applier sees `markdown absent` → `failed`.
+
+CLASS: BUG-920 is "bytes without a receipt" (artefact, no record); this is the MIRROR — "a receipt without bytes" (record, no artefact). Both are one checkpoint↔filesystem divergence. THE GAP that makes this instance possible: `safe_delete` purges bytes but not the record, and a resume SKIP is decided on the record alone, never on the artefact's presence.
+
+THE FIX (sequence AFTER this batch — the same files are mid-run): S0's resume-skip must verify the `.md` exists (an `existing` record whose `output_path` is absent is not "done", it is a re-convert), OR `safe_delete` must also remove the S0 checkpoint record for the moved `source_file`. Land with BUG-920's incremental-write fix; do NOT open a new number for the mirror of an OPEN bug.
+
+DISPOSITION THIS BATCH (correct, no action): the failure is harmless — the book is a duplicate, the copy is quarantined (not deleted), no data loss.
+
+## BUG-923 (MED, CLOSED 2026-10-18) — THE APPLIER'S STATE VOCABULARY IS STALE, AND TWO INTENTIONAL OUTCOMES ARE RECORDED AS `failed`
+
+    # THE RED LOOP — one command, RED while a door deferral is mislabelled, GREEN when the state is right:
+    python3 - <<'PY'
+    import json
+    from pathlib import Path
+    f = max(Path("governance/evidence").glob("ADMISSION_APPLIED_*.jsonl"), key=lambda p: p.stat().st_mtime)
+    recs = [json.loads(l) for l in f.read_text().splitlines() if l.strip()]
+    bad  = [r for r in recs if r.get("state") == "failed" and "deferred_for_identity" in str(r.get("reason", ""))]
+    print("door deferrals recorded as FAILED:", len(bad))   # RED while > 0
+    PY
+
+    # MEASURED 2026-10-18, during the 449-row apply (ADMISSION_APPLIED_20261018T140653Z.jsonl):
+    #  * `applier.states` declares [run, would_apply, applied, already_applied, refused, failed, summary] and its
+    #    own comment says a state the writer can produce but the list does not carry is FATAL — yet the writer
+    #    EMITS `skipped` (75 rows this run) and NO code path enforces the closed vocabulary (D-3034: the
+    #    declaration does not resolve). `skipped` and `deferred` are both missing from the list.
+    #  * The applier recognises exactly ONE non-failure outcome (`S0_SKIPPED_IMAGE_HEAVY` -> `skipped`,
+    #    apply_admission.py:598). Every other intentional outcome falls through to the generic failure branch
+    #    (:614). TWO live shapes are mislabelled `failed`:
+    #      (a) 4 `*GYST_README!.rtf` rows — the door's `deferred_for_identity` ("same_sanitized_stem", needs an
+    #          OWNER WORD, NOT deleted, R-D410), a RECORDED DEFERRAL the config itself calls "skipped in place".
+    #      (b) `Semiotics-the-Basics.pdf` — an S0 resume-skip whose `.md` was safe_deleted (BUG-920 mirror).
+    # WHY IT MATTERS: `failed` drives `admit-alert` and the batch exit code, so a deferral (pending an owner
+    # word) is reported as a breakage — the owner is paged for work that is merely undecided, and the receipt's
+    # failure count overstates reality on every tranche that meets an identity collision.
+    # THE FIX (ONE change, AFTER this batch — apply_admission.py is mid-run): add `skipped` and `deferred` to
+    # `applier.states`; map `S0_SKIPPED_IMAGE_HEAVY -> skipped`, `deferred_for_identity -> deferred`, and make an
+    # UNRECOGNISED S0 outcome FATAL (a state nobody declared) instead of silently `failed`; and the batch's own
+    # failure exit excludes those two outcomes. Cross-ref BUG-921 (the identity-collision class the GYST rows belong
+    # to) and BUG-920 (the checkpoint mirror).
+
+## BUG-921 — ADDENDUM 2026-10-18: THE LIVE INSTANCE IS 5 GYST README COLLISIONS (door deferred correctly)
+
+The duplicate-stem class is now OBSERVED at apply time, not theoretical: 5 `*GYST_README!.rtf` rows (831 B each,
+boilerplate template READMEs under `journals_notes/.../GYST by <name>/`) all share `key: *gyst_readme!` and collide
+with an existing `*GYST_README!.md`. The door DEFERRED all 5 (`same_sanitized_stem`, needs an OWNER WORD) and did
+NOT delete them (R-D410) — the disposition is CORRECT; only the STATE LABEL is wrong (BUG-923). OWNER DECISION
+OWED: are these boilerplate READMEs permanently REFUSED (a declared refusal, so they never re-enter a plan), or
+admitted once under one canonical name? Until that word, they are quarantined and re-proposed each tranche.
+
+### BUG-921 — ADDENDUM 2026-10-18 17:02Z: THE OWNER'S WORD ON THE GYST INSTANCE — THE KEY IS REFUSED PERMANENTLY AND THE BYTES ARE GONE
+
+**THE WORD.** "GYST README refuse permanently, also delete source and md file" (owner, 2026-10-18). Registered as
+**D-3089** (`config/decisions.yaml`, census 1216 / stamp `c72bce92c4fdd78f`). This closes the OWNER DECISION that
+this bug's earlier addendum left open; the bug itself stays OPEN because its subject — *no per-work dedup key* — is
+untouched by deleting five files.
+
+**WHAT WAS MEASURED FIRST (the reason this is a class, not five handles).** All five `*GYST_README!.rtf` are
+byte-identical: md5 `0ea61080d536c5ac35a30d56cd1614f7`, **831 B each**, and their entire content is a template's
+signature block ("Get Your Shit Together", a thank-you paragraph, a URL, a phone number, a Wichita postal address).
+The `XXX_PROJECT_TITLE_000000` sibling is the proof rather than an inference: this is an **UNFILLED TEMPLATE**, so the
+door key `*gyst_readme!` names a plant, not a work. The collision was **self-inflicted by ONE run** — the applier
+admitted the Erica Gorochow copy at 16:40:52 local (receipt `ADMISSION_APPLIED_20261018T140653Z`, state `applied`),
+which materialised the key in the corpus, and the remaining four then deferred `deferred_for_identity`
+(`same_sanitized_stem`) and were mislabelled `failed` by BUG-923. One run, five rows, two opposite verdicts — which is
+BUG-921's thesis measured live.
+
+**THE PRE-FLIGHT THAT AUTHORISED DELETION (BUG-920's mirror class, checked BEFORE any byte moved).**
+`maxwell.db#fbs`: **0** rows carry `gyst` in `source_books`, `primary_source` or `citation`. Deleting the derived
+`.md` therefore orphans **no committed work** — the failure mode that would have made this a BUG-920 instance was
+tested for and is absent.
+
+**THE ACT (8 files, 6,332 B, every one through `pipeline/safe_delete.py`, `--maxwell-confirmed D-3089`).**
+
+| # | path | bytes |
+|---|---|---|
+| 1 | `education/journals:notes/…/GYST by Erica Gorochow/*GYST_README!.rtf` | 831 |
+| 2 | `…/GYST by Harry Frank/*GYST_README!.rtf` | 831 |
+| 3 | `…/GYST by Hasraf Dulull/*GYST_README!.rtf` | 831 |
+| 4 | `…/GYST by Jonathan Winbush/*GYST_README!.rtf` | 831 |
+| 5 | `…/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf` | 831 |
+| 6 | `knowledge pipeline/admission_quarantine/20261018T140653Z/*GYST_README!.rtf` | 831 |
+| 7 | `knowledge pipeline/books/…/GYST by Erica Gorochow/*GYST_README!.md` | 515 |
+| 8 | `knowledge pipeline/books/…/GYST by Erica Gorochow/*GYST_README!.rtf` (the copy the run itself made) | 831 |
+
+Backups (R-D410 — a copy precedes every delete): `backup/deletions/20261018_170201/` (1 rtf) and
+`backup/deletions/20261018_170202/` (1 rtf + 1 md). **2 byte-sequences survive, not 8** — the seven rtfs are
+identical by measurement, and `safe_delete` keys its backup by basename, so six same-named copies collapse into one
+per stamp directory. That collapse is a property of the guard, not a lost act: the eight paths are enumerated here,
+which is the record. No folder was emptied (each GYST project folder keeps 5–13 peers).
+
+**THE RED LOOP — run once, GREEN now, RED the moment a GYST byte returns (a Dropbox re-sync or a GYST re-export
+would trip it):**
+```
+python3 - <<'PY'
+from pathlib import Path
+roots = [Path("/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes"),
+         Path("knowledge pipeline/books"),
+         Path("knowledge pipeline/admission_quarantine")]
+left = [str(p) for r in roots for p in r.rglob("*GYST_README*")]
+print("GYST bytes:", left or "NONE")
+raise SystemExit(1 if left else 0)      # RED while > 0
+PY
+# MEASURED 2026-10-18 17:02Z: remaining NONE, rc 0. Before the act: 8 paths.
+```
+
+**A CORRECTION, RECORDED RATHER THAN EDITED.** D-3089's own `cost_deleted` receipt says "5,157 B across 7 files".
+The measured figure is **6,332 B across 8 files** (7 × 831 + 1 × 515) — the decision undercounted the corpus `.rtf`
+that the run had copied in and one quarantine duplicate. `config/decisions.yaml` is append-only (D-2655), so the
+wrong figure is **not** edited in place; it is superseded here by measurement and owes an amendment record.
+
+**WHAT REMAINS OWED (NOT done now — the applier was reading `config/*.yaml` per row, BUG-614's class):**
+1. **The refusal must RESOLVE (D-3034).** A prose refusal is not a control: add
+   `source_library.admission.owner_refusals` to `config/ingest_identity_gate.yaml` with the key `*gyst_readme!`, and
+   have `scripts/plan_admission.py` classify a matching row as the declared decision
+   `refused_by_owner_decision` — counted and printed like every other refusal class. Without it the KEY stays free and
+   the next arrival re-proposes a work the owner has already refused, which is the loop this addendum exists to stop.
+2. **Purge the S0 checkpoint record** whose `source_path` is the corpus `.rtf` (written 16:40:52 by this run). Left
+   in place it is **BUG-920's mirror exactly** — a receipt whose bytes are gone; a future re-admit would read
+   `Skipped: 1`, write no `.md`, and the applier would report "markdown absent" for a file that no longer exists.
+3. **Two real works still owe a word** and were NOT touched: `IdentityLectureNotes.pdf` (collides with the `.docx`
+   of the same work, admitted this run) and `Interactive_documentary_and_live_perform.pdf` (collides with an existing
+   corpus `.md`). Those are ONE WORK IN TWO CONTAINERS — BUG-921's subject, not a boilerplate — and a format
+   duplicate must not be resolved by an engine (D-3045).
+
+## BUG-923 — FIX LANDED 2026-10-18 17:2xZ: THE VOCABULARY IS NOW A GATE, A DEFERRAL IS NOT A FAILURE, AND THE EXIT CODE IS DECLARED
+
+**What was wrong (unchanged from the report below, now measured on the day's own receipt).**
+`governance/evidence/ADMISSION_APPLIED_20261018T140653Z.jsonl` at 320 rows read
+`{'applied': 216, 'skipped': 85, 'failed': 19}`. Of those 19 "failed" rows, **18 were not failures**: 17 the door had
+deliberately DEFERRED (`deferred_for_identity` — `byte_identical` / `same_sanitized_stem`, i.e. a work the corpus
+already holds and only the OWNER may adjudicate, D-3045) and 1 was image-heavy (a SKIP). Only
+`Semiotics-the-Basics.pdf` is the genuine S0-with-no-markdown case (BUG-920's mirror).
+
+**Why that produced the error the owner kept seeing.** The writer's exit code was
+`if counts.get("failed") or counts.get("refused"): return RC_FATAL`. `deferred` did not exist, so a deferral was
+recorded `failed` and that line returned **1**, and `just` prints `error: Recipe `admit-apply` failed with exit code 1`
+for anything that is not 0 or 2. A tranche that had applied 182 works reported itself as broken. The owner then
+re-signed and re-applied — the loop in `~/.zsh_history` lines 1402-1413 is exactly that, four sign+apply pairs.
+
+**The fix (three parts, in the DECLARATION, not in code — C12):**
+1. `config/ingest_identity_gate.yaml#source_library.admission.applier.states` now carries **`skipped` and `deferred`**
+   (it carried neither while the writer emitted `skipped` 85 times), and `run()` now REFUSES a record whose state is
+   not on that list (`declared_state`) — the "closed vocabulary" was a caption for as long as nothing enforced it.
+2. **`s0_outcome_tokens`** declares each S0 token WITH the sentence its receipt line carries
+   (`S0_SKIPPED_IMAGE_HEAVY` → skipped; `deferred_for_identity` → deferred). The applier spells neither the token nor
+   the story. An UNMAPPED S0 outcome stays what it must be — a FAILED conversion (fail-closed, unchanged).
+3. **`exit_codes`** declares the mapping: `fatal_states: [refused, failed]`, `owner_owed_states: [deferred]`.
+   So a batch that only deferred/skipped exits **2 (OWNER-OWED, loud, never fatal — BUG-457)** and `just` reports it
+   as owed rather than as an error, and a deferral prints a line naming D-3045 as the reason.
+
+**Controls (4 new; `python3 scripts/apply_admission.py --selftest` = 42/42 green, MEASURED 17:2x local):**
+`a_batch_that_only_DEFERRED_is_OWNER_OWED_and_never_a_failure` (five sides: applied+skipped+deferred → 2;
+skipped-only → 0; applied-only → 0; deferred+failed → 1; refused → 1) · `an_UNDECLARED_state_is_REFUSED_by_the_vocabulary` ·
+`every_declared_S0_outcome_token_EXISTS_in_the_producer_that_prints_it` (reads `pipeline/stage0_convert.py`'s own
+bytes, so a renamed token breaks a control instead of silently turning every skip back into a failure) · and the
+fixture declares the new keys the way the gate does, so a writer nobody runs is never what gets tested.
+
+**A NOTE ON THE AUDIT, because it matters for the next pass.** The bug report said the wrong label "drives
+admit-alert". MEASURED: `scripts/container_alert.py` reads the PLAN's refusal classes and `container_integrity`
+probes; it does **not** read receipt states, so nothing there needed to change. `pipeline/model_store_sweep.py` is the
+only other reader of `receipt_prefix` and it keys on the ledger, not on this vocabulary.
+
+STATE: **CLOSED** (the three defects it named are each declared, enforced and controlled). Its sibling
+`skipped`-without-`deferred` asymmetry is gone; what remains in the same receipt is BUG-921's subject (the door
+DEFERS because there is no per-work key) — that bug is untouched and stays OPEN.
+
+## BUG-924 (HIGH, CLOSED 2026-10-18) — `--limit N` WAS A PREFIX, NOT A TRANCHE: THE SAME ACTS WERE RE-ATTEMPTED EVERY RUN, ONE OF THEM THREE TIMES
+
+**MEASURED, on the day's own receipts (no inference).** `rows = signed; rows = rows[:limit]` took the FIRST N SIGNED
+ROWS, so each later tranche re-walked the prefix from row 1. Cross-reading
+`ADMISSION_APPLIED_20261018T132104Z`, `T132142Z` and `T134204Z`: **20 rows were attempted in MORE THAN ONE tranche**,
+and `books/epub/DOMAIN 3 …/generative+art+creative+…` was **copied, converted and quarantined three times** (13:21:04,
+13:21:42, 13:42:04). `T134204Z`'s first fifty rows held 9 `already_applied` and the same failed rows the earlier
+tranche had just concluded.
+
+**WHY IT MATTERS BEYOND WASTE.** Every re-attempt pays a full copy plus an S0 conversion; a `deferred` row is a
+question only the OWNER can answer, so re-asking an engine cannot change the answer. A batch that must re-walk its own
+history also re-prints its own failures, which is why "there was an error" was a permanent condition rather than an
+event.
+
+**THE FIX.** The tranche now counts WORK, not positions: `split_decided()` removes the acts a PRIOR receipt already
+DECIDED (`skipped`, `deferred`) keyed by **(rel, target)** — the act, not the label — and `--limit N` takes the next N
+acts still OUTSTANDING. A decided act is REPORTED (`DECIDED  85 act(s) … not re-attempted; 152 outstanding`) and the
+summary carries `decided_by_prior_receipt`. `applied` is deliberately NOT filtered: `apply_row` re-proves an applied
+target by DIGEST, and skipping that would trade a repeated read for a blind one.
+
+**A DIFFERENT TARGET IS A DIFFERENT ACT** — so when BUG-921's per-work key lands and a deferred row is re-targeted, the
+lookup MISSES and the row is attempted again. That is the property that makes this filter safe rather than a
+permanent verdict.
+
+**Controls:** `a_DECIDED_act_is_not_re_attempted_and_does_not_consume_the_tranche`, and
+`the_SAME_label_with_a_DIFFERENT_target_is_a_DIFFERENT_act` (42/42 green).
+**VERIFIED ON THE LIVE TREE (read-only dry run, 17:15Z):** `DECIDED 85 act(s) … 152 outstanding` against the
+`20261018` plan — the 85 image-heavy skips are no longer re-priced or re-copied.
+
+## BUG-925 (HIGH, CLOSED 2026-10-18) — A SECOND `--sign` OF THE DAY OVERWROTE THE FIRST, AND THE RUNNING RECEIPT'S AUTHORITY STOPPED RESOLVING
+
+**MEASURED, two-sided.** The live batch's header (16:06Z) pins its authority by **path and digest**:
+`accept: governance/ADMISSION_ACCEPTED_20261018.yaml`, `accept_sha256: 94c3c308…`, 449 rows, scope `9d51674b…`.
+At 17:07 the owner re-derived (237 rows) and re-signed; `--sign` wrote `<accept_prefix><date><ext>`
+**unconditionally**, and `shasum -a 256` on that same path now returns **`941f3a6c…`**. The document the receipt names
+no longer exists, and the word that authorised the 449 rows the batch is still applying is gone — no copy anywhere.
+
+**WHY IT IS A CLASS, NOT AN ACCIDENT.** A signature is an APPEND-ONLY ACT (D-3036): an act that leaves no trace did not
+happen. A file named by a DATE is a slot, and a slot is overwritten by definition, so **every** re-sign of the day
+destroys the previous authority — and the digest-and-path reference every receipt uses is exactly what a slot
+destroys first.
+
+**THE FIX (`signature_path`).** The day's name is used when it is FREE; an IDENTICAL word is not written twice (one
+word, one stable digest — so every receipt stays resolvable); different words land in a NEW stamped file
+(`…_20261018T170900Z.yaml`) and NEVER replace the file a receipt already names. `newest()` sorts these correctly
+(`.` < `T`, and a later date still wins), so the reader needs no change.
+
+**Controls:** `a_second_word_is_APPENDED_and_an_IDENTICAL_word_is_NOT_written_twice`,
+`ONE_command_writes_the_IDENTITY_and_pins_the_LIVE_ACTS`,
+`re_signing_the_SAME_name_is_IDEMPOTENT_and_never_a_second_identity` (42/42 green).
+
+**WHAT THIS DOES NOT FIX, named so it is not mistaken for fixed.** The 449-row word is already lost for the batch in
+flight (nothing can restore bytes nobody copied). And a RE-DERIVE still voids a word whose acts moved, because the
+acceptance carries row LABELS, not acts — the principled repair is for the signature to carry the scope FIELDS per row
+so a plan re-derived after a tranche (which legitimately drops the fulfilled rows) still proves the same outstanding
+acts. That is a schema change with a migration, it is NOT needed to stop the loop (with BUG-923/924 fixed the owner
+never needs to re-derive mid-batch), and it is registered here as the next refinement rather than guessed at now
+(D-3036: no theory-driven implementation).
+
+## BUG-926 (HIGH, CLOSED 2026-10-18) — IDENTITY WAS DECIDED BY FILENAME WHILE THE RECEIPTS ALREADY HELD THE BYTES, SO 24 OF 28 "OWNER QUESTIONS" WERE ALREADY ANSWERED
+
+**MEASURED on the day's own receipt** (`governance/evidence/ADMISSION_APPLIED_20261018T140653Z.jsonl`, 422 records at
+15:26Z): of **37** rows recorded `failed`, **34 were door deferrals** (`deferred_for_identity`) and only 1 was a
+conversion fault (`Semiotics-the-Basics.pdf`, BUG-920's mirror) plus **2 a new class** (`no_output`: Pandoc/Docling
+rc=0 having written 54 and 62 bytes, below the 100-byte floor). The 34 deferrals decompose, by proof against the
+receipts themselves, into:
+
+- **24 whose bytes a receipt of the SAME RUN had already ADMITTED** — the twin's `md_target` is on disk AND its
+  recorded `md_sha256` still matches those bytes. The work IS in the corpus; the row is a redundant second copy.
+- **4 that are one file five times** — `*GYST_README!.rtf`: its admit record names `*GYST_README!.md`, which is
+  **NOT on disk**. That is BUG-920's mirror LIVE in today's receipt (a record with no bytes behind it), and it is the
+  same work D-3089 owes an `owner_refusals` entry for.
+- **6 genuine identity questions** — four case/suffix variants of one name (`Creative brief.docx` vs `Creative
+  Brief.docx`, `Freelancing.docx` vs `FREELANCING.docx`, `SCORE-Deluxe-Startup-Business-Plan-Template_2.pdf`, `Sample
+  Lean Business Plan - Wooden Grain Toy Company`) and two format pairs (`IdentityLectureNotes.pdf` vs `.docx`,
+  `Interactive_documentary_and_live_perform.pdf` vs `.md`). Those keep the OWNER word (D-3045).
+
+**THE ROOT CAUSE, and why it is not BUG-921 repeated.** The door's key is `sanitize_source_book(stem).strip().lower()`
+— a NAME. The same work sat in two library folders (`…/business-notes/pdf/…/Exercise Files/Your_ROI_Matrix.pdf`
+**applied**, `…/business-pdf/…/Exercise Files/Your_ROI_Matrix.pdf` then **deferred against its twin's OWN output**), and
+a name-keyed lookup cannot see that. Meanwhile the applier's OWN receipts already carry `source_sha256`, `md_target`
+and `md_sha256` — so the answer existed, in this writer's own output, and was never asked for. The owner was being
+asked to adjudicate identities the record had already resolved: the exact slop the OS exists to prevent.
+
+**THE FIX — the corpus is asked by BYTES, and the evidence costs no extra read (D-3092).**
+
+1. `admitted_bytes()` builds a digest → applied-record index from `read_receipts()` (only `applied`/`already_applied`
+   are indexed: `failed`/`refused` prove nothing, `skipped` means the bytes are held but not as a work, and an empty
+   digest from a dry run is never indexed — an unproven key would let one row vouch for another).
+2. `same_bytes` is DECLARED in the gate (`state`, `evidence: source_sha256`, `meaning`, `absent_target_means`), so
+   the writer spells neither the state nor the story (C12). A rule declared on a NAME or a SIZE is FATAL.
+3. The rule is asked **BEFORE the copy and before the door**: the twin's target is re-proved by DIGEST, and when it
+   holds, the row is recorded `duplicate_of_admitted` naming the path it duplicates — **nothing is copied, converted
+   or quarantined**, and the state is in neither `fatal_states` nor `owner_owed_states`, so the batch stays rc 0.
+4. When the twin's target is **absent** the record proves nothing: the row is **converted again** and the line carries
+   `twin_without_bytes` — one half may never silently vouch for the other (BUG-920's mirror, closed here by design,
+   while BUG-920's own resume-skip defect stays open).
+5. `run()` keeps the index current after every admitted row, so two copies inside the SAME tranche are caught too
+   (a start-of-run snapshot would have missed exactly the case the owner hit).
+
+**Controls (46/46 green):** `bytes_a_receipt_already_ADMITTED_are_NAMED_as_a_duplicate_and_NEVER_copied`,
+`a_receipt_with_NO_BYTES_behind_it_is_CONVERTED_never_written_off_as_a_duplicate`,
+`a_same_bytes_rule_declared_on_a_NAME_or_a_SIZE_is_REFUSED`,
+`the_run_KEeps_its_bytes_index_current_after_every_admitted_row`.
+**VERIFIED ON THE LIVE RECEIPT (read-only, 15:30Z):** 428 digests already admitted; of the 34 deferrals, **24 resolve
+as duplicate**, **4 are the twin-without-bytes class**, **6 remain genuine** — 34 questions fall to 6.
+
+**WHAT THIS DOES NOT FIX, named so it is not mistaken for fixed.** (a) The PLAN still proposes both copies as
+separate acts — accepted, because it self-heals: once one is admitted, a re-derive reads the other as
+`already_in_the_corpus` by key, and a plan-time digest pass would hash 237 cloud-backed candidates for no act the
+owner needs. (b) A `--dry-run` cannot resolve this at all (BUG-882 forbids hashing in a dry run) and now SAYS SO in
+its output, rather than printing a count it cannot honour. (c) BUG-921's per-work key at S0/plan time is still owed —
+this fix removes the false questions, it does not merge the two names.
+
+## BUG-927 (MED, CLOSED 2026-10-18) — A TORN TAIL IN THE RECEIPT A BATCH IS STILL WRITING READ AS "NOT JSON", I.E. AS CORRUPTION
+
+**MEASURED, in structure.** `read_receipts()` reads every receipt matching the prefix — including the file the
+RUNNING batch is appending to (the day's own file grew 276 → 320 → 388 → 422 records while the owner's tranches
+ran). The reader required every line to parse and raised
+`FATAL: receipt … carries a line that is not JSON` otherwise. An `append_receipt()` write is a single line but not a
+single atomic operation: between the append and the fsync, a concurrent reader can see a PREFIX of that line. The
+window is small, the consequence is not: `--dry-run`, `--limit` in a second terminal, or any tranche started while
+another is finishing would report a FATAL that describes corruption where there is only a write in flight — a FALSE
+fault, and false faults are what the owner's loop was made of (BUG-923/924/925).
+
+**THE FIX — the distinction the old rule could not make.** A TORN TAIL (the final line) is a write in progress: it is
+skipped, it is NAMED on stderr, and every record before it still reads. An INTERIOR gap is corruption: it stays
+FATAL, because silence about a hole in the middle is how a rerun becomes a licence to overwrite bytes nobody can
+account for (C16). Only the last non-empty line is ever excused, and never silently.
+
+**Controls (48/48 green):** `a_TORN_TAIL_line_is_skipped_and_the_records_before_it_still_read`,
+`an_INTERIOR_gap_in_a_receipt_stays_FATAL`.
+
+## BUG-920 (HIGH, FIX LANDED 2026-10-18) — A CHECKPOINT LINE CLAIMED A CONVERSION THAT HAD NO BYTES BEHIND IT, AND THE RESUME HONOURED IT ON FAITH
+
+**MEASURED, both directions.** `Semiotics-the-Basics.pdf` was admitted, S0 was run on it, and the next S0 invocation
+SKIPPED it because the checkpoint held a line for its name; S0 exited 0 and no markdown existed. The applier then
+recorded the row `failed` (`S0 rc=0, markdown absent`) — a state that names the symptom and not the cause. The other
+direction is the same defect: a run whose artefact was written but whose checkpoint line was never appended leaves
+bytes nobody can account for. One object was being kept as two independent facts.
+
+**THE FIX (`resume_has_work`, ONE home, used by BOTH the resume and the new audit).** A resume is a promise about
+BYTES, so the promise is checked before it is honoured: the recorded `output_path` must EXIST and exceed
+`MIN_OUTPUT_BYTES` (the same floor a fresh conversion must clear). A line that fails is named on stderr, dropped from
+the resume set, and the book is CONVERTED AGAIN in that same invocation. A digest test is deliberately not made
+here — this is asked once per book on every S0 invocation (the applier runs S0 PER ROW), so re-hashing 1,327
+artefacts per row would cost more than the conversions it protects; existence-plus-floor is the cheap half that
+catches the live defect.
+
+**THE STANDING INSTRUMENT — `python3 pipeline/stage0_convert.py --audit-checkpoint`** (read-only, D-3036's red loop).
+MEASURED on today's checkpoint: **1,327 lines, 3 with no work on disk** —
+`*GYST_README!.rtf`, `Semiotics-the-Basics.pdf`, `ZZ REPRO.pdf` — rc 2 (OWNER-OWED, loud, never fatal). Two-sided
+proof on the same file: a line with its artefact reads True (1,324 of them), a line without reads False, an artefact
+below the 100-byte floor reads False, a line with no `output_path` reads False.
+
+**NO PURGE, and that is the decision.** The phantom lines are left in place: they are now INERT (the resume asks the
+bytes first), NAMED (the audit prints each), and RE-CONVERTIBLE (no flag change needed). Deleting a checkpoint line
+would have been a write to a derived artefact to fix a claim the reader no longer honours — R-D410's spirit and
+D-3038 both prefer the loud, reversible state.
+
+**WHAT THIS DOES NOT FIX.** The checkpoint is still keyed by `source_file` NAME, so two books with one name share a
+line (BUG-899, still open). The failure is fail-SAFE in that direction — a name that resolves to another book's
+record loses its own `output_path`, reads as "no work", and is re-converted rather than skipped.
+
+## BUG-928 (MED, CLOSED 2026-10-18) — THE RUN'S OWN TARGET INDEX WAS STALE, SO TWO ROWS OF ONE WORK RECORDED A REFUSAL WHERE THE RECEIPT EXISTED
+
+**MEASURED on the FINAL receipt of the day (449 rows, PID 11083).** Two rows recorded
+`refused — the markdown target already exists and NO receipt accounts for it`. The receipt that DOES account for it
+was written by the SAME run, minutes earlier, after `receipt_index()` had already been built once at the start.
+A refusal that names a fault where the record exists is a FALSE fault — the class this whole pass exists to remove.
+
+**THE FIX.** `run()` now refreshes BOTH indexes after every admitted row: the digest index (`admitted`, D-3092) and
+the target index (`index`, this bug). Both carry the same reason in one place, so a future reader sees that they are
+one rule with two keys.
+
+**Controls (49/49 green):** `the_run_KEeps_its_bytes_index_current_after_every_admitted_row`,
+`the_run_ALSO_keeps_its_TARGET_index_current_after_every_admitted_row`.
+
+## BUG-929 (HIGH, CLOSED 2026-10-18) — THE DAY'S PLAN WAS A SLOT TOO: A SECOND DERIVATION REPLACED THE PLAN A SIGNED ACCEPTANCE PINS
+
+**MEASURED, and it was one command away from doing damage.** `governance/ADMISSION_ACCEPTED_20261018.yaml` pins
+`ADMISSION_PLAN_20261018.json` **by path AND digest** (`plan_sha256: 9852c484…`), and `write_plan()` named the plan
+`<prefix><YYYYMMDD>.json` and wrote it **unconditionally** — the exact defect BUG-925 had just closed for the
+acceptance, one file over. D-3072's SCOPE proof rescues the owner only while the ACTS are identical; the moment a
+derivation moves a row (MEASURED: the live `--dry-run` refused **12 accepted rows** as "no longer classifies as an
+admission candidate" once the batch had applied them) the pinned digest resolves to nothing and the word is
+unverifiable. That is the owner's loop again, from the other side of the same file pair.
+
+**THE FIX (`write_plan`).** The day's name is used only when it is FREE or when the plan REPEATS ITSELF in its acts
+(`rows` identical → no write at all, so one plan keeps one digest). A plan whose acts MOVED lands in a stamped file
+(`ADMISSION_PLAN_20261018T153603ZZ.json`) and NEVER replaces the one a signature names; `newest()` already sorts the
+stamped name after the date name (`.` < `T`), so no reader changes.
+
+**VERIFIED LIVE, not argued:** after the fix, `python3 scripts/plan_admission.py --plan` wrote
+`ADMISSION_PLAN_20261018T153603ZZ.json` and `shasum -a 256 governance/ADMISSION_PLAN_20261018.json` returned
+**`9852c4847ea0d92e…` BEFORE and AFTER** — the signed document is untouched. The fresh plan reads 109 candidates
+(was 237), `already_in_the_corpus` 2,181 (was 2,040): the difference is the works the batch admitted, plus the 24
+byte-twins D-3092 now answers instead of asking about.
+
+**Controls:** `a_SECOND_derivation_of_the_day_NEVER_replaces_the_plan_a_SIGNATURE_pins_and_a_REPEAT_does_not_rewrite`
+(plan_admission, all controls green).
+
+**THE RULE THIS LEAVES BEHIND.** D-3091 said a signature is an append-only act. This bug says what that IMPLIES:
+**whatever a signature NAMES is append-only too** — the acceptance AND the plan. Two slots, one lesson.
+
+## BUG-930 (HIGH, CLOSED 2026-10-18) — ONE BOOLEAN AT THE DOOR ABORTED 109 AUTHORISED ACTS OVER 12 ROWS OF WHICH 9 WERE ALREADY DONE
+
+**What was measured.** The owner re-derived, re-signed and ran `just admit-apply --dry-run` on their own 237-row plan and hit
+`FATAL: 12 accepted row(s) no longer read as admission candidates — re-derive the plan and re-sign it`, then `error: Recipe
+admit-apply failed`. Every one of the 12 was classified by measurement, and none of them was a fault: **9 carried bytes a
+receipt had already admitted** from another library path (the work *is* in the corpus and the row is redundant — D-3092), and
+**3 are the D-3045 format duplicates only the owner may name** (`Freelancing.docx` vs the corpus `FREELANCING.docx`,
+`SCORE-Deluxe-…_2.pdf` vs `…_2.docx`, `Sample Lean …(1).pdf` vs `…(1).docx`). The gate `verify_rows()` asked ONE boolean —
+"is this row still a candidate?" — and turned "no" into a verdict on the whole signature.
+
+**Why it kept recurring.** It is BUG-923's category error one layer up. BUG-923 was a *deferral* (a question only the owner
+can answer) driving rc 1; this is a *question* driving a FATAL that blocks 109 rows that were ready to work. The OS's own
+doctrine already forbade it: BUG-457 (owner-owed is loud, never fatal) and the declared `exit_codes` (rc 2 = a word is owed).
+
+**Fix (D-3095).** `verify_rows()` now CLASSIFIES, per row, and every class has one owner: SATISFIED (the row's own target is
+on disk — an earlier tranche applied it), QUESTION (no target, but the corpus or an ingest record holds this NAME → deferred,
+rc 2, nothing copied), FAULT (no target, no name held anywhere → refused BY NAME, and the other rows still run), KEY MOVED
+(the door reads the row under a different key → fault). The rule lives in `config/ingest_identity_gate.yaml#…applier.name_held`
+(C12: state, indexes, meaning, bytes_win, absent_means) and the applier invents nothing (D-3068). **Bytes answer first**: a
+name-held row whose source digest a receipt already admitted is `duplicate_of_admitted`, not a question. A dry run takes the
+digest for name-held rows ONLY (the set is bounded by the world — 12 of 237), so `--dry-run` no longer lies about the price.
+
+**Receipts.** Controls 49 → 57 (8 new, all green), then 63/63 after BUG-931/932. Live: the owner's own signature, no
+re-derivation, `admit-apply` → 1 applied (`Semiotics-the-Basics.pdf`, BUG-920's phantom, converted at last), 25 duplicates,
+116 already-applied, 3 deferred (the owner's word), 2 failed (`no_output`), **rc 2 → then rc 1 for the 2 failures only**.
+
+## BUG-931 (HIGH, CLOSED 2026-10-18) — THE APPLIER CHOSE THE PLAN BY THE CLOCK, SO EVERY RE-DERIVATION VOIDED A VALID SIGNATURE
+
+**What was measured.** `run()` resolved the plan with `newest(plan_prefix)` and `load_acceptance()` then required the
+signature to name *that* file. The owner's signature pins `ADMISSION_PLAN_20261018.json` (digest `9852c484…`, scope
+`a3166cf7…`); a re-derivation had written `ADMISSION_PLAN_20261018T153603ZZ.json` beside it, so every `admit-apply` refused
+with *"a signature for another plan authorises nothing"* while the signed plan sat on disk, unchanged, its acts still matching
+the signature's scope digest exactly. The only remedy the message implied was to re-derive and re-sign — which produced
+another newer plan and re-armed the same trap. Three of the owner's four "circles" this week are this shape: **a derived
+artefact treated as if it must stay the newest thing, when only the ACTS must stay true.**
+
+**Fix (D-3096).** The signature names the plan: with no explicit `--plan`, `acceptance_plan()` reads the signature and applies
+THE PLAN IT NAMES (a signature naming a plan that is gone is FATAL and says so). `newest()` is the default only when no
+signature exists. An explicit `--plan` still meets the name check, because there the owner chose the document and a
+disagreement is real. Controls 57 → 60.
+
+## BUG-932 (HIGH, CLOSED 2026-10-18) — A LATER REFUSAL ERASED AN EARLIER ADMISSION IN THE ACCOUNTING INDEX
+
+**What was measured.** Two rows of the owner's plan stayed `refused — the markdown target already exists and NO receipt
+accounts for it` although the receipt held, for that very target, `applied …-January-2013.docx (md_sha256 e7ad6ab1…)`
+followed by `refused …-January-2013.md`. The library holds that work twice — as the `.docx` that was converted and as the
+`.md` that is already a work — both rows write ONE markdown target, and `receipt_index()` was LAST-WINS over
+`applied|failed|refused`, so the record with NO BYTES outranked the record WITH them. The pinned plan then carried a
+permanent false fault that BUG-930's gate had been faithfully reporting.
+
+**Fix (D-3096).** The index ranks by EVIDENCE: `applied`/`already_applied` (a target proved by digest) outrank
+`failed`/`refused` (an attempt that proved nothing); within a rank the last record wins; a target whose ONLY record is a
+refusal still refuses (two-sided control). `apply_row` now accepts `already_applied` as accounting, because it too carries
+the digest. Controls 60 → 63.
+
+## BUG-933 (HIGH, CLOSED 2026-10-18) — A GUARD WITH NO REMEDY BRICKED THE ADMISSION LANE THE MOMENT THE PIPELINE EDITED ITS OWN READER
+
+**What was measured.** `check_stage_code_fingerprint()` (BUG-614) refuses to resume a stage-0 checkpoint written by different
+code. BUG-920's fix last session was a READER change in `pipeline/stage0_convert.py`, which is in
+`stage0.fingerprint_files`, so the stored id `54c389c7357a84ec` no longer matched `d9390042be4f4d9d`. Consequence: the
+applier runs S0 once per row, so **every** conversion now raised inside S0 → the copy was quarantined and the row was written
+`failed`. MEASURED: 3 rows of the owner's signed plan were copied, refused by the guard and quarantined, and the whole
+signature would have paid the same cost. The guard's stated remedies were both unusable: a bare re-run raises the guard
+*before* the loop, and `--force` discards 1,327 completed conversions.
+
+**Fix.** (1) `python3 pipeline/stage0_convert.py --rebind-code-fingerprint --why '<reason>'` — a DECLARED re-bind: a
+non-empty `--why` is required, old and new ids are printed, the act is appended to
+`checkpoint.jsonl.code_fingerprint.rebinds.jsonl` beside the sidecar, and the existing lines are untouched. (2) The applier
+asks ONCE, BEFORE any copy (`stage0_code_binding()`): a mismatch is one named condition with the remedy spelled out, never N
+quarantined books. MEASURED after: `Semiotics-the-Basics.pdf` converted on the first row. **A defect in the fix itself, found
+by using it:** the first version wrote the sidecar and THEN raised (`NameError: datetime`), i.e. the act completed with no
+trace — the one outcome D-3036 forbids. Ordering corrected (trace first, binding second) and the completed untraced act was
+recorded with `"reconstructed": true`.
+
+## BUG-934 (MED, CLOSED 2026-10-18) — THE BATCH'S OWN REPORT CONTRADICTED ITS EXIT CODE ABOUT THE SAME NINE ROWS
+
+**What was measured.** `just admit-apply --dry-run` on the owner's signed plan printed, in one run:
+`OWED 9 row(s) the corpus already holds BY NAME with other bytes — the owner's word on which work that is (D-3045);
+nothing was copied and rc 2 says so (D-3095)` … and, 147 lines later, `DRY RUN {'already_applied': 117,
+'would_apply': 18, 'duplicate_of_admitted': 9}` with `REDUNDANT: … no word is owed`, exiting **rc 0**. The nine rows
+were name-held, the DIGEST then resolved all nine as `duplicate_of_admitted` (D-3092 — bytes beat name), and the
+banner had been printed from the PRE-verdict collision count, so it promised an exit code the run did not produce.
+
+**Why nothing caught it.** Every control asserted a COUNT (`collisions == 9`, `counts == {...}`, `batch_rc == 0`), and
+each of those was correct. The lie was a RELATION between a printed claim and the exit code — a shape no count-based
+control can see. The 63/63 green battery was measuring the numbers and never the sentence.
+
+**Fix (structural, not a rewording).** The pre-verdict line is now `asking_line(collisions)`, which is handed **no
+counts and no declaration** and is therefore incapable of naming an exit code; everything that speaks about what the
+owner owes or what was redundant is `verdict_lines(counts, collisions, decl)`, derived from the SAME dict `batch_rc`
+reads. The control is **one invariant over EVERY declared state** — `("OWNER-OWED" in lines) == (batch_rc(only) ==
+RC_OWNER_OWED)` — plus a control that the pre-verdict line contains no `rc `, no `OWNER-OWED` and no "no word is
+owed". MEASURED after: the same dry run prints `ASKING … and this line is not that verdict`, then `ANSWERED: all 9
+name-held row(s) resolved on the digest alone … this batch owes the owner nothing`, rc 0. Selftest **78/78**.
+
+## BUG-935 (HIGH, OPEN 2026-10-18) — 57 ADMITTED WORKS ARE GONE FROM THE CORPUS AND NO RECEIPT RECORDS THE REMOVAL
+
+**What was measured, by a new instrument rather than by an author's imagination.** `scripts/audit_evidence.py`
+(`just audit-evidence`, D-3097) re-proves the ACCUMULATED evidence — 1,143 receipt rows and 2 signatures — against
+the declarations in config. First run, on the owner's real data: **64 findings**, two classes, both invisible to the
+77-control battery:
+- **57 `DISAPPEARED`** — a receipt records `applied` (bytes hashed, `md_sha256` recorded) and the markdown is not on
+  disk. Checked exhaustively: **0 of 57 exist under any name anywhere in the corpus**. One of them is from TODAY
+  (applied 14:40:52Z, `*GYST_README!.rtf`); that whole corpus folder is now **empty** (mtime 17:02 local).
+- **7 `NOTHING-LEFT`** — a row recorded `failed` whose container still sits in the corpus with no receipt accounting
+  for it (the pre-D-3071 shape).
+
+**Why it matters (ontology, not tidiness).** An admission receipt is evidence of a PAST ACT, so an absent object is
+not by itself a false receipt — it is an object that LEFT, and the question is whether any act records the leaving
+(D-3036). Measured answer: **nothing does.** The receipt vocabulary has no state for a removal
+(`state_roles.removal: []` — declared empty on purpose, on 2026-10-18), `governance/MUTATION_JOURNAL.jsonl` records
+only document writes, and D-3086's disposal of 58 wrong-shaped artefacts left no admission trace. **The corpus can
+lose a work and the evidence cannot say who removed it.** Fix owed: a `disposed` state + a disposition act through
+`pipeline/safe_delete.py` that writes it; then the 57 are either re-admitted or formally disposed, never silent.
+
+**Status.** The instrument is landed and green (rc 2 = a reading is owed, never a batch failure). The 57/7 themselves
+are an OWNER decision (re-admit vs dispose) and are NOT closed here.
+
+## BUG-936 (HIGH, CLOSED 2026-10-18) — THE QUARANTINE DROPPED THE FOLDER, SO DISTINCT WORKS DESTROYED EACH OTHER'S EVIDENCE
+
+**What was measured.** `quarantine_copy()` built its destination as `base / path.name` — the row's folder was dropped.
+MEASURED over every receipt: **398 quarantine destinations, 3 of them claimed by MORE THAN ONE different source.**
+`*GYST_README!.rtf` was claimed by **four** distinct works (the four GYST folders) → four `shutil.move` calls onto one
+path, each replacing the last, and the survivor is **not there now**. `Business guide.pdf` and `Creative brief.docx`
+are each claimed by two sources and only one file exists. The safety net was the thing losing bytes — and because a
+quarantined byte-source is the evidence for WHY a work would not convert, its loss is permanent for every later
+reader.
+
+**Fix.** The destination now mirrors the row's own `rel` folder (`quarantine/<stamp>/<rel-parent>/<name>`), a residual
+collision is disambiguated by `sha256(<source path>)[:8]` instead of replaced, and if even that exists the move is
+**refused** rather than performed (evidence that is overwritten cannot be recovered by any later reader). Controls
+added, two-sided: `two_works_of_one_NAME_keep_BOTH_bytes_in_quarantine`,
+`a_quarantined_work_keeps_its_FOLDER_dimension`, `a_second_work_on_the_SAME_rel_path_does_not_REPLACE_the_first`. The
+pre-existing control that had hardcoded the FLAT path was rewritten to assert the PROPERTY (the corpus holds no
+attempt, the bytes still exist under the run's home) — it had been measuring the bug instead of the rule. Selftest
+**78/78**.
+
+## BUG-935 (HIGH, CLOSED 2026-10-18) — 57 ADMITTED WORKS WERE NOT "LOST": THEY WERE THE D-3086 DISPOSAL, RECEIPTED IN A VOCABULARY THE AUDITOR DID NOT READ
+    # The 57 DISAPPEARED = the 57 `quarantine_and_reconvert` artefacts D-3086's shape rule moved to a LOCAL pen; their
+    # source containers remain in the corpus (`container_exists: true`), so nothing is unrecoverable. The disposition
+    # wrote `S0_ARTIFACT_DISPOSITION_*.applied.jsonl`, but the admission auditor only read `ADMISSION_APPLIED_*`, so it
+    # reported "applied, target gone" as a silent loss. THE FIX (D-3099): `disposed` declared in the admission
+    # vocabulary + `state_roles.removal: [disposed]`, and `disposition_receipt_prefix` declared so the auditor folds the
+    # disposition receipt into its `removed` set. MEASURED: 57 DISAPPEARED -> 0; selftest 79/79.
+    # RESIDUAL (a DIFFERENT class, NOT this bug): 7 NOTHING-LEFT = `failed` rows whose container still sits in the
+    # corpus with no receipt accounting for it (the BUG-920 orphan/failed-conversion class), and 1 GYST DISAPPEARED =
+    # the BUG-936 four-way quarantine collision survivor. Re-admission of the 57 (re-convert via the FIXED engine, whose
+    # checkpoint rows D-3086 already dropped) is the owner's next act, not a fix to this bug.

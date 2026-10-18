@@ -278,6 +278,7 @@ S0_DOCLING_FLOOR_S=_s0_budget("docling_floor_s")
 S0_DOCLING_PER_MB_S=_s0_budget("docling_per_mb_s")
 S0_DOCLING_CEILING_S=_s0_budget("docling_ceiling_s")
 S0_STAGE_TIMEOUT_S=_s0_budget("stage_timeout_s")
+S0_DOCLING_FAST_CEILING_S=_s0_budget("docling_fast_ceiling_s")  # born-digital pdf fast-path ceiling (text_layer routing)
 #: D-3034: a declaration must RESOLVE. The applier kills the whole Stage-0 subprocess at stage_timeout_s, so a
 #: Docling ceiling at or above it would make the inner budget unreachable — the outer wall would speak instead, and
 #: it speaks as `S0 could not be run`, which names neither the work nor the reason. Refused at import.
@@ -286,6 +287,13 @@ if S0_STAGE_TIMEOUT_S <= S0_DOCLING_CEILING_S:
         f"FATAL: stage0.conversion_budget.stage_timeout_s={S0_STAGE_TIMEOUT_S} must EXCEED docling_ceiling_s="
         f"{S0_DOCLING_CEILING_S} — a ceiling the outer wall can never reach is a declaration with no referent (C12)"
     )
+#: English-only / convert-text-only (owner 2026-10-18): the PDF reader routes by TEXT LAYER (config#stage0.text_layer).
+#: A born-digital pdf (selectable text on its leading pages) takes the FAST path; an image-heavy scan is SKIPPED.
+S0_TEXT_LAYER=_CFG.get("stage0", {}).get("text_layer") or {}
+S0_TEXT_PROBE_PAGES=int(S0_TEXT_LAYER.get("probe_pages", 2))
+S0_TEXT_MIN_CHARS=int(S0_TEXT_LAYER.get("min_chars", 100))
+S0_TEXT_SCAN_POLICY=str(S0_TEXT_LAYER.get("scan_policy", "skip"))
+
 #: BUG-898: the failure vocabulary, declared (not invented in the converter). The meaning is what the owner reads.
 S0_FAILURE_CLASSES={str(k): str(v) for k, v in (_CFG.get("stage0", {}).get("failure_classes") or {}).items()}
 if not S0_FAILURE_CLASSES:

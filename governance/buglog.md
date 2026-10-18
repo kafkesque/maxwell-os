@@ -18190,6 +18190,31 @@ acts. That is a schema change with a migration, it is NOT needed to stop the loo
 never needs to re-derive mid-batch), and it is registered here as the next refinement rather than guessed at now
 (D-3036: no theory-driven implementation).
 
+## BUG-940 (HIGH, OPEN 2026-10-19) — THE LAUNCHD ENGINE GUARD EXITS 126 "OPERATION NOT PERMITTED", SO BUG-802's REBOOT-SURVIVAL REMEDY IS SILENTLY DEAD ON THIS MACHINE
+
+**What was measured.** `launchctl list` shows `com.maxwell.omlx-engine` with `last exit code = 126`, and
+`~/.omlx/logs/boot_agent.err.log` repeats `bash: …/pipeline/omlx_engine_guard.sh: Operation not permitted`
+every ~30 s since 2026-10-15 (the file has grown to ~888 KB of identical lines — a silent hot-loop). The
+LaunchAgent's ProgramArguments resolve INSIDE the Dropbox tree
+(`/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/pipeline/omlx_engine_guard.sh`).
+launchd's background context is denied read/exec on `~/Library/CloudStorage` (macOS TCC Files & Folders), so
+the job can never exec its own script → exit 126 (the script's mode is `-rwxr-xr-x`, so it is NOT a bit problem
+— the kernel refuses the path, not the file). CONSEQUENCE: the engine does NOT survive a reboot via the guard;
+the currently-running `omlx-server` (PID 61121, PPID 1) was started by the user's `omlx restart`, not by the guard.
+This is the D-3036 "an act that leaves no trace" shape: a remedy declared in a plist but never able to run.
+
+**Root cause.** `pipeline/install_omlx_engine_agent.sh` substitutes the REPO's absolute path (which lives in
+Dropbox/CloudStorage) into the LaunchAgent at install time. C12 forbids the repo from storing that path, but the
+INSTALLED plist carries it, and that path is TCC-protected to launchd. Any TCC-protected home (Dropbox, iCloud
+Drive, Desktop/Documents without Full Disk Access) breaks the same way.
+
+**Fix (owner, noob-proof).** One of:
+1. Grant Full Disk Access to the launchd/omlx context (System Settings → Privacy & Security → Full Disk Access) — brittle, macOS-version-dependent.
+2. (DURABLE) Relocate the guard OUT of the TCC-protected tree: install `pipeline/omlx_engine_guard.sh` (and a copy of
+   the 3 config values it reads) to `~/.omlx/engine_guard.sh`, rewrite the plist's ProgramArguments to that path, then
+   `launchctl unload ~/Library/LaunchAgents/com.maxwell.omlx-engine.plist && launchctl load …` and re-run
+   `launchctl list | grep maxwell` to confirm exit code is 0, not 126.
+
 ## BUG-926 (HIGH, CLOSED 2026-10-18) — IDENTITY WAS DECIDED BY FILENAME WHILE THE RECEIPTS ALREADY HELD THE BYTES, SO 24 OF 28 "OWNER QUESTIONS" WERE ALREADY ANSWERED
 
 **MEASURED on the day's own receipt** (`governance/evidence/ADMISSION_APPLIED_20261018T140653Z.jsonl`, 422 records at

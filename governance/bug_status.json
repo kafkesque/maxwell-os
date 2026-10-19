@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 706,
-  "open_n": 252,
+  "total_ids": 707,
+  "open_n": 253,
   "closed_n": 454,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1101,7 +1101,7 @@
     {
       "id": "BUG-832",
       "title": "(MED - OPEN 2026-10-15) \u2014 the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change",
-      "events": 1
+      "events": 3
     },
     {
       "id": "BUG-834",
@@ -1266,6 +1266,11 @@
     {
       "id": "BUG-941",
       "title": "(HIGH, OPEN 2026-10-19) \u2014 qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL",
+      "events": 1
+    },
+    {
+      "id": "BUG-942",
+      "title": "(MED - OPEN 2026-10-19) \u2014 voting suite unusable: gold_4axis.jsonl fb_ids resolve 0/251 rows in maxwell.db",
       "events": 1
     }
   ],

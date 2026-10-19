@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**252 open** / 454 closed of 706 ids.
+**253 open** / 454 closed of 707 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -225,7 +225,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-820 | (MED - OPEN 2026-10-15) - a guard artifact rewritten by a generic YAML dumper loses the comments that ARE the guard | 1 |
 | BUG-821 | (MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for | 1 |
 | BUG-829 | (MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider | 1 |
-| BUG-832 | (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change | 1 |
+| BUG-832 | (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change | 3 |
 | BUG-834 | (MED - OPEN 2026-10-15) — a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same | 1 |
 | BUG-836 | (MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two | 1 |
 | BUG-846 | (LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding | 1 |
@@ -259,3 +259,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-920 | (HIGH, OPEN 2026-10-18) — AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END | 3 |
 | BUG-921 | (MED, OPEN 2026-10-18) — 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY | 3 |
 | BUG-941 | (HIGH, OPEN 2026-10-19) — qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL | 1 |
+| BUG-942 | (MED - OPEN 2026-10-19) — voting suite unusable: gold_4axis.jsonl fb_ids resolve 0/251 rows in maxwell.db | 1 |

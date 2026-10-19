@@ -370,6 +370,14 @@ REVIEW_CASES = [
      "text": "Claim: HTTP 301 and 302 are semantically identical. True or false? Answer with one word."},
     {"id": "rv-shadow", "want": ["attribute", "dict", "shadow", "error"],
      "text": ("import json" + chr(10) + "json = {}" + chr(10) + "print(json.dumps({}))" + chr(10) + chr(10) + "What happens and why?")},
+    {"id": "rv-emptyindex", "want": ["empty", "index"],
+     "text": "def head(xs):" + chr(10) + "    return xs[0]" + chr(10) + chr(10) + "On what input does this raise an error?"},
+    {"id": "rv-float", "want": ["false"],
+     "text": "Claim: In Python, 0.1 + 0.2 == 0.3 evaluates to True. True or false? Answer with one word."},
+    {"id": "rv-unbound", "want": ["unbound", "local", "before assignment"],
+     "text": ("x = 5" + chr(10) + "def f():" + chr(10) + "    x = x + 1" + chr(10) + chr(10) + "What happens when f() is called, and why?")},
+    {"id": "rv-sortnone", "want": ["none", "in place", "returns none"],
+     "text": "def sort_list(xs):" + chr(10) + "    return xs.sort()" + chr(10) + chr(10) + "What does sort_list([3, 1, 2]) actually return? Answer with one word."},
 ]
 
 STABILITY_ITEMS = [
@@ -594,6 +602,109 @@ def suite_stability() -> list[dict]:
                         "stab_key": "stab-" + str(k)})
     return out
 
+
+
+# -- Extractive-summarisation drift suite: condense a passage to its central finding. --
+# The gemma drift eval's "20 summ" leg (BUG-832 gate 3). Ground truth is DETERMINISTIC and
+# non-LLM: each case carries one gold fact (must appear in the summary) and incidental
+# distractors (must NOT appear — a model that "summarises" by echoing the passage leaks them).
+# Recall + precision in one deterministic grader: no second LLM judge, so the grader cannot drift.
+SUMM_CASES = [
+    {"id": "summ-0", "gold": "daily coffee cut stroke risk by 12 percent",
+     "distractors": ["42,000", "trade group"],
+     "text": "A nine-year cohort study followed 42,000 adults. The work was partly funded by a beverage trade group. The central finding was that daily coffee cut stroke risk by 12 percent. Participants were recruited across northern Europe."},
+    {"id": "summ-1", "gold": "green roofs lowered cooling costs by 18 percent",
+     "distractors": ["Chicago", "500 buildings"],
+     "text": "Researchers surveyed 500 buildings in Chicago. The study ran over three summers. The headline result was that green roofs lowered cooling costs by 18 percent. Several buildings used a new lightweight substrate."},
+    {"id": "summ-2", "gold": "the vaccine reduced severe illness by 91 percent",
+     "distractors": ["two-dose", "placebo"],
+     "text": "A two-dose regimen was tested in a placebo-controlled trial. The trial enrolled participants across four countries. The key result was that the vaccine reduced severe illness by 91 percent. Follow-up lasted twelve months."},
+    {"id": "summ-3", "gold": "model compression cut inference latency by 60 percent",
+     "distractors": ["30 billion", "4-bit"],
+     "text": "The authors compressed a 30 billion parameter model. The weights were quantized to 4-bit. The central finding was that model compression cut inference latency by 60 percent. The work was done in a university lab."},
+    {"id": "summ-4", "gold": "an afternoon nap improved recall by 20 percent",
+     "distractors": ["40 minutes", "university students"],
+     "text": "Forty university students were tested after a 40 minute nap. The study controlled for caffeine intake. The main finding was that an afternoon nap improved recall by 20 percent. All sessions ran on weekdays."},
+    {"id": "summ-5", "gold": "drip irrigation raised crop yields by 34 percent",
+     "distractors": ["drought", "subsidized"],
+     "text": "The trial covered a drought-prone region. Farmers were subsidized to install new equipment. The key result was that drip irrigation raised crop yields by 34 percent. Measurements spanned two growing seasons."},
+    {"id": "summ-6", "gold": "hybrid work raised productivity by 13 percent",
+     "distractors": ["2,000 employees", "tech firms"],
+     "text": "A survey of 2,000 employees at tech firms compared three schedules. The data was gathered over one year. The central finding was that hybrid work raised productivity by 13 percent. Attrition was measured separately."},
+    {"id": "summ-7", "gold": "the solid-state cell doubled driving range",
+     "distractors": ["500 charge cycles", "prototype"],
+     "text": "The prototype cell survived 500 charge cycles in testing. A ceramic separator replaced the liquid electrolyte. The headline result was that the solid-state cell doubled driving range. Manufacturing cost was not disclosed."},
+    {"id": "summ-8", "gold": "walking three times a week cut depression risk by 26 percent",
+     "distractors": ["older adults", "observational"],
+     "text": "An observational study followed older adults for six years. Participants reported their habits on questionnaires. The main finding was that walking three times a week cut depression risk by 26 percent. Diet was not adjusted for."},
+    {"id": "summ-9", "gold": "a 4096-token block cache gave a 22x speedup",
+     "distractors": ["kernel", "five months"],
+     "text": "The engineer worked on the change for five months. The change touched a low-level kernel path. The central result was that a 4096-token block cache gave a 22x speedup. Benchmarking used a fixed prefix."},
+    {"id": "summ-10", "gold": "class size reduction lifted graduation rates by 7 points",
+     "distractors": ["Tennessee", "kindergarten"],
+     "text": "The study re-examined a Tennessee kindergarten cohort. Classrooms were assigned by lottery. The key finding was that class size reduction lifted graduation rates by 7 points. College enrollment was tracked as a secondary outcome."},
+    {"id": "summ-11", "gold": "prefetching cut page-load latency by 41 percent",
+     "distractors": ["beta", "mobile browsers"],
+     "text": "The feature shipped to a beta group first. Tests ran on mobile browsers under simulated network conditions. The main result was that prefetching cut page-load latency by 41 percent. Cache size was increased too."},
+    {"id": "summ-12", "gold": "solar panels paid back their energy cost in 1.2 years",
+     "distractors": ["Germany", "rooftop"],
+     "text": "The analysis covered rooftop arrays in Germany. Manufacturing and transport were included in the accounting. The headline finding was that solar panels paid back their energy cost in 1.2 years. Panel lifetime was assumed at 25 years."},
+    {"id": "summ-13", "gold": "the revised algorithm solved 99.7 percent of instances",
+     "distractors": ["C++", "open-source"],
+     "text": "The solver was rewritten in C++ and released open-source. It was tested on a standard benchmark suite. The central finding was that the revised algorithm solved 99.7 percent of instances. Runtime was reduced as well."},
+    {"id": "summ-14", "gold": "antibiotic overuse dropped by 30 percent after the audit",
+     "distractors": ["rural clinics", "six months"],
+     "text": "The audit was rolled out across rural clinics. Prescribers received feedback over six months. The key result was that antibiotic overuse dropped by 30 percent after the audit. Patient outcomes did not worsen."},
+    {"id": "summ-15", "gold": "tree cover cooled summer streets by 4 degrees",
+     "distractors": ["drones", "ten cities"],
+     "text": "Researchers used drones to map ten cities. Measurements were taken at midday in summer. The main finding was that tree cover cooled summer streets by 4 degrees. Humidity was recorded alongside temperature."},
+    {"id": "summ-16", "gold": "the new scheduler raised CPU utilization by 9 percent",
+     "distractors": ["datacenter", "weekend"],
+     "text": "The scheduler was tested in a datacenter over a weekend. Load came from production traffic. The central result was that the new scheduler raised CPU utilization by 9 percent. Tail latency stayed flat."},
+    {"id": "summ-17", "gold": "early screening reduced mortality by 40 percent",
+     "distractors": ["national registry", "15,000 patients"],
+     "text": "The study drew on a national registry of 15,000 patients. Follow-up data was complete for most subjects. The headline finding was that early screening reduced mortality by 40 percent. Treatment costs were also compared."},
+    {"id": "summ-18", "gold": "the fine-tuned model gained 11 points on the benchmark",
+     "distractors": ["one hour", "single GPU"],
+     "text": "Fine-tuning took under one hour on a single GPU. The dataset contained only a few thousand examples. The key result was that the fine-tuned model gained 11 points on the benchmark. General capability was unchanged."},
+    {"id": "summ-19", "gold": "reduced meetings freed 7 hours per worker per week",
+     "distractors": ["calendar data", "30 teams"],
+     "text": "The analysis mined calendar data from 30 teams. The intervention removed recurring status meetings. The central finding was that reduced meetings freed 7 hours per worker per week. Deep-work time rose accordingly."},
+]
+
+
+# The DRIFT rubric: a summary drifts when it states the WRONG number or the WRONG topic, NOT when it
+# paraphrases the right one. So grade on the two irreducible facts (the signal number + the concept noun),
+# paraphrase-tolerant and deterministically anti-slop. Exact-phrase matching (the first draft) scored gemma
+# 1/20 while its summaries were substantively correct — the grader, not the model, had drifted.
+SUMM_KEYS = {
+    "summ-0": ["12 percent", "stroke"], "summ-1": ["18 percent", "cooling"],
+    "summ-2": ["91 percent", "illness"], "summ-3": ["60 percent", "latency"],
+    "summ-4": ["20 percent", "recall"], "summ-5": ["34 percent", "yield"],
+    "summ-6": ["13 percent", "productivity"], "summ-7": ["doubled", "range"],
+    "summ-8": ["26 percent", "depression"], "summ-9": ["22x", "speedup"],
+    "summ-10": ["7 points", "graduation"], "summ-11": ["41 percent", "latency"],
+    "summ-12": ["1.2 years", "energy"], "summ-13": ["99.7 percent", "solved"],
+    "summ-14": ["30 percent", "overuse"], "summ-15": ["4 degrees", "cool"],
+    "summ-16": ["9 percent", "utilization"], "summ-17": ["40 percent", "mortality"],
+    "summ-18": ["11 points", "benchmark"], "summ-19": ["7 hours", "freed"],
+}
+
+
+def suite_summ_extractive() -> list[dict]:
+    def make_grader(c: dict):
+        keys = [k.lower() for k in SUMM_KEYS.get(c["id"], [])]
+
+        def g(pred: str) -> tuple[bool, str]:
+            low = pred.lower()
+            missing = [k for k in keys if k not in low]
+            return (not missing, "ok" if not missing else "missing=" + str(missing))
+
+        return g
+
+    return [{"id": c["id"], "system": NO_COT, "max_tokens": 80,
+             "user": c["text"] + chr(10) + chr(10) + "Summarize the single central finding in one sentence.",
+             "grader": make_grader(c)} for c in SUMM_CASES]
 
 
 # -- Delegation suite: faithfully implement a spec authored by a frontier model --
@@ -891,6 +1002,7 @@ SUITES: dict[str, Callable[[], list[dict]]] = {
     "toolcalling": suite_toolcalling, "planning": suite_planning,
     "hardcode": suite_hardcode, "reviewing": suite_reviewing, "stability": suite_stability,
     "delegation": suite_delegation, "voting": suite_voting, "abstain": suite_abstain,
+    "summ_extractive": suite_summ_extractive,
 }
 
 

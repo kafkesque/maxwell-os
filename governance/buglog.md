@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1236 decisions (census stamp ae8b93d38d972582, 2026-10-19) · 711 bugs (252 open / 459 closed; highest OPEN = BUG-941) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1237 decisions (census stamp 075504bb3f61206e, 2026-10-19) · 711 bugs (251 open / 460 closed; highest OPEN = BUG-921) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1236 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 643 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1236, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1237 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1237, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
+> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 251 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -18783,3 +18783,28 @@ query 6573). Output paths are now `--out-dir` overridable (C12).
 RECEIPT (synthetic harness, LLM-free): non-injective map -> REFUSED rc=2; many-to-one delta ->
 reattach_pending (not attached); injective map + collision surfaced; stale cache -> "cache stale (L 3/4 live) —
 re-embedding" with no IndexError. py_compile clean on all four re-attach scripts.
+
+## BUG-941 (HIGH, RESOLVED 2026-10-19) — negative A/B confirmed; ANE-prefill lever permanently OFF on this M1 Max
+
+The fix recorded in the OPEN entry above (revert `qwen35_ane_prefill_enabled` to false) is CONFIRMED APPLIED and
+VERIFIED on the live surface, not just the intent spec. Re-derived 2026-10-19 (post root-cause-fix session):
+
+LIVE STATE (measured, this machine): `~/.omlx/model_settings.json` carries `qwen35_ane_prefill_enabled: false` on
+EVERY served profile (all 14 occurrences, none true), and its companion `qwen35_oq_a8_enabled: false` on the 3
+qwen35 profiles that declare it (none true). `config/omlx_m1_best_config.yaml` records the intent with the reason
+inline — "ANE-prefill is an M5+ path; M1 ANE is a wash" — and `config/flag_consumer_registry.yaml` registers the
+flag under D-339 as `required: false` with no verified consumer (the C-1 pattern).
+
+ACCEPTED NEGATIVE (D-3038): we deliberately do NOT enable `qwen35_ane_prefill_enabled` on this M1 Max, and here is
+why — the compiled ANE procedures the qwen35 prefill patch warms up do not load on M1-era ANE (Code=47 "request
+aborted", _ANEErrorUnderlyingStatus=21); the server degrades per-module ("disabling ANE for its GDN module and
+continuing") instead of refusing the setting, so a cold prefill stalls past 600 s against a baseline ~86 s. This
+negative is registered so the lever is not re-proposed from memory: it is an M5-series-class ANE path and this
+machine is an M1 Max (no NAX, no advanced ANE). Re-enabling is gated by a re-measure on matching M5 hardware
+(D-332: community benchmark on matching hardware outranks vendor claim).
+
+RELATED (already RESOLVED as BUG-940): the `omlx restart` stale-`control.sock` route the OPEN entry flagged is
+fixed separately — `pipeline/omlx_engine_guard.sh` now prefers `OMLX_ENGINE_HOST/PORT/BUNDLE` env vars and
+`open <full path>`.
+
+CLOSED, not re-opened. This was a negative A/B result recorded so the lever stays off; it is not a live defect.

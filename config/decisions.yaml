@@ -30907,3 +30907,24 @@ decisions:
   bugs: []
   files:
   - AGENTS.md
+
+- id: D-3110
+  state: ACTIVE
+  date: '2026-10-19'
+  by: assistant
+  category: HARDWARE / MODEL SETTINGS
+  title: 'Accepted negative: qwen35_ane_prefill_enabled stays OFF on M1 Max (BUG-941)'
+  decision: 'The qwen35 ANE-prefill lever (model_settings.py qwen35_ane_prefill_enabled) is a NEGATIVE A/B
+    result on this machine (MacBookPro18,2, M1 Max): enabling it makes a cold load of the 27B model never
+    complete — compiled ANE procedures fail with Code=47 "request aborted" (_ANEErrorUnderlyingStatus=21),
+    the server degrades per-module instead of failing fast, and a cold prefill stalls past 600 s against a
+    ~86 s baseline. The lever and its companion qwen35_oq_a8_enabled are M5-series-class ANE paths. ACCEPTED
+    NEGATIVE (D-3038): we deliberately do NOT enable it on M1 hardware, recorded so it is not re-proposed
+    from memory. Verified 2026-10-19 on the live surface: ~/.omlx/model_settings.json carries the flag false
+    on all 14 served profiles and oq_a8 false on the 3 qwen35 profiles. Re-enabling is gated by a re-measure
+    on matching M5 hardware (D-332: community benchmark on matching hardware outranks vendor claim).'
+  bugs:
+  - BUG-941
+  files:
+  - config/omlx_m1_best_config.yaml
+  - config/flag_consumer_registry.yaml

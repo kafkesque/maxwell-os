@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 711,
-  "open_n": 252,
-  "closed_n": 459,
+  "open_n": 251,
+  "closed_n": 460,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1262,11 +1262,6 @@
       "id": "BUG-921",
       "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
       "events": 3
-    },
-    {
-      "id": "BUG-941",
-      "title": "(HIGH, OPEN 2026-10-19) \u2014 qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL",
-      "events": 1
     }
   ],
   "closed": [
@@ -1724,6 +1719,7 @@
     "BUG-938",
     "BUG-939",
     "BUG-940",
+    "BUG-941",
     "BUG-942",
     "BUG-943",
     "BUG-944",

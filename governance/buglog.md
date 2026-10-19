@@ -18549,3 +18549,52 @@ rule (D-3095). The one reopening is the twin vanishing (BUG-920: a receipt names
 which case the act is attempted again rather than written off. Two controls added (decided-while-twin-holds; reopened-when-
 twin-gone). MEASURED after: `--selftest` 81/81; `--dry-run` converges `19 outstanding -> 3 outstanding` (1 already_applied
 + 2 genuinely unadmitted: `Proposal.docx`, `pre-hire.pdf`).
+
+
+## BUG-941 (HIGH, OPEN 2026-10-19) — qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL
+
+**What was measured.** With `models.Qwen3.8-27B-MLX-4bit.qwen35_ane_prefill_enabled = true`, a cold load of the
+27B model never completes. `~/.omlx/logs/server.log` repeats, per procedure:
+`WARNING - ANE warmup failed for procedure NN; disabling ANE for its GDN module and continuing` then
+`RuntimeError: ANE evaluation failed: Code=47 "Inference failed — request aborted" (_ANEErrorUnderlyingStatus=21)`.
+Each failure costs ~6 s and the warmup walks dozens of procedures, so a cold prefill the baseline serves in ~86 s
+stalls past 600 s (`measure_prefill.py --tokens 4000` timed out at 600 s). This lever is the ANE/GPU prompt
+processing switch (model_settings.py `qwen35_ane_prefill_enabled`); its companion `qwen35_oq_a8_enabled` is already
+documented in the same source as "M5-series and newer" only, and this machine is an M1 Max — the same hardware gate.
+
+**Root cause.** The compiled ANE procedures the qwen35 prefill patch warms up do not load on this machine's ANE
+(Code=47, request aborted). The server degrades per-module ("disabling ANE for its GDN module and continuing")
+instead of refusing the setting, so it CRAWLS rather than failing fast.
+
+**Fix (owner).** Leave `qwen35_ane_prefill_enabled = false` on this machine (reverted 2026-10-19). Do not re-enable
+without M5-series-class ANE. This is a NEGATIVE A/B result, recorded so the lever is not re-proposed from memory.
+
+**RELATED restart root cause (measured same day).** `omlx restart` / `omlx start` route through
+`~/Library/Application Support/oMLX/control.sock`, which is stale when the GUI is not running, so they fail with
+"Expecting value … (char 0)" even though the server restarts fine. The ONLY reliable restart is a FRESH GUI launch:
+`pkill -f omlx-server; pkill -f oMLX.app; sleep 4; open /Applications/oMLX.app` then poll `/health` until
+`status == healthy` (~6–8 s). `open -a oMLX.app` (by name) is flaky; the full path is reliable.
+`scripts/bug793_ab.py` encodes this route.
+
+## BUG-940 (RESOLVED 2026-10-19) — DURABLE FIX APPLIED: GUARD DEPLOYED TO ~/.omlx/, ENGINE FACTS IN EnvironmentVariables
+
+**Fix applied (the "option 2" prose above, now an act).** Three repo changes, all within the session's may_touch grant:
+1. `pipeline/omlx_engine_guard.sh` now prefers `OMLX_ENGINE_HOST/PORT/BUNDLE` env vars (authoritative when set by
+   launchd); the `config/engine.yaml` read stays only as the MANUAL-from-repo fallback. Also `open -a <name>` →
+   `open <full path>` (BUG-941's verified reliable form).
+2. `pipeline/install_omlx_engine_agent.sh` reads the engine facts ONCE at install time (interactive owner has TCC
+   access), copies the guard to `~/.omlx/omlx_engine_guard.sh`, and renders the facts into the plist's
+   `EnvironmentVariables` — so the job reads NOTHING from the Dropbox path at runtime.
+3. `pipeline/com.maxwell.omlx-engine.plist` template: ProgramArguments → `@HOME@/.omlx/omlx_engine_guard.sh`, plus
+   the three env vars.
+
+**Receipt (measured, this machine).** `launchctl list` → `com.maxwell.omlx-engine` last exit code **0** (was 126).
+Full down→up cycle via `launchctl kickstart -k gui/501/com.maxwell.omlx-engine`: boot out log shows
+`engine is down … - bringing up /Applications/oMLX.app` → `ok: the engine answers … after bringing up` →
+`/health` `{"status":"healthy","model_count":8}`. No new 126 lines in `boot_agent.err.log` (the remaining lines are
+pre-fix append-only history).
+
+**Scope note (not a new bug).** The guard is a BOOT-TIME one-shot (RunAtLoad + KeepAlive{SuccessfulExit:false}); it
+retries only on non-zero exit, so it does NOT catch a mid-session crash that happens after a clean exit-0 check.
+That is the documented BUG-802 scope ("survive a reboot"), not a defect introduced by this fix. Continuous
+mid-session monitoring is a separate decision (a distinct KeepAlive shape / watchdog), not BUG-940.

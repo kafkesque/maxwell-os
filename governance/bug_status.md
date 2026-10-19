@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**251 open** / 452 closed of 703 ids.
+**252 open** / 454 closed of 706 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -258,3 +258,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-919 | (MED, OPEN 2026-10-18) — A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED | 1 |
 | BUG-920 | (HIGH, OPEN 2026-10-18) — AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END | 3 |
 | BUG-921 | (MED, OPEN 2026-10-18) — 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY | 3 |
+| BUG-941 | (HIGH, OPEN 2026-10-19) — qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL | 1 |

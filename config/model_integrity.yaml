@@ -1,0 +1,65 @@
+# config/model_integrity.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# THE MODEL-INTEGRITY GATE (red-loop-first, D-3036). One named command —
+# scripts/model_integrity_gate.py — that goes RED on a crafted-malicious fixture
+# and GREEN on a clean safetensors model. This file is the ONE home (C12/C12c) for
+# every knob the gate reads: it names no path, no host and no magic string of its own.
+#
+# Authority: D-3036 (a theory needs a red loop first) — the gate is the red loop
+# for the model-load threat model (pickle-RCE / poisoned chat templates).
+# Status: PROPOSED — the red loop lands first, then the gate controls below.
+schema_version: '1'
+authority: D-3036
+authority_state: PROPOSED
+updated: '2026-10-19'
+state: red_loop_first
+
+#: The payload formats the gate will PERMIT through to the inference engine.
+#: pickle is deliberately ABSENT: pickle = arbitrary code on load (Equistamp/UIUC,
+#: JFrog malicious HF models). safetensors carries tensors only, no code path.
+allowed_load_formats:
+  - safetensors
+
+#: The format the gate REFUSES on sight. Any file of this format is RED before its
+#: contents are inspected — the format itself is the threat, not the bytes.
+refused_load_formats:
+  - pickle
+
+#: The marker a crafted-malicious fixture writes IF it were ever unpickled. The gate
+#: never unpickles, so the marker is the PROOF of the threat the gate refuses to touch:
+#: it exists only as the fixture's declared payload, not as a side-effect of the gate.
+malicious_marker: 'malicious_marker.txt'
+
+#: The two fixtures the red loop runs against. red (malicious) must exit non-zero;
+#: green (clean safetensors) must exit zero. Paths are repo-relative (C12).
+red_loop_fixtures:
+  red: 'tests/malicious.pkl'
+  green: 'tests/clean.safetensors'
+  poisoned_template: 'tests/poisoned_chat_template.txt'
+  clean_template: 'tests/clean_chat_template.txt'
+
+# ── POST-RED-LOOP CONTROLS (D-3105 owed -> now built, 2026-10-19) ─────────────────────────────
+# The red loop refused the FORMAT. These refuse a payload whose FORMAT is fine but whose PROVENANCE
+# or TEMPLATE is not. All knobs are read here (C12): the gate names none of its own.
+#
+# 1. SHA-256 pinning: a model file MUST carry a pinned digest before it may load. A pinned file whose
+#    digest differs was TAMPERED (or silently swapped) -> RED. Fail-closed: an UNPINNED file is
+#    QUARANTINED (refused) until the owner verifies it and adds its pin. `quarantine_unknown: false`
+#    relaxes this to "format check only" — the owner opts out, never the gate.
+#    BOOTSTRAP RULE (anti-drift): pin enforcement is ACTIVE only once `sha256_pins` is non-empty — an
+#    empty pin table means "pinning not yet provisioned", so the gate stays format-only (reported, never
+#    silent) rather than refusing every model on a bootstrap machine. The owner's FIRST pin flips the
+#    gate to strict fail-closed; no model is silently admitted and none is silently refused.
+# 2. chat_template_scan: the tokenizer chat_template is a Jinja string; a poisoned one executes Python
+#    on tokenize. The gate refuses any template carrying a DENIED pattern below (the classic
+#    object.__subclasses__ / __import__ / eval / exec chain).
+sha256_pins: {}            # owner fills: {filename: '<64-hex digest>'}
+quarantine_unknown: true   # an unpinned model file is REFUSED to load (fail-closed)
+chat_template_scan:
+  deny_patterns:
+    - '__subclasses__'
+    - '__import__'
+    - '__builtins__'
+    - '__globals__'
+    - 'eval('
+    - 'exec('

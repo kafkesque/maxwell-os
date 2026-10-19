@@ -4889,3 +4889,42 @@ and caught by measuring:**
 
 **Not this decision.** Nothing in the harness is rewritten: not one environment variable, not one provider slot.
 The declaration is amended; the owner's word on the two knobs is still the act T-132 waits for.
+
+
+---
+
+## D-3101 CORRECTION (2026-10-19) — the split discriminator resolves by LEDGER, not cost_source; the window is an owner word
+
+FORENSIC AUDIT of D-3101 ("THE CLOUD-CEILING SPLIT — pipeline-ingestion and harness-metering are two
+classes, not one lifetime counter") before any implementation. Three measured facts, each a receipt:
+
+1. **The discriminator D-3101 names does not resolve (D-3034).** The decision text says the split must
+   "RESOLVE via model in cloud_model_families plus cost_source". But `cost_source` in the harness ledger is
+   COST-PROVENANCE, not metering-class: its only values are `estimated` (37,933 rows), NULL (1,443),
+   `carried_forward` (1). None of those three distinguishes pipeline-ingestion from harness-metering. The two
+   metering classes ALREADY resolve by LEDGER (realpath ownership): the harness ledger
+   (`~/.local/share/goose/sessions/sessions.db#usage_ledger`, 33,231 rows, carries `created_timestamp`) vs the
+   pipeline ledger (`~/.maxwell_os/usage_ledger.db#usage`, **0 rows**, file dated Jul 14). A row's realpath lands
+   in exactly one ledger. cost_source is not the discriminator; the ledger is.
+
+2. **The pipeline-ingestion class has no writer and no declared home.** The pipeline ledger carries 0 rows, no
+   pipeline stage writes to it, and `config/agent_context.yaml#homes` declares no home for it (only `cache_ledger`
+   = the harness ledger). The pipeline is local-only by C1/C3, so pipeline cloud-ingestion volume is ~0 BY DESIGN —
+   there is nothing to meter yet. A ceiling on that class is a forward guard, not a current measurement.
+
+3. **"Windowed, burn-rate" names no window.** A lifetime counter always re-breaches any flat number (the reason
+   D-3101 exists); splitting into TWO lifetime counters only halves the re-breach, it does not remove it. The fix
+   requires a WINDOW, and D-3101 does not specify one. A window is an owner word, not an edit.
+
+**Correction.** The split discriminator is the LEDGER (realpath ownership — D-3034), not `cost_source`.
+`cost_source` keeps its existing job (cost provenance → the unclassified bucket, BUG-767's shape). The corrected
+implementation order:
+  1. Declare the pipeline ledger's home in `agent_context.yaml` and add it as a second source in
+     `delegation_economy.yaml` (C12: ONE home, resolved through the ONE resolver).
+  2. OWNER defines the window (e.g. trailing-30-day burn, or daily-burn = ceiling / 30) — a word with a reason.
+  3. Implement two metering classes; windowed burn-rate for the harness class (which has `created_timestamp`),
+     lifetime-with-reason for the pipeline class until its writer exists.
+
+NOT IMPLEMENTED this turn: D-3101's stated discriminator resolves to nothing, so implementing the 1-2-3 as
+written would encode a discriminator with no referent. The correction above is the act that unblocks a clean
+implementation. T-187 (brain ranking) and the owner's window word are the two inputs the implementation waits on.

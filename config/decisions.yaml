@@ -30734,3 +30734,19 @@ decisions:
   receipts:
     t187: 'temp/subagent_loop_two_step_full_20261019.json: 8 rows, budget 90.0. PASS 6 (MiniCPM5 1.2s, Ornith-REAP 2.9s, Ornith-9B 13.5s, Qwen3-Coder 17.2s, Qwen3.8-27B 39.8s, gpt-oss 35.3s); FAIL 2 (Phi-4-mini 0 tool calls, gemma read=1 lookup=0)'
     lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5 all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'
+
+- id: D-3104
+  state: RESOLVED
+  date: '2026-10-19'
+  by: owner
+  category: DELEGATION / MODEL ROUTING
+  title: Brain DECIDE (BUG-832 remedy #2) - gpt-oss local everyday, deepseek escalation strategic
+  decision: 'The owner DECIDES the session brain (BUG-832 remedy #2, owner-gated per the bug): everyday decisions run on gpt-oss-20b-MXFP4-Q8 (local, provider maxwell_omlx, $0 marginal), and STRATEGIC decisions/tasks where gpt-oss would slop or drift ESCALATE to custom_deepseek (deepseek-v4-pro). This executes the existing D-3023 escalation architecture: active=local, escalation=cloud, GOOSE_PLANNER stays deepseek. gpt-oss clears all three local-brain gates by measurement (T-187 native two-step tool loop PASS 35.3s; lc_reasoning 6/6=1.0 at 16k; gemma drift eval class 0.80 / code-review 0.80 / summ 0.85 - no catastrophic drift). gemma-4-E4B, the prior AGENT_LOOP_SHORT, FAILS the dependent-step loop (D-3103) and is demoted from the brain role (retained as STABILITY_FIRST). NOT auto-promoted (D-2898): this is an OWNER word, not a benchmark promotion. The ~15-20 percent residual error on the drift legs is the measured accuracy ceiling the owner accepts for the everyday brain.'
+  bugs:
+  - BUG-832
+  files:
+  - config/model_assignments.yaml
+  - config/engine.yaml
+  receipts:
+    gates: 'gpt-oss 3/3 local-brain gates cleared: t187 native-loop PASS (35.3s), lc_reasoning 6/6=1.0, gemma drift 0.80/0.80/0.85'
+    owner_word: 'gpt-oss everyday; deepseek escalation for strategic/slop-risk'

@@ -18631,3 +18631,21 @@ NOT auto-promoted (D-2898). The brain DECIDE (remedy #2) remains an OWNER WORD; 
 candidate that cleared two gates, not an approved brain. Two further D-3103 corrections apply to the capability
 register: gpt-oss is NOT a 0.0 tool-caller (the 0.0 was the raw-JSON format), and gemma-4-E4B — the prior
 "only latency-routable" model — FAILS the dependent second step (read_lines=1, lookup_token=0).
+
+
+## BUG-832 UPDATE (2026-10-19, D-3104) — remedy #2 (brain DECIDE) landed: gpt-oss local everyday, deepseek escalation strategic
+
+The owner's brain DECIDE (remedy #2, the owner-gated step) is recorded as D-3104. Everyday brain = gpt-oss-20b-MXFP4-Q8
+on maxwell_omlx (local); strategic/slop-risk = ESCALATE to custom_deepseek (deepseek-v4-pro), the existing D-3023 path.
+gpt-oss clears all three local-brain gates (T-187 loop PASS 35.3s, lc_reasoning 6/6=1.0, gemma drift 0.80/0.80/0.85),
+overturning the "local route REFUTED" premise that named only gemma/Qwen3-Coder. Remedy #1 (census T-157) and #3
+(restate the ban with the delegate-passthrough subject) remain OPEN; this closes only the DECIDE gate.
+
+## BUG-942 (MED - OPEN 2026-10-19) — voting suite unusable: gold_4axis.jsonl fb_ids resolve 0/251 rows in maxwell.db
+
+DISCOVERED 2026-10-19 running tools/model_eval_suite.py --suites voting: PREFLIGHT GATE FAILED (RuntimeError: list
+index out of range) because suite_voting built 0 items - fb_ids matched 0 of 251 rows in 'knowledge pipeline/maxwell.db'.
+Sample gold id 000e035798b39c4d4ada638aef410061175cfe7b7c6eb37e50ae2024d5d50724 does not exist in the DB. The
+gold_4axis.jsonl fb_ids are 64-char hashes that no longer match the DB fb ids (DB rebuilt with new ids, or the gold set
+was generated against a different snapshot). Until fixed, the voting suite cannot run; the classification drift leg was
+run with the self-contained 'stability' suite instead.

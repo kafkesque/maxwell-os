@@ -258,10 +258,10 @@ _merged_at: 2026-07-08 20:31 UTC
 # model is the weakest coder.
 harness_roles:
   AGENT_LOOP_SHORT:
-    model: gemma-4-E4B-it-MLX-4bit
-    basis: "T-131: the only served model ROUTABLE for agent_loop (54.7s against a 60s budget); RE-MEASURED 2026-10-17 by scripts/agent_context_probe.py: 455.0 tok/s prefill, working_set 26214 in 57.6 s against the class prefill_budget_s 60 - still the ONLY routable agent_loop model"
-    also_best_at: "stability 0.7 - the highest measured, which is what an interactive loop needs"
-    never_for: "code generation (humaneval 0.16) and long context (lc_reason 0.0)"
+    model: gpt-oss-20b-MXFP4-Q8
+    basis: "D-3104 (OWNER brain DECIDE 2026-10-19): the only served model clearing all three local-brain gates - T-187 native two-step loop PASS (35.3s), lc_reasoning 6/6=1.0 at 16k, gemma drift eval 0.80/0.80/0.85. Replaces gemma-4-E4B which FAILS the dependent second step (D-3103)."
+    also_best_at: "long_context_reasoning_16k 1.0 (ties Qwen3.8-27B); native tool loop"
+    never_for: "code generation (route to Qwen3-Coder) and STRATEGIC decisions (escalate to custom_deepseek per D-3023)"
   AGENT_EDIT_LONG_CONTEXT:
     model: Qwen3.8-27B-MLX-4bit
     basis: "lc_reason 1.0, niah 1.0, reviewing 1.0, humaneval 0.96, ifeval 1.0 - the strongest axis set in the portfolio"

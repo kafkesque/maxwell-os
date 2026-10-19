@@ -4985,3 +4985,21 @@ gpt-oss is now a candidate that cleared two gates, not an approved brain.
 
 **Receipts.** `temp/subagent_loop_two_step_full_20261019.json` (8 rows, budget 90.0) |
 `governance/model_eval_checkpoint.jsonl` (gpt-oss lcr-0..5 all ok, ctx_tokens 16000).
+
+
+## D-3104 (RESOLVED 2026-10-19, OWNER) — Brain DECIDE: gpt-oss local everyday, deepseek escalation strategic
+
+The owner decided BUG-832 remedy #2 (the owner-gated brain choice). Everyday: gpt-oss-20b-MXFP4-Q8 on maxwell_omlx
+(local, $0 marginal, sovereign). Strategic / slop-risk: ESCALATE to custom_deepseek (deepseek-v4-pro) — the existing
+D-3023 escalation path, with GOOSE_PLANNER already pinned to deepseek.
+
+Why gpt-oss is the everyday brain (not gemma, not Qwen3-Coder): it is the only served model that clears all three
+local-brain gates by measurement — T-187 native two-step tool loop PASS (slowest turn 35.3 s), lc_reasoning 6/6 = 1.0
+at 16k ctx, and the gemma drift eval (class 0.80 / code-review 0.80 / summ 0.85) shows no catastrophic drift.
+gemma-4-E4B, the prior AGENT_LOOP_SHORT, FAILS the dependent second step (D-3103) and is demoted from the brain role
+(retained as STABILITY_FIRST). NOTHING is auto-promoted (D-2898): this is an OWNER word, not a benchmark promotion.
+The ~15-20% residual error on the drift legs is the measured ceiling the owner accepts for the everyday brain;
+anything higher-stakes escalates to deepseek.
+
+**Receipts.** T-187 native loop PASS (35.3s) | lc_reasoning 6/6 = 1.0 | gemma drift eval 0.80/0.80/0.85 |
+owner word "gpt-oss everyday; deepseek for strategic/slop-risk".

@@ -325,6 +325,25 @@ capabilities:
       - scripts/container_alert.py
       - pipeline/container_integrity.py
 
+  #: BUG-948/D-3112 — THE OWNER WORD INTAKE (T-129/T-130). scripts/owner_marks.py (render/check/apply/sign)
+  #: turns the owner's word into a rendered sheet + signed receipt, reading config/owner_marks.yaml (vocabulary)
+  #: and config/corroboration_collapse.yaml (rule), leaving the pair object + apply receipt behind. It was owned
+  #: by NO capability, so a finding about it could not route (BUG-948) — the exact blindspot this registry exists
+  #: to refuse (T-156). Declared 2026-10-19 so the fix task for BUG-948 has a capability to name.
+  - id: owner_marks
+    kind: script
+    entrypoint: python3 scripts/owner_marks.py --check
+    check: python3 scripts/owner_marks.py --selftest
+    receipt: governance/owner_marks_receipt.json
+    cost_tier: T0
+    owns:
+      - scripts/owner_marks.py
+      - scripts/check_corroboration_collapse.py
+      - config/owner_marks.yaml
+      - config/corroboration_collapse.yaml
+      - governance/owner_marks_receipt.json
+      - governance/corroboration_collapse_pairs.json
+
 # ─── THE OPERATOR LANES (T-164/BUG-837's disposition) ───
 #: An operator lane is an entry point a HUMAN runs and that produces a READING or a STATE CHANGE, not a receipt —
 #: which is why it is a LANE and not a capability: declaring it a capability would force a receipt field to be
@@ -451,6 +470,7 @@ unrouted:
   BUG-919: bug_is_a_finding   # an artefact's WHITESPACE DENSITY is a finding about pandoc's epub reader, not a file's route
   BUG-920: bug_is_a_finding   # a missing RECEIPT is a finding about when the checkpoint is written, not a file's route
   BUG-921: bug_is_a_finding   # filename punctuation drift is a finding about the missing per-work identity, not a file's route
+  BUG-948: bug_is_a_finding   # rule_digest whole-file sha256: the title names the script by dotted id, not a path; the fix task will name scripts/owner_marks.py, which routes to owner_marks
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

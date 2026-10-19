@@ -28,6 +28,7 @@ environment:
     - retrieval_benchmark.py
     - run_final_chain.sh
   expected_models:
+    - MiniCPM5-2B-MLX
     - Ornith-1.5-35B-A3B-REAP-19B
     - Ornith-1.5-9B-MLX-8bit
     - Phi-4-mini-instruct-8bit

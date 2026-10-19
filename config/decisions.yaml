@@ -30966,3 +30966,28 @@ decisions:
   files:
   - scripts/owner_marks.py
   - config/corroboration_collapse.yaml
+
+- id: D-3113
+  state: RESOLVED
+  date: '2026-10-20'
+  by: assistant
+  category: DELEGATION / MODEL ROUTING
+  title: D-3104 planner clause OVERTURNED — GOOSE_PLANNER now local (maxwell_omlx/gpt-oss-20b); deepseek only explicit escalation
+  decision: 'D-3104 (2026-10-19) decided "active=local, escalation=cloud, GOOSE_PLANNER stays deepseek", a clause
+    that contradicted its own first clause. MEASURED 2026-10-19/20 from usage_ledger: every interactive turn ran on
+    deepseek-v4-pro (976 calls/day; Oct-18 $8.41 + Oct-19 $7.70 = $16.11 across 2 days, matching the DeepSeek
+    dashboard ~$17), so "everyday decisions run on gpt-oss-20b (local, $0 marginal)" was NOT achieved: the
+    GOOSE_PLANNER override held the session planner on deepseek on EVERY turn. The session-birth pin (BUG-877) is a
+    second, independent layer - a running session keeps its born model regardless of the file. RESOLUTION (owner
+    directive 2026-10-20: deepseek only for strategic orchestration/decisions, serious 3rd-party analysis, or
+    periodic centre-checkups; apart from that cut costs): ~/.config/goose/config.yaml GOOSE_PLANNER_PROVIDER and
+    GOOSE_PLANNER_MODEL changed from custom_deepseek/deepseek-v4-pro to maxwell_omlx/gpt-oss-20b-MXFP4-Q8 (backup
+    config.yaml.bak.20261020_prelocalplanner; active_provider was already maxwell_omlx). The everyday loop is now
+    local ($0); deepseek is an EXPLICIT escalation for strategic D-3xxx decisions only, never the ambient planner.
+    VERIFICATION owed: a NEW session (birth-pin requires it) must show gpt-oss-20b rows at $0 in usage_ledger; if it
+    still shows deepseek, the planner key is not the operative lever and BUG-877 is the sole cause.'
+  bugs:
+  - BUG-877
+  - BUG-832
+  files:
+  - /Users/barn/.config/goose/config.yaml

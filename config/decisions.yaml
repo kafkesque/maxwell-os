@@ -30695,3 +30695,24 @@ decisions:
   - BUG-917
   files:
   - config/delegation_economy.yaml
+- id: D-3102
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: INFRASTRUCTURE / ENGINE
+  title: Adopt oMLX 0.7.1rc1 as the production engine (A/B measured vs 0.7.0 on M1 Max)
+  decision: 'A/B of oMLX 0.7.1rc1 vs 0.7.0, cold Ornith-1.5-35B-A3B-REAP-19B @4010 tokens
+    (measure_prefill.py, OMLX_HOT_CACHE_ONLY=true to defeat the shared 51GB SSD prefix cache).
+    ADOPT rc1: model load 5.9s -> 3.68s (-37.6%), wall 17.7s -> 15.8s (-10.7%), prefill
+    361.88 -> 355.32 tok/s (flat), TTFT 11.08 -> 11.29s (flat). Decode 96.91 -> 222.13 tok/s
+    is a SINGLE-TOKEN artifact (max_tokens=1) and is NOT promoted; a >=128-token benchmark is
+    owed first. Config, models and the SSD cache are EXTERNAL to the .app (~/.omlx) and untouched;
+    rollback preserved at /Applications/oMLX-0.7.0.app plus ~/.omlx/*.bak-before-071upgrade.'
+  bugs: []
+  files:
+  - scripts/measure_prefill.py
+  - scripts/bug793_ab.py
+  receipts:
+    measured: 'serving parent /Applications/oMLX.app/Contents/MacOS/oMLX reads __version__ =
+      0.7.1rc1; /health healthy model_count 8 loaded_count 1; guard com.maxwell.omlx-engine
+      last exit 0'

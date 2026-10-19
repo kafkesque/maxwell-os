@@ -13,9 +13,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1228 decisions (census stamp 43435ef695a1fe22, 2026-10-19) · 704 bugs (252 open / 452 closed; highest OPEN = BUG-939) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1229 decisions (census stamp f47ca55b54416f86, 2026-10-19) · 704 bugs (252 open / 452 closed; highest OPEN = BUG-939) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1228 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1228, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1229 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 326 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1229, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
@@ -4928,3 +4928,28 @@ implementation order:
 NOT IMPLEMENTED this turn: D-3101's stated discriminator resolves to nothing, so implementing the 1-2-3 as
 written would encode a discriminator with no referent. The correction above is the act that unblocks a clean
 implementation. T-187 (brain ranking) and the owner's window word are the two inputs the implementation waits on.
+
+## D-3102 (RESOLVED 2026-10-19) — ADOPT oMLX 0.7.1rc1 as the production engine (A/B measured vs 0.7.0)
+
+**Verdict.** The corrected, guard-aware A/B is DONE and the production engine now runs 0.7.1rc1. ADOPT on
+measured grounds:
+
+| metric | 0.7.0 | 0.7.1rc1 | verdict |
+|---|---|---|---|
+| model load (cold) | 5.9 s | 3.68 s | −37.6% |
+| wall (load + TTFT) | 17.7 s | 15.8 s | −10.7% |
+| prefill (Ornith @4k) | 361.88 tok/s | 355.32 tok/s | flat |
+| TTFT | 11.08 s | 11.29 s | flat |
+| decode (max_tokens=1) | 96.91 tok/s | 222.13 tok/s | SINGLE-TOKEN ARTIFACT, not promoted |
+
+**The decode 2.29× is NOT adopted.** `measure_prefill.py` sends ONE `max_tokens=1` completion, so its
+`generation_tokens_per_second` counter is single-token latency, not sustained decode throughput. A ≥128-token
+benchmark is owed before any decode claim enters the register (D-3036: a hypothesis stays labelled until a
+receipt speaks).
+
+**Why config is safe.** The `.app` bundle holds only code; `settings.json`, `model_settings.json`, model weights
+and the 51 GB SSD prefix cache all live in `~/.omlx/`, external to the bundle, and are untouched by the swap.
+Rollback is preserved at `/Applications/oMLX-0.7.0.app` plus `~/.omlx/*.bak-before-071upgrade`.
+
+**Receipt.** Serving parent `/Applications/oMLX.app/Contents/MacOS/oMLX` reads `__version__ = "0.7.1rc1"`;
+`/health` healthy, `model_count 8`, `loaded_count 1`; guard `com.maxwell.omlx-engine` last exit 0.

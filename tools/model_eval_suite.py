@@ -895,6 +895,15 @@ def suite_voting() -> list[dict]:
     rows = [r for r in rows if r.get("discipline") and r.get("domains")]
     discs, doms = _voting_taxonomy()
     texts = _voting_texts([r["fb_id"] for r in rows])
+    if not texts:
+        # BUG-942: fail loud, not opaque. 0 gold fb_ids resolve in the live DB — the anchor
+        # was built against a superseded corpus generation (fb_id = sha256(name|definition)
+        # is generation-sensitive, F-19/D-2949). Do NOT re-point ids; rebuild the anchor.
+        raise RuntimeError(
+            "gold anchor orphaned: 0/" + str(len(rows)) + " gold fb_ids resolve in the live DB "
+            + "(" + str(_DB_PATH) + "). Anchor built against a superseded corpus generation "
+            + "(fb_id = sha256(name|definition) is generation-sensitive). Rebuild the anchor "
+            + "against the live generation (owner-gated) — do NOT re-point ids.")
     out = []
     for r in rows:
         text = texts.get(r["fb_id"]) or ""

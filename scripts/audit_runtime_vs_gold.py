@@ -16,6 +16,12 @@ wrong. This script re-derives the comparison from the filesystem on every run so
 divergence cannot silently return.
 
 Exit 0 when every axis mismatch count is <= --max-mismatch (default 0).
+
+D-3107 re-attachment (2026-10-19): each anchor now carries `invariant_key` (generation-invariant) and,
+after scripts/apply_gold_reattach.py, either a `live_fb_id` (semantic re-attachment to the live generation)
+or `disposition: dead` (owner-adjudicated removal). This script resolves a row by `live_fb_id` when present
+(falling back to `fb_id`), and SKIPS dead rows — they are recorded decisions, not orphans. Missing therefore
+means "an anchor that is neither re-attached nor dead", which is the true remaining drift.
 """
 from __future__ import annotations
 
@@ -75,10 +81,18 @@ def main() -> int:
     mismatches: dict[str, list[str]] = {axis: [] for axis in AXES}
     missing = 0
     compared = 0
+    dead = 0
+    reattached = 0
     for gold in load_gold():
+        if gold.get("disposition") == "dead":
+            dead += 1
+            continue
+        tid = gold.get("live_fb_id") or gold.get("fb_id")
+        if "live_fb_id" in gold:
+            reattached += 1
         row = con.execute(
             "select content_type, depth, discipline, domains from fbs where fb_id = ?",
-            (gold.get("fb_id"),),
+            (tid,),
         ).fetchone()
         if row is None:
             missing += 1
@@ -94,7 +108,7 @@ def main() -> int:
     con.close()
 
     print("runtime vs gold_4axis: compared " + str(compared) + " row(s), missing from DB "
-          + str(missing))
+          + str(missing) + ", dead " + str(dead) + ", re-attached " + str(reattached))
     worst = 0
     for axis in AXES:
         bad = mismatches[axis]
@@ -103,6 +117,15 @@ def main() -> int:
         print("  " + axis.ljust(13) + str(len(bad)).rjust(4) + " mismatch (" + ("%.1f" % pct) + "%)")
         for name in bad[: args.show]:
             print("      - " + name)
+    # F-01/F-19 (BUG-944): a MISSING gold row is the strongest drift signal — the anchor
+    # cannot even resolve against the runtime KB. fb_id = sha256(name|definition) is
+    # generation-sensitive, so a corpus re-extraction orphans every anchor row; treating
+    # missing as a no-op silently flipped this sentinel to a false "OK" (0 compared / 251
+    # missing). Fail closed: any missing row above the floor is DRIFT.
+    if missing > args.max_mismatch:
+        print("DRIFT: " + str(missing) + " of " + str(compared + missing + dead)
+              + " anchor row(s) MISSING from the runtime KB — golden anchor orphaned (F-01/F-19)")
+        return 1
     if worst > args.max_mismatch:
         print("DRIFT: the runtime KB does not carry the adjudicated 4-axis labels (see F-01)")
         return 1

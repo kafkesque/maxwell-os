@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1229 decisions (census stamp f47ca55b54416f86, 2026-10-19) · 707 bugs (253 open / 454 closed; highest OPEN = BUG-942) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1236 decisions (census stamp ae8b93d38d972582, 2026-10-19) · 711 bugs (252 open / 459 closed; highest OPEN = BUG-941) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1229 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 326 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1229, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1236 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 643 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1236, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 253 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -18649,3 +18649,137 @@ Sample gold id 000e035798b39c4d4ada638aef410061175cfe7b7c6eb37e50ae2024d5d50724 
 gold_4axis.jsonl fb_ids are 64-char hashes that no longer match the DB fb ids (DB rebuilt with new ids, or the gold set
 was generated against a different snapshot). Until fixed, the voting suite cannot run; the classification drift leg was
 run with the self-contained 'stability' suite instead.
+
+
+## BUG-943 (RESOLVED 2026-10-19) — Model-load path had no integrity gate: pickle = arbitrary code on load
+
+The inference model-load path accepted any payload format with no integrity rail. A malicious `.pkl` weight file
+would execute arbitrary code on load (pickle-RCE — Equistamp/UIUC backdoor persistence arXiv 2610.07510; JFrog
+in-the-wild malicious HF models). RESOLVED red-loop-first (D-3036/D-3105): `scripts/model_integrity_gate.py`
+refuses pickle on sight (exit 1) and allows safetensors (exit 0), reading every knob from
+`config/model_integrity.yaml` (C12). The post-red-loop controls — SHA-256 pinning, chat-template Jinja scan,
+quarantine-until-verified — remain OWED as the next gate extension (D-3105 declares them not-built, not silent).
+
+
+## BUG-944 (HIGH, RESOLVED 2026-10-19) — audit_runtime_vs_gold.py silently false-passes: "OK" with 0 compared / 251 missing
+
+The anchor-drift sentinel treated a MISSING gold row as a no-op, so when the golden anchor was fully orphaned by
+corpus re-generation it printed `compared 0 row(s), missing from DB 251` and still exited 0 with `OK: runtime KB
+matches the adjudicated anchor`. The F-01 drift detector could no longer detect the exact drift it exists to catch —
+a silent false-pass (C16). RESOLVED: `scripts/audit_runtime_vs_gold.py` now fails closed — any `missing >
+--max-mismatch` (default 0) returns exit 1 with `DRIFT: <n> of <N> anchor row(s) MISSING ... golden anchor
+orphaned`. Red loop verified live: was rc=0 (false-pass), now rc=1 with missing=251.
+
+
+## BUG-942 (RESOLVED 2026-10-19) — root cause corrected: golden anchor orphaned by corpus re-generation, not fb_id drift
+
+The 0/251 fb_id resolution was not a hash bug but a symptom of a deeper event: the live DB was re-extracted
+(pipeline_commit bae6662 -> 32321c9), and `fb_id = sha256(name|definition)` is generation-sensitive (D-2949/F-19).
+Only 6.0% of principle names survive across the two generations (388/6521; e.g. "Chroma Subsampling Optimization"
+-> "Chroma Subsampling in Jpeg Compression"), so the gold anchor resolves 0/251 in the live DB but 251/251 in the
+DELETED archive snapshot (archive/session_20260923/scratch/backup/deletions/20260917_131815/maxwell.db). RESOLVED
+fail-closed, NOT by mechanical re-point (6% survival would make re-pointing wrong and mask the orphan): (1)
+`tools/model_eval_suite.py::suite_voting` now raises a named RuntimeError ("gold anchor orphaned: 0/251 ...")
+instead of crashing opaquely via IndexError -> rc 2; (2) the audit sentinel now fails closed on missing (BUG-944).
+Rebuilding the anchor against the live generation is an OWNER-GATED next step (D-3106), not a script.
+
+
+## BUG-945 (MED, OPEN 2026-10-19) — gov_sync --check/--apply carry no register-freshness guard, so a "clean sync" can be a false green
+
+The bug-status register (`governance/bug_status.json`) is DERIVED from `governance/buglog.md` by
+`scripts/bug_status.py`, but `scripts/gov_sync.py` reads it as an INPUT and never verifies it is fresh. A session
+that appends bug entries and then runs only `gov_sync --apply` + `gov_sync --check` re-cuts every face from a STALE
+register and gets `ok` (EXIT=0) — a false green (the BUG-798 shape, one level up). MEASURED 2026-10-19: after
+BUG-942/943/944 were appended, the stale register read 707 bugs / 253 open / 454 closed / highest OPEN then BUG-942;
+the re-derivation reads 709 / 252 / 457 / highest OPEN then BUG-941 (BUG-943 and BUG-944 were MISSING from the register
+entirely and BUG-942 was wrongly OPEN). The freshness rail `scripts/check_bug_status.py` (which byte-compares the
+register against its re-derivation) caught it instantly, but it is a SEPARATE step (`just health` line 86), not part
+of the sync command. FIX: `gov_sync --apply`/`--check` should REFUSE or loudly warn when the register is stale (i.e.
+when check_bug_status would fail) so a "clean sync" can never be a false green. Until then the sync sequence MUST be:
+`bug_status.py` -> `recompute_decision_summary.py` -> `gov_sync --apply` -> `gov_sync --check` +
+`check_governance_faces.py`.
+
+
+## BUG-945 (MED, RESOLVED 2026-10-19) — gov_sync now refuses a sync cut from a stale bug register (register-freshness guard)
+
+RESOLVED red-loop-first (D-3036). `scripts/gov_sync.py` now runs the ONE freshness home
+(`scripts/check_bug_status.py#stale_register_files`) BEFORE `derive()` reads `governance/bug_status.json`, and
+refuses with exit 2 (C16) when the register does not equal its own re-derivation from `governance/buglog.md` —
+so a "clean sync" can never again be a false green (the BUG-798 shape, one level up). The freshness logic was
+lifted out of `check_bug_status.py::main()` into a reusable `stale_register_files()` so the rail and the sync
+guard cannot disagree about what "fresh" means (one home, D-2642). Red loop verified live 2026-10-19: a
+corrupted register → `gov_sync --check` exits 2 with the named fault `the bug register is STALE [...]`; the
+restored register → exits 0. The mandatory sync sequence (bug_status.py → recompute_decision_summary.py →
+gov_sync --apply → gov_sync --check) is now ENFORCED, not just documented.
+
+
+## BUG-943 (RESOLVED 2026-10-19) — post-red-loop controls BUILT (the "OWED" extension is no longer owed)
+
+Follow-up to the BUG-943 red loop above. The post-red-loop controls that D-3105 declared "not built yet"
+are now BUILT as D-3108, all config-driven (C12), as tiers 2 and 3 of `scripts/model_integrity_gate.py`:
+(1) SHA-256 pinning — a pinned file whose digest differs is REFUSED (tampered); an unpinned file is
+QUARANTINED when `quarantine_unknown` is true. Pin enforcement is ACTIVE only once `sha256_pins` is
+non-empty (an empty pin table = "not yet provisioned" -> format-only, reported not silent); the owner's
+first pin flips the gate strict. (2) chat-template Jinja denylist via `--chat-template` — a template
+carrying `__subclasses__` / `__import__` / `eval` / `exec` is REFUSED. (3) `quarantine_unknown` defaults
+true (fail-closed). A `--selftest` exercises all three tiers (9 controls) as a re-runnable red loop.
+Red loop verified live 2026-10-19: `--selftest` 9/9; `tests/malicious.pkl` RED rc=1 (no marker written);
+`tests/clean.safetensors` GREEN rc=0; `tests/poisoned_chat_template.txt` RED rc=1;
+`tests/clean_chat_template.txt` GREEN rc=0.
+
+## BUG-946 (HIGH, OPEN 2026-10-19) — D-3107 re-attachment many-to-one collision: ~10 false-positive merges recorded as "legitimate convergence"
+
+FOUND by forensic audit (2026-10-19) while preparing the F-01 re-propagation. `governance/gold_reattach_many_to_one.jsonl` records 20 live rows each claimed by 2 gold anchors, framed as "near-duplicate convergence". Measured against `knowledge pipeline/maxwell.db`: ~10 of the 20 are FALSE re-attachments, not near-dupes — two genuinely distinct principles collided on one live row because `scripts/build_anchor_reattach_map.py` is a greedy nearest-neighbour (bge-m3 cosine, PROPOSE_SIM=0.60) with NO one-to-one uniqueness enforcement. Representative false merges:
+
+  * `Network Robustness Through Structural Diversity` (social network analysis) + `Equity Capital Source Diversity` (finance) → both matched `Diversity As Source of Systemic Potential` (ecology) — a shared keyword, not a shared principle.
+  * `Langgraph Agent Workflow Graph Structure` (software eng) + `Visual Effects Workflow Integration` (computer graphics) → both matched `Ai-assisted Workflow Integration` (HCI).
+  * `Fitness-proportional Selection` (AI) wrongly matched `Semiospheric Selectivity` (semiotics) — the only semiotics-anchored live row.
+
+CONSEQUENCE (now contained): `scripts/propagate_4axis_anchor.py` would have written each of those 20 live rows twice with differing axis values — non-deterministic last-write-wins corrupting the runtime KB. A fail-closed many-to-one guard was added the same day (C16): 32 conflicted cells across the 20 rows are now SKIPPED and reported, never written. 516 clean cells remain propagatable.
+
+ROOT CAUSE: the semantic matcher emits a greedy PROPOSED map without a uniqueness pass; `scripts/apply_gold_reattach.py` then RECORDED the merges instead of REFUSING them (the "record, don't refuse" decision treated every many-to-one as legitimate convergence, which is false for ~half).
+
+OWED (owner word): adjudicate the 20 merges — split the false positives back to their correct live rows (or `dead`), accept the true near-dupes with a single canonical axis — THEN run `scripts/propagate_4axis_anchor.py --apply` to close F-01. Blocking: no `--apply` of propagate until this is done (the guard holds the line, but the 20 rows stay drifted by design).
+
+## BUG-946 (HIGH, RESOLVED 2026-10-19) — 20 many-to-one merges adjudicated (2 near-same kept, 18 split); 21 false anchors detached; F-01 re-propagated
+
+OWNER WORD (2026-10-19): two pairs are near-same (slightly different category) and KEPT —
+  {Metaphorical Conceptualization From Cultural Traces, Metaphorical Cognitive Mapping} and
+  {Natural Pattern Recognition, Symbolic Pattern Recognition}; all 18 remaining merges are DIFFERENT and split.
+
+RESOLUTION (deterministic, LLM-free, data-grounded — the CSV is the authority, NOT a similarity heuristic):
+  * scripts/resolve_merge_adjudication.py rewritten to honour the owner's per-anchor SAME/DIFFERENT marks in
+    governance/gold_reattach_many_to_one_ADJUDICATION.csv. The prior version used `discipline==live OR sim>=0.80`
+    and REVERSED 6 of the owner's marks (kept an anchor the owner called DIFFERENT, killed one called SAME —
+    e.g. it kept "Optical Illusions in Design" and killed "Color Management in Graphic Design"). Rejected, not applied.
+  * Disposition: 21 anchors -> disposition:dead (false re-attachments detached), 15 SAME kept, 4 NEAR-SAME kept.
+    gold_4axis.jsonl updated C6-atomic; C13 backup backup/deletions/20261019_213501/gold_4axis.jsonl.
+    Resolution record: governance/gold_reattach_merge_resolution.jsonl.
+
+PROPAGATION: scripts/propagate_4axis_anchor.py --apply wrote 522 clean cells (C13 backup
+backup/deletions/20261019_213532/maxwell.db; R14 manifest governance/axis_propagation_manifest_20261019_213532.json).
+Merge-conflict cells fell 32 -> 3. The 3 remaining are the owner-flagged "slightly different category" cases
+(rows 7/8/10 domains) — correctly owner-gated, never force-merged.
+
+DRIFT (scripts/audit_runtime_vs_gold.py, before -> after): content_type 14 -> 1, discipline 186 -> 1,
+domains 227 -> 6. Remaining: the 3 owner-gated category cells + depth 15 (F-03 n/a-non-principle sentinel, separate).
+
+ROOT CAUSE (still open — follow-up): scripts/build_anchor_reattach_map.py is a greedy bge-m3 nearest-neighbour
+(PROPOSE_SIM=0.60) with NO one-to-one uniqueness pass, and apply_gold_reattach.py RECORDS many-to-one instead of
+REFUSING it. This resolution adjudicated the CURRENT 20 collisions; the matcher still needs a uniqueness pass to
+prevent recurrence. See next critical steps.
+
+## BUG-946 (HIGH, RESOLVED 2026-10-19) — root-cause fix landed: injective uniqueness pass + refuse-not-record + cache-staleness guard
+
+The "ROOT CAUSE (still open)" follow-up above is now CLOSED. `scripts/build_anchor_reattach_map.py` runs a
+one-to-one uniqueness pass: a live principle may be claimed by AT MOST ONE anchor — exact-name (priority 2)
+outranks semantic cosine (priority 1); a contended live row keeps its single strongest claim and demotes the
+rest to tier `many-to-one`, surfaced for owner SAME/DIFFERENT adjudication, never silently merged.
+`scripts/apply_gold_reattach.py` now REFUSES a non-injective map (rc=2) and leaves many-to-one delta anchors as
+`reattach_pending`, never recording a merge. The embedding cache is keyed by the ORDERED live fb_id list and
+re-embeds on any divergence (count/content/order) — this was the observed IndexError (cached L 6587 vs live
+query 6573). Output paths are now `--out-dir` overridable (C12).
+
+RECEIPT (synthetic harness, LLM-free): non-injective map -> REFUSED rc=2; many-to-one delta ->
+reattach_pending (not attached); injective map + collision surfaced; stale cache -> "cache stale (L 3/4 live) —
+re-embedding" with no IndexError. py_compile clean on all four re-attach scripts.

@@ -13,11 +13,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1229 decisions (census stamp f47ca55b54416f86, 2026-10-19) · 707 bugs (253 open / 454 closed; highest OPEN = BUG-942) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1236 decisions (census stamp ae8b93d38d972582, 2026-10-19) · 711 bugs (252 open / 459 closed; highest OPEN = BUG-941) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1229 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 642 · ⚖ ratified 146 | closed: ✅ resolved 326 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1229, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1236 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 643 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1236, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 253 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25,7 +25,7 @@
 > |---|---|---|---|
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -42,7 +42,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -5003,3 +5003,65 @@ anything higher-stakes escalates to deepseek.
 
 **Receipts.** T-187 native loop PASS (35.3s) | lc_reasoning 6/6 = 1.0 | gemma drift eval 0.80/0.80/0.85 |
 owner word "gpt-oss everyday; deepseek for strategic/slop-risk".
+
+
+## D-3105 (RESOLVED 2026-10-19) — Model-integrity gate registered red-loop-first (D-3036): pickle refused, safetensors-only
+
+**Verdict.** The red loop for the model-load threat model (pickle-RCE / poisoned chat templates) is one named
+command — `scripts/model_integrity_gate.py` — and it is RED on a crafted-malicious fixture and GREEN on a clean
+safetensors model, verified live this session. It reads every knob from `config/model_integrity.yaml` (C12/C12c:
+no path, host or format string of its own) and classifies a payload by FORMAT before any bytes are executed.
+
+**Why refuse-on-format, never inspect-then-execute.** pickle = arbitrary code on load, and that is a MEASURED
+attack class, not a hypothetical (Equistamp/UIUC backdoor persistence survives safety training, arXiv 2610.07510;
+JFrog documented in-the-wild pickle-RCE on malicious HF models). The gate therefore never unpickles a payload:
+it refuses on the format before the bytes are inspected. `tests/malicious.pkl` goes RED not because the gate
+executed it, but because the gate refused to — and the absence of `malicious_marker.txt` is the proof.
+
+**Red-loop receipts (this session).** `malicious.pkl` → RED exit 1, no marker written; `clean.safetensors` → GREEN
+exit 0. The gate answers the question a checker must answer: is this payload loadable, or must it be refused?
+
+**Next gate extension (NOT built yet, declared not silent).** The post-red-loop controls — SHA-256 pinning at
+download against a known-good registry, chat-template Jinja scan, quarantine-until-verified — are the NEXT
+extension. They are registered as owed, not as done: a gate that refuses pickle is the first rail, not the last.
+
+**Receipts.** `scripts/model_integrity_gate.py` (exit 1 RED / exit 0 GREEN) | `config/model_integrity.yaml` |
+`tests/malicious.pkl`, `tests/clean.safetensors` | no `malicious_marker.txt` written.
+
+
+## D-3106 (RESOLVED 2026-10-19) — Golden anchor orphaned by corpus re-generation; fail-closed sentinels + owner-gated rebuild, not mechanical re-point
+
+**Verdict.** The golden anchor (`governance/gold_4axis.jsonl`, 251 human-adjudicated 4-axis rows) resolves **0/251**
+against the live DB because the corpus was re-extracted — `pipeline_commit bae6662` → `32321c9` — and
+`fb_id = sha256(name|definition)` is generation-sensitive (D-2949/F-19). Only **6.0%** of principle names survive
+across generations (388/6521), and the ids resolve 251/251 only in a DELETED archive snapshot. The correct
+disposition is **fail closed, not re-point**: mechanically re-pointing the 6% of surviving ids would mask the orphan
+and mislabel drifted definitions.
+
+**Two sentinels were repaired (red-loop-first, D-3036).** (1) `tools/model_eval_suite.py::suite_voting` now raises a
+named `RuntimeError` ("gold anchor orphaned: 0/251 …") instead of crashing opaquely via `IndexError` → rc 2;
+(2) `scripts/audit_runtime_vs_gold.py` — the F-01 drift detector — had silently false-passed ("OK" with 0 compared /
+251 missing) and now fails closed on missing rows (BUG-944). Red loop verified live: audit was rc=0, now rc=1 with
+`DRIFT: 251 of 251 anchor row(s) MISSING`.
+
+**What remains owed, stated as such.** Rebuilding the golden anchor against the live generation is an **owner-gated**
+task — the 4-axis labels must be re-adjudicated against the current corpus, not re-pointed. This decision registers
+the orphan and the fail-closed rails; it does not claim the anchor is rebuilt.
+
+
+## D-3107 (PROPOSED 2026-10-19) — Golden anchor identity must be generation-invariant (D-2949 at the anchor level, not only dedup)
+
+**Recommendation on D-3106.** D-3106's disposition is correct: fail closed, do not mechanically re-point the 6% of
+surviving `fb_id`s, and make the rebuild owner-gated. But D-3106 fixes the *symptom* (this anchor is orphaned) while
+leaving the *disease* (identity is generation-sensitive) untouched — so the owner-gated rebuild will recur on every
+corpus re-generation, each time discarding the human adjudication it cost.
+
+**The future-proof fix.** D-2949 established `fb_id = sha256(name|definition)` is generation-sensitive and added a
+deterministic grouping/merge gate for **dedup**. This extends the same diagnosis to **human-adjudicated ground
+truth**: the anchor must carry a generation-invariant identity — a key derived from a semantic/content representation
+stable across extraction runs (normalized concept name, or a content hash independent of exact definition wording) —
+so a re-generation can semantically re-attach the majority of anchors and only a small delta needs re-adjudication.
+The owner-gated rebuild in D-3106 is the natural moment to add this key (do it once, then it never fully recurs).
+
+**State: PROPOSED** — the direction is decided, the mechanism is not built. Complements D-2949 (dedup) and D-3106
+(immediate orphan); conflicts with neither.

@@ -94,8 +94,15 @@ def plan_updates(gold_rows: list[dict[str, Any]], con: sqlite3.Connection) -> tu
     updates: list[tuple] = []
     stats: dict[str, Counter] = {axis: Counter() for axis in AXIS_COLUMN}
     problems: list[str] = []
+    dead = 0
     for row in gold_rows:
-        fb_id = row.get("fb_id")
+        # D-3107: honor the re-attachment contract. A dead anchor is a recorded owner
+        # decision (not an orphan); a re-attached anchor resolves by live_fb_id, not the
+        # stale fb_id orphaned by corpus re-generation (D-3106/BUG-942).
+        if row.get("disposition") == "dead":
+            dead += 1
+            continue
+        fb_id = row.get("live_fb_id") or row.get("fb_id")
         stored = con.execute(
             "select content_type, depth, discipline, domains from fbs where fb_id = ?", (fb_id,)
         ).fetchone()
@@ -126,7 +133,17 @@ def plan_updates(gold_rows: list[dict[str, Any]], con: sqlite3.Connection) -> tu
                 continue
             stats[axis][source] += 1
             updates.append((column, _encode_domains(value) if axis == "domains" else _s(value), fb_id))
-    return updates, {"stats": stats, "problems": problems}
+    # D-3107 many-to-one guard (forensic finding 2026-10-19): a live row claimed by 2+ anchors
+    # with a differing axis value is an UNADJUDICATED re-attachment (a near-dupe OR a false
+    # positive). Never write those cells — fail closed (C16) and report them for owner word
+    # instead of a non-deterministic last-write-wins.
+    cell_values: dict[tuple[str, str], set[str]] = {}
+    for column, value, fb_id in updates:
+        cell_values.setdefault((column, fb_id), set()).add(value)
+    conflicted = {(c, f) for (c, f), vals in cell_values.items() if len(vals) > 1}
+    clean = [u for u in updates if (u[0], u[2]) not in conflicted]
+    return clean, {"stats": stats, "problems": problems, "dead": dead,
+                   "merge_conflicts": sorted(f + ":" + c for c, f in conflicted)}
 
 
 def main() -> int:
@@ -147,14 +164,20 @@ def main() -> int:
         con.close()
         return 2
 
-    print("anchor rows: " + str(len(gold_rows)) + " | planned cell updates: " + str(len(updates)))
+    print("anchor rows: " + str(len(gold_rows)) + " (dead " + str(report["dead"]) + ") | planned cell updates: " + str(len(updates)))
     for axis in AXIS_COLUMN:
         counts = report["stats"][axis]
         print("  " + axis.ljust(13) + " ".join(k + "=" + str(v) for k, v in sorted(counts.items())))
+    if report["merge_conflicts"]:
+        print("MERGE-CONFLICT: " + str(len(report["merge_conflicts"])) +
+              " cell(s) skipped — a live row is claimed by 2+ anchors with differing values "
+              "(owner adjudication owed before these can be written)")
+        for mc in report["merge_conflicts"][:30]:
+            print("   " + mc)
     if not args.apply:
         print("DRY RUN — nothing written. Re-run with --apply (a backup is taken first).")
         con.close()
-        return 0
+        return 1 if report["merge_conflicts"] else 0
 
     stamp = time.strftime("%Y%m%d_%H%M%S")
     backup_dir = BACKUP_ROOT / stamp
@@ -184,8 +207,8 @@ def main() -> int:
     out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     print("rows remaining to update after write: " + str(len(verify_updates)))
     print("R14 manifest: " + str(out.relative_to(REPO)))
-    if verify_updates:
-        print("WARNING: the write did not converge - inspect the manifest before claiming done")
+    if verify_updates or report["merge_conflicts"]:
+        print("WARNING: the write did not converge or merge-conflicts remain - inspect the manifest before claiming done")
         return 1
     print("OK: the runtime KB now carries the adjudicated 4-axis labels")
     return 0

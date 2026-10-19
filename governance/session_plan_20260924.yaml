@@ -409,11 +409,37 @@ may_touch:
 - scripts/llm_candidate_probe.py
 - config/model_oracles.yaml
 - governance/evidence/LLM_CANDIDATE_20261017_Qwen__Qwen3-30B-A3B-Instruct-2507.json
+#: BUG-946 RESOLUTION (2026-10-19) — THE GOLD 4-AXIS LABEL STORE + RE-ATTACHMENT ADJUDICATION FAMILY. gold_4axis.jsonl
+#: is the tracked authoritative 4-axis label store (rewritten by resolve_merge_adjudication.py, consumed by
+#: propagate_4axis_anchor.py). gold_reattach_* (adjudication/delta/map/many_to_one/merge_resolution) and the R14
+#: axis_propagation_manifest_*.json are RE-DERIVED by the re-attachment lane; HOW_TO_ADJUDICATE_MERGES.md is the
+#: owner-facing doc. All are governance GOLD records that must be VERSIONED, not excluded. Granted as prefix-families
+#: so the next re-attachment run does not mint a new red line (the BUG-563 shape); nothing outside these prefixes
+#: becomes committable.
+- governance/gold_4axis.jsonl
+- governance/gold_reattach_*
+- governance/axis_propagation_manifest_*.json
+- governance/HOW_TO_ADJUDICATE_MERGES.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-19'
+  actor: assistant
+  owner_ack: 'owner 2026-10-19 (BUG-946 adjudication, verbatim: "apart from those 3 [near-same], the rest are all different")'
+  addendum: 'BUG-946 RESOLUTION ARTIFACTS — the gold 4-axis label store and the re-attachment adjudication family were written/rewritten by the BUG-946 resolution (resolve_merge_adjudication.py + propagate_4axis_anchor.py) and had NO declared home, so rail 0 refused the tree (BUG-563). Widened to prefix-families: gold_reattach_* and axis_propagation_manifest_*.json are re-derived every run; gold_4axis.jsonl is the tracked authoritative label store; HOW_TO_ADJUDICATE_MERGES.md is the owner-facing method doc. All are governance gold records that must be VERSIONED, not excluded. Nothing outside these prefixes becomes committable.'
+  additions:
+  - pattern: governance/gold_4axis.jsonl
+    why: BUG-946 authoritative 4-axis label store — tracked; rewritten by resolve_merge_adjudication.py (disposition:dead) and consumed by propagate_4axis_anchor.py.
+  - pattern: governance/gold_reattach_*
+    why: BUG-946 re-attachment adjudication family (adjudication/delta/map/many_to_one/many_to_one_ADJUDICATION.csv/merge_resolution) — re-derived every re-attachment run.
+  - pattern: governance/axis_propagation_manifest_*.json
+    why: R14 propagation manifest — dated generated family, written every propagate --apply.
+  - pattern: governance/HOW_TO_ADJUDICATE_MERGES.md
+    why: BUG-946 owner-facing adjudication method — must be versioned so the owner''s method is auditable.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
 - date: '2026-10-18'
   actor: assistant
   owner_ack: 'owner 2026-10-18 ("I approve ... resign + apply 484 book" + "first look in general maxwell os current state ... update and synch gov dependencies")'

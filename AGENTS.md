@@ -227,3 +227,15 @@ protected file; the correction itself is already made here.
   copy-paste-able procedure: the exact command, the exact file, the expected output, and the "if it differs, do this"
   branch. A manual step named only in prose is a step the owner cannot run (BUG-588's shape applied to an instruction).
   This rule is the user-facing face of "manual tasks → clear step-by-step instructions"; it changes no pipeline behaviour.
+
+<!-- ════════════════════════════════════════════════════════════════════════════════════════════
+     WORKING RULE ADDED 2026-10-19 (D-3109): EVERY RECOMMENDATION IS DATA-GROUNDED.
+     Appended (AGENTS.md is append_only per D824) — same mechanism as the blocks above.
+     ════════════════════════════════════════════════════════════════════════════════════════════ -->
+
+- EVERY RECOMMENDATION IS SENIOR-ARCHITECT LEVEL, FUTURE-PROOF, AND GROUNDED IN VERIFIED ACTUAL DATA (D-3109).
+  A recommendation must cite the reading that produced it — a file read, a query result, a receipt — never
+  training-data assumption or unverified prose. Before asserting a fact, RESOLVE it (D-3034): read the file,
+  run the query, name the receipt. A claim whose only support is "likely"/"generally" is a hypothesis and
+  must be labelled as such (D-3036). This applies to every decision, bug, and task, and is enforced on every
+  turn.

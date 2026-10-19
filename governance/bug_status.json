@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 707,
-  "open_n": 253,
-  "closed_n": 454,
+  "total_ids": 711,
+  "open_n": 252,
+  "closed_n": 459,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1267,11 +1267,6 @@
       "id": "BUG-941",
       "title": "(HIGH, OPEN 2026-10-19) \u2014 qwen35_ane_prefill_enabled CRASHES ANE WARMUP ON THIS M1 MAX (Code=47), MAKING COLD LOAD PATHOLOGICAL",
       "events": 1
-    },
-    {
-      "id": "BUG-942",
-      "title": "(MED - OPEN 2026-10-19) \u2014 voting suite unusable: gold_4axis.jsonl fb_ids resolve 0/251 rows in maxwell.db",
-      "events": 1
     }
   ],
   "closed": [
@@ -1728,6 +1723,11 @@
     "BUG-937",
     "BUG-938",
     "BUG-939",
-    "BUG-940"
+    "BUG-940",
+    "BUG-942",
+    "BUG-943",
+    "BUG-944",
+    "BUG-945",
+    "BUG-946"
   ]
 }

@@ -42,6 +42,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 # fallback also wrote WITHOUT a receipt (tempfile + os.replace), i.e. the one path that most needed the guard
 # was the one path that bypassed it; failing to import the guard is now a loud import error (C16).
 from lib.write_guard import OWNED_ANY, write_document  # noqa: E402
+from check_bug_status import stale_register_files  # noqa: E402  # BUG-945: ONE home for register freshness
 CFG_PATH = REPO / "config/gov_sync.yaml"
 IDX_S = "<!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->"
 IDX_E = "<!-- GOV-INDEX:END -->"
@@ -734,10 +735,33 @@ def selftest() -> int:
     return EXIT_OK
 
 
+def bug_register_freshness_fault(d: dict) -> str | None:
+    """BUG-945: gov_sync reads the bug register (registers.bugs.census) as an INPUT but never verified it
+    was fresh, so a 'clean sync' could be cut from a stale register and still print `ok`. This guard runs
+    the ONE freshness home (scripts/check_bug_status.py#stale_register_files) BEFORE derive() reads the
+    register, and refuses with a named fault when the register does not equal its own re-derivation from
+    governance/buglog.md. A false green is worse than no green (BUG-798, one level up)."""
+    census = REPO / str(d["registers"]["bugs"]["census"])
+    md = census.with_suffix(".md")
+    stale = stale_register_files(census, md)
+    if stale is None:
+        return "the bug register could not be re-derived (the generator failed) - fail closed (C16)"
+    if stale:
+        rel = [str(p.relative_to(REPO)) for p in stale]
+        return (f"the bug register is STALE {rel} - re-run: python3 scripts/bug_status.py, "
+                f"then re-run gov_sync (a sync cut from a stale register is a false green)")
+    return None
+
+
 def main(argv: list[str]) -> int:
     if "--selftest" in argv:
         return selftest()
     d = cfg()
+    fault = bug_register_freshness_fault(d)
+    if fault:
+        print("  !! " + fault)
+        print("FAIL gov-sync: register-freshness guard refused the sync (BUG-945)")
+        return EXIT_FAIL
     x = derive(d)
     if "--apply" in argv:
         return apply(d, x)

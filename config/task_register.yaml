@@ -2276,7 +2276,8 @@ tasks:
     the new surface is real in the NEXT session, which is the one that must be read to close this limb.
 - id: T-187
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-19'
   mover: pipeline
   title: THE TWO-STEP / TWO-TOOL LOOP DISCRIMINATION - before any model is promoted into an agent-loop role
   source: D-3058; scripts/measure_subagent_loop.py; D-2549
@@ -2285,10 +2286,11 @@ tasks:
     tool-call" but does NOT rank them - the task needed one trivial read and every model that called it answered 12.
     MiniCPM5-2B passed in 2.1 s and gemma in 14.3 s, yet a single read cannot distinguish "drives a loop" from "calls
     a tool once and guesses". Phi-4-mini made ZERO calls, the one real discriminator the current fixture produced.
-  gate: >-
-    A second fixture in scripts/measure_subagent_loop.py: two tools with a DISTRACTOR, two DEPENDENT steps, and an
-    expected answer that only the second tool's output can produce; the same served set; a receipt. Promotion of
-    AGENT_LOOP_FAST / AGENT_LOOP_WORKHORSE into config/model_assignments.yaml is gated on it (D-3058).
+  why: >-
+    CLOSED 2026-10-19: gate met — the two-step fixture landed (scripts/measure_subagent_loop.py#run_two_step_model)
+    and the FULL served-set run completed (receipt temp/subagent_loop_two_step_full_20261019.json). Promotion done by
+    D-3104 (AGENT_LOOP_SHORT = gpt-oss-20b-MXFP4-Q8).
+  gate: none
 - id: T-188
   priority: SHOULD
   state: open

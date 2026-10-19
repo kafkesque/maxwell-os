@@ -30685,12 +30685,15 @@ decisions:
 - id: D-3101
   state: PROPOSED
   category: DELEGATION / ECONOMY
-  title: THE CLOUD-CEILING SPLIT — pipeline-ingestion and harness-metering are two classes, not one lifetime counter
-  decision: 'Split the lifetime cloud_input_tokens/cloud_calls ceilings into two metering classes: pipeline-ingestion
-    volume (windowed, burn-rate) vs harness-metering volume (interactive delegation). The flat lifetime raises (BUG-917:
-    4.6B->5.0B tokens and 37k->50k calls) are interim D-3023 raise-with-reason acts, not the durable fix: a lifetime
-    counter always re-breaches any flat number. The discriminator must RESOLVE via the LEDGER (realpath ownership, D-3034), not cost_source — a register whose values are sentences
-    declares no bytes (corrected 2026-10-19).'
+  title: THE CLOUD-CEILING SPLIT — pipeline-ingestion and harness-metering are two
+    classes, not one lifetime counter
+  decision: 'Split the lifetime cloud_input_tokens/cloud_calls ceilings into two metering
+    classes: pipeline-ingestion volume (windowed, burn-rate) vs harness-metering volume
+    (interactive delegation). The flat lifetime raises (BUG-917: 4.6B->5.0B tokens
+    and 37k->50k calls) are interim D-3023 raise-with-reason acts, not the durable
+    fix: a lifetime counter always re-breaches any flat number. The discriminator
+    must RESOLVE via the LEDGER (realpath ownership, D-3034), not cost_source — a
+    register whose values are sentences declares no bytes (corrected 2026-10-19).'
   bugs:
   - BUG-917
   files:
@@ -30700,30 +30703,47 @@ decisions:
   date: '2026-10-19'
   by: assistant
   category: INFRASTRUCTURE / ENGINE
-  title: Adopt oMLX 0.7.1rc1 as the production engine (A/B measured vs 0.7.0 on M1 Max)
-  decision: 'A/B of oMLX 0.7.1rc1 vs 0.7.0, cold Ornith-1.5-35B-A3B-REAP-19B @4010 tokens
-    (measure_prefill.py, OMLX_HOT_CACHE_ONLY=true to defeat the shared 51GB SSD prefix cache).
-    ADOPT rc1: model load 5.9s -> 3.68s (-37.6%), wall 17.7s -> 15.8s (-10.7%), prefill
-    361.88 -> 355.32 tok/s (flat), TTFT 11.08 -> 11.29s (flat). Decode 96.91 -> 222.13 tok/s
-    is a SINGLE-TOKEN artifact (max_tokens=1) and is NOT promoted; a >=128-token benchmark is
-    owed first. Config, models and the SSD cache are EXTERNAL to the .app (~/.omlx) and untouched;
-    rollback preserved at /Applications/oMLX-0.7.0.app plus ~/.omlx/*.bak-before-071upgrade.'
+  title: Adopt oMLX 0.7.1rc1 as the production engine (A/B measured vs 0.7.0 on M1
+    Max)
+  decision: 'A/B of oMLX 0.7.1rc1 vs 0.7.0, cold Ornith-1.5-35B-A3B-REAP-19B @4010
+    tokens (measure_prefill.py, OMLX_HOT_CACHE_ONLY=true to defeat the shared 51GB
+    SSD prefix cache). ADOPT rc1: model load 5.9s -> 3.68s (-37.6%), wall 17.7s ->
+    15.8s (-10.7%), prefill 361.88 -> 355.32 tok/s (flat), TTFT 11.08 -> 11.29s (flat).
+    Decode 96.91 -> 222.13 tok/s is a SINGLE-TOKEN artifact (max_tokens=1) and is
+    NOT promoted; a >=128-token benchmark is owed first. Config, models and the SSD
+    cache are EXTERNAL to the .app (~/.omlx) and untouched; rollback preserved at
+    /Applications/oMLX-0.7.0.app plus ~/.omlx/*.bak-before-071upgrade.'
   bugs: []
   files:
   - scripts/measure_prefill.py
   - scripts/bug793_ab.py
   receipts:
-    measured: 'serving parent /Applications/oMLX.app/Contents/MacOS/oMLX reads __version__ =
-      0.7.1rc1; /health healthy model_count 8 loaded_count 1; guard com.maxwell.omlx-engine
-      last exit 0'
-
+    measured: serving parent /Applications/oMLX.app/Contents/MacOS/oMLX reads __version__
+      = 0.7.1rc1; /health healthy model_count 8 loaded_count 1; guard com.maxwell.omlx-engine
+      last exit 0
 - id: D-3103
   state: RESOLVED
   date: '2026-10-19'
   by: assistant
   category: DELEGATION / MODEL ROUTING
-  title: Re-rule the two capability axes contradicted by T-187 + lc_reasoning (gpt-oss native tool loop PASS, gemma dependent-step FAIL, gpt-oss long-context 1.0)
-  decision: 'Two rows of config/harness_policy.yaml#capability_axes were contradicted by receipts this session and are RE-RULED (D-3038: a contradicted finding is re-ruled, never silently kept). (1) tool_calling.never{gpt-oss-20b-MXFP4-Q8: 0.0} is CONTRADICTED: the 0.0 was measured on the RAW-JSON tool format, not native tool_calls; on T-187 (scripts/measure_subagent_loop.py --two-step, two-tool dependent loop, per-turn budget 90s) gpt-oss PASSES (slowest turn 35.3s, decode 42.4/42.4/42.0 tok/s). (2) latency_agent_loop.routable{gemma-4-E4B-it-MLX-4bit} is CONTRADICTED: on the same fixture gemma FAILS the dependent second step (read_lines=1, lookup_token=0) — latency-fast but loop-incapable. (3) long_context_reasoning_16k gains gpt-oss at 6/6 = 1.0 (lc_reasoning numeric exact match over 16k ctx), tying Qwen3.8-27B-MLX-4bit. NET: gpt-oss-20b-MXFP4-Q8 clears 2 of 3 local-brain gates (native tool loop + long-context); the third gate (gemma drift eval slop-proof switch-back) is still owed. This re-opens BUG-832 remedy #2 with a VIABLE local candidate — the prior "local route REFUTED" premise named gemma/Qwen3-Coder both at 0.0 long-context, and gpt-oss is no longer in that refuted set. NOTHING is auto-promoted (D-2898: no_llm promotion).'
+  title: Re-rule the two capability axes contradicted by T-187 + lc_reasoning (gpt-oss
+    native tool loop PASS, gemma dependent-step FAIL, gpt-oss long-context 1.0)
+  decision: 'Two rows of config/harness_policy.yaml#capability_axes were contradicted
+    by receipts this session and are RE-RULED (D-3038: a contradicted finding is re-ruled,
+    never silently kept). (1) tool_calling.never{gpt-oss-20b-MXFP4-Q8: 0.0} is CONTRADICTED:
+    the 0.0 was measured on the RAW-JSON tool format, not native tool_calls; on T-187
+    (scripts/measure_subagent_loop.py --two-step, two-tool dependent loop, per-turn
+    budget 90s) gpt-oss PASSES (slowest turn 35.3s, decode 42.4/42.4/42.0 tok/s).
+    (2) latency_agent_loop.routable{gemma-4-E4B-it-MLX-4bit} is CONTRADICTED: on the
+    same fixture gemma FAILS the dependent second step (read_lines=1, lookup_token=0)
+    — latency-fast but loop-incapable. (3) long_context_reasoning_16k gains gpt-oss
+    at 6/6 = 1.0 (lc_reasoning numeric exact match over 16k ctx), tying Qwen3.8-27B-MLX-4bit.
+    NET: gpt-oss-20b-MXFP4-Q8 clears 2 of 3 local-brain gates (native tool loop +
+    long-context); the third gate (gemma drift eval slop-proof switch-back) is still
+    owed. This re-opens BUG-832 remedy #2 with a VIABLE local candidate — the prior
+    "local route REFUTED" premise named gemma/Qwen3-Coder both at 0.0 long-context,
+    and gpt-oss is no longer in that refuted set. NOTHING is auto-promoted (D-2898:
+    no_llm promotion).'
   bugs:
   - BUG-832
   files:
@@ -30732,21 +30752,158 @@ decisions:
   - temp/subagent_loop_two_step_full_20261019.json
   - governance/model_eval_checkpoint.jsonl
   receipts:
-    t187: 'temp/subagent_loop_two_step_full_20261019.json: 8 rows, budget 90.0. PASS 6 (MiniCPM5 1.2s, Ornith-REAP 2.9s, Ornith-9B 13.5s, Qwen3-Coder 17.2s, Qwen3.8-27B 39.8s, gpt-oss 35.3s); FAIL 2 (Phi-4-mini 0 tool calls, gemma read=1 lookup=0)'
-    lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5 all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'
-
+    t187: 'temp/subagent_loop_two_step_full_20261019.json: 8 rows, budget 90.0. PASS
+      6 (MiniCPM5 1.2s, Ornith-REAP 2.9s, Ornith-9B 13.5s, Qwen3-Coder 17.2s, Qwen3.8-27B
+      39.8s, gpt-oss 35.3s); FAIL 2 (Phi-4-mini 0 tool calls, gemma read=1 lookup=0)'
+    lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5
+      all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'
 - id: D-3104
   state: RESOLVED
   date: '2026-10-19'
   by: owner
   category: DELEGATION / MODEL ROUTING
-  title: Brain DECIDE (BUG-832 remedy #2) - gpt-oss local everyday, deepseek escalation strategic
-  decision: 'The owner DECIDES the session brain (BUG-832 remedy #2, owner-gated per the bug): everyday decisions run on gpt-oss-20b-MXFP4-Q8 (local, provider maxwell_omlx, $0 marginal), and STRATEGIC decisions/tasks where gpt-oss would slop or drift ESCALATE to custom_deepseek (deepseek-v4-pro). This executes the existing D-3023 escalation architecture: active=local, escalation=cloud, GOOSE_PLANNER stays deepseek. gpt-oss clears all three local-brain gates by measurement (T-187 native two-step tool loop PASS 35.3s; lc_reasoning 6/6=1.0 at 16k; gemma drift eval class 0.80 / code-review 0.80 / summ 0.85 - no catastrophic drift). gemma-4-E4B, the prior AGENT_LOOP_SHORT, FAILS the dependent-step loop (D-3103) and is demoted from the brain role (retained as STABILITY_FIRST). NOT auto-promoted (D-2898): this is an OWNER word, not a benchmark promotion. The ~15-20 percent residual error on the drift legs is the measured accuracy ceiling the owner accepts for the everyday brain.'
+  title: Brain DECIDE (BUG-832 remedy
+  decision: 'The owner DECIDES the session brain (BUG-832 remedy #2, owner-gated per
+    the bug): everyday decisions run on gpt-oss-20b-MXFP4-Q8 (local, provider maxwell_omlx,
+    $0 marginal), and STRATEGIC decisions/tasks where gpt-oss would slop or drift
+    ESCALATE to custom_deepseek (deepseek-v4-pro). This executes the existing D-3023
+    escalation architecture: active=local, escalation=cloud, GOOSE_PLANNER stays deepseek.
+    gpt-oss clears all three local-brain gates by measurement (T-187 native two-step
+    tool loop PASS 35.3s; lc_reasoning 6/6=1.0 at 16k; gemma drift eval class 0.80
+    / code-review 0.80 / summ 0.85 - no catastrophic drift). gemma-4-E4B, the prior
+    AGENT_LOOP_SHORT, FAILS the dependent-step loop (D-3103) and is demoted from the
+    brain role (retained as STABILITY_FIRST). NOT auto-promoted (D-2898): this is
+    an OWNER word, not a benchmark promotion. The ~15-20 percent residual error on
+    the drift legs is the measured accuracy ceiling the owner accepts for the everyday
+    brain.'
   bugs:
   - BUG-832
   files:
   - config/model_assignments.yaml
   - config/engine.yaml
   receipts:
-    gates: 'gpt-oss 3/3 local-brain gates cleared: t187 native-loop PASS (35.3s), lc_reasoning 6/6=1.0, gemma drift 0.80/0.80/0.85'
-    owner_word: 'gpt-oss everyday; deepseek escalation for strategic/slop-risk'
+    gates: 'gpt-oss 3/3 local-brain gates cleared: t187 native-loop PASS (35.3s),
+      lc_reasoning 6/6=1.0, gemma drift 0.80/0.80/0.85'
+    owner_word: gpt-oss everyday; deepseek escalation for strategic/slop-risk
+- id: D-3105
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: SECURITY / MODEL INTEGRITY
+  title: 'Model-integrity gate registered red-loop-first (D-3036): pickle refused,
+    safetensors-only'
+  decision: 'One named command, scripts/model_integrity_gate.py, is the red loop for
+    the model-load threat model (pickle-RCE / poisoned chat templates). It reads every
+    knob from config/model_integrity.yaml (C12) and classifies a payload by FORMAT
+    before any bytes are executed: pickle is REFUSED on sight (exit 1, RED) because
+    pickle = arbitrary code on load (Equistamp/UIUC backdoor persistence, JFrog malicious
+    HF models); safetensors is ALLOWED (exit 0, GREEN). The gate NEVER unpickles a
+    payload, so the crafted-malicious fixture tests/malicious.pkl goes RED not because
+    the gate executed it but because the gate refused to. Red loop verified live this
+    session: malicious.pkl -> RED exit 1 with no malicious_marker.txt written; clean.safetensors
+    -> GREEN exit 0. Post-red-loop controls (SHA-256 pinning, chat-template Jinja
+    scan, quarantine-until-verified) are the NEXT gate extension, now BUILT (D-3108).'
+  bugs:
+  - BUG-943
+  files:
+  - scripts/model_integrity_gate.py
+  - config/model_integrity.yaml
+  - tests/malicious.pkl
+  - tests/clean.safetensors
+  receipts:
+    red_loop: malicious.pkl -> RED exit 1 (no marker written); clean.safetensors ->
+      GREEN exit 0 (2026-10-19)
+- id: D-3106
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: GOVERNANCE / ANCHOR INTEGRITY
+  title: 'Golden anchor orphaned by corpus re-generation; fail-closed sentinels +
+    owner-gated rebuild, not mechanical re-point'
+  decision: 'The golden anchor (gold_4axis.jsonl, 251 human-adjudicated rows) resolved
+    0/251 against the live DB because the corpus was re-extracted (pipeline_commit
+    bae6662 -> 32321c9) and fb_id = sha256(name|definition) is generation-sensitive
+    (D-2949/F-19): only 6.0% of principle names survive across generations (388/6521).
+    The ids resolve 251/251 only in the DELETED archive snapshot. Disposition: FAIL
+    CLOSED, not re-point. suite_voting now raises a named RuntimeError instead of an
+    opaque IndexError, and audit_runtime_vs_gold.py now fails closed on missing rows
+    (BUG-944). Rebuilding the anchor against the live generation is OWNER-GATED;
+    mechanically re-pointing the 6% of surviving ids would mask the orphan and mislabel
+    drifted definitions.'
+  bugs:
+  - BUG-942
+  - BUG-944
+  files:
+  - scripts/audit_runtime_vs_gold.py
+  - tools/model_eval_suite.py
+  receipts:
+    red_loop: 'audit_runtime_vs_gold.py was rc=0 (false OK, 0 compared / 251 missing);
+      now rc=1 DRIFT with missing=251. suite_voting raised named RuntimeError (0/251
+      resolve).'
+- id: D-3107
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: ANCHOR IDENTITY / FUTURE-PROOFING
+  title: 'Golden anchor identity must be generation-invariant (D-2949 at the anchor level, not only dedup)'
+  decision: 'D-3106 fail-closed the orphaned golden anchor correctly, but its owner-gated
+    rebuild will recur on every corpus re-generation because the anchor is keyed by the same
+    generation-sensitive fb_id = sha256(name|definition) (D-2949/F-19). D-2949 already added a
+    deterministic grouping/merge gate for DEDUP; this extends the same diagnosis to human-adjudicated
+    ground truth. Mechanism BUILT 2026-10-19 (receipts below): the anchor now carries a generation-invariant
+    identity — a key derived from a semantic/content representation stable across extraction runs
+    (normalized concept name or content hash independent of exact definition wording) — so a
+    re-generation can semantically re-attach the majority of anchors and only a small delta requires
+    re-adjudication. This converts a recurring full re-adjudication into a shrinking delta. COMPLEMENTS
+    D-2949 (dedup) and D-3106 (immediate orphan); CONFLICTS with neither.'
+  bugs: []
+  files:
+  - scripts/apply_gold_reattach.py
+  - scripts/audit_runtime_vs_gold.py
+  - governance/gold_reattach_adjudication.jsonl
+  - governance/gold_reattach_many_to_one.jsonl
+  - governance/gold_4axis.jsonl
+  receipts:
+    red_loop: 'audit_runtime_vs_gold.py RED missing=251 before; after apply_gold_reattach.py
+      (249 re-attached + 2 dead + 20 many-to-one merges) missing=0; invariant_key written to all
+      251 (2026-10-19)'
+- id: D-3108
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: SECURITY / MODEL INTEGRITY
+  title: 'Model-integrity post-red-loop controls built: SHA-256 pinning, chat-template Jinja denylist, quarantine-until-verified'
+  decision: 'D-3105 registered the model-integrity red loop (pickle refused, safetensors-only)
+    and declared the post-red-loop controls "not built yet". They are now BUILT as tiers 2 and 3 of
+    scripts/model_integrity_gate.py, all config-driven (C12). (1) SHA-256 pinning: a pinned file whose
+    digest differs is REFUSED (tampered); an unpinned file is QUARANTINED when quarantine_unknown is
+    true. Pin enforcement is ACTIVE only once sha256_pins is non-empty, so an empty pin table keeps the
+    gate format-only (reported, never silent — C16) rather than refusing every model on a bootstrap
+    machine; the owner''s first pin flips it strict. (2) chat_template_scan: a Jinja chat template
+    carrying a denied pattern (object.__subclasses__ / __import__ / eval / exec chain) is REFUSED via
+    --chat-template. (3) quarantine_unknown defaults true (fail-closed). A --selftest exercises all
+    three tiers (9 controls) as a re-runnable red loop (D-3036). Red loop verified live 2026-10-19.'
+  bugs:
+  - BUG-943
+  files:
+  - scripts/model_integrity_gate.py
+  - config/model_integrity.yaml
+  - tests/poisoned_chat_template.txt
+  - tests/clean_chat_template.txt
+  receipts:
+    red_loop: 'selftest 9/9; malicious.pkl RED rc=1 (no marker written); clean.safetensors GREEN rc=0;
+      poisoned template RED rc=1; clean template GREEN rc=0 (2026-10-19)'
+- id: D-3109
+  state: ACTIVE
+  date: '2026-10-19'
+  by: owner
+  category: GOVERNANCE / RECOMMENDATION DISCIPLINE
+  title: 'Every recommendation is senior-architect level, future-proof, and grounded in verified actual data'
+  decision: 'Standing rule (owner, 2026-10-19): ground every recommendation in verified actual data — a
+    file read, a query result, a receipt — never in training-data assumption or unverified prose. A claim
+    whose only support is "likely"/"generally" is a hypothesis and must be labelled as such (D-3036).
+    Before asserting a fact, RESOLVE it (D-3034): read the file, run the query, name the receipt. Codified
+    in AGENTS.md as an append-only working rule (D824); applies to every decision, bug, and task.'
+  bugs: []
+  files:
+  - AGENTS.md

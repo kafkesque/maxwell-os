@@ -444,20 +444,21 @@ def isor_score(fb: dict[str, Any]) -> dict[str, Any]:
       - "weak": single author/source
     """
     source_books = fb.get("source_books", [])
-    if not isinstance(source_books, list) or len(source_books) == 0:
+    # BUG-939 (D-3036): count the CANONICAL IDENTITY (source_ids), not the raw provenance
+    # (source_books). The corroboration bit (is_convergent) already counts source_ids; isor must
+    # follow, else the epistemic label and the bit derive from two different evidence sets (C12/D-2646).
+    source_ids = fb_source_ids(fb)
+    if not source_ids:
         return {
             "score": 0.0,
             "rating": "weak",
             "n_sources": 0,
             "n_authors": 0,
             "n_domains": 0,
-            "detail": "No source books",
+            "detail": "No source ids",
         }
 
-    # D2309: canonical source count — distinct WORKS, not distinct filenames.
-    from pipeline.book_metadata import resolve_source_ids
-
-    n_sources = len(resolve_source_ids(source_books))
+    n_sources = len(source_ids)
 
     # 1. Author independence — canonical author from metadata (D2309).
     authors: set[str] = set()

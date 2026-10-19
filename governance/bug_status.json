@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 712,
+  "total_ids": 713,
   "open_n": 252,
-  "closed_n": 460,
+  "closed_n": 461,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1264,8 +1264,8 @@
       "events": 3
     },
     {
-      "id": "BUG-947",
-      "title": "(HIGH, OPEN 2026-10-19) \u2014 T-129 identity collapse applied WITHOUT re-rendering the corroboration-collapse measurement; `just health` is RED",
+      "id": "BUG-948",
+      "title": "(MED, OPEN 2026-10-19) \u2014 owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object",
       "events": 1
     }
   ],
@@ -1729,6 +1729,7 @@
     "BUG-943",
     "BUG-944",
     "BUG-945",
-    "BUG-946"
+    "BUG-946",
+    "BUG-947"
   ]
 }

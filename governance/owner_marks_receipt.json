@@ -1,20 +1,20 @@
 {
   "schema_version": "1",
   "kind": "owner_marks_apply_receipt",
-  "generated_at": "2026-10-14T20:45:21Z",
+  "generated_at": "2026-10-19T21:24:15Z",
   "sheet": {
     "path": "governance/work_identity_collapse_review_20261014.csv",
-    "rows": 84,
-    "words_written": 84,
-    "backup": "backups/work_identity_collapse_review_20261014.csv.PRE_owner_marks_apply_20261014T204521Z"
+    "rows": 80,
+    "words_written": 80,
+    "backup": "backups/work_identity_collapse_review_20261014.csv.PRE_owner_marks_apply_20261019T212415Z"
   },
   "ledger": {
     "path": "governance/duplicate_adjudication.json",
     "pairs": 59,
-    "verdicts_written": 59,
+    "verdicts_written": 0,
     "adjudicated": 59,
     "pending": 0,
-    "backup": "backups/duplicate_adjudication.json.PRE_owner_marks_apply_20261014T204521Z"
+    "backup": "backups/duplicate_adjudication.json.PRE_owner_marks_apply_20261019T212415Z"
   },
   "tiers": [
     {

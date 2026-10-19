@@ -1,5 +1,5 @@
 pair_id,a_id,b_id,a,b,detectors,max_similarity,hint,proposed_verdict,proposal_basis,owner_verdict,owner_note
-25587e01b7d60821,3a0c20ab274efcd5,8fbfcb06f27bf76a,"Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor","Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor","title,content",1,subtitle_or_edition,MERGE,tier:L-A(declared),MERGE,
+25587e01b7d60821,3a0c20ab274efcd5,8fbfcb06f27bf76a,"Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor","Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor","title,content",1.0,subtitle_or_edition,MERGE,tier:L-A(declared),MERGE,
 4720e54652284157,6ec1d7b227afc802,d7acaa5ac0b13cb0,"David J. Bland, Alex Osterwalder — Testing Business Ideas A Field Guide for Rapid Experimentation","Bland, David J. — Testing Business Ideas A Field Guide for Rapid","title,content",0.9994,subtitle_or_edition,MERGE,tier:L-A(declared),MERGE,
 0b54967c8706ae57,d406c9b5d5f07a0d,92a9f5c93cf9794b,John Gall — Systemantics,John Gall — The Systems Bible: The Beginner's Guide to Systems Large and Small,content,0.9986,title_rename,MERGE,tier:L-A(declared),MERGE,
 d7968892630f7e0e,8d569bb0a35a14de,ac89013f3be41ace,Seth Godin — This Is Marketing,Seth Godin — This Is Marketing You Cant Be Seen Until You Learn to See,content,0.9954,subtitle_or_edition,MERGE,tier:L-A(declared),MERGE,

@@ -814,10 +814,15 @@ def hand_typed_cells(policy: dict[str, Any], cfg: dict[str, Any], rows: Sequence
     for row in rows:
         old = on_disk.get(work_key(str(row.get("work_a", "")), str(row.get("work_b", "")))) or {}
         old_word = str(old.get(derived_col) or "").strip()
+        src = str(old.get(src_col) or "").strip()
+        if src.startswith("signature:") or src == "row":
+            # Re-derivable (BUG-947): a tier signature or the carried owner override REPRODUCES this word on
+            # --apply, so a refresh that empties the derived column is not a loss. The guard exists for the
+            # BUG-782 shape alone - a word typed into the derived column with NO expansion behind it.
+            continue
         if old_word and not str(row.get(derived_col) or "").strip():
-            src = str(old.get(src_col) or "").strip() or "BLANK"
             blanks.append(f"{str(row.get('work_a', ''))[:40]} / {str(row.get('work_b', ''))[:40]}: "
-                          f"{old_word!r} (provenance {src})")
+                          f"{old_word!r} (provenance {src or 'BLANK'})")
     return blanks
 
 
@@ -953,6 +958,7 @@ CONTROL_LABELS: tuple[str, ...] = (
     "a_tier_that_names_no_word_is_never_signed",
     "a_write_never_blanks_a_hand_typed_cell",
     "a_control_fixture_is_unsigned_whatever_the_live_declaration_says",
+    "a_signature_derived_cell_is_re_derivable_never_blanked",
 )
 
 
@@ -1147,6 +1153,13 @@ def selftest() -> int:
             accepted = False
         control(CONTROL_LABELS[12],
                 refused and accepted and len(hand_typed_cells(policy, cfg4, blanked)) == 1)
+        # BUG-947: a signature-derived cell emptied by a re-render is re-derivable on --apply, so it is NOT a
+        # hand-typed word and must NOT trip the blank guard (the guard protects the BUG-782 shape alone: a word
+        # typed into the derived column with NO expansion behind it).
+        sig_row = dict(typed_row, owner_ruling="CONFIRM-ONE-WORK", ruling_source="signature:A@2026-10-14")
+        write_csv(Path(cfg4["path"]), cols, [sig_row])
+        sig_blanked = [dict(typed_row, owner_ruling="", ruling_source="")]
+        control(CONTROL_LABELS[14], len(hand_typed_cells(policy, cfg4, sig_blanked)) == 0)
     finally:
         shutil.rmtree(tmp4, ignore_errors=True)
 

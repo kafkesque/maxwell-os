@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1238 decisions (census stamp b1eea0797fb0855d, 2026-10-19) · 712 bugs (252 open / 460 closed; highest OPEN = BUG-947) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1239 decisions (census stamp 0fb5f9b41e2d2d09, 2026-10-19) · 713 bugs (252 open / 461 closed; highest OPEN = BUG-948) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1238 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 645 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1238, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1239 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 334 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1239, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -18837,3 +18837,40 @@ the living rule file (not only a parameter change) stale-ifies the pair object �
 docstring ("measured under OTHER parameters is STALE"). It should be scoped to measurement() (the declared
 parameters), and the per-key parameter check should also cover shingle_words + sketch_width (today only
 collapse_at_or_above + min_words_per_side are checked).
+
+
+## BUG-947 (HIGH, RESOLVED 2026-10-19) — owner_marks re-render + signature-derived-cell fix landed; corroboration-collapse re-measured and GREEN
+
+The OPEN entry above named two fail-closed stalls and offered two owner-gated paths. Neither was taken as
+offered; the root cause was one level deeper. `hand_typed_cells` (the refuse_to_blank guard) based "would blank"
+on old-non-empty + new-empty but never read `ruling_source`, so every signature-derived cell
+(`signature:A/B/C@2026-10-14`, a recorded expansion) was treated as a hand-typed owner word the guard must refuse
+to blank — a permanent deadlock on `--render`. Fix (scripts/owner_marks.py): `hand_typed_cells` now SKIPS cells
+whose provenance is `signature:*` or `row` (re-derivable on `--apply`, never a hand-typed word), preserving the
+BUG-782 fail-closed shape for the original defect (a hand-typed word with no expansion). New selftest control
+`a_signature_derived_cell_is_re_derivable_never_blanked` (control 14/15, appended to the END of CONTROL_LABELS so
+existing indices stay stable) asserts a signature-derived emptied cell yields 0 hand-typed cells. 15/15 PASS.
+
+RECEIPT (measured 2026-10-19, this machine): `--render` RC=0 (80 rows), `--apply` RC=0 (80 sheet rows resolved,
+0 ledger verdicts changed), `--check` RC=0 (GREEN). The measured block of config/corroboration_collapse.yaml was
+re-measured to the live census (rows_tested 896, pairs_at_bar 80, pairs_identical_text 35, groups 68,
+rows_collapsed 245, collapsed_share 0.2734375) and the 7 legacy census fields nothing reads were dropped for the
+modern rail emit (population_served / population_advertised). The pair object rule_digest now matches the rule
+file; the review sheet is in phase with the census.
+
+CLOSED. The sequencing rule this fault mothered is D-3111 (now RESOLVED). The latent SECONDARY named in the OPEN
+entry is registered as BUG-948, not silently dropped.
+
+## BUG-948 (MED, OPEN 2026-10-19) — owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object
+
+SECONDARY of BUG-947, registered on its close (the OPEN entry said "register now, fix later"). owner_marks
+computes rule_digest as the WHOLE-FILE sha256 of config/corroboration_collapse.yaml, so ANY append to the living
+rule file — not only a parameter change — invalidates the pair object's rule_digest and forces a `--render`. The
+digest contradicts its own docstring ("measured under OTHER parameters is STALE"): it should be scoped to
+measurement() (the declared parameters collapse_at_or_above + min_words_per_side), and the per-key parameter check
+should also cover shingle_words + sketch_width (today only collapse_at_or_above + min_words_per_side are checked).
+
+IMPACT: latent — every future append to the rule file requires a full `--render` even when the measurement
+parameters are unchanged. No current red (the BUG-947 close re-rendered under the live file). Fix is a digest
+scoping change in scripts/owner_marks.py, red-loop-first (D-3036: a theory needs a named command that goes RED on
+this bug and GREEN when fixed before the fix is attempted).

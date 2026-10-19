@@ -90,21 +90,19 @@ lexical_limb:
   #: MEASURED 2026-10-14 (read-only, ZERO store writes, ~1 min local CPU, no model). Declared here
   #: because this file is the census's ONE home for these counts.
   measured:
-    date: '2026-10-14'
-    rows_tested: 1393
-    pairs_at_bar: 84
-    pairs_identical_text: 37
-    groups: 72
-    largest_group: 3
-    rows_collapsed: 530
-    collapsed_share: 0.3805
-    rows_collapsed_at_090: 351
-    rows_collapsed_at_095: 284
-    served_rows_collapsed: 369
-    served_rows_total: 938
-    advertised_corroborated_collapsed: 134
-    advertised_corroborated_total: 257
-    isor_strong_or_medium_among_collapsed: 205
+    date: '2026-10-19'
+    rows_tested: 896
+    pairs_at_bar: 80
+    pairs_identical_text: 35
+    groups: 68
+    rows_collapsed: 245
+    collapsed_share: 0.2734375
+    bar: 0.8
+    served_rows_collapsed: 160
+    advertised_rows_collapsed: 134
+    population_served: 583
+    population_advertised: 256
+    segments_matched: 146847
     review_sheet: governance/work_identity_collapse_review_20261014.csv
   scope: >-
     LEXICAL ONLY. It can CERTIFY a collapse (identical or near-identical text is one voice) and can

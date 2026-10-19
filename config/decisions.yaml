@@ -30930,7 +30930,7 @@ decisions:
   - config/flag_consumer_registry.yaml
 
 - id: D-3111
-  state: ACTIVE
+  state: RESOLVED
   date: '2026-10-19'
   by: assistant
   category: GOVERNANCE / SEQUENCING
@@ -30947,3 +30947,22 @@ decisions:
   files:
   - scripts/apply_identity_collapse.py
   - scripts/owner_marks.py
+- id: D-3112
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: GOVERNANCE / SEQUENCING
+  title: BUG-947 RESOLVED — owner_marks re-render + signature-derived-cell fix landed in the same act; D-3111 enacted
+  decision: 'The store-mutating apply that caused BUG-947 (T-129 identity collapse, is_convergent 1393 -> 896, applied
+    WITHOUT re-rendering the corroboration-collapse measurement) is now remediated IN THE SAME ACT the D-3111 sequencing
+    rule requires. The deeper stall was owner_marks.hand_typed_cells ignoring ruling_source, so signature-derived
+    cells (signature:A/B/C@2026-10-14, a recorded expansion) deadlocked --render. Fix: hand_typed_cells now skips
+    signature:* and row provenance (re-derivable on --apply, never a hand-typed word); selftest control 14/15 added.
+    --render/--apply/--check all RC=0 (80 rows, 896 rows_tested, collapsed_share 0.2734375). D-3111 (the rule) is
+    RESOLVED by this act; BUG-947 is CLOSED; the latent whole-file rule_digest SECONDARY is registered as BUG-948,
+    not dropped.'
+  bugs:
+  - BUG-947
+  files:
+  - scripts/owner_marks.py
+  - config/corroboration_collapse.yaml

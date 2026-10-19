@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "kind": "corroboration_collapse_pair_object",
- "generated_at": "2026-10-19T20:40:58Z",
+ "generated_at": "2026-10-19T21:24:11Z",
  "rule_file": "config/corroboration_collapse.yaml",
- "rule_digest": "94ec6dfd1eafcc39162700349e2c126c3ffeaed98fb43b98a28c72430b6f69a2",
+ "rule_digest": "51ffe5468bbb4948b9350107f61f2219987c3773bc20db24cbccc56274a532c3",
  "parameters": {
   "collapse_at_or_above": 0.8,
   "min_words_per_side": 120,

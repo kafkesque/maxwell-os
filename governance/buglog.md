@@ -18598,3 +18598,22 @@ pre-fix append-only history).
 retries only on non-zero exit, so it does NOT catch a mid-session crash that happens after a clean exit-0 check.
 That is the documented BUG-802 scope ("survive a reboot"), not a defect introduced by this fix. Continuous
 mid-session monitoring is a separate decision (a distinct KeepAlive shape / watchdog), not BUG-940.
+
+
+## BUG-939 (RESOLVED 2026-10-19) — isor_score now reads the canonical source_ids (fb_source_ids), the SAME evidence home as the corroboration bit
+
+**Fix applied.** `pipeline/schema_accessor.py::isor_score` counted `n_sources = len(resolve_source_ids(source_books))`
+from the RAW provenance field; it now counts `n_sources = len(fb_source_ids(fb))` — the canonical `source_ids` column
+that `is_convergent` (the corroboration bit) already prefers (D2185). Both derivations now share ONE evidence home
+(C12/D-2646): the epistemic label and the corroboration bit can no longer disagree about how many independent sources
+support a claim. The author-independence loop stays on `source_books` (author names come from book metadata; source_ids
+are SHA-256 hashes and cannot be reversed) — safe because a collapse only merges same-author duplicates (source_id =
+SHA-256(author|title)).
+
+**Red loop (D-3036).** `isor_score({"source_ids":["a"],"source_books":["b1.md","b2.md"],"domains":["d1","d2"]})["n_sources"]`
+was RED (returned 2 — one WORK under two names counted twice); GREEN after (returns 1). The naive SQL loop
+(`source_ids != resolve_source_ids(source_books)` → 2,677) is the EXPECTED post-T-129 state and was never the target
+(see the CORRECTED note in the OPEN entry above).
+
+**Receipt (measured).** red loop GREEN; `scripts/check_corroboration_collapse.py --selftest` 8/8. The 17 rows that
+advertised `epistemic_status='corroborated'` unsupported by their collapsed identity reconcile on next re-score.

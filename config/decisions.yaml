@@ -30689,8 +30689,8 @@ decisions:
   decision: 'Split the lifetime cloud_input_tokens/cloud_calls ceilings into two metering classes: pipeline-ingestion
     volume (windowed, burn-rate) vs harness-metering volume (interactive delegation). The flat lifetime raises (BUG-917:
     4.6B->5.0B tokens and 37k->50k calls) are interim D-3023 raise-with-reason acts, not the durable fix: a lifetime
-    counter always re-breaches any flat number. The discriminator must RESOLVE via model in cloud_model_families
-    plus cost_source (D-3034) — a register whose values are sentences declares no bytes.'
+    counter always re-breaches any flat number. The discriminator must RESOLVE via the LEDGER (realpath ownership, D-3034), not cost_source — a register whose values are sentences
+    declares no bytes (corrected 2026-10-19).'
   bugs:
   - BUG-917
   files:

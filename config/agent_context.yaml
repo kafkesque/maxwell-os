@@ -567,6 +567,25 @@ measured_decode_20261015:
     bill. They stay REFUSED a route (fail-closed) until a size-declared prefill reading exists - and that
     reading is precisely T-131's preflight cell.
 
+#: D-3102 ENGINE A/B + THE OWED >=128-TOKEN DECODE BENCHMARK (2026-10-19). The A/B's decode column
+#: (96.91 -> 222.13 tok/s) was read at max_tokens=1, i.e. a SINGLE-TOKEN artifact, and was NOT promoted.
+#: The owed benchmark is now delivered: measure_prefill.py gained --max-tokens, so a real decode rate is
+#: read with --max-tokens >= 128. The real Ornith-REAP-19B decode is ~39 tok/s, not 222 nor 96.
+measured_engine_ab_20261019:
+  d3102_adopt_rc1: true          # oMLX 0.7.1rc1 ADOPTED (load 5.9->3.68s, wall 17.7->15.8s; prefill/TTFT flat)
+  decode_128_ornith_reap_19b:
+    model: Ornith-1.5-35B-A3B-REAP-19B
+    prompt_tokens: 4010
+    max_tokens: 128
+    decode_tps: 39.14            # THE REAL decode rate - corrects the 96.91/222.13 single-token artifact
+    ttft_s: 0.25
+    model_load_s: 6.24           # rc1 cold load
+    note: >-
+      the 222.13 tok/s (max_tokens=1) and the A/B's 96.91 were single-token artifacts; the real 128-token
+      decode is ~39 tok/s. The prompt_tokens_per_second counter (19.88) on this same cold call is
+      CONTAMINATED by the 6.24 s cold load folded into its denominator - it is NOT a canonical prefill
+      reading and does not supersede measured_prefill_20261016 (155.1 warm).
+
 #: ── THE DELEGATION CANDIDATE SET, MEASURED 2026-10-15 (HF API + llmfit, read-only) ────────────────
 #: WHAT THIS IS: the pool the bench (T-131) draws from, with each row's weight bytes MEASURED from the
 #: repo's own file listing and llmfit's MoE-AWARE decode estimate beside it. WHAT IT IS NOT: a route. A

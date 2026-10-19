@@ -89,8 +89,10 @@ def build_prompt(tokens: int, filler: str, per_unit: float) -> str:
     return (filler * (chars // len(filler) + 1))[:chars]
 
 
-def measure(model: str, tokens: int, timeout: int) -> dict:
-    """Send ONE cold prompt and return the server's own counters, verbatim."""
+def measure(model: str, tokens: int, timeout: int, max_tokens: int = 1) -> dict:
+    """Send ONE cold prompt and return the server's own counters, verbatim.
+    max_tokens=1 is the PREFILL receipt; a decode rate read at max_tokens=1 is a single-token artifact
+    (D-3102), so a real decode rate is read with --max-tokens >= 128."""
     filler, per_unit = filler_unit()
     if not filler or per_unit <= 0:
         raise ProbeFault("FATAL: the declaration names no filler or its chars-per-token rate (C12)")
@@ -98,7 +100,7 @@ def measure(model: str, tokens: int, timeout: int) -> dict:
     url = f"http://{host}:{port}/v1/chat/completions"
     prompt = build_prompt(tokens, filler, per_unit)
     payload = {
-        "model": model, "max_tokens": 1, "temperature": 0.0, "stream": False,
+        "model": model, "max_tokens": max_tokens, "temperature": 0.0, "stream": False,
         "messages": [{"role": "user", "content": prompt}],
     }
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key()}"}
@@ -146,8 +148,8 @@ def selftest() -> int:
     src = pathlib.Path(__file__).read_text().split("#: The tokens this file must never", 1)[0]
     leaked = [lit for lit in FORBIDDEN if lit in src]
     assert not leaked, f"hardcoded value leaked into source: {leaked}"
-    print(f"ok measure-prefill --selftest: 2/2 controls green "
-          f"(filler unit + chars-per-token rate read from config, no hardcoded value in source)")
+    print("ok measure-prefill --selftest: 2/2 controls green "
+          "(filler unit + chars-per-token rate read from config, no hardcoded value in source)")
     return OK
 
 
@@ -155,13 +157,15 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Cold-prefill receipt (BUG-793, D-332 measurement-gated)")
     ap.add_argument("--model", default="Qwen3.8-27B-MLX-4bit", help="the served model to measure")
     ap.add_argument("--tokens", type=int, default=26214, help="cold-prompt size in tokens")
+    ap.add_argument("--max-tokens", type=int, default=1,
+                    help="answer size; 1 = prefill receipt, >=128 = a real decode-rate benchmark (D-3102)")
     ap.add_argument("--timeout", type=int, default=1200, help="wall-clock ceiling for the one call")
     ap.add_argument("--json", action="store_true", help="emit the receipt as JSON")
     ap.add_argument("--selftest", action="store_true", help="run the known-answer controls (offline)")
     args = ap.parse_args(argv)
     if args.selftest:
         return selftest()
-    result = measure(args.model, args.tokens, args.timeout)
+    result = measure(args.model, args.tokens, args.timeout, args.max_tokens)
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))
     else:

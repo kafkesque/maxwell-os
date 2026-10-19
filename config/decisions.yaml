@@ -30928,3 +30928,22 @@ decisions:
   files:
   - config/omlx_m1_best_config.yaml
   - config/flag_consumer_registry.yaml
+
+- id: D-3111
+  state: ACTIVE
+  date: '2026-10-19'
+  by: assistant
+  category: GOVERNANCE / SEQUENCING
+  title: 'A store-mutating apply must re-render its dependent derived faces in the same act (T-129 -> owner_marks)'
+  decision: 'T-129 (scripts/apply_identity_collapse.py) mutated the fbs store (is_convergent 1393 -> 896) and
+    appended identity_collapse: to the rule file, but did NOT re-render the corroboration-collapse pair object and
+    review sheet it invalidated, leaving `just health` RED (BUG-947). STANDING RULE: any script that mutates a
+    store the measurement rails bind against MUST, in the SAME act, re-render every dependent derived face (here:
+    `python3 scripts/owner_marks.py --render`) OR leave the owning task `state: open` with a named dependent
+    re-render. A `done` task whose dependent measurement is stale is not done (D-3036: an act that leaves no trace
+    did not happen).'
+  bugs:
+  - BUG-947
+  files:
+  - scripts/apply_identity_collapse.py
+  - scripts/owner_marks.py

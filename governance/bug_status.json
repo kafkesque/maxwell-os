@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 711,
-  "open_n": 251,
+  "total_ids": 712,
+  "open_n": 252,
   "closed_n": 460,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1262,6 +1262,11 @@
       "id": "BUG-921",
       "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
       "events": 3
+    },
+    {
+      "id": "BUG-947",
+      "title": "(HIGH, OPEN 2026-10-19) \u2014 T-129 identity collapse applied WITHOUT re-rendering the corroboration-collapse measurement; `just health` is RED",
+      "events": 1
     }
   ],
   "closed": [

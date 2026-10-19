@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1237 decisions (census stamp 075504bb3f61206e, 2026-10-19) · 711 bugs (251 open / 460 closed; highest OPEN = BUG-921) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1238 decisions (census stamp b1eea0797fb0855d, 2026-10-19) · 712 bugs (252 open / 460 closed; highest OPEN = BUG-947) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1237 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1237, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1238 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 645 · ⚖ ratified 146 | closed: ✅ resolved 332 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1238, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 251 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 39 · 🟨 MED 80 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -18808,3 +18808,32 @@ fixed separately — `pipeline/omlx_engine_guard.sh` now prefers `OMLX_ENGINE_HO
 `open <full path>`.
 
 CLOSED, not re-opened. This was a negative A/B result recorded so the lever stays off; it is not a live defect.
+
+## BUG-947 (HIGH, OPEN 2026-10-19) — T-129 identity collapse applied WITHOUT re-rendering the corroboration-collapse measurement; `just health` is RED
+
+MEASURED 2026-10-19 (forensic, read-only). Commit 8184df8 (T-129 identity collapse applied) ran
+scripts/apply_identity_collapse.py, which does `UPDATE fbs SET source_ids, source_diversity, is_convergent`
+— flipping the is_convergent=1 population 1393 -> 896 (-497 rows) — AND appended the `identity_collapse:` block
+to config/corroboration_collapse.yaml (whole-file sha256 changed). Neither the pair object
+(governance/corroboration_collapse_pairs.json, generated 2026-10-14) nor the review sheet
+(governance/work_identity_collapse_review_20261014.csv) was re-rendered in the same act.
+
+CONSEQUENCE: `just health` fails at `scripts/owner_marks.py --check` rc=1 (FATAL): the pair object's rule_digest
+no longer matches the rule file, AND the sheet is out of phase with the census (re-measurement over the new store
+yields pairs_at_bar 80 vs the signed 84, groups 68 vs 72, rows_collapsed 245 vs 530). `--render` correctly
+REFUSES (fail-closed, BUG-782) because 80 non-empty owner_ruling cells carrying `signature:C@2026-10-14` would
+be blanked.
+
+ROOT CAUSE (two independent stalenesses, one act): (1) the rule-file append changed the whole-file digest; (2)
+the store mutation changed the measured population. The task that mutated the store (T-129, state:done) did not
+re-render the dependent derived face it invalidated.
+
+FIX (owner-gated, D-3100): re-render must not silently drop the 80 signed rulings. The rail names two safe paths
+— (a) `python3 scripts/owner_marks.py --sign <tier-ids>` to re-expand the signed tiers over the new 80 pairs, or
+(b) move the per-row words to owner_override. See the handoff for the exact noob-proof procedure.
+
+SECONDARY (latent, register now, fix later): owner_marks.rule_digest is a WHOLE-FILE sha256, so ANY append to
+the living rule file (not only a parameter change) stale-ifies the pair object — the digest contradicts its own
+docstring ("measured under OTHER parameters is STALE"). It should be scoped to measurement() (the declared
+parameters), and the per-key parameter check should also cover shingle_words + sketch_width (today only
+collapse_at_or_above + min_words_per_side are checked).

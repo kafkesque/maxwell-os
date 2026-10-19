@@ -1,0 +1,6 @@
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-0", "ok": true, "detail": "pred=452 gold=452", "secs": 7.6, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 452"}
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-1", "ok": true, "detail": "pred=392 gold=392", "secs": 97.2, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 392"}
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-2", "ok": true, "detail": "pred=605 gold=605", "secs": 84.6, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 605"}
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-3", "ok": true, "detail": "pred=419 gold=419", "secs": 108.3, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 419"}
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-4", "ok": true, "detail": "pred=618 gold=618", "secs": 95.5, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 618"}
+{"model": "gpt-oss-20b-MXFP4-Q8", "suite": "lc_reasoning", "id": "lcr-5", "ok": true, "detail": "pred=366 gold=366", "secs": 94.4, "err": null, "ctx_tokens": 16000, "stab_key": null, "pred": "ANSWER: 366"}

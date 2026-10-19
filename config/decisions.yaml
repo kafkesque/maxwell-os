@@ -30716,3 +30716,21 @@ decisions:
     measured: 'serving parent /Applications/oMLX.app/Contents/MacOS/oMLX reads __version__ =
       0.7.1rc1; /health healthy model_count 8 loaded_count 1; guard com.maxwell.omlx-engine
       last exit 0'
+
+- id: D-3103
+  state: RESOLVED
+  date: '2026-10-19'
+  by: assistant
+  category: DELEGATION / MODEL ROUTING
+  title: Re-rule the two capability axes contradicted by T-187 + lc_reasoning (gpt-oss native tool loop PASS, gemma dependent-step FAIL, gpt-oss long-context 1.0)
+  decision: 'Two rows of config/harness_policy.yaml#capability_axes were contradicted by receipts this session and are RE-RULED (D-3038: a contradicted finding is re-ruled, never silently kept). (1) tool_calling.never{gpt-oss-20b-MXFP4-Q8: 0.0} is CONTRADICTED: the 0.0 was measured on the RAW-JSON tool format, not native tool_calls; on T-187 (scripts/measure_subagent_loop.py --two-step, two-tool dependent loop, per-turn budget 90s) gpt-oss PASSES (slowest turn 35.3s, decode 42.4/42.4/42.0 tok/s). (2) latency_agent_loop.routable{gemma-4-E4B-it-MLX-4bit} is CONTRADICTED: on the same fixture gemma FAILS the dependent second step (read_lines=1, lookup_token=0) — latency-fast but loop-incapable. (3) long_context_reasoning_16k gains gpt-oss at 6/6 = 1.0 (lc_reasoning numeric exact match over 16k ctx), tying Qwen3.8-27B-MLX-4bit. NET: gpt-oss-20b-MXFP4-Q8 clears 2 of 3 local-brain gates (native tool loop + long-context); the third gate (gemma drift eval slop-proof switch-back) is still owed. This re-opens BUG-832 remedy #2 with a VIABLE local candidate — the prior "local route REFUTED" premise named gemma/Qwen3-Coder both at 0.0 long-context, and gpt-oss is no longer in that refuted set. NOTHING is auto-promoted (D-2898: no_llm promotion).'
+  bugs:
+  - BUG-832
+  files:
+  - config/harness_policy.yaml
+  - governance/model_eval_report.md
+  - temp/subagent_loop_two_step_full_20261019.json
+  - governance/model_eval_checkpoint.jsonl
+  receipts:
+    t187: 'temp/subagent_loop_two_step_full_20261019.json: 8 rows, budget 90.0. PASS 6 (MiniCPM5 1.2s, Ornith-REAP 2.9s, Ornith-9B 13.5s, Qwen3-Coder 17.2s, Qwen3.8-27B 39.8s, gpt-oss 35.3s); FAIL 2 (Phi-4-mini 0 tool calls, gemma read=1 lookup=0)'
+    lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5 all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'

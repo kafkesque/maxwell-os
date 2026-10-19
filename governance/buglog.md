@@ -18616,3 +18616,18 @@ was RED (returned 2 — one WORK under two names counted twice); GREEN after (re
 
 **Receipt (measured).** red loop GREEN; `scripts/check_corroboration_collapse.py --selftest` 8/8. The 17 rows that
 advertised `epistemic_status='corroborated'` unsupported by their collapsed identity reconcile on next re-score.
+
+
+## BUG-832 UPDATE (2026-10-19, D-3103) — the "local route REFUTED" premise is PARTIALLY OVERTURNED by measurement
+
+The gate that kept BUG-832 remedy #2 closed on the grounds "no served model passes agent_loop long-context
+reasoning" is now 2/3 cleared for gpt-oss-20b-MXFP4-Q8, on receipts (D-3103):
+
+- long_context_reasoning_16k: gpt-oss = 6/6 exact = 1.0 (lc_reasoning over 16k ctx, `governance/model_eval_checkpoint.jsonl`).
+- tool loop (native): gpt-oss PASSES the T-187 two-step dependent loop (`temp/subagent_loop_two_step_full_20261019.json`, 35.3 s).
+- The still-owed third gate: the gemma drift eval (slop-proof switch-back). NOT run this session.
+
+NOT auto-promoted (D-2898). The brain DECIDE (remedy #2) remains an OWNER WORD; gpt-oss is now a measured
+candidate that cleared two gates, not an approved brain. Two further D-3103 corrections apply to the capability
+register: gpt-oss is NOT a 0.0 tool-caller (the 0.0 was the raw-JSON format), and gemma-4-E4B — the prior
+"only latency-routable" model — FAILS the dependent second step (read_lines=1, lookup_token=0).

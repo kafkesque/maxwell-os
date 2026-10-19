@@ -15,9 +15,12 @@ schema_version: "1.0"
 capability_axes:
   tool_calling:                  # the axis every agentic harness lives on
     best: {model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, score: 0.7}
-    never: {model: gpt-oss-20b-MXFP4-Q8, score: 0.0, why: "a 0.0 tool-caller must never drive a tool loop"}
+    native_two_step_pass: [Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit, MiniCPM5-2B-MLX, Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit]   # T-187 2026-10-19 (native tool_calls)
+    native_two_step_fail: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit]   # Phi: 0 calls (BUG-053 shape); gemma: read=1 lookup=0 (no dependent step 2)
+    note: "gpt-oss 0.0 was the RAW-JSON tool format, not native tool_calls; native PASS (D-3103). A 0.0 tool-caller must never drive a tool loop, but gpt-oss is NOT a 0.0 native tool-caller."
   long_context_reasoning_16k:    # the axis a harness creates by design (it stuffs the window)
-    best: {model: Qwen3.8-27B-MLX-4bit, score: 1.0}
+    best: [{model: Qwen3.8-27B-MLX-4bit, score: 1.0},
+           {model: gpt-oss-20b-MXFP4-Q8, score: 1.0}]   # lc_reasoning 6/6 2026-10-19 (D-3103)
     fails: [{model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, score: 0.0},
             {model: gemma-4-E4B-it-MLX-4bit, score: 0.0}]
     consequence: "a harness pointed at the coder for long-context work is pointed at the model's measured worst axis"
@@ -30,10 +33,11 @@ capability_axes:
   stability_self_agreement:
     best: {model: gemma-4-E4B-it-MLX-4bit, score: 0.7}
     note: "the best STABILITY is not the best QUALITY - the two axes disagree, so an agent loop that needs repeatability and one that needs correctness take different models"
-  latency_agent_loop:            # T-131 (temp/prefill_bench_20261015.json)
+  latency_agent_loop:            # T-131 (temp/prefill_bench_20261015.json); D-3103 re-rule
     routable: [gemma-4-E4B-it-MLX-4bit]
     refused: [Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, gpt-oss-20b-MXFP4-Q8]
     means: "only one served model currently fits an interactive per-turn budget; the rest are batch models"
+    d3103_correction: "gemma's latency-routable status is CONTRADICTED by T-187: it FAILS the dependent two-step (read_lines=1 lookup_token=0), so 'the only routable model' names a loop-incapable model. Re-measure the interactive budget against the native-loop passers before re-routing."
   pool: "8 served, 46.88 GB resident, 55 GB guard, adaptive eviction observed mid-request (BUG-803). ONE pool: harnesses queue on it, they do not add to it."
 
 # ── 2. THE LAYERED VERDICT ──

@@ -102,6 +102,7 @@ Ornith-1.5-9B-MLX-8bit                  0.83 (6)
 Qwen3-Coder-30B-A3B-Instruct-MLX-        0.0 (6)
 Qwen3.8-27B-MLX-4bit                     1.0 (6)
 gemma-4-E4B-it-MLX-4bit                  0.0 (6)
+gpt-oss-20b-MXFP4-Q8                     1.0 (6)
 
 Stability — self-agreement across 3 identical repeats
 ------------------------------------------------------------------------------

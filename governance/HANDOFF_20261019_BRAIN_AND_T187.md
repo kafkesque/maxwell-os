@@ -161,3 +161,59 @@ BUG-832 gate previously only tested gemma + Qwen3-Coder, both 0.0).
    NOT a silent edit (D-3038: rejected/contradicted findings are registered with their reason).
 3. gemma drift eval (20 class + 20 summ + 10 code-review) — the slop-proof gate for switch-back.
 4. `just gov-sync` / health ladder after the preflight config edit (confirm faces still equal).
+
+
+---
+
+## SESSION DELTA 2026-10-19 (part 2 — lc_reasoning landed, D-3103 re-rule, market research)
+
+### 1. lc_reasoning RESULT (gpt-oss-20b-MXFP4-Q8) — CLEARED
+`tools/model_eval_suite.py --models gpt-oss-20b-MXFP4-Q8 --suites lc_reasoning` finished 6/6 exact:
+`452, 392, 605, 419, 618, 366` at ctx_tokens 16000 (receipt `governance/model_eval_checkpoint.jsonl`).
+gpt-oss now scores **1.0** on long_context_reasoning_16k, TYING Qwen3.8-27B-MLX-4bit as the best.
+
+### 2. D-3103 RE-RULE DONE (the two harness_policy contradictions + a third axis)
+- `tool_calling.never{gpt-oss: 0.0}` → CONTRADICTED: the 0.0 was the RAW-JSON tool format; native `tool_calls` PASS (T-187).
+- `latency_agent_loop.routable{gemma}` → CONTRADICTED: gemma FAILS the dependent second step (read=1 lookup=0).
+- `long_context_reasoning_16k` gains gpt-oss at 1.0.
+- **NET: gpt-oss-20b-MXFP4-Q8 clears 2 of 3 local-brain gates** (tool loop + long-context) at ~42 tok/s decode.
+  This re-opens BUG-832 remedy #2 with a VIABLE local candidate. NOTHING auto-promoted (D-2898). The 3rd gate
+  (gemma drift eval) and the owner's brain DECIDE are still owed.
+- Files: config/decisions.yaml (D-3103), DECISION-LOG.md, governance/buglog.md (BUG-832 UPDATE),
+  config/harness_policy.yaml, governance/model_eval_report.md (lc_reasoning table +gpt-oss 1.0).
+- gov_sync re-derives GREEN (1229 decisions / 706 bugs / 58 open tasks).
+
+### 3. MARKET RESEARCH (Luke's Dev Lab + oMLX/MLX availability, 2026-10-19)
+Source: lukesdevlab.com (S3 index.json, 20 models) — NOTE his rig is RTX 2000 16GB VRAM / llama.cpp GGUF, so his
+tok/s do NOT transfer to M1 Max MLX; his CAPABILITY scores (HumanEval / Reasoning / Memory / agent tests) are
+architecture-independent. Excluded already-tested: Ornith-1.5-35B, Qwen3.8-27B, Ternary-Bonsai-2, Underdog-Saluki,
+Qwen3.8-Max / Kimi-K3 (cloud API, not local).
+- **Standout NEW coder candidate: `peculiar-ragdoll/Nail-Qwen3.6-35B-A3B`** — 155/164 HumanEval (94.5%, highest in
+  the set), MoE 3B-active (→ fast on M1 Max MLX), 4/5 agent. **MLX ports EXIST** (`Nail-Qwen3.6-35B-A3B-MLX`,
+  `-MLX-5bit`, `-MLX-6bit`). ⚠️ Same base architecture as the PHANTOM `Qwen3.6-35B-A3B-4bit` (BUG-808) — do not
+  re-propose without clearing that first.
+- Other new candidates (weaker or no-MLX): Tiel-Coder-35B-A3B (79% HE, GGUF-only, no MLX found), Nex-N2.5-mini
+  (87% HE, fast, but 2/5 agent), ThinkingCap-Qwen3.8-27B (5/5 agent, HAS MLX-4bit, but dense→slow ~9 t/s).
+- **M1 Max speed law (from our own T-187 receipts):** MoE ~3B-active (30-35B total) = 39-47 t/s FAST; dense 27B
+  = 6-8 t/s SLOW. The "fast AND capable" sweet spot is MoE-with-small-active. gpt-oss (42 t/s), Qwen3-Coder-30B-A3B
+  (41-47), Ornith-REAP-19B (39-41) already sit there; Nail would too.
+- **Design/creative roles (web/UI/mograph/app/3D):** Luke's `blender_lantern` + `godot_moving_platforms` agent
+  tests are the direct 3D/game-code probe. Full 5/5 (incl. both 3D) = the Qwen3.8-27B variants (ISTA GSQ-RCO,
+  Escha-W2, ThinkingCap, Swift, Flash-Next-GSQ-RCO-Coder) — all dense-27B → SLOW on M1 Max. No served model is a
+  clear "fast + 3D-capable" win; the best current coder (Qwen3-Coder-30B-A3B) is the pragmatic web/UI/app/3D-code
+  model today. IMAGE/3D-ASSET *generation* is a diffusion pipeline (FLUX/SDXL via MLX), NOT an oMLX chat model —
+  out of scope for the served pool.
+
+### 4. NEXT CRITICAL STEPS (consequential order, updated)
+1. **gemma drift eval** (20 class + 20 summ + 10 code-review ground-truth) — the 3rd slop-proof gate; decides
+   whether gpt-oss is a safe brain switch-back. Run during a deepseek window.
+2. **OWNER: DECIDE the brain** (BUG-832 remedy #2) — gpt-oss now clears 2/3 gates, so the honest options are
+   (a) route the session brain local to gpt-oss after gate 3, or (b) keep deepseek. One word, with a reason.
+3. **Nail-Qwen3.6-35B-A3B candidate** — only AFTER the phantom Qwen3.6-35B-A3B-4bit is cleaned (BUG-808): register
+   as a candidate, then a T-187 + humaneval + lc_reasoning receipt before any promotion.
+4. Re-measure the interactive latency budget against the native-loop passers (the D-3103 latency re-route).
+
+### 5. MANUAL OWNER INSTRUCTIONS — unchanged from part 1 (still owed)
+1. Env knobs relaunch (GOOSE_AUTO_COMPACT_THRESHOLD=0.94 etc.) — see part 1 §5.1.
+2. DECIDE the brain (BUG-832 remedy #2) — now a live choice, not a blocked one.
+3. Phantom model cleanup (`~/.omlx/model_settings.json` → remove `Qwen3.6-35B-A3B-4bit` while oMLX stopped).

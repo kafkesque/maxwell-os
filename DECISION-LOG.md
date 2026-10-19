@@ -4953,3 +4953,35 @@ Rollback is preserved at `/Applications/oMLX-0.7.0.app` plus `~/.omlx/*.bak-befo
 
 **Receipt.** Serving parent `/Applications/oMLX.app/Contents/MacOS/oMLX` reads `__version__ = "0.7.1rc1"`;
 `/health` healthy, `model_count 8`, `loaded_count 1`; guard `com.maxwell.omlx-engine` last exit 0.
+
+
+## D-3103 (RESOLVED 2026-10-19) — RE-RULE the two capability axes contradicted by T-187 + lc_reasoning
+
+**Verdict.** Two rows of `config/harness_policy.yaml#capability_axes` were contradicted by receipts this session and
+are RE-RULED (D-3038: a contradicted finding is re-ruled, never silently kept). A third axis gained a new reading.
+
+1. **`tool_calling.never{gpt-oss-20b-MXFP4-Q8: 0.0}` is CONTRADICTED.** The 0.0 was measured on the RAW-JSON tool
+   format, not native `tool_calls`. On T-187 (`scripts/measure_subagent_loop.py --two-step`: two-tool, two-STEP,
+   DEPENDENT loop with a distractor, per-turn budget 90 s), gpt-oss PASSES — slowest turn 35.3 s, decode
+   42.4/42.4/42.0 tok/s. A 0.0 tool-caller must never drive a tool loop, but gpt-oss is NOT a 0.0 native
+   tool-caller: the raw-JSON reading and the native reading disagree, and the native one is what a harness exercises.
+
+2. **`latency_agent_loop.routable{gemma-4-E4B-it-MLX-4bit}` is CONTRADICTED.** On the same fixture gemma FAILS the
+   dependent second step (read_lines=1, lookup_token=0): it reads but never takes the dependent lookup. It is
+   latency-fast and loop-incapable. "The only routable model" therefore names a model that cannot do the work the
+   route exists for. The interactive-budget re-measurement against the native-loop passers is owed before re-routing.
+
+3. **`long_context_reasoning_16k` gains gpt-oss at 1.0.** lc_reasoning (numeric exact match over 16 k ctx,
+   `tools/model_eval_suite.py --models gpt-oss-20b-MXFP4-Q8 --suites lc_reasoning`): 6/6 exact
+   (452, 392, 605, 419, 618, 366). Ties Qwen3.8-27B-MLX-4bit.
+
+**NET — this re-opens BUG-832 remedy #2 with a VIABLE local candidate.** BUG-832's premise ("no served model passes
+agent_loop long-context reasoning — gemma 0.0, Qwen3-Coder 0.0; only Qwen3.8-27B at 1.0 and slow") is now
+PARTIALLY OVERTURNED: gpt-oss-20b-MXFP4-Q8 clears BOTH the native tool loop (T-187) AND long-context reasoning
+(lc_reasoning 6/6), at ~42 tok/s decode (fast). It clears 2 of 3 local-brain gates. The third gate — the gemma
+drift eval (slop-proof switch-back: 20 class + 20 summ + 10 code-review ground-truth) — is still owed, and the
+owner's brain DECIDE (BUG-832 remedy #2) remains an owner word. NOTHING is auto-promoted (D-2898: no LLM promotion):
+gpt-oss is now a candidate that cleared two gates, not an approved brain.
+
+**Receipts.** `temp/subagent_loop_two_step_full_20261019.json` (8 rows, budget 90.0) |
+`governance/model_eval_checkpoint.jsonl` (gpt-oss lcr-0..5 all ok, ctx_tokens 16000).

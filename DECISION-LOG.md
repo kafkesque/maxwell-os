@@ -13,19 +13,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1243 decisions (census stamp 6ba41de2b421a9c5, 2026-10-20) · 723 bugs (256 open / 467 closed; highest OPEN = BUG-956) · 60 open tasks (MUST 12 / SHOULD 44 / WORTH 4; OWNER-moved 3, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1243 decisions (census stamp 6ba41de2b421a9c5, 2026-10-20) · 723 bugs (256 open / 467 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1243 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 339 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1243, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-191 | 🔴 MUST | RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 option 1, D-3116) | Owner completes the blind-sheet re-adjudication; build_anchor_bridge_r |
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
-> | T-192 | 🟠 SHOULD | STEP C: RAISE THE WIRED-MEMORY CAP BEFORE THE NEXT oMLX LAUNCH (D-3115) | Owner runs the sudo sysctl before the next oMLX launch (session-scoped |
 >
 > **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >

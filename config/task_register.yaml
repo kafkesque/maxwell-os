@@ -2360,13 +2360,14 @@ tasks:
   gate: 'Owner completes the blind-sheet re-adjudication; build_anchor_bridge_ruler_208.py re-derives a ruler keyed to rechunk-v4-20260929; build_anchor_store_bridge.py --check returns EXIT_CLEAN (0).'
 - id: T-192
   priority: SHOULD
-  state: open
+  state: done
   mover: owner
+  closed: '2026-10-20'
   title: 'STEP C: RAISE THE WIRED-MEMORY CAP BEFORE THE NEXT oMLX LAUNCH (D-3115)'
   why: 'Session-scoped sudo sysctl iogpu.wired_limit_mb=57344 before launching oMLX; never above ~58.7GB (D-334). Raises the ceiling so a large model can be loaded for the Step B red loop without hitting the wire cap.'
   source: 'D-3115; D-334'
-  evidence: 'MEASURED 2026-10-20: /health final_ceiling ~56.7GB with 3 models loaded (24.13GB); raising the wired cap to 57344MB frees headroom for KV cache and prefill.'
-  gate: 'Owner runs the sudo sysctl before the next oMLX launch (session-scoped, not persistent).'
+  evidence: 'OWNER RECEIPT 2026-10-20: sudo sysctl iogpu.wired_limit_mb=57344 -> "iogpu.wired_limit_mb: 0 -> 57344"; readback `sysctl iogpu.wired_limit_mb` = 57344. /health final_ceiling ~56.7GB with 3 models loaded (24.13GB). Session-scoped: re-run before EACH oMLX launch (never above ~58.7GB).'
+  gate: 'DONE 2026-10-20 (owner ran the sudo sysctl; readback 57344). Session-scoped, not persistent — re-run before each oMLX launch.'
 - id: T-193
   priority: SHOULD
   state: open

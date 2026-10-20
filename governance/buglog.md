@@ -19338,3 +19338,36 @@ are bound. So the compaction feature cannot work on this provider for TWO reason
 **NOT DONE HERE:** nothing was exported and no provider file was created. Exporting variables into a live process is
 impossible by design (BUG-873: a config write is not live until a new session starts), and inventing a provider file
 would be a declaration from memory, which is the class D-3034 refuses.
+
+
+## BUG-956 UPDATE (2026-10-20) — CAUSE NAMED (D-3036: the delta is a canonical-run consolidation, NOT data loss)
+
+**Forensic re-derivation, field by field** (against `knowledge pipeline/maxwell.db.bak_redomain_cardinality_20261007_134402`, the
+newest pre-collapse copy, mtime 2026-10-07 13:44 — one day before the bridge was committed):
+
+| store state | fbs rows | run breakdown |
+|---|---|---|
+| 2026-10-07 (pre-collapse) | **14,574** | `t11` 7,855 · `rechunk-v4-20260929` 6,591 · `e2e` 122 · `bug198_reinject` 6 |
+| 2026-10-13 (`_pre_identity` backup) | **7,640** | `rechunk-v4-20260929` 7,640 (single run) |
+| today | **7,640** | `rechunk-v4-20260929` 7,640 (single run) |
+
+**The arithmetic closes exactly:** 14,574 − 7,640 = **6,934** = 47.6%. The delta is `t11` (7,855) + `e2e` (122) +
+`bug198_reinject` (6) = 7,983 removed **minus** the +1,049 non-principle sidecar rows the D2590 landing (2026-10-12)
+added to the canonical run (6,591 → 7,640). **This is the D-2881 canonical-run consolidation the `canonical_run:
+rechunk-v4-20260929` declaration was built for, executed legitimately** — the store was a 4-run collision and is now the
+single declared canonical run. The bridge (committed 2026-10-08 against the 4-run store) was simply never re-derived.
+
+**A second, sharper problem this exposes — the anchor ruler sheet is 94% keyed to the REMOVED `t11` run:**
+`join.counts` re-derived = 13 joined / **195 unresolved** (of 208 ruler rows). Of those 195 dangling ruler concepts,
+**0** have a casefold-exact name in the canonical store and only **3** have even a substring match. So the certified
+anchor core (`inputs.ruler_sheet`) references a store generation that the consolidation removed — this is NOT a
+renaming artifact, and NOT a bridge drift. Re-deriving the bridge now would record 195 undeclared-unresolved → EXIT_DRIFT
+(fatal), which is the bridge correctly REFUSING to certify a ruler whose referents are gone.
+
+**THE ACT OWED (owner lane, NOT an agent decision — D-3035):** choose the disposition of the 195 dangling ruler rows:
+1. **Re-key the ruler** to the canonical `rechunk-v4-20260929` run (re-sample the certified core from the current store), or
+2. **Restore `t11` rows** (only if the ruler is meant to be a run-independent gold standard and the store must retain both runs), or
+3. **Declare the 195 as `declared_unresolved`** (only if the ruler is historical/archival and the dangling is EXPECTED — a
+   195-row declaration is a deliberate policy, never a green-wash).
+
+Until the owner rules, BUG-956 stays OPEN and `just health` line 126 stays RED (correctly).

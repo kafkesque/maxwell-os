@@ -581,3 +581,54 @@ task; it failed to survive the plumbing while acting on it.
 - **The `--with-builtin developer` GREEN run is NOT the owner's session shape.** It had one extension; the real session
   carries ~11, so its system prompt is larger. The mechanism fix is what transfers, not the exact 117 s.
 - **Nothing was retracted from BUG-950's first form**; the 120 s reading is mechanism B and it stands, unlocalised.
+
+# DELTA 2026-10-20T12:35 local — THE LADDER NOW WALKS, AND IT HAS FOUND A 47.6% STORE LOSS
+
+**Owner's word this turn:** "I go with option a" = **OPTION 1** on BUG-955. Applied, committed `15caebd`.
+
+## 1. WHAT LANDED THIS TURN
+
+| commit | act |
+|---|---|
+| `ef8c450` | retired BUG-917's stale route override; dispositioned BUG-949/950/951/952/954; de-duplicated `config/acquisition.yaml` (BUG-953) — routing debt 224 → **223 == ceiling**, never raised |
+| `189c45d` | BUG-955 filed: a post-rule `SUPERSEDED` record had no legal home |
+| `15caebd` | **BUG-955 CLOSED, option 1**: D-3104 `SUPERSEDED → RESOLVED`, `superseded_by → clause_superseded_by: D-3113`. Scope decided it, not convenience: D-3113 overturned D-3104's *planner clause*, not its operative "active=local, escalation=cloud" clause. `legacy_debt_ids` NOT padded (still 24 — reserved for pre-rule records) |
+| `505d1b6` | **BUG-956 HIGH filed** — see §2. Bridge deliberately **NOT** re-derived |
+
+## 2. THE FINDING THAT MATTERS — BUG-956, THE STORE HALVED
+
+`build_anchor_store_bridge.py --check` (justfile:126, reached for the first time ever) says DRIFT. Re-derivation vs
+committed, field by field: **`inputs.store.rows` 14,574 → 7,640 (−47.6%)**; `join.counts.joined` 208 → 13;
+`unresolved` 0 → **195**; `golden_join.joined` 967 → **61**. The join degraded in the SAME direction as the row loss, so
+the SUBJECT moved and the bridge is only the WITNESS (D-3034). File facts: bridge mtime **2026-10-08 22:09**,
+`knowledge pipeline/maxwell.db` mtime **2026-10-19 21:35** (219 MB) — the store was written eleven days later and never
+re-derived.
+
+**Re-deriving is ONE command and it would turn line 126 green.** It was refused, because it writes the current
+7,640-row store into the register as the measured truth and the delta may be DATA LOSS. Owed order: (1) name the cause
+of the 6,934-row delta — REMOVED vs REPLACED vs REBUILT; (2) then re-derive (legitimate) or restore first (loss);
+(3) either way the bridge must carry the row count it was measured against so the next halving is a one-line diff.
+
+## 3. WHY THE LADDER WAS BLIND — FIVE LATENT FAULTS, ONE REPAIR
+
+Line 54 (D-3101) was fixed yesterday; the ladder then walked for the first time in weeks and stopped at **84 → 86 →
+122 → 126**, one fault per line, all pre-existing:
+- **84** routing debt 224 > 223, of which the 224th item was BUG-949 *filed by the D-3101 act itself*. FIXED.
+- **86** `yaml_guard` found a genuine duplicate key in `config/acquisition.yaml` (`probe_timeout_s` twice, both `15`).
+  FIXED (BUG-953). The same rail takes **442.9 s** (BUG-954, OPEN) — 282 MB of YAML parsed twice; **this is why the
+  ladder reads as hung for ~7 minutes. Do not kill it.**
+- **122** D-3104. FIXED by the owner's option 1.
+- **126** BUG-956. OPEN, HIGH.
+
+**Lines 127–184 remain UNMEASURED. Expect at least one more fault.**
+
+## 4. DO-NOT-DRIFT
+
+- **"The local LLM is unreliable" was never the finding.** Ornith made **30 tool calls / 30 tool responses** and stated
+  BUG-948's fix correctly on its own; 6 tool names arrived corrupted (`shell<|channel|>commentary`) and the final
+  request was killed by the engine deep-reset. The plumbing was unreliable. Do not retire a model over a transport bug.
+- **A witness that adjusts itself to its subject certifies nothing.** Line 126 must not be closed by running the
+  re-derivation. That is the whole point of BUG-956.
+- **A shrink-only ceiling against a growing register hollows the metric.** Every new bug forces one more override. This
+  is recorded next to the `unrouted:` block and is an OPEN design question, not a solved one.
+- **`just health` is ~10 minutes now**, and 442.9 s of that is BUG-954. Budget for it; do not read the stall as a hang.

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 720,
-  "open_n": 256,
+  "total_ids": 721,
+  "open_n": 257,
   "closed_n": 464,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1286,6 +1286,11 @@
     {
       "id": "BUG-954",
       "title": "(MED, OPEN 2026-10-20) \u2014 `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG",
+      "events": 1
+    },
+    {
+      "id": "BUG-956",
+      "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
       "events": 1
     }
   ],

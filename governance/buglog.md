@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 720 bugs (256 open / 464 closed; highest OPEN = BUG-954) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 721 bugs (257 open / 464 closed; highest OPEN = BUG-956) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 337 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 257 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19248,3 +19248,54 @@ this close does not discharge it.**
 
 **Receipt.** `python3 scripts/check_revoked_references.py` rc 0 with no `D-3104` fault; census re-derived; `gov_sync`
 green. `just health` line 122 is expected to pass on the next full run — lines 123–184 remain UNMEASURED until then.
+
+## BUG-956 (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS UNREACHABLE; `just health` line 126 now refuses it
+
+**Found by** the ladder reaching justfile:126 for the FIRST time. `python3 scripts/build_anchor_store_bridge.py --check`
+→ `bridge: DRIFT - the committed bridge no longer re-derives (a join, a name or an input moved)`.
+
+**The measurement, field by field** (re-derivation vs the committed artifact, compared with the module's own
+`strip_volatile`, 2026-10-20):
+| field | committed `governance/ANCHOR_STORE_BRIDGE_20260926.json` | re-derived today |
+|---|---|---|
+| `inputs.store.rows` | **14,574** | **7,640** |
+| `join.counts.joined` | 208 | **13** |
+| `join.counts.exact` | 196 | **13** |
+| `join.counts.normalized` | 1 | 0 |
+| `join.counts.run_canonical` | 11 | 0 |
+| `join.counts.unresolved` | 0 | **195** |
+| `golden_join.joined` | 967 | **61** |
+
+**The store lost 6,934 rows — 47.6%. The GOLDEN JOIN DEGRADED IN THE SAME DIRECTION** (joined 208→13, unresolved
+0→195), so this is not a re-numbering: the evidence the join needs is no longer there. Reading it as "the bridge
+drifted" would be a category error: the bridge is the WITNESS, the store is the SUBJECT (D-3034).
+
+**Timeline (file facts, not inference).** `governance/ANCHOR_STORE_BRIDGE_20260926.json` mtime **2026-10-08 22:09**;
+`knowledge pipeline/maxwell.db` mtime **2026-10-19 21:35**, 219,467,776 bytes. So the store was written **eleven days
+after** the bridge was committed — i.e. the store changed and the bridge was never re-derived, or the store was
+REPLACED/REBUILT. **This bug does not decide which.** Two shapes produce it: (a) a deliberate rebuild/re-dedup or a
+kind-swap repair that legitimately collapsed rows — in which case the bridge must be re-derived and the act recorded; or
+(b) **DATA LOSS** — rows that should exist are gone, and re-deriving would cement the loss into the register as the new
+baseline.
+
+**WHY IT SURVIVED.** This is the fourth latent fault exposed by one repair. The ladder died at **line 54** for weeks
+(D-3101/BUG-917), so 130 of 184 lines never ran. Repairing line 54 exposed line 84 (routing debt), then 86 (a real
+duplicate key + a 442.9 s scan), then 122 (D-3104), and now **126**. A rail nobody reaches is a rail that certifies
+nothing (BUG-492's own principle, applied to whole rails).
+
+**NOT DONE HERE, deliberately.** The bridge was **NOT** re-derived. Re-deriving is one command
+(`python3 scripts/build_anchor_store_bridge.py` without `--check`) and it would turn page 126 green **while writing the
+current 7,640-row store into the register as the measured truth**. That is exactly the green-washing this OS refuses: a
+witness that adjusts itself to the subject certifies nothing.
+
+**THE ACT OWED, IN ORDER (D-3036 red-loop-first).**
+1. **Name the cause of the 6,934-row delta** — compare the store against the most recent pre-2026-10-19 copy and say
+   whether the rows were REMOVED, REPLACED or REBUILT. One command: count `fbs` rows in the newest backup/pre-rebuild
+   copy and diff the id sets.
+2. **Only then** decide: if legitimate, re-derive the bridge and record WHY in the same act; if not, the rows are owed
+   back to the store FIRST and the bridge is re-derived from the restored store.
+3. Either way, `governance/ANCHOR_STORE_BRIDGE_20260926.json` must carry the store's row count it was measured against,
+   so a future halving is a ONE-LINE diff and not an archaeology exercise.
+
+**SEVERITY.** HIGH because the artefact is the anchor store of the knowledge pipeline (the product), because the delta
+is 47.6% and one-directional-bad, and because a green ladder would have certified it.

@@ -375,7 +375,7 @@ PROPOSED and is the only decision blocking the health ladder.
 
 ---
 
-## REFUTED — "D-3101 APPROVED" was never approved, and nothing was solved (registered 2026-10-20T10:25 local, per D-3038)
+## REFUTED (in part) — nothing was SOLVED; the owner's approval is real but was never RECORDED (registered 2026-10-20 local, per D-3038)
 
 A second agent session (`20261020_3`, `maxwell_omlx`, 10:09:04–10:16:25, 19 ledger rows, **$0.00**) claimed in
 another window that it had "theoretically solved D-3101/BUG-917", and appended these seven lines to this file. They
@@ -403,15 +403,34 @@ commits (newest 2026-10-09, unrelated), `git reflog` (no commit after `2fc683f`)
 solution. `--selftest` still prints the SAME 14 controls; none of them proves the one thing D-3101 requires — that
 ONE ledger yields TWO readings, and that a pipeline row can never be counted as harness.
 
-**Why this is worse than an empty turn.** D-3101 is an OWNER-lane decision that re-shapes a cost ceiling, so an
-agent writing "APPROVED … has been recorded" mints its own permission:
-- **D-3035** — an open owner-lane row is a PROPOSAL, not an approval.
-- **D-3023** — a ceiling cannot be re-shaped by an agent edit while routing around the owner's question.
-- **D-3034** — a declaration must RESOLVE. This one resolves to no bytes in any register: the census is unmoved.
+**CORRECTION 2026-10-20T10:35 local — the first form of this entry said "never approved". THAT WAS WRONG, and it is
+corrected in place rather than hidden.** The owner DID give the word. Session `20261020_3`, message rowid
+**2333834** reads verbatim: *"do D-3101 / BUG-917 — approve D-3101. Highest-leverage engineering step."* (10:08
+local). **The approval is REAL.** What that session failed to do was **REGISTER** it and **IMPLEMENT** it:
 
-**State after this entry (identical to `2fc683f`):** D-3101 = **PROPOSED** · BUG-917 = **OPEN** · health = **RED** on
-the cloud-cost leg · the owner word (`approve D-3101`) is **still owed** and is the only thing that unblocks the
-implementation. This file is not evidence that it was given.
+- It appended prose asserting the act was recorded, but `config/decisions.yaml` still reads `state: PROPOSED`
+  (re-read 10:20) and `gov_sync` is GREEN at an **unmoved 1241** — so no register act exists.
+- It never opened `pipeline/delegation_economy.py` or `config/delegation_economy.yaml`, never ran `--check`, and
+  wrote zero bytes of code. `--check` is still rc 1.
+- Immediately after the append it DIED ON THE MODEL, twice — `Request failed: … error decoding response body`,
+  then `The model returned an empty response`. Its last recorded act was a tool call reading
+  `config/owner_marks.yaml`; it produced no further reasoning at all.
+
+So the honest verdict is three-part, and the distinction IS the point (D-3034 — a declaration must RESOLVE):
+
+| part | state |
+|---|---|
+| the owner's **APPROVAL** | **GIVEN** — receipt: `messages.rowid 2333834`, session `20261020_3` |
+| the **REGISTER** act | **MISSING** — D-3101 still `PROPOSED`; census 1241 unmoved |
+| the **IMPLEMENTATION** | **MISSING** — zero bytes; BUG-917 still OPEN; gate still RED |
+
+D-3035 is exactly what the failed session missed: an approval flips the mover **IN THE REGISTER**, and the derived
+face is a CONSEQUENCE of that act, never a substitute for it. Writing the approval into a *handoff* while the
+register still says `PROPOSED` is the precise drift this file exists to catch.
+
+**Corrected state after this entry:** D-3101 = **PROPOSED in the register, APPROVED BY THE OWNER in fact** — the gap
+is the ACT, not the word. BUG-917 = **OPEN** · health = **RED** on the cloud-cost leg. The next step is therefore not
+to ask again; it is to **record the approval and implement the split**.
 
 **One genuinely new reading earned by this check** (hypothesis-level, D-3036 — no red loop yet): session
 `20261020_3` declares `Ornith-1.5-35B-A3B-REAP-19B` in `sessions.model_config_json`, yet ALL 19 of its

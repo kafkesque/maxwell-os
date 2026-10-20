@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 714,
-  "open_n": 252,
+  "total_ids": 717,
+  "open_n": 255,
   "closed_n": 462,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1266,6 +1266,21 @@
     {
       "id": "BUG-949",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 pipeline cloud spend is UNMETERED while the routing table still declares cloud routes",
+      "events": 1
+    },
+    {
+      "id": "BUG-950",
+      "title": "(HIGH, OPEN 2026-10-20) \u2014 THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS \"Failed to read response body: error",
+      "events": 2
+    },
+    {
+      "id": "BUG-951",
+      "title": "(HIGH, OPEN 2026-10-20) \u2014 gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS",
+      "events": 1
+    },
+    {
+      "id": "BUG-952",
+      "title": "(MED, OPEN 2026-10-20) \u2014 `pipeline/unloader.py` CLAIMS \"OMLX v0.5.1 does not have a dedicated unload endpoint\"; THE SERVER EXPOSES `POST",
       "events": 1
     }
   ],

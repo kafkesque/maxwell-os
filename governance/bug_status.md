@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**252 open** / 462 closed of 714 ids.
+**255 open** / 462 closed of 717 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -259,3 +259,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-921 | (MED, OPEN 2026-10-18) — 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY | 3 |
 | BUG-948 | (MED, OPEN 2026-10-19) — owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object | 1 |
 | BUG-949 | (HIGH, OPEN 2026-10-20) — pipeline cloud spend is UNMETERED while the routing table still declares cloud routes | 1 |
+| BUG-950 | (HIGH, OPEN 2026-10-20) — THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS "Failed to read response body: error | 2 |
+| BUG-951 | (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS | 1 |
+| BUG-952 | (MED, OPEN 2026-10-20) — `pipeline/unloader.py` CLAIMS "OMLX v0.5.1 does not have a dedicated unload endpoint"; THE SERVER EXPOSES `POST | 1 |

@@ -505,3 +505,79 @@ highest OPEN = BUG-949) · 57 open tasks`. `gov_sync` **GREEN** twice (after `--
   gate can speak again.
 - **BUG-949 is the next engineering item**, and it is a WRITER, not a reader: the reader is already built and
   waiting for the declared columns.
+
+# DELTA 2026-10-20T11:15 local — WHY THE LOCAL MODEL LOOKED INCAPABLE: THREE PLUMBING FAULTS, ONE OF THEM **PROVEN FIXED**
+
+**Trigger.** Owner, 10:47 local: "I tried in maxwell omlx to implement tasks from handoff and ornith ran into
+`Request failed: Failed to read response body: error decoding response body`. So I'm not sure any of the local AI is
+capable to implement tasks by their own." **Verdict: the model was never given a fair run.** Every receipt below is a
+file read or a command run today, not an inference (D-3109).
+
+## 1. THE DEATH OF THE ORNITH SESSION, EXACTLY
+
+Session `20261020_3`, the only `type:"error"` row it contains: `2026-10-20 08:31:37` UTC = **10:31:37 local**. The
+oMLX server log's last line for that request: `10:31:37,349 Request 7cb47bfd … cancelled, aborting`, after
+`10:29:37,887 Reserved prefill capacity for 45,650 tokens`. Same second. Nothing mysterious: one request, killed.
+
+## 2. FAULT A — TWO RESIDENT MODELS THRASH, THE ENGINE DEEP-RESETS, THE STREAM DIES (fix proven)
+
+`~/.omlx/logs/server.log` 11:02:40: `needs prefill headroom … current=31.51GB, predicted=5.84GB, target=36.77GB` →
+`Evicting idle model 'gpt-oss-20b-MXFP4-Q8' … projected=37.33GB > target=36.77GB` → `Engine stopped` → **`Deep reset
+completed - all caches cleared`** → request resumed with a COLD cache → client had already lost the stream.
+**The overshoot that triggers an 11.25 GB eviction and a full cache wipe is 0.58 GB.**
+
+**Why it fires every turn:** `GOOSE_PLANNER_MODEL=gpt-oss-20b-MXFP4-Q8` (config.yaml:314) is a DIFFERENT model from the
+executor, so each turn loads an 11.25 GB planner that the executor's prefill then evicts, wiping the prefix cache that
+made 40k-token prompts fast. Loop: plan → load gpt-oss → evict → wipe → re-prefill from zero → plan → load again.
+
+**PROVEN FIX — same command, same prompt, one variable changed.**
+| | |
+|---|---|
+| RED | `goose run --no-profile --with-builtin developer --provider maxwell_omlx --model Ornith-1.5-35B-A3B-REAP-19B --max-turns 1 --no-session -q -i /tmp/bigprompt.txt` → `Failed to parse JSON: error decoding response body` · **121 s** |
+| GREEN | same + `GOOSE_PLANNER_PROVIDER=maxwell_omlx GOOSE_PLANNER_MODEL=Ornith-1.5-35B-A3B-REAP-19B` → **`OK`** · **117 s** |
+| GREEN receipt | `11:06:36,193 Chat completion: model=Ornith…, 54 tokens in 116.73s, prompt: 33817, finish_reason=stop`, with ZERO evict/stop/reset lines after it |
+No ceiling raised, no timeout touched, no model retired.
+
+## 3. FAULT B — THE ~120 s CLIENT WALL (unlocalised; two negative results already paid for)
+
+Three aborts with NO engine reset near them: 09:52:26 (119.81 s), 10:05:34 (117.84 s), 10:31:37 (119.46 s). A raw HTTP
+client served the same shapes in **142.0 / 126.9 / 118.9 s** without abort ⇒ oMLX is not imposing it. **Do not repeat
+these two:** (i) no `GOOSE_*TIMEOUT*` key exists in config.yaml (only per-extension `timeout: 300`); (ii)
+`GOOSE_STREAM_TIMEOUT=600` **did not move the wall** (121 s with and without).
+
+## 4. FAULT C — THE TOOL CALLS THEMSELVES WERE MANGLED (BUG-951)
+
+6 of ~30 tool calls in `20261020_3` arrived with a control token inside the NAME: `shell<|channel|>commentary`,
+`shell<|channel|>json`, `docguard__check_protected<|channel|>commentary`, `tree<|channel|>analysis`,
+`search_available_extensions<|channel|>commentary` — each a call to a tool that does not exist. Plus four CONSECUTIVE
+dropped calls: `10:15:30/48`, `10:16:06/25 - Error parsing tool calls … unexpected tokens remaining in message header`
+→ `finish_reason=stop`, 28 tokens, the call gone. Attribution receipt: the harmony parser's input at `10:09:45,018` is
+verbatim the session's own thinking block at `08:09:45` UTC ⇒ **gpt-oss-20b-MXFP4-Q8**, the planner model. The model
+diagnosed it itself: *"There's a recurring 'tool call errors' warning that seems to be a system issue."* It was right.
+**Not reproduced in isolation** (6/6 clean at 30 tools, 2 KB) ⇒ contextual, trigger unisolated, HYPOTHESIS (D-3036).
+
+## 5. WHAT THE LOCAL MODEL ACTUALLY DID RIGHT (the capability datapoint nobody counted)
+
+`20261020_3` produced **30 tool calls and 30 tool responses** — reads, `tree`, `docguard__check_protected`,
+`summarize__summarize`, `safe_append`. It read `scripts/owner_marks.py` and stated BUG-948 correctly on its own:
+*"rule_digest computes sha256 over the WHOLE config/corroboration_…"*, and that the per-key check covers only
+`collapse_at_or_above` + `min_words_per_side`. **That is the actual fix design.** It did not fail to understand the
+task; it failed to survive the plumbing while acting on it.
+
+## 6. NEW EXPOSURE — BUG-952: THE UNLOAD LEVER WAS DECLARED MISSING
+
+`pipeline/unloader.py:22` says "OMLX v0.5.1 does not have a dedicated unload endpoint" and therefore only calls
+`/health` — **it never unloads**. The server exposes `POST /admin/api/models/{model_id}/unload`, `POST …/load`,
+`POST /admin/api/reload`, and `GET /admin/api/models` with a per-model `loaded` flag (read 11:06: Ornith + Phi-4
+`loaded=True`, the other six `False`). The lever existed; the repo said it did not.
+
+## 7. DO-NOT-DRIFT
+
+- **A capability verdict cannot be issued while the plumbing is red.** "The local model can't do it" is now a
+  falsifiable claim with a fixture attached, not an opinion.
+- **A second resident model is the fault, not a preference.** On a 64 GB machine (note: `AGENTS.md` still says 64 GB;
+  the guard reads `final_ceiling: 49.99 GB` and the prefill target `36.77 GB` — three different numbers, unreconciled,
+  LEFT AS AN OPEN QUESTION, not silently picked) do not run planner ≠ executor locally.
+- **The `--with-builtin developer` GREEN run is NOT the owner's session shape.** It had one extension; the real session
+  carries ~11, so its system prompt is larger. The mechanism fix is what transfers, not the exact 117 s.
+- **Nothing was retracted from BUG-950's first form**; the 120 s reading is mechanism B and it stands, unlocalised.

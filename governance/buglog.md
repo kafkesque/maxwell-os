@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 714 bugs (252 open / 462 closed; highest OPEN = BUG-949) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 717 bugs (255 open / 462 closed; highest OPEN = BUG-952) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
+> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -18970,3 +18970,178 @@ fresh number beside it on every reading. The budget was not silently widened by 
 FOLLOW-ON REGISTERED, NOT ABSORBED: **BUG-949** — the pipeline class has no WRITER, so pipeline cloud spend is
 unmetered while `config/model_assignments.yaml` still declares cloud routes. The reader is built and waiting for
 the declared columns; that is a separate act.
+
+## BUG-950 (HIGH, OPEN 2026-10-20) — THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS "Failed to read response body: error decoding response body", SO THE LOCAL MODEL IS BLAMED FOR A CLIENT-SIDE DEADLINE
+
+**Reported by the owner as a capability doubt.** Owner, 2026-10-20 10:47 local: "I tried in maxwell omlx to implement
+tasks from handoff and ornith ran into: Request failed: Failed to read response body: error decoding response body.
+So I'm not sure any of the local AI is capable to implement task by their own." The reading below says the model was
+never given a fair run: the request was KILLED, and the error text names the transport, not the model.
+
+**What was measured — the abort is real and it is timed.** `~/.omlx/logs/server.log`, three aborts, each with NO
+`Chat completion` line afterwards (so nothing was served):
+| request | prefill reserved | aborted | delta | server note |
+|---|---|---|---|---|
+| `4e1a8948` | 09:50:26.213 (35,453 tok) | 09:52:26.026 | **119.81 s** | `Prefill interrupted at 23883/25544 tokens` |
+| `20f00018` | 10:03:36.885 (94,536 tok) | 10:05:34.728 | **117.84 s** | `Prefill interrupted at 27136/94536 tokens` |
+| `7cb47bfd` | 10:29:37.887 (45,650 tok) | 10:31:37.349 | **119.46 s** | `after scheduler-side stop (prompt only)` |
+A fourth at 10:13:51 (`36e6e4e9`, 94,536 tok) cut after 47.8 s. The caller gave up at a ~120 s wall.
+
+**The session error and the server abort are the same event.** The only `type:"error"` row in session `20261020_3`
+is timestamped `2026-10-20 08:31:37` UTC = **10:31:37 local — the exact second `7cb47bfd` was aborted**. There is no
+ambiguity about which request died.
+
+**THE SERVER IS NOT GUILTY — measured, so the deadline is CLIENT-side.** A prefix-cache-defeated 46,076-token prompt
+was streamed from a client with a 900 s own-timeout: it emitted first byte at 0.1 s and **COMPLETED in 142.0 s**, past
+the 120 s wall with no abort (`python3 /tmp/toolcall_probe2.py --big`, then the inline 142 s run, 2026-10-20). A second
+run at ~38,403 tokens with 30 tools took **126.9 s and 118.9 s, both completed**. So oMLX serves past 120 s; goose
+1.39.0 (or the Desktop front-end) stops first. **The precise knob is NOT yet located** — `~/.config/goose/config.yaml`
+holds no `GOOSE_*TIMEOUT*` key, its only `timeout:` keys are per-extension at 300 s, and no 120000 constant exists in
+`/Applications/Goose.app/Contents/Resources`. That is a **HYPOTHESIS OWED A RECEIPT** (D-3036), not a finding: the
+localising experiment is a `goose run` CLI call with a ≥40k-token prompt timed against the same wall.
+
+**WHY IT FIRES AT ALL — the arithmetic that makes the wall reachable.** Uncached prefill on this machine is
+**199–230 tok/s** (23,883 tok in 119.8 s = 199; 27,136 tok in 118 s = 230). Therefore a cold-cache prompt above
+**~24k tokens cannot be served inside a 120 s wall, ever**. The ornith session ran **39,493 → 45,650-token prompts**,
+because the payload it was handed was `governance/HANDOFF_20261020_LOCAL_PLANNER.md` (34,994 B) + `AGENTS.md`
+(20,944 B) + the tool surface. The wall was reached by prompt size, not by model slowness.
+
+**What the error string actually means.** `Failed to read response body: error decoding response body` is reqwest
+failing to decode an HTTP body that ended **without a terminator** — the stream was cut mid-flight. It is a transport
+verdict. Reading it as "the model could not answer" is the misdiagnosis this bug exists to stop.
+
+**MEASURED WORKAROUND (do this, do not raise a ceiling).** A warm prefix cache makes the wall unreachable: the SAME
+ornith session served 40k-token prompts in **4.94 s / 7.61 s / 9.76 s / 12.65 s / 15.78 s** whenever the new suffix was
+126–828 tokens, versus **97.67 s** when 1,682 new tokens had to be prefilled. So the remedy is a SMALL BRIEF plus a
+PRE-WARM, not a bigger timeout. Warm the cache with one throwaway call carrying the identical system prompt before
+the first real turn.
+
+**NOT DONE HERE:** no config was changed, no ceiling touched, no runtime patched. Nothing was "worked around" by
+silencing the error.
+
+## BUG-951 (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS `name<|channel|>channel` AND FOUR CONSECUTIVE TOOL CALLS VANISH
+
+**Two distinct symptoms, one cause.**
+1. **Corrupted tool NAME (6 of ~30 calls in session `20261020_3`).** The harness received, verbatim:
+   `"name":"shell<|channel|>commentary"`, `"name":"shell<|channel|>json"`,
+   `"name":"docguard__check_protected<|channel|>commentary"`, `"name":"tree<|channel|>analysis"`,
+   `"name":"search_available_extensions<|channel|>commentary"`. Each is a call to a tool that **does not exist**.
+2. **Dropped tool CALL.** `~/.omlx/logs/server.log` 10:15:30.366, 10:15:48.395, 10:16:06.734, 10:16:25.546 — four in a
+   row: `omlx.adapter.harmony - WARNING - Error parsing tool calls from tokens: unexpected tokens remaining in message
+   header: Some("<|start|>assistant")`, each followed by `Chat completion: model=gpt-oss-20b-MXFP4-Q8, 28 tokens …
+   finish_reason=stop`. The model asked for `functions.shell` four times and the call **never reached the harness**.
+
+**Attribution — receipt, not inference.** The harmony parser's input at `10:09:45,018` reads, verbatim:
+`We need to read file content. Use shell tool. … We attempted but got error due to wrong channel. We need to call
+shell with correct JSON.` That is the **identical text** of the session's own thinking block at `08:09:45` UTC. So the
+malformed tool calls were produced by **gpt-oss-20b-MXFP4-Q8**, the model configured as `GOOSE_PLANNER_MODEL`
+(`~/.config/goose/config.yaml:314`) and therefore in the loop on every turn.
+
+**The model diagnosed its own harness.** Session `20261020_3` thinking, 08:26:24 UTC: "There's a recurring 'tool call
+errors' warning that seems to be a system issue. My actual tool calls (the shell outp…". It was right, and it was
+being charged for it.
+
+**NOT REPRODUCED IN ISOLATION — stated as a hypothesis (D-3036).** `python3 /tmp/toolcall_probe2.py --model
+gpt-oss-20b-MXFP4-Q8 --tools 30 --prompt-kb 2 --n 6 --stream` returned `names=['shell']` **6/6 clean**. The same
+probe was clean 3/3 for `Ornith-1.5-35B-A3B-REAP-19B` at 8 KB and 2/2 at ~38k tokens with 30 tools. So the trigger is
+**contextual and unisolated**: the malformed header appears in a long, error-laden conversation and then PERSISTS
+(the four drops are byte-identical retries of the same bad form). Candidate triggers, none tested: a prior corrupted
+name echoed back in history; the `<|channel|>json` token where `<|constrain|>json` belongs; `enable_thinking: False`
+on a harmony model that emits an analysis channel anyway. **Red loop owed:** a fixture that replays one corrupted
+`name` into the history and proves the NEXT call is clean — today it would go RED.
+
+**Also seen, same defect family.** `10:19:41,940 - Harmony streaming parser error, switching to passthrough:
+unexpected tokens remaining in message header: Some("to=repo_browser.write_file")`.
+
+**IMPACT.** A corrupted name is not a warning: it is a failed tool call, then a retry of the same call, then a spent
+turn. With 6/30 calls corrupted and four consecutive drops, a local agent burns its budget proving it is "incapable"
+when the plumbing is what failed. Queue this ABOVE any further model-capability A/B on this machine.
+
+### BUG-950 — CORRECTION AND ROOT CAUSE, MEASURED 2026-10-20 11:00–11:07 local (the first form of this entry said "client-side deadline"; that is only ONE of two mechanisms, and not the one that killed the ornith session)
+
+**The first form of this entry is INCOMPLETE, not wrong, and it is corrected here rather than rewritten** (append-only
+register). The 120 s reading was real but it is the SECOND mechanism. The FIRST — and the one with a proven fix — is an
+**engine deep-reset under prefill-headroom pressure that destroys the prefix cache and cuts the stream**.
+
+**Mechanism A — TWO RESIDENT MODELS THRASH, THE ENGINE DEEP-RESETS, THE STREAM DIES.**
+`~/.omlx/logs/server.log`, 11:02:40 (the second reproduction; identical chain at 10:49:53):
+```
+11:02:40,650 needs prefill headroom before throttling (reason=adaptive_prefill_throttle,
+             current=31.51GB, predicted=5.84GB, target=36.77GB)
+11:02:40,651 Paused request 12797b23 for prefill LRU eviction
+11:02:40,779 Evicting idle model 'gpt-oss-20b-MXFP4-Q8' for prefill headroom on
+             'Ornith-1.5-35B-A3B-REAP-19B' (projected=37.33GB > target=36.77GB)
+11:02:40,779 Unloading model: gpt-oss-20b-MXFP4-Q8 (immediate abort)
+11:02:40,779 Engine stopped          ← the in-flight stream dies HERE
+11:02:40,937 Deep reset completed - all caches cleared   ← the WARM PREFIX CACHE IS GONE
+11:02:41,246 [prefill-eviction] retry=1 ... outcome=headroom_available
+11:04:05,112 Request 12797b23 cancelled, aborting
+11:04:21,828 Prefill interrupted at 24064/29209 tokens: 1 request(s) aborted
+```
+**The overshoot is 0.58 GB** (projected 37.33 vs target 36.77). To recover 0.58 GB the server unloads an 11.25 GB
+model AND runs a full deep reset that clears the caches which were the only reason 40k-token prompts were fast. The
+client, which had received bytes and then had the connection cut, reports exactly
+`Failed to read response body: error decoding response body`.
+
+**Why this fires on EVERY TURN of a local agent session.** `GOOSE_PLANNER_PROVIDER` / `GOOSE_PLANNER_MODEL`
+(`~/.config/goose/config.yaml:313-314`) point at `gpt-oss-20b-MXFP4-Q8`, a model DIFFERENT from the executor. So the
+loop is: planner turn loads gpt-oss (11.25 GB resident) → executor turn needs prefill headroom → gpt-oss is evicted →
+deep reset clears the prefix cache → the executor re-prefills the whole 40k-token prompt from ZERO → next turn the
+planner must COLD-LOAD gpt-oss again. The 42–134 s cold-load TTFT already recorded in `AGENTS.md` is the other half of
+this loop. **A second resident model on a 64 GB machine is not a preference here; it is the fault.**
+
+**THE FIX IS PROVEN, with before and after on the SAME command and the SAME prompt.**
+
+RED (two independent runs, 121 s elapsed each):
+```
+goose run --no-profile --with-builtin developer --provider maxwell_omlx \
+  --model Ornith-1.5-35B-A3B-REAP-19B --max-turns 1 --no-session -q -i /tmp/bigprompt.txt
+→ Ran into this error: Request failed: Failed to parse JSON: error decoding response body
+  for url (http://localhost:11435/v1/chat/completions).   ELAPSED=121s
+```
+GREEN (the only change is the planner pin — no ceiling raised, no timeout touched):
+```
+GOOSE_PLANNER_PROVIDER=maxwell_omlx GOOSE_PLANNER_MODEL=Ornith-1.5-35B-A3B-REAP-19B \
+goose run --no-profile --with-builtin developer --provider maxwell_omlx \
+  --model Ornith-1.5-35B-A3B-REAP-19B --max-turns 1 --no-session -q -i /tmp/bigprompt.txt
+→ OK                                                     ELAPSED=117s
+```
+Server-side receipt for the GREEN run: `11:06:36,193 Chat completion: model=Ornith-1.5-35B-A3B-REAP-19B, 54 tokens in
+116.73s (0.5 tok/s), prompt: 33817, finish_reason=stop` with **ZERO** `Evicting idle model` / `Engine stopped` /
+`Deep reset` / `cancelled` lines after it. `GET /health` then read `loaded_count: 2` (Ornith + Phi-4), `gpt-oss-20b`
+`loaded=False`.
+
+**Mechanism B — a ~120 s client abandonment, still unlocalised.** Three aborts with NO engine reset anywhere near them:
+09:52:26 (`Prefill interrupted at 23883/25544`, 119.81 s), 10:05:34 (`27136/94536`, 117.84 s), 10:31:37 (`after
+scheduler-side stop`, 119.46 s). A raw HTTP client served the same shapes in **142.0 s / 126.9 s / 118.9 s** with no
+abort, so oMLX does not impose it. **Two negative results already paid for, do not repeat them:** (i) there is no
+`GOOSE_*TIMEOUT*` key in `~/.config/goose/config.yaml` — its only `timeout:` keys are per-extension at 300 s; (ii)
+`GOOSE_STREAM_TIMEOUT=600` **did not move the wall** (completed/failed at 121 s both with and without it). The knob is
+still a hypothesis owed a receipt (D-3036).
+
+**PRACTICAL RULE.** On this machine, run ONE local model at a time, and make the planner the SAME model as the
+executor whenever the executor is a local model. A local agent brief must also stay small — see the workaround
+paragraph above: 40k-token prompts served in 4.94–22.02 s on a WARM cache and took 97.67 s / >120 s on a COLD one,
+and Mechanism A guarantees the cache goes cold.
+
+## BUG-952 (MED, OPEN 2026-10-20) — `pipeline/unloader.py` CLAIMS "OMLX v0.5.1 does not have a dedicated unload endpoint"; THE SERVER EXPOSES `POST /admin/api/models/{model_id}/unload`, SO THE OPERATOR'S ONLY MEMORY LEVER WAS DECLARED MISSING
+
+**What the shipped code says.** `pipeline/unloader.py:22-27`: "OMLX v0.5.1 does not have a dedicated unload endpoint.
+Workaround: trigger a health check, then the engine pool garbage-collects unused models… For explicit unloading, restart
+the server via watchdog." `unload_model()` therefore performs a `GET /health` and returns `loaded > 0` — **it never
+unloads anything**, and its return value says "success" when models ARE loaded, which is the inverse of what a caller
+would read it as.
+
+**What the server actually exposes** (`GET http://localhost:11435/openapi.json`, read 2026-10-20 11:06):
+`POST /admin/api/models/{model_id}/unload`, `POST /admin/api/models/{model_id}/load`, `POST /admin/api/reload`,
+`GET /admin/api/models`, `PUT /admin/api/models/{model_id}/settings`. `GET /admin/api/models` returns a list with an
+explicit `loaded` flag per model (read at 11:06: `Ornith-1.5-35B-A3B-REAP-19B loaded=True`,
+`Phi-4-mini-instruct-8bit loaded=True`, the other six `loaded=False`).
+
+**Why it matters now.** Mechanism A of BUG-950 is fixed by NOT having a second model resident. The repo's own tool for
+that is a stub that cannot do it, so the lever looked absent while the endpoint was there all along (D-3034: a
+declaration must RESOLVE — this one resolved to a health check).
+
+**NOT DONE HERE:** the stub was not rewritten. The correct form is `POST /admin/api/models/{id}/unload`, and it must be
+verified against `loaded` before and after. No unload was issued during this diagnosis (the two resident models belong
+to a live session).

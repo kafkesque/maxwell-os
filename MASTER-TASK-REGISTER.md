@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 714 bugs (252 open / 462 closed; highest OPEN = BUG-949) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 717 bugs (255 open / 462 closed; highest OPEN = BUG-952) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
+> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >

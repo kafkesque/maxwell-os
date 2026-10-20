@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**256 open** / 463 closed of 719 ids.
+**257 open** / 463 closed of 720 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -263,3 +263,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-951 | (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS | 1 |
 | BUG-952 | (MED, OPEN 2026-10-20) — `pipeline/unloader.py` CLAIMS "OMLX v0.5.1 does not have a dedicated unload endpoint"; THE SERVER EXPOSES `POST | 1 |
 | BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
+| BUG-955 | (HIGH, OPEN 2026-10-20) — A POST-RULE `SUPERSEDED` RECORD HAS NO LEGAL HOME: the reference rail demands a `revocation:` declaration, while | 1 |

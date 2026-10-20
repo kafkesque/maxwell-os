@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 719 bugs (256 open / 463 closed; highest OPEN = BUG-954) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 720 bugs (257 open / 463 closed; highest OPEN = BUG-955) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 257 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19182,3 +19182,45 @@ fast rail (live declarations) plus a scheduled deep sweep (archives). **All thre
 carries a `receipt.artifacts` count that `SCAN-SHRANK` compares against — so the receipt must be re-cut in the same act
 or the rail will refuse the narrowing, correctly.** NOT DONE HERE: no root, skip, depth or receipt was changed, because
 choosing what the rail stops looking at is the owner's call and this session had no mandate for it.
+
+## BUG-955 (HIGH, OPEN 2026-10-20) — A POST-RULE `SUPERSEDED` RECORD HAS NO LEGAL HOME: the reference rail demands a `revocation:` declaration, while the only other escape is a list the policy reserves for records that PREDATE the rule
+
+**FOUND BY** the ladder reaching justfile:122 for the first time. `python3 scripts/check_revoked_references.py` (rc 1):
+`FAIL check-revoked-references: D-3104 is SUPERSEDED and is NOT in legacy_debt_ids - new debt may not be declared by silence (D-2645)`.
+
+**The two rules that do not meet.** `scripts/check_revoked_references.py:218-226` accepts a `SUPERSEDED`/`ARCHIVED`
+record in exactly two ways: (i) it carries a `revocation:` block with **scope, reason, evidence, date, tokens**; or
+(ii) its id is listed in `legacy_debt_ids`. `config/decisions_policy.yaml:63-66` says of that list: *"The records below
+predate the rule ... every revocation minted from 2026-09-25 on must carry its scope, reason, evidence, date and tokens
+or it is not a revocation."* **D-3104 is dated 2026-10-19 — it is post-rule, so (ii) is closed to it by the policy's own
+words — yet (i) is not reachable either, because the `tokens` it must declare are the identifiers NO live file may name,
+and D-3104 is named by D-3113, the very record that superseded it.** Declaring `tokens: [D-3104]` would therefore fail
+the same rail on the successor.
+
+**MEASURED STATE OF THE REGISTER** (read 2026-10-20): 25 records are `SUPERSEDED`/`ARCHIVED`; **24 are in
+`legacy_debt_ids`; 0 carry a `revocation:` block.** D-3104 is the single outlier, and it became one today: D-3113
+(`by: assistant`, 2026-10-20) overturned D-3104's planner clause and D-3104 was flipped to `SUPERSEDED` with
+`superseded_by: D-3113` **without** a declaration. The rail is right to refuse it.
+
+**WHY THIS IS A RULE DEFECT AND NOT MERELY ONE MISSING FIELD.** There is no precedent to copy — zero records have ever
+carried a `revocation:` block — and the one worked example (`legacy_debt_ids`) is closed to post-rule records. A register
+that makes a legal state unreachable will be made green by the nearest available move, and the nearest available move
+here is to pad a SHRINK-ONLY list, which is precisely the corruption its own comment says the list exists to prevent.
+
+**THE TWO HONEST RESOLUTIONS, BOTH OWNER CALLS — NEITHER TAKEN HERE.**
+1. **Narrow the state instead of the rule.** D-3113 overturned ONE clause of D-3104 ("GOOSE_PLANNER stays deepseek"),
+   not the whole record: D-3104's operative first clause ("active=local, escalation=cloud") is still in force. On that
+   reading D-3104 is `RESOLVED` with the planner clause noted as overturned, and no revocation is owed at all. This is
+   the reading I believe is correct, and it is the one I did NOT implement, because un-superseding a record to make a
+   rail green is the exact move this OS refuses.
+2. **Give post-rule revocations a real home** — a declared `revocation:` block whose `tokens` are the retired
+   SCOPE (the clause), not the record id, so naming the superseded record stays legal.
+
+**CONSEQUENCE WHILE OPEN.** `just health` cannot complete: it now stops at line 122 of 184. Lines 123-184 are
+UNMEASURED — an unknown number of further faults may sit behind this one, and each ladder repair this session has
+exposed exactly one new latent fault (line 54 → 84 → 122).
+
+**RELATED, AND NOT TO BE LOST:** D-3113 pins the local planner to **gpt-oss-20b-MXFP4-Q8**. BUG-950's measurement says
+a planner model that is a SECOND resident model is what triggers the engine deep-reset. The owner's pin
+(`GOOSE_PLANNER_MODEL = the executor`) preserves D-3113's INTENT (local planner, no cloud) while deviating from the
+model it names — so D-3113 now needs either a note or a successor. Not minted here; minting is an owner act.

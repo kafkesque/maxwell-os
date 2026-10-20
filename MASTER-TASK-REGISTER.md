@@ -11,9 +11,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 1d3a530e3eb1956f, 2026-10-20) · 713 bugs (252 open / 461 closed; highest OPEN = BUG-948) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 714 bugs (252 open / 462 closed; highest OPEN = BUG-949) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1241 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 335 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
@@ -65,7 +65,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 80 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 79 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->

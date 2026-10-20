@@ -215,10 +215,10 @@ stacks:
 
 # ── The delegation economy (D-3023): what leaves the machine, what stays, and the ceiling ──
 economy:
-    @python3 pipeline/delegation_economy.py
+    @python3 pipeline/delegation_economy.py || [ $? -eq 2 ]   # D-3101: 2 = a declared metering CLASS has no ledger (UNMEASURED, loud, NOT fatal, BUG-457) - the reading is printed either way, so this display recipe must not fail on it
 
 economy-json:
-    @python3 pipeline/delegation_economy.py --json
+    @python3 pipeline/delegation_economy.py --json || [ $? -eq 2 ]
 
 preflight:
     @echo "=== Maxwell OS Preflight ==="

@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 713,
+  "total_ids": 714,
   "open_n": 252,
-  "closed_n": 461,
+  "closed_n": 462,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1244,11 +1244,6 @@
       "events": 1
     },
     {
-      "id": "BUG-917",
-      "title": "(HIGH, OPEN 2026-10-17) \u2014 THE CLOUD-CALL CEILING IS EXCEEDED BY 354 CALLS AND NOBODY OWNS THE READING",
-      "events": 1
-    },
-    {
       "id": "BUG-919",
       "title": "(MED, OPEN 2026-10-18) \u2014 A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED",
       "events": 1
@@ -1266,6 +1261,11 @@
     {
       "id": "BUG-948",
       "title": "(MED, OPEN 2026-10-19) \u2014 owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object",
+      "events": 1
+    },
+    {
+      "id": "BUG-949",
+      "title": "(HIGH, OPEN 2026-10-20) \u2014 pipeline cloud spend is UNMETERED while the routing table still declares cloud routes",
       "events": 1
     }
   ],
@@ -1704,6 +1704,7 @@
     "BUG-910",
     "BUG-913",
     "BUG-916",
+    "BUG-917",
     "BUG-918",
     "BUG-922",
     "BUG-923",

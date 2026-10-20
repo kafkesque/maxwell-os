@@ -438,3 +438,70 @@ to ask again; it is to **record the approval and implement the split**.
 the ledger matches its declared model exactly. So the ledger proves that session was **local and $0.00**, and proves
 **nothing** about which local model produced the reasoning. Tier classification (the actual gate) is unaffected;
 per-model attribution is not reliable from this column — relevant to D-2549 routing receipts, not to the ceiling.
+
+
+---
+
+# DELTA 2026-10-20T10:50 local — D-3101 IMPLEMENTED AND **RESOLVED**; BUG-917 **CLOSED**; no ceiling was raised
+
+## 1. WHAT LANDED (two files, one decision, one bug)
+
+| file | change |
+|---|---|
+| `config/delegation_economy.yaml` | `metering_classes` (harness_metering = the same home, followed twice; pipeline_ingestion = a home with no writer), `ledger_fields.at`, `token_ceiling_counts: gross` + `report_token_bases: [gross, billable_fresh]` |
+| `pipeline/delegation_economy.py` | `resolve_home` (REALPATH = ownership, D-3034), hop-following `pointer` (so a class names `homes.ledger` instead of copying it — C12), `split_window`, `read_economy`, `report_economy`, `breaches(token_basis)`; `--check` now gates per class |
+| selftest | **14 → 19** — the five new controls prove the SPLIT, not the arithmetic |
+
+The discriminator is the LEDGER FILE a row was read from, resolved by realpath. It is **not** `cost_source`
+(D-3101's own correction), and it is **not** a judgement about what a session was "doing" — a semantic class
+would have been a sentence that declares no bytes.
+
+## 2. THE READINGS — before/after, same command
+
+| reading | before | after |
+|---|---|---|
+| `--check` rc | **1** BREACH `cloud cost USD 130.53 > ceiling 130.00` | **2** — every MEASURED class within every ceiling; 2 = loud, NOT fatal (BUG-457) |
+| harness_metering | did not exist | **104.73 USD / 30d**, 30,060 calls — the GATE |
+| harness lifetime | was the gate | **130.59 USD / 40,083 calls** — PRINTED, not gated |
+| pipeline_ingestion | silently absent | **UNMEASURED**, named, never folded into harness (D-2957) |
+| `just health` | died at **line 54**; 130 of 184 lines never ran | **line 54 PASSES** |
+
+## 3. THE HONEST PART — what was NOT done
+
+- **No ceiling was raised.** 130.00 / 5,000,000,000 / 50,000 are the numbers already declared. What changed is
+  the READING the gate uses, which is what D-3101 was approved to change. `reading: lifetime` restores the old
+  gate in **one word**.
+- **The lifetime total is still 130.59**, i.e. still above 130.00, and it is printed on every run. A window was
+  added; no history was deleted.
+- **The cost estimator was NOT touched.** Its per-row prices were audited: cache reads are priced separately
+  (~$0.06/M hit vs ~$0.12–0.28/M miss), so 130.59 is not an over-charge artefact. Correcting the estimator to
+  make a gate green would have been the exact sin this file exists to prevent.
+- **The 97% cache-read axis was NAMED, not used to widen anything.** `token_ceiling_counts: gross` keeps the
+  gate where it was (already green at 4.72B < 5.0B); `billable_fresh` is printed beside it. Switching the basis
+  would have multiplied the token headroom ~38× silently — refused.
+
+## 4. THE FULLER PICTURE, MEASURED (why the split was the right act at all)
+
+- `user` sessions carried **$130.13 of $130.53** lifetime cloud cost — the breach was **interactive** spend, not
+  ingestion. The split names that truth instead of hiding it behind one number.
+- The pipeline writes **zero rows** to the harness ledger (`grep -rlE "usage_ledger|sessions\.db" pipeline/`
+  matches only two READERS). Therefore the "pipeline-ingestion" class has **no ledger**, reads **UNMEASURED**,
+  and that absence is the finding — registered as **BUG-949 (HIGH, OPEN)**: pipeline cloud spend is unmetered
+  while `model_assignments.yaml` still declares cloud routes (`depth_reasoning.primary: qwen-max`,
+  `concept_summarization.fallbacks: [qwen-plus]`).
+
+## 5. CENSUS
+
+`1241 decisions (stamp 98abdebe3e138ef5; proposed 27→26, resolved 335→336) · 714 bugs (252 open / 462 closed;
+highest OPEN = BUG-949) · 57 open tasks`. `gov_sync` **GREEN** twice (after `--apply` and on verify).
+
+## 6. DO-NOT-DRIFT
+
+- **A green gate is not a raised ceiling** — and here it is not even a green gate: rc **2** means one declared
+  class has no ledger. Do not "fix" that by pointing `pipeline_ingestion` at the harness ledger; that would
+  recreate the exact defect D-3101 repaired.
+- **The window is not a discount.** 104.73 is the last 30 days of the SAME spend; it does not cancel 130.59.
+- **BUG-917's close is not a claim that cloud spend fell.** It is a claim that the READING is now owned and the
+  gate can speak again.
+- **BUG-949 is the next engineering item**, and it is a WRITER, not a reader: the reader is already built and
+  waiting for the declared columns.

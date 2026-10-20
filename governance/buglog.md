@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 1d3a530e3eb1956f, 2026-10-20) · 713 bugs (252 open / 461 closed; highest OPEN = BUG-948) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 714 bugs (252 open / 462 closed; highest OPEN = BUG-949) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1241 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 335 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
@@ -62,7 +62,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 80 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 79 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->
@@ -18907,3 +18907,66 @@ this bug and GREEN when fixed before the fix is attempted).
     it writes through `agent/adapters/goose/apply_provider_flip.py` or `check_harness_homes.py` runs AT the write;
     and (b) a provider switch must SAY "new session required" at the point of the switch, because the birth pin
     makes the file's truth inert for the running session.
+
+## BUG-949 (HIGH, OPEN 2026-10-20) — pipeline cloud spend is UNMETERED while the routing table still declares cloud routes
+
+FOUND BY the act that implemented D-3101. The split asked which metering class a row belongs to and
+discovered that one of the two classes **has no ledger at all**: no writer anywhere creates
+`logs/pipeline_usage/usage_ledger.db`, and `pipeline/**` never writes `usage_ledger` in the harness store
+(MEASURED 2026-10-20: `grep -rlE "usage_ledger|sessions\.db" pipeline/ scripts/` matches only two READERS,
+`pipeline/delegation_economy.py` and `scripts/agent_context_probe.py`).
+
+WHY THAT IS HIGH, NOT COSMETIC. `config/model_assignments.yaml` still declares cloud routes the pipeline may
+take — `depth_reasoning.primary: qwen-max`, `concept_summarization.fallbacks: [qwen-plus]`,
+`daily_zed`/`complex_coding` `qwen-plus`/`deepseek-v4-flash` — and `pipeline/parallel.py` fans work out by
+subprocess, which is exactly the shape that produces volume nobody reads. So a pipeline cloud call is possible,
+priced by nobody, and invisible to every ceiling in `config/delegation_economy.yaml`. The instrument now says so
+out loud (`UNMEASURED CLASS [pipeline_ingestion]`, rc 2) instead of folding those hypothetical rows into the
+harness number.
+
+THE DEFECT IS A MISSING WRITER, NOT A MISSING READING. The reader is built and green: `pipeline_ingestion`
+declares `home: 'logs/pipeline_usage/usage_ledger.db#usage_ledger'`, `reading: windowed`, `window_days: 30`,
+`gate: true`. The day a writer emits the DECLARED columns (`model, input_tokens, output_tokens,
+cache_read_tokens, cost, cost_source, created_timestamp`) the class becomes MEASURED with no code change —
+that is what the realpath-ownership split was for (D-3034/D-3101).
+
+REMEDY OWED (red-loop-first, D-3036): name ONE command that goes RED today and GREEN when a pipeline cloud call
+is counted. Candidate loop: run a single cloud-routed pipeline call and assert the row appears in the class's
+own ledger with a resolvable `cost_source`. Until then this entry stays OPEN and the class stays UNMEASURED.
+
+NOT DONE HERE: no writer was written, no route was removed, and no ceiling was touched. A split that reads
+UNMEASURED is the correct reading of an unmetered lane — a fabricated zero is the defect this bug reports.
+
+## BUG-917 (HIGH, CLOSED 2026-10-20) — THE CLOUD-CALL CEILING WAS EXCEEDED AND NOBODY OWNED THE READING; the OWNER chose option (2), the SPLIT, and it is now IMPLEMENTED
+
+CLOSED BY D-3101 (state RESOLVED 2026-10-20; owner approval = session `20261020_3`, `messages.rowid 2333834`).
+The bug listed three ways out and said it took none of them: (1) raise with a reason, (2) split into
+pipeline + harness streams, (3) keep red. **The owner took (2)**, and the split is now in the instrument.
+
+WHAT CHANGED, MEASURED FROM THE LEDGER ITSELF (2026-10-20, same command before and after):
+
+| reading | before | after |
+|---|---|---|
+| `--check` rc | **1** — BREACH cloud cost USD 130.53 > 130.00, permanently: a lifetime counter can trip once and then never recover | **2** — every MEASURED class within every ceiling; 2 is loud and NOT fatal (BUG-457) |
+| harness_metering (gate) | did not exist | 104.73 USD / 30d, 30,060 calls — within 130.00 / 50,000 |
+| harness_metering (history) | the only reading, and it gated | 130.59 USD lifetime, 40,083 calls — PRINTED, not gated |
+| pipeline_ingestion | silently absent from the measurement | **UNMEASURED** and named — no ledger, never folded into harness (D-2957) |
+| `just health` | died at line 54, so 130 of 184 lines never ran | line 54 PASSES |
+| selftest | 14 controls | **19** (the five new ones prove the split, not the arithmetic) |
+
+THE THREE THINGS THIS CLOSE DOES *NOT* CLAIM. (a) **No ceiling was raised.** 130.00 / 5,000,000,000 / 50,000
+are the numbers that were already declared; what changed is the READING the gate is held against, which is
+exactly what D-3101 was approved to change and is reversible with `reading: lifetime` in one word. (b) The
+**lifetime** cost is still 130.59, i.e. above 130.00, and it is printed on every run — a window was added, not
+a history deleted. (c) The **cost estimator** was not touched: the per-row `cost` values were audited and priced
+cache reads separately from fresh input (measured ~$0.06/M hit vs ~$0.12–0.28/M miss), so the $130.59 is not an
+artefact of over-charging cached tokens.
+
+THE SECOND AXIS, NAMED AND NOT FOLDED IN (owner instruction 2026-10-20). 4,594,138,880 of the 4,718,058,113
+lifetime cloud input tokens are CACHE READS — 97%. `token_ceiling_counts: gross` keeps the gate exactly where it
+was (and it was already green at 4.72B < 5.0B), while `report_token_bases: [gross, billable_fresh]` prints the
+fresh number beside it on every reading. The budget was not silently widened by 4.6B tokens; the axis is visible.
+
+FOLLOW-ON REGISTERED, NOT ABSORBED: **BUG-949** — the pipeline class has no WRITER, so pipeline cloud spend is
+unmetered while `config/model_assignments.yaml` still declares cloud routes. The reader is built and waiting for
+the declared columns; that is a separate act.

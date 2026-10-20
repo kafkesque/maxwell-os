@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**252 open** / 461 closed of 713 ids.
+**252 open** / 462 closed of 714 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -254,8 +254,8 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-912 | (LOW — OPEN 2026-10-17) — An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI | 1 |
 | BUG-914 | (MED — OPEN 2026-10-17) — THE LANE RECORDS DELIVERY AND NEVER CUSTODY, SO IT PAID THE SHADOW PRICE FOR A WORK THE CORPUS ALREADY HELD | 1 |
 | BUG-915 | (MED — OPEN 2026-10-17) — THE DOCLING BUDGET'S DECLARED BASIS IS **BYTES**, AND BYTES DO NOT PREDICT CONVERSION COST (MEASURED r = −0.131) | 1 |
-| BUG-917 | (HIGH, OPEN 2026-10-17) — THE CLOUD-CALL CEILING IS EXCEEDED BY 354 CALLS AND NOBODY OWNS THE READING | 1 |
 | BUG-919 | (MED, OPEN 2026-10-18) — A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED | 1 |
 | BUG-920 | (HIGH, OPEN 2026-10-18) — AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END | 3 |
 | BUG-921 | (MED, OPEN 2026-10-18) — 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY | 3 |
 | BUG-948 | (MED, OPEN 2026-10-19) — owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object | 1 |
+| BUG-949 | (HIGH, OPEN 2026-10-20) — pipeline cloud spend is UNMETERED while the routing table still declares cloud routes | 1 |

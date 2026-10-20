@@ -30683,7 +30683,9 @@ decisions:
     measured: working rule appended to AGENTS.md (append_only, D824); D-3100 registered
       so gov_sync derives the face
 - id: D-3101
-  state: PROPOSED
+  state: RESOLVED
+  date: '2026-10-20'
+  by: 'owner (approval: session 20261020_3, messages.rowid 2333834) + assistant (implementation)'
   category: DELEGATION / ECONOMY
   title: THE CLOUD-CEILING SPLIT — pipeline-ingestion and harness-metering are two
     classes, not one lifetime counter
@@ -30698,6 +30700,33 @@ decisions:
   - BUG-917
   files:
   - config/delegation_economy.yaml
+  - pipeline/delegation_economy.py
+  resolution: >-
+    IMPLEMENTED 2026-10-20 and the gate is honest for the first time since the counter was created.
+    A row now belongs to the class whose declared HOME owns the ledger FILE it was read from, decided by
+    REALPATH (D-3034) and never by cost_source. harness_metering (interactive delegation) owns the goose
+    ledger and is gated on a 30-day burn-rate; pipeline_ingestion owns a ledger that DOES NOT EXIST, so it
+    reads UNMEASURED and is never folded into the other class. The lifetime total is still computed and
+    PRINTED for every measured class, so the window decides what the GATE looks at and cannot hide
+    history. NO CEILING WAS RAISED: 130.00 / 5,000,000,000 / 50,000 are the numbers that were already
+    declared. `reading: lifetime` on harness_metering restores the previous gate in one word.
+  receipts:
+    red_loop_named: 'python3 pipeline/delegation_economy.py --check (D-3036: it was rc 1 before this act)'
+    before: 'rc 1 - BREACH cloud cost USD 130.53 > ceiling 130.00 (a LIFETIME reading; it can only trip once)'
+    after: >-
+      rc 2 - harness_metering within every ceiling at 104.73 USD / 30d (lifetime history 130.59 printed),
+      pipeline_ingestion UNMEASURED (no ledger); 2 is loud and NOT fatal, which is exactly how the ladder
+      treats an OWNER-OWED name (BUG-457). Line 54 of `just health` now PASSES instead of aborting it.
+    controls: 'selftest 14 -> 19: one_ledger_yields_TWO_readings_that_differ, a_pipeline_row_is_never_counted_as_harness, an_absent_class_ledger_is_UNMEASURED_never_satisfied_by_the_other_class, the_token_ceiling_basis_is_declared_and_decides_the_reading, an_undated_row_is_counted_in_the_lifetime_and_never_smuggled_into_the_window'
+    measured_split: >-
+      2026-10-20 from the harness ledger: harness cloud lifetime 130.59 USD over 40,083 calls; the last
+      30 days 104.73 USD over 30,060 calls. 99.7% of lifetime cloud cost sits in `user` sessions (130.13
+      of 130.53 at the time of the act), and the pipeline writes NO rows to this ledger at all.
+    second_axis: 'declared, not folded in: token_ceiling_counts=gross (the gate, unchanged and already green) with billable_fresh REPORTED beside it - MEASURED 4,594,138,880 of 4,718,058,113 lifetime cloud input tokens are CACHE READS (97%), so a cached re-read was being counted as budget'
+  open_leg: >-
+    the pipeline_ingestion class has NO WRITER, so pipeline cloud spend is UNMEASURED while
+    config/model_assignments.yaml still declares cloud routes (depth_reasoning.primary qwen-max,
+    concept_summarization fallback qwen-plus). Registered as a follow-on bug, not silently absorbed here.
 - id: D-3102
   state: RESOLVED
   date: '2026-10-19'

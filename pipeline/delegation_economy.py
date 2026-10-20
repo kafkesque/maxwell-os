@@ -35,6 +35,7 @@ import os
 import pathlib
 import sqlite3
 import sys
+import time
 from typing import Any
 
 import yaml
@@ -59,18 +60,31 @@ def load_config(path: pathlib.Path = CONFIG) -> dict[str, Any]:
     if not path.exists():
         raise SystemExit(f"FATAL: {path} is absent — it is the one home of the economy's ceilings (C12)")
     cfg = yaml.safe_load(path.read_text()) or {}
-    for key in ("homes", "ledger_fields", "ceiling", "cloud_model_families", "ratio"):
+    for key in ("homes", "ledger_fields", "ceiling", "cloud_model_families", "ratio",
+                "metering_classes", "token_ceiling_counts"):
         if key not in cfg:
             raise SystemExit(f"FATAL: {path.name} declares no '{key}' — refusing to invent it (C12)")
     return cfg
 
 
 def pointer(ref: str) -> str:
-    """Resolve an '@file#dotted.path' pointer through the ONE resolver; refuse a bare literal."""
-    if not str(ref).startswith("@"):
+    """Resolve an '@file#dotted.path' pointer through the ONE resolver; refuse a bare literal.
+
+    A pointer may point AT another pointer (a class home names `homes.ledger` rather than restating the
+    ledger path, so the address lives in exactly one place — C12). The chain is followed to its END,
+    bounded: a chain that does not terminate is refused, because a home that cannot be reached is not
+    a home (C16).
+    """
+    text = str(ref)
+    if not text.startswith("@"):
         raise SystemExit(f"FATAL: '{ref}' is not a pointer — a path written into this file would be "
                          f"the second home C12 forbids")
-    return resolve(str(ref))
+    for _ in range(5):
+        text = resolve(text)
+        if not str(text).startswith("@"):
+            return str(text)
+    raise SystemExit(f"FATAL: the pointer chain from '{ref}' does not terminate — refusing to guess "
+                     f"which home it meant (C16)")
 
 
 def local_model_set(cfg: dict[str, Any]) -> set[str]:
@@ -92,14 +106,77 @@ def local_model_set(cfg: dict[str, Any]) -> set[str]:
     return set(models)
 
 
+def resolve_home(ref: str) -> tuple[pathlib.Path, str]:
+    """A declared HOME as (REALPATH, table). 'Ownership' means realpath — this is the D-3034 resolver.
+
+    A pointer is followed to its end (so a class home can name `homes.ledger` instead of restating the
+    address — C12), and a repo-relative path is resolved from ROOT. The returned path is passed through
+    `realpath`, so two spellings of one file can never be mistaken for two ledgers, and two different
+    files can never be mistaken for one.
+    """
+    text = pointer(ref) if str(ref).startswith("@") else str(ref)
+    file_part, _, table = text.partition("#")
+    if not table:
+        raise SystemExit(f"FATAL: the home '{ref}' names no table after '#' — a table invented here "
+                         f"would be a second home (C12)")
+    path = pathlib.Path(os.path.expanduser(file_part))
+    if not path.is_absolute():
+        path = ROOT / path
+    return pathlib.Path(os.path.realpath(path)), table
+
+
 def ledger_home(cfg: dict[str, Any]) -> tuple[pathlib.Path, str]:
     """The ledger FILE and its TABLE, both read from the declared pointer (no literal here)."""
-    home = pointer(cfg["homes"]["ledger"])
-    file_part, _, table = home.partition("#")
-    if not table:
-        raise SystemExit(f"FATAL: the ledger pointer '{cfg['homes']['ledger']}' names no table after "
-                         f"'#' — a table name invented here would be a second home (C12)")
-    return pathlib.Path(os.path.expanduser(file_part)), table
+    return resolve_home(cfg["homes"]["ledger"])
+
+
+def metering_classes(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """The declared classes. A class without a home, a reading, or a reason is not a class (C16).
+
+    Validated here rather than trusted: `reading` must be one of the two the instrument can compute, and
+    a `windowed` class must declare the window, because "the last N days" with no N is not a reading.
+    """
+    classes = cfg.get("metering_classes")
+    if not isinstance(classes, dict) or not classes:
+        raise SystemExit("FATAL: config declares no 'metering_classes' — one class is not a split (D-3101)")
+    for name, spec in classes.items():
+        if not isinstance(spec, dict):
+            raise SystemExit(f"FATAL: metering class '{name}' is not a mapping (C16)")
+        for key in ("home", "reading", "why"):
+            if not spec.get(key):
+                raise SystemExit(f"FATAL: metering class '{name}' declares no '{key}' — a class with no "
+                                 f"reason cannot be reviewed and is refused (C12)")
+        if spec["reading"] not in ("lifetime", "windowed"):
+            raise SystemExit(f"FATAL: metering class '{name}' declares reading "
+                             f"'{spec['reading']}' — only lifetime|windowed are computable (C16)")
+        if spec["reading"] == "windowed" and not int(spec.get("window_days") or 0):
+            raise SystemExit(f"FATAL: metering class '{name}' is windowed but declares no "
+                             f"'window_days' — a window with no length is not a reading (C16)")
+    return classes
+
+
+def window_since(days: int, now: float | None = None) -> float:
+    """The epoch a window opens at. `now` is injectable so a control's answer is known, not clock-dependent."""
+    return (time.time() if now is None else now) - float(days) * 86400.0
+
+
+def split_window(rows: list[dict[str, Any]], days: int,
+                 now: float | None = None) -> tuple[list[dict[str, Any]], int]:
+    """(rows inside the window, count of UNDATED rows). An undated row is never silently dropped.
+
+    It stays in the lifetime total, it is REPORTED as undated, and it is excluded from the window —
+    because a row that cannot be dated cannot be claimed inside a period (D-2957: absent is not zero).
+    """
+    since = window_since(days, now)
+    inside: list[dict[str, Any]] = []
+    undated = 0
+    for row in rows:
+        at = row.get("at")
+        if at is None:
+            undated += 1
+        elif float(at) >= since:
+            inside.append(row)
+    return inside, undated
 
 
 def read_rows(db: pathlib.Path, table: str, fields: dict[str, str]) -> list[dict[str, Any]] | None:
@@ -166,13 +243,25 @@ def summarise(rows: list[dict[str, Any]], local: set[str], families: list[str],
             "local_share": share, "min_calls": min_calls, "sources": dict(sources)}
 
 
-def breaches(summary: dict[str, Any], ceiling: dict[str, Any]) -> list[str]:
-    """Every ceiling that is EXCEEDED, named with both numbers — never a bare boolean."""
+def breaches(summary: dict[str, Any], ceiling: dict[str, Any],
+             token_basis: str = "gross") -> list[str]:
+    """Every ceiling that is EXCEEDED, named with both numbers — never a bare boolean.
+
+    `token_basis` decides what the TOKEN leg counts: `gross` (every reported input token — the gated
+    number) or `billable_fresh` (gross minus cache reads — the tokens that are new work). The basis is
+    declared in config, never inferred here, and the label says which one produced the number.
+    """
     cloud = summary["tiers"]["cloud"]
+    if token_basis == "billable_fresh":
+        tokens = cloud["input"] - cloud["cache_read"]
+        token_label = "cloud billable-fresh input tokens"
+    else:
+        tokens = cloud["input"]
+        token_label = "cloud input tokens"
     out: list[str] = []
     for key, measured, label in (
             ("cloud_cost_usd", cloud["cost"], "cloud cost USD"),
-            ("cloud_input_tokens", cloud["input"], "cloud input tokens"),
+            ("cloud_input_tokens", tokens, token_label),
             ("cloud_calls", cloud["calls"], "cloud calls")):
         limit = float(ceiling[key])
         if measured > limit:
@@ -228,12 +317,103 @@ def measure(config_path: pathlib.Path = CONFIG, *, ledger: pathlib.Path | None =
     return summarise(rows, local, cfg["cloud_model_families"], declared_min_calls(cfg)), cfg, ""
 
 
+def read_economy(cfg: dict[str, Any] | None = None, *, local: set[str] | None = None,
+                 now: float | None = None) -> dict[str, dict[str, Any]]:
+    """ONE reading PER METERING CLASS — the whole of D-3101 in one function.
+
+    A class owns the ledger its home resolves to (REALPATH — D-3034), so the discriminator is a file,
+    not a judgement. A class whose ledger is absent, or empty, is UNMEASURED: loud, rc-neutral, and
+    never satisfied by another class's rows — otherwise the "split" would be two names for one number,
+    which is exactly the defect it exists to repair.
+    """
+    cfg = cfg or load_config()
+    local = local_model_set(cfg) if local is None else local
+    families = cfg["cloud_model_families"]
+    floor = declared_min_calls(cfg)
+    basis = str(cfg["token_ceiling_counts"])
+    ceiling = cfg["ceiling"]
+    readings: dict[str, dict[str, Any]] = {}
+    for name, spec in metering_classes(cfg).items():
+        db, table = resolve_home(str(spec["home"]))
+        rows = read_rows(db, table, cfg["ledger_fields"])
+        if rows is None or not rows:
+            why = (f"no ledger at {db}" if rows is None else f"the ledger at {db} carries no rows")
+            readings[name] = {"state": "UNMEASURED", "home": db, "spec": spec,
+                              "gate": bool(spec.get("gate", True)),
+                              "why": f"{why} — this class is UNMEASURED and is NOT folded into another "
+                                     f"class (absent is not zero, D-2957)"}
+            continue
+        lifetime = summarise(rows, local, families, floor)
+        entry: dict[str, Any] = {"state": "MEASURED", "home": db, "spec": spec, "rows": len(rows),
+                                 "lifetime": lifetime, "gate": bool(spec.get("gate", True))}
+        if spec["reading"] == "windowed":
+            days = int(spec["window_days"])
+            inside, undated = split_window(rows, days, now)
+            entry["window"] = summarise(inside, local, families, floor)
+            entry["window_days"] = days
+            entry["undated"] = undated
+            entry["gated"] = entry["window"]
+        else:
+            entry["undated"] = sum(1 for row in rows if row.get("at") is None)
+            entry["gated"] = lifetime
+        entry["breaches"] = breaches(entry["gated"], ceiling, basis) if entry["gate"] else []
+        readings[name] = entry
+    return readings
+
+
+def _tier_line(label: str, summary: dict[str, Any]) -> str:
+    """One line per READING, always carrying gross and fresh input side by side (the named second axis)."""
+    cloud = summary["tiers"]["cloud"]
+    fresh = cloud["input"] - cloud["cache_read"]
+    return (f"  {label:<24}{cloud['calls']:>9,} calls {cloud['input']:>16,} gross "
+            f"{cloud['cache_read']:>16,} cached {fresh:>15,} fresh {cloud['cost']:>10,.2f} USD")
+
+
+def report_economy(readings: dict[str, dict[str, Any]], cfg: dict[str, Any]) -> str:
+    """The class-by-class reading. The LIFETIME total is printed for EVERY measured class, gate or not,
+    so a window can never hide history — it only decides what the GATE looks at."""
+    lines = [f"metering classes ({len(readings)} declared) — a class owns the ledger its home resolves to"]
+    for name, reading in readings.items():
+        spec = reading["spec"]
+        head = f"[{name}] reading={spec['reading']}"
+        if spec["reading"] == "windowed":
+            head += f" window={int(spec['window_days'])}d"
+        head += f" gate={'yes' if reading.get('gate') else 'no'}"
+        lines.append(head)
+        if reading["state"] == "UNMEASURED":
+            lines.append(f"  UNMEASURED  {reading['why']}")
+            continue
+        lines.append(_tier_line("lifetime (history)", reading["lifetime"]))
+        if spec["reading"] == "windowed":
+            lines.append(_tier_line(f"last {reading['window_days']}d (gate)", reading["window"]))
+        if reading["undated"]:
+            lines.append(f"  {reading['undated']:,} row(s) UNDATED — counted in the lifetime total, "
+                         f"excluded from the window (a row that cannot be dated is not claimed)")
+        lines.append("  gate: " + ("within every ceiling" if not reading["breaches"]
+                                  else "CEILING EXCEEDED — " + "; ".join(reading["breaches"])))
+    ceiling = cfg["ceiling"]
+    measured = ceiling.get("measured_20261015") or {}
+    for key, label in (("cloud_cost_usd", "cloud cost USD"),
+                       ("cloud_input_tokens", "cloud input tokens"),
+                       ("cloud_calls", "cloud calls")):
+        value = float(ceiling[key])
+        was = measured.get(key)
+        lines.append(f"ceiling {label}: {value:,.2f} (shrink-only; measured 2026-10-15 at "
+                     f"{float(was):,.2f})" if was is not None else f"ceiling {label}: {value:,.2f}")
+    lines.append(f"token ceiling counts: {cfg['token_ceiling_counts']} "
+                 f"(reported bases: {', '.join(cfg.get('report_token_bases') or [])})")
+    lines.append("an escalation carries a reason: " + ", ".join(cfg["escalation"]["reasons"])
+                 if "escalation" in cfg else "an escalation carries a reason (none declared)")
+    return "\n".join(lines)
+
+
 def _synth(dirname: pathlib.Path, rows: list[dict[str, Any]], drop: str | None = None) -> pathlib.Path:
     """A synthetic ledger carrying the DECLARED schema — the control's known answer (D-400)."""
     dirname.mkdir(parents=True, exist_ok=True)
     db = dirname / "sessions.db"
     spec = {"model": "TEXT", "input_tokens": "INTEGER", "output_tokens": "INTEGER",
-            "cache_read_tokens": "INTEGER", "cost": "REAL", "cost_source": "TEXT"}
+            "cache_read_tokens": "INTEGER", "cost": "REAL", "cost_source": "TEXT",
+            "created_timestamp": "INTEGER"}
     if drop:
         spec.pop(drop)
     con = sqlite3.connect(db)
@@ -255,9 +435,9 @@ def _selftest() -> int:
     cfg_text = CONFIG.read_text() if CONFIG.exists() else ""
 
     def row(model: str, i: int, o: int = 0, cr: int = 0, cost: float | None = None,
-            cs: str | None = None) -> dict[str, Any]:
+            cs: str | None = None, at: int | None = None) -> dict[str, Any]:
         return {"model": model, "input_tokens": i, "output_tokens": o, "cache_read_tokens": cr,
-                "cost": cost, "cost_source": cs}
+                "cost": cost, "cost_source": cs, "created_timestamp": at}
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -270,6 +450,10 @@ def _selftest() -> int:
             "cloud_model_families": ["deepseek", "gpt-"],
             "ceiling": {"cloud_cost_usd": 10.0, "cloud_input_tokens": 1000000, "cloud_calls": 100},
             "ratio": {"min_calls": 30},
+            "metering_classes": {"harness_metering": {"home": "@config/x.yaml#y", "reading": "lifetime",
+                                                      "why": "control: one class, the baseline shape"}},
+            "token_ceiling_counts": "gross",
+            "report_token_bases": ["gross", "billable_fresh"],
         }
         cpath.write_text(yaml.safe_dump(base))
         LOC = {"gemma-4-E4B-it-MLX-4bit", "gpt-local-test"}
@@ -322,6 +506,89 @@ def _selftest() -> int:
             fatal_on_missing_column = True
         checks.append(("a_ledger_missing_a_declared_column_is_FATAL_not_a_zero", fatal_on_missing_column))
 
+        # ── D-3101 CONTROLS ────────────────────────────────────────────────────────────────────────
+        # These prove the SPLIT, which is the whole decision: (a) one ledger can yield two readings,
+        # (b) a row in one class can never be counted in another, (c) an absent class ledger is
+        # UNMEASURED rather than satisfied by the other class's rows, (d) the token ceiling's BASIS is
+        # declared and changes the answer, and (e) a row that cannot be dated is reported, never
+        # quietly slipped into the window.
+        NOW = 1_800_000_000.0                      # a FIXED clock: a windowed answer must be known
+        old_at, new_at = int(NOW - 40 * 86400), int(NOW - 1 * 86400)
+
+        def class_cfg(name: str, classes: dict[str, Any], **over: Any) -> pathlib.Path:
+            """A config with declared classes — the shipped loader is exercised, never a copy of it."""
+            doc = json.loads(json.dumps(base))
+            doc["metering_classes"] = classes
+            doc["ledger_fields"] = dict(base["ledger_fields"], at="created_timestamp")
+            doc.update(over)
+            path = tmp / f"{name}.yaml"
+            path.write_text(yaml.safe_dump(doc))
+            return path
+
+        def cost_of(summary: dict[str, Any]) -> float:
+            return float(summary["tiers"]["cloud"]["cost"])
+
+        two = _synth(tmp / "two_readings", [
+            row("deepseek-v4-pro", 1000, 10, 0, 5.0, "estimated", at=old_at),
+            row("deepseek-v4-pro", 1000, 10, 0, 0.5, "estimated", at=new_at)])
+        rd1 = read_economy(load_config(class_cfg("two_readings", {"harness_metering": {
+            "home": f"{two}#usage_ledger", "reading": "windowed", "window_days": 30, "gate": True,
+            "why": "control"}})), local=LOC, now=NOW)["harness_metering"]
+        checks.append(("one_ledger_yields_TWO_readings_that_differ",
+                       rd1["state"] == "MEASURED"
+                       and abs(cost_of(rd1["lifetime"]) - 5.5) < 1e-9
+                       and abs(cost_of(rd1["window"]) - 0.5) < 1e-9))
+
+        hdb = _synth(tmp / "split_h", [row("deepseek-v4-pro", 10, 1, 0, 1.0, "estimated", at=new_at)])
+        pdb = _synth(tmp / "split_p", [row("deepseek-v4-pro", 20, 2, 0, 2.0, "estimated", at=new_at),
+                                       row("deepseek-v4-pro", 30, 3, 0, 3.0, "estimated", at=new_at)])
+        rd2 = read_economy(load_config(class_cfg("split", {
+            "harness_metering": {"home": f"{hdb}#usage_ledger", "reading": "lifetime", "gate": True,
+                                 "why": "control"},
+            "pipeline_ingestion": {"home": f"{pdb}#usage_ledger", "reading": "windowed",
+                                   "window_days": 30, "gate": True, "why": "control"}})),
+            local=LOC, now=NOW)
+        checks.append(("a_pipeline_row_is_never_counted_as_harness",
+                       rd2["harness_metering"]["lifetime"]["tiers"]["cloud"]["calls"] == 1
+                       and rd2["pipeline_ingestion"]["window"]["tiers"]["cloud"]["calls"] == 2
+                       and abs(cost_of(rd2["harness_metering"]["lifetime"]) - 1.0) < 1e-9))
+
+        rd3 = read_economy(load_config(class_cfg("absent_class", {
+            "harness_metering": {"home": f"{hdb}#usage_ledger", "reading": "lifetime", "gate": True,
+                                 "why": "control"},
+            "pipeline_ingestion": {"home": f"{tmp / 'nope' / 'usage.db'}#usage_ledger",
+                                   "reading": "windowed", "window_days": 30, "gate": True,
+                                   "why": "control"}})), local=LOC, now=NOW)
+        checks.append(("an_absent_class_ledger_is_UNMEASURED_never_satisfied_by_the_other_class",
+                       rd3["pipeline_ingestion"]["state"] == "UNMEASURED"
+                       and "UNMEASURED" in rd3["pipeline_ingestion"]["why"]
+                       and rd3["harness_metering"]["state"] == "MEASURED"))
+
+        cached = _synth(tmp / "cached", [
+            row("deepseek-v4-pro", 2000000, 10, 1900000, 0.01, "estimated", at=new_at)])
+        base_classes = {"harness_metering": {"home": f"{cached}#usage_ledger", "reading": "lifetime",
+                                             "gate": True, "why": "control"}}
+        gross_b = read_economy(load_config(class_cfg("basis_gross", base_classes,
+                                                     token_ceiling_counts="gross")),
+                               local=LOC, now=NOW)["harness_metering"]["breaches"]
+        fresh_b = read_economy(load_config(class_cfg("basis_fresh", base_classes,
+                                                     token_ceiling_counts="billable_fresh")),
+                               local=LOC, now=NOW)["harness_metering"]["breaches"]
+        checks.append(("the_token_ceiling_basis_is_declared_and_decides_the_reading",
+                       any("input tokens" in b for b in gross_b)
+                       and not any("input tokens" in b for b in fresh_b)))
+
+        und = _synth(tmp / "undated", [
+            row("deepseek-v4-pro", 1000, 10, 0, 2.0, "estimated", at=None),
+            row("deepseek-v4-pro", 1000, 10, 0, 0.5, "estimated", at=new_at)])
+        rd5 = read_economy(load_config(class_cfg("undated", {"harness_metering": {
+            "home": f"{und}#usage_ledger", "reading": "windowed", "window_days": 30, "gate": True,
+            "why": "control"}})), local=LOC, now=NOW)["harness_metering"]
+        checks.append(("an_undated_row_is_counted_in_the_lifetime_and_never_smuggled_into_the_window",
+                       rd5["undated"] == 1
+                       and abs(cost_of(rd5["lifetime"]) - 2.5) < 1e-9
+                       and abs(cost_of(rd5["window"]) - 0.5) < 1e-9))
+
     # C12, proved by reading the module's own bytes: the needles are DERIVED from the config, so a
     # ceiling copied into this file would be caught instead of declared.
     declared = (yaml.safe_load(cfg_text) or {}).get("ceiling", {}) if cfg_text else {}
@@ -361,24 +628,42 @@ def main(argv: list[str] | None = None) -> int:
     if args.selftest:
         return _selftest()
     try:
-        summary, cfg, why = measure()
+        cfg = load_config()
+        readings = read_economy(cfg)
     except SystemExit as exc:
         print(str(exc))
         return RC_BREACH
-    if summary is None:
-        print(f"UNMEASURED delegation-economy: {why}")
+    measured = {name: r for name, r in readings.items() if r["state"] == "MEASURED"}
+    if not measured:
+        print("UNMEASURED delegation-economy: no metering class has a ledger to read — "
+              + "; ".join(f"{name}: {r['why']}" for name, r in readings.items()))
         return RC_UNMEASURED
-    bad = breaches(summary, cfg["ceiling"])
+    bad = [f"[{name}] {line}" for name, reading in measured.items() if reading.get("gate")
+           for line in reading["breaches"]]
+    # A declared GATE class with no ledger is not "green": nothing about it was measured. That is the
+    # whole of D-2957 (absent is not zero), so it is reported loudly and returns UNMEASURED (2) —
+    # tolerated by the ladder exactly as an OWNER-OWED env name is (BUG-457), never silently passed.
+    unmeasured_gates = [name for name, reading in readings.items()
+                        if reading["state"] == "UNMEASURED" and reading.get("gate")]
     if args.json:
-        print(json.dumps({"summary": summary, "breaches": bad}, indent=1, default=str))
+        print(json.dumps({"classes": readings, "breaches": bad,
+                          "unmeasured_gate_classes": unmeasured_gates}, indent=1, default=str))
     else:
-        print(report_text(summary, cfg))
-    if bad:
+        print(report_economy(readings, cfg))
         for line in bad:
             print(f"  BREACH  {line}")
-        print("  a ceiling is SHRINK-ONLY: route the work to T0 (script) or T1 (local engine), or the "
-              "OWNER raises the ceiling with a reason (D-3023)")
+        if bad:
+            print("  a ceiling is SHRINK-ONLY: route the work to T0 (script) or T1 (local engine), or the "
+                  "OWNER raises the ceiling with a reason (D-3023)")
+        for name in unmeasured_gates:
+            print(f"  UNMEASURED CLASS  [{name}] {readings[name]['why']}")
+        if unmeasured_gates:
+            print("  a class with no ledger is not a zero and not a pass: the gate is green only on what "
+                  "was measured, and this class was not (D-2957)")
+    if bad:
         return RC_BREACH
+    if unmeasured_gates:
+        return RC_UNMEASURED
     return RC_OK
 
 

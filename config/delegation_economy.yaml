@@ -23,8 +23,8 @@
 # never an edit. (D-3023; the same shape as the T-104 shrink-only ceiling, and the same principle
 # as D-2941: a gate carries intent, a script applies it.)
 schema_version: '1'
-authority: D-3023
-updated: '2026-10-19'
+authority: D-3023, D-3101
+updated: '2026-10-20'
 state: measured
 
 #: The ledger and the local model registry are READ from the homes that already own them — never
@@ -35,6 +35,9 @@ homes:
   local_model_set: '@config/agent_context.yaml#homes.served_window'
 
 #: The columns this instrument reads, by ROLE. A missing column is FATAL, never a zero (C16).
+#: `at` is the row's own clock. It is REQUIRED for a windowed class: a reading over "the last N days"
+#: that cannot date a row is not a reading, and a row with no time is REPORTED as undated, never
+#: silently dropped out of the window (D-2957).
 ledger_fields:
   model: model
   input: input_tokens
@@ -42,6 +45,7 @@ ledger_fields:
   cache_read: cache_read_tokens
   cost: cost
   cost_source: cost_source
+  at: created_timestamp
 
 #: A row is LOCAL iff its model is in the engine's OWN registry (the join IS the measurement —
 #: no list of local models is written down here). A row that names a declared cloud FAMILY is
@@ -81,6 +85,66 @@ ceiling:
   #: raise under D-3023, pending the SPLIT that separates pipeline-ingestion volume from harness
   #: metering volume — the durable fix, because a lifetime counter always re-breaches any flat number.
   cloud_calls: 50000
+
+#: ─────────────────────────────────────────────────────────────────────────────────────────────
+#: D-3101 — TWO METERING CLASSES, NOT ONE LIFETIME COUNTER (owner-approved 2026-10-20; receipt:
+#: session 20261020_3, messages.rowid 2333834).
+#:
+#: THE DEFECT THIS REPAIRS. One lifetime counter conflated two populations that have nothing in
+#: common: volume that arrives in BURSTS (an ingestion drain) and volume that arrives PER TURN (an
+#: interactive session). MEASURED 2026-10-20: harness `user` sessions carried 99.7% of lifetime cloud
+#: cost ($130.13 of $130.53) while the pipeline's cloud volume is not metered by ANY ledger at all.
+#: A single lifetime number therefore answered a question nobody asked, and — per D-3101's own words,
+#: "a lifetime counter always re-breaches any flat number" — had already tripped permanently: 130.53
+#: against a 130.00 ceiling, which disabled the whole `just health` ladder from line 54 onward.
+#:
+#: HOW A CLASS IS DECIDED — BY RESOLUTION, NEVER BY A SENTENCE (D-3034). A row belongs to the class
+#: whose declared HOME owns the ledger FILE it was read from; ownership is decided by REALPATH. It is
+#: NOT decided by `cost_source`, which is a sentence about provenance and therefore declares no bytes.
+#: A class whose ledger is absent reads UNMEASURED (loud, never zero) and is NEVER satisfied by
+#: another class's rows — that is the whole point of having two classes.
+#:
+#: WHAT A GATE READS. `reading: windowed` gates the burn-rate over `window_days`; `reading: lifetime`
+#: gates the running total. The LIFETIME TOTAL IS STILL COMPUTED AND PRINTED for every class, so a
+#: window can never hide history — it only decides what the GATE looks at.
+#:
+#: NO CEILING BELOW WAS CHANGED BY THIS ACT. 130.00 / 5,000,000,000 / 50,000 are exactly the numbers
+#: that were already declared; what changed is the reading they are held against for a gate class.
+#: Setting `reading: lifetime` on `harness_metering` restores the previous behaviour in one word.
+metering_classes:
+  harness_metering:
+    home: '@config/delegation_economy.yaml#homes.ledger'   # the SAME home, followed twice — never a copy (C12)
+    reading: windowed
+    window_days: 30
+    gate: true
+    why: >-
+      interactive delegation — every model call a goose session makes, driven by the owner or by an agent
+      inside a session. This is the class that actually spends: MEASURED 2026-10-20 it carries $130.13 of
+      the $130.53 lifetime cloud cost. Gated on a 30-day burn-rate because a lifetime reading can only
+      trip once and then stays red forever (D-3101).
+  pipeline_ingestion:
+    home: 'logs/pipeline_usage/usage_ledger.db#usage_ledger'
+    reading: windowed
+    window_days: 30
+    gate: true
+    why: >-
+      ingestion volume — stage 0..6 drains, where the same work arrives 510 works at a time. MEASURED
+      2026-10-20: this ledger DOES NOT EXIST and no writer creates it, so this class reads UNMEASURED and
+      is reported as such. That absence is a real finding, not a placeholder: config/model_assignments.yaml
+      declares cloud routes (depth_reasoning.primary qwen-max; concept_summarization fallback qwen-plus),
+      so pipeline cloud spend is possible and NOBODY IS COUNTING IT. Wiring a writer is the follow-on act.
+      Until then this class is UNMEASURED (loud, rc-neutral) and is never folded into harness_metering.
+
+#: THE SECOND AXIS (owner-named 2026-10-20): a token ceiling holds GROSS input today, and MEASURED
+#: 2026-10-20 the cloud tier's 4,714,065,643 "input tokens" are 4,590,181,248 CACHE READS — 97%. A
+#: cached re-read is not a fresh token; it is the same bytes served again, and the COST leg already
+#: prices it correctly (~$0.06/M hit vs ~$0.12-0.28/M miss, measured from this ledger's own rows).
+#: Naming it here rather than folding it in: the gate stays on GROSS (unchanged, and already green),
+#: and BOTH bases are printed, so the axis is visible without silently widening the budget.
+token_ceiling_counts: gross
+report_token_bases:
+  - gross            # every input token the row reports, cached or not — the gated number
+  - billable_fresh   # gross - cache_read: the tokens that are actually new work
 
 #: The vocabulary an escalation reason is drawn FROM. The instrument never infers a reason; the
 #: CALLER records one. The route registry (T-156) holds the ROUTES, this holds the WORDS, and

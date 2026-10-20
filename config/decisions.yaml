@@ -30758,7 +30758,8 @@ decisions:
     lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5
       all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'
 - id: D-3104
-  state: RESOLVED
+  state: SUPERSEDED
+  superseded_by: D-3113
   date: '2026-10-19'
   by: owner
   category: DELEGATION / MODEL ROUTING
@@ -30991,3 +30992,45 @@ decisions:
   - BUG-832
   files:
   - /Users/barn/.config/goose/config.yaml
+- id: D-3114
+  state: RESOLVED
+  date: '2026-10-20'
+  by: assistant
+  category: DELEGATION / MODEL ROUTING
+  title: 'PROVIDER ROUTING HAS TWO KNOBS AND A BIRTH PIN — planner-local does not make a session local; D-3104
+    planner clause marked SUPERSEDED by D-3113'
+  decision: 'MEASURED 2026-10-20 on this machine; three readings decide a routing question the register could not
+    answer. (1) THE PLANNER FIX HOLDS: ~/.config/goose/config.yaml carries GOOSE_PLANNER_PROVIDER: maxwell_omlx /
+    GOOSE_PLANNER_MODEL: gpt-oss-20b-MXFP4-Q8 as written 2026-10-20 00:14 local (backup
+    config.yaml.bak.20261020_prelocalplanner) and NOT reverted. (2) YET THE SESSION WAS CLOUD-BORN: the same file
+    reads active_provider: custom_deepseek from mtime 09:31 local, and session 20261020_1 (created 07:34:23Z =
+    09:34:23 local, name "Maxwell OS provider selection") was born custom_deepseek/deepseek-v4-flash, writing 10 of
+    its OWN usage_ledger rows by 07:35:43Z (all cost_source=estimated, $0.0128) while ZERO local-model rows exist
+    for 2026-10-20. GOOSE_PLANNER_* and active_provider are therefore TWO INDEPENDENT KNOBS: the planner clause
+    fixes the planning call, active_provider fixes the model that answers and drives tools - only the second is the
+    session brain. D-3113 recorded "active_provider was already maxwell_omlx": TRUE at 00:14, FALSIFIED at 09:31 by
+    the owner switching provider in the harness app, which simultaneously rewrote that provider record from
+    deepseek-v4-pro to deepseek-v4-flash. (3) THE LOCAL ROUTE WAS HEALTHY MINUTES EARLIER: ~/.omlx/logs/server.log
+    records gemma-4-E4B-it-MLX-4bit completions at 09:30:49 / 09:31:15 / 09:31:28 local (prompt 17,318 / 17,555
+    tok) for session 20261018_6 (provider maxwell_omlx), and GET /health reads healthy, model_count 8, with
+    gpt-oss-20b-MXFP4-Q8 served. RULE: routing local requires BOTH knobs correct AND a NEW session (birth pin,
+    BUG-877); a provider change is a THREE-PART act - set active_provider, set the planner, start a new session -
+    and a handoff that names one knob is an incomplete instruction (D-3100). D-3104 planner clause is marked state
+    SUPERSEDED, superseded_by D-3113, in this same act; its surviving clauses (active=local, escalation=cloud) are
+    carried by D-3113 and by C1/C3.'
+  bugs:
+  - BUG-877
+  files:
+  - /Users/barn/.config/goose/config.yaml
+  - governance/HANDOFF_20261020_LOCAL_PLANNER.md
+  receipts:
+    two_point_reading: 'config.yaml.bak.20261020_prelocalplanner -> active_provider: maxwell_omlx, planner
+      custom_deepseek/deepseek-v4-pro; config.yaml (mtime 09:31 local) -> active_provider: custom_deepseek,
+      planner maxwell_omlx/gpt-oss-20b-MXFP4-Q8. Both writes survive in the file: the app is a second writer and
+      its last write wins per key.'
+    session_billing: 'usage_ledger WHERE session_id=20261020_1: 10 rows by 07:35:43Z, model deepseek-flash,
+      cost_source estimated, input 12,598 -> 37,339 tokens, $0.0128. No local-model row on 2026-10-20.'
+    local_engine_healthy: 'GET /health -> status healthy, model_count 8, loaded_count 3; omlx --version ->
+      0.7.1rc1; server.log completions for maxwell_omlx sessions at 09:30-09:31 local.'
+    rail: 'scripts/check_harness_homes.py rc 2 — 4 bound / 1 conflicting (active_provider: home
+      custom_deepseek vs declaration maxwell_omlx). The rail is correct; it caught the switch.'

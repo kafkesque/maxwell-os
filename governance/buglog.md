@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1240 decisions (census stamp 0c8a9e564ca3fd8d, 2026-10-20) · 713 bugs (252 open / 461 closed; highest OPEN = BUG-948) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 1d3a530e3eb1956f, 2026-10-20) · 713 bugs (252 open / 461 closed; highest OPEN = BUG-948) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1240 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 335 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1240, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1241 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 335 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 252 open.
 >
@@ -18874,3 +18874,36 @@ IMPACT: latent — every future append to the rule file requires a full `--rende
 parameters are unchanged. No current red (the BUG-947 close re-rendered under the live file). Fix is a digest
 scoping change in scripts/owner_marks.py, red-loop-first (D-3036: a theory needs a named command that goes RED on
 this bug and GREEN when fixed before the fix is attempted).
+
+- **LIVE READING 2026-10-20T07:31Z (09:31 local) — THE WRITER IS NAMED, AND IT IS ONE LAYER OUTSIDE THIS BUG'S
+  ORIGINAL FRAME.** This is the reading remedy (a) asked for ("start the client, read `active_provider`
+  before/after"): two points on the SAME file, both still on disk.
+  - `~/.config/goose/config.yaml.bak.20261020_prelocalplanner` (00:14 local): `active_provider: maxwell_omlx`,
+    planner still `custom_deepseek/deepseek-v4-pro`.
+  - `~/.config/goose/config.yaml` (mtime **09:31** local, the owner's provider switch in the Goose app):
+    `active_provider: custom_deepseek`, that provider's model `deepseek-v4-pro` -> `deepseek-v4-flash`, and the
+    D-3113 planner flip APPLIED and INTACT (`GOOSE_PLANNER_PROVIDER: maxwell_omlx`).
+  **Both writes survive in the file. The D-3113 planner edit, written by an agent ~9h earlier, was NOT reverted.**
+  That refutes "the home reverts agent writes" and narrows the defect to its true shape: **the harness home has TWO
+  writers, and the app's last write wins for the key it touches** (`active_provider` + that provider's `model`) —
+  which is also why no backup beside the home carried T-174's flipped value: the app overwrote it without a backup
+  of its own. Cause still a HYPOTHESIS (D-3036: no red loop has isolated the app's write; the loop is: read, switch
+  in the app, re-read).
+  - **SHADOW, measured:** `scripts/check_harness_homes.py` rc **2** — 4 bound / 1 conflicting — `active_provider:
+    the home says 'custom_deepseek', the declaration says 'maxwell_omlx'`. The rail is RIGHT and it caught this
+    state. What it cannot do is stop a session being BORN on the conflicting value.
+  - **SECOND LAYER, now with a number:** the local engine was HEALTHY and IN USE minutes earlier —
+    `~/.omlx/logs/server.log` records three completions at 09:30:49 / 09:31:15 / 09:31:28 local
+    (`model=gemma-4-E4B-it-MLX-4bit`, prompt 17,318 / 17,555 tok), belonging to session `20261018_6`
+    (provider `maxwell_omlx`, `updated_at` 07:31:28Z). Session `20261020_1` ("Maxwell OS provider selection") was
+    then BORN at 07:34:23Z on `custom_deepseek/deepseek-v4-flash`, and by 07:35:43Z had written **10** of its own
+    `usage_ledger` rows — all `cost_source=estimated`, $0.0128 — while ZERO local-model rows exist for 2026-10-20.
+    So routing local needs BOTH: the home correct AND a NEW session. The birth pin is not a footnote; it is the
+    operative layer, and the gap between 09:31:28 (last local completion) and 09:34:23 (cloud-born session) is the
+    whole cost of the two knobs being set independently.
+  - **WHAT THIS ENTRY DOES NOT CLAIM:** that the owner's switch was wrong (it is the OWNER's knob; a deliberate
+    escalation is legitimate under D-3023); that the planner fix failed (it HOLDS — verified in the file); or that
+    BUG-877 is fixed. Remedy owed, sharpened: (a) the app must not be the silent winner of a declared key — either
+    it writes through `agent/adapters/goose/apply_provider_flip.py` or `check_harness_homes.py` runs AT the write;
+    and (b) a provider switch must SAY "new session required" at the point of the switch, because the birth pin
+    makes the file's truth inert for the running session.

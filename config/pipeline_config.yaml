@@ -144,7 +144,13 @@ services:
     # external server_aliases). Enable auth in ~/.omlx/settings.json to use dev4.
     # D-2772 (2026-10-02): OMLX updated to 0.7.0 release (build 2987), verified
     # healthy on this M1 Max. Pin synced to the now-running release.
-    pinned_version: 0.7.0
+    # D-3102 (2026-10-19, RESOLVED): 0.7.1rc1 A/B-ADOPTED vs 0.7.0 (cold Ornith-REAP-19B @4010 tok: load
+    # 5.9s -> 3.68s, wall 17.7s -> 15.8s, prefill/TTFT flat). Pin synced to the engine that actually SERVES
+    # (`omlx --version` -> 0.7.1rc1; /health healthy, model_count 8). D-2772's 0.7.0 pin is superseded; a pin
+    # naming a version nothing runs is the BUG-623 stale-pin class. Rollback: /Applications/oMLX-0.7.0.app.
+    # NOTE (D-3034): pinned_version has no runtime consumer (monitor_stacks gates on min_version) — this line
+    # is documentation truth, not a gate. min_version 0.4.0 is unchanged.
+    pinned_version: 0.7.1rc1
     # D-293: Lightning MTP drafter for Qwen3 adapters (+34-58% decode, lossless at
     # temp=0.0). Enabled per-model in ~/.omlx/model_settings.json; flag records intent.
     mtp_enabled: false

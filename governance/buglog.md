@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 720 bugs (257 open / 463 closed; highest OPEN = BUG-955) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 720 bugs (256 open / 464 closed; highest OPEN = BUG-954) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 337 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 257 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19224,3 +19224,27 @@ exposed exactly one new latent fault (line 54 → 84 → 122).
 a planner model that is a SECOND resident model is what triggers the engine deep-reset. The owner's pin
 (`GOOSE_PLANNER_MODEL = the executor`) preserves D-3113's INTENT (local planner, no cloud) while deviating from the
 model it names — so D-3113 now needs either a note or a successor. Not minted here; minting is an owner act.
+
+### BUG-955 — CLOSED 2026-10-20, owner chose OPTION 1: the record is RESOLVED, the CLAUSE is superseded
+
+**The owner's word** (2026-10-20 session): "I go with option a" = option 1, the recommended reading.
+
+**The act.** `config/decisions.yaml#D-3104` changed from `state: SUPERSEDED` + `superseded_by: D-3113` to
+`state: RESOLVED` + `clause_superseded_by: D-3113`. **The decisive argument is scope, not convenience:** D-3113's own
+text says it overturned "D-3104's planner clause" — *"a clause that contradicted its own first clause"* — while D-3104's
+operative first clause ("active=local, escalation=cloud") was NOT overturned and is still the standing routing
+architecture. A record whose majority is in force is not a superseded record, so `SUPERSEDED` was the wrong state, and
+the missing `revocation:` declaration was never owed in the first place. Nothing was padded onto `legacy_debt_ids` — the
+shrink-only list that the policy reserves for pre-rule records is untouched at 24 entries.
+
+**Why the other key was renamed, not deleted.** `superseded_by` on a RESOLVED record would say two contradictory things
+at once. `clause_superseded_by` keeps the succession LINK (the graph rule, BUG-575/D-2682: "what replaced X must have a
+machine home") while narrowing it to the part that actually moved.
+
+**What this does NOT settle.** D-3113 still pins the local planner to `gpt-oss-20b-MXFP4-Q8`, which BUG-950 measured as
+the deep-reset trigger. The owner's live pin (`GOOSE_PLANNER_MODEL` = the executor) preserves D-3113's INTENT — local
+planner, zero cloud spend — but not the model it names. **A successor record or an amendment to D-3113 is still owed;
+this close does not discharge it.**
+
+**Receipt.** `python3 scripts/check_revoked_references.py` rc 0 with no `D-3104` fault; census re-derived; `gov_sync`
+green. `just health` line 122 is expected to pass on the next full run — lines 123–184 remain UNMEASURED until then.

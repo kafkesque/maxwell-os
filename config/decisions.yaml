@@ -30787,8 +30787,8 @@ decisions:
     lc_reasoning: 'governance/model_eval_checkpoint.jsonl: gpt-oss-20b-MXFP4-Q8 lcr-0..5
       all ok, exact (452,392,605,419,618,366) at ctx_tokens 16000'
 - id: D-3104
-  state: SUPERSEDED
-  superseded_by: D-3113
+  state: RESOLVED
+  clause_superseded_by: D-3113
   date: '2026-10-19'
   by: owner
   category: DELEGATION / MODEL ROUTING

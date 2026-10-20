@@ -265,3 +265,109 @@ same ledger yields TWO readings and that a pipeline row can never be counted as 
 - **`pinned_version` is documentation, `min_version` is the gate.** Do not describe the pin as protection.
 - **A ceiling on a lifetime counter is not a rail, it is a ratchet.** Any new ceiling must carry its window and
   its provenance (billed vs estimated) in the same declaration.
+
+
+---
+
+# DELTA 2026-10-20T10:00 local — CURRENT STATE + THE ONE OWNER WORD (D-3101 / BUG-917)
+
+> Session `20261020_2` (this session). Read this as the live delta; the two sections above are the
+> 2026-10-19/20 history and remain true except where this section reports a newer reading.
+
+## 1. THE SESSION IS STILL PARTLY CLOUD — the local executor is not enough
+
+`usage_ledger` for `20261020_2` (session born `maxwell_omlx` / `gpt-oss-20b-MXFP4-Q8`) carries BOTH:
+
+| model | rows | cost | first → last (UTC) |
+|---|---:|---:|---|
+| `gpt-oss-20b-MXFP4-Q8` | 8 | $0.00 | 07:50:25 → 07:55:44 |
+| `deepseek-flash` | 28 | $0.0208 | 07:59:07 → 08:01:13 |
+
+So the executor model is local, but **28 cloud calls were still made by this session** after the
+local executor rows. The planner file is correct (`~/.config/goose/config.yaml` lines 313-315:
+`GOOSE_PLANNER_PROVIDER: maxwell_omlx`, `GOOSE_PLANNER_MODEL: gpt-oss-20b-MXFP4-Q8`,
+`active_provider: maxwell_omlx`). The operative cause is therefore still the **birth pin / a background
+call in the running session**, not the file. The remedy is unchanged and manual: **start a NEW session**
+after the provider selector shows `Maxwell OMLX` + `gpt-oss-20b-MXFP4-Q8`. This session cannot shed it.
+
+## 2. HEALTH IS STILL RED ON BUG-917, AND THE READING IS NOW WORSE
+
+`python3 pipeline/delegation_economy.py --check` → **rc 1**:
+
+```
+cloud  39,995 calls  4,711,066,732 input  68,573,788 output  $130.48
+BREACH  cloud cost USD: 130.48 > ceiling 130.00
+```
+
+`just health` stops at **line 54 of 184** on that one line. The cloud cost moved **$130.44 → $130.48**
+since the 09:5x reading; the ceiling is still `130.00` (D-3023, shrink-only). Nothing else in the
+economy moved enough to matter: local 475 calls / $0.00; unclassified 1 row / $7.35 (historical,
+no model name).
+
+## 3. THE WINDOWED BURN-RATE, MEASURED (the data D-3101 needs)
+
+Cloud-model rows only, from the same ledger, read at 10:00 local:
+
+| window | cloud calls | cost | avg/day |
+|---|---:|---:|---:|
+| last 1 day | 1,117 | $7.83 | $7.83 |
+| last 7 days | 13,842 | $37.02 | $5.29 |
+| last 14 days | 20,925 | $76.40 | $5.46 |
+| last 30 days | 30,030 | $104.64 | $3.49 |
+| last 60 days | 40,053 | $130.49 | $2.17 |
+
+The current day (2026-10-20) is **$0.07** — the meter did stop when the local executor took over.
+The lifetime number is what keeps the gate red; a **windowed** reading is green against any sane
+7-day or 30-day cap. This is exactly the distinction BUG-917 names and D-3101 proposes to encode.
+
+## 4. THE ONE OWNER WORD OWED — D-3101 (state PROPOSED)
+
+`config/decisions.yaml#D-3101` already exists as **PROPOSED**, with the correct ontology:
+
+> Split the lifetime `cloud_input_tokens` / `cloud_calls` ceilings into two metering classes:
+> **pipeline-ingestion volume (windowed, burn-rate)** vs **harness-metering volume (interactive
+> delegation)**. The flat lifetime raises (BUG-917: 4.6B→5.0B tokens, 37k→50k calls) are interim
+> D-3023 raise-with-reason acts, not the durable fix: a lifetime counter always re-breaches any flat
+> number. The discriminator must RESOLVE via the LEDGER (realpath ownership, D-3034), not cost_source.
+
+It is **not** resolved. Per D-3035 an open owner-lane row is a proposal, not an approval, and per
+D-3023 a ceiling cannot be raised or re-shaped by an agent edit while routing around the question.
+The owner must choose one:
+
+| option | owner word | consequence |
+|---|---|---|
+| **1. APPROVE D-3101** | `approve D-3101` | Implement the two-class split + windowed burn-rate + selftests; `just health` returns green honestly; no ceiling is raised. **Recommended.** |
+| 2. RAISE the lifetime ceiling | `raise cloud_cost_usd to <N> with reason: <...>` | Fastest green, but keeps the defect class: a lifetime counter always re-breaches. |
+| 3. KEEP RED | `keep BUG-917 red` | Legitimate, but `just health` can never be the first line of defence; `just health-full` becomes mandatory every session. |
+
+**Recommendation: option 1.** It is the only option that removes the defect instead of moving the
+number. The windowed data above shows the break is a lifetime artifact, not a current burn.
+
+## 5. NEXT CRITICAL STEPS — revised consecutive order
+
+1. **Start a NEW local session** (manual, §1 above). Zero engineering; stops the remaining cloud
+   calls. Until this is done, every turn is paid for in tokens.
+2. **Owner word on D-3101 / BUG-917** (§4). This is the highest-leverage engineering step: it is the
+   single line dark-ing 130 of 184 health lines.
+3. **BUG-948** — highest OPEN bug: `owner_marks.rule_digest` is a whole-file sha256, so any append to
+   `config/corroboration_collapse.yaml` stale-ifies the pair object. Red-loop-first (D-3036).
+4. **BUG-877 remedy (b)** — make the provider switch SAY "new session required", and decide whether
+   the app may keep writing a governed key. The reading is landed; the rail gap is not.
+5. **T-187 receipt persistence** — the two-step receipt lives only in gitignored `temp/`.
+6. **F-03** — unchanged, deferred until `content_type` is certified.
+
+## 6. CENSUS (verified by `gov_sync.py` at 10:00 local)
+
+**1241 decisions** (census stamp `1d3a530e3eb1956f`; D-3114 added after the 1240 reading) ·
+**713 bugs** (252 open / 461 closed; highest OPEN = BUG-948) · **57 open tasks**. `gov_sync.py` is
+**GREEN, rc 0** (4 faces equal their re-derivation). D-3113 and D-3114 are RESOLVED; D-3101 is
+PROPOSED and is the only decision blocking the health ladder.
+
+## 7. DO-NOT-DRIFT (this delta)
+
+- **A resolved decision is not a resolved bug.** D-3113/D-3114 fixed the ROUTING; BUG-877 (birth pin)
+  and BUG-917 (lifetime counter) are still open. Do not close either on the strength of the decision.
+- **A windowed reading is not a ceiling raise.** Reporting the last 7/30 days is measurement; changing
+  the gate is an owner act. Do not silently swap one for the other.
+- **The current session cannot prove the planner fix.** Only a NEW session can. The file reading is
+  necessary, not sufficient (BUG-877).

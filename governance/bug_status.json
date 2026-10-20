@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 722,
-  "open_n": 258,
-  "closed_n": 464,
+  "open_n": 256,
+  "closed_n": 466,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1279,11 +1279,6 @@
       "events": 1
     },
     {
-      "id": "BUG-952",
-      "title": "(MED, OPEN 2026-10-20) \u2014 `pipeline/unloader.py` CLAIMS \"OMLX v0.5.1 does not have a dedicated unload endpoint\"; THE SERVER EXPOSES `POST",
-      "events": 1
-    },
-    {
       "id": "BUG-954",
       "title": "(MED, OPEN 2026-10-20) \u2014 `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG",
       "events": 1
@@ -1291,12 +1286,7 @@
     {
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
-      "events": 2
-    },
-    {
-      "id": "BUG-957",
-      "title": "(HIGH, OPEN 2026-10-20) \u2014 THE COMPACTION KNOBS ARE DECLARED AND NEVER BOUND, SO GOOSE RUNS ON VENDOR DEFAULTS AND THE DECLARED LOCAL BUDGET",
-      "events": 1
+      "events": 3
     }
   ],
   "closed": [
@@ -1762,7 +1752,9 @@
     "BUG-945",
     "BUG-946",
     "BUG-947",
+    "BUG-952",
     "BUG-953",
-    "BUG-955"
+    "BUG-955",
+    "BUG-957"
   ]
 }

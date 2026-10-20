@@ -31097,3 +31097,32 @@ decisions:
       POST /v1/models/MiniCPM5-2B-MLX/unload -> "Model not loaded" (resolves and is authenticated).
       POST /admin/api/models/MiniCPM5-2B-MLX/unload (api key) -> "Model not loaded"; (secret key as bearer) -> "Invalid API key".
       The secret_key is not a bearer token; the api_key is the operative credential.
+- id: D-3116
+  state: RESOLVED
+  date: '2026-10-20'
+  by: assistant
+  category: ANCHOR / KNOWLEDGE ARCHITECTURE
+  title: 'BUG-956 owner ruling: the 195 dangling anchor rows are RE-SEGMENTATION (not loss); option 1 = RE-ANCHOR to rechunk-v4-20260929'
+  decision: 'Owner directed 2026-10-20 "if option 1 is the most reliable future-proof solution, go with it."
+    Forensic re-derivation measured the 195 dangling ruler concepts against the live canonical store: 195/195 share
+    >=1 content word with SOME store name but the best single match is weak (Jaccard >=0.6 for 14/195; nearest
+    matches are WRONG concepts). The 6,934-row delta is D-2881 re-chunk RE-SEGMENTATION, not data loss and not a
+    rename. Option 1 is therefore a RE-ANCHORING (re-sample the certified core from rechunk-v4-20260929 + owner
+    re-adjudication), NOT a nearest-name re-key (which would corrupt the anchor — the D-2658 never-guess violation).
+    Option 2 (restore t11) is regressive (un-does the ratified D-2881 consolidation); option 3 (declare 195
+    unresolved) leaves 94% of the anchor unable to measure the store. The bridge stays RED until the re-anchoring
+    re-derives it.'
+  bugs:
+  - BUG-956
+  files:
+  - governance/ANCHOR_208_BRIDGE_RULER_20261002.csv
+  - governance/ANCHOR_STORE_BRIDGE_20260926.json
+  receipts:
+    forensic: |-
+      Live store: single run rechunk-v4-20260929 = 7640 fbs rows. Bridge ruler 208 rows; 195 dangling (no
+      casefold-exact store name). Best-match Jaccard vs store: >=0.8 = 1, >=0.6 = 14, >=0.4 = 72 of 195; nearest
+      matches are wrong concepts. build_anchor_store_bridge.py --check -> DRIFT (correctly refuses).
+    stepA: |-
+      Unloaded Ornith-1.5-35B-A3B-REAP-19B (12.08GB) and Ornith-1.5-9B-MLX-8bit (9.30GB). /health: loaded_count
+      5 -> 3, current_model_memory 47.09GB -> 24.13GB. gpt-oss-20b deferred (it is AGENT_LOOP_SHORT = this
+      session's serving model).

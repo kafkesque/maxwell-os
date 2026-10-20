@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 722 bugs (258 open / 464 closed; highest OPEN = BUG-957) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1243 decisions (census stamp 6ba41de2b421a9c5, 2026-10-20) · 722 bugs (256 open / 466 closed; highest OPEN = BUG-956) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 337 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1243 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 339 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1243, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 258 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 42 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 258 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19371,3 +19371,47 @@ renaming artifact, and NOT a bridge drift. Re-deriving the bridge now would reco
    195-row declaration is a deliberate policy, never a green-wash).
 
 Until the owner rules, BUG-956 stays OPEN and `just health` line 126 stays RED (correctly).
+
+
+## BUG-956 UPDATE #2 (2026-10-20) — the 195 dangling rows are RE-SEGMENTATION, not rename and not data loss; option 1 = RE-ANCHORING
+
+**Forensic re-derivation (D-3036, measured against the live canonical store).** Of the 195 dangling ruler concepts,
+195/195 share ≥1 content word with SOME canonical-store name and 132/195 share ≥2 — the underlying content is still
+IN the store. But the BEST single store match per concept is weak: Jaccard ≥0.6 for only 14/195, ≥0.4 for 72/195,
+and the nearest matches are the WRONG concepts (R001 "Surveillance Capitalism Value Proposition" → "Starbucks Value
+Proposition"; R005 "Graphics Algebra Cross Operator" → "Operator Precedence in Programming"). A casefold-exact
+rename would score ~1.0; it does not. CONCLUSION: `rechunk-v4-20260929` RE-SEGMENTED the corpus (D-2881's ratified
+re-chunk), so 195/208 anchor concepts were split/merged out of a 1:1 name mapping. The store is correct; the anchor
+(built 2026-10-02..07 against the PRE-rechunk t11 segmentation) is what lagged.
+
+**CONSEQUENCE — option 1 is a RE-ANCHORING, not a "re-key".** `build_anchor_bridge_ruler_208.py` derives the 208
+names VERBATIM from the human-adjudicated content ruler (ANCHOR_RULER_CONSOLIDATED_20260923.csv) + 58 folded depth
+extras (ANCHOR_208_DEPTH_CORRECTED_20261002.json), both keyed to t11; re-running it reproduces the SAME 208 dangling
+names. Option 1 therefore means RE-SAMPLING the certified core from `rechunk-v4-20260929` AND RE-ADJUDICATING it (a
+blind-sheet human pass), then re-deriving the bridge ruler + bridge. A nearest-name re-key would CORRUPT the anchor
+(R001's label would silently claim to adjudicate a different concept) — the exact D-2658 "never guess" violation.
+
+**OWNER RULING (2026-10-20).** Owner directed: "if option 1 is the most reliable future-proof solution, go with it."
+It is, and it is adopted: RE-ANCHOR (recorded as D-3116). Option 2 (restore t11) is regressive — it un-does the
+ratified D-2881 consolidation; option 3 (declare 195 unresolved) leaves 94% of the anchor unable to measure the
+store. The bridge stays RED (correctly) until the re-anchoring re-derives it; the rail is the witness, the anchor is
+the subject (D-3034).
+
+## BUG-957 (HIGH, CLOSED 2026-10-20) — compaction knobs BOUND; provider context_limit declared
+
+Owner bound the harness env and declared the provider. `python3 pipeline/harness_contract.py --check` now reports
+all five knobs BOUND (GOOSE_AUTO_COMPACT_THRESHOLD 0.94, GOOSE_AUTO_COMPACT_TOKEN_LIMIT 32768, GOOSE_CONTEXT_LIMIT
+32768, GOOSE_MODEL, GOOSE_PROVIDER). `~/.config/goose/config.yaml` now carries `providers.custom_deepseek:
+{enabled: true, model: deepseek-v4-flash, context_limit: 65536, configured: true}`, closing the second gap (a
+provider whose context_limit the harness could not read). The trailing `goose run` error ("Must provide either
+--instructions...") is BENIGN: goose launched with no instruction, not a harness fault. Local oMLX models stay at
+32K (the 262144 prefill-killer declarations are Step B of D-3115); deepseek's 64K is cloud-side (D-3113,
+escalation-only).
+
+## BUG-952 (MED, CLOSED 2026-10-20) — unload endpoint repaired with a red-loop receipt
+
+`pipeline/unloader.py` now calls the real endpoint `POST /v1/models/{model}/unload` (Bearer sk-maxwell-local), not
+the false "no endpoint" stub. Red-loop receipt on an already-unloaded model returned "Model not loaded" — the
+endpoint resolves and is authenticated; the secret_key is NOT a bearer token (api_key is the operative credential).
+Measured this act: unload Ornith-1.5-9B → OK; Ornith-35B unload returned a read-timeout but the server DID unload
+(/health: loaded_count 5 → 3, current_model_memory 47.09GB → 24.13GB).

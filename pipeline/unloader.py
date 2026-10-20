@@ -22,26 +22,31 @@ from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL  # noqa: E402  (C12: 
 def unload_model(model_name: str) -> bool:
     """Unload a specific model from OMLX engine pool.
 
-    OMLX v0.5.1 does not have a dedicated unload endpoint.
-    Workaround: trigger a health check, then the engine pool
-    garbage-collects unused models when memory pressure rises.
+    BUG-952: OMLX DOES expose a dedicated unload endpoint. The prior stub claimed it did not
+    and returned 'success' on a health check while never unloading anything (D-3034: a
+    declaration that resolves to a health check declares nothing).
 
-    For explicit unloading, restart the server via watchdog.
+    Receipt 2026-10-20 (red loop, safe on an already-unloaded model — no live model touched):
+      POST /v1/models/MiniCPM5-2B-MLX/unload  (Bearer sk-maxwell-local)
+        -> {"error":{"message":"Model not loaded: MiniCPM5-2B-MLX", ...}}  # endpoint RESOLVES + is auth'd
+      POST /admin/api/models/MiniCPM5-2B-MLX/unload (same key) -> {"detail":"Model not loaded: ..."}
+      POST /admin/api/models/.../unload (secret_key as bearer) -> {"detail":"Invalid API key"} (secret is NOT a token)
+    The v1 form is the OpenAI-compatible surface already used by model_lazyload.py, so it is the one used here.
     """
     try:
-        # Check if model is loaded
-        r = requests.get(f"{OMLX_URL}/health",
-                        headers={"Authorization": f"Bearer {OMLX_API_KEY}"},
-                        timeout=5)
-        if r.status_code == 200:
-            data = r.json()
-            loaded = data.get("engine_pool", {}).get("loaded_count", 0)
-            # OMLX auto-manages model lifecycle. The watchdog handles
-            # server-level restart when RSS exceeds threshold.
-            return loaded > 0
-    except Exception:
-        pass
-    return False
+        r = requests.post(
+            f"{OMLX_URL}/v1/models/{model_name}/unload",
+            headers={"Authorization": f"Bearer {OMLX_API_KEY}"},
+            timeout=30,
+        )
+        # 200 = unloaded; 400/404 = already unloaded (the requested state already holds — a no-op is success).
+        if r.status_code in (200, 400, 404):
+            return True
+        print(f"unload {model_name}: HTTP {r.status_code} {r.text[:200]}", file=sys.stderr)
+        return False
+    except Exception as exc:
+        print(f"unload {model_name}: {exc}", file=sys.stderr)
+        return False
 
 
 def unload_all_models() -> int:

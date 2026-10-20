@@ -60,18 +60,19 @@ PINNED_MODELS = {"Phi-4-mini-instruct-8bit"}
 
 # ── Model memory estimates (GB, from OMLX observations) ──────────────
 MODEL_SIZES = {
-    "Phi-4-mini-instruct-8bit": 3.80,
-    "gemma-4-E4B-it-MLX-4bit": 6.36,
-    "Qwopus-GLM-18B": 8.73,
-    "Ornith-1.0-9B-4bit": 4.69,
-    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 16.00,
-    "gpt-oss-20b-MXFP4-Q8": 15.00,  # D2410: S4 classifier — was missing (showed 0.0GB)
-    "gemma-4-26B-A4B-it-OptiQ-4bit": 18.36,
-    # "Qwen3.6-35B-A3B-4bit": 19.95,  # PHANTOM (BUG-036: config only, no weights)
-    "gemma-4-31B-it-OptiQ-4bit": 22.43,
-    "gemma-4-12b-coder-fable5-composer2.5-4bit": 6.30,
-    "gemma-4-12b-coder-fable5-composer2.5-8bit": 12.00,
-    "Qwen2.5-Coder-7B-Instruct-4bit": 4.00,
+    # Refresh 2026-10-20 from GET /admin/api/models (estimated_size_formatted) — the 8 registered models.
+    # Receipt: MiniCPM5 1.38 · Ornith-1.5-35B 12.08 · Ornith-1.5-9B 9.30 · Phi-4-mini 3.99 (pinned)
+    #           Qwen3-Coder-30B 16.80 · Qwen3.8-27B 15.70 · gemma-4-E4B 6.68 · gpt-oss-20b 11.81.
+    # Phantom/stale entries (Qwopus, Ornith-1.0, gemma-4-26B/31B/12b, Qwen2.5-Coder) removed — D-3109: a size
+    # table that names models the server no longer registers declares nothing and mis-accounts residency.
+    "MiniCPM5-2B-MLX": 1.38,
+    "Ornith-1.5-35B-A3B-REAP-19B": 12.08,
+    "Ornith-1.5-9B-MLX-8bit": 9.30,
+    "Phi-4-mini-instruct-8bit": 3.99,
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 16.80,
+    "Qwen3.8-27B-MLX-4bit": 15.70,
+    "gemma-4-E4B-it-MLX-4bit": 6.68,
+    "gpt-oss-20b-MXFP4-Q8": 11.81,
 }
 
 # ── Model last-used timestamps (in-memory, resets on restart) ────────

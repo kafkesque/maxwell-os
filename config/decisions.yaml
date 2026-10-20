@@ -31063,3 +31063,37 @@ decisions:
       0.7.1rc1; server.log completions for maxwell_omlx sessions at 09:30-09:31 local.'
     rail: 'scripts/check_harness_homes.py rc 2 — 4 bound / 1 conflicting (active_provider: home
       custom_deepseek vs declaration maxwell_omlx). The rail is correct; it caught the switch.'
+
+- id: D-3115
+  state: RESOLVED
+  date: '2026-10-20'
+  by: assistant
+  category: OMLX / MEMORY RESIDENCY
+  title: 'OWNER-APPROVED oMLX residency shrink (Steps A–E) recorded as APPROVED work; the unload-endpoint red loop closed BUG-952'
+  decision: 'Owner approved 2026-10-20 the five-step residency plan and asked it be recorded as APPROVED work.
+    STEP A (shrink residency): unload Ornith-1.5-35B-A3B-REAP-19B (12.08GB), Ornith-1.5-9B-MLX-8bit (9.30GB),
+    gpt-oss-20b-MXFP4-Q8 (11.81GB) when idle; keep Phi-4-mini (pinned, 3.99GB) + gemma-4-E4B (6.68GB) + one
+    generator resident (~20GB), leaving ~33GB for KV/prefill/compute. MEASURED 2026-10-20: 5 of 8 models loaded,
+    current_model_memory 47.09GB against final_ceiling 67.1GB — the over-provisioned state BUG-950 names as the
+    deep-reset trigger. STEP B (cap context + quantize KV): local models cap at what the job needs (<=32K); the
+    262144 declarations on Ornith-35B/9B/Qwen3.8-27B are the prefill killer; turboquant_kv via
+    scripts/omlx_lever_ab.py (red loop, D-332) before adopting, never a config-flip. STEP C (raise wired cap):
+    session-scoped sudo sysctl iogpu.wired_limit_mb=57344 before launch, never above ~58.7GB (D-334). STEP D
+    (repair lazy-load): MODEL_SIZES refreshed from /admin/api/models and the unload endpoint repaired — both DONE
+    this act (BUG-952). STEP E: do NOT add LiteLLM/router now; keep delegate(provider=maxwell_omlx) inline routing
+    (D-2549). D-3036: every Step B lever is adopted only after its red loop turns green, never by assumption.'
+  bugs:
+  - BUG-950
+  - BUG-952
+  files:
+  - pipeline/model_lazyload.py
+  - pipeline/unloader.py
+  receipts:
+    residency: |-
+      GET /admin/api/models (Bearer sk-maxwell-local) 2026-10-20: Ornith-35B 12.08GB, Ornith-9B 9.30GB,
+      Phi-4-mini 3.99GB (pinned), gemma-4-E4B 6.68GB, gpt-oss-20b 11.81GB loaded; MiniCPM5 1.38, Qwen3-Coder-30B
+      16.80, Qwen3.8-27B 15.70 not loaded. /health: loaded_count 5, current_model_memory 47.09GB, final_ceiling 67.1GB.
+    unload_endpoint: |-
+      POST /v1/models/MiniCPM5-2B-MLX/unload -> "Model not loaded" (resolves and is authenticated).
+      POST /admin/api/models/MiniCPM5-2B-MLX/unload (api key) -> "Model not loaded"; (secret key as bearer) -> "Invalid API key".
+      The secret_key is not a bearer token; the api_key is the operative credential.

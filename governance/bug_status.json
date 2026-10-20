@@ -1291,7 +1291,7 @@
     {
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
-      "events": 1
+      "events": 2
     },
     {
       "id": "BUG-957",

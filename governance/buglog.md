@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 721 bugs (257 open / 464 closed; highest OPEN = BUG-956) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 7830c659163098e5, 2026-10-20) · 722 bugs (258 open / 464 closed; highest OPEN = BUG-957) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 337 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 257 open.
+> Open BUGS by severity (population = the census's 258 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 42 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 258 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19299,3 +19299,42 @@ witness that adjusts itself to the subject certifies nothing.
 
 **SEVERITY.** HIGH because the artefact is the anchor store of the knowledge pipeline (the product), because the delta
 is 47.6% and one-directional-bad, and because a green ladder would have certified it.
+
+## BUG-957 (HIGH, OPEN 2026-10-20) — THE COMPACTION KNOBS ARE DECLARED AND NEVER BOUND, SO GOOSE RUNS ON VENDOR DEFAULTS AND THE DECLARED LOCAL BUDGET DOES NOT EXIST
+
+**Reported by the owner:** "now we are using custom deepseek provider but can[']t see the context window and compaction feature."
+**The reading explains it exactly:** `python3 pipeline/harness_contract.py` (T-132/D-3000) reports **five knobs declared,
+five UNBOUND** in the running process:
+```
+UNBOUND  GOOSE_AUTO_COMPACT_THRESHOLD   declared=0.94     effective=None
+UNBOUND  GOOSE_AUTO_COMPACT_TOKEN_LIMIT declared=32768    effective=None
+UNBOUND  GOOSE_CONTEXT_LIMIT            declared=32768    effective=None
+UNBOUND  GOOSE_MODEL                    declared=@config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model   effective=None
+UNBOUND  GOOSE_PROVIDER                 declared=@config/engine.yaml#harnesses.goose_provider_id                     effective=None
+OWNER-OWED harness-contract: the harness will use its OWN defaults for the names above (C1/C22: those defaults are a
+cloud price tier, not a local budget)
+```
+A declaration in `config/agent_context.yaml#ratified.knobs.trigger` is not an environment variable (this is the exact
+defect D-3000 measured on 2026-10-15 and `pipeline/harness_contract.py` exists to close). It is still open, so the
+effective filter is goose's own **0.8 / 225,000** while the DECLARED budget is **0.94 / 32,768 / 32,768** with
+`max_compactions_per_session: 1`, `min_headroom_tokens: 2048`, `strategy: declared_handoff_first`. **The declared
+strategy is not running, and nothing in the session says so** - hence "can't see it".
+
+**SECOND, INDEPENDENT GAP (D-3034: a declaration must RESOLVE).** `~/.config/goose/custom_providers/` contains
+`maxwell_omlx.json`, `custom_moonshot_kimi.json` and backups - **there is NO `custom_deepseek.json`**, yet the harness
+ledger records `provider_name = custom_deepseek` on every row of sessions `20261020_1/2`. A provider that bills and
+appears in the ledger while its declaration cannot be found is a provider whose `context_limit` the harness has no way
+to read - and with no `context_limit` there is **nothing to compute a compaction trigger from** even once the env vars
+are bound. So the compaction feature cannot work on this provider for TWO reasons, not one.
+
+**THE FIX (owner, two minutes, both steps are needed).**
+1. **Bind the environment before launch** - a shell started through the binder inherits the declared values:
+   `eval "$(python3 pipeline/harness_contract.py --emit-env)"` then start goose from THAT shell.
+   Verify in the session's own shell with `python3 pipeline/harness_contract.py --check` → every line must read BOUND.
+2. **Give the provider a declaration** - find where `custom_deepseek` is actually registered (it is not in
+   `custom_providers/`), and declare its `context_limit` there, so the harness can compute `min(threshold x window,
+   token_limit)` at all. Until that is done, step 1 binds variables that no window can use.
+
+**NOT DONE HERE:** nothing was exported and no provider file was created. Exporting variables into a live process is
+impossible by design (BUG-873: a config write is not live until a new session starts), and inventing a provider file
+would be a declaration from memory, which is the class D-3034 refuses.

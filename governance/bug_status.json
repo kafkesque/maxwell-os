@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 721,
-  "open_n": 257,
+  "total_ids": 722,
+  "open_n": 258,
   "closed_n": 464,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1291,6 +1291,11 @@
     {
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
+      "events": 1
+    },
+    {
+      "id": "BUG-957",
+      "title": "(HIGH, OPEN 2026-10-20) \u2014 THE COMPACTION KNOBS ARE DECLARED AND NEVER BOUND, SO GOOSE RUNS ON VENDOR DEFAULTS AND THE DECLARED LOCAL BUDGET",
       "events": 1
     }
   ],

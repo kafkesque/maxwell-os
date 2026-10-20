@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**257 open** / 464 closed of 721 ids.
+**258 open** / 464 closed of 722 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -264,3 +264,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-952 | (MED, OPEN 2026-10-20) — `pipeline/unloader.py` CLAIMS "OMLX v0.5.1 does not have a dedicated unload endpoint"; THE SERVER EXPOSES `POST | 1 |
 | BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
 | BUG-956 | (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS | 1 |
+| BUG-957 | (HIGH, OPEN 2026-10-20) — THE COMPACTION KNOBS ARE DECLARED AND NEVER BOUND, SO GOOSE RUNS ON VENDOR DEFAULTS AND THE DECLARED LOCAL BUDGET | 1 |

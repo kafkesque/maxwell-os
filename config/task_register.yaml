@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-18'
+updated: '2026-10-20'
 tasks:
 - id: T-101
   priority: MUST
@@ -2348,3 +2348,31 @@ tasks:
     written whenever the surface changes (the toggle is model-driven, so the trigger must be the tool call itself,
     not a config diff), plus a rail that refuses a `done` claim whose session shows a surface it cannot account for.
     Until then the runtime toggle is permitted ONLY as a convenience on `on_demand` members, never as the record.
+
+- id: T-191
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 option 1, D-3116)'
+  why: '195/208 anchor-ruler rows dangle on the removed t11 run (re-segmentation, not loss, D-3116). Option 1 re-samples the certified core from rechunk-v4-20260929 plus an owner blind-sheet re-adjudication, then re-derives the bridge ruler and bridge. Correctness core: until done the bridge stays RED and 94 percent of the anchor cannot measure the store.'
+  source: 'D-3116; BUG-956; governance/ANCHOR_208_BRIDGE_RULER_20261002.csv; scripts/build_anchor_store_bridge.py; scripts/build_anchor_bridge_ruler_208.py'
+  evidence: 'MEASURED 2026-10-20: live store is a single run rechunk-v4-20260929 = 7640 fbs rows; ruler 208 rows, 195 dangling (no casefold-exact store name); best-match Jaccard >=0.6 for only 14 of 195 and nearest matches are the wrong concepts.'
+  gate: 'Owner completes the blind-sheet re-adjudication; build_anchor_bridge_ruler_208.py re-derives a ruler keyed to rechunk-v4-20260929; build_anchor_store_bridge.py --check returns EXIT_CLEAN (0).'
+- id: T-192
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'STEP C: RAISE THE WIRED-MEMORY CAP BEFORE THE NEXT oMLX LAUNCH (D-3115)'
+  why: 'Session-scoped sudo sysctl iogpu.wired_limit_mb=57344 before launching oMLX; never above ~58.7GB (D-334). Raises the ceiling so a large model can be loaded for the Step B red loop without hitting the wire cap.'
+  source: 'D-3115; D-334'
+  evidence: 'MEASURED 2026-10-20: /health final_ceiling ~56.7GB with 3 models loaded (24.13GB); raising the wired cap to 57344MB frees headroom for KV cache and prefill.'
+  gate: 'Owner runs the sudo sysctl before the next oMLX launch (session-scoped, not persistent).'
+- id: T-193
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'STEP B: APPLY THE 32768 CONTEXT CAP (disk edits done; reload deferred past the serving gpt-oss)'
+  why: 'Seven models carried native 262144/131072 with no max_context_window (the prefill killer D-3115 names). Disk edits now cap six unloaded models to 32768; gpt-oss-20b-MXFP4-Q8 (serving AGENT_LOOP_SHORT) is deferred because a reload evicts non-pinned loaded models. turboquant_kv is REJECTED (measured LOSS).'
+  source: 'D-3115; D-2772; D-332'
+  evidence: 'MEASURED 2026-10-20: reload evicts non-pinned loaded models (loaded_count 3->1, only pinned Phi-4-mini survives); lever_ab receipt kv_off 161.12 vs kv_on 104.82 tok/s on Qwen3-Coder-30B = 0.65x LOSS.'
+  gate: 'The next safe reload applies the disk edits; /admin/api/models then shows max_context_window=32768 on the capped models and gpt-oss-Q8 is capped too.'

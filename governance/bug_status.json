@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 717,
-  "open_n": 255,
-  "closed_n": 462,
+  "total_ids": 719,
+  "open_n": 256,
+  "closed_n": 463,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1282,6 +1282,11 @@
       "id": "BUG-952",
       "title": "(MED, OPEN 2026-10-20) \u2014 `pipeline/unloader.py` CLAIMS \"OMLX v0.5.1 does not have a dedicated unload endpoint\"; THE SERVER EXPOSES `POST",
       "events": 1
+    },
+    {
+      "id": "BUG-954",
+      "title": "(MED, OPEN 2026-10-20) \u2014 `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG",
+      "events": 1
     }
   ],
   "closed": [
@@ -1746,6 +1751,7 @@
     "BUG-944",
     "BUG-945",
     "BUG-946",
-    "BUG-947"
+    "BUG-947",
+    "BUG-953"
   ]
 }

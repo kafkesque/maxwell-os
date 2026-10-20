@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 717 bugs (255 open / 462 closed; highest OPEN = BUG-952) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1241 decisions (census stamp 98abdebe3e138ef5, 2026-10-20) · 719 bugs (256 open / 463 closed; highest OPEN = BUG-954) · 57 open tasks (MUST 11 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1241 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 336 · ⚪ superseded 17 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1241, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19145,3 +19145,40 @@ declaration must RESOLVE — this one resolved to a health check).
 **NOT DONE HERE:** the stub was not rewritten. The correct form is `POST /admin/api/models/{id}/unload`, and it must be
 verified against `loaded` before and after. No unload was issued during this diagnosis (the two resident models belong
 to a live session).
+
+## BUG-953 (MED, RESOLVED 2026-10-20) — `config/acquisition.yaml` DECLARED `probe_timeout_s` TWICE, 3 LINES APART; PyYAML KEPT THE LAST AND DROPPED THE FIRST, AND THE LADDER NEVER REACHED THE RAIL THAT SAYS SO
+
+**FOUND BY** unblocking `just health`. `python3 scripts/lib/yaml_guard.py --check` (justfile:86) returned **rc 1** with:
+`DRIFT DUP-KEY: config/acquisition.yaml declares 'probe_timeout_s' at line 232 and AGAIN at line 235`.
+Both declarations carried **the same value, 15** — this was a duplicate HOME, not a conflict, so no behaviour was wrong;
+a declared fact had two homes and one of them was already dead (D-2649).
+
+**Why it survived:** the rail at justfile:86 was never reached. `just health` died at **line 54** (the delegation-economy
+`--check`) from the D-3101 breach, so 130 of 184 lines — including this one — never ran. The D-3101 act repaired line 54
+and this fault surfaced on the first ladder run afterwards.
+
+**Fix applied (no value changed).** The SECOND declaration (line 235, after `ttl_hours: 6`) was removed; the FIRST is
+kept because it is the one carrying its reason (BUG-911: "a mirror probe asks 'alive now', so it gets ONE attempt and a
+short ceiling"). Receipt: `duplicate_keys(config/acquisition.yaml)` now returns `[]` and `yaml.safe_load(...)` reads
+`mirrors.probe_timeout_s == 15`, byte-for-byte the value that was already winning.
+
+## BUG-954 (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG AND IS EFFECTIVELY UNRUNNABLE
+
+**MEASURED, not estimated.** `time python3 scripts/lib/yaml_guard.py --check` → **rc 1 in 442.9 s**. Two independent
+attempts at 240 s both timed out. A user watching the ladder sees it stop on one line for seven minutes at 99.4% CPU
+(`ps`), which reads exactly like a hang — and the previous session DID read it as one and killed the ladder.
+
+**WHERE THE 282 MB IS.** `_artifacts()` walks **6 declared roots** whose first entry is `{'path': '.', 'depth': 0}` —
+depth 0 means UNBOUNDED on that root. It reaches **481** YAML artifacts totalling **281.9 MB**, of which the top eight
+are `config/decisions.yaml` (1.76 MB) and seven `backups/decisions.PRE_*` snapshots at 1.55–1.75 MB each;
+`config/golden/gold_frozen.yaml` is another 1.70 MB. `scan()` parses every file **TWICE** — `yaml.safe_load(text)` for
+parseability and `duplicate_keys(text)` for the D-2649 check — and both were measured at **~0.78 s/MB**
+(1.76 MB → 1.35 s and 1.32 s respectively). 281.9 × 0.78 × 2 ≈ **440 s**, which matches the observed 442.9 s.
+
+**THE FIX IS A DECISION, NOT A TUNING.** `backups/` holds IMMUTABLE snapshots whose duplicate keys were already
+accepted at the moment they were written; re-parsing them every ladder run re-litigates a settled fact. The narrowing
+options are: (a) add `backups`/`backup`/`temp` to `skip_dirs`, (b) give root `.` a finite `depth`, or (c) split into a
+fast rail (live declarations) plus a scheduled deep sweep (archives). **All three SHRINK THE SCAN, and the register
+carries a `receipt.artifacts` count that `SCAN-SHRANK` compares against — so the receipt must be re-cut in the same act
+or the rail will refuse the narrowing, correctly.** NOT DONE HERE: no root, skip, depth or receipt was changed, because
+choosing what the rail stops looking at is the owner's call and this session had no mandate for it.

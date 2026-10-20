@@ -232,7 +232,9 @@ mirrors:
   probe_timeout_s: 15
   cache: "knowledge pipeline/acquisition/mirrors.json"
   ttl_hours: 6
-  probe_timeout_s: 15
+  #: BUG-953/D-2649 (2026-10-20): a SECOND `probe_timeout_s: 15` stood here. Both declarations carried the VALUE 15,
+  #: so this was a duplicate HOME, not a conflict - PyYAML kept the last and silently dropped the first. Removed in
+  #: favour of the earlier declaration, which is the one that carries its reason (BUG-911). No value changed.
   #: A 200 IS NOT LIVENESS (measured: a parked domain answers 200). A mirror is used only when its body carries
   #: the family's own marker.
   markers:

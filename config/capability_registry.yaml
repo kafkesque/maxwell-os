@@ -466,11 +466,27 @@ unrouted:
   BUG-912: bug_is_a_finding   # an OA route can hand back an HTML landing page (the adapter's finding)
   BUG-914: bug_is_a_finding   # the lane records delivery and never custody (a model gap, not a file's route)
   BUG-915: bug_is_a_finding   # a conversion BUDGET's basis is a finding about docling's cost, not a file's route
-  BUG-917: bug_is_a_finding   # a metered counter over its ceiling is a finding about the world, not a file
+  #: BUG-917 RETIRED FROM THIS BLOCK 2026-10-20 (D-3038: what we reject we REGISTER, we do not silently delete).
+  #: The entry read `BUG-917: bug_is_a_finding` and was correct while BUG-917 was open. BUG-917 is now CLOSED
+  #: (the D-3101 two-class split is implemented and the ceiling was never raised), so the reason OUTLIVED the item
+  #: it explained and the rail refused it at (v) - correctly. The key is removed because an override for a closed
+  #: item is a declaration with no referent (D-3034); the reason it gave is preserved here so the decision is not lost.
   BUG-919: bug_is_a_finding   # an artefact's WHITESPACE DENSITY is a finding about pandoc's epub reader, not a file's route
   BUG-920: bug_is_a_finding   # a missing RECEIPT is a finding about when the checkpoint is written, not a file's route
   BUG-921: bug_is_a_finding   # filename punctuation drift is a finding about the missing per-work identity, not a file's route
   BUG-948: bug_is_a_finding   # rule_digest whole-file sha256: the title names the script by dotted id, not a path; the fix task will name scripts/owner_marks.py, which routes to owner_marks
+  #: BUG-950/951/952 appended 2026-10-20 by the act that diagnosed them (commit cb23258). Each reason is stated so the
+  #: override is a DECISION and not a shrug; the debt ceiling was NOT touched (223 before and after).
+  BUG-950: bug_is_a_finding   # the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - the title names no owned artefact. The FIX does have an owner: the planner pin belongs to agent/adapters/goose/apply_provider_flip.py (capability harness_adapter), which is why this override is not a route waiver for the work, only for the reading
+  BUG-951: bug_is_a_finding   # a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT, not about a file this repo owns. Its red loop WILL name scripts/toolcall_probe2.py when that probe is promoted out of /tmp
+  BUG-952: route_graph_incomplete   # NOT a finding: pipeline/unloader.py EXISTS and NO declared capability owns it - this is the missing route itself, recorded as such. Remedy owed: a model-residency capability (the lever is POST /admin/api/models/{id}/unload), after which this line is deleted
+  #: BUG-949 appended 2026-10-20. Debt went 223 -> 224 the moment BUG-949 was filed, and that is the ONLY reason the rail
+  #: at justfile:84 was red: it was invisible for weeks because the ladder DIED at line 54 before reaching line 84, and
+  #: the D-3101 act repaired line 54. So this line is not a waiver of a headline - it is the honest class for an item whose
+  #: TITLE names no artifact and whose WORK has no owning capability (the ledger writer does not exist yet).
+  #: It is `route_graph_incomplete`, NOT `bug_is_a_finding`: there is real engineering here, and the day a pipeline cloud-spend
+  #: capability is declared this line is deleted and the ceiling is LOWERED - never raised (D-3023).
+  BUG-949: route_graph_incomplete   # pipeline cloud spend is unmetered: the writer that would emit the declared rows has NO owning capability. Measured here: no capability owns pipeline/delegation_economy.py, config/delegation_economy.yaml, config/model_assignments.yaml or pipeline/parallel.py - the economy has a READER and no declared owner
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

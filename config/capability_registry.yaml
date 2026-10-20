@@ -487,6 +487,12 @@ unrouted:
   #: It is `route_graph_incomplete`, NOT `bug_is_a_finding`: there is real engineering here, and the day a pipeline cloud-spend
   #: capability is declared this line is deleted and the ceiling is LOWERED - never raised (D-3023).
   BUG-949: route_graph_incomplete   # pipeline cloud spend is unmetered: the writer that would emit the declared rows has NO owning capability. Measured here: no capability owns pipeline/delegation_economy.py, config/delegation_economy.yaml, config/model_assignments.yaml or pipeline/parallel.py - the economy has a READER and no declared owner
+  #: BUG-954 appended 2026-10-20. NOTE THE PATTERN, because it is the real finding: this ceiling is a NUMBER fixed at
+  #: 223 on 2026-10-17 while bugs keep arriving, so EVERY new bug forces one more override or the ladder goes red. A
+  #: shrink-only ceiling plus an ever-growing register means the metric can only be kept green by hollowing itself out.
+  #: BUG-953 did NOT need one (its title names config/acquisition.yaml, which acquisition_lane owns - it ROUTED). This
+  #: one does, and it is honest: yaml_guard.py is a rail, and no capability owns any rail's SCAN BUDGET.
+  BUG-954: route_graph_incomplete   # the scan budget of a rail has no owner: narrowing the roots SHRINKS the scan against a declared receipt.artifacts, so the fix is a decision plus a receipt re-cut, and nobody is declared to make it
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

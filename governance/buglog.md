@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1250 decisions (census stamp f1d26b9e1ad6d5b2, 2026-10-21) · 726 bugs (255 open / 471 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1250 decisions (census stamp f1d26b9e1ad6d5b2, 2026-10-21) · 727 bugs (256 open / 471 closed; highest OPEN = BUG-962) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1250 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 342 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1250, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19519,3 +19519,25 @@ RESOLVED 2026-10-21: all 31 keys paid down (29 genuine `.get(key, literal)` → 
 - **Remedy (pay down, do NOT raise the ceiling)**: for each genuine key, remove the hardcoded default -> loud read (`cfg["key"]`), never a silent `.get(key, default)`. For the 2 false-positives (basis, cache) investigate the code line and either declare the real home or document why the default is not C12 debt.
 - **Verification**: re-run `python3 scripts/check_config_defaults.py --check`; shadowed_declared must return to 300 (or lower), then `--rebaseline --because <D-id>` to record the LOWER ceiling. Full enumeration + config-home map captured in this session.
 - **Delegation note**: Qwen3-Coder-30B delegate (subagent 20261021_5) was attempted for this but returned no output (DELEGATE-002 collapse shape); the pay-down remains EXECUTE-directly work (D2549 deterministic data-repair) and is NOT yet done.
+
+
+## BUG-962 (HIGH, OPEN 2026-10-21) — check_silent_repair: 35 undeclared silent-repair sites (C16) accumulated in recently-rewritten rails
+
+**Finding (receipt-backed).** `python3 scripts/check_silent_repair.py --check` returns rc=1 (FATAL): `debt 13 of ceiling 13 | unknown 35 | allowed 7`. The `unknown 35` are `errors="replace"` / `errors="ignore"` reads the scanner finds that the register declares NOWHERE. They are concentrated in recently-rewritten rails, not line-shifts of existing entries:
+- `pipeline/subagent_fanout.py` (10 sites: 156, 248, 641, 693, 716, 924, 1016, 1345, 1459, 1473) — T-163 delegation executor
+- `scripts/check_agent_surface.py` (4: 196, 231, 265, 382) — T-169 adapter-surface rail
+- `scripts/resolve_route.py` (4: 132, 481, 484, 487) — T-156 routing graph
+- plus `pipeline/stage0_convert.py:528` (reads a CONVERTED ARTIFACT — a real C16 launder risk), `pipeline/acquisition/net.py:76,80`, `pipeline/hf_fetch_model.py:109`, `pipeline/model_store_census.py:459,469`, `scripts/dispose_s0_artifacts.py:131`, `scripts/model_integrity_gate.py:155`, `scripts/normalise_corpus_names.py:242`, and one `tools/model_eval_suite.py` site already re-keyed by content (see STALE fix below).
+
+**Root cause.** Recent governed feature work (T-156/T-163/T-169 and the acquisition paths) wrote `read_text(errors="replace")` / `errors="ignore"` without declaring them in `config/silent_repair.yaml`. A silent repair launders an invalid byte into U+FFFD with no crash, so two readers of one artifact can disagree and NEITHER raises (the BUG-511 class). `stage0_convert.py:528` is the worst: it repairs bytes of a converted artifact, which can corrupt a stored object.
+
+**STALE fix already applied this session.** `tools/model_eval_suite.py` debt entry was a coordinate `lines: [918]` that went stale (site moved 918→1039); re-keyed by content `match: 'CKPT.read_text(encoding="utf-8", errors="replace")'` per BUG-542/D-2658. That removed the STALE fault and one DRIFT (unknown 36→35, debt 12→13).
+
+**Remedy (pay down, do NOT raise the ceiling; ceiling.debt=13 is SHRINK-ONLY).** For each of the 35 sites, classify then act:
+1. **Artifact read** (stage0_convert.py:528, and any site reading a declared artifact) → repoint to `scripts/lib/artifact_encoding.py` (`open_artifact` / `read_encoding`), never a bare `errors="replace"`.
+2. **Foreign stream / runtime log / subprocess output** (e.g. net.py, hf_fetch_model.py) → declare under `allowed:` with the measured `match:`/`lines:` and a `why:` naming the foreign producer.
+3. **Source-census read where a repaired byte could hide a rival definition** → declare under `debt:` with a `why:` and repoint the read when the rail can tolerate it.
+
+**Verification.** `python3 scripts/check_silent_repair.py --check` must return `unknown 0` and `debt <= 13` (rc 0). Do NOT raise `ceiling.debt`.
+
+**Status: OPEN** — 35 sites to classify+repoint/declare; EXECUTE-directly deterministic work (D-2549), no LLM needed for the mechanical repoints.

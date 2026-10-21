@@ -24,8 +24,12 @@ import re
 import sqlite3
 import tempfile
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lib.artifact_encoding as artifact_encoding  # noqa: E402 - the ONE home for a DECLARED encoding (D-2644)
 
 ROOT = Path(__file__).resolve().parent.parent
 RULER = ROOT / "governance" / "ANCHOR_208_BRIDGE_RULER_20261002.csv"
@@ -53,7 +57,7 @@ def _jaccard(a: set[str], b: set[str]) -> float:
 
 
 def _load_ruler() -> list[dict[str, str]]:
-    with open(RULER, newline="", encoding="utf-8-sig") as fh:  # utf-8-sig strips the BOM
+    with artifact_encoding.open_artifact(RULER, ROOT) as fh:  # D-2646: declared encoding (BOM stripped), never a guess
         return [
             {"item_id": r["item_id"].strip(), "name": (r.get("name") or "").strip()}
             for r in csv.DictReader(fh)

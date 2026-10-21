@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**255 open** / 471 closed of 726 ids.
+**256 open** / 471 closed of 727 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -262,3 +262,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-951 | (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS | 1 |
 | BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
 | BUG-956 | (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS | 3 |
+| BUG-962 | (HIGH, OPEN 2026-10-21) — check_silent_repair: 35 undeclared silent-repair sites (C16) accumulated in recently-rewritten rails | 1 |

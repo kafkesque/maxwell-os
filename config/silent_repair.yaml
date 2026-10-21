@@ -114,9 +114,11 @@ debt:
     mode: replace
     why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.
   - path: tools/model_eval_suite.py
-    lines: [918]
+    # BUG-542: was `lines: [918]`, a COORDINATE that went stale when the file grew (site moved 918 -> 1039) -
+    # ONE site reported twice (STALE 918 + DRIFT 1039). Keyed by CONTENT now (D-2658).
+    match: 'CKPT.read_text(encoding="utf-8", errors="replace")'
     mode: replace
-    why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.
+    why: reads a checkpoint jsonl for the golden keys; tools/ was outside the first census.
   - path: tools/voting_report.py
     lines: [65]
     mode: replace

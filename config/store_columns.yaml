@@ -113,33 +113,33 @@ measured:
       hollow: 0
       mentions: 12
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     application:
       distinct: 6591
       hollow: 0
-      mentions: 77
+      mentions: 91
       nonblank: 6591
       nonnull: 7640
       rows: 7640
     borp_score:
       distinct: 1
       hollow: 0
-      mentions: 13
+      mentions: 9
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     boundary:
       distinct: 7639
       hollow: 0
-      mentions: 137
+      mentions: 144
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     citation:
       distinct: 720
       hollow: 0
-      mentions: 36
+      mentions: 45
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -160,7 +160,7 @@ measured:
     classification_status:
       distinct: 1
       hollow: 0
-      mentions: 15
+      mentions: 16
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -171,24 +171,31 @@ measured:
       nonblank: 7640
       nonnull: 7640
       rows: 7640
+    concept_key:
+      distinct: 7635
+      hollow: 0
+      mentions: 3
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     confidence_score:
       distinct: 148
       hollow: 0
-      mentions: 11
+      mentions: 12
       nonblank: 6591
       nonnull: 6591
       rows: 7640
     consequence:
       distinct: 7640
       hollow: 0
-      mentions: 58
+      mentions: 63
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     content_type:
-      distinct: 5
+      distinct: 7
       hollow: 0
-      mentions: 127
+      mentions: 130
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -202,9 +209,9 @@ measured:
     context:
       distinct: 13
       hollow: 0
-      mentions: 74
+      mentions: 83
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     contradicts_fbs:
       distinct: 0
@@ -216,21 +223,21 @@ measured:
     created_at:
       distinct: 7640
       hollow: 0
-      mentions: 41
+      mentions: 45
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     definition:
       distinct: 7640
       hollow: 0
-      mentions: 196
+      mentions: 206
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     depth:
       distinct: 4
       hollow: 0
-      mentions: 145
+      mentions: 149
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -239,12 +246,12 @@ measured:
       hollow: 0
       mentions: 8
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     discipline:
-      distinct: 61
+      distinct: 66
       hollow: 0
-      mentions: 218
+      mentions: 227
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -260,7 +267,7 @@ measured:
       hollow: 0
       mentions: 49
       nonblank: 6401
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     discipline_source:
       distinct: 2
@@ -270,9 +277,9 @@ measured:
       nonnull: 7640
       rows: 7640
     domains:
-      distinct: 1234
+      distinct: 1328
       hollow: 1049
-      mentions: 177
+      mentions: 183
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -286,28 +293,28 @@ measured:
     duplicate_of:
       distinct: 0
       hollow: 0
-      mentions: 15
+      mentions: 17
       nonblank: 0
       nonnull: 0
       rows: 7640
     elaboration:
       distinct: 6591
       hollow: 0
-      mentions: 41
+      mentions: 42
       nonblank: 6591
       nonnull: 6591
       rows: 7640
     epistemic_status:
       distinct: 4
       hollow: 0
-      mentions: 12
+      mentions: 14
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 119
+      mentions: 146
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -342,14 +349,14 @@ measured:
     failure_mode:
       distinct: 7365
       hollow: 0
-      mentions: 31
+      mentions: 32
       nonblank: 7365
       nonnull: 7640
       rows: 7640
     fb_id:
       distinct: 7640
       hollow: 0
-      mentions: 192
+      mentions: 205
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -363,21 +370,21 @@ measured:
     feedback_count:
       distinct: 1
       hollow: 0
-      mentions: 11
+      mentions: 12
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     feedback_score:
       distinct: 0
       hollow: 0
-      mentions: 14
+      mentions: 16
       nonblank: 0
       nonnull: 0
       rows: 7640
     gen_model:
       distinct: 1
       hollow: 0
-      mentions: 75
+      mentions: 83
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -386,12 +393,12 @@ measured:
       hollow: 0
       mentions: 11
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     is_convergent:
       distinct: 2
       hollow: 0
-      mentions: 45
+      mentions: 49
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -405,14 +412,14 @@ measured:
     isor:
       distinct: 362
       hollow: 0
-      mentions: 10
+      mentions: 12
       nonblank: 6591
       nonnull: 6591
       rows: 7640
     jargon:
       distinct: 4394
       hollow: 0
-      mentions: 20
+      mentions: 21
       nonblank: 4421
       nonnull: 7640
       rows: 7640
@@ -421,7 +428,7 @@ measured:
       hollow: 0
       mentions: 22
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     last_retrieved_at:
       distinct: 90
@@ -433,7 +440,7 @@ measured:
     mechanism:
       distinct: 7640
       hollow: 0
-      mentions: 144
+      mentions: 148
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -447,7 +454,7 @@ measured:
     name:
       distinct: 7637
       hollow: 0
-      mentions: 351
+      mentions: 410
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -461,21 +468,21 @@ measured:
     origin:
       distinct: 2
       hollow: 0
-      mentions: 22
+      mentions: 25
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     pipeline_commit:
       distinct: 2
       hollow: 0
-      mentions: 69
+      mentions: 78
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     pipeline_run_id:
       distinct: 1
       hollow: 0
-      mentions: 40
+      mentions: 45
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -484,7 +491,7 @@ measured:
       hollow: 0
       mentions: 7
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     prerequisite_fbs:
       distinct: 1
@@ -496,7 +503,7 @@ measured:
     primary_source:
       distinct: 968
       hollow: 0
-      mentions: 20
+      mentions: 21
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -510,7 +517,7 @@ measured:
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 118
+      mentions: 127
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -531,7 +538,7 @@ measured:
     schema_version:
       distinct: 1
       hollow: 0
-      mentions: 111
+      mentions: 128
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -545,7 +552,7 @@ measured:
     source_books:
       distinct: 1504
       hollow: 0
-      mentions: 43
+      mentions: 45
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -557,16 +564,16 @@ measured:
       nonnull: 7640
       rows: 7640
     source_diversity:
-      distinct: 99
+      distinct: 94
       hollow: 0
-      mentions: 29
+      mentions: 32
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     source_ids:
-      distinct: 1489
+      distinct: 1475
       hollow: 0
-      mentions: 28
+      mentions: 32
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -580,7 +587,7 @@ measured:
     source_segments:
       distinct: 7640
       hollow: 0
-      mentions: 19
+      mentions: 20
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -589,12 +596,12 @@ measured:
       hollow: 0
       mentions: 24
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     status:
       distinct: 2
       hollow: 0
-      mentions: 129
+      mentions: 142
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -603,7 +610,7 @@ measured:
       hollow: 0
       mentions: 20
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     taxonomy_version:
       distinct: 2
@@ -617,7 +624,7 @@ measured:
       hollow: 0
       mentions: 8
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     type_body:
       distinct: 1049
@@ -638,7 +645,7 @@ measured:
       hollow: 0
       mentions: 7
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     verification_results:
       distinct: 4908

@@ -647,7 +647,7 @@ tasks:
     while the store holds a NON-NULL blank there, so count(col) keeps claiming rows whose field was never written - every
     coverage statistic computed over this store, including the CRIBS fields'' own nonblank counts, is inflated by that
     tier. Two things are owed and they are ONE act: (i) the store reshape to a TRUE NULL outside the population, using
-    the PRECEDENT THAT ALREADY EXISTS (D-2630 mark-never-delete + the pipeline/normalize_absent_shape.py normalizer,
+    the PRECEDENT THAT ALREADY EXISTS (D-2630 mark-never-delete + the scripts/normalize_absent_shape.py normalizer,
     BUG-737 column 2 of 14) - a STORE WRITE, so it carries its own receipt, a C13 backup and a byte comparison, and it
     may not touch a PASS row; (ii) the DECLARATION of the shapes the rail cannot see: a column that carries a hollow
     blank with NO `outside:` key is invisible to the rail by construction, so the register''s own blind spot is part
@@ -664,7 +664,7 @@ tasks:
   evidence: 'governance/buglog.md BUG-766 (the MEASURED UPDATE 2026-10-14 block: the rail''s 12 fatal lines, the 4 blind
     columns, and all 1,049 rows being status=QUARANTINE with verification_results=''[]'') + scripts/check_store_columns.py
     --check (rc=1; the POPULATION-SHAPE lines are the fatal class; the census moves are OWED/non-fatal) + config/store_columns.yaml
-    (the declared `outside:` keys) + pipeline/normalize_absent_shape.py (the existing normalizer) + knowledge pipeline/maxwell.db#fbs'
+    (the declared `outside:` keys) + scripts/normalize_absent_shape.py (the existing normalizer) + knowledge pipeline/maxwell.db#fbs'
   gate: mover = pipeline. The predicate is the register's own declaration (population + outside), never a new one; the
     write is bounded by the QUARANTINE/sidecar tier and refuses a PASS row; the reshape and the declaration land in ONE
     act, and the rail's own re-record of the measured block follows the write (D-2642), with the ceiling SHRINK-ONLY

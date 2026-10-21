@@ -848,36 +848,41 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("mechanism"), ""),
             _safe_str(fb.get("boundary"), ""),
             _safe_str(fb.get("consequence"), ""),
-            _safe_str(fb.get("taxonomy_match_method"), ""),
+            # D-2957/BUG-766: outside: absent columns — the 1,049 sidecar rows carry none of
+            # these fields (they carry type_body), so absent must read NULL, never ''. In-tier
+            # there are zero blanks for all but discipline_raw (role: sparse — its 190 in-tier
+            # blanks are a REAL coverage gap and stay visible), so discipline_raw is population-
+            # conditional above and these eleven are `or None` (same shape as elaboration/verifier_model).
+            _safe_str(fb.get("taxonomy_match_method")) or None,
             _safe_str(fb.get("content_type_source")),
             _safe_str(fb.get("discipline_source")),
             _safe_str(fb.get("extraction_type_source")),
             _safe_str(fb.get("menu_hash")),
-            _safe_str(fb.get("keywords"), ""),
+            _safe_str(fb.get("keywords")) or None,
             _safe_str(fb.get("jargon")),
             # domains + discipline (canonical + raw) — D316: discipline singular
             _safe_json(fb_domains(fb)),
             _safe_json(fb.get("domains_raw")),
             _safe_str(fb_discipline(fb), "emerging"),
-            _safe_str(fb_discipline_raw(fb)),
+            _safe_str(fb_discipline_raw(fb)) if fb.get("s5_reason") != "s5_not_applicable" else None,
             _safe_str(fb.get("discipline_macro"), "emerging"),
             # depth, evidence
             _safe_str(fb_depth(fb), "domain"),
             _safe_str(fb_evidence_type(fb), "cited"),
             # v1 Anytype properties
-            _safe_str(fb_context(fb)),
-            _safe_str(fb_accessibility(fb)),
-            _safe_str(fb_intimacy_boundary(fb)),
+            _safe_str(fb_context(fb)) or None,
+            _safe_str(fb_accessibility(fb)) or None,
+            _safe_str(fb_intimacy_boundary(fb)) or None,
             _safe_str(fb_provenance(fb), "llm_extracted_from_source"),
             # source text for verification (D2131) + summary/principle gate (D2352)
-            _safe_str(fb.get("source_text")),
+            _safe_str(fb.get("source_text")) or None,
             1 if fb.get("is_summary") else 0,
             # D2439: structural evidence tier (convergence axis)
             1 if fb.get("is_convergent") else 0,
             _safe_str(fb.get("origin"), "single_source"),
             # agentic metadata (D2130)
-            _safe_str(fb.get("difficulty_level")),
-            _safe_str(fb.get("temporal_scope")),
+            _safe_str(fb.get("difficulty_level")) or None,
+            _safe_str(fb.get("temporal_scope")) or None,
             fb.get("confidence_score"),
             _safe_json(fb.get("prerequisite_fbs")),
             _safe_str(fb.get("procedural_skill")),
@@ -924,10 +929,10 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             # rows the column does not actually carry a value on.
             _safe_str(fb.get("verifier_model")) or None,
             _safe_str(fb.get("s5_reason")),
-            _safe_str(fb.get("epistemic_status")),
-            _safe_str(fb.get("verification_method")),
+            _safe_str(fb.get("epistemic_status")) or None,
+            _safe_str(fb.get("verification_method")) or None,
             _safe_json(fb.get("isor")),
-            _safe_str(fb.get("practicality")),
+            _safe_str(fb.get("practicality")) or None,
             # D2590/D-2943: the role-specific body (JSON text, or a TRUE NULL for a role that declares
             # none). Deliberately NOT `_safe_str(...)`: that maps None to "" and a store where "no body"
             # and "empty body" are the same bytes cannot be audited. One type only (text) so SQLite and

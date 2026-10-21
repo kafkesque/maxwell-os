@@ -706,6 +706,9 @@ measured_20261014:
     gpt-oss-20b-MXFP4-Q8: {prompt_tokens: 50082, prefill_tps: 210, decode_tps: 33}
     Qwen3.8-27B-MLX-4bit: {prompt_tokens: 32026, prefill_tps: 39, decode_tps: 1.7}
     Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {prompt_tokens: 2616, prefill_tps: 84.4, note: 'MEASURED 2026-10-16; previously null/UNMEASURED'}
+    MiniCPM5-2B-MLX: {prompt_tokens: 26226, prefill_tps: 295.3, decode_tps: 41.76, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
+    Ornith-1.5-35B-A3B-REAP-19B: {prompt_tokens: 26224, prefill_tps: 289.14, decode_tps: 36.1, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
+    Ornith-1.5-9B-MLX-8bit: {prompt_tokens: 26224, prefill_tps: 141.4, decode_tps: 17.12, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
   # ── MEASURED 2026-10-16 (BUG-874). Six rows that had NO reading. Every row declares the prompt size it
   # ── was taken at, because a prefill figure without one is INCOMPARABLE (the rule above).
   prefill_reading: 'prompt_tokens is the number the SERVER echoed; a row without it is refused rather than estimated'

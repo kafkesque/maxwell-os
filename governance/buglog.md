@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-21) · 727 bugs (255 open / 472 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-21) · 728 bugs (255 open / 473 closed; highest OPEN = BUG-956) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1252 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 344 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1252, D-2987/BUG-765)
 >
@@ -21,7 +21,7 @@
 > | T-191 | 🔴 MUST | RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 option 1, D-3116) | Owner completes the blind-sheet re-adjudication; build_anchor_bridge_r |
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -38,7 +38,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -19543,3 +19543,18 @@ RESOLVED 2026-10-21: all 35 undeclared sites triaged and cleared — `unknown 35
 **Verification.** `python3 scripts/check_silent_repair.py --check` must return `unknown 0` and `debt <= 13` (rc 0). Do NOT raise `ceiling.debt`.
 
 **Status: RESOLVED** — all 35 sites classified+repointed/declared (21 repoints, 14 allowed). The remaining debt 13/13 is a separate pre-existing standing concern tracked under the shrink-only ceiling.
+
+
+## BUG-963 (HIGH, RESOLVED 2026-10-21) — oMLX 0.7.1 clobbered per-model served-context windows to 32768 (silent parity breach, restored)
+
+**Symptom.** The oMLX 0.7.1 upgrade rewrote `~/.omlx/model_settings.json`, resetting every per-model `max_context_window` to 32768. The long-context models — Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit, Qwen3.8-27B-MLX-4bit, gpt-oss-20b-MXFP4-Q8, MiniCPM5-2B-MLX — silently dropped to a 32768 served window: a served_window < declared_context_limit parity breach with no error raised (the BUG-874 silent-truncation class, not a loud fault).
+
+**Root cause (measured, D-3034).** oMLX 0.7.1's installer lost the per-model overrides and wrote the uniform 32768 fallback into the per-model (Priority 1) slots. Read from oMLX source `server.py#_configured_max_context_window`: per-model `model_settings.max_context_window` resolves at Priority 1 and WINS unconditionally (not clamped by policy); the global `sampling.max_context_window=32768` in `settings.json` is only a Priority 3 FALLBACK DEFAULT, not a cap. The clobber was real precisely because it hit Priority 1, not the fallback.
+
+**Restoration (2026-10-21).** Per-model windows restored to declared: MiniCPM5-2B-MLX=131072, Ornith-1.5-35B-A3B-REAP-19B=262144, Ornith-1.5-9B-MLX-8bit=262144, Qwen3.8-27B-MLX-4bit=262144, gpt-oss-20b-MXFP4-Q8=131072, others 32768. `scripts/agent_context_probe.py` rc=0: all 8 served windows == declared.
+
+**0.7.2 (build 3406).** Upgrade did NOT re-clobber: Info.plist `CFBundleShortVersionString=0.7.2` / `CFBundleVersion=3406`; model_settings.json windows intact post-upgrade; `/v1/models` reports max_model_len 131072/262144 for the long-context models.
+
+**Resolution.** RESTORED + parity re-verified on 0.7.2. The parity surface is the per-model `max_context_window` (Priority 1) — already watched by the harness parity rule. `sampling.max_context_window` is a fallback default and is intentionally KEPT at 32768 (raising it is a no-op for every model carrying a per-model override).
+
+**Rail**: `scripts/agent_context_probe.py` (served_window == declared_context_limit); re-verified rc=0 2026-10-21.

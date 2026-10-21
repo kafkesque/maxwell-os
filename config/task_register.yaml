@@ -1261,6 +1261,9 @@ tasks:
     and the ladder reports the trigger; the ONE WORD fetch Edge0 overrides it, and the download lock (T-141) is in place
     so a single fetch is safe. Until then this stays deferred, and a deferred item must not read as a pending question
     (the D-3035 sitting).'
+  release_test_result: 'T-153 DONE 2026-10-21: the resident 35B-A3B (Ornith-1.5-35B-A3B-REAP-19B) prefills 26224 tokens in
+    90.7 s (289.14 tok/s), FAILING the agent_loop bill, so Edge0 (same class) would not fit either. Deferral CONFIRMED by
+    measurement - agent_loop needs a DIFFERENT class, not this model_type.'
 - id: T-146
   priority: COULD
   state: done
@@ -1372,7 +1375,8 @@ tasks:
     explicit proposal-only marker so a future reader does not mistake it for a contract'
 - id: T-153
   priority: SHOULD
-  state: open
+  state: done
+  closed: 2026-10-21
   mover: pipeline
   title: 'MEASURE THE CLASS REPRESENTATIVE BEFORE BUYING Edge0: the served 35B-A3B MoE can decide T-145 with zero bytes
     downloaded'
@@ -1385,6 +1389,10 @@ tasks:
     it is the same class.'
   gate: 'pipeline: run the class-context measurement (prefill + decode at 26214 tokens) against the resident Ornith-1.5-35B-A3B-REAP-19B
     and record the verdict on T-145. This REPLACES the download as the release condition.'
+  verdict: 'MEASURED 2026-10-21: Ornith-1.5-35B-A3B-REAP-19B prefill 289.14 tok/s at 26224 tokens = 90.7 s TTFT, FAILS the
+    agent_loop prefill bill (60 s) and exceeds the owner 90 s per-turn knob. agent_loop does NOT move to it; Edge0 (same
+    35B-A3B class) is ruled out for agent_loop for the same reason. All three previously-UNMEASURED models are now
+    measured and routable to agent_probe/pipeline_batch only.'
 - id: T-154
   priority: MUST
   state: done

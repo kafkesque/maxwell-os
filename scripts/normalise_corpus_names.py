@@ -144,7 +144,7 @@ def defect_rows(pol: dict[str, Any], books_dir: str | Path | None = None) -> lis
 def _surface_dirs(cfg: dict[str, Any]) -> list[tuple[str, Path]]:
     """The stage trees to scan, named by their pipeline_paths attribute (no path is hardcoded here)."""
     out: list[tuple[str, Path]] = []
-    for attr in cfg.get("surfaces", {}).get("stage_dir_attrs", []):
+    for attr in cfg["surfaces"]["stage_dir_attrs"]:
         value = getattr(pp, str(attr), None)
         if value is not None:
             out.append((str(attr), Path(value)))
@@ -193,7 +193,7 @@ def _stage_surface(dirs: list[tuple[str, Path]], stem: str) -> dict[str, Any]:
 def _store_surface(cfg: dict[str, Any], stem: str) -> dict[str, Any]:
     """The store's declared source columns. Read-only, bounded, one row count per declared column."""
     out: dict[str, Any] = {}
-    for attr in cfg.get("surfaces", {}).get("store_db_attrs", []):
+    for attr in cfg["surfaces"]["store_db_attrs"]:
         db = getattr(pp, str(attr), None)
         if db is None or not Path(db).exists():
             out[str(attr)] = {"count": None, "reason": "absent"}
@@ -202,7 +202,7 @@ def _store_surface(cfg: dict[str, Any], stem: str) -> dict[str, Any]:
         try:
             con = sqlite3.connect(f"file:{db}?mode=ro&immutable=1", uri=True)
             try:
-                for table, column in cfg.get("surfaces", {}).get("store_columns", []):
+                for table, column in cfg["surfaces"]["store_columns"]:
                     try:
                         n = con.execute(
                             f"SELECT COUNT(*) FROM {table} WHERE {column} LIKE ?", (f"%{stem}%",)
@@ -229,10 +229,10 @@ def _artifact_surface(cfg: dict[str, Any], stem: str, roots: list[Path] | None =
     and names the artifact. Scanning filenames alone MISSED this surface - MEASURED 2026-10-15: the
     filename-only census read 0 for every row while 3,171 content references sat in 13 artifacts.
     """
-    suffixes = {str(s) for s in cfg.get("surfaces", {}).get("artifact_suffixes", [])}
+    suffixes = {str(s) for s in cfg["surfaces"]["artifact_suffixes"]}
     total, where = 0, []
     for root in (roots if roots is not None else [
-            getattr(pp, str(a), None) for a in cfg.get("surfaces", {}).get("artifact_dir_attrs", [])]):
+            getattr(pp, str(a), None) for a in cfg["surfaces"]["artifact_dir_attrs"]]):
         if root is None or not Path(root).exists():
             continue
         for child in Path(root).rglob("*"):

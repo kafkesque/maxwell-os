@@ -147,7 +147,7 @@ def check_template(text: str, deny_patterns: Sequence[str]) -> tuple[bool, str]:
 
 def _chat_template_mode(path_str: str, cfg: dict) -> int:
     """Run tier 3 (Jinja denylist) against a template file and exit."""
-    deny: Sequence[str] = cfg.get("chat_template_scan", {}).get("deny_patterns", [])
+    deny: Sequence[str] = cfg["chat_template_scan"]["deny_patterns"]
     p = Path(path_str).resolve()
     if not p.exists():
         print(f"RED: template file not found: {p}", file=sys.stderr)
@@ -170,13 +170,13 @@ def selftest(cfg: dict) -> int:
             faults.append(f"{desc}: got {'GREEN' if got_ok else 'RED'}, "
                           f"want {'GREEN' if want_ok else 'RED'}")
 
-    allowed: Sequence[str] = cfg.get("allowed_load_formats", [])
-    refused: Sequence[str] = cfg.get("refused_load_formats", [])
-    deny: Sequence[str] = cfg.get("chat_template_scan", {}).get("deny_patterns", [])
-    quarantine: bool = bool(cfg.get("quarantine_unknown", True))
-    fixtures = cfg.get("red_loop_fixtures", {})
-    red_pkl = REPO_ROOT / str(fixtures.get("red", "tests/malicious.pkl"))
-    green_st = REPO_ROOT / str(fixtures.get("green", "tests/clean.safetensors"))
+    allowed: Sequence[str] = cfg["allowed_load_formats"]
+    refused: Sequence[str] = cfg["refused_load_formats"]
+    deny: Sequence[str] = cfg["chat_template_scan"]["deny_patterns"]
+    quarantine: bool = bool(cfg["quarantine_unknown"])
+    fixtures = cfg["red_loop_fixtures"]
+    red_pkl = REPO_ROOT / str(fixtures["red"])
+    green_st = REPO_ROOT / str(fixtures["green"])
 
     # Tier 1 — format.
     check("format: pickle refused (RED)", classify(red_pkl, refused, allowed) in refused, True)
@@ -227,10 +227,10 @@ def main(argv: Sequence[str]) -> int:
               file=sys.stderr)
         return 1
 
-    allowed: Sequence[str] = cfg.get("allowed_load_formats", [])
-    refused: Sequence[str] = cfg.get("refused_load_formats", [])
-    pins: dict = cfg.get("sha256_pins", {}) or {}
-    quarantine: bool = bool(cfg.get("quarantine_unknown", True))
+    allowed: Sequence[str] = cfg["allowed_load_formats"]
+    refused: Sequence[str] = cfg["refused_load_formats"]
+    pins: dict = cfg["sha256_pins"] or {}
+    quarantine: bool = bool(cfg["quarantine_unknown"])
 
     path = Path(argv[1]).resolve()
     if not path.exists():

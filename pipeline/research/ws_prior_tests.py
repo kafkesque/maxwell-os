@@ -35,8 +35,8 @@ def candidates() -> list[str]:
     """Read the candidate set from config/engine.yaml (the one home - C12)."""
     import yaml
     conf = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())
-    cand = conf.get("candidates", {})
-    return list(cand.get("probe", [])) + list(cand.get("served_now", []))
+    cand = conf["candidates"]
+    return list(cand["probe"]) + list(cand["served_now"])
 
 
 def scan(names: list[str]) -> dict:

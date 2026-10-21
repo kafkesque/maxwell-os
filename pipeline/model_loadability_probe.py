@@ -107,7 +107,7 @@ def http_text(url: str, timeout: int = 25) -> tuple[int, str]:
 def oracle(force: bool = False) -> dict:
     """Ask the ENGINE's own interpreter which architectures its mlx_lm implements."""
     conf = cfg()["engine"]
-    ttl_s = float(conf.get("oracle_ttl_days", 7)) * 86400
+    ttl_s = float(conf["oracle_ttl_days"]) * 86400
     if CACHE.exists() and not force and time.time() - CACHE.stat().st_mtime < ttl_s:
         cached = json.loads(CACHE.read_text())
         cached["source"] = "cache"
@@ -228,8 +228,8 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv)
 
     conf = cfg()["engine"]
-    cand = cfg().get("candidates", {})
-    repos = args.repos or list(cand.get("probe", []))
+    cand = cfg()["candidates"]
+    repos = args.repos or list(cand["probe"])
     orc = oracle(force=args.refresh_oracle)
     if not orc.get("ok"):
         print("FATAL: no architecture oracle - refusing to guess")

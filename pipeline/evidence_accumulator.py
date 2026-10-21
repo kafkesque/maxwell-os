@@ -88,12 +88,12 @@ def _group_disposition(members: list[dict], cfg: dict) -> dict:
     for m in members:
         union |= source_set(m.get("source_ids"))
     new_diversity = len(union)
-    min_sources = int(cfg.get("convergent_min_sources", 2))
+    min_sources = int(cfg["convergent_min_sources"])
     scope = str(cfg.get("is_convergent_scope", _PRINCIPLE_SCOPE))
     content_type = members[0].get("content_type")
     eligible = new_diversity >= min_sources
     scope_ok = scope == "all" or content_type == _PRINCIPLE_SCOPE
-    merge_fields: list[str] = list(cfg.get("merge_fields", []))
+    merge_fields: list[str] = list(cfg["merge_fields"])
     fills: dict[str, str | None] = {}
     for f in merge_fields:
         richer = _richer([m.get(f) for m in members])
@@ -151,9 +151,9 @@ def _apply(conn: sqlite3.Connection, groups: list[tuple[tuple[str, str], list[di
     and the principle-scoped is_convergent flip are touched on a member that already carries
     content. Runs in one transaction (C6); caller already backed up (C13).
     """
-    min_sources = int(cfg.get("convergent_min_sources", 2))
+    min_sources = int(cfg["convergent_min_sources"])
     scope = str(cfg.get("is_convergent_scope", _PRINCIPLE_SCOPE))
-    merge_fields: list[str] = list(cfg.get("merge_fields", []))
+    merge_fields: list[str] = list(cfg["merge_fields"])
     applied = 0
     for key, members in groups:
         disp = _group_disposition(members, cfg)
@@ -176,7 +176,7 @@ def _apply(conn: sqlite3.Connection, groups: list[tuple[tuple[str, str], list[di
 
 def run(mode: str, receipt_path: str, cfg: dict) -> list[dict]:
     """Run the accumulator; returns the receipt records (report mode) or [] (apply)."""
-    merge_fields: list[str] = list(cfg.get("merge_fields", []))
+    merge_fields: list[str] = list(cfg["merge_fields"])
     conn = sqlite3.connect(str(DB_PATH))
     try:
         conn.row_factory = sqlite3.Row
@@ -224,9 +224,9 @@ def run(mode: str, receipt_path: str, cfg: dict) -> list[dict]:
 def main(argv: list[str] | None = None) -> int:
     cfg = _config()
     ap = argparse.ArgumentParser(description="Cross-run evidence accumulation (D-3117).")
-    ap.add_argument("--mode", choices=["report", "apply"], default=str(cfg.get("mode", "report")))
+    ap.add_argument("--mode", choices=["report", "apply"], default=str(cfg["mode"]))
     ap.add_argument("--check", action="store_true", help="report mode + exit 1 when any group WOULD accumulate (red-loop probe)")
-    ap.add_argument("--receipt", default=str(cfg.get("receipt_path", "governance/evidence_accumulator_receipt.jsonl")))
+    ap.add_argument("--receipt", default=str(cfg["receipt_path"]))
     args = ap.parse_args(argv)
     receipt = run(args.mode, args.receipt, cfg)
     n = len(receipt)

@@ -193,7 +193,7 @@ def test_inv9_the_pre_flight_writes_nothing_and_blocks(tmp_path: Path) -> None:
     )
     before = sorted(p.name for p in tmp_path.iterdir())
     res = subprocess.run(
-        [sys.executable, str(SCRIPT), "--csv", str(sheet), "--yaml-out", str(draft), "--check"],
+        [sys.executable, str(SCRIPT), "--reviewed-csv", str(sheet), "--reviewed-draft", str(draft), "--check"],
         capture_output=True,
         text=True,
         cwd=str(PROJECT_ROOT),

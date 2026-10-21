@@ -272,7 +272,7 @@ def _s0_budget(key: str) -> int:
     return value
 
 
-S0_BUDGET_BASIS=str(_CFG.get("stage0", {}).get("conversion_budget", {}).get("basis", ""))  # the signal the allowance derives from
+S0_BUDGET_BASIS=str(_CFG["stage0"]["conversion_budget"]["basis"])  # the signal the allowance derives from
 S0_PANDOC_TIMEOUT_S=_s0_budget("pandoc_timeout_s")
 S0_DOCLING_FLOOR_S=_s0_budget("docling_floor_s")
 S0_DOCLING_PER_MB_S=_s0_budget("docling_per_mb_s")
@@ -321,7 +321,7 @@ def _s0_artifact_rule() -> dict:
             "DECLARED fact, never the converter's default (C12, BUG-918)"
         )
     allowed_modes = {"placeholder", "embedded", "referenced"}
-    mode = str(block.get("image_export_mode", "")).strip().lower()
+    mode = str(block["image_export_mode"]).strip().lower()
     if mode not in allowed_modes:
         raise RuntimeError(
             f"FATAL: stage0.artifact.image_export_mode={block.get('image_export_mode')!r} is not one of "

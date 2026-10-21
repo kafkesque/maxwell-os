@@ -19480,3 +19480,42 @@ necessary-condition guard (content_type = axis 1 functional ROLE ⇒ cross-type 
 never accumulated). The 4 legit same-type groups are unaffected. R5 review by gemma-4-E4B: APPROVE.
 Phase B (embedding cosine divergence for same-type collisions + the ~28% name-paraphrase gap) remains OPEN
 under D-3118.
+
+
+## BUG-960 (HIGH, RESOLVED 2026-10-21) — D-3118 half-migration: insert_fb VALUES clause missing concept_key's placeholder
+
+**Finding (receipt-backed).** D-3118 Phase A (commit 5632b00) added `concept_key` to THREE of the four surfaces of
+the governed insert path but NOT the fourth: `CREATE_FBS_TABLE` (DDL col #2), the INSERT column list (col #2), and the
+param tuple (`concept_key(fb_name(fb))`, param #2) all carry it — but the VALUES `?` placeholder list stayed at 77
+placeholders for 78 columns. `insert_fb` therefore failed "77 values for 78 columns" on EVERY insert, so the 3 tests
+in `tests/test_stage6_duplicate_marker.py` went RED (regression; declared-red=0).
+
+**Root cause.** The D-3118 edit touched the column list and the param tuple, but the placeholder list is a FOURTH
+positional surface inside the SAME SQL statement. A one-`?` omission is invisible to the editor and to
+`check_store_columns` (which measures the STORE, not the insert SQL). Same class as the corroboration-bit drift:
+a half-applied migration that leaves a governed surface and its receipt disagreeing.
+
+**Fix.** Added the missing `?` to the first placeholder line (`?, ?, ?, ?, ?,` → `?, ?, ?, ?, ?, ?,`), restoring
+78 columns == 78 placeholders == 78 params, with `concept_key` in the correct position (after `fb_id`).
+Verified: `tests/test_stage6_duplicate_marker.py` 3/3 green.
+
+**Status: RESOLVED.** (`borp_score` correctly remains absent from the INSERT — D-2995 retirement keeps the slot but
+writes NULL — so 78 named columns against the 79-column table is the intended shape, not a second defect.)
+
+
+## BUG-961 (MEDIUM, RESOLVED 2026-10-21) — config_defaults debt GREW: 31 NEW shadowed-declared keys (C12)
+RESOLVED 2026-10-21: all 31 keys paid down (29 genuine `.get(key, literal)` → loud `[key]` reads; `cache` was a receiver-name collision in omlx_call.py → renamed local `settings`→`gui_settings`; `basis`/`conversion_budget`/`image_export_mode` were GENUINE shadows, not name collisions as first assessed). `check_config_defaults.py --check` GREEN (300 shadowed / 3 undeclared, key set == receipt). `counts.modules` re-recorded 563→626 via `--record`. check_tests GREEN (551 collected, 540 passed, 0 red). No ceiling raise — D-2644 honoured.
+- **Rail**: `scripts/check_config_defaults.py --check` — FAIL: declared 300 -> measured 331 shadowed-declared key(s), 625 config-default sites over 626 modules.
+- **Cause**: recent governed feature work introduced `cfg.get(key, DEFAULT)` reads where the key is already declared in config — a code default that SHADOWS the config home (C12/D-2644/D-2982: a value read with a code default has no home in config).
+- **The 31 keys** (code site -> config home), grouped by file:
+  - scripts/model_integrity_gate.py: allowed_load_formats, refused_load_formats, chat_template_scan, deny_patterns, quarantine_unknown, red_loop_fixtures, red, green, sha256_pins -> config/model_integrity.yaml (genuine)
+  - scripts/normalise_corpus_names.py: surfaces, stage_dir_attrs, store_db_attrs, store_columns, artifact_suffixes, artifact_dir_attrs -> config/ingest_identity_gate.yaml#name_normalisation.surfaces (genuine)
+  - pipeline/subagent_fanout.py: fanout, default_max_tokens, excerpt_bytes, max_parallel -> config/engine.yaml#fanout (genuine)
+  - pipeline/evidence_accumulator.py: convergent_min_sources, merge_fields, mode, receipt_path -> config/accumulate.yaml#accumulate (genuine)
+  - pipeline/model_loadability_probe.py: oracle_ttl_days, candidates, probe -> config/engine.yaml (genuine)
+  - pipeline/pipeline_paths.py: conversion_budget, image_export_mode -> config/pipeline_config.yaml (genuine); basis -> config/agent_context.yaml (LIKELY false-positive name collision)
+  - pipeline/research/ws_prior_tests.py: candidates, probe, served_now -> config/engine.yaml (genuine)
+  - pipeline/omlx_call.py: cache -> reads a JSON settings file, NOT yaml config (FALSE-POSITIVE)
+- **Remedy (pay down, do NOT raise the ceiling)**: for each genuine key, remove the hardcoded default -> loud read (`cfg["key"]`), never a silent `.get(key, default)`. For the 2 false-positives (basis, cache) investigate the code line and either declare the real home or document why the default is not C12 debt.
+- **Verification**: re-run `python3 scripts/check_config_defaults.py --check`; shadowed_declared must return to 300 (or lower), then `--rebaseline --because <D-id>` to record the LOWER ceiling. Full enumeration + config-home map captured in this session.
+- **Delegation note**: Qwen3-Coder-30B delegate (subagent 20261021_5) was attempted for this but returned no output (DELEGATE-002 collapse shape); the pay-down remains EXECUTE-directly work (D2549 deterministic data-repair) and is NOT yet done.

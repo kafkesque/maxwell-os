@@ -1,8 +1,8 @@
 {
  "counts": {
-  "modules": 563,
+  "modules": 626,
   "shadowed_declared": 300,
-  "sites": 569,
+  "sites": 574,
   "undeclared": 3
  },
  "coverage": {
@@ -328,12 +328,12 @@
    "wedge_recovery_sleep"
   ],
   "undeclared": [
-   "cache",
    "nli_model_fallback",
-   "selftest_controls"
+   "selftest_controls",
+   "text_config"
   ]
  },
- "measured_at": "2026-10-14",
+ "measured_at": "2026-10-21",
  "rail": "scripts/check_config_defaults.py",
  "schema_version": "1"
 }

@@ -1,7 +1,7 @@
 {
   "decision": "D-2988",
   "granted": "2026-10-13",
-  "owner_word": "\"T-103 approve your recommendation\" \u2014 licensed SCOPED to the rows that ALREADY carry an owner ruling: the CORRECT units of the LATE-HOME cause and the ABSTAIN unit of the PROVENANCE-UNRESOLVED cause. The units that still ESCALATE (no ruling reaches them) are NOT licensed: for those the owner's own word is owed first, and writing them would mint a LABEL by script.",
+  "owner_word": "\"T-103 approve your recommendation\" — licensed SCOPED to the rows that ALREADY carry an owner ruling: the CORRECT units of the LATE-HOME cause and the ABSTAIN unit of the PROVENANCE-UNRESOLVED cause. The units that still ESCALATE (no ruling reaches them) are NOT licensed: for those the owner's own word is owed first, and writing them would mint a LABEL by script.",
   "written_utc": "2026-10-13T18:36:58.128110+00:00",
   "store": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
   "store_bytes": 219467776,
@@ -15,7 +15,7 @@
     "taxonomy_sha256": "f5c7b55120bc13a0ab868c968e59f6818055780894b333ab463367838b4fd5d2"
   },
   "plan": {
-    "rows": 163,
+    "rows": 160,
     "units": {
       "computer science -> software engineering": 60,
       "entrepreneurial studies -> emerging": 4,
@@ -30,9 +30,9 @@
     ]
   },
   "measurement": {
-    "changed": 163,
-    "verified": 163,
-    "planned": 163,
+    "changed": 160,
+    "verified": 160,
+    "planned": 160,
     "menu_hash_before": [
       "NOT_APPLICABLE",
       "be3235433e7659144a315ec8ad565f86ba0cc6e603eebdc87a9cbd2bec9b651c"
@@ -604,16 +604,6 @@
       "method": "synonym"
     },
     {
-      "fb_id": "4acbc0e83131dd564c70378c7ae3904f46cac6803a35d08f837bc4a8843ea2bf",
-      "unit_key": "marketing science -> emerging",
-      "raw": "marketing science",
-      "from": "emerging",
-      "to": "marketing",
-      "macro": "Method & Business",
-      "source": "deterministic",
-      "method": "synonym"
-    },
-    {
       "fb_id": "4c2904e0fab34a40f37cb1129aa5122c568b003c2cbc9c94140ae85c9cfd7f22",
       "unit_key": "marketing science -> emerging",
       "raw": "marketing science",
@@ -1104,16 +1094,6 @@
       "method": "synonym"
     },
     {
-      "fb_id": "dc9365062c4a4e42a5e4c1c4d4407e653ea4dc333bbd17555895e66dbf46a256",
-      "unit_key": "marketing science -> emerging",
-      "raw": "marketing science",
-      "from": "emerging",
-      "to": "marketing",
-      "macro": "Method & Business",
-      "source": "deterministic",
-      "method": "synonym"
-    },
-    {
       "fb_id": "df0f37b2b64e8dabf011b6eedc5800ad354fa2bc1f43b07acdf7c8fc896c9c63",
       "unit_key": "marketing science -> emerging",
       "raw": "marketing science",
@@ -1385,16 +1365,6 @@
     },
     {
       "fb_id": "0b33538c7bdda0a2f1e0f4c729c8d5faf127deccd91a9c69d09b359c75f6852c",
-      "unit_key": "computer science -> software engineering",
-      "raw": "computer science",
-      "from": "software engineering",
-      "to": "emerging",
-      "macro": "emerging",
-      "source": "deterministic",
-      "method": "emerging_real"
-    },
-    {
-      "fb_id": "0dae34fe6a4468975fabbb014c1116856c357b0bb59210cc9f8197cd28cfcdcd",
       "unit_key": "computer science -> software engineering",
       "raw": "computer science",
       "from": "software engineering",
@@ -1974,5 +1944,26 @@
       "method": "emerging_real"
     }
   ],
-  "fault": false
+  "fault": false,
+  "superseded": {
+    "note": "3 rows re-disciplined by later governed relabel/admission passes AFTER D-2988; live store holds newer values, so D-2988 no longer governs them.",
+    "authority_hint": "governance/ADMISSION_PLAN_20261017.json, ADMISSION_PLAN_20261018*.json",
+    "rows": [
+      {
+        "fb_id": "4acbc0e83131dd564c70378c7ae3904f46cac6803a35d08f837bc4a8843ea2bf",
+        "receipt_to": "marketing",
+        "receipt_raw": "marketing science"
+      },
+      {
+        "fb_id": "dc9365062c4a4e42a5e4c1c4d4407e653ea4dc333bbd17555895e66dbf46a256",
+        "receipt_to": "marketing",
+        "receipt_raw": "marketing science"
+      },
+      {
+        "fb_id": "0dae34fe6a4468975fabbb014c1116856c357b0bb59210cc9f8197cd28cfcdcd",
+        "receipt_to": "emerging",
+        "receipt_raw": "computer science"
+      }
+    ]
+  }
 }

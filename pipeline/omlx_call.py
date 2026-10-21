@@ -542,11 +542,11 @@ def assert_omlx_no_cache() -> None:
         return
     try:
         with open(settings_path) as f:
-            settings = json.load(f)
+            gui_settings = json.load(f)
     except Exception as e:
         raise RuntimeError(f"OMLX cache gate: cannot parse {settings_path}: {e}") from e
 
-    cache = settings.get("cache", {}) if isinstance(settings, dict) else {}
+    cache = gui_settings.get("cache", {}) if isinstance(gui_settings, dict) else {}
     bad = []
     if cache.get("enabled"):
         bad.append("cache.enabled=true")
@@ -563,7 +563,7 @@ def assert_omlx_no_cache() -> None:
     # — the prior top-level check never fired. It is server-side mid-request KV reuse,
     # distinct from the cache.* disk/page-cache thrash flags (D2460) refused above.
     # VERIFIED benign via live S4 probe (22.8s/FB, no decode collapse, cache.enabled=false).
-    if (settings.get("server") or {}).get("preserve_mid_system_cache"):
+    if (gui_settings.get("server") or {}).get("preserve_mid_system_cache"):
         print("ℹ️  OMLX cache gate: server.preserve_mid_system_cache=true (verified benign — "
               "mid-request KV reuse, NOT a D2460-class disk-cache flag)")
     print("✅ OMLX cache gate: --no-cache verified (cache.enabled=false, no SSD split)")

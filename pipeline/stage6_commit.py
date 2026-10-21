@@ -636,7 +636,7 @@ def audit_stale_store_labels(conn: sqlite3.Connection, run_id: str) -> tuple[int
 def update_s5_provenance(conn: sqlite3.Connection, fb: dict) -> bool:
     """D-2933 (rule V): write ONLY the S5-owned provenance columns onto an existing row.
 
-    Why this exists: `INSERT OR REPLACE` re-writes all 77 columns from the S5 checkpoint,
+    Why this exists: `INSERT OR REPLACE` re-writes all 79 columns from the S5 checkpoint,
     including the S4-owned ontology (name, definition, domains, discipline, content_type…).
     When the checkpoint predates a ratified taxonomy repair its labels are STALE, so the
     "replace" REGRESSES the store (BUG-709: 770/6591 rows differ; 466 rejected by D2620,
@@ -799,7 +799,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 created_at, committed_at,
                 duplicate_of
             ) VALUES (
-                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, ?, ?, ?,

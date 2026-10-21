@@ -123,7 +123,7 @@ def guards() -> dict:
     the smallest answer that counts as an answer. Inventing any one of them at runtime is the
     BUG-817 defect, so a missing key stops the run instead of being filled in (C12/C16).
     """
-    g = conf().get("fanout", {}).get("guards")
+    g = conf()["fanout"].get("guards")
     if not isinstance(g, dict):
         raise SystemExit("FATAL: config/engine.yaml declares no fanout.guards block - a delegation "
                          "without guards is the BUG-809 defect (C12)")
@@ -608,7 +608,7 @@ def _cmd_for(task: dict, wsd: str, g: dict, model: str) -> str:
         lines.append(f'python3 {entry["executor"]} --exec -- "$HARNESS_BIN" run -t "$(cat "$WS_DIR/00_prompt.txt")" '
                      f'> "$WS_DIR/20_answer.md" 2>&1')
     else:
-        mt = int(task.get("max_tokens", conf().get("fanout", {}).get("default_max_tokens", 512)))
+        mt = int(task.get("max_tokens", conf()["fanout"]["default_max_tokens"]))
         lines.append(f'python3 pipeline/oneshot_ask.py --model {model} --prompt-file "$WS_DIR/00_prompt.txt" '
                      f'--max-tokens {mt} --out "$WS_DIR/20_answer.md" --json-out "$WS_DIR/21_meta.json" '
                      f'>> "$WS_REPORT" 2>&1')
@@ -678,7 +678,7 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
     if not tasks:
         print("FATAL: the task file declares no tasks")
         return FATAL
-    cap = int(conf().get("fanout", {}).get("excerpt_bytes", 24000))
+    cap = int(conf()["fanout"]["excerpt_bytes"])
     subprocess.run([sys.executable, str(RUNNER), "new", "--run", run_id,
                     "--brief-text", tasks_file.read_text()], check=True, cwd=str(ROOT))
     for t in tasks:
@@ -778,7 +778,7 @@ def start(run_id: str, watch: bool = True) -> int:
     started and walked away from is the exact shape of the 2026-10-15 stall (BUG-809).
     """
     g = guards()
-    cap = int(conf().get("fanout", {}).get("max_parallel", 3))
+    cap = int(conf()["fanout"]["max_parallel"])
     _rows(run_id)                       # reconcile before deciding what to launch
     started, waiting = 0, []
     for t in sorted([p for p in (RUNS / run_id).glob("fan_*") if p.is_dir()]):
@@ -828,7 +828,7 @@ def retry(run_id: str) -> int:
     g = guards()
     retry_on = set(g["retry_on"])
     fallback = str(g["fallback_model"])
-    cap = int(conf().get("fanout", {}).get("max_parallel", 3))
+    cap = int(conf()["fanout"]["max_parallel"])
     launched = 0
     for t in sorted([p for p in (RUNS / run_id).glob("fan_*") if p.is_dir()]):
         if re.search(r"_r\d+$", t.name):

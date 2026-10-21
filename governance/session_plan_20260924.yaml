@@ -420,6 +420,11 @@ may_touch:
 - governance/gold_reattach_*
 - governance/axis_propagation_manifest_*.json
 - governance/HOW_TO_ADJUDICATE_MERGES.md
+#: D-3117/D-3118 PHASE 0 RECEIPT (2026-10-21) — the D-3036 red-loop receipt for the identity-decoupling /
+#: convergence-upgrade path. governance/*.md is deliberately NOT a pattern (named grants only), and a receipt that
+#: cannot be committed is not a receipt (D-342). This is the report the Phase 0 harness (scripts/phase0_idempotency.py,
+#: inside scripts/*.py) writes; the config is inside config/*.yaml. Named here so the tree can be clean.
+- governance/PHASE0_IDEMPOTENCY_REPORT.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1342,3 +1347,26 @@ widening_log:
     os current state continue with the next critical step starting with the highest leverage step'. NOTE ON SCOPE:
     every other touched path was already granted; the four code files are named in the reason so the act is not
     invisible, and no path was widened without a named addition.
+- date: '2026-10-21'
+  actor: assistant
+  reason: >-
+    D-3117/D-3118 PHASE 0 INSTRUMENT LANDED. The Phase 0 idempotency harness (scripts/phase0_idempotency.py +
+    config/phase0_idempotency.yaml) is the D-3036 red-loop instrument that D-3117/D-3118 (RATIFIED 2026-10-21) name
+    as "the instrument that decides it". It was built and RUN (S0->S5 twice on a fixed 16-book door-clean corpus,
+    SAME chunker, S6 skipped so the live store is never touched) and produced a DECISIVE receipt: S0/S1/S1.5 identical
+    (jaccard 1.0); S2/S4/S5 divergent (fb_id survival 27% / jaccard 0.2726, name survival 72% / 0.7204, body_hash_8field
+    survival 0% / 0.0; shared_name_identical_definition 199 vs shared_name_different_definition 190). The report is the
+    receipt D-3036 requires; governance/*.md is deliberately NOT a pattern, so the report needs a NAMED grant (D-342:
+    a receipt that cannot be committed is not a receipt). The script and config already fall inside existing globs
+    (scripts/*.py, config/*.yaml); this entry grants the one path that had no home.
+  additions:
+  - pattern: governance/PHASE0_IDEMPOTENCY_REPORT.md
+    why: 'the D-3036 red-loop receipt for D-3117/D-3118: two S0->S5 runs on the same 16 books, SAME chunker, diffed per-stage. This receipt decides the D-3118 Phase A-vs-Phase B gate: Phase A (name-based concept_key) is necessary but MEASURED-INSUFFICIENT (name survives only 72%, body 0%); Phase B (embedding recall) is now measured-NECESSARY, not a hypothesis.'
+  owner_ack: >-
+    IMPLIED by D-3117/D-3118 RATIFICATION (2026-10-21): the owner ratified both decisions, which name this harness as
+    their deciding instrument; the owner''s standing directive ("continue with the next critical step, highest leverage
+    first; forensic audit before serious implementation; sync gov dependencies") covers landing the already-built
+    receipt so the tree is clean and the rails green. This entry grants a NAMED path only (no glob), records the
+    receipt, and changes no pipeline behaviour.
+  may_touch_untouched: false
+  why: One widening, one NAMED grant (the D-3036 receipt).

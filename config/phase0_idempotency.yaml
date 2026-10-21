@@ -1,0 +1,57 @@
+# D-3036 Phase 0 idempotency test — config (C12: no hardcoding; read at runtime).
+# Purpose: run the S0→S5 pipeline TWICE on a FIXED corpus + FIXED chunker and diff
+# the per-stage checkpoints to attribute "rerun regenerates new principles/non-principles"
+# to (a) the D-2703 chunker change, or (b) residual LLM/embedding non-determinism.
+#
+# WHY S0→S5 and NOT S6: S6 commit is a deterministic content-addressed projection of
+# the S5 checkpoint into SQLite/Parquet (fb_id = sha256(name|definition)); it introduces
+# no non-determinism of its own. Running S6 with a fresh run_id would INSERT rows into
+# the LIVE store (knowledge pipeline/maxwell.db) and pollute its vector/text indices.
+# The S5 checkpoint already carries every field S6 would project (all 8 CRIBS fields +
+# fb_id + status), so it is the correct and contamination-free diff point.
+phase0_idempotency:
+  corpus:
+    # Fixed, domain-coherent corpus (D-2316 sampling pattern). MUST be an INGEST-DOOR-CLEAN
+    # leaf subdir: a subdir whose source files carry no cross-format stem collisions
+    # (a .md/.epub/.pdf pair sharing one sanitized stem). MEASURED 2026-10-20: the naive
+    # "DOMAIN 3 Art + Computational Media" corpus tripped the door (8/16 books deferred
+    # for same_sanitized_stem identity collisions, stage0 rc!=0). This subdir
+    # (mental+models+epistemology) is door-clean: 26 files, 0 collisions, all native .md.
+    # book_limit 16 selects the first 16 deterministically (find_books sorts by filename);
+    # the SAME 16 docs run in both arms.
+    subdir: "DOMAIN 0 Systems + Decision/mental+models+epistemology"
+    book_limit: 16
+  runs:
+    - idem_a
+    - idem_b
+  # Canonical stage order, S0→S5 only (S6 excluded per header note).
+  stages:
+    - stage0_convert.py
+    - stage0_5_extract_metadata.py
+    - stage1_chunk.py
+    - stage1_3_prefilter.py
+    - stage1_5_embed_cluster.py
+    - stage2_extract.py
+    - stage4_merge.py
+    - stage5_verify.py
+  # Extra CLI args passed to a stage script (S1.3 prefilter defaults to dry-run; e2e
+  # passes --in-place so structural garbage is actually filtered before S1.5).
+  stage_extra_args:
+    stage1_3_prefilter.py:
+      - --in-place
+  diff:
+    # The 8 CRIBS body fields whose byte-exact hash defines a "full-body duplicate"
+    # (Phase 2 recommendation's body_hash). Order is the canonical hash order.
+    body_fields:
+      - name
+      - definition
+      - mechanism
+      - boundary
+      - consequence
+      - application
+      - failure_mode
+      - elaboration
+    report_path: governance/PHASE0_IDEMPOTENCY_REPORT.md
+    # A run whose per-stage row digest sets differ here is reported NON-IDENTICAL.
+    # No pass/fail threshold on FB overlap is asserted — the report is the receipt.
+    assert_corpus_identical: true

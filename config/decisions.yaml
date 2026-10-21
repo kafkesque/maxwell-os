@@ -31144,7 +31144,12 @@ decisions:
     = (len >= 2), field-wise richer merge (per body field keep the richer; non-empty beats empty; never
     concatenate, never a summary/noise copy). Re-derives the same S2 convergence rule at a monotonic accumulation
     point; idempotent + monotonic at this layer only (extraction layer is never idempotent, arXiv 2408.04667).
-    Report mode default. Depends on D-3118 Phase A. Known limitation: inherits corroboration-collapse inflation
+    Report mode default. SCOPE REFINEMENT (2026-10-21, measured): source_ids union + source_diversity bump apply to
+    ALL content types (evidence is content-agnostic and monotonic); the is_convergent flip is scoped to
+    content_type=principle behind config flag accumulate.is_convergent_scope (principle|all). A corroborated
+    non-principle is DETECTED via source_diversity 1->2 without being relabeled under BORP (BUG-231/BUG-166 is an
+    extraction-layer design, not a store invariant; the store already holds 4 convergent non-principle leaks: 2
+    process_template incl. one at sd=77, 2 noise_drop). Depends on D-3118 Phase A. Known limitation: inherits corroboration-collapse inflation
     (BUG-780/T-119).'
   bugs:
   - BUG-780

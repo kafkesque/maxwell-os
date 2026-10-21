@@ -5277,3 +5277,33 @@ cosine threshold).
 **State.** Reconciliation RECORDED, not yet owner-gated — the accumulator build proceeds on the corrected shape
 once the owner acknowledges, or is reverted to the hard gate if the owner holds the hard-gate line. The two-sided
 receipt above is the evidence either way.
+
+## D-3117 MATCH GATE RECONCILIATION — OWNER ACCEPTED (2026-10-21) + content-type scope refinement
+
+Owner acknowledged the reconciliation this session. Repurpose the hard body-divergence reject to a REPORTED
+divergence metric: BLOCK on `concept_key` → ACCUMULATE monotonic → divergence (token Jaccard + SequenceMatcher)
+computed and reported, never a blocking reject; homonym disambiguation stays deferred to D-3118 Phase B. The
+two-sided receipt stands: `body_hash_8field` survival 0% (Phase 0 a6323a7), and all 5 live duplicate `concept_key`
+groups are `is_divergent` (incl. "Design Thinking Process" from TWO different books, jaccard 0.116) — the exact
+cross-source re-appearance D-3117 exists to accumulate. A hard body gate would be a silent no-op.
+
+SCOPE REFINEMENT (new finding this session, measured not assumed — D-3034). The ratified ACCUMULATE step wrote
+`is_convergent ← (source_diversity >= 2)` with NO content_type scope. Live-store measurement (2026-10-21, this
+session) shows the store ALREADY holds 4 convergent non-principle rows: 2 `process_template` (one at
+source_diversity=77 — a misclassified shared procedure) + 2 `noise_drop`. Therefore "convergent → principle"
+(BUG-231/BUG-166) is an EXTRACTION-layer design (the S2 convergent prompt emits principle-only), NOT a store
+invariant — and a uniform `is_convergent` flip would manufacture convergent non-principles and silently blur the
+BORP corroboration signal, which is a PRINCIPLE-scoped concept (">=2 independent sources" = the Book of Record
+Principle).
+
+RULING (refinement, not a new decision): the ACCUMULATE evidence union (`source_ids ← source_ids ∪ incoming`,
+`source_diversity ← len`) applies to ALL content types — evidence is content-agnostic and monotonic. The
+`is_convergent` FLIP is scoped to `content_type='principle'` by default, behind a config flag
+(`accumulate.is_convergent_scope: principle | all`). A multi-source non-principle keeps its `source_diversity`
+bumped (visible, useful — this IS the "convergent non-principle" signal the owner asked about) but is NOT stamped
+`is_convergent` until "convergent non-principle" is a deliberate first-class decision (candidate D-3119). This makes
+the owner's scenario DETECTED — a single-source process_template later corroborated by a NEW book advances
+source_diversity 1→2 — without silently relabeling it under BORP.
+
+State: RECONCILIATION ACCEPTED. Build proceeds on the corrected shape: record divergence (report) + accumulate
+evidence for ALL content types + `is_convergent` flip principle-scoped behind the flag.

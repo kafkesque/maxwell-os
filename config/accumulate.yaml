@@ -14,8 +14,10 @@ accumulate:
   #     A corroborated NON-principle still gets source_ids union + source_diversity bump
   #     (evidence is content-agnostic and monotonic) but is NOT relabeled under BORP
   #     (BUG-231/BUG-166 is an extraction-layer design, not a store invariant).
-  #   all: flip every content type — candidate D-3119; DO NOT set without an owner decision.
-  is_convergent_scope: principle
+  #   all: flip every content type — OWNER DECISION (D-2993 vs D-3117 conflict resolved
+  #   option (c): is_convergent is a pure re-derivation of the row's OWN source_ids, content-agnostic,
+  #   matching config/derivations.yaml, pipeline/retrieve.py ranking SQL, and stage4 origin derivation.
+  is_convergent_scope: all
   # Body fields merged field-wise. Monotonic fill: non-empty beats empty; NEVER overwrite a
   # non-empty field (D-2933 rule V); NEVER concatenate; NEVER copy a summary/noise value.
   # These are the 7 body content fields of the 8 CRIBS fields

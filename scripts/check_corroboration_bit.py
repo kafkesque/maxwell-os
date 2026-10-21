@@ -135,6 +135,19 @@ def disagreements(rows: list[dict[str, Any]], min_sources: int) -> tuple[list[st
                 f"{row.get('fb_id')}: stored source_diversity={int(row.get('source_diversity') or 0)} but the "
                 f"evidence set holds {works} distinct canonical work(s)"
             )
+        # D-3123: `origin` is a PURE function of `is_convergent` (stage4_merge.py):
+        #   is_convergent=1 -> 'convergent'; is_convergent=0 -> 'single_source' | 'singleton'.
+        # A drifted origin is the same WRONG-VALUE class as a drifted bit (D-2642).
+        origin = row.get("origin")
+        if bit == 1 and origin != "convergent":
+            faults.append(
+                f"{row.get('fb_id')}: stored origin={origin!r} but is_convergent=1 recomputes origin='convergent'"
+            )
+        elif bit == 0 and origin not in ("single_source", "singleton"):
+            faults.append(
+                f"{row.get('fb_id')}: stored origin={origin!r} but is_convergent=0 recomputes origin="
+                f"'single_source'|'singleton'"
+            )
     return faults, unreadable
 
 
@@ -144,17 +157,17 @@ def controls(min_sources: int) -> list[tuple[str, list[dict[str, Any]], bool]]:
     one = json.dumps(["work-a"])
     return [
         ("a_two_work_row_is_convergent",
-         [{"fb_id": "c1", "source_ids": two, "is_convergent": 1, "source_diversity": 2}], False),
+         [{"fb_id": "c1", "source_ids": two, "is_convergent": 1, "source_diversity": 2, "origin": "convergent"}], False),
         ("a_one_work_row_is_not_convergent",
-         [{"fb_id": "c2", "source_ids": one, "is_convergent": 0, "source_diversity": 1}], False),
+         [{"fb_id": "c2", "source_ids": one, "is_convergent": 0, "source_diversity": 1, "origin": "single_source"}], False),
         ("a_drifted_bit_is_detected",
-         [{"fb_id": "c3", "source_ids": two, "is_convergent": 0, "source_diversity": 2}], True),
+         [{"fb_id": "c3", "source_ids": two, "is_convergent": 0, "source_diversity": 2, "origin": "convergent"}], True),
         ("a_drifted_count_is_detected",
-         [{"fb_id": "c4", "source_ids": two, "is_convergent": 1, "source_diversity": 7}], True),
+         [{"fb_id": "c4", "source_ids": two, "is_convergent": 1, "source_diversity": 7, "origin": "convergent"}], True),
         ("an_unparseable_source_set_is_reported",
-         [{"fb_id": "c5", "source_ids": "[oops", "is_convergent": 0, "source_diversity": 0}], True),
+         [{"fb_id": "c5", "source_ids": "[oops", "is_convergent": 0, "source_diversity": 0, "origin": "single_source"}], True),
         ("the_threshold_comes_from_its_declared_home",
-         [{"fb_id": "c6", "source_ids": json.dumps(["a", "b"]), "is_convergent": 1, "source_diversity": 2}],
+         [{"fb_id": "c6", "source_ids": json.dumps(["a", "b"]), "is_convergent": 1, "source_diversity": 2, "origin": "convergent"}],
          min_sources != 2),
     ]
 
@@ -185,7 +198,7 @@ def live_rows() -> list[dict[str, Any]]:
         return [
             dict(row)
             for row in con.execute(
-                "SELECT fb_id, source_ids, is_convergent, source_diversity FROM fbs WHERE pipeline_run_id = ?",
+                "SELECT fb_id, source_ids, is_convergent, source_diversity, origin FROM fbs WHERE pipeline_run_id = ?",
                 (CANONICAL_RUN,),
             )
         ]

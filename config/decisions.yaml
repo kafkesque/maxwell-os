@@ -31222,3 +31222,34 @@ decisions:
   files:
   - pipeline/revert_bug959.py
   - pipeline/evidence_accumulator.py
+- id: D-3123
+  state: RESOLVED
+  date: '2026-10-21'
+  by: assistant
+  category: KNOWLEDGE ARCHITECTURE / CONVERGENCE
+  title: Amend D-3117 SCOPE REFINEMENT — is_convergent_scope := all (option c); is_convergent is a content-agnostic
+    pure re-derivation of the row's own source_ids, restoring the D-2993 invariant
+  decision: 'D-3117 SCOPE REFINEMENT AMENDED (option c). MEASURED conflict: D-2993 (RESOLVED 2026-10-14) proved
+    is_convergent == (source_diversity >= 2) == (|source_ids| >= 2) is EXACT on 7,640/7,640 rows, content-agnostic;
+    BUG-775 filed that one bit as a DERIVATION with a parity rail (scripts/check_corroboration_bit.py). D-3117 (RATIFIED
+    2026-10-21) scoped the accumulator''s is_convergent flip to content_type=principle; the accumulator then unioned
+    source_ids and bumped source_diversity 1->2 on 2 process_template rows ("Design Thinking Process") while leaving
+    is_convergent=0 — a WRONG stored value, not owner-waivable (D-2642), because is_convergent is a pure function
+    of the row''s OWN source_ids. Resolution option (c): config/accumulate.yaml is_convergent_scope := all, so is_convergent
+    flips for EVERY content type, consistent with D-2993, config/derivations.yaml (fbs.is_convergent derived_regenerable),
+    pipeline/retrieve.py ranking SQL, and stage4 origin derivation. Deterministic repair (C6, behind C13 backups
+    maxwell.db.bak_isconv_20261021_191205 and maxwell.db.bak_origin_20261021_192156): flipped is_convergent on the
+    2 process_template rows and reconciled origin = f(is_convergent) on 499 drifted rows. Post-repair: 900 is_convergent=1,
+    900 source_diversity>=2, 0 violators, 0 origin drift (7,640/7,640 re-derive exactly). The parity rail was extended
+    to also re-derive origin from is_convergent (origin-drift detection); selftest 6/6. Supersedes D-3117''s principle-scope
+    clause ONLY; the accumulator mechanism, D-3118 concept_key dependency, and BUG-780 corroboration-collapse inflation
+    limitation stand unchanged. evidence_accumulator.py already reads is_convergent_scope (scope_ok = scope == "all"
+    or principle), so NO code change was required — the flag already had an "all" arm.'
+  bugs:
+  - BUG-775
+  - BUG-780
+  files:
+  - config/accumulate.yaml
+  - scripts/check_corroboration_bit.py
+  - pipeline/evidence_accumulator.py
+  - config/derivations.yaml

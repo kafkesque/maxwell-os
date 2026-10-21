@@ -5346,3 +5346,33 @@ receipt for Maxwell's fleet = drift (D-3034/D-3036). Note 0.7.1rc1 is a release 
 owner-accepted via D-3102 with rollback `/Applications/oMLX-0.7.0.app`. TRIGGER to revisit: a commit touching base MLX
 decode/prefill or the chat-completions API for Maxwell's model families (Qwen3-Coder / gpt-oss-20b / Phi-4-mini /
 MiniCPM5 / gemma). Registered so it is not re-proposed from memory (D-3038).
+
+
+## CORRECTION (2026-10-21) — D-3117 "Poker no-op" claim SUPERSEDED by BUG-959
+
+The D-3117 note above ("Poker concept_key `ccf192e8551b` ... untouched by accumulation (no-op group)") is CORRECTED
+by BUG-959 (governance/buglog.md). The C13-backup comparison measured a real empty-field-fill: the accumulator wrote
+the principle row's application/elaboration into the process_template row (fb_id f81658d0...) whose fields were empty
+pre-run. Poker was an [ACCUMULATE] via fill (no source-growth), not a no-op. The authoritative register is BUG-959,
+which also holds the owner adjudication gate (revert 2 fields + split the false merge).
+
+## D-3121 — Qwen3.6-35B-A3B evaluated for the generator ("brain") role; DEFER swap (measure-gated), NO omlx upgrade (confirms D-3120)
+
+Examined the model the owner flagged ("qwen 3.6 35B" via the HF mlx-lm filter) = Qwen/Qwen3.6-35B-A3B. Architecture
+(qwen3_5_moe, from config.json): 35B total / A3B = 3B active MoE (256 experts, top-8), hidden 2048, 40 layers,
+16 heads, 2 KV heads, head_dim 256, vocab 248320, max_pos 262144 (irrelevant at Maxwell's 32K, D-3115).
+
+Speed: 3B active MoE -> decode/prefill in the SAME class as the current generator Qwen3-Coder-30B-A3B (measured
+34.5 tok/s). KV cache = 2x40x2x256 = 40,960 el/tok ~ 80 KB/tok fp16 ~ 2.7 GB @ 32K ctx - SMALLER than Qwen3-Coder-30B
+(48L x 4KV x 128 ~ 98 KB/tok). Memory ~ 17.5 GB @ 4-bit; the 35B class is already proven on this M1 Max (Ornith-35B
+was loaded, BUG-952).
+
+Loadable on the CURRENT omlx 0.7.1rc1: the bundled mlx-lm 0.31.4.dev132 contains mlx_lm/models/qwen3_5_moe.py
+(verified in /Applications/oMLX.app). So NO omlx upgrade is needed for this model - D-3120 stands (its trigger was
+base-MLX or chat-completions commits, not a model architecture). Community 4-bit quants exist (mlx-community/
+Qwen3.6-35B-A3B-4bit 2026-04-16; lmstudio-community/Qwen3.6-35B-A3B-MLX-4bit).
+
+"Better for brain?" is a HYPOTHESIS (D-3036), not a receipt: it is a newer GENERALIST vs a coder-specialist, plausibly
+better at general extraction/classification, but there is no measurement on this machine. DEFER the swap: the only
+future-proof path is a cheap reversible A/B vs Qwen3-Coder-30B on the S2 probe / eval floor with a red-loop receipt,
+then adopt only on a measured WIN. Registered so the swap is not proposed from memory (D-3038).

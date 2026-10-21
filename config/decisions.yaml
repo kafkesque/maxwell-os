@@ -31191,3 +31191,18 @@ decisions:
     Rollback preserved: /Applications/oMLX-0.7.0.app.'
   files:
   - config/pipeline_config.yaml
+- id: D-3121
+  state: DEFERRED
+  date: '2026-10-21'
+  by: assistant
+  category: INFRASTRUCTURE / RUNTIME
+  title: 'Qwen3.6-35B-A3B evaluated for generator role - DEFER swap (measure-gated); no omlx upgrade (confirms D-3120)'
+  decision: 'Examined Qwen/Qwen3.6-35B-A3B (qwen3_5_moe: 35B total / 3B active MoE, 40 layers, 2 KV heads, head_dim
+    256). Decode/prefill in the same class as the current generator Qwen3-Coder-30B-A3B (3B active, 34.5 tok/s);
+    KV cache ~80 KB/tok (~2.7 GB at 32K) SMALLER than the generator; ~17.5 GB at 4-bit fits 64 GB. Loadable on the
+    CURRENT omlx 0.7.1rc1 (bundled mlx-lm 0.31.4.dev132 has mlx_lm/models/qwen3_5_moe.py) so NO omlx upgrade is
+    needed; D-3120 stands. Better-for-brain is a HYPOTHESIS until a measured WIN on this machine (D-3036). DEFER the
+    swap; adopt only on a red-loop receipt from a reversible A/B vs Qwen3-Coder-30B on the S2 probe / eval floor.
+    Trigger to revisit: a WIN receipt or a Maxwell-family commit.'
+  files:
+  - config/pipeline_config.yaml

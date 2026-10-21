@@ -19445,3 +19445,33 @@ therefore be scheduled (next session start), never fired mid-session while a mod
 2. Store reshape: `scripts/normalize_absent_shape.py --column <c> --apply` × 12, each `1049 row(s) reshaped to NULL; in-tier census unchanged`, C13 backups `backups/maxwell.db.bak_20261021_1408*`.
 
 **Receipt.** `check_store_columns.py --check` before: `FAIL` (12 POPULATION-SHAPE + 5 MEASUREMENT-DRIFT + 39 census moves). After `--record`: `OWED` — debt 8 of ceiling 8 (shrink-only, pre-existing), census moves 0, the 2 `OUTSIDE-COVERAGE` lines (failure_mode, menu_hash) are declared `unconstrained` (never drift). The 12 POPULATION-SHAPE faults and the nonnull 7640→6591 drifts are GONE. The rail's remaining rc=2 is the D-2642 shrink-only debt ceiling, not BUG-766.
+
+
+## BUG-959 (HIGH, OPEN 2026-10-21) — evidence_accumulator cross-contaminated a false concept_key merge (Poker)
+
+**Finding (D-3036 receipt-backed).** `concept_key` (D-3118 Phase A) keys on name-token identity (stopword-removed
++ sorted tokens). Two DISTINCT concepts from the same book collide to one key `ccf192e8551b…` because their names
+differ only by the stopword "as" (word order is discarded by the sort):
+
+- `Poker As Decision-making Framework` — `content_type=principle` (`ct_source=llm_extracted_from_source`) —
+  poker as an ANALOGY for decision-under-uncertainty (the "Thinking in Bets" thesis, applied to markets).
+- `Poker Decision-Making Framework` — `content_type=process_template` (`ct_source=deterministic`) —
+  a METHOD to improve poker play (retrospective hand review separating skill from luck).
+
+Their `definition`s are semantically distant (uncertainty calibration vs skill-vs-luck analysis). Name-token
+identity is necessary but NOT sufficient for concept identity — this is the false-positive face of the D-3118
+name-paraphrase gap.
+
+**The damage (measured).** The D-3117 accumulator's empty-field-fill wrote the principle row's `application` and
+`elaboration` INTO the process_template row's empty `application`/`elaboration`. C13 backup
+`knowledge pipeline/maxwell.db.bak_accumulate_20261021_143827` proves the pre-run state was
+`application=''`, `elaboration=NULL` on `fb_id f81658d0e91008114672b1cbf8da28ecc04826fdbe38e6978fd7caa74d018c2b`.
+Blast radius = **1 row × 2 fields** (the only body change across the entire accumulation run; the other 2
+accumulates were source-id unions on true duplicates, no field-fill wrote new content).
+
+**Root cause.** D-3118 Phase A has no DIVERGENCE gate: two same-key rows are merged without checking definitional
+similarity. Phase B (embedding) must therefore gate accumulation BOTH ways — recover false-negative name-paraphrase
+matches AND block false-positive token collisions before a merge/fill.
+
+**Status: AWAITING OWNER ADJUDICATION.** Proposed: (1) revert the 2 contaminated fields from the C13 backup;
+(2) split the false merge (the two Poker rows are distinct concepts and must not share a concept_key).

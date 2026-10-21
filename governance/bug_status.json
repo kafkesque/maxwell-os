@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 727,
-  "open_n": 256,
-  "closed_n": 471,
+  "open_n": 255,
+  "closed_n": 472,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1282,11 +1282,6 @@
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
       "events": 3
-    },
-    {
-      "id": "BUG-962",
-      "title": "(HIGH, OPEN 2026-10-21) \u2014 check_silent_repair: 35 undeclared silent-repair sites (C16) accumulated in recently-rewritten rails",
-      "events": 1
     }
   ],
   "closed": [
@@ -1760,6 +1755,7 @@
     "BUG-958",
     "BUG-959",
     "BUG-960",
-    "BUG-961"
+    "BUG-961",
+    "BUG-962"
   ]
 }

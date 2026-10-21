@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1251 decisions (census stamp e009dad1988dc02b, 2026-10-21) · 727 bugs (256 open / 471 closed; highest OPEN = BUG-962) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1251 decisions (census stamp e009dad1988dc02b, 2026-10-21) · 727 bugs (255 open / 472 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1251 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 343 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1251, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19521,7 +19521,9 @@ RESOLVED 2026-10-21: all 31 keys paid down (29 genuine `.get(key, literal)` → 
 - **Delegation note**: Qwen3-Coder-30B delegate (subagent 20261021_5) was attempted for this but returned no output (DELEGATE-002 collapse shape); the pay-down remains EXECUTE-directly work (D2549 deterministic data-repair) and is NOT yet done.
 
 
-## BUG-962 (HIGH, OPEN 2026-10-21) — check_silent_repair: 35 undeclared silent-repair sites (C16) accumulated in recently-rewritten rails
+## BUG-962 (HIGH, RESOLVED 2026-10-21) — check_silent_repair: 35 undeclared silent-repair sites (C16) accumulated in recently-rewritten rails
+
+RESOLVED 2026-10-21: all 35 undeclared sites triaged and cleared — `unknown 35 → 0`. 21 artifact/source reads repointed to `scripts/lib/artifact_encoding.py` (`open_artifact`, fail-closed; D-2644/D-2646) across model_store_census, ws_prior_tests, stage0_convert, subagent_fanout, check_agent_surface, dispose_s0_artifacts, resolve_route; 14 foreign/derived streams (subprocess output, runtime logs, CLI answers, one re-derivable checkpoint receipt) declared under `allowed:` (7→21 allowed) in config/silent_repair.yaml. `check_silent_repair.py --check` now reads `OWED silent-repair: debt 13 of ceiling 13 | unknown 0 | allowed 21` — FATAL gone, rc=2 (owner-owed, BUG-457) is the standing state. The debt 13/13 is the PRE-EXISTING declared source-census debt (audit_final_chain, check_derivation_homes, check_revoked_references, f11_anchor_review, enhance_md_headers, fix_remaining, tools/{watch_s2,model_eval_suite,voting_report,model_eval_report}), NOT part of this finding; ceiling stays shrink-only (D-2642/D-3050). Selftests green: artifact_encoding 14/14, check_agent_surface 21/21, resolve_route 19/19, model_store_census 36/36, subagent_fanout 66/66, normalise_corpus_names 10/10. Follow-on: the repoint edit stripped subagent_fanout.py's exec bit (100755→100644), redding the bare-path `lane fanout` route (BUG-842/T-146); restored 755 in d6fb540.
 
 **Finding (receipt-backed).** `python3 scripts/check_silent_repair.py --check` returns rc=1 (FATAL): `debt 13 of ceiling 13 | unknown 35 | allowed 7`. The `unknown 35` are `errors="replace"` / `errors="ignore"` reads the scanner finds that the register declares NOWHERE. They are concentrated in recently-rewritten rails, not line-shifts of existing entries:
 - `pipeline/subagent_fanout.py` (10 sites: 156, 248, 641, 693, 716, 924, 1016, 1345, 1459, 1473) — T-163 delegation executor
@@ -19540,4 +19542,4 @@ RESOLVED 2026-10-21: all 31 keys paid down (29 genuine `.get(key, literal)` → 
 
 **Verification.** `python3 scripts/check_silent_repair.py --check` must return `unknown 0` and `debt <= 13` (rc 0). Do NOT raise `ceiling.debt`.
 
-**Status: OPEN** — 35 sites to classify+repoint/declare; EXECUTE-directly deterministic work (D-2549), no LLM needed for the mechanical repoints.
+**Status: RESOLVED** — all 35 sites classified+repointed/declared (21 repoints, 14 allowed). The remaining debt 13/13 is a separate pre-existing standing concern tracked under the shrink-only ceiling.

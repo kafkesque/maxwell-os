@@ -31317,3 +31317,24 @@ decisions:
   - config/store_authority.yaml
   - scripts/check_store_authority.py
   - config/store_columns.yaml
+- id: D-3126
+  state: RESOLVED
+  date: '2026-10-21'
+  by: assistant
+  category: STORE AUTHORITY / MODEL STORE
+  title: Dispose both ORPHAN FETCHABLE-BY-ID hub snapshots (4654.1 MB) via model_store_sweep
+  decision: 'Owner word A (dispose both). model_store_census --check reads OWNER-OWED 2 ORPHAN FETCHABLE-BY-ID repos
+    above the D-3018 floor (256.0 MiB), 4654.1 MB total: models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit (4295.9
+    MB) and models--docling-project--docling-models (358.2 MB). Forensic (receipt-backed): both are NO RESOLUTION
+    / 0 mentions; Qwen2.5-Coder-7B appears only in historical temp/llmfit_fit.json (no live code or config resolution);
+    docling-models has zero repo references (docling the tool is invoked in pipeline/stage0_convert.py, but its
+    model cache is re-downloadable). Both are FETCHABLE-BY-ID, so disposal is recoverable by re-download; no cascade,
+    no drift. The act rides model_store_sweep - the ONE route model-store bytes leave disk (T-167/D-3035), NOT safe_delete
+    (BUG-818/D-3013), which copies-before-delete - and its --selftest is 17/17 green with the served twin re-hashed
+    before any byte moves (T-167). Receipt: governance/DELETION_RECEIPT_20261021.json.'
+  bugs:
+  - BUG-818
+  files:
+  - pipeline/model_store_sweep.py
+  - pipeline/model_store_census.py
+  - config/engine.yaml

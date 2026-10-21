@@ -101,6 +101,7 @@ may_touch:
 - governance/bug_status.md
 - governance/buglog.md
 - governance/land_receipt_20261015e.json
+- governance/DELETION_RECEIPT_*.json
 - governance/session_plan_20260924.yaml
 - justfile
 - pipeline/harness_env.py
@@ -431,6 +432,16 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-21'
+  actor: assistant
+  owner_ack: 'owner 2026-10-21 (verbatim: "dispose both") — the two ORPHAN FETCHABLE-BY-ID hub snapshots'
+  addendum: 'D-3126 MODEL-STORE DISPOSAL — model_store_sweep --apply removed two ORPHAN FETCHABLE-BY-ID hub snapshots and wrote governance/DELETION_RECEIPT_20261021.json, a DATED PER-BATCH EVIDENCE receipt (the D-3035/T-167 shape). The receipt is immutable evidence written once per batch; a per-file grant would turn every future sweep into a new red line (the BUG-563 shape). Widened to the prefix family DELETION_RECEIPT_*.json so every future batch is committable without a new plan edit.'
+  additions:
+  - pattern: governance/DELETION_RECEIPT_*.json
+    why: D-3035/T-167 per-batch model-store sweep receipt — immutable evidence, one file per batch; declared in config/artifact_ownership.yaml (D-401).
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the one dated per-batch receipt family the sweep writes (measured 2026-10-21: governance/DELETION_RECEIPT_20261021.json had no declared home, so rail 0 refused the tree). No pipeline/** path, no pinned artifact, and no will_not_touch family is involved.'
 - date: '2026-10-19'
   actor: assistant
   owner_ack: 'owner 2026-10-19 (BUG-946 adjudication, verbatim: "apart from those 3 [near-same], the rest are all different")'

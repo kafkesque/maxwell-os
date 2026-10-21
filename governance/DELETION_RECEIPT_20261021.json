@@ -1,0 +1,516 @@
+{
+ "artifact": "model-store sweep receipt (D-3035/T-167)",
+ "authority": "D-3126",
+ "batch": [
+  {
+   "bytes_measured_before": 4295890004,
+   "class": "ORPHAN",
+   "kind": "bytes",
+   "path": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit",
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "repo": "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit"
+  },
+  {
+   "bytes_measured_before": 358236323,
+   "class": "ORPHAN",
+   "kind": "bytes",
+   "path": "/Users/barn/.cache/huggingface/hub/models--docling-project--docling-models",
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "repo": "models--docling-project--docling-models"
+  }
+ ],
+ "before": {
+  "buckets": {
+   "DECLARED": {
+    "bytes": 51728.0,
+    "n": 12
+   },
+   "LIVE": {
+    "bytes": 60876.4,
+    "n": 6
+   },
+   "ORPHAN": {
+    "bytes": 5502.9,
+    "n": 55
+   },
+   "PARKED": {
+    "bytes": 0.0,
+    "n": 0
+   }
+  },
+  "hub_repos_mb": 118107.4
+ },
+ "deleted_at": "2026-10-21T22:39:20",
+ "method": "direct removal of model-store bytes; NO COPY is taken (copy_policy = none-for-weights). pipeline/safe_delete.py copies the target into backup/deletions/ inside this Dropbox-synced repository (BUG-818c), so it is not the route for weights (D-3013); the RECEIPT is the evidence in the copy's place.",
+ "not_removed": [
+  {
+   "bytes": 17190.8,
+   "class": "LIVE",
+   "repo": "models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 15362.3,
+   "class": "DECLARED",
+   "repo": "models--mlx-community--pplx-decider-v1.1-27b-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 13757.0,
+   "class": "LIVE",
+   "repo": "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 12104.2,
+   "class": "LIVE",
+   "repo": "models--mlx-community--gpt-oss-20b-MXFP4-Q8",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 9536.3,
+   "class": "LIVE",
+   "repo": "models--ornith-ai--Ornith-1.5-9B-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 8845.4,
+   "class": "DECLARED",
+   "repo": "models--mlx-community--clef-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 6861.8,
+   "class": "LIVE",
+   "repo": "models--lmstudio-community--gemma-4-E4B-it-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 6214.0,
+   "class": "DECLARED",
+   "repo": "models--mlx-community--clef-flash-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 4564.4,
+   "class": "DECLARED",
+   "repo": "models--BAAI--bge-m3",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 4270.2,
+   "class": "DECLARED",
+   "repo": "models--lmstudio-community--Qwen3.8-27B-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 4136.1,
+   "class": "DECLARED",
+   "repo": "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 3429.5,
+   "class": "DECLARED",
+   "repo": "models--MoritzLaurer--bge-m3-zeroshot-v2.0",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 2293.2,
+   "class": "DECLARED",
+   "repo": "models--BAAI--bge-reranker-v2-m3",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 1526.4,
+   "class": "DECLARED",
+   "repo": "models--convaiinnovations--laya",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 1426.2,
+   "class": "LIVE",
+   "repo": "models--openbmb--MiniCPM5-2B-MLX",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 600.8,
+   "class": "DECLARED",
+   "repo": "models--answerdotai--ModernBERT-base",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 351.2,
+   "class": "DECLARED",
+   "repo": "models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 267.8,
+   "class": "ORPHAN",
+   "repo": "models--typeform--distilbert-base-uncased-mnli",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 171.8,
+   "class": "ORPHAN",
+   "repo": "models--docling-project--docling-layout-heron",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 134.5,
+   "class": "DECLARED",
+   "repo": "models--BAAI--bge-small-en-v1.5",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 131.2,
+   "class": "ORPHAN",
+   "repo": "models--minishlab--potion-base-32M",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 91.8,
+   "class": "ORPHAN",
+   "repo": "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 91.6,
+   "class": "ORPHAN",
+   "repo": "models--sentence-transformers--all-MiniLM-L6-v2",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 91.1,
+   "class": "ORPHAN",
+   "repo": "models--Qdrant--all-MiniLM-L6-v2-onnx",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 3.2,
+   "class": "ORPHAN",
+   "repo": "models--google--flan-t5-base",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-E4B-it-MLX-5bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-E4B-it-MLX-6bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-E4B-it-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-26B-A4B-it-QAT-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolVLM-256M-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolVLM-500M-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceM4--Idefics3-8B-Llama3",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-12B-it-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--gemma-4-12B-it-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--StargazerLabs--Qwen3.8-23B-Mini-Me-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.8-27B-MLX-5bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.8-27B-MLX-6bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.8-27B-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--mlx-community--Qwen3.8-27B-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.6-27B-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.6-27B-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--jialinyyzz--humanizer",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--keXjos--Qwen3.8-9B-mlx-4Bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolVLM2-256M-Video-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--prism-ml--Bonsai-27B-mlx-1bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--prism-ml--Ternary-Bonsai-27B-mlx-2bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolVLM2-500M-Video-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolVLM2-2.2B-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--ornith-ai--Ornith-1.5-35B-A3B-MLX",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.5-9B-MLX-4bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--lmstudio-community--Qwen3.5-9B-MLX-8bit",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--mlx-community--mlx-mistral-7B-v0.1",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--Pluto-AI-Labs--Qwen3.8-27B-MLX",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM3-3B",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--GSAI-ML--LLaDA-8B-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--hugging-quants--gemma-2-9b-it-AWQ-INT4",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--hugging-quants--Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--hugging-quants--Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM3-3B-Base",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-1.7B-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-135M-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-360M-Instruct",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceFW--fineweb-edu-classifier",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM-135M",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-135M",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM-1.7B",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-360M",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceH4--zephyr-7b-beta",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  },
+  {
+   "bytes": 0.0,
+   "class": "ORPHAN",
+   "repo": "models--HuggingFaceTB--SmolLM2-1.7B",
+   "why": "not an offered class, or at/below the declared floor (D-3018)"
+  }
+ ],
+ "order": [
+  "name",
+  "bytes"
+ ],
+ "rule": {
+  "copy_policy": "none-for-weights",
+  "offered_classes": [
+   "SHADOW",
+   "ORPHAN"
+  ],
+  "order": [
+   "name",
+   "bytes"
+  ],
+  "owner_word_prefix": "D-",
+  "receipt_dir": "governance",
+  "receipt_prefix": "DELETION_RECEIPT_",
+  "receipt_suffix": ".json",
+  "verify_digest": true
+ },
+ "schema_version": "1",
+ "verification": {
+  "buckets_after": {
+   "DECLARED": {
+    "bytes": 51728.0,
+    "n": 12
+   },
+   "LIVE": {
+    "bytes": 60876.4,
+    "n": 6
+   },
+   "ORPHAN": {
+    "bytes": 848.8,
+    "n": 53
+   },
+   "PARKED": {
+    "bytes": 0.0,
+    "n": 0
+   }
+  },
+  "buckets_moved_only_by_these_bytes": true,
+  "surviving_twin": {}
+ }
+}

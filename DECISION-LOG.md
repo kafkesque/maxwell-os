@@ -5307,3 +5307,42 @@ source_diversity 1→2 — without silently relabeling it under BORP.
 
 State: RECONCILIATION ACCEPTED. Build proceeds on the corrected shape: record divergence (report) + accumulate
 evidence for ALL content types + `is_convergent` flip principle-scoped behind the flag.
+
+## D-3117 BUILD COMPLETE — evidence_accumulator applied to live store (2026-10-21)
+
+D-3117 cross-run evidence accumulation is BUILT and APPLIED. Artifacts: `config/accumulate.yaml` (config-first,
+C12) + `pipeline/evidence_accumulator.py` (deterministic, LLM-free) + `governance/evidence_accumulator_receipt.jsonl`.
+
+R5 review (gemma-4-E4B-it-MLX-4bit, generator≠verifier) found 2 real defects, both FIXED:
+(1) noisy receipt filter — `len(source_set_of(v)) >= 2` admitted single-row already-convergent groups, flooding
+the receipt with hundreds of no-op `[2]->2`/`[49]->49` rows and making `--check` always red; fixed to `len(v) >= 2`
+(cross-row = 2+ distinct fb_ids) + a computed `would_accumulate` (source-growth OR empty-field-fill) so the red-loop
+goes GREEN after apply (D-3036). (2) dead imports `shutil` + `PROJECT_ROOT` removed (C19). The verifier also raised
+a NO-GO on a claimed non-idempotency; REFUTED EMPIRICALLY — apply on a copy then re-run: PASS1 would_accumulate=3,
+PASS2 would_accumulate=0 (idempotent+monotonic by construction: source union + empty-field-fill only).
+
+LIVE APPLY (behind C13 backup `knowledge pipeline/maxwell.db.bak_accumulate_20261021_143827`): 5 duplicate
+concept_key groups, 3 accumulated, 2 no-op, verified green (`--check` exit 0). Receipt is the D-3036 red-loop instrument.
+
+TWO ONTOLOGICAL FINDINGS (owner-gated follow-ups, NOT accumulator defects):
+(1) "Social Identity Influence on Behavior" (principle, key `1d2d0aca1632`) — 2 paraphrased-name rows from 2 sources
+flipped `is_convergent=1` with `is_divergent=True` (bodies differ): convergent-per-D3117 but divergent-per-body — the
+"corroboration vs convergence" boundary, recorded not resolved.
+(2) "Poker" concept_key `ccf192e8551b` groups the SAME concept under TWO content_types: "Poker As Decision-making
+Framework" (principle) + "Poker Decision-Making Framework" (process_template) — a PRE-EXISTING classification
+conflation surfaced by the key, untouched by accumulation (no-op group). Owner adjudication required.
+
+## D-3120 — DEFER oMLX 0.7.2 upgrade (2026-10-21)
+
+Examined `jundot/omlx` v0.7.1...v0.7.2 (32 commits via GitHub API). ~28 of 32 are IRRELEVANT to Maxwell's headless
+single-machine non-MTP non-GGUF non-deepseek usage: web-UI/cosmetic (status card, dark theme, navbar keyboard nav,
+i18n, WCAG AA, copy buttons), Splash/specprefill/DFlash speculative-decode refactors (`mtp_enabled=false`), cluster
+MTP (multi-Mac), and model-family perf (deepseek_v41 oQ2e-oQ4e, Qwen3.8-Flash-Next GGUF, ParoQuant Qwen). The ~4
+relevant ones are API hardening (reject non-positive max_tokens; system-note ordering after a tool result; bound
+thinking for Claude Code auto-mode) that Maxwell's single-shot `omlx_call.py` path likely never triggers.
+
+Verdict: DEFER. 0.7.1rc1 was A/B-ADOPTED 2 days ago (D-3102) with a receipt; a blind 0.7.2 upgrade has zero red-loop
+receipt for Maxwell's fleet = drift (D-3034/D-3036). Note 0.7.1rc1 is a release candidate — a mild hygiene smell, but
+owner-accepted via D-3102 with rollback `/Applications/oMLX-0.7.0.app`. TRIGGER to revisit: a commit touching base MLX
+decode/prefill or the chat-completions API for Maxwell's model families (Qwen3-Coder / gpt-oss-20b / Phi-4-mini /
+MiniCPM5 / gemma). Registered so it is not re-proposed from memory (D-3038).

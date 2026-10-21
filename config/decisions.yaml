@@ -31175,3 +31175,19 @@ decisions:
   - pipeline/stage6_commit.py
   - pipeline/dedup_identity.py
   - config/dedup_identity.yaml
+- id: D-3120
+  state: DEFERRED
+  date: '2026-10-21'
+  by: assistant
+  category: INFRASTRUCTURE / RUNTIME
+  title: 'Defer oMLX 0.7.2 upgrade — no relevant commits for Maxwell fleet; revisit on trigger'
+  decision: 'Examined jundot/omlx v0.7.1...v0.7.2 (32 commits). ~28/32 irrelevant to headless single-machine
+    non-MTP non-GGUF non-deepseek usage (web-UI cosmetic, Splash/specprefill speculative-decode refactors,
+    cluster MTP, deepseek_v41 oQ / Qwen3.8-Flash-Next GGUF / ParoQuant Qwen perf). ~4 relevant are API hardening
+    (reject non-positive max_tokens, system-note ordering, bound Claude Code auto-mode thinking) likely never
+    triggered by single-shot omlx_call.py. DEFER: 0.7.1rc1 A/B-adopted 2 days ago (D-3102) with receipt; blind
+    upgrade = drift (D-3034/D-3036). Trigger to revisit: a commit touching base MLX decode/prefill or the
+    chat-completions API for Maxwell model families (Qwen3-Coder / gpt-oss-20b / Phi-4-mini / MiniCPM5 / gemma).
+    Rollback preserved: /Applications/oMLX-0.7.0.app.'
+  files:
+  - config/pipeline_config.yaml

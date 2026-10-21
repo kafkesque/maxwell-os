@@ -9,6 +9,7 @@ next_state:
 - owner's ANCHOR-4 depth pass (150/150, drop-in) receipted, write-locked and scored against the pre-registered references; ANCHOR-4 sheet itself STILL not written (owner gate)
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- governance/evidence_accumulator_receipt.jsonl
 - governance/ACQUISITION_PIPELINE_SPEC_20261017.md
 #: D-3078 THE LANE ITSELF (2026-10-17): the downloader is four modules behind one protocol, one CLI and one
 #: declaration. Each is granted as a family because the lane's own run artefacts are DATED and re-derived

@@ -319,6 +319,8 @@ the same fault as an unpinned value (BUG-869), one layer out.
 | cleanlab_label_audit / nli_label_audit | 2026-10-xx | Label-audit runs (cleanlab challenger + NLI audit). | `governance/cleanlab_label_audit.md`, `governance/nli_label_audit.md` |
 | BORP_FEEDBACK_ASSESSMENT | 2026-10-13 | BORP feedback assessment. | `governance/BORP_FEEDBACK_ASSESSMENT_20261013.md` |
 | INTAKE_ASSESSMENT | 2026-10-14 | Intake/curator assessment. | `governance/INTAKE_ASSESSMENT_20261014.md` |
+| MARKET_RESEARCH_20261021 | 2026-10-21 | Agentic-RAG video audit (turbopuffer "RIP vector DB"): **MAXWELL ALREADY AT FRONTIER** (Keyword/FTS5/Vector/Hybrid-RRF/Graph/Agentic all shipped in retrieve.py); D-3118 dual-identity (lexical + embedding) independently confirmed; REFERENCE ColBERT late-interaction + Frames/Enterprise-RAG-Bench as eval harnesses; DEFER hop-count routing. | `governance/MARKET_RESEARCH_20261021.md` |
+| MARKET_RESEARCH_20261021_KARPATHY | 2026-10-21 | Karpathy "99% use AI wrong" (beamnxw): **CONFIRMATION ONLY** — context-window=working-memory + distraction-degrades-accuracy validates selective verified-extraction injection; search/tool-use = "most useful tool" (already shipped). REFERENCE context-hygiene framing; no new technique. | `governance/MARKET_RESEARCH_20261021.md` |
 
 **Net of the aggregation:** 27 scattered research docs indexed in one place. The two genuinely-NEW candidate families
 that were NOT yet reflected in this register's P1/P2/P3 rows are (a) the **ontology R1-R20 set** and (b) the

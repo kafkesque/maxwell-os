@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 723,
-  "open_n": 256,
-  "closed_n": 467,
+  "total_ids": 724,
+  "open_n": 255,
+  "closed_n": 469,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -929,11 +929,6 @@
       "events": 1
     },
     {
-      "id": "BUG-766",
-      "title": "(HIGH - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: TWELVE columns declare `outside:",
-      "events": 1
-    },
-    {
       "id": "BUG-767",
       "title": "(HIGH - OPEN 2026-10-13) - the RETIRED trust metric still leaves the machine, published to agents and written into two exports",
       "events": 1
@@ -1636,6 +1631,7 @@
     "BUG-763",
     "BUG-764",
     "BUG-765",
+    "BUG-766",
     "BUG-769",
     "BUG-770",
     "BUG-776",
@@ -1756,6 +1752,7 @@
     "BUG-953",
     "BUG-955",
     "BUG-957",
-    "BUG-958"
+    "BUG-958",
+    "BUG-959"
   ]
 }

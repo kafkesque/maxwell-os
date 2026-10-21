@@ -31253,3 +31253,38 @@ decisions:
   - scripts/check_corroboration_bit.py
   - pipeline/evidence_accumulator.py
   - config/derivations.yaml
+- id: D-3124
+  state: RESOLVED
+  date: '2026-10-21'
+  by: assistant
+  category: KNOWLEDGE ARCHITECTURE / GENERATOR IDENTITY
+  title: Re-mint probe_phi4mini generator pin via new kind omlx_dir (option B) after D-3035 deleted the
+    redundant HF hub snapshot
+  decision: 'RED probe_phi4mini: pinned kind hf_repo -> mlx-community/Phi-4-mini-instruct-8bit snapshot; D-3035
+    deleted that hub snapshot as redundant-by-content with the OMLX served copy (same model.safetensors content
+    84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1e89ee4d347a50a24 at 4,076,012,072 B). The pin therefore
+    measured MISSING -> FATAL (C16): the rail could not say which bytes produced the S2 probe numbers. Resolution
+    OPTION B (owner-chosen): extend the pin schema with a third kind omlx_dir that resolves a real-file served
+    directory under omlx_models (~/.omlx/models); re-mint probe_phi4mini as kind omlx_dir, dir
+    Phi-4-mini-instruct-8bit. Rejected option A (re-download the 4 GB hub snapshot: recreates the exact redundancy
+    D-3035 deleted) and option C (retire the pin: Phi-4-mini is still LIVE as the S2 fast probe per D2319,
+    config/model_assignments.yaml T2_GATE/T3_GATE/CONTEXT_CLASS/CODING_DRAFT, config/pipeline_config.yaml fast_model).
+    NEW IDENTITY MEASURED: 14 files, 4,097,978,555 B, sparse_sha256 afe419cf6651055b221bfd375d6e5213b2b5aafb99cba72ae69f6a03b0c8a939,
+    deep identity_sha256 5d12bae521ca5ce935a533b66b044bc2ba3c339d267d2f3be750420c62341da5 (content, --deep only).
+    The served dir is a symlink ~/.omlx/models/Phi-4-mini-instruct-8bit -> ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit;
+    the pin .resolve()s it so a re-pointed symlink is caught via the manifest change, and because py3.13 rglob no
+    longer follows directory symlinks. DESIGN: a real-file dir is NOT content-addressed like an HF blob-symlink
+    snapshot, so identity_sha256 is DEEP-ONLY and is NOT declared as a daily-checked fact (declaring it would make
+    the daily check OWED "not measurable", the BUG-492 shape); the daily check enforces the sparse manifest
+    (file_count/bytes/sparse_sha256) and --pin --deep re-verifies content on demand. The weight-file content receipt
+    is already pinned by D-3035. SCHEMA EXTENSION: scripts/verify_generator_pins.py adds omlx_dir to measure() and
+    _pin(), adds _probe_omlx() plus two known-answer controls (selftest 12->14, BUG-492); config/generator_pins.yaml
+    adds top-level omlx_models (mirrors hf_cache/ollama_manifests) and bumps decided to D-3124. BOUNDARY: omlx_models
+    is scoped to "where this rail resolves OMLX-served generator bytes", distinct from config/engine.yaml model_dir
+    (the engine launch config) - two rules, two homes (D-2646); no alias_snapshots for omlx_dir (an HF-snapshot
+    concept).'
+  bugs: []
+  files:
+  - scripts/verify_generator_pins.py
+  - config/generator_pins.yaml
+  - justfile

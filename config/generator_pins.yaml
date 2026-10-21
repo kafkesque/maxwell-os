@@ -26,10 +26,11 @@
 # `identity_sha256` wherever the snapshot is symlinked (the blob basename is the content digest).
 
 schema_version: '1'
-decided: D-2809            # minted by owner ruling (D-2809); was PENDING - the rail never writes this file (D-382)
+decided: D-3124            # re-minted probe_phi4mini via kind omlx_dir (option B, D-3124); the rail never writes this file (D-382)
 
 hf_cache: "~/.cache/huggingface/hub"
 ollama_manifests: "~/.ollama/models/manifests"
+omlx_models: "~/.omlx/models"
 
 pins:
 - name: generator_s2
@@ -79,14 +80,16 @@ pins:
 - name: probe_phi4mini
   role: "S2 fast probe - summarization WITH source text (D2319); NOT an S5 verifier (D2298)"
   served_as: Phi-4-mini-instruct-8bit
-  kind: hf_repo
-  repo: mlx-community/Phi-4-mini-instruct-8bit
-  rev: 93b273a5497a4fcdcfb7ac00143565506b4f72e4   # AUDIT 2026-09-26: was a TRUNCATED prefix (93b273a5497a)
-  resolved_commit: 93b273a5497a4fcdcfb7ac00143565506b4f72e4
-  file_count: 12
-  bytes: 4097975786
-  sparse_sha256: 97ad18a0e77a06101b7a4d7c14f151c4fe37dfde7280eccfe5ce763973ae3094
-  identity_sha256: c0a22c2e71f1adfd4890d5d5261aaf672d78b9cfe3b75ca472122fa1d8edc60d
+  kind: omlx_dir
+  dir: Phi-4-mini-instruct-8bit   # D-3124 (option B re-mint): D-3035 deleted the HF hub snapshot as redundant-by-content
+  #   with THIS served copy (same model.safetensors content 84bcf5553d78... at 4,076,012,072 B). OMLX serves it from
+  #   ~/.omlx/models/Phi-4-mini-instruct-8bit (symlink -> ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit). A real-file
+  #   dir is NOT content-addressed like an HF snapshot, so identity_sha256 is DEEP-ONLY and is NOT a daily-checked fact
+  #   here: the daily check enforces the sparse manifest below, --pin --deep re-verifies content on demand (deep
+  #   identity_sha256 5d12bae521ca5ce935a533b66b044bc2ba3c339d267d2f3be750420c62341da5 recorded in D-3124).
+  file_count: 14
+  bytes: 4097978555
+  sparse_sha256: afe419cf6651055b221bfd375d6e5213b2b5aafb99cba72ae69f6a03b0c8a939
 
 - name: nli_verifier_s5
   role: "S5 fail-closed NLI verifier (D2298) - the rail that decides what may ship"

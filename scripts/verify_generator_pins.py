@@ -41,6 +41,13 @@ Usage:
   python3 scripts/verify_generator_pins.py --deep      # also hash file CONTENTS (slow, opt-in)
   python3 scripts/verify_generator_pins.py --pin       # print the measured pins (never writes)
   python3 scripts/verify_generator_pins.py --selftest  # known-answer controls; they must be SEEN to fire
+
+KINDS (D-3124 added omlx_dir): hf_repo (HF hub snapshot, content-addressed via blob symlinks) and
+ollama_manifest (content-addressed registry) carry identity_sha256 CHEAPLY. omlx_dir is a REAL-FILE
+served directory (~/.omlx/models/<name>), so identity_sha256 is DEEP-ONLY (real files must be hashed):
+its pin declares the sparse manifest (file_count/bytes/sparse_sha256) and the daily check enforces
+THAT; --pin --deep re-verifies content on demand. A real-file dir is the NORMAL shape for an OMLX
+served model, not a drift - unlike an HF snapshot whose symlinks collapse (the BUG-492 shape).
 """
 from __future__ import annotations
 
@@ -171,6 +178,20 @@ def measure(pin: dict, cfg: dict, deep: bool = False) -> dict | None:
             "sparse_sha256": sparse_sha256(entries),
             "identity_sha256": identity_sha256(entries),
         }
+    if pin["kind"] == "omlx_dir":
+        # D-3124: an OMLX served directory is a REAL-FILE dir (often a symlink under ~/.omlx/models
+        # to a stashed real dir). .resolve() collapses the symlink so rglob works on py3.13 (rglob no
+        # longer follows dir symlinks) and so a re-pointed symlink is caught via the manifest change.
+        base = (pathlib.Path(cfg["omlx_models"]).expanduser() / pin["dir"]).resolve()
+        if not base.is_dir():
+            return None
+        entries = _entries(base, deep)
+        return {
+            "file_count": len(entries),
+            "bytes": sum(size for _, size, _ in entries),
+            "sparse_sha256": sparse_sha256(entries),
+            "identity_sha256": identity_sha256(entries),
+        }
     if pin["kind"] == "ollama_manifest":
         return ollama_measure(pathlib.Path(cfg["ollama_manifests"]).expanduser(), pin["tag"])
     raise SystemExit("unknown pin kind: " + str(pin.get("kind")))
@@ -258,7 +279,7 @@ def scan_split(cfg: dict, deep: bool = False) -> tuple[list[str], list[str]]:
                          " bytes produced the numbers")
             continue
         if got is None:
-            where = pin.get("repo", pin.get("tag"))
+            where = pin.get("repo") or pin.get("tag") or pin.get("dir")
             fatal.append(f"{name}: pinned object is MISSING from disk ({where}) - a broken declaration fails"
                          " CLOSED (C16): we cannot say which model produced the numbers")
             continue
@@ -346,6 +367,25 @@ def _probe(declare: bool = True, move_sparse: bool = False, move_blob: bool = Fa
         return len(fatal), len(owed), len(all_faults(cfg))
 
 
+def _probe_omlx(missing: bool = False) -> tuple[int, int, int]:
+    """Known-answer control for kind omlx_dir: a REAL-FILE served directory (not an HF snapshot)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        models = root / "models"
+        d = models / "probe"
+        d.mkdir(parents=True)
+        (d / "model.safetensors").write_bytes(b"weights")
+        (d / "config.json").write_text("{}", encoding=_ENCODING)
+        cfg = {"omlx_models": str(models),
+               "pins": [{"name": "omlx", "kind": "omlx_dir", "dir": "probe"}]}
+        for pin in cfg["pins"]:
+            pin.update(measure(pin, cfg) or {})
+        if missing:
+            shutil.rmtree(d)
+        fatal, owed = scan_split(cfg)
+        return len(fatal), len(owed), len(all_faults(cfg))
+
+
 def _selftest() -> int:
     """Controls that must be SEEN to fire: a control that never fails is a comment (BUG-492)."""
     checks: list[tuple[str, bool]] = [
@@ -369,6 +409,9 @@ def _selftest() -> int:
          _probe(alias="main", alias_differs=True) == (0, 1, 1)),
         ("an ALIAS snapshot that is declared but absent is FATAL (C16 fail closed)",
          _probe(alias="main", alias_missing=True) == (1, 0, 1)),
+        ("an OMLX-served directory that matches disk is CLEAN", _probe_omlx() == (0, 0, 0)),
+        ("an OMLX-served directory that is absent is FATAL (C16 fail closed)",
+         _probe_omlx(missing=True) == (1, 0, 1)),
     ]
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
@@ -385,6 +428,9 @@ def _pin(cfg: dict, deep: bool) -> int:
             print(f"  kind: {pin['kind']}")
             print(f"  repo: {pin['repo']}")
             print(f"  rev: {pin['rev']}")
+        elif pin["kind"] == "omlx_dir":
+            print(f"  kind: {pin['kind']}")
+            print(f"  dir: {pin['dir']}")
         try:
             got = measure(pin, cfg, deep)
         except RevUnresolved as exc:

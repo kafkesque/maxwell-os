@@ -73,8 +73,8 @@ def load_inputs() -> tuple[dict[str, Any], dict[str, Any], set[str], set[str]]:
     Returns:
         (displaced_to, alias_map, canonical_domains, canonical_disciplines)
     """
-    tax = yaml.safe_load(TAXONOMY_PATH.read_text())
-    aliases = yaml.safe_load(ALIAS_MAP_PATH.read_text())
+    tax = yaml.safe_load(TAXONOMY_PATH.read_text(encoding='utf-8'))
+    aliases = yaml.safe_load(ALIAS_MAP_PATH.read_text(encoding='utf-8'))
     meta = tax.get("meta", {})
     if "displaced_to" not in meta:
         raise RuntimeError(
@@ -254,7 +254,7 @@ def write_triage(rows: list[dict[str, Any]], path: Path) -> int:
     """Write the per-cell triage CSV (auditable owner-signature surface)."""
     n = 0
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="") as fh:
+    with path.open("w", newline="", encoding='utf-8') as fh:
         writer = csv.DictWriter(fh, fieldnames=list(TRIAGE_COLUMNS))
         writer.writeheader()
         for row in rows:

@@ -1155,8 +1155,8 @@ mutations:
   - id: the_self_scan_may_read_the_control_data
     subject: scripts/agent_context_probe.py
     op: replace
-    find: '    return Path(__file__).read_text().split(REPORT_PATH_MARKER, 1)[0]'
-    replace: '    return Path(__file__).read_text().split(REPORT_PATH_MARKER, 1)[-1]  # MUTATION (D-2679): the scan reads control data'
+    find: '    return Path(__file__).read_text(encoding=''utf-8'').split(REPORT_PATH_MARKER, 1)[0]'
+    replace: '    return Path(__file__).read_text(encoding=''utf-8'').split(REPORT_PATH_MARKER, 1)[-1]  # MUTATION (D-2679): the scan reads control data'
     runner: scripts/agent_context_probe.py
     runner_args: [--selftest]
     expect: red

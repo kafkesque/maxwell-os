@@ -31,7 +31,7 @@ PROMPT_WORDS = 24
 def conf() -> dict:
     """Engine facts from their one home (C12)."""
     import yaml
-    return yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())["engine"]
+    return yaml.safe_load((ROOT / "config" / "engine.yaml").read_text(encoding='utf-8'))["engine"]
 
 
 def token() -> str:
@@ -87,7 +87,7 @@ def main(argv: list[str]) -> int:
 
     def emit(line: str) -> None:
         lines.append(line)
-        with open(report, "a") as fh:
+        with open(report, "a", encoding='utf-8') as fh:
             fh.write(line.rstrip() + chr(10))
             fh.flush()
 
@@ -181,7 +181,7 @@ def main(argv: list[str]) -> int:
         emit(f"  unload http={code}")
 
     if args.json_out:
-        pathlib.Path(args.json_out).write_text(json.dumps(result, indent=1))
+        pathlib.Path(args.json_out).write_text(json.dumps(result, indent=1), encoding='utf-8')
     emit(f"STEP total: {time.time() - t0:.0f}s")
     emit("TERMINAL: DONE - fetched, discovered by the engine, exercised and released")
     return 0

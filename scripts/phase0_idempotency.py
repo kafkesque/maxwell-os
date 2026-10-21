@@ -51,7 +51,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
         import yaml
     except ImportError as e:  # C16: no silent error
         raise RuntimeError(f"PyYAML unavailable ({e}); cannot read {path}") from e
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         doc = yaml.safe_load(f)
     if not isinstance(doc, dict):
         raise RuntimeError(f"{path} is not a YAML mapping")
@@ -134,7 +134,7 @@ _STAGE_DIR_KEY = {
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -337,7 +337,7 @@ def main() -> int:
         result = diff(block)
         report_path = PROJECT_ROOT / block["diff"]["report_path"]
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
+        report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
         print(json.dumps(result, indent=2, ensure_ascii=False))
         if result["corpus_confound"] and block["diff"].get("assert_corpus_identical"):
             print("❌ CONFOUND: the two arms converted different source docs — test invalid")

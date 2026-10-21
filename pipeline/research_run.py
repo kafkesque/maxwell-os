@@ -83,7 +83,7 @@ def _guards() -> dict:
     home = ROOT / "config" / "engine.yaml"
     if not home.exists():
         raise SystemExit(f"FATAL: {home} is absent - it is the one home for the delegation budgets (C12)")
-    guards = ((yaml.safe_load(home.read_text()) or {}).get("fanout") or {}).get("guards")
+    guards = ((yaml.safe_load(home.read_text(encoding='utf-8')) or {}).get("fanout") or {}).get("guards")
     if not isinstance(guards, dict):
         raise SystemExit("FATAL: config/engine.yaml declares no fanout.guards block - a workstream "
                          "without a declared budget is the BUG-809 defect (D-3020)")
@@ -102,7 +102,7 @@ def _agent_context() -> dict:
     import yaml
     if not AGENT_CONTEXT.exists():
         raise SystemExit(f"FATAL: {AGENT_CONTEXT} is absent - it is the one home for the class bounds (C12)")
-    doc = yaml.safe_load(AGENT_CONTEXT.read_text()) or {}
+    doc = yaml.safe_load(AGENT_CONTEXT.read_text(encoding='utf-8')) or {}
     if not doc.get("classes") or not doc.get("workstreams"):
         raise SystemExit("FATAL: config/agent_context.yaml declares no classes/workstreams block - a "
                          "workstream without a declared class is the BUG-828 defect (fail-closed, C16)")
@@ -212,7 +212,7 @@ def write_json(path: pathlib.Path, obj: dict) -> None:
 def read_json(path: pathlib.Path) -> dict:
     """Read a state file, returning {} when it is absent or unreadable."""
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding='utf-8'))
     except Exception:
         return {}
 
@@ -220,7 +220,7 @@ def read_json(path: pathlib.Path) -> dict:
 def append_line(path: pathlib.Path, line: str) -> None:
     """Append one line to an append-only report (fsync'd - a report is evidence)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a") as fh:
+    with open(path, "a", encoding='utf-8') as fh:
         fh.write(line.rstrip("\n") + "\n")
         fh.flush()
         os.fsync(fh.fileno())
@@ -275,7 +275,7 @@ def terminal_line(report: pathlib.Path) -> str | None:
     """Return the workstream's own TERMINAL line, or None when it has not declared one."""
     if not report.exists():
         return None
-    for raw in report.read_text(errors="replace").splitlines():
+    for raw in report.read_text(errors="replace", encoding='utf-8').splitlines():
         if raw.startswith(TERMINAL):
             return raw
     return None
@@ -285,7 +285,7 @@ def last_heartbeat(report: pathlib.Path) -> str | None:
     """Return the last STEP line, so a long workstream is readable while it runs."""
     if not report.exists():
         return None
-    lines = [l for l in report.read_text(errors="replace").splitlines() if l.startswith(HEARTBEAT)]
+    lines = [l for l in report.read_text(errors="replace", encoding='utf-8').splitlines() if l.startswith(HEARTBEAT)]
     return lines[-1] if lines else None
 
 
@@ -294,14 +294,14 @@ def new_run(run_id: str, brief_path: pathlib.Path | None, brief_text: str | None
     _assert_slug(run_id, "run id")
     root = RUNS / run_id
     root.mkdir(parents=True, exist_ok=True)
-    body = brief_path.read_text() if brief_path else (brief_text or "")
-    (root / BRIEF).write_text(body.rstrip("\n") + "\n")
+    body = brief_path.read_text(encoding='utf-8') if brief_path else (brief_text or "")
+    (root / BRIEF).write_text(body.rstrip("\n") + "\n", encoding='utf-8')
     return root
 
 
 def _meaningful(path: pathlib.Path) -> bool:
     """True when a file exists and carries more than whitespace (an empty prompt is a no-op call)."""
-    return path.exists() and bool(path.read_text(errors="replace").strip())
+    return path.exists() and bool(path.read_text(errors="replace", encoding='utf-8').strip())
 
 
 def materialise_prompt(wsd: pathlib.Path) -> tuple[int, str]:
@@ -318,7 +318,7 @@ def materialise_prompt(wsd: pathlib.Path) -> tuple[int, str]:
         return prompt.stat().st_size, "prompt present"
     brief = wsd.parent / BRIEF
     if _meaningful(brief):
-        prompt.write_text(brief.read_text())
+        prompt.write_text(brief.read_text(encoding='utf-8'), encoding='utf-8')
         return prompt.stat().st_size, f"materialised from run brief ({brief.stat().st_size}B)"
     return 0, "no prompt and no run brief - refused (BUG-833)"
 
@@ -363,7 +363,7 @@ def start(run_id: str, ws: str, cmd: str, timeout_s: int | None = None, note: st
                         f"command carries the harness marker {hit} but class '{ws_class or DEFAULT_CLASS}' "
                         f"declares transcript_in_ws: false - run it as a harness class (T-154)",
                         resolved_timeout, resolved_stall, kill_on_stall, note)
-    (wsd / CMD).write_text(cmd.rstrip("\n") + "\n")
+    (wsd / CMD).write_text(cmd.rstrip("\n") + "\n", encoding='utf-8')
     bound = class_env(spec, wsd)
     append_line(wsd / REPORT, "# class env: " + (", ".join(f"{k}={v}" for k, v in sorted(bound.items()))
                                                  or "none declared"))
@@ -509,7 +509,7 @@ def _pointer(value: str) -> object:
             path = ROOT / ref
         if not path.exists():
             raise SystemExit(f"FATAL: the pointer {value} names {path}, which does not exist")
-        doc = yaml.safe_load(path.read_text()) or {}
+        doc = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     else:
         dotted = text
         doc = _CONTEXT
@@ -601,7 +601,7 @@ def _binding_verdict(tb: dict, models: list[str], ceiling_tokens: int) -> str:
         return "owner_owed"
     import json
     try:
-        doc = json.loads(path.read_text())
+        doc = json.loads(path.read_text(encoding='utf-8'))
     except Exception:
         return "CONTRADICTION"
     for model in models:
@@ -744,7 +744,7 @@ def selftest() -> int:
     # The runner's own liveness controls still need a non-empty mandate: start's prompt gate must
     # hold for EVERY workstream (T-160), so give the harness run a brief to materialise.
     (RUNS / rnd).mkdir(parents=True, exist_ok=True)
-    (RUNS / rnd / BRIEF).write_text("selftest control brief - the runner's own liveness/harness controls\n")
+    (RUNS / rnd / BRIEF).write_text("selftest control brief - the runner's own liveness/harness controls\n", encoding='utf-8')
 
     start(rnd, "early", 'echo boot >> "$WS_REPORT"; echo "TERMINAL: DONE - finished before the process ended" >> "$WS_REPORT"; sleep 90',
           timeout_s=120, note="declares its end, then keeps existing")
@@ -846,7 +846,7 @@ def selftest() -> int:
     if (RUNS / rq).exists():
         shutil.rmtree(RUNS / rq)
     (RUNS / rq).mkdir(parents=True, exist_ok=True)
-    (RUNS / rq / BRIEF).write_text("selftest control brief - the harness-class refusal controls (T-154)\n")
+    (RUNS / rq / BRIEF).write_text("selftest control brief - the harness-class refusal controls (T-154)\n", encoding='utf-8')
     marked = f'echo "{marker}pi --help" >/dev/null; sleep 30'
     bad_class = start(rq, "unbound", marked, timeout_s=10, note="a harness marker under a one-shot class")
     add("a_harness_marker_under_a_one_shot_class_is_REFUSED_T154",
@@ -916,9 +916,9 @@ def selftest() -> int:
     # ceiling, so a bound above it contradicts the budget and an absent bound is OWNER-OWED (never a pass).
     model = (_CONTEXT["routing"]["measured_routable_20261014"]["agent_loop"] or [""])[0]
     bound_file = ws_dir(rnd, "early") / "engine_bound_control.json"
-    bound_file.write_text(json.dumps({"models": {model: {"max_tokens": 10 ** 9}}}))
+    bound_file.write_text(json.dumps({"models": {model: {"max_tokens": 10 ** 9}}}), encoding='utf-8')
     unbound_file = ws_dir(rnd, "early") / "engine_unbound_control.json"
-    unbound_file.write_text(json.dumps({"models": {}}))
+    unbound_file.write_text(json.dumps({"models": {}}), encoding='utf-8')
 
     def with_binding(path: pathlib.Path) -> list[tuple[str, str, str]]:
         return class_defects({**_CONTEXT, "turn_budget": {
@@ -932,7 +932,7 @@ def selftest() -> int:
         all(v != "ok" for n, v, _ in with_binding(unbound_file) if n == "agent_loop"),
         "an unbound ceiling was reported as a pass")
 
-    src = pathlib.Path(__file__).read_text()
+    src = pathlib.Path(__file__).read_text(encoding='utf-8')
     # assembled at run time: the control may not contain the literals it forbids
     forbidden = [t for t in ("114" + "35", "sk-" + "maxwell", "bge" + "-m3", "deberta" + "-v3",
                              "gemma" + "-4", "phi" + "-4") if t in src.lower()]
@@ -982,7 +982,7 @@ def main(argv: list[str]) -> int:
         print(f"run {args.run} created at {root}")
         return OK
     if args.verb == "start":
-        cmd = pathlib.Path(args.cmd_file).read_text() if args.cmd_file else args.cmd
+        cmd = pathlib.Path(args.cmd_file).read_text(encoding='utf-8') if args.cmd_file else args.cmd
         if not cmd.strip():
             print("FATAL: start needs --cmd or --cmd-file")
             return FATAL

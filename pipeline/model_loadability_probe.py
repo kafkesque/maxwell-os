@@ -65,7 +65,7 @@ def cfg() -> dict:
     import yaml
     if not CONFIG.exists():
         raise SystemExit(f"FATAL: {CONFIG} is missing - the probe restates no engine path of its own")
-    return yaml.safe_load(CONFIG.read_text())
+    return yaml.safe_load(CONFIG.read_text(encoding='utf-8'))
 
 
 def fetch(url: str, timeout: int = 25) -> tuple[int, str]:
@@ -109,7 +109,7 @@ def oracle(force: bool = False) -> dict:
     conf = cfg()["engine"]
     ttl_s = float(conf["oracle_ttl_days"]) * 86400
     if CACHE.exists() and not force and time.time() - CACHE.stat().st_mtime < ttl_s:
-        cached = json.loads(CACHE.read_text())
+        cached = json.loads(CACHE.read_text(encoding='utf-8'))
         cached["source"] = "cache"
         return cached
     py = pathlib.Path(conf["bundle"]) / conf["oracle_python"]
@@ -125,7 +125,7 @@ def oracle(force: bool = False) -> dict:
         print(f"FATAL: the oracle produced no JSON. stderr tail: {proc.stderr[-300:]}")
         return {"ok": False}
     if got.get("ok"):
-        CACHE.write_text(json.dumps(got, indent=1))
+        CACHE.write_text(json.dumps(got, indent=1), encoding='utf-8')
         got["source"] = "measured"
     return got
 
@@ -256,7 +256,7 @@ def main(argv: list[str]) -> int:
         print(f"    {'':<20} {why}")
     if args.json_out:
         pathlib.Path(args.json_out).write_text(json.dumps({"oracle": {k: orc[k] for k in ("mlx_lm", "mlx") if k in orc},
-                                                          "rows": rows}, indent=1))
+                                                          "rows": rows}, indent=1), encoding='utf-8')
     if fatal:
         print(f"FATAL: {fatal} repo(s) could not be read - the probe refuses to guess (C16)")
         return FATAL

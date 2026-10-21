@@ -86,7 +86,7 @@ def _surface() -> dict[str, Any]:
     accept anything by editing the thing it reads. `read_only_token` must NOT be a path-shaped word, or a caller
     writing a real path would be read as declaring that it writes nothing (the D-3034 shape, inverted).
     """
-    cfg = yaml.safe_load((REPO_ROOT / SURFACE_REL).read_text()) or {}
+    cfg = yaml.safe_load((REPO_ROOT / SURFACE_REL).read_text(encoding='utf-8')) or {}
     block = cfg.get(LOGGING_KEY)
     if not isinstance(block, dict):
         raise SystemExit("FATAL (" + WRITER + "): " + SURFACE_REL + " declares no '" + LOGGING_KEY
@@ -178,7 +178,7 @@ def read_rows(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     rows: list[dict[str, Any]] = []
     faults: list[str] = []
     limit = int(LOGGING["max_rows_read"])
-    for n, line in enumerate(path.read_text().splitlines(), start=1):
+    for n, line in enumerate(path.read_text(encoding='utf-8').splitlines(), start=1):
         if not line.strip():
             continue
         try:
@@ -449,7 +449,7 @@ def start_main(argv: Sequence[str]) -> int:
     runs, fold_faults = fold(rows)
     when = now_utc()
     run_id = str(args.id).strip() or make_id(str(LOGGING["id_prefix"]), when)
-    ownership = yaml.safe_load((REPO_ROOT / OWNERSHIP_REL).read_text()) or {}
+    ownership = yaml.safe_load((REPO_ROOT / OWNERSHIP_REL).read_text(encoding='utf-8')) or {}
     declared = declared_append_only(rel_of(JOURNAL, REPO_ROOT), ownership)
     faults.extend(start_faults(run_id, args.purpose, args.model, claims, read_only, args.budget_s, runs, declared,
                                LOGGING, REPO_ROOT))
@@ -572,7 +572,7 @@ def refuse(verb: str, faults: Sequence[str]) -> int:
 
 def scratch_lines(path: Path, lines: Sequence[str]) -> Path:
     """Create a scratch ledger for the controls - hermetic, so this repository's own bytes can never pass one."""
-    path.write_text("".join(line + "\n" for line in lines))
+    path.write_text("".join(line + "\n" for line in lines), encoding='utf-8')
     return path
 
 

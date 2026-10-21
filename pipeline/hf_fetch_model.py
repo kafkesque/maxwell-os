@@ -67,7 +67,7 @@ class LockHeld(Exception):
 def engine_conf() -> dict:
     """Read the engine's declared facts from their one home (C12)."""
     import yaml
-    return yaml.safe_load(CONFIG.read_text())
+    return yaml.safe_load(CONFIG.read_text(encoding='utf-8'))
 
 
 def hf_setting(conf: dict, key: str) -> str:
@@ -106,12 +106,12 @@ class RepoLock:
         try:
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            holder = self.path.read_text(errors="ignore").strip() or "(no payload was written)"
+            holder = self.path.read_text(errors="ignore", encoding='utf-8').strip() or "(no payload was written)"
             os.close(self.fd)
             self.fd = None
             raise LockHeld(self.path, holder)
         self.path.write_text(json.dumps({"pid": os.getpid(), "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                         "cmd": " ".join(sys.argv)}))
+                                         "cmd": " ".join(sys.argv)}), encoding='utf-8')
         return self
 
     def __exit__(self, *exc: object) -> None:
@@ -157,7 +157,7 @@ def progress(snapshot: pathlib.Path) -> str:
     index = snapshot / INDEX_NAME
     if index.exists():
         try:
-            expected = sorted(set(json.loads(index.read_text())["weight_map"].values()))
+            expected = sorted(set(json.loads(index.read_text(encoding='utf-8'))["weight_map"].values()))
         except Exception as exc:
             return f"index present but unreadable ({type(exc).__name__}) - shard count unknown"
         present = [n for n in expected
@@ -186,9 +186,9 @@ def verify(snapshot: pathlib.Path) -> tuple[bool, str]:
 
 def append_receipt(record: dict) -> None:
     """One line per fetch, appended, so the store's history is evidence and not a memory."""
-    receipt = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else []
+    receipt = json.loads(RECEIPT.read_text(encoding='utf-8')) if RECEIPT.exists() else []
     receipt.append(record)
-    RECEIPT.write_text(json.dumps(receipt, indent=1))
+    RECEIPT.write_text(json.dumps(receipt, indent=1), encoding='utf-8')
 
 
 def main(argv: list[str]) -> int:

@@ -239,7 +239,7 @@ def _artifact_surface(cfg: dict[str, Any], stem: str, roots: list[Path] | None =
             if not child.is_file() or child.suffix.lower() not in suffixes:
                 continue
             try:
-                n = child.read_text(errors="ignore").count(stem)
+                n = child.read_text(errors="ignore", encoding='utf-8').count(stem)
             except OSError:
                 continue
             if n:
@@ -376,7 +376,7 @@ def rewrite_cache(old_to_new: dict[str, str], pol: dict[str, Any] | None = None,
 def apply_plan(plan_path: Path, approve: bool, pol: dict[str, Any] | None = None) -> int:
     """Execute a plan under its preconditions, then re-prove the census. Never a partial rename."""
     cfg = _policy(pol)
-    plan = json.loads(plan_path.read_text())
+    plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if not approve:
         print("REFUSED: --apply needs --approve (this act renames corpus files)")
         return gate.RC_FATAL
@@ -419,7 +419,7 @@ def apply_plan(plan_path: Path, approve: bool, pol: dict[str, Any] | None = None
         "control": "every row re-hashed after the rename; a byte delta would have rolled it back",
     }
     receipt_path = Path(cfg["receipt"])
-    receipt_path.write_text(json.dumps(receipt, indent=1, ensure_ascii=False))
+    receipt_path.write_text(json.dumps(receipt, indent=1, ensure_ascii=False), encoding='utf-8')
     after_rows = defect_rows(pol)
     print(f"applied {len(done)} rename(s); cache {cache}")
     print(f"receipt: {receipt_path}")
@@ -452,8 +452,8 @@ def selftest() -> int:
     # 3: collision detection
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        (root / "X  Y.md").write_text("a")
-        (root / "X Y.md").write_text("b")
+        (root / "X  Y.md").write_text("a", encoding='utf-8')
+        (root / "X Y.md").write_text("b", encoding='utf-8')
         check(CONTROL_LABELS[2], (root / "X Y.md").exists(), True)
     # 4: a plan is a SNAPSHOT (a row-count mismatch refuses)
     check(CONTROL_LABELS[3], len({"rows": [1, 2]}) , 1)
@@ -466,13 +466,13 @@ def selftest() -> int:
     # 7: TWO different zeros - absent is null (D-795), present-with-no-match is 0
     with tempfile.TemporaryDirectory() as td:
         empty = Path(td)
-        (empty / gate.METADATA_CACHE_NAME).write_text("")
+        (empty / gate.METADATA_CACHE_NAME).write_text("", encoding='utf-8')
         check(CONTROL_LABELS[6] + " (absent cache)", _cache_surface({}, "s", "n.md", empty / "nope").get("count"), None)
         check(CONTROL_LABELS[6] + " (present, no match)", _cache_surface({}, "s", "n.md", empty).get("count"), 0)
     # 8: a rename moves a name and no byte
     with tempfile.TemporaryDirectory() as td:
         src = Path(td) / "A  B.md"
-        src.write_text("payload")
+        src.write_text("payload", encoding='utf-8')
         d0 = file_digest(src)
         src.rename(Path(td) / "A B.md")
         d1 = file_digest(Path(td) / "A B.md")
@@ -482,7 +482,7 @@ def selftest() -> int:
         d = Path(td)
         cache = d / gate.METADATA_CACHE_NAME
         cache.write_text('{"source_book": "A  B", "source_path": "/x/A  B.md"}\n'
-                         '{"source_book":"Other","source_path":"/x/O.md"}\n')
+                         '{"source_book":"Other","source_path":"/x/O.md"}\n', encoding='utf-8')
         try:
             rewrite_cache({"A  B": "A B"}, None, d)
             got = "NO REFUSAL"
@@ -490,19 +490,19 @@ def selftest() -> int:
             got = "REFUSED"
         check(CONTROL_LABELS[8], got, "REFUSED")
         cache.write_text('{"source_book": "A  B", "source_path": "/x/A  B.md"}\n'
-                         '{"source_book": "Other", "source_path": "/x/O.md"}\n')
+                         '{"source_book": "Other", "source_path": "/x/O.md"}\n', encoding='utf-8')
         res = rewrite_cache({"A  B": "A B"}, None, d)
-        after = cache.read_text().splitlines()
+        after = cache.read_text(encoding='utf-8').splitlines()
         check(CONTROL_LABELS[8] + " (a clean cache is not refused)",
               [res.get("rewritten"), after[1]], [1, '{"source_book": "Other", "source_path": "/x/O.md"}'])
     # 10: the false green this act was built to catch - content is scanned, not only filenames
     with tempfile.TemporaryDirectory() as td:
         d = Path(td)
-        (d / "checkpoint.jsonl").write_text('{"source_file": "Some Book  With  Double.md"}\n')
+        (d / "checkpoint.jsonl").write_text('{"source_file": "Some Book  With  Double.md"}\n', encoding='utf-8')
         cfg_fixture = {"surfaces": {"artifact_suffixes": [".jsonl"]}}
         check(CONTROL_LABELS[9], _artifact_surface(cfg_fixture, "Some Book  With  Double", [d]).get("count"), 1)
-        (d / "checkpoint.jsonl").write_text('{"source_file": "unrelated.md"}\n')
-        (d / "A  B  Name.jsonl").write_text('{"note": "no name in here"}\n')
+        (d / "checkpoint.jsonl").write_text('{"source_file": "unrelated.md"}\n', encoding='utf-8')
+        (d / "A  B  Name.jsonl").write_text('{"note": "no name in here"}\n', encoding='utf-8')
         check(CONTROL_LABELS[9] + " (a filename match alone is not a content reference)",
               _artifact_surface(cfg_fixture, "A  B  Name", [d]).get("count"), 0)
     print(f"selftest: {len(CONTROL_LABELS) - len(failures)}/{len(CONTROL_LABELS)} control(s) answered as declared")
@@ -540,7 +540,7 @@ def main() -> int:
             cfg = _policy()
             plan = build_plan()
             out = Path(cfg["plan"])
-            out.write_text(json.dumps(plan, indent=1, ensure_ascii=False))
+            out.write_text(json.dumps(plan, indent=1, ensure_ascii=False), encoding='utf-8')
             print(f"wrote {out}: {plan['row_count']} row(s) | apply_ready={plan['apply_ready']}")
             return gate.RC_CLEAN if plan["apply_ready"] else gate.RC_OWNER_OWED
         if args.apply:

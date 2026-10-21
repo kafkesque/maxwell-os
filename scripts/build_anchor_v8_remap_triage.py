@@ -73,7 +73,7 @@ def remap(discipline, domains):
 
 
 def main():
-    rows = json.loads(REDERIVED.read_text())["rows"]
+    rows = json.loads(REDERIVED.read_text(encoding='utf-8'))["rows"]
     out = []
     for r in rows:
         proposed, ctype, removed = remap(r["discipline"], r["domains"])

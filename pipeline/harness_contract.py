@@ -33,7 +33,7 @@ def declared_bindings(config: Path = CONFIG) -> dict[str, str]:
     """
     import yaml
 
-    doc: Any = yaml.safe_load(config.read_text())
+    doc: Any = yaml.safe_load(config.read_text(encoding='utf-8'))
     trigger = doc["ratified"]["knobs"][TRIGGER_KEY]
     return {str(k): str(v) for k, v in trigger.items() if ENV_NAME.match(str(k))}
 
@@ -84,7 +84,7 @@ def _selftest() -> int:
         for k, v in saved.items():
             os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
 
-    own = Path(__file__).read_text()
+    own = Path(__file__).read_text(encoding='utf-8')
     restated = [v for v in bind.values() if len(v) >= 2 and re.search(r"(?<![0-9A-Za-z_.])" + re.escape(v) + r"(?![0-9A-Za-z_.])", own)]
     checks.append(("the_module_restates_no_declared_value", not restated))
     checks.append(("the_contract_is_read_from_its_declared_home", CONFIG.name in own and TRIGGER_KEY in own))

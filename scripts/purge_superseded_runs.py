@@ -75,7 +75,7 @@ from pipeline.sqlite_vec_loader import load_sqlite_vec  # noqa: E402
 
 CFG_PATH: Path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 _CFG_HOME = str(CFG_PATH.relative_to(CFG_PATH.parent.parent))  # D-2982: derived, not a second copy
-with open(CFG_PATH) as _f:
+with open(CFG_PATH, encoding='utf-8') as _f:
     _CFG: dict = yaml.safe_load(_f) or {}
 # D-2982 (C16/D-2644): declared read - the old `_CFG.get("serving", {})` silently emptied the
 # purge list, so the tool reported "nothing superseded" for a config it had never read.

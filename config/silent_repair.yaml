@@ -74,19 +74,19 @@ allowed:
     mode: replace
     why: an HTTP error snippet, decoded for a display message; never stored.
   - path: pipeline/hf_fetch_model.py
-    match: 'self.path.read_text(errors="ignore")'
+    match: 'self.path.read_text(errors="ignore"'
     mode: ignore
     why: a lock-file payload written by another process; read only to name the holder.
   - path: pipeline/research_run.py
-    match: 'for raw in report.read_text(errors="replace")'
+    match: 'for raw in report.read_text(errors="replace"'
     mode: replace
     why: the run's own report log, mined for the terminal marker - a runtime log.
   - path: pipeline/research_run.py
-    match: 'lines = [l for l in report.read_text(errors="replace")'
+    match: 'lines = [l for l in report.read_text(errors="replace"'
     mode: replace
     why: the run's own report log, mined for heartbeat lines - a runtime log.
   - path: pipeline/research_run.py
-    match: 'bool(path.read_text(errors="replace").strip())'
+    match: 'bool(path.read_text(errors="replace"'
     mode: replace
     why: a prompt file, checked for non-emptiness only; nothing is parsed or stored.
   - path: pipeline/stage0_convert.py
@@ -102,7 +102,7 @@ allowed:
     mode: replace
     why: textutil stdout - a foreign producer; the converter's normalization of arbitrary bytes.
   - path: pipeline/research/ws_harness_survey.py
-    match: 'cand[0].read_text(errors="replace")'
+    match: 'cand[0].read_text(errors="replace"'
     mode: replace
     why: an installed OMLX app bundle's integration code - a foreign producer outside the repo.
   - path: scripts/model_integrity_gate.py
@@ -110,15 +110,15 @@ allowed:
     mode: replace
     why: a chat-template path from the CLI - an arbitrary input scanned for a denylist, not a repo-declared artifact.
   - path: pipeline/subagent_fanout.py
-    match: 'citation_defects(a.read_text(errors="replace"))'
+    match: 'citation_defects(a.read_text(errors="replace"'
     mode: replace
     why: an answer path from the CLI (args.answer) - an arbitrary input scanned for citations, not a repo-declared artifact.
   - path: pipeline/subagent_fanout.py
-    match: 'shape_defects(a.read_text(errors="replace")'
+    match: 'shape_defects(a.read_text(errors="replace"'
     mode: replace
     why: an answer path from the CLI (args.answer) - an arbitrary input scanned for shape, not a repo-declared artifact.
   - path: scripts/normalise_corpus_names.py
-    match: 'child.read_text(errors="ignore")'
+    match: 'child.read_text(errors="ignore"'
     mode: ignore
     why: a derived run receipt (checkpoint/parquet), mined ONLY for a normalized book-name stem; a repaired byte cannot
       create a normalized stem, nothing is written back, and the receipt is re-derivable - a runtime log, not a source.

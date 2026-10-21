@@ -69,7 +69,7 @@ from pipeline.pipeline_paths import CANONICAL_RUN, RERANK_ENABLED, RETRIEVAL_MET
 STAMP: str = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 CFG_PATH: Path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 GOLDEN_PATH: Path = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
-with open(CFG_PATH) as _f:
+with open(CFG_PATH, encoding='utf-8') as _f:
     _CFG: dict = yaml.safe_load(_f) or {}
 _BENCH: dict = _CFG.get("retrieval_benchmark", {})
 REANCHOR_CFG: dict = _BENCH.get("reanchor", {})

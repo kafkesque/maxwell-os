@@ -36,7 +36,7 @@ SKIP_PARTS = ("/runs/", "/.git/", "node_modules", "_backup", ".bak")
 def candidates() -> list[str]:
     """Read the candidate set from config/engine.yaml (the one home - C12)."""
     import yaml
-    conf = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())
+    conf = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text(encoding='utf-8'))
     cand = conf["candidates"]
     return list(cand["probe"]) + list(cand["served_now"])
 
@@ -81,7 +81,7 @@ def main(argv: list[str]) -> int:
     names = candidates()
 
     def emit(line: str) -> None:
-        with open(report, "a") as fh:
+        with open(report, "a", encoding='utf-8') as fh:
             fh.write(line.rstrip() + chr(10))
             fh.flush()
 
@@ -105,7 +105,7 @@ def main(argv: list[str]) -> int:
         emit("  - " + why)
         emit("STEP: " + name + " -> " + verdict)
     if args.json_out:
-        pathlib.Path(args.json_out).write_text(json.dumps(summary, indent=1))
+        pathlib.Path(args.json_out).write_text(json.dumps(summary, indent=1), encoding='utf-8')
     emit("STEP final: census complete")
     emit("TERMINAL: DONE - every candidate classified as measured, mentioned or unknown")
     return 0

@@ -78,7 +78,7 @@ def load_config(path: str | None = None) -> dict[str, Any]:
     p = Path(path) if path else repo_root() / CONFIG_REL
     if not p.is_file():
         raise ProbeError(f"FAIL-CLOSED (agent-context): no declaration at {p} - the rule has ONE home (C12)")
-    cfg = yaml.safe_load(p.read_text())
+    cfg = yaml.safe_load(p.read_text(encoding='utf-8'))
     if not isinstance(cfg, dict):
         raise ProbeError(f"FAIL-CLOSED (agent-context): {p} does not parse to a mapping")
     return cfg
@@ -97,7 +97,7 @@ def read_json(path: Path) -> dict[str, Any]:
     """Read a JSON file, refusing anything that is not an object."""
     if not path.is_file():
         raise ProbeError(f"FAIL-CLOSED (agent-context): declared declaration unreadable: {path}")
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding='utf-8'))
     if not isinstance(data, dict):
         raise ProbeError(f"FAIL-CLOSED (agent-context): {path} is not a JSON object")
     return data
@@ -109,7 +109,7 @@ def read_yaml_mapping(path: Path) -> dict[str, Any]:
 
     if not path.is_file():
         return {}
-    data = yaml.safe_load(path.read_text()) or {}
+    data = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     return data if isinstance(data, dict) else {}
 
 
@@ -335,7 +335,7 @@ def prefix_audit(cfg: dict[str, Any]) -> dict[str, Any]:
     floor = int(declared_value(cfg, "pipeline_stages", "min_prompt_chars"))
     totals: dict[str, list[dict[str, Any]]] = {"stable": [], "volatile": [], "ignored": []}
     for path in sorted((repo_root() / "pipeline").glob("*.py")):
-        rows = prefix_rows_from_source(path.read_text(), path.name, floor)
+        rows = prefix_rows_from_source(path.read_text(encoding='utf-8'), path.name, floor)
         for key, items in rows.items():
             totals[key].extend(items)
     return {"declared_stable": declared_stable, "stable": len(totals["stable"]), "rows": totals["stable"],
@@ -583,7 +583,7 @@ CONTROL_LABELS = (
 
 def report_path_source() -> str:
     """This file UP TO the controls: the part that can emit a number, path or host to a reader."""
-    return Path(__file__).read_text().split(REPORT_PATH_MARKER, 1)[0]
+    return Path(__file__).read_text(encoding='utf-8').split(REPORT_PATH_MARKER, 1)[0]
 
 
 def selftest(cfg: dict[str, Any]) -> int:

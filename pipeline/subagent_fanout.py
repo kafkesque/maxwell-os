@@ -82,7 +82,7 @@ def conf() -> dict:
     sub-agent was blamed for correctly reporting that the setting did not exist (BUG-817).
     """
     import yaml
-    doc = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())
+    doc = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text(encoding='utf-8'))
     if not doc.get("fanout"):
         raise SystemExit("FATAL: config/engine.yaml declares no fanout block - refusing to invent a cap (C12)")
     return doc
@@ -105,7 +105,7 @@ def client_entry() -> dict:
     if not which or not surface_path.is_file():
         raise SystemExit("FATAL: config/engine.yaml#harnesses.default_harness or config/agent_surface.yaml is "
                          "absent - the client a workstream launches is DECLARED, never inferred (C12)")
-    surface = yaml.safe_load(surface_path.read_text()) or {}
+    surface = yaml.safe_load(surface_path.read_text(encoding='utf-8')) or {}
     adapter = (surface.get("adapter") or {})
     row = ((adapter.get("provider_bindings") or {}).get(which)) or {}
     binary = row.get("client_bin") or {}
@@ -520,7 +520,7 @@ def grade(answer: pathlib.Path, rc: int, min_chars: int, report: pathlib.Path,
     else:
         word = "FAILED"
     line = f"TERMINAL: {word} - rc={rc}, {why}"
-    with open(report, "a") as fh:
+    with open(report, "a", encoding='utf-8') as fh:
         fh.write(line + "\n")
         fh.flush()
     return 0 if word == "DONE" else 1
@@ -674,14 +674,14 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
     """
     import yaml
     g = guards()
-    doc = yaml.safe_load(tasks_file.read_text()) or {}
+    doc = yaml.safe_load(tasks_file.read_text(encoding='utf-8')) or {}
     tasks = doc.get("tasks") or []
     if not tasks:
         print("FATAL: the task file declares no tasks")
         return FATAL
     cap = int(conf()["fanout"]["excerpt_bytes"])
     subprocess.run([sys.executable, str(RUNNER), "new", "--run", run_id,
-                    "--brief-text", tasks_file.read_text()], check=True, cwd=str(ROOT))
+                    "--brief-text", tasks_file.read_text(encoding='utf-8')], check=True, cwd=str(ROOT))
     for t in tasks:
         wid = str(t["id"])
         # THE PREMISE GATE. A fan-out verifies ANSWERS; nothing in it verifies the PREMISE of a task.
@@ -719,14 +719,14 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
                           f"chars - this is a PARTIAL review by construction and the prompt SAYS SO to the "
                           f"model; refusing a review whose prompt exceeds a measured size is the registry's job "
                           f"(T-156/BUG-836)")
-        (wsd / "00_prompt.txt").write_text(_prompt_for(t, cap))
+        (wsd / "00_prompt.txt").write_text(_prompt_for(t, cap), encoding='utf-8')
         _write_json(wsd / "task.json", {"id": wid, "model": t["model"], "mode": str(t.get("mode", "oneshot")),
                                         "class": class_for_mode(str(t.get("mode", "oneshot"))),
                                         "max_tokens": t.get("max_tokens"), "attempt": 1,
                                         "timeout_s": t.get("timeout_s"), "shape": shape or None,
                                         "files": [str(f) for f in (t.get("files") or [])],
                                         "retry_of": None, "question": str(t.get("question", ""))})
-        (wsd / "cmd.sh").write_text(_cmd_for(t, str(wsd), g, str(t["model"])))
+        (wsd / "cmd.sh").write_text(_cmd_for(t, str(wsd), g, str(t["model"])), encoding='utf-8')
     print(f"planned {len(tasks)} task(s) for run {run_id}")
     return OK
 
@@ -787,7 +787,7 @@ def start(run_id: str, watch: bool = True) -> int:
         sp = t / "state.json"
         if sp.exists():
             try:
-                state = json.loads(sp.read_text())
+                state = json.loads(sp.read_text(encoding='utf-8'))
             except Exception as exc:  # reported, never swallowed (C16)
                 print(f"FATAL: unreadable state for {t.name}: {type(exc).__name__}: {exc}")
                 return FATAL
@@ -800,7 +800,7 @@ def start(run_id: str, watch: bool = True) -> int:
             waiting.append(t.name)
             continue
         meta = t / "task.json"
-        task = json.loads(meta.read_text()) if meta.exists() else {"mode": "oneshot"}
+        task = json.loads(meta.read_text(encoding='utf-8')) if meta.exists() else {"mode": "oneshot"}
         _start_one(run_id, t.name.removeprefix("fan_"), g, task)
         started += 1
     print(f"started {started} (cap {cap})")
@@ -838,7 +838,7 @@ def retry(run_id: str) -> int:
         if not meta.exists():
             continue
         try:
-            task = json.loads(meta.read_text())
+            task = json.loads(meta.read_text(encoding='utf-8'))
         except Exception as exc:
             print(f"FATAL: unreadable task.json for {t.name}: {type(exc).__name__}: {exc}")
             return 0
@@ -874,7 +874,7 @@ def retry(run_id: str) -> int:
         wid = f"{task['id']}_r2"
         wsd = RUNS / run_id / f"fan_{wid}"
         wsd.mkdir(parents=True, exist_ok=True)
-        (wsd / "00_prompt.txt").write_text((t / "00_prompt.txt").read_text())
+        (wsd / "00_prompt.txt").write_text((t / "00_prompt.txt").read_text(encoding='utf-8'), encoding='utf-8')
         retried = dict(task, model=fallback, attempt=int(task.get("attempt", 1)) + 1, retry_of=t.name)
         # A retry does NOT inherit the per-task budget that just proved insufficient: re-asking the
         # same question with the same impossible clock is a way to spend the pool twice and call it
@@ -882,7 +882,7 @@ def retry(run_id: str) -> int:
         relaxed = retried.pop("timeout_s", None)
         retried["timeout_relaxed_from"] = relaxed
         _write_json(wsd / "task.json", retried)
-        (wsd / "cmd.sh").write_text(_cmd_for(retried, str(wsd), g, fallback))
+        (wsd / "cmd.sh").write_text(_cmd_for(retried, str(wsd), g, fallback), encoding='utf-8')
         _start_one(run_id, wid, g, retried, note=f"retry of {t.name} after {state}")
         print(f"retry: {task['id']} ({state}) re-asked on {fallback} as fan_{wid}")
         launched += 1
@@ -918,7 +918,7 @@ def receipt(run_id: str) -> int:
         meta = {}
         if (wsd / "task.json").exists():
             try:
-                meta = json.loads((wsd / "task.json").read_text())
+                meta = json.loads((wsd / "task.json").read_text(encoding='utf-8'))
             except Exception as exc:  # reported, never swallowed (C16)
                 print(f"warn: unreadable task.json for {r['ws']}: {type(exc).__name__}: {exc}")
         ans = wsd / "20_answer.md"
@@ -1008,7 +1008,7 @@ def verify(run_id: str, model: str, out: pathlib.Path) -> int:
         meta = {}
         if (t / "task.json").exists():
             try:
-                meta = json.loads((t / "task.json").read_text())
+                meta = json.loads((t / "task.json").read_text(encoding='utf-8'))
             except Exception as exc:  # reported, never swallowed (C16)
                 print(f"warn: unreadable task.json for {t.name}: {type(exc).__name__}: {exc}")
         ok, why = answer_verdict(a, int(g["min_answer_chars"]),
@@ -1026,7 +1026,7 @@ def verify(run_id: str, model: str, out: pathlib.Path) -> int:
               "and name any claim that the cited file would contradict. End with a table "
               "(task | verdict | one-line reason).\n\n" + "\n\n".join(answers))
     tmp = RUNS / run_id / "99_verify_prompt.txt"
-    tmp.write_text(prompt)
+    tmp.write_text(prompt, encoding='utf-8')
     rc = subprocess.run([sys.executable, str(ASKER), "--model", model, "--prompt-file", str(tmp),
                          "--max-tokens", "1200", "--out", str(out)], cwd=str(ROOT)).returncode
     print("verify: " + ("ok" if rc == 0 else "FAILED") + f" -> {out}")
@@ -1055,7 +1055,7 @@ def _plan_models(tasks_file: pathlib.Path | None) -> list[str]:
     if not tasks_file:
         return []
     import yaml
-    return [str(t["model"]) for t in (yaml.safe_load(tasks_file.read_text()) or {}).get("tasks", [])]
+    return [str(t["model"]) for t in (yaml.safe_load(tasks_file.read_text(encoding='utf-8')) or {}).get("tasks", [])]
 
 
 def _served_check(models: list[str], served: set[str]) -> tuple[bool | None, str]:
@@ -1188,19 +1188,19 @@ def selftest() -> int:
     tmp.mkdir(parents=True, exist_ok=True)
 
     stub = tmp / "stub.md"
-    stub.write_text(STUB_PREFIX + ")\n")
+    stub.write_text(STUB_PREFIX + ")\n", encoding='utf-8')
     ok, why = answer_verdict(stub, 10)
     checks.append(("the_no_content_stub_is_NOT_an_answer", not ok))
     empty = tmp / "empty.md"
-    empty.write_text("   \n")
+    empty.write_text("   \n", encoding='utf-8')
     checks.append(("a_whitespace_answer_is_NOT_an_answer", not answer_verdict(empty, 10)[0]))
     short = tmp / "short.md"
-    short.write_text("yes")
+    short.write_text("yes", encoding='utf-8')
     checks.append(("an_answer_below_the_declared_floor_is_NOT_an_answer",
                    not answer_verdict(short, int(g["min_answer_chars"]))[0]
                    or int(g["min_answer_chars"]) <= 3))
     real = tmp / "real.md"
-    real.write_text("x" * (int(g["min_answer_chars"]) + 5))
+    real.write_text("x" * (int(g["min_answer_chars"]) + 5), encoding='utf-8')
     checks.append(("a_real_answer_is_an_answer", answer_verdict(real, int(g["min_answer_chars"]))[0]))
     checks.append(("a_missing_answer_file_is_NOT_an_answer",
                    not answer_verdict(tmp / "nope.md", 10)[0]))
@@ -1211,15 +1211,15 @@ def selftest() -> int:
     rep.unlink(missing_ok=True)
     grade(stub, 1, int(g["min_answer_chars"]), rep)
     checks.append(("a_failed_oneshot_with_a_stub_reads_EMPTY_not_DONE",
-                   rep.read_text().startswith("TERMINAL: EMPTY")))
+                   rep.read_text(encoding='utf-8').startswith("TERMINAL: EMPTY")))
     rep.unlink(missing_ok=True)
     grade(real, 1, int(g["min_answer_chars"]), rep)
     checks.append(("a_failed_oneshot_with_an_answer_reads_FAILED_not_DONE",
-                   rep.read_text().startswith("TERMINAL: FAILED")))
+                   rep.read_text(encoding='utf-8').startswith("TERMINAL: FAILED")))
     rep.unlink(missing_ok=True)
     grade(real, 0, int(g["min_answer_chars"]), rep)
     checks.append(("a_successful_oneshot_with_an_answer_reads_DONE",
-                   rep.read_text().startswith("TERMINAL: DONE")))
+                   rep.read_text(encoding='utf-8').startswith("TERMINAL: DONE")))
 
     # NO COMMAND MAY CARRY A BAKED-IN VERDICT (the exact defect: `TERMINAL: DONE - rc=$?`).
     cmd = _cmd_for({"id": "x", "mode": "oneshot", "max_tokens": 8}, "/tmp", g, "M")
@@ -1253,7 +1253,7 @@ def selftest() -> int:
     # itself and the control could never pass).
     entry = client_entry()
     acmd = _cmd_for({"id": "a", "mode": "agent"}, "/tmp", g, "M")
-    own = pathlib.Path(__file__).read_text()
+    own = pathlib.Path(__file__).read_text(encoding='utf-8')
     checks.append(("an_agent_command_is_launched_through_the_DECLARED_executor_T175",
                    entry["executor"] in acmd and f'{entry["executor"]} --exec --' in acmd))
     checks.append(("the_agent_command_reads_the_binary_from_the_DECLARATION_not_from_this_module_T175",
@@ -1267,7 +1267,7 @@ def selftest() -> int:
         checks.append(("an_undeclared_mode_is_FATAL_in_the_front_door_too_T154", True))
     checks.append(("the_retry_count_is_bounded", int(g["max_attempts"]) >= 1))
     checks.append(("a_retried_task_cannot_be_retried_again_by_construction",
-                   r'if re.search(r"_r\d+$", t.name)' in pathlib.Path(__file__).read_text()))
+                   r'if re.search(r"_r\d+$", t.name)' in pathlib.Path(__file__).read_text(encoding='utf-8')))
     # The receipt must roll attempts up to the TASK, or a successful retry is reported as a failure.
     checks.append(("a_task_that_succeeded_on_its_retry_reads_DONE_not_TIMEOUT",
                    task_state([{"state": "TIMEOUT", "answer_usable": False},
@@ -1279,12 +1279,12 @@ def selftest() -> int:
     # R5 finding: a task that already holds a usable answer must not buy a retry (the pool is a resource,
     # and the verifier - not the pool - decides whether a usable-but-odd answer is good enough).
     checks.append(("a_usable_answer_is_not_re_bought_from_the_pool",
-                   "already has a usable answer" in pathlib.Path(__file__).read_text()))
+                   "already has a usable answer" in pathlib.Path(__file__).read_text(encoding='utf-8')))
     # The cap may not double-book a launch: counting `started` on top of the ledger stranded a task.
     # The literal is assembled at run time because a control may not CONTAIN what it forbids.
     cap_leak = "started" + " + _running"
     checks.append(("the_pool_cap_counts_each_running_workstream_exactly_once",
-                   cap_leak not in pathlib.Path(__file__).read_text()))
+                   cap_leak not in pathlib.Path(__file__).read_text(encoding='utf-8')))
 
     # A CHECK THAT DECIDED NOTHING MUST NOT READ AS A PASS (BUG-826). doctor was reading the LEDGER OF
     # EVERY RUN EVER as if it were the plan, so the R5 check failed against a historical plan while the
@@ -1298,7 +1298,7 @@ def selftest() -> int:
     # BUG-721, MADE MECHANICAL: a citation is a claim about a file, so it is checkable without a model.
     bad_ans = 'pipeline/subagent_fanout.py:1 `word = "DONE"` asserts the terminal word'
     checks.append(("a_fabricated_citation_is_refuted", len(citation_defects(bad_ans)[1]) == 1))
-    src = (ROOT / "pipeline/subagent_fanout.py").read_text().splitlines()
+    src = (ROOT / "pipeline/subagent_fanout.py").read_text(encoding='utf-8').splitlines()
     n = next(i for i, line in enumerate(src, 1) if "def grade(" in line)
     good_ans = f"see pipeline/subagent_fanout.py:{n} `def grade(` for the only writer of the word"
     checks.append(("a_true_citation_passes", citation_defects(good_ans)[1] == []))
@@ -1349,7 +1349,7 @@ def selftest() -> int:
     checks.append(("at_least_one_shape_control_is_DECLARED_T163", bool(controls)))
     listing = "\n".join(f"pipeline/subagent_fanout.py:{i}" for i in (1, 2, 3)) + "\n"
     listing_file = tmp / "listing.md"
-    listing_file.write_text(listing)
+    listing_file.write_text(listing, encoding='utf-8')
     checks.append(("a_citation_list_with_no_finding_is_NOT_an_answer_T163",
                    shape_defects(listing, "review", ["pipeline/subagent_fanout.py"])[1] != []))
     finding = (f"FINDING: pipeline/subagent_fanout.py:{n} is the only writer of the terminal word, but nothing "
@@ -1398,7 +1398,7 @@ def selftest() -> int:
     rep.unlink(missing_ok=True)
     grade(listing_file, 0, int(g["min_answer_chars"]), rep, "review", ["pipeline/subagent_fanout.py"])
     checks.append(("a_long_answer_with_no_finding_reads_FAILED_and_not_EMPTY_T163",
-                   rep.read_text().startswith("TERMINAL: FAILED")))
+                   rep.read_text(encoding='utf-8').startswith("TERMINAL: FAILED")))
     try:
         shape_spec("T163-NO-SUCH-SHAPE")
         checks.append(("an_undeclared_shape_is_REFUSED_not_invented_T163", False))
@@ -1457,7 +1457,7 @@ def main(argv: list[str]) -> int:
         if not a.exists():
             print(f"FATAL: no answer file at {a}")
             return FATAL
-        checked, defects = citation_defects(a.read_text(errors="replace"))
+        checked, defects = citation_defects(a.read_text(errors="replace", encoding='utf-8'))
         for d in defects:
             print(f"  REFUTED  {d}")
         if not checked:
@@ -1471,7 +1471,7 @@ def main(argv: list[str]) -> int:
             print(f"FATAL: no answer file at {a}")
             return FATAL
         arts = [x for x in str(args.artifact).split(",") if x.strip()]
-        findings, defects = shape_defects(a.read_text(errors="replace"), str(args.shape), arts)
+        findings, defects = shape_defects(a.read_text(errors="replace", encoding='utf-8'), str(args.shape), arts)
         for d in defects:
             print(f"  NOT A {str(args.shape).upper()}  {d}")
         print(f"shape: {findings} finding(s) about {arts or '(no artefact declared)'}")

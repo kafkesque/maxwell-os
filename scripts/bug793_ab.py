@@ -86,13 +86,13 @@ def app_path() -> str:
 
 
 def load_settings(path: pathlib.Path) -> dict:
-    with path.open() as fh:
+    with path.open(encoding='utf-8') as fh:
         return json.load(fh)
 
 
 def save_settings(path: pathlib.Path, doc: dict) -> None:
     tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(doc, indent=2) + "\n")
+    tmp.write_text(json.dumps(doc, indent=2) + "\n", encoding='utf-8')
     tmp.replace(path)                             # atomic enough for the server's reload-on-launch
 
 
@@ -168,7 +168,7 @@ def selftest() -> int:
     assert build_prompt(10, filler, per_unit) == filler, "10 tokens must build to the 45-char unit"
     assert pathlib.Path(app_path()).name == "oMLX.app", "app path must resolve to oMLX.app"
     assert model_settings_path().name == "model_settings.json", "settings path must resolve to model_settings.json"
-    src = pathlib.Path(__file__).read_text().split("#: The three lever keys", 1)[0]
+    src = pathlib.Path(__file__).read_text(encoding='utf-8').split("#: The three lever keys", 1)[0]
     leaked = [lit for lit in FORBIDDEN if lit in src]
     assert not leaked, f"hardcoded value leaked into source: {leaked}"
     print("ok bug793-ab --selftest: 3/3 controls green "
@@ -191,7 +191,7 @@ def main(argv: list[str] | None = None) -> int:
     path = model_settings_path()
     original = load_settings(path)
     backup = path.with_name(path.name + f".bak_{int(time.time())}")
-    backup.write_text(json.dumps(original, indent=2) + "\n")
+    backup.write_text(json.dumps(original, indent=2) + "\n", encoding='utf-8')
 
     def _resolve(lever: str) -> str | None:
         lever = lever.strip()

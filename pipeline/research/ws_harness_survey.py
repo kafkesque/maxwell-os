@@ -30,7 +30,7 @@ LIST_RE = re.compile(r"^\s*([a-z_]+)\s+(.*?)\s*\((installed|not installed)\)\s*$
 def engine_conf() -> dict:
     """Read the engine's declared facts from its one home (C12)."""
     import yaml
-    return yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())["engine"]
+    return yaml.safe_load((ROOT / "config" / "engine.yaml").read_text(encoding='utf-8'))["engine"]
 
 
 def launch_list(cli: pathlib.Path) -> str:
@@ -48,7 +48,7 @@ def integration_source(bundle: str, tool: str) -> tuple[str, str]:
     cand = [p for p in ([d / (tool + ".py")] + list(d.glob(tool + "*.py"))) if p.exists()]
     if not cand:
         return "", ""
-    text = cand[0].read_text(errors="replace")
+    text = cand[0].read_text(errors="replace", encoding='utf-8')
     envs = sorted(set(ENV_HINT.findall(text)))
     head = "evidence" if HEADLESS_HINT.search(text) else "none"
     return cand[0].name + ": " + ", ".join(envs[:6]), head
@@ -78,7 +78,7 @@ def main(argv: list[str]) -> int:
     cli = pathlib.Path(conf["launch_cli"])
 
     def emit(line: str) -> None:
-        with open(report, "a") as fh:
+        with open(report, "a", encoding='utf-8') as fh:
             fh.write(line.rstrip() + chr(10))
             fh.flush()
 
@@ -106,7 +106,7 @@ def main(argv: list[str]) -> int:
     emit("READING: a tool with a headless mode AND engine wiring can be driven by a script. A tool with neither is")
     emit("an interactive shell: its value is human-driven exploration, not unattended pipeline work.")
     if args.json_out:
-        pathlib.Path(args.json_out).write_text(json.dumps(rows, indent=1))
+        pathlib.Path(args.json_out).write_text(json.dumps(rows, indent=1), encoding='utf-8')
     emit("STEP final: survey complete")
     emit("TERMINAL: DONE - every integration classified for unattended use")
     return 0

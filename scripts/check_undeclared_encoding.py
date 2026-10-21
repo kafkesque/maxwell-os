@@ -94,8 +94,13 @@ def _literal_mode(call: ast.Call, name: str) -> tuple[bool, str]:
     return True, "r"
 
 
-def findings_in(source: str) -> list[tuple[int, str]]:
-    """Every undeclared-encoding site in one module, as (line, kind): read | write | unresolvable."""
+def findings_in(source: str, non_text_open: tuple[str, ...] = ()) -> list[tuple[int, str]]:
+    """Every undeclared-encoding site in one module, as (line, kind): read | write | unresolvable.
+
+    `non_text_open` is the declared set of `.open()` receivers that are NOT text file opens (os.open ->
+    a raw fd with flags, fitz.open -> a PDF document). They are never text and never UNRESOLVABLE, so
+    the rail skips them rather than demanding a literal 'mode' they do not have.
+    """
     out: set[tuple[int, str]] = set()
     for node in ast.walk(ast.parse(source)):
         if not isinstance(node, ast.Call):
@@ -103,6 +108,9 @@ def findings_in(source: str) -> list[tuple[int, str]]:
         func = node.func
         name = func.attr if isinstance(func, ast.Attribute) else (func.id if isinstance(func, ast.Name) else "")
         if name not in ("open",) + TEXT_CALLS:
+            continue
+        if (name == "open" and isinstance(func, ast.Attribute)
+                and isinstance(func.value, ast.Name) and func.value.id in non_text_open):
             continue
         line = int(getattr(node, "lineno", 0))
         if _names_encoding(node, name):
@@ -123,6 +131,7 @@ def findings_in(source: str) -> list[tuple[int, str]]:
 def scan(reg: dict, repo: Path = ROOT) -> tuple[dict[str, list[tuple[int, str]]], list[str]]:
     """{rel path: sites} for every module under scan_roots, plus the modules a census could not read."""
     exempt = [str(x) for x in declared(reg, "exempt")]
+    non_text_open = tuple(str(x) for x in declared(reg, "non_text_open"))
     found: dict[str, list[tuple[int, str]]] = {}
     unreadable: list[str] = []
     for root in declared(reg, "scan_roots"):
@@ -136,7 +145,7 @@ def scan(reg: dict, repo: Path = ROOT) -> tuple[dict[str, list[tuple[int, str]]]
             if rel in exempt:
                 continue
             try:
-                sites = findings_in(path.read_text(encoding="utf-8"))
+                sites = findings_in(path.read_text(encoding="utf-8"), non_text_open)
             except (SyntaxError, UnicodeDecodeError, OSError):
                 unreadable.append(rel)
                 continue
@@ -215,6 +224,10 @@ def controls() -> list:
         ("a non-literal mode is UNRESOLVABLE, never assumed text", site("open(p, m)\n", 1, "unresolvable")),
         ("a comment naming open() is invisible (AST)", findings_in("# open(p)\n") == []),
         ("errors= without an encoding is STILL undeclared", site('p.read_text(errors="replace")\n', 1, "read")),
+        ("os.open(...) is NOT a text open and is never unresolvable",
+         findings_in("os.open(p, os.O_RDONLY)\n", ("os",)) == []),
+        ("fitz.open(...) is NOT a text open and is never unresolvable",
+         findings_in("fitz.open(p)\n", ("fitz",)) == []),
     ]
 
 

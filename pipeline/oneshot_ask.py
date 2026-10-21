@@ -29,7 +29,7 @@ OK, FATAL = 0, 1
 def conf() -> dict:
     """Engine facts from their one home (C12)."""
     import yaml
-    return yaml.safe_load(CONFIG.read_text())
+    return yaml.safe_load(CONFIG.read_text(encoding='utf-8'))
 
 
 def key() -> str:
@@ -81,16 +81,16 @@ def main(argv: list[str]) -> int:
         print("FATAL: config/engine.yaml declares no fanout.default_max_tokens - refusing to invent one (C12)")
         return FATAL
     max_tokens = args.max_tokens or int(fanout["default_max_tokens"])
-    prompt = args.prompt if args.prompt else pathlib.Path(args.prompt_file).read_text()
+    prompt = args.prompt if args.prompt else pathlib.Path(args.prompt_file).read_text(encoding='utf-8')
     t0 = time.time()
     content, meta = ask(args.model, prompt, max_tokens, args.timeout)
     out = pathlib.Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(content if content else "(no content returned)\n")
+    out.write_text(content if content else "(no content returned)\n", encoding='utf-8')
     meta.update({"model": args.model, "wall_s": round(time.time() - t0, 2),
                  "prompt_chars": len(prompt), "answer_chars": len(content), "out": str(out)})
     if args.json_out:
-        pathlib.Path(args.json_out).write_text(json.dumps(meta, indent=1))
+        pathlib.Path(args.json_out).write_text(json.dumps(meta, indent=1), encoding='utf-8')
     if not content:
         print(f"FATAL: {args.model} returned no content: {meta.get('error', '')}")
         return FATAL

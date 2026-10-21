@@ -61,7 +61,7 @@ def _home(path: pathlib.Path) -> dict:
     resolved = path if path.is_absolute() else REPO / path
     if not resolved.exists():
         raise SystemExit(f"FATAL: {path} is absent - it is the one home for what this reads (C12)")
-    return yaml.safe_load(resolved.read_text()) or {}
+    return yaml.safe_load(resolved.read_text(encoding='utf-8')) or {}
 
 
 def declared() -> dict[str, str]:
@@ -187,7 +187,7 @@ def resolve(value: str) -> str:
     if not path.is_absolute():
         path = REPO / path
     try:
-        node: object = yaml.safe_load(path.read_text())
+        node: object = yaml.safe_load(path.read_text(encoding='utf-8'))
         for part in dotted.split("."):
             node = node[int(part)] if isinstance(node, list) else node[part]  # type: ignore[index]
     except Exception as exc:
@@ -268,7 +268,7 @@ def selftest() -> int:
     """Controls: the binding must be readable, faithful, and must not restate a declared value."""
     checks: list[tuple[str, bool]] = []
     bindings = declared()
-    own = pathlib.Path(__file__).read_text()
+    own = pathlib.Path(__file__).read_text(encoding='utf-8')
     checks.append(("the_one_home_declares_at_least_one_env_shaped_name", len(bindings) >= 1))
     checks.append(("every_declared_name_is_env_shaped", all(ENV_SHAPED.match(name) for name in bindings)))
     probe = next(iter(bindings))

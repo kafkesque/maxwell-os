@@ -516,7 +516,7 @@ def selftest() -> int:
 
         def receipt_refuses_an_existing_file() -> bool:
             handle = base / "taken.json"
-            handle.write_text("{}")
+            handle.write_text("{}", encoding='utf-8')
             try:
                 write_receipt(handle, {"a": 1})
             except SystemExit:
@@ -535,7 +535,7 @@ def selftest() -> int:
             ("an_owner_word_that_NAMES_a_record_passes_the_licence",
              lambda: not licence_fires("D-3010")),
             ("a_receipt_that_ALREADY_EXISTS_is_never_overwritten",
-             lambda: ((base / "taken.json").write_text("{}"),
+             lambda: ((base / "taken.json").write_text("{}", encoding='utf-8'),
                       any("already exists" in p for p in licence_problems(
                           "D-3010", base / "taken.json", declared={_rel(base / "taken.json")})))[1]),
             ("a_receipt_path_no_declaration_owns_is_REFUSED_with_the_line_to_add",

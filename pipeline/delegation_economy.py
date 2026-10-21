@@ -59,7 +59,7 @@ def load_config(path: pathlib.Path = CONFIG) -> dict[str, Any]:
     """Read the ONE home of the economy's declarations; never invent a default (C12/C16)."""
     if not path.exists():
         raise SystemExit(f"FATAL: {path} is absent — it is the one home of the economy's ceilings (C12)")
-    cfg = yaml.safe_load(path.read_text()) or {}
+    cfg = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     for key in ("homes", "ledger_fields", "ceiling", "cloud_model_families", "ratio",
                 "metering_classes", "token_ceiling_counts"):
         if key not in cfg:
@@ -98,7 +98,7 @@ def local_model_set(cfg: dict[str, Any]) -> set[str]:
     if not path.exists():
         raise SystemExit(f"FATAL: the engine's model registry is absent at {path} — the local tier "
                          f"cannot be decided, and an undecidable tier is not a tier (C16)")
-    doc = yaml.safe_load(path.read_text()) or {}
+    doc = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     models = doc.get("models") if isinstance(doc, dict) else None
     if not isinstance(models, dict) or not models:
         raise SystemExit(f"FATAL: {path} carries no 'models' mapping — the join that defines LOCAL "
@@ -431,8 +431,8 @@ def _selftest() -> int:
     """Known-answer controls. A control verifies the SHIPPED path, never a copy of it."""
     import tempfile
     checks: list[tuple[str, bool]] = []
-    src = pathlib.Path(__file__).read_text()
-    cfg_text = CONFIG.read_text() if CONFIG.exists() else ""
+    src = pathlib.Path(__file__).read_text(encoding='utf-8')
+    cfg_text = CONFIG.read_text(encoding='utf-8') if CONFIG.exists() else ""
 
     def row(model: str, i: int, o: int = 0, cr: int = 0, cost: float | None = None,
             cs: str | None = None, at: int | None = None) -> dict[str, Any]:
@@ -455,7 +455,7 @@ def _selftest() -> int:
             "token_ceiling_counts": "gross",
             "report_token_bases": ["gross", "billable_fresh"],
         }
-        cpath.write_text(yaml.safe_dump(base))
+        cpath.write_text(yaml.safe_dump(base), encoding='utf-8')
         LOC = {"gemma-4-E4B-it-MLX-4bit", "gpt-local-test"}
 
         s, _, why = measure(cpath, ledger=_synth(tmp / "local_only", [
@@ -522,7 +522,7 @@ def _selftest() -> int:
             doc["ledger_fields"] = dict(base["ledger_fields"], at="created_timestamp")
             doc.update(over)
             path = tmp / f"{name}.yaml"
-            path.write_text(yaml.safe_dump(doc))
+            path.write_text(yaml.safe_dump(doc), encoding='utf-8')
             return path
 
         def cost_of(summary: dict[str, Any]) -> float:

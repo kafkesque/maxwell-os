@@ -127,7 +127,7 @@ def _model_store(path: pathlib.Path = ENGINE_YAML) -> dict:
     """The declared model_store block. FATAL when absent - a store rule with no home is a rumour (C12)."""
     if not path.exists():
         raise SystemExit("FATAL: " + str(path) + " is absent - it is the one home for the store rules (C12)")
-    row = (yaml.safe_load(path.read_text()) or {}).get("model_store")
+    row = (yaml.safe_load(path.read_text(encoding='utf-8')) or {}).get("model_store")
     if not isinstance(row, dict) or not row:
         raise SystemExit("FATAL: config/engine.yaml declares no model_store block - refusing to invent one (C12)")
     return row
@@ -924,7 +924,7 @@ def main(argv: list) -> int:
         if arg == "--json-out" and position + 1 < len(argv):
             out = pathlib.Path(argv[position + 1])
     if out:
-        out.write_text(json.dumps(report, indent=1, sort_keys=True))
+        out.write_text(json.dumps(report, indent=1, sort_keys=True), encoding='utf-8')
         print("wrote %s" % out)
     return exit_code(undeclared, owed)
 
@@ -996,7 +996,7 @@ def _cases() -> list:
     def reader_still(_path):
         return 100
 
-    source = pathlib.Path(__file__).read_text()
+    source = pathlib.Path(__file__).read_text(encoding='utf-8')
     kinds = {".locks": KIND_STORE_METADATA, "version.txt": KIND_STORE_METADATA, "blobs": KIND_STORE_METADATA,
              "datasets--TIGER-Lab--MMLU-Pro": KIND_NON_MODEL_REPO, "models--a--b": KIND_MODEL}
 
@@ -1014,7 +1014,7 @@ def _cases() -> list:
         for name, payload in (weights or {}).items():
             (root / name).write_bytes(payload)
         for name, payload in (extra or {}).items():
-            (root / name).write_text(payload)
+            (root / name).write_text(payload, encoding='utf-8')
         for name, payload in (partial or {}).items():
             (root / name).write_bytes(payload)
         return root

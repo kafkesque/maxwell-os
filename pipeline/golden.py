@@ -44,7 +44,7 @@ from pipeline.pipeline_paths import CANONICAL_RUN, required, required_mapping  #
 
 _CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 _CFG_HOME = str(_CFG_PATH.relative_to(_CFG_PATH.parent.parent))  # D-2982: derived, never a second copy
-with open(_CFG_PATH) as _f:
+with open(_CFG_PATH, encoding='utf-8') as _f:
     _CFG: dict = yaml.safe_load(_f) or {}
 # D-2982 (C16/D-2644): the serving block is DECLARED. A missing block must be an ERROR - the old
 # `_CFG.get("serving", {})` read an EMPTY anchoring contract instead, so golden.py would silently
@@ -59,7 +59,7 @@ GOLDEN_PATH: Path = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml
 
 def load_golden(path: Path) -> list[dict]:
     """Load the golden query list from YAML."""
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         return (yaml.safe_load(f) or {}).get("queries", [])
 
 

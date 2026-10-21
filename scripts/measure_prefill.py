@@ -57,7 +57,7 @@ def _yaml(path: pathlib.Path) -> dict:
 
     if not path.is_file():
         raise ProbeFault(f"FATAL: {path} is absent — it is the one home of these facts (C12)")
-    doc = yaml.safe_load(path.read_text()) or {}
+    doc = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     if not isinstance(doc, dict):
         raise ProbeFault(f"FATAL: {path} does not parse to a mapping")
     return doc
@@ -145,7 +145,7 @@ def selftest() -> int:
     assert len(p) == 45 and p == filler, "10 declared tokens must build to exactly the 45-char unit"
     p2 = build_prompt(26214, filler, per_unit)
     assert len(p2) == int(26214 * per_unit), "the char count must be tokens * declared rate"
-    src = pathlib.Path(__file__).read_text().split("#: The tokens this file must never", 1)[0]
+    src = pathlib.Path(__file__).read_text(encoding='utf-8').split("#: The tokens this file must never", 1)[0]
     leaked = [lit for lit in FORBIDDEN if lit in src]
     assert not leaked, f"hardcoded value leaked into source: {leaked}"
     print("ok measure-prefill --selftest: 2/2 controls green "

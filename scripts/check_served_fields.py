@@ -81,7 +81,7 @@ DEFECTS = (
 
 def load_declaration() -> dict[str, Any]:
     """Read the ONE home of the advertised-field dispositions (fail-closed: no code default)."""
-    doc = yaml.safe_load(DECLARATION.read_text())
+    doc = yaml.safe_load(DECLARATION.read_text(encoding='utf-8'))
     if not isinstance(doc, dict):
         raise ValueError(f"{DECLARATION} must be a mapping")
     return doc
@@ -114,7 +114,7 @@ def advertised_fields(rel: str, kind: str, columns: set[str]) -> set[str]:
     path: Path = REPO / rel
     if not path.exists():
         raise FileNotFoundError(f"the declared surface {rel} does not exist")
-    tree: ast.Module = ast.parse(path.read_text())
+    tree: ast.Module = ast.parse(path.read_text(encoding='utf-8'))
     found: set[str] = set()
     for node in ast.walk(tree):
         if kind == "dict_keys" and isinstance(node, ast.Dict):
@@ -137,7 +137,7 @@ def register_flags(declaration: dict[str, Any]) -> dict[str, list[str]]:
     """
     regs: dict[str, Any] = declaration["registers"]
     flagged: dict[str, list[str]] = {}
-    derived_doc: dict[str, Any] = yaml.safe_load((REPO / regs["derived"]).read_text())
+    derived_doc: dict[str, Any] = yaml.safe_load((REPO / regs["derived"]).read_text(encoding='utf-8'))
     derived_bad: set[str] = set(declaration["flagged_status"]["derived"])
     for row in derived_doc.get("derivations") or []:
         if not isinstance(row, dict) or not row.get("name"):
@@ -146,7 +146,7 @@ def register_flags(declaration: dict[str, Any]) -> dict[str, list[str]]:
         if status in derived_bad:
             leaf: str = str(row["name"]).split(".")[-1]
             flagged.setdefault(leaf, []).append(f"derivations:{status}")
-    shape_doc: dict[str, Any] = yaml.safe_load((REPO / regs["shape"]).read_text())
+    shape_doc: dict[str, Any] = yaml.safe_load((REPO / regs["shape"]).read_text(encoding='utf-8'))
     shape_bad: set[str] = set(declaration["flagged_status"]["shape"])
     for col, info in (shape_doc.get("columns") or {}).items():
         if isinstance(info, dict) and str(info.get("status")) in shape_bad:
@@ -162,7 +162,7 @@ def home_exists(home: str) -> bool:
     path: Path = REPO / rel
     if not path.exists():
         return False
-    src: str = path.read_text()
+    src: str = path.read_text(encoding='utf-8')
     return f"def {symbol}" in src or f"class {symbol}" in src or f"{symbol}:" in src
 
 
@@ -184,7 +184,7 @@ def symbol_literals(rel: str, symbol: str) -> set[str]:
     if not path.exists():
         return set()
     try:
-        tree = ast.parse(path.read_text())
+        tree = ast.parse(path.read_text(encoding='utf-8'))
     except SyntaxError:
         return set()
     for node in ast.walk(tree):
@@ -262,7 +262,7 @@ def module_tuple(rel: str, name: str) -> list[str]:
     if not path.exists():
         return []
     try:
-        tree = ast.parse(path.read_text())
+        tree = ast.parse(path.read_text(encoding='utf-8'))
     except SyntaxError:
         return []
     for node in tree.body:
@@ -596,7 +596,7 @@ def main() -> int:
     #: D-2993/D-2994 - the COMPLETED words and the two WIRE SHAPES are joined to reality the same way the tier word
     #: is: a retirement that did not leave the wire, and a contract restated in config, are both DEFECTS.
     retired_problems: list[str] = retired_faults(list(declaration.get("retired") or []), set(surfaces))
-    feedback_policy: dict[str, Any] = yaml.safe_load((REPO / "config" / "feedback.yaml").read_text()) or {}
+    feedback_policy: dict[str, Any] = yaml.safe_load((REPO / "config" / "feedback.yaml").read_text(encoding='utf-8')) or {}
     shape_problems: list[str] = shape_faults(
         declaration,
         feedback_policy,

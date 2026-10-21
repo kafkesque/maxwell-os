@@ -31,11 +31,14 @@ rail: scripts/check_undeclared_encoding.py
 scan_roots: [scripts, pipeline, tools]
 exempt:
   - scripts/check_undeclared_encoding.py
+non_text_open: [os, fitz]   # `.open()` receivers that are NOT text file opens - os.open returns a raw fd (bytes,
+                             # flags, never a codec) and fitz.open opens a PDF document. Neither is text nor
+                             # UNRESOLVABLE; the rail skips them instead of demanding a literal 'mode' they lack.
 measured_by: scripts/check_undeclared_encoding.py
 allowed: []
 ceiling:
-  files: 156
-  sites: 392
+  files: 150
+  sites: 384
   writes: 74
-  unresolvable: 3
+  unresolvable: 0
   direction: shrink_only

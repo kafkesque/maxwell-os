@@ -79,7 +79,7 @@ def load_yaml(path: Path) -> dict[str, Any]:
         raise
     if not path.exists():
         raise FileNotFoundError(f"rule file missing: {path}")
-    with path.open() as fh:
+    with path.open(encoding='utf-8') as fh:
         doc = yaml.safe_load(fh)
     if not isinstance(doc, dict):
         raise ValueError(f"rule file is not a mapping: {path}")

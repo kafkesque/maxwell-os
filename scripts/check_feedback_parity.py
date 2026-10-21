@@ -60,7 +60,7 @@ CONTROL_LABELS: tuple[str, ...] = (
 
 def policy() -> dict:
     """The declared policy (config/feedback.yaml) - read, never restated (C12)."""
-    return yaml.safe_load((REPO / "config" / "feedback.yaml").read_text())
+    return yaml.safe_load((REPO / "config" / "feedback.yaml").read_text(encoding='utf-8'))
 
 
 def _fixture() -> sqlite3.Connection:

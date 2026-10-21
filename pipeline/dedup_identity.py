@@ -14,6 +14,7 @@ config/dedup_identity.yaml (C12); the in-file values are fail-safe defaults only
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import unicodedata
@@ -48,6 +49,27 @@ def _fold(text: str) -> str:
 def normalize_name(name: str) -> str:
     """Deterministic concept-name folding (NFKC+NFKD, lowercase, alnum-only tokens)."""
     return re.sub(r"[^a-z0-9]+", " ", _fold((name or "").lower())).strip()
+
+
+def concept_key(name: str) -> str:
+    """D-3118 Phase A: the generation-invariant match key (distinct from fb_id, the storage key).
+
+    sha256 of the SORTED, stopword-filtered content-tokens of normalize_name(name). Deterministic
+    and idempotent (LLM-free, D-343): two extractions of the same concept with a paraphrase-identical
+    name fold to ONE key, while fb_id stays definition-sensitive (D-2949). The stopword set loads from
+    config/dedup_identity.yaml#concept_key.stopwords (C12) — NEVER a code default — so the key is a
+    stable property of the IDENTITY model, not of retrieval tuning.
+
+    Edge case (a real collision, not a paraphrase): a name that IS all stopwords would leave no token
+    and every such name would collapse to sha256(""). Fall back to the UNFILTERED tokens so a
+    stopword-only name keeps its own key instead of joining a shared empty bucket.
+    """
+    tokens = normalize_name(name).split()
+    stopwords = frozenset(_config().get("concept_key", {}).get("stopwords", []))
+    kept = sorted(t for t in tokens if t not in stopwords)
+    if not kept:
+        kept = sorted(tokens)
+    return hashlib.sha256(" ".join(kept).encode("utf-8")).hexdigest()
 
 
 def source_set(value: object) -> frozenset[str]:

@@ -76,3 +76,17 @@ thresholds_direction:            # fences the ONE destructive value (C6/C16)
   may_tighten_without_owner: true    # stricter divergence = keep both = fail-safe
   may_loosen_without_owner: false    # require_both: true, or raising the mins, merges on DOUBT -> owner-gated + labelled evidence
 
+# ── D-3118 Phase A: concept_key — the generation-invariant match key ──────────────────────
+# concept_key = sha256(sorted stopword-filtered content-tokens of normalize_name(name)).
+# It is the IDENTITY key for cross-run matching (D-3117) and dedup grouping (D-2951); fb_id
+# stays the immutable storage key. The stopword set is OWNED HERE (not referenced from
+# retrieval.fts_stopwords) so a retrieval-tuning change can never silently rewrite every
+# concept_key — that would be identity drift, the exact failure D-3118 exists to prevent.
+# The 64 words are the standard English function-word set; kept as an explicit list so the
+# key's derivation is auditable byte-for-byte (C12: no hardcoded value, but the VALUE must be
+# pinned in config and its provenance recorded).
+concept_key:
+  # stopword-filtered BEFORE sorting; a name that is ALL stopwords falls back to unfiltered
+  # tokens (see pipeline/dedup_identity.concept_key) so it never collapses to sha256("").
+  stopwords: [a, an, the, and, or, of, to, in, on, for, with, is, are, was, were, be, been, how, what, why, when, where, which, who, do, does, did, can, could, should, would, will, this, that, these, those, it, its, as, at, by, from, about, into, than, then, so, if, but, not, no, have, has, had, i, me, my, we, our, you, your, they, them, their]
+

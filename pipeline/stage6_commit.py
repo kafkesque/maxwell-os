@@ -5,7 +5,7 @@ stage6_commit.py — Commit verified FBs to SQLite + Parquet snapshot.
 Authority: CONSTITUTION.md §3 (Pipeline Stage 6), §2.3
 
 Input:  Verified FBs from Stage 5 checkpoint
-Output: SQLite database (data/maxwell.db) + Parquet snapshot (data/parquet/)
+Output: SQLite database (knowledge pipeline/maxwell.db) + Parquet snapshot (knowledge pipeline/parquet/)
 
 Process:
   1. Load verified FBs from Stage 5
@@ -92,6 +92,7 @@ from pipeline.dedup_gate import (  # D-2951: commit-time dedup gate (D-2949 prev
     duplicate_marker,
     load_committed_index,
 )
+from pipeline.dedup_identity import concept_key  # D-3118 Phase A: generation-invariant match key
 from pipeline.discipline_macro import macro_for  # D-2884(a): C21 single home for fine->macro collapse
 from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 from pipeline.sqlite_vec_loader import load_sqlite_vec  # D-2915: shared sqlite-vec loader (ctypes fallback)
@@ -106,6 +107,7 @@ from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
 CREATE_FBS_TABLE = """
 CREATE TABLE IF NOT EXISTS fbs (
     fb_id TEXT PRIMARY KEY,
+    concept_key TEXT,           -- D-3118 Phase A: generation-invariant match key (identity), distinct from fb_id (storage)
     name TEXT NOT NULL,
     definition TEXT NOT NULL,
     application TEXT,
@@ -286,6 +288,9 @@ def init_db(db_path: Path) -> sqlite3.Connection:
         print("     Full-text search will not be available.")
     # Add new columns if upgrading from older schema versions
     _migrate_add_column(conn, "fbs", "domains_raw", "TEXT")
+    # D-3118 Phase A: generation-invariant match key (identity decoupling). NULL until backfilled by
+    # pipeline/migrate_concept_key.py; new inserts compute it below (insert_fb). Distinct from fb_id.
+    _migrate_add_column(conn, "fbs", "concept_key", "TEXT")
     _migrate_add_column(conn, "fbs", "discipline_raw", "TEXT")  # D316: singular
     _migrate_add_column(conn, "fbs", "discipline_macro", "TEXT")  # D-2884(a): operative 3-way macro routing facet
     _migrate_add_column(conn, "fbs", "pipeline_run_id", "TEXT")
@@ -764,7 +769,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     try:
         conn.execute("""
             INSERT OR REPLACE INTO fbs (
-                fb_id, name, definition, application, failure_mode,
+                fb_id, concept_key, name, definition, application, failure_mode,
                 elaboration, content_type, extraction_type, mechanism,
                 boundary, consequence, taxonomy_match_method,
                 content_type_source, discipline_source, extraction_type_source, menu_hash,
@@ -826,6 +831,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             )
         """, (
             _safe_str(fb_id(fb)),
+            concept_key(fb_name(fb)),  # D-3118: derived from name — the ONE source of truth, never a passed-in value
             _safe_str(fb_name(fb)),
             _safe_str(fb_definition(fb)),
             _safe_str(fb.get("application"), ""),

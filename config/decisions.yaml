@@ -31137,7 +31137,10 @@ decisions:
     disposition. A new layer pipeline/evidence_accumulator.py (config-first, run at S6 after extraction) matches
     each incoming FB against the committed store in three deterministic LLM-free steps reusing D-2950 primitives:
     (1) BLOCK by concept_key (D-3118; normalize_name Phase-A surrogate), (2) MATCH GATE body-divergence (token
-    Jaccard + SequenceMatcher), (3) ACCUMULATE monotonic: source_ids union, source_diversity = len, is_convergent
+    Jaccard + SequenceMatcher; RECONCILED 2026-10-21 — repurposed from HARD reject to REPORTED divergence metric:
+    Phase 0 receipt a6323a7 measures body survival 0%, and all 5 live duplicate concept_keys are is_divergent, so
+    a hard body gate would reject the exact cross-source re-appearance D-3117 accumulates; homonym disambiguation
+    deferred to D-3118 Phase B), (3) ACCUMULATE monotonic: source_ids union, source_diversity = len, is_convergent
     = (len >= 2), field-wise richer merge (per body field keep the richer; non-empty beats empty; never
     concatenate, never a summary/noise copy). Re-derives the same S2 convergence rule at a monotonic accumulation
     point; idempotent + monotonic at this layer only (extraction layer is never idempotent, arXiv 2408.04667).

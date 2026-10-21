@@ -5231,3 +5231,49 @@ Next critical step: D-3118 Phase A (concept_key column + backfill) — the depen
 **State.** Phase A proceeds as scheduled (build-now). Phase B's gate flips from "deferred/unmeasured" to
 "necessary, threshold-to-be-calibrated". No owner action required beyond the standing approval; this record
 closes the drift the receipt exposed.
+
+## D-3117 MATCH GATE RECONCILIATION (2026-10-21) — body-divergence is measured-unreliable as a HARD gate
+
+**Receipt (D-3036) — two readings, one conclusion.**
+1. Phase 0 (a6323a7): `body_hash_8field` survival **0%** (jaccard 0.0) — extraction is never idempotent
+   (arXiv 2408.04667), so any gate that keys on body wording cannot re-match a body-divergent re-extraction.
+2. Live store (this reconciliation): **all 5** duplicate `concept_key` groups return `is_divergent == True` under
+   the D-2950 body-divergence gate (token Jaccard + SequenceMatcher), including:
+   - "Design Thinking Process" from TWO DIFFERENT books (jaccard 0.116) — the exact cross-source re-appearance
+     D-3117 exists to accumulate (the corroboration upgrade);
+   - "Social Identity Influence on Behavior" / "Social Influence on Identity and Behavior" (jaccard 0.105) — the
+     name-paraphrase pair Phase A correctly collided into one key.
+
+**The conflict.** D-3117's PROPOSED text (written BEFORE the Phase 0 receipt) specifies step (2) MATCH GATE as a
+body-divergence gate reusing D-2950's `is_divergent`. But body-divergence CANNOT separate the two cases the gate
+exists to separate — "same concept re-extracted from a different book" (body diverges by construction, should
+ACCUMULATE) vs "distinct concept sharing a name" (body diverges, should KEEP BOTH) — because the extraction layer
+destroys the body signal (0% survival) in BOTH cases. As literally specified, the MATCH GATE rejects every
+cross-source re-appearance, and D-3117 becomes a SILENT NO-OP: the module passes its own tests while failing its
+purpose.
+
+**Reconciliation (a correction, not a new decision — it reconciles D-3117 with a receipt it predates).**
+- The MATCH GATE is REPURPOSED from a HARD body-divergence reject to a REPORTED divergence metric: BLOCK on
+  `concept_key` → ACCUMULATE monotonic (unchanged), and the body-divergence (token Jaccard + SequenceMatcher) is
+  computed and REPORTED (mode=report default), never a blocking reject.
+- Homonym disambiguation (the gate's original purpose) is DEFERRED to D-3118 Phase B embedding recall — the cosine
+  threshold Phase B calibrates is exactly the discriminator a 0%-stable body token gate cannot be.
+- Monotonic + report-mode + recoverable (source_ids union, is_convergent flip) bounds the false-positive risk; the
+  corroboration-collapse inflation (BUG-780/T-119) remains the declared known limitation, unchanged.
+
+**Why the asymmetry inverts here (the D-2950 rule does not transfer).** D-2950's `is_divergent` is deliberately
+one-sided ("a false divergent keeps two rows, visible and recoverable") — but that rule is scoped to SAME-WORK
+dedup (source overlap), where a false "keep both" is cheap and a false "merge" drops a distinct concept. In the
+ACCUMULATION layer the asymmetry INVERTS: a false "divergent" is a SILENT lost corroboration (no row, no flag, no
+recoverable trace), while a false "convergent" is a visible, monotonic, reversible source_ids union. Doubt must
+therefore go to ACCUMULATE here, and the divergence signal becomes an audit trail (Phase B's calibration input),
+not a reject.
+
+**Effect on the build.** `pipeline/evidence_accumulator.py` keeps its three steps; step (2) becomes "record
+divergence" rather than "reject on divergence". No schema change beyond the already-planned `concept_key`; the
+divergence metric is report-only in Phase A (a nullable column is Phase B's concern, where it feeds the calibrated
+cosine threshold).
+
+**State.** Reconciliation RECORDED, not yet owner-gated — the accumulator build proceeds on the corrected shape
+once the owner acknowledges, or is reverted to the hard gate if the owner holds the hard-gate line. The two-sided
+receipt above is the evidence either way.

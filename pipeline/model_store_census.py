@@ -83,6 +83,8 @@ HUB = HOME / ".cache" / "huggingface" / "hub"
 ENGINE_YAML = pathlib.Path(__file__).resolve().parent.parent / "config" / "engine.yaml"
 ROOT = ENGINE_YAML.parent.parent
 SELF = pathlib.Path(__file__).resolve()
+sys.path.insert(0, str(ROOT))
+from scripts.lib import artifact_encoding  # noqa: E402
 
 KIND_MODEL = "MODEL"
 KIND_NON_MODEL_REPO = "NON_MODEL_REPO"
@@ -408,6 +410,8 @@ def _reference_files(homes: list, suffixes: list, exclude: list) -> list:
     out = []
     for home in homes:
         base = pathlib.Path(home)
+        if not base.is_absolute():
+            base = ROOT / base
         if not base.is_dir():
             continue
         for path in sorted(base.rglob("*")):
@@ -456,7 +460,7 @@ def resolution_index(dom: dict = None) -> dict:
     values, code, unreadable = [], [], []
     for path in _reference_files(dom["value_homes"], dom["file_suffixes"], dom["exclude"]):
         try:
-            doc = yaml.safe_load(path.read_text(errors="ignore"))
+            doc = yaml.safe_load(artifact_encoding.open_artifact(path, ROOT).read())
         except yaml.YAMLError as exc:
             unreadable.append((path.as_posix(), "YAML: " + str(exc).splitlines()[0]))
             continue
@@ -466,7 +470,7 @@ def resolution_index(dom: dict = None) -> dict:
         values.extend((rel, key_path, value) for key_path, value in leaves)
     for path in _reference_files(dom["code_homes"], dom["file_suffixes"], dom["exclude"]):
         try:
-            tree = ast.parse(path.read_text(errors="ignore"))
+            tree = ast.parse(artifact_encoding.open_artifact(path, ROOT).read())
         except SyntaxError as exc:
             unreadable.append((path.as_posix(), "Python: " + str(exc).splitlines()[0]))
             continue

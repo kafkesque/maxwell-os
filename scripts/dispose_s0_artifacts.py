@@ -50,6 +50,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
+from scripts.lib import artifact_encoding  # noqa: E402
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     S0_ARTIFACT_MAX_EMBEDDED_IMAGES,
@@ -62,6 +63,7 @@ SCHEMA_VERSION = "1.0"
 QUARANTINE_ROOT = Path.home() / ".maxwell_quarantine" / "s0_artifacts"
 EVIDENCE_DIR = Path(__file__).resolve().parent.parent / "governance" / "evidence"
 DB_PATH = Path(__file__).resolve().parent.parent / "knowledge pipeline" / "maxwell.db"
+_ROOT = Path(__file__).resolve().parent.parent
 
 
 def sha256_of(path: Path, chunk: int = 1 << 20) -> str:
@@ -128,7 +130,7 @@ def classify(artefact: Path, container: Path | None, referenced: set[str], since
              native: bool = False) -> dict[str, Any]:
     """One verdict for one artefact, named by a CLOSED vocabulary (the same discipline as the admission door)."""
     size_bytes = artefact.stat().st_size
-    text = artefact.read_text(encoding="utf-8", errors="replace")
+    text = artifact_encoding.open_artifact(artefact, _ROOT).read()
     blobs = text.count(EMBEDDED_IMAGE_MARKER)
     oversize = size_bytes > S0_ARTIFACT_MAX_MB * 1024 * 1024
     too_many_images = blobs > S0_ARTIFACT_MAX_EMBEDDED_IMAGES

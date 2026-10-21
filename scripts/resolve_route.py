@@ -38,6 +38,7 @@ import sys
 from typing import Callable
 
 import yaml
+from lib import artifact_encoding  # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 CFG = REPO / "config/capability_registry.yaml"
@@ -129,7 +130,7 @@ def read_pointer(ref: str, exists: Callable[[str], bool]) -> list[str]:
     if not exists(path):
         return [f"its receipt points at {path!r}, which does not exist"]
     try:
-        text = (REPO / path).read_text(encoding="utf-8", errors="replace")
+        text = artifact_encoding.open_artifact(REPO / path, REPO).read()
     except OSError as exc:                                        # pragma: no cover - a readable path was just checked
         return [f"its receipt {ref!r} could not be read: {exc}"]
     if not re.search(rf"^{re.escape(key)}\s*:", text, re.M):
@@ -478,13 +479,13 @@ def census_report() -> str:
     corpus = [pathlib.Path(REPO, "justfile").read_text(encoding="utf-8")]
     for pat in ("config/*.yaml", "config/*.json", "governance/**/*.md"):
         for p in sorted(REPO.glob(pat)):
-            corpus.append(p.read_text(encoding="utf-8", errors="replace"))
+            corpus.append(artifact_encoding.open_artifact(p, REPO).read())
     for extra in ("CLAUDE.md", "AGENTS.md", "DECISION-LOG.md", "MASTER-TASK-REGISTER.md"):
         if (REPO / extra).is_file():
-            corpus.append((REPO / extra).read_text(encoding="utf-8", errors="replace"))
+            corpus.append(artifact_encoding.open_artifact(REPO / extra, REPO).read())
     blob = "\n".join(corpus)
     unnamed = [str(p.relative_to(REPO)) for p in files if p.name not in blob]
-    verbs = sum(1 for p in files if arg.search(p.read_text(encoding="utf-8", errors="replace")))
+    verbs = sum(1 for p in files if arg.search(artifact_encoding.open_artifact(p, REPO).read()))
     lines = [f"census: {len(files)} python file(s) | {len(unnamed)} named by NO declared home | "
              f"{verbs} declare a check verb",
              f"join: a file counts as NAMED when its BASENAME appears in the corpus - COARSE by declaration: "

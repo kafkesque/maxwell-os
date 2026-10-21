@@ -60,6 +60,7 @@ import time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from scripts.lib import artifact_encoding  # noqa: E402
 # ONE class resolver (C21): the workstream contract lives in pipeline/research_run.py, which reads it from
 # config/agent_context.yaml. A second reader here would be a second home for the same vocabulary (C12).
 from pipeline.research_run import class_for_mode, resolve_class  # noqa: E402
@@ -153,7 +154,7 @@ def answer_verdict(path: pathlib.Path, min_chars: int, shape: str = "", artifact
     """
     if not path.exists():
         return False, "no answer file"
-    text = path.read_text(errors="replace").strip()
+    text = artifact_encoding.open_artifact(path, ROOT).read().strip()
     if not text:
         return False, "the answer is empty"
     if text.startswith(STUB_PREFIX):
@@ -245,7 +246,7 @@ def resolve_location(path: str, line_no: int) -> tuple[str, str]:
         if not alt.exists():
             return "", f"cites {path}:{line_no} and no such file exists"
         target = alt
-    lines = target.read_text(errors="replace").splitlines()
+    lines = artifact_encoding.open_artifact(target, ROOT).read().splitlines()
     if line_no > len(lines):
         return "", f"{path}:{line_no} is past the end of the file ({len(lines)} lines)"
     return " ".join(lines[line_no - 1].split()), ""
@@ -638,7 +639,7 @@ def _excerpt(path: pathlib.Path, cap: int) -> tuple[str, str]:
     never shown to it, and to the owner, for whom a finding below the cut is impossible in a way nobody sees.
     That is the BUG-816 class: the premise and the task disagreeing SILENTLY.
     """
-    body = path.read_text(errors="replace")
+    body = artifact_encoding.open_artifact(path, ROOT).read()
     if len(body) <= cap:
         return body, ""
     why = (f"TRUNCATED: the file is {len(body)} chars and the declared excerpt is {cap}; anything below the cut "
@@ -690,7 +691,7 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
         expect = t.get("expect")
         if expect:
             hit = [f for f in t.get("files", [])
-                   if (ROOT / f).exists() and re.search(str(expect), (ROOT / f).read_text(errors="replace"))]
+                   if (ROOT / f).exists() and re.search(str(expect), artifact_encoding.open_artifact(ROOT / f, ROOT).read())]
             if not hit:
                 print(f"FATAL: task {wid} declares expect={expect!r} and no listed file contains it - "
                       f"the PREMISE is wrong, so no model should be asked")
@@ -713,7 +714,7 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
                   f"{', '.join(files)}")
             for f in files:
                 p = ROOT / f
-                if p.exists() and len(p.read_text(errors="replace")) > cap:
+                if p.exists() and len(artifact_encoding.open_artifact(p, ROOT).read()) > cap:
                     print(f"warn: task {wid} reviews {f}, which is longer than the declared excerpt of {cap} "
                           f"chars - this is a PARTIAL review by construction and the prompt SAYS SO to the "
                           f"model; refusing a review whose prompt exceeds a measured size is the registry's job "
@@ -921,7 +922,7 @@ def receipt(run_id: str) -> int:
             except Exception as exc:  # reported, never swallowed (C16)
                 print(f"warn: unreadable task.json for {r['ws']}: {type(exc).__name__}: {exc}")
         ans = wsd / "20_answer.md"
-        answer_text = ans.read_text(errors="replace") if ans.exists() else ""
+        answer_text = artifact_encoding.open_artifact(ans, ROOT).read() if ans.exists() else ""
         shape = str(meta.get("shape") or "")
         artefacts = [str(f) for f in (meta.get("files") or [])]
         ok, why = answer_verdict(ans, floor, shape, artefacts)
@@ -1013,7 +1014,7 @@ def verify(run_id: str, model: str, out: pathlib.Path) -> int:
         ok, why = answer_verdict(a, int(g["min_answer_chars"]),
                                  str(meta.get("shape") or ""), meta.get("files") or [])
         if ok:
-            answers.append(f"## {t.name}\n{a.read_text(errors='replace')[:4000]}")
+            answers.append(f"## {t.name}\n{artifact_encoding.open_artifact(a, ROOT).read()[:4000]}")
         elif a.exists():
             answers.append(f"## {t.name}\n[UNUSABLE ANSWER - {why}; the verifier must not treat this as "
                            f"a claim to check]")
@@ -1342,7 +1343,7 @@ def selftest() -> int:
         if not cp.exists():
             checks.append((f"{ctl['name']}[subject_ABSENT]", False))
             continue
-        cfind, cdefs = shape_defects(cp.read_text(errors="replace"), str(ctl["shape"]), ctl["artifact"])
+        cfind, cdefs = shape_defects(artifact_encoding.open_artifact(cp, ROOT).read(), str(ctl["shape"]), ctl["artifact"])
         checks.append((str(ctl["name"]),
                        (cfind >= 1 and not cdefs) if str(ctl["expect"]) == "an_answer" else bool(cdefs)))
     checks.append(("at_least_one_shape_control_is_DECLARED_T163", bool(controls)))

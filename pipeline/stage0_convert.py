@@ -34,6 +34,8 @@ from typing import Any
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+_ROOT = Path(__file__).resolve().parent.parent
+from scripts.lib import artifact_encoding  # noqa: E402
 
 from pipeline import ingest_gate  # D-2997/BUG-781: the INGEST DOOR (delta-scoped; never re-classifies an ingested file)
 from pipeline.io_guard import load_jsonl, safe_write  # D2332 fail-closed read + D2487 atomic write
@@ -525,7 +527,7 @@ def verify_artifact(artifact_path: Path) -> dict[str, Any]:
             f"stage0.artifact.max_artifact_mb={S0_ARTIFACT_MAX_MB} MB — a TEXT conversion of a book does not reach "
             f"this, so the engine is dumping a layout. The work is WHOLE and was not written into the corpus",
         )
-    text = artifact_path.read_text(encoding="utf-8", errors="replace")
+    text = artifact_encoding.open_artifact(artifact_path, _ROOT).read()
     blobs = text.count(EMBEDDED_IMAGE_MARKER)
     if blobs > S0_ARTIFACT_MAX_EMBEDDED_IMAGES:
         return _failure(

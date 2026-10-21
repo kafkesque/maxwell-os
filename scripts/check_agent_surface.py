@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Any, NoReturn
 
 import yaml
+from lib import artifact_encoding  # noqa: E402
 
 RC_OK = 0
 RC_FAULT = 1
@@ -193,7 +194,7 @@ def binding_hits(
     for path in files:
         relative = path.relative_to(repo).as_posix()
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = artifact_encoding.open_artifact(path, repo).read()
         except OSError as exc:
             fatal(f"cannot read {relative}: {type(exc).__name__}: {exc}")
         code_lines = code_only(text).splitlines()
@@ -228,7 +229,7 @@ def class_faults(repo: Path, data: dict[str, Any], sites: list[Any]) -> list[str
         path = repo_path(repo, str(site["path"]))
         if klass not in vocabulary or not path.is_file():
             continue  # an undeclared class and an absent file are already faults in site_faults
-        text = path.read_text(encoding="utf-8", errors="replace")
+        text = artifact_encoding.open_artifact(path, repo).read()
         quoted = [sid for sid, pat in shapes if any(pat.search(line) for line in text.splitlines())]
         if not quoted:
             continue  # a stale row is already a fault in site_faults
@@ -262,7 +263,7 @@ def portable_faults(repo: Path, data: dict[str, Any]) -> tuple[list[str], list[s
             faults.append(f"R1 the declared portable artifact '{glob}' matches NO file - a declaration must resolve (D-3034)")
         for path in matched:
             scanned += 1
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = artifact_encoding.open_artifact(path, repo).read()
             for number, line in enumerate(text.splitlines(), 1):
                 lowered = line.lower()
                 for token in tokens:
@@ -379,7 +380,7 @@ def resolution_faults(repo: Path, data: dict[str, Any]) -> tuple[list[str], list
     reader_script = repo_path(repo, reader)
     if not reader_script.is_file():
         faults.append(f"R3 the declared journal reader '{reader}' does not exist")
-    elif SURFACE not in reader_script.read_text(encoding="utf-8", errors="replace"):
+    elif SURFACE not in artifact_encoding.open_artifact(reader_script, repo).read():
         faults.append(
             f"R3 the declared reader '{reader}' does not name '{SURFACE}' - the ONE home a reader must read (C12)"
         )

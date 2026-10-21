@@ -20,6 +20,8 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from scripts.lib import artifact_encoding  # noqa: E402
 SCAN_DIRS = ("temp", "governance", "config", "pipeline", "scripts")
 SCAN_EXT = (".json", ".md", ".log", ".yaml", ".txt", ".py")
 # MEASURED means the line carries a READING, not merely a number:
@@ -55,7 +57,7 @@ def scan(names: list[str]) -> dict:
             try:
                 if path.stat().st_size > 4_000_000:
                     continue
-                text = path.read_text(errors="replace")
+                text = artifact_encoding.open_artifact(path, ROOT).read()
             except Exception:
                 continue
             low = text.lower()

@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-21 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1249 decisions (81 needing action) / 724 bugs (255 open) / 59 open tasks (2 OWNER-moved, 57 pipeline). YOURS: 🟠 T-183 THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSIO; 🔴 T-191 RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 opt. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs.'
+  status: '2026-10-21 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1249 decisions (81 needing action) / 726 bugs (255 open) / 59 open tasks (2 OWNER-moved, 57 pipeline). YOURS: 🟠 T-183 THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSIO; 🔴 T-191 RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 opt. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs.'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

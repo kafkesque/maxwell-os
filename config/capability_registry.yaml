@@ -479,7 +479,12 @@ unrouted:
   #: override is a DECISION and not a shrug; the debt ceiling was NOT touched (223 before and after).
   BUG-950: bug_is_a_finding   # the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - the title names no owned artefact. The FIX does have an owner: the planner pin belongs to agent/adapters/goose/apply_provider_flip.py (capability harness_adapter), which is why this override is not a route waiver for the work, only for the reading
   BUG-951: bug_is_a_finding   # a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT, not about a file this repo owns. Its red loop WILL name scripts/toolcall_probe2.py when that probe is promoted out of /tmp
-  BUG-952: route_graph_incomplete   # NOT a finding: pipeline/unloader.py EXISTS and NO declared capability owns it - this is the missing route itself, recorded as such. Remedy owed: a model-residency capability (the lever is POST /admin/api/models/{id}/unload), after which this line is deleted
+  #: BUG-952 RETIRED FROM THIS BLOCK 2026-10-21 (D-3038: what we reject we REGISTER, we do not silently delete).
+  #: The entry read `BUG-952: route_graph_incomplete` and was correct while BUG-952 was open. BUG-952 is now CLOSED
+  #: (2026-10-20: pipeline/unloader.py calls the real POST /v1/models/{model}/unload endpoint with a red-loop
+  #: receipt), so the reason OUTLIVED the item it explained and the rail refused it at (v) - correctly. The key is
+  #: removed because an override for a closed item is a declaration with no referent (D-3034); the reason it gave
+  #: (a model-residency capability for the unload lever) is preserved here so the decision is not lost.
   #: BUG-949 appended 2026-10-20. Debt went 223 -> 224 the moment BUG-949 was filed, and that is the ONLY reason the rail
   #: at justfile:84 was red: it was invisible for weeks because the ladder DIED at line 54 before reaching line 84, and
   #: the D-3101 act repaired line 54. So this line is not a waiver of a headline - it is the honest class for an item whose
@@ -493,6 +498,13 @@ unrouted:
   #: BUG-953 did NOT need one (its title names config/acquisition.yaml, which acquisition_lane owns - it ROUTED). This
   #: one does, and it is honest: yaml_guard.py is a rail, and no capability owns any rail's SCAN BUDGET.
   BUG-954: route_graph_incomplete   # the scan budget of a rail has no owner: narrowing the roots SHRINKS the scan against a declared receipt.artifacts, so the fix is a decision plus a receipt re-cut, and nobody is declared to make it
+  #: BUG-909/956 appended 2026-10-21. Both are the `bug_is_a_finding` shape (the DEFAULT reason for every bug), made
+  #: PER-ITEM so the rail's debt count subtracts them (BUG-913: only the per-item override moves the number). Neither
+  #: title names a repo artifact; both have real OWNED work elsewhere: BUG-909's fix is the LibGen circuit breaker in
+  #: pipeline/acquisition/adapters.py (owned by acquisition_lane), BUG-956's is T-191 / D-3116 re-anchoring (owned by
+  #: the owner gate). The override is not a route waiver for the work, only for the reading (D-3023 SHRINK-ONLY).
+  BUG-909: bug_is_a_finding   # every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane)
+  BUG-956: bug_is_a_finding   # the store halved 14,574 -> 7,640 (a canonical-run consolidation, NOT data loss) and the anchor-bridge rail witnessed it: a FINDING, not a file's route; the work is T-191 / D-3116 re-anchoring (owner gate)
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

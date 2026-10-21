@@ -20,6 +20,14 @@ bug: BUG-524
 rail: scripts/check_store_authority.py
 scan_roots: ['.']
 max_depth: 4
+# PRUNE DIRECTORIES (D-3125, 2026-10-21): machine-generated TRANSIENT tool state is NOT a store. A browser
+# profile captured under an acquisition tree (Chrome runtime caches: GPUCache, DawnGraphiteCache, Session
+# Storage, WebStorage, GCM Store, and per-feature .db files like declarative_performance_observer.db /
+# heavy_ad_intervention_opt_out.db) is transient machine state, not knowledge. Pruned by DIRECTORY NAME (the
+# same mechanism as the rail's SKIP_DIRS: .git, __pycache__, .venv) so the CLASS is declared once and the next
+# browser acquisition does not re-open this fault. Config-first (C12): the boundary is declared, not hidden.
+prune_dirs:
+  - browser-profile
 stores:
   - path: knowledge pipeline/maxwell.db
     kind: sqlite

@@ -52,12 +52,18 @@ MIN_WHY = 20
 PREIMAGE_KEY = "preimage_regions"
 
 
-def find_stores(root: Path, scan_roots: list[str], max_depth: int) -> dict[str, str]:
+def find_stores(root: Path, scan_roots: list[str], max_depth: int,
+                prune_dirs: set[str] | None = None) -> dict[str, str]:
     """Return {rel_path: kind} for every store under `scan_roots` within `max_depth`.
 
     kind is "sqlite" for a store file, "parquet_collection" for a directory of parquet snapshots.
+
+    `prune_dirs` (D-3125) are DECLARED directory NAMES of machine-generated transient tool state (a browser
+    profile, e.g.) that is NOT a store; they are pruned the same way SKIP_DIRS is, by NAME, so the CLASS is
+    declared once and every future instance is pruned too (config-first, C12).
     """
     root = root.resolve()
+    skip = SKIP_DIRS | (prune_dirs or set())
     found: dict[str, str] = {}
     for scan in scan_roots:
         base = (root / scan).resolve()
@@ -65,7 +71,7 @@ def find_stores(root: Path, scan_roots: list[str], max_depth: int) -> dict[str, 
             continue
         base_depth = len(base.parts)
         for dirpath, dirnames, filenames in os.walk(base):
-            dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS and not d.startswith("."))
+            dirnames[:] = sorted(d for d in dirnames if d not in skip and not d.startswith("."))
             if len(Path(dirpath).parts) - base_depth >= max_depth:
                 dirnames[:] = []
             rel_dir = Path(dirpath).resolve().relative_to(root).as_posix()
@@ -182,8 +188,9 @@ def audit(root: Path, reg: dict[str, Any], note: dict[str, Any] | None = None) -
     faults: list[str] = []
     scan_roots = [str(s) for s in (reg.get("scan_roots") or ["."])]
     max_depth = int(reg.get("max_depth") or 4)
+    prune_dirs = {str(d) for d in (reg.get("prune_dirs") or [])}
     declared = _declared(reg)
-    on_disk = find_stores(root, scan_roots, max_depth)
+    on_disk = find_stores(root, scan_roots, max_depth, prune_dirs)
 
     authoritative = [d for d in declared if str(d.get("status")) == "authoritative"]
     if len(authoritative) != 1:
@@ -476,6 +483,27 @@ def controls() -> list[tuple[str, Callable[[], bool]]]:
                 print("      faults: " + " | ".join(faults))
             return any(f.startswith("UNDECLARED-STORE") for f in faults)
 
+    def c17_prune_dirs_is_declared_boundary() -> bool:
+        """D-3125: a DECLARED transient dir (browser profile) is pruned by NAME, and prunes nothing outside it."""
+        import sqlite3
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"], "elsewhere/real.db": ["fbs"]})
+            # a machine-generated browser profile carrying a Chrome feature DB is NOT a store:
+            prof = base / "acq" / "browser-profile" / "Default"
+            prof.mkdir(parents=True, exist_ok=True)
+            con = sqlite3.connect(str(prof / "declarative_performance_observer.db"))
+            con.execute("create table meta (k text primary key, v text)")
+            con.commit(); con.close()
+            reg = {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                   "prune_dirs": ["browser-profile"]}
+            faults = audit(base, reg)
+            # the transient dir's DB is pruned, but `elsewhere/real.db` is still UNDECLARED-STORE (no loosening):
+            return (not any("browser-profile" in f for f in faults)
+                    and any(f.startswith("UNDECLARED-STORE") for f in faults)
+                    and any("elsewhere/real.db" in f for f in faults))
+
     return [
         ("c01 a single authoritative store with no siblings is CLEAN", c01_clean),
         ("c02 an undeclared store is UNDECLARED-STORE", c02_undeclared),
@@ -494,6 +522,8 @@ def controls() -> list[tuple[str, Callable[[], bool]]]:
         ("c14 a region covering a DECLARED store is refused", c14_region_shadows_declaration),
         ("c15 a region covering the whole repo is refused", c15_region_blinds_repo),
         ("c16 a declared region does NOT loosen the rule elsewhere", c16_region_does_not_loosen),
+        ("c17 a DECLARED transient dir (browser profile) is pruned by name, nothing outside it",
+         c17_prune_dirs_is_declared_boundary),
     ]
 
 

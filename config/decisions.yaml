@@ -31288,3 +31288,32 @@ decisions:
   - scripts/verify_generator_pins.py
   - config/generator_pins.yaml
   - justfile
+
+- id: D-3125
+  state: RESOLVED
+  date: '2026-10-21'
+  by: assistant
+  category: KNOWLEDGE ARCHITECTURE / STORE AUTHORITY
+  title: Declare browser-profile a transient prune class (owner A) and adjudicate the source_ids.distinct 1475->1477 drift (owner B)
+  decision: 'Two FATAL rails cleared with owner rulings. (A) check_store_authority flagged two Chrome browser-profile
+    sqlite DBs (declarative_performance_observer.db, heavy_ad_intervention_opt_out.db) as UNDECLARED-STORE. Forensic: a
+    full 14 MB Chrome runtime profile was captured under knowledge pipeline/acquisition/browser-profile (GPUCache,
+    DawnGraphiteCache, Session Storage, WebStorage, GCM Store). These are machine-generated TRANSIENT tool state, NOT
+    stores; recycling preimage_regions/tombstone semantics was rejected (a tombstone is a delete pre-image, not a tool
+    cache). Resolution: a config-first prune_dirs list in config/store_authority.yaml declares browser-profile by
+    DIRECTORY NAME (same mechanism as SKIP_DIRS), threaded through find_stores()/audit() in
+    scripts/check_store_authority.py; new control c17 proves the prune is a declared boundary that loosens nothing (an
+    elsewhere/real.db is still UNDECLARED-STORE). Selftest 16->17. (B) check_store_columns flagged source_ids.distinct
+    recorded 1475 vs measured 1477 (MEASUREMENT-DRIFT, FATAL). Forensic (receipt-backed): the store was mutated in-place
+    2026-10-21 by the D-3123 is_convergent deterministic repair (bak_isconv_20261021_191205); pre-image
+    bak_accumulate_20261021_143827 still measures 1475, post-image measures 1477, and the diff is +2 well-formed 2-ID
+    source_ids lists (01cfe1caf081973d+5482d1921cd4b03a, 844d1d816a056e75+9b87e5bb662d5b2b), -0 gone. That is a
+    decided, backed-up, well-formed content change (evidence accumulation on convergent rows), NOT corruption and NOT
+    silent growth; committed_at is unchanged (2026-10-12). Resolution: adjudicate 1477 as the legitimate new truth and
+    re-record via check_store_columns.py --record (also re-records 12 CODE-CENSUS-MOVED mentions, all code churn). Debt
+    ceiling held at 8 (shrink-only, no raise).'
+  bugs: []
+  files:
+  - config/store_authority.yaml
+  - scripts/check_store_authority.py
+  - config/store_columns.yaml

@@ -118,7 +118,7 @@ measured:
     application:
       distinct: 6591
       hollow: 0
-      mentions: 91
+      mentions: 92
       nonblank: 6591
       nonnull: 7640
       rows: 7640
@@ -174,7 +174,7 @@ measured:
     concept_key:
       distinct: 7635
       hollow: 0
-      mentions: 3
+      mentions: 5
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -195,7 +195,7 @@ measured:
     content_type:
       distinct: 7
       hollow: 0
-      mentions: 130
+      mentions: 132
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -230,7 +230,7 @@ measured:
     definition:
       distinct: 7640
       hollow: 0
-      mentions: 206
+      mentions: 207
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -300,7 +300,7 @@ measured:
     elaboration:
       distinct: 6591
       hollow: 0
-      mentions: 42
+      mentions: 43
       nonblank: 6591
       nonnull: 6591
       rows: 7640
@@ -314,7 +314,7 @@ measured:
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 146
+      mentions: 147
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -356,7 +356,7 @@ measured:
     fb_id:
       distinct: 7640
       hollow: 0
-      mentions: 205
+      mentions: 207
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -398,7 +398,7 @@ measured:
     is_convergent:
       distinct: 2
       hollow: 0
-      mentions: 49
+      mentions: 51
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -454,7 +454,7 @@ measured:
     name:
       distinct: 7637
       hollow: 0
-      mentions: 410
+      mentions: 411
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -468,7 +468,7 @@ measured:
     origin:
       distinct: 2
       hollow: 0
-      mentions: 25
+      mentions: 27
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -566,14 +566,14 @@ measured:
     source_diversity:
       distinct: 94
       hollow: 0
-      mentions: 32
+      mentions: 34
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     source_ids:
-      distinct: 1475
+      distinct: 1477
       hollow: 0
-      mentions: 32
+      mentions: 34
       nonblank: 7640
       nonnull: 7640
       rows: 7640

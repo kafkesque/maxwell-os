@@ -184,11 +184,14 @@ meta:
   # invoked by nothing, so the rail built to be un-silent was itself silent.
   # BUG-483 residual: a key whose NAME is in the citation vocabulary but whose value is not a source. Declared,
   # reasoned, printed on every run, shrink-only. Renaming a key to escape the rail is NOT an exemption.
-  # EMPTY since 2026-09-25, and it is a FLOOR, not a default: a new entry is a declared decision, not
-  # an edit. The one entry (config/menu_axis_hashes.yaml:decision) was never a citation - it was the
-  # sha256 of the menu's 'decision' AXIS sitting in KEY position. Fixed at the source, not by naming it:
+  # FLOOR, not a default: a new entry is a declared decision, not an edit. The one entry
+  # (config/menu_axis_hashes.yaml:decision) was never a citation - it was the sha256 of the menu's
+  # 'decision' AXIS sitting in KEY position. Fixed at the source, not by naming it:
   # scripts/menu_axis_hashes.py now emits hashes: as a list of {axis, sha256} records.
-  citation_exemptions: []
+  # 2026-10-21: config/bug_recall.yaml:decision is the TRACE-CLASS vocabulary term (the class that
+  # PROVES "the fix rests on a RULING"), not a provenance citation; renaming a vocabulary term to
+  # escape the rail is NOT an exemption (D-402/BUG-483), so it is declared a homonym here.
+  citation_exemptions: [config/bug_recall.yaml:decision]
 
   reach:
     # SHRINK-ONLY. Measured baseline 2026-09-25 (4): check_depth_load_bearing.py (BUG-482 - built, invoked by

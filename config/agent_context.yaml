@@ -615,7 +615,7 @@ candidates_20261015:
     'Qwen3.8-Flash-Next (180B MoE)': {published_4bit_gb: 111.5, verdict: 'refused: 64 GB unified, 55 GB guard ceiling, 24 GB delegate budget (D2496)'}
     'Qwen3-Coder-Next (79.7B)': {mlx_4bit_gb: 44.8, verdict: 'loadable but hostile: it would hold the whole guard and leave no room for the verifier'}
     'Ornith-1.5-35B-A3B-MLX (fp16)': {gb: 69.3, verdict: 'refused: unquantised; the REAP-19B 4-bit variant is the servable one'}
-  decided_by: 'a declared preflight per slot (T-131); a community ranking is not evidence'
+  admission_method: 'a declared preflight per slot (T-131); a community ranking is not evidence'
   measured_agent_loop_capable: [gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit]   # by WINDOW only (superseded as a decision by the bill)
   measured_agent_probe_only: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit,
                               Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, Qwen3.5-9B-4bit]

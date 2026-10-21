@@ -170,7 +170,7 @@ acknowledged:
 #: THE OWNER WORD. This block declares the vocabulary and the state; the words themselves live on the `declared`
 #: rows above (ONE home per field — a second copy of the same word here would be a rival truth).
 owner_word:
-  decision: T-107
+  decision: D-2994
   vocabulary: [retire, keep, keep-and-declare, keep-and-repair, 'promote <field>']
   state: granted            # granted 2026-10-14: `retire` for borp_score, `keep-and-declare` for feedback_score,
                             # `keep-and-repair` for classification_status (see `declared` and `retired`)
@@ -191,7 +191,7 @@ owner_word:
 #: count; D2309 canonical works) - and the rail asserts THIS block's vocabulary against the string constants of that
 #: function, so a second definition of a tier in config is refused as the BUG-499/BUG-502 class, not tolerated.
 tier_policy:
-  decision: T-118
+  decision: D-2989
   word: tier
   vocabulary: [weak, medium, strong]
   vocabulary_home: pipeline/schema_accessor.py::isor_score

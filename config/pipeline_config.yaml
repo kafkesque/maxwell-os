@@ -780,7 +780,7 @@ stage5:
   paraphrase_require_no_contra: true
   paraphrase_max_chars: 1500
   paraphrase_calibration:
-    decision: null
+    decision: D-2932
     threshold: null
   banned_mechanism_prefixes:
   - because it enables

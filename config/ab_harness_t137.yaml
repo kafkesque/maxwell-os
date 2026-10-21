@@ -6,7 +6,7 @@
 # State: DECLARED. measured values below come from 2026-10-14/15 instrumentation; bars marked
 #        "declared" are proposed thresholds, NOT yet measured baselines (verify before adopting).
 
-decision: T-137
+decision: D-3025
 question: >
   Is gemma-4-E4B-it-MLX-4bit + tiered-cache a strictly better agent_loop engine than
   Qwen3-Coder-30B-A3B-Instruct-MLX-4bit + current cache, on latency, decode stability,

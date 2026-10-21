@@ -26,7 +26,14 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [scripts/ingest_relabel_rulings.py, scripts/reanchor_retrieval_goldens.py, justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py, scripts/agent_context_probe.py]
+  include_files: [scripts/ingest_relabel_rulings.py, scripts/reanchor_retrieval_goldens.py, justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py, scripts/agent_context_probe.py, knowledge pipeline/checkpoints/book_metadata.jsonl, governance/duplicate_adjudication.json]
+  # ^ MEASURED 2026-10-21: check_ingest_identity_gate.py --selftest calls gate.standing() WITHOUT cache_path on its
+  #   C16 accepted-class controls, so the runner reads the LIVE metadata cache (CHECKPOINT_DIR / METADATA_CACHE_NAME
+  #   = knowledge pipeline/checkpoints/book_metadata.jsonl, config-first via pipeline.pipeline_paths). The fixture did
+  #   not carry it, so gate.cache_records() raised GateInputError "metadata cache missing" and the
+  #   word_provenance_guard baseline red with rc=1 - the BUG-589 shape (a runner redding for a missing input, blamed
+  #   on the MUTATION). Carried FILE-GRANULARLY (the cache, not the whole checkpoints/ tree, which holds run receipts
+  #   no runner reads). It is copied fresh from the live repo at each build, so it is never a stale snapshot.
   # ^ MEASURED 2026-10-14 (T-132/D-3000): the probe is its OWN subject and its own runner, and it reads
   #   config/agent_context.yaml (carried by include_dirs config/) - so without this line every one of its
   #   four mutations would report "the oracle's BASELINE is not green", blaming a MUTATION for a fixture gap.

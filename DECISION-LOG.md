@@ -13,7 +13,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1243 decisions (census stamp 6ba41de2b421a9c5, 2026-10-20) · 723 bugs (256 open / 467 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1243 decisions (census stamp 6ba41de2b421a9c5, 2026-10-21) · 723 bugs (256 open / 467 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1243 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 146 | closed: ✅ resolved 339 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1243, D-2987/BUG-765)
 >
@@ -5066,3 +5066,147 @@ The owner-gated rebuild in D-3106 is the natural moment to add this key (do it o
 
 **State: PROPOSED** — the direction is decided, the mechanism is not built. Complements D-2949 (dedup) and D-3106
 (immediate orphan); conflicts with neither.
+
+
+## D-3117 (PROPOSED 2026-10-21) — Cross-run evidence-accumulation / convergence-upgrade layer
+
+**The gap, verified against code and store (D-3034: a claim is resolved, not asserted).**
+`is_convergent` is minted ONCE at S2 from the within-run cluster source count (`sub_sid_count >= 2`,
+pipeline/stage2_extract.py), passed through S4 untouched (pipeline/stage4_merge.py), and NEVER
+upgraded thereafter. A principle extracted from a single-source (1-book) cluster or a singleton
+(1-segment) is stamped `is_convergent=false` forever, even if a LATER corpus run extracts the SAME
+principle from a DIFFERENT book — which is the definition of corroboration. The D-2951 commit dedup
+gate is name-fragile (keys on `normalize_name(name)`), mode=report (config/pipeline_config.yaml
+`dedup_gate.mode: report`, live store 0 `duplicate_of`), and even in enforce has NO disposition that
+unions `source_ids` or flips `is_convergent` — its actions are `link_duplicate | insert |
+supersede_review` only (pipeline/dedup_gate.py::decide). The root cause is the identity model:
+`fb_id = sha256(name|definition)` is paraphrase-sensitive (D-2949; 6.0% name survival across
+generations, D-3106), so a cross-run "same principle" match never fires.
+
+**Market-research grounding (cited; the pattern is settled, not novel).**
+1. OpenIE/OKB canonicalization (Galárraga et al., CIKM 2014; ESWC 2022 survey) — the proven shape is
+   POST-HOC: extract freely, then cluster synonymous names/phrases and assign a canonical id. This is
+   exactly the layer Maxwell lacks.
+2. Incremental multi-source entity resolution (Springer 2020) — accumulate sources ORDER-INDEPENDENTLY.
+3. Incremental KBC (DeepDive, VLDB 2015) — incremental inference over a persistent KB.
+4. Non-determinism of "deterministic" LLM settings (arXiv 2408.04667) — temp=0 is NOT bit-identical, so
+   identity must not be derived from extraction-output wording (the empirical basis for D-3118).
+5. Deterministic validation predicates for LLM causal extraction (IEEE) — the merge/upgrade verdict must
+   be deterministic and LLM-free (D-343; D-2898: no LLM promotion).
+
+**The layer (what is proposed, deterministic and LLM-free).**
+A new module `pipeline/evidence_accumulator.py` (name TBD, config-first per C12), run at the S6 commit
+boundary AFTER extraction, matching each incoming FB against the committed store and applying three
+deterministic steps that REUSE the existing D-2950 primitives:
+1. BLOCK (candidate generation) — match key = the generation-invariant `concept_key` (D-3118), with
+   `normalize_name(name)` as the immediate Phase-A surrogate.
+2. MATCH GATE (deterministic) — body-divergence gate (token Jaccard + SequenceMatcher, from
+   dedup_identity) decides "same concept" vs "distinct concept sharing a name".
+3. ACCUMULATE (monotonic — this is the automatic upgrade): `source_ids ← source_ids ∪ incoming.source_ids`
+   (canonical ids, D2176), `source_diversity ← len(source_ids)`, `is_convergent ← (source_diversity >= 2)`,
+   keep the richer body (D-2950 richness). NEVER remove a source (monotonic); NEVER downgrade is_convergent.
+
+**Two properties that answer the owner's question directly.**
+- AUTOMATIC UPGRADE: a singleton/single-source principle that reappears from a NEW book upgrades to
+  convergent by structure (len>=2), with no owner word and no LLM. This is the missing "convergence".
+- IDEMPOTENCY AT THIS LAYER ONLY: accumulation is deterministic and monotonic, so re-running it is
+  idempotent (union of equal sets = equal result). The EXTRACTION layer above it is NOT idempotent
+  (arXiv 2408.04667), so the honest idempotency claim is scoped to the accumulator, never the LLM.
+
+**Forensic audit (conflicts/cascades/blindspots, before any implementation).**
+- D-2933 rule V ("ontology never rewritten" for an existing fb_id): this layer is a DELIBERATE,
+  SEPARATE post-commit pass that rewrites ONLY the provenance/corroboration fields (source_ids,
+  source_diversity, is_convergent), never name/body. Declared an EXPLICIT EXCEPTION, not a silent
+  violation; rule V still governs every other existing-fb_id write.
+- D-2898 (no LLM promotion): no conflict — the upgrade is a structural recompute, not a model decision.
+- D-2951 (dedup gate): COMPLEMENTS, does not replace — dedup answers "duplicate vs distinct", this layer
+  answers "accumulate evidence + upgrade corroboration"; both must share the D-3118 concept key.
+- D-2943 (store = one canonical run's artifact): the committed store is the persistent accumulation
+  target; new corpus runs ACCUMULATE onto it (consistent with D-2881), never mint parallel identities.
+- D-2950 (identity model): REUSED (classify_group / is_divergent / richness); the source_ids union is
+  the intent, not a conflict.
+- C6/C13: batch write → crash-safe (tempfile→fsync→os.replace / BEGIN IMMEDIATE) + backup_guardian.sh.
+- KNOWN LIMITATION (declared, not hidden): `is_convergent = len(source_ids) >= 2` inherits the
+  corroboration-collapse inflation (BUG-780/T-119: 530 of 1,393 "corroborated" rows are one text under
+  two names). True source-independence validation is the existing T-119 instrument's job, not this layer.
+
+**State: PROPOSED, owner-gated.** Mechanism not built. DEPENDS ON D-3118 (generation-invariant key).
+Phase 0 harness (D-3036 red-loop-first, bounded-recall golden corpus) is the instrument that decides it.
+
+## D-3118 (PROPOSED 2026-10-21) — Identity decoupling: generation-invariant `concept_key` (concretizes D-3107)
+
+**Problem.** `fb_id = sha256(name|definition)` is generation-sensitive (D-2949; D-3106's 251/251 orphan).
+D-3107 already PROPOSED generation-invariant identity at the GOLDEN-ANCHOR level; this spec concretizes the
+same principle at the STORE level, where it becomes the match key for D-3117 and D-2951.
+
+**Design — decouple two identities that are today one hash.**
+- `fb_id` = IMMUTABLE storage key (minted once at first extraction, never rewritten; remains the row
+  address and the `duplicate_of` referent).
+- `concept_key` = GENERATION-INVARIANT match key, used ONLY for cross-run matching/accumulation (D-3117)
+  and dedup grouping (D-2951). Two rows share a concept_key iff they are the same concept re-expressed.
+
+**Staged derivation (non-overengineered; each phase gated by a receipt, D-3036).**
+- Phase A (deterministic, immediate): `concept_key = sha256(sorted(normalize_name(name) content-tokens,
+  stopword-filtered))`. Deterministic, cheap, no new model. Fragile to name PARAPHRASE (inherits D-2949's
+  ~6% name survival), so it is the FLOOR, not the ceiling.
+- Phase B (embedding recall, gated): semantic recall layer (embedding of name+definition, cosine +
+  threshold) to catch paraphrased names. Default OFF; calibrated red-loop-first (D-3036) because the
+  threshold is UNMEASURED on this machine — a hypothesis until a receipt speaks.
+
+**Schema.** New nullable column `concept_key`. Migration follows the existing discipline
+(pipeline/migrate_D2205_epistemic.py pattern); D-2205's own column is still absent from the live store,
+so this migration must be tracked to completion, not declared.
+
+**Forensic audit.**
+- D-3107: this spec PROMOTES D-3107's "mechanism not built" → mechanism specified; not a competing decision.
+- D-2950: the grouping key becomes `(concept_key, source_ids)` once Phase A lands; `normalize_name` remains
+  the Phase-A surrogate (back-compatible).
+- D-2949: extends the same diagnosis from dedup to identity (dedup was the first symptom; this is the disease).
+- No conflict with D-2933 rule V: concept_key is minted at first extraction and immutable, never rewritten.
+
+**State: PROPOSED, owner-gated.** Phase A implementable now; Phase B gated behind calibration.
+
+## D-3117 / D-3118 — RATIFIED (2026-10-21) + Q2 refinement: FIELD-WISE richer merge
+
+Owner ratified both records after a fresh senior-architect re-examination grounded in live-store
+receipts (D-3034 — verified, not assumed). Three questions answered with evidence:
+
+**Q1 — is auto-detect + auto-upgrade correct? YES (verified absent today, structurally right).**
+`is_convergent` is minted ONCE at S2 (stage2_extract.py:1905 `sub_sid_count >= 2`), passed through S4
+verbatim (stage4_merge.py:776), committed unchanged (stage6_commit.py:870). dedup_gate `decide()`
+dispositions are insert | merge_convergent | keep_both_divergent | keep_both_cross_source | review
+only — NO `source_ids` union, NO `is_convergent` flip. Live store cross-tab is CLEAN and self-consistent:
+`is_convergent=1` ⟺ `source_diversity>=2` (896 = 896), `is_convergent=0` with `sd>=2` = 0,
+`is_convergent=1` with `sd<2` = 0. `duplicate_of` column EXISTS but 0 populated (gate inert, mode=report).
+Live split: 6,744 single-source / 896 convergent. ⇒ D-3117 does NOT invent a new convergence definition;
+it re-derives the SAME S2 rule (`len(source_ids)>=2`) at a monotonic accumulation point. Correct.
+
+**Q2 — loss-avoidance WITHOUT clutter? YES, with ONE refinement (adopted).**
+`richness()` = count of non-empty body fields; `pick_richer` = single winner (max richness, tie→existing),
+never concatenates. But WHOLE-ROW winner-take-all can drop a COMPLEMENTARY field (book A's mechanism vs
+book B's failure_mode) even when the match gate still says "same concept". REFINEMENT ADOPTED: ACCUMULATE
+merges FIELD-WISE — per body field keep the richer of existing vs incoming (non-empty beats empty; among
+two non-empty keep the more complete, tie→existing) — instead of whole-row winner-take-all. This is
+loss-averse (a filled field is never dropped for an empty one), clutter-free (exactly one value per field;
+NEVER concatenation, NEVER a summary/noise copy), and reuses D-2950's `body_tokens`/`richness` primitives
+(not over-engineered). `source_ids` union remains the ONLY growth vector — evidence, not clutter.
+
+**Q3 — is idempotency the right integrity anchor? YES, scoped correctly.**
+The accumulator's three steps are each idempotent (set union, `len`, `>=2` threshold, per-field max) AND
+monotonic, over a deterministic LLM-free layer (D-343). The EXTRACTION layer above is NOT idempotent
+(temp=0 sparse-MoE non-determinism, arXiv 2408.04667). ⇒ The integrity anchor is the PAIR
+(monotonic + idempotent) scoped to the deterministic accumulator; it is never claimed for the LLM layer.
+
+**Gov dependency sync (no conflicts, no supersessions introduced).**
+- D-3107 (generation-invariant anchor identity): CONCRETIZED by D-3118 at the store level — D-3107 stays
+  the anchor-level principle, D-3118 is its store-level mechanism. Complementary, not superseded.
+- D-2951 (dedup gate): unchanged; complements D-3117 (dedup = duplicate-vs-distinct; accumulate = evidence
+  + convergence upgrade). Both share D-3118's concept_key.
+- D-2933 rule V: the explicit exception already declared in D-3117 stands (provenance-only rewrite), now
+  bound to field-wise richer merge over the 8 body fields — name/body never rewritten outside the gate.
+- D-2898 (no LLM promotion): unchanged — the upgrade is structural recompute, not a model decision.
+- D-2949 / D-2950 / D-3106: unchanged; D-3118 extends D-2949's diagnosis from dedup to identity.
+- config/decisions.yaml: D-3117/D-3118 move PROPOSED → APPROVED via the registry's normal sync path.
+
+State: D-3117 RATIFIED (with field-wise richer merge). D-3118 RATIFIED.
+Next critical step: D-3118 Phase A (concept_key column + backfill) — the dependency D-3117 blocks on.

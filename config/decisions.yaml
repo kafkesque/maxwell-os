@@ -31126,3 +31126,44 @@ decisions:
       Unloaded Ornith-1.5-35B-A3B-REAP-19B (12.08GB) and Ornith-1.5-9B-MLX-8bit (9.30GB). /health: loaded_count
       5 -> 3, current_model_memory 47.09GB -> 24.13GB. gpt-oss-20b deferred (it is AGENT_LOOP_SHORT = this
       session's serving model).
+- id: D-3117
+  state: RATIFIED
+  date: '2026-10-21'
+  by: assistant
+  category: KNOWLEDGE ARCHITECTURE / CONVERGENCE
+  title: 'Cross-run evidence-accumulation / convergence-upgrade layer (auto-upgrade singleton to convergent, deterministic LLM-free)'
+  decision: 'Owner ratified 2026-10-21. is_convergent is minted once at S2 (stage2_extract.py sub_sid_count >= 2),
+    passed through S4, committed unchanged; dedup_gate decide() has no source_ids-union or is_convergent-flip
+    disposition. A new layer pipeline/evidence_accumulator.py (config-first, run at S6 after extraction) matches
+    each incoming FB against the committed store in three deterministic LLM-free steps reusing D-2950 primitives:
+    (1) BLOCK by concept_key (D-3118; normalize_name Phase-A surrogate), (2) MATCH GATE body-divergence (token
+    Jaccard + SequenceMatcher), (3) ACCUMULATE monotonic: source_ids union, source_diversity = len, is_convergent
+    = (len >= 2), field-wise richer merge (per body field keep the richer; non-empty beats empty; never
+    concatenate, never a summary/noise copy). Re-derives the same S2 convergence rule at a monotonic accumulation
+    point; idempotent + monotonic at this layer only (extraction layer is never idempotent, arXiv 2408.04667).
+    Report mode default. Depends on D-3118 Phase A. Known limitation: inherits corroboration-collapse inflation
+    (BUG-780/T-119).'
+  bugs:
+  - BUG-780
+  files:
+  - pipeline/evidence_accumulator.py
+  - pipeline/dedup_gate.py
+  - pipeline/dedup_identity.py
+- id: D-3118
+  state: RATIFIED
+  date: '2026-10-21'
+  by: assistant
+  category: KNOWLEDGE ARCHITECTURE / IDENTITY
+  title: 'Identity decoupling: generation-invariant concept_key (concretizes D-3107) as match key for D-3117 and D-2951'
+  decision: 'Owner ratified 2026-10-21. fb_id = sha256(name|definition) is generation-sensitive (D-2949/D-3106).
+    Decouple two identities: fb_id = immutable storage key (minted once, never rewritten, remains row address and
+    duplicate_of referent); concept_key = generation-invariant match key used only for cross-run matching and
+    accumulation (D-3117) and dedup grouping (D-2951). Phase A (deterministic, immediate): sha256 of sorted
+    normalize_name(name) content-tokens, stopword-filtered — floor not ceiling (about 6 percent name survival).
+    Phase B (embedding recall, gated): name+definition cosine + threshold, default OFF, red-loop-calibrated
+    (threshold unmeasured). New nullable column concept_key; migration follows the migrate_D2205_epistemic.py
+    pattern; tracked to completion (concept_key column verified absent 2026-10-21).'
+  files:
+  - pipeline/stage6_commit.py
+  - pipeline/dedup_identity.py
+  - config/dedup_identity.yaml

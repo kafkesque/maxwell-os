@@ -5210,3 +5210,24 @@ monotonic, over a deterministic LLM-free layer (D-343). The EXTRACTION layer abo
 
 State: D-3117 RATIFIED (with field-wise richer merge). D-3118 RATIFIED.
 Next critical step: D-3118 Phase A (concept_key column + backfill) — the dependency D-3117 blocks on.
+
+## D-3118 Phase B GATE-FLIP (2026-10-21) — Phase B is now MEASURED-NECESSARY, not an unmeasured hypothesis
+
+**Receipt (D-3036).** `governance/PHASE0_IDEMPOTENCY_REPORT.md` (committed a6323a7) ran S0→S5 TWICE on a fixed
+16-book corpus and measured cross-run survival. Three readings:
+- `fb_id` survival **27%** (jaccard 0.2726) — the generation-sensitive key, as D-2949/D-3106 predicted.
+- `name` survival **72%** (jaccard 0.7204) — the Phase A surrogate's actual floor.
+- `body_hash_8field` survival **0%** (jaccard 0.0) — extraction is never idempotent (arXiv 2408.04667), so any
+  key that folds the body can never re-match a body-divergent re-extraction.
+
+**Two corrections to the D-3118 record, both now facts, both were silent drift:**
+1. **Phase A is not "~6% name survival".** D-3118 imported D-2949's "~6%" figure; the Phase 0 receipt measures
+   **72%**. The floor is 12× better than recorded. This matters: a 6% floor would have justified treating Phase A
+   as a placeholder; a 72% floor makes Phase A a real, build-now base layer.
+2. **Phase B is no longer an unmeasured hypothesis.** The receipt names the exact gap Phase B must close: the
+   **~28% name-paraphrase loss** (100% − 72%). Phase B's *necessity* is measured; only its *cosine threshold*
+   remains uncalibrated, and that is the Phase B red-loop (D-3036), now with a measured target.
+
+**State.** Phase A proceeds as scheduled (build-now). Phase B's gate flips from "deferred/unmeasured" to
+"necessary, threshold-to-be-calibrated". No owner action required beyond the standing approval; this record
+closes the drift the receipt exposed.

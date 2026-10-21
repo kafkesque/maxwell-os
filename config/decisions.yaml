@@ -31159,9 +31159,9 @@ decisions:
     Decouple two identities: fb_id = immutable storage key (minted once, never rewritten, remains row address and
     duplicate_of referent); concept_key = generation-invariant match key used only for cross-run matching and
     accumulation (D-3117) and dedup grouping (D-2951). Phase A (deterministic, immediate): sha256 of sorted
-    normalize_name(name) content-tokens, stopword-filtered — floor not ceiling (about 6 percent name survival).
+    normalize_name(name) content-tokens, stopword-filtered — floor not ceiling (measured 72 percent name survival by the Phase 0 receipt, correcting the 6 percent figure imported from D-2949).
     Phase B (embedding recall, gated): name+definition cosine + threshold, default OFF, red-loop-calibrated
-    (threshold unmeasured). New nullable column concept_key; migration follows the migrate_D2205_epistemic.py
+    (threshold unmeasured at ratification; Phase 0 receipt a6323a7 now measures it: name floor 72%, body 0%, 28% paraphrase gap — Phase B is MEASURED-NECESSARY, only the cosine threshold remains to be calibrated). New nullable column concept_key; migration follows the migrate_D2205_epistemic.py
     pattern; tracked to completion (concept_key column verified absent 2026-10-21).'
   files:
   - pipeline/stage6_commit.py

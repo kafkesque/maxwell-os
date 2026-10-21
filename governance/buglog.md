@@ -19447,7 +19447,7 @@ therefore be scheduled (next session start), never fired mid-session while a mod
 **Receipt.** `check_store_columns.py --check` before: `FAIL` (12 POPULATION-SHAPE + 5 MEASUREMENT-DRIFT + 39 census moves). After `--record`: `OWED` — debt 8 of ceiling 8 (shrink-only, pre-existing), census moves 0, the 2 `OUTSIDE-COVERAGE` lines (failure_mode, menu_hash) are declared `unconstrained` (never drift). The 12 POPULATION-SHAPE faults and the nonnull 7640→6591 drifts are GONE. The rail's remaining rc=2 is the D-2642 shrink-only debt ceiling, not BUG-766.
 
 
-## BUG-959 (HIGH, OPEN 2026-10-21) — evidence_accumulator cross-contaminated a false concept_key merge (Poker)
+## BUG-959 (HIGH, RESOLVED 2026-10-21) — evidence_accumulator cross-contaminated a false concept_key merge (Poker)
 
 **Finding (D-3036 receipt-backed).** `concept_key` (D-3118 Phase A) keys on name-token identity (stopword-removed
 + sorted tokens). Two DISTINCT concepts from the same book collide to one key `ccf192e8551b…` because their names
@@ -19473,5 +19473,11 @@ accumulates were source-id unions on true duplicates, no field-fill wrote new co
 similarity. Phase B (embedding) must therefore gate accumulation BOTH ways — recover false-negative name-paraphrase
 matches AND block false-positive token collisions before a merge/fill.
 
-**Status: AWAITING OWNER ADJUDICATION.** Proposed: (1) revert the 2 contaminated fields from the C13 backup;
-(2) split the false merge (the two Poker rows are distinct concepts and must not share a concept_key).
+**Status: RESOLVED (owner APPROVE-A+B, 2026-10-21).** Part A: `pipeline/revert_bug959.py` reconciled the
+process_template row `f81658d0` (`application` ''→214c, `elaboration` NULL→556c) back to the C13 backup
+`maxwell.db.bak_accumulate_20261021_143827` (C6 atomic; D-3036 red-loop `--check` 2→0 RED→GREEN). Part B:
+`pipeline/evidence_accumulator.py` now groups by `(concept_key, content_type)` — the permanent
+necessary-condition guard (content_type = axis 1 functional ROLE ⇒ cross-type rows are distinct concepts,
+never accumulated). The 4 legit same-type groups are unaffected. R5 review by gemma-4-E4B: APPROVE.
+Phase B (embedding cosine divergence for same-type collisions + the ~28% name-paraphrase gap) remains OPEN
+under D-3118.

@@ -31206,3 +31206,19 @@ decisions:
     Trigger to revisit: a WIN receipt or a Maxwell-family commit.'
   files:
   - config/pipeline_config.yaml
+- id: D-3122
+  state: RESOLVED
+  date: '2026-10-21'
+  by: assistant
+  category: PIPELINE / DATA INTEGRITY
+  title: 'BUG-959 APPROVE-A+B IMPLEMENTED - revert cross-type accumulation + content_type necessary-condition guard'
+  decision: 'Owner APPROVE-A+B. Part A: pipeline/revert_bug959.py reconciled the process_template Poker row
+    f81658d0 (application empty -> 214c, elaboration NULL -> 556c) back to the C13 backup
+    maxwell.db.bak_accumulate_20261021_143827 (C6 atomic; D-3036 red-loop --check 2 -> 0). Part B:
+    evidence_accumulator.py now groups by (concept_key, content_type) so cross-type rows (distinct concepts on
+    axis 1 = functional ROLE) never accumulate; the 4 legit same-type groups remain intact. R5 review by
+    gemma-4-E4B: APPROVE. Phase B (embedding cosine divergence for same-type collisions + ~28% name-paraphrase
+    gap) remains OPEN under D-3118.'
+  files:
+  - pipeline/revert_bug959.py
+  - pipeline/evidence_accumulator.py

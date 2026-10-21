@@ -1,7 +1,11 @@
 """pipeline/evidence_accumulator.py — cross-run evidence accumulation (D-3117).
 
 Matches committed FBs against the store by generation-invariant ``concept_key`` (D-3118
-Phase A) and, for every group of 2+ distinct sources, accumulates monotonic evidence:
+Phase A) and, for every group of 2+ distinct sources, accumulates monotonic evidence.
+
+Grouping is by ``(concept_key, content_type)`` — a necessary-condition guard (BUG-959):
+content_type is axis 1 = functional ROLE, so two rows sharing a concept_key but differing in
+content_type are DISTINCT concepts and are never accumulated across types.
 
   source_ids       <- union (never shrinks)
   source_diversity <- len(union)
@@ -140,7 +144,7 @@ def _backup(conn: sqlite3.Connection) -> str:
     return str(dest)
 
 
-def _apply(conn: sqlite3.Connection, groups: list[tuple[str, list[dict]]], cfg: dict) -> int:
+def _apply(conn: sqlite3.Connection, groups: list[tuple[tuple[str, str], list[dict]]], cfg: dict) -> int:
     """Monotonic apply: union source_ids + bump source_diversity + fill empty body fields only.
 
     D-2933 rule V: never overwrite a non-empty body field. Only source_ids/source_diversity
@@ -179,10 +183,14 @@ def run(mode: str, receipt_path: str, cfg: dict) -> list[dict]:
         rows = _load_rows(conn, merge_fields)
     finally:
         pass
-    # Group by concept_key; keep groups with 2+ DISTINCT sources (evidence union can grow).
-    groups: dict[str, list[dict]] = {}
+    # Group by (concept_key, content_type) — the necessary-condition guard (BUG-959 / D-3118).
+    # content_type is axis 1 = functional ROLE; two rows sharing a concept_key but differing in
+    # content_type are DISTINCT concepts by definition and must never accumulate across types.
+    # (The D-3118 Phase A key is name-derived and folds 'Poker As ...' / 'Poker ...' into one key;
+    # the composite key stops that false merge from ever cross-filling body fields.)
+    groups: dict[tuple[str, str], list[dict]] = {}
     for r in rows:
-        groups.setdefault(r["concept_key"], []).append(dict(r))
+        groups.setdefault((r["concept_key"], r["content_type"]), []).append(dict(r))
     multi = {k: v for k, v in groups.items() if len(v) >= 2}
     receipt: list[dict] = []
     for key, members in multi.items():
@@ -190,9 +198,18 @@ def run(mode: str, receipt_path: str, cfg: dict) -> list[dict]:
         disp["_ts"] = datetime.now(timezone.utc).isoformat()
         disp["_mode"] = mode
         receipt.append(disp)
+    # Surface cross-type collisions the guard SUPPRESSES (distinct concepts, never accumulated) —
+    # these are the D-3118 Phase B embedding-divergence fixtures, reported for visibility only.
+    by_ck: dict[str, set[str]] = {}
+    for r in rows:
+        by_ck.setdefault(r["concept_key"], set()).add(r["content_type"])
+    cross_type = sorted(k for k, v in by_ck.items() if len(v) > 1)
+    if cross_type:
+        print(f"evidence_accumulator: cross-type collision(s) SUPPRESSED by content_type guard: "
+              f"{len(cross_type)} concept_key(s) spanning >1 content_type")
     if mode == "apply" and receipt:
         _backup(conn)
-        _apply(conn, [(d["concept_key"], [m for m in groups[d["concept_key"]]]) for d in receipt], cfg)
+        _apply(conn, list(multi.items()), cfg)
         conn.commit()
     elif mode == "report" and receipt:
         out = Path(receipt_path)

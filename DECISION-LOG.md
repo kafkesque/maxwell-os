@@ -5376,3 +5376,22 @@ Qwen3.6-35B-A3B-4bit 2026-04-16; lmstudio-community/Qwen3.6-35B-A3B-MLX-4bit).
 better at general extraction/classification, but there is no measurement on this machine. DEFER the swap: the only
 future-proof path is a cheap reversible A/B vs Qwen3-Coder-30B on the S2 probe / eval floor with a red-loop receipt,
 then adopt only on a measured WIN. Registered so the swap is not proposed from memory (D-3038).
+
+
+## D-3122 — BUG-959 APPROVE-A+B IMPLEMENTED: revert + content_type necessary-condition guard (2026-10-21)
+
+Owner APPROVE-A+B. Executed with a D-3036 red-loop receipt and R5 review (generator≠verifier).
+
+Part A (revert): `pipeline/revert_bug959.py` reconciled the process_template Poker row `f81658d0`
+(`application` ''→214c, `elaboration` NULL→556c) back to the C13 backup
+`knowledge pipeline/maxwell.db.bak_accumulate_20261021_143827`, in one C6 transaction. `--check` red-loop:
+2 contaminated fields (application, elaboration) BEFORE → 0 AFTER (RED→GREEN).
+
+Part B (permanent guard): `pipeline/evidence_accumulator.py` now groups by `(concept_key, content_type)`
+instead of `concept_key` alone. content_type is axis 1 = functional ROLE, so two rows sharing a concept_key
+but differing in content_type are DISTINCT concepts by definition and can never cross-fill body fields. The
+4 legit same-type accumulation groups (VJ Performance Method, Design Thinking Process, Item Validation
+Protocol, Social Identity Influence on Behavior) are unaffected (report mode: groups=4, cross-type SUPPRESSED=1).
+
+R5 review: gemma-4-E4B APPROVED. Phase B (embedding cosine divergence for same-type collisions + the ~28%
+name-paraphrase false-negative gap) remains OPEN under D-3118; the Poker collision is its red-loop fixture.

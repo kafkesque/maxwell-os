@@ -212,3 +212,36 @@ store_bridge:
   # ACTIVE eval gate: UNDECLARED unjoined = 1 (DRIFT), DECLARED = 2, no adequate why = 1, a declaration whose row
   # now JOINS = 2 (SHRINK-ONLY, loudly).
   declared_golden_unjoined: []
+
+reanchor_triage:
+  source_sheet: governance/ANCHOR_208_REANCHOR_CANDIDATES_20261020.csv
+  store: "knowledge pipeline/maxwell.db"
+  store_table: fbs
+  store_key: fb_id
+  store_name_column: name
+  store_definition_column: definition
+  confirm_cos: 0.85
+  none_cos: 0.65
+  definition_chars: 170
+  out: governance/ANCHOR_208_REANCHOR_TRIAGE_20261022.csv
+
+# reanchor_adjudication - two-family agreement router over the 195 dangling ruler names (T-191/D-3116).
+# R5 (generator != verifier): TWO different model families independently read each ruler name's top
+# candidates' (name/definition/mechanism/boundary/consequence + source_text/evidence_passages/source_authors/source_books) and verdict MATCH(fb_id)|NONE, then the
+# two verdicts merge into a bucket (AUTO-NONE / NONE-MUDDY / SAME / SPLIT / CONFLICT / ERROR).
+# ADVISORY ONLY (D-2658): never writes owner_ruling_fb_id. none_guardrail_cos is a THIRD non-LLM signal
+# (content-cosine) whose errors are decorrelated from the LLMs, so a false-NONE cannot be certified by
+# two LLMs alone. Consumed by scripts/adjudicate_reanchor_two_model.py.
+reanchor_adjudication:
+  source_sheet: governance/ANCHOR_208_REANCHOR_TRIAGE_20261022.csv
+  candidate_sheet: governance/ANCHOR_208_REANCHOR_CANDIDATES_20261020.csv
+  store: "knowledge pipeline/maxwell.db"
+  store_table: fbs
+  store_key: fb_id
+  fields: [name, definition, mechanism, boundary, consequence, source_text, evidence_passages, source_authors, source_books]
+  models: [gemma-4-E4B-it-MLX-4bit, gpt-oss-20b-MXFP4-Q8]
+  none_guardrail_cos: 0.55
+  max_candidates: 6
+  max_workers: 6
+  out: governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022.csv
+  raw: governance/ANCHOR_208_REANCHOR_ADJUDICATION_RAW_20261022.jsonl

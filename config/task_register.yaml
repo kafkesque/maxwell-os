@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-20'
+updated: '2026-10-22'
 tasks:
 - id: T-101
   priority: MUST
@@ -2385,3 +2385,17 @@ tasks:
   source: 'D-3115; D-2772; D-332'
   evidence: 'MEASURED 2026-10-20: reload evicts non-pinned loaded models (loaded_count 3->1, only pinned Phi-4-mini survives); lever_ab receipt kv_off 161.12 vs kv_on 104.82 tok/s on Qwen3-Coder-30B = 0.65x LOSS.'
   gate: 'The next safe reload applies the disk edits; /admin/api/models then shows max_context_window=32768 on the capped models and gpt-oss-Q8 is capped too.'
+- id: T-194
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'BUILD THE SOURCE-TO-EXPECTED-FB EXTRACTION-RECALL GOLDEN (SOTA-audit gap 1: nothing-lost is unmeasurable)'
+  why: 'Maxwell has no source-to-expected-FB golden, so "nothing lost from the source" is UNMEASURABLE (SOTA-audit gap 1, governance/MARKET_RESEARCH_20261022_SOTA_RAG_REFERENCE.md). The S2 conformance audit proves extracted rows are schema-well-formed but cannot prove the extractor EMITTED every principle and non-principle the source contains; RAGChecker measures exactly this recall and Maxwell has no instrument for it. This golden must be keyed to the re-anchored ruler, so it lands AFTER the T-191 re-anchor (D-3116/BUG-956); building it before would re-key the golden a second time (future tax).'
+  source:
+  - governance/MARKET_RESEARCH_20261022_SOTA_RAG_REFERENCE.md
+  - scripts/stress_test_s2_exhaustive.py
+  - scripts/phase0_idempotency.py
+  - D-3116
+  - BUG-956
+  evidence: 'MEASURED 2026-10-22: stress_test_s2_exhaustive reports convergent×principle conform but hard gaps concentrate in non-principle types; no source-to-expected-FB golden exists, so extraction exhaustiveness has no receipt (D-3036 no-trace rule).'
+  gate: 'T-191 lands (build_anchor_store_bridge.py --check returns EXIT_CLEAN 0); then derive the source-to-expected-FB golden against the re-anchored ruler and wire it as a recall rail.'

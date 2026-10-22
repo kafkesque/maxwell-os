@@ -1,0 +1,770 @@
+{
+  "artifact_id": "ANCHOR-208-RECHUNKV4-DECLARED-NONE",
+  "carried_forward_rows": 13,
+  "count": 151,
+  "gen_model": "none (deterministic ruling consumer; no LLM)",
+  "generated_by": "scripts/build_anchor_ruler_from_adjudication.py",
+  "pipeline_commit": "uncommitted",
+  "rows": [
+    {
+      "item_id": "R030",
+      "note": "NONE",
+      "ruler_name": "Digital Iconic Reproduction in Computer Graphics"
+    },
+    {
+      "item_id": "R050",
+      "note": "NONE",
+      "ruler_name": "Methodological Accountability"
+    },
+    {
+      "item_id": "R060",
+      "note": "NONE",
+      "ruler_name": "Aiga Transportation Symbol System Development"
+    },
+    {
+      "item_id": "R074",
+      "note": "NONE",
+      "ruler_name": "Attention Economy Externalities"
+    },
+    {
+      "item_id": "R153",
+      "note": "NONE",
+      "ruler_name": "Cognitive Interview Analysis of Question Clarity Issues"
+    },
+    {
+      "item_id": "R005",
+      "note": "NONE",
+      "ruler_name": "Graphics Algebra Cross Operator"
+    },
+    {
+      "item_id": "R014",
+      "note": "NONE",
+      "ruler_name": "Sacred Geometry and Symbolic Resonance"
+    },
+    {
+      "item_id": "R015",
+      "note": "NONE",
+      "ruler_name": "Long-term Strategic Planning in Different Industries"
+    },
+    {
+      "item_id": "R016",
+      "note": "NONE",
+      "ruler_name": "Modelans-modelandum Relationship"
+    },
+    {
+      "item_id": "R024",
+      "note": "NONE",
+      "ruler_name": "Execution Gap From Technological Readiness"
+    },
+    {
+      "item_id": "R025",
+      "note": "NONE",
+      "ruler_name": "Design for Management and Organizational Culture"
+    },
+    {
+      "item_id": "R044",
+      "note": "NONE",
+      "ruler_name": "Cyclical Design Lifecycle"
+    },
+    {
+      "item_id": "R047",
+      "note": "NONE",
+      "ruler_name": "Emotional Transaction Design"
+    },
+    {
+      "item_id": "R055",
+      "note": "NONE",
+      "ruler_name": "Demand-side Sales Pattern"
+    },
+    {
+      "item_id": "R056",
+      "note": "NONE",
+      "ruler_name": "Quiz Generation with Llm Integration"
+    },
+    {
+      "item_id": "R058",
+      "note": "NONE",
+      "ruler_name": "Illustration As Propaganda Tool"
+    },
+    {
+      "item_id": "R061",
+      "note": "NONE",
+      "ruler_name": "Core Focus As Organizational Discipline"
+    },
+    {
+      "item_id": "R068",
+      "note": "NONE",
+      "ruler_name": "Imagination and the Image"
+    },
+    {
+      "item_id": "R073",
+      "note": "NONE",
+      "ruler_name": "Evolution of Language Through Mental Models"
+    },
+    {
+      "item_id": "R075",
+      "note": "NONE",
+      "ruler_name": "Paradigm Shift Through Disruption"
+    },
+    {
+      "item_id": "R081",
+      "note": "NONE",
+      "ruler_name": "Shift From Trend-chasing to Intentional Consumption"
+    },
+    {
+      "item_id": "R082",
+      "note": "NONE",
+      "ruler_name": "Historical Data Sources for Manufacturing and Economic Analysis"
+    },
+    {
+      "item_id": "R087",
+      "note": "NONE",
+      "ruler_name": "In-group Identity and Social Bonding"
+    },
+    {
+      "item_id": "R088",
+      "note": "NONE",
+      "ruler_name": "Gradio Web Interface for Ml Models"
+    },
+    {
+      "item_id": "R092",
+      "note": "NONE",
+      "ruler_name": "Data Quality and Method Transparency in Journalism"
+    },
+    {
+      "item_id": "R093",
+      "note": "NONE",
+      "ruler_name": "Numerical Symbolism in Design and Biology"
+    },
+    {
+      "item_id": "R095",
+      "note": "NONE",
+      "ruler_name": "Sensory Engagement As Quality Signal"
+    },
+    {
+      "item_id": "R099",
+      "note": "NONE",
+      "ruler_name": "Charismatic Brand Discipline"
+    },
+    {
+      "item_id": "R101",
+      "note": "NONE",
+      "ruler_name": "Pragmatist View of Truth and Knowledge"
+    },
+    {
+      "item_id": "R108",
+      "note": "NONE",
+      "ruler_name": "Typography in Brand Positioning and Magazine Design"
+    },
+    {
+      "item_id": "R109",
+      "note": "NONE",
+      "ruler_name": "Project Completion Bias"
+    },
+    {
+      "item_id": "R113",
+      "note": "NONE",
+      "ruler_name": "Traveling Salesman Problem Computational Complexity"
+    },
+    {
+      "item_id": "R115",
+      "note": "NONE",
+      "ruler_name": "Heuristic Reasoning in Problem Solving"
+    },
+    {
+      "item_id": "R116",
+      "note": "NONE",
+      "ruler_name": "Ai Model Deployment Risk"
+    },
+    {
+      "item_id": "R120",
+      "note": "NONE",
+      "ruler_name": "Nonlinear Magnification Fields"
+    },
+    {
+      "item_id": "R121",
+      "note": "NONE",
+      "ruler_name": "Consumers Hero Refurbishment Strategy"
+    },
+    {
+      "item_id": "R125",
+      "note": "NONE",
+      "ruler_name": "Dell Computer's Direct-sale Business Model"
+    },
+    {
+      "item_id": "R126",
+      "note": "NONE",
+      "ruler_name": "Embodied Knowledge in Design"
+    },
+    {
+      "item_id": "R128",
+      "note": "NONE",
+      "ruler_name": "Choice Architecture and Identity Framing"
+    },
+    {
+      "item_id": "R131",
+      "note": "NONE",
+      "ruler_name": "Differential Privacy in Data Collection"
+    },
+    {
+      "item_id": "R143",
+      "note": "NONE",
+      "ruler_name": "Figma Hamburger Icon Creation"
+    },
+    {
+      "item_id": "R147",
+      "note": "NONE",
+      "ruler_name": "Randomness in Data Measurement"
+    },
+    {
+      "item_id": "R148",
+      "note": "NONE",
+      "ruler_name": "Professional Development Through Studio Experience"
+    },
+    {
+      "item_id": "R151",
+      "note": "NONE",
+      "ruler_name": "Context-dependent Cognitive Processing"
+    },
+    {
+      "item_id": "R159",
+      "note": "NONE",
+      "ruler_name": "Context-dependent Quality Assessment"
+    },
+    {
+      "item_id": "R163",
+      "note": "NONE",
+      "ruler_name": "Metaphorically Selling How to Use the Ma"
+    },
+    {
+      "item_id": "R167",
+      "note": "NONE",
+      "ruler_name": "Innocent Brand Identity Through Organic Development"
+    },
+    {
+      "item_id": "R170",
+      "note": "NONE",
+      "ruler_name": "Dream-driven Life Planning"
+    },
+    {
+      "item_id": "R171",
+      "note": "NONE",
+      "ruler_name": "Alpha Blending Control"
+    },
+    {
+      "item_id": "R174",
+      "note": "NONE",
+      "ruler_name": "Concept-first Prototyping"
+    },
+    {
+      "item_id": "R180",
+      "note": "NONE",
+      "ruler_name": "Intersectional Design Approaches for Underserved Communities"
+    },
+    {
+      "item_id": "R182",
+      "note": "NONE",
+      "ruler_name": "Cultural Mourning Rituals and Symbolism"
+    },
+    {
+      "item_id": "R185",
+      "note": "NONE",
+      "ruler_name": "Tv Advertising Consumer Behavior Pattern"
+    },
+    {
+      "item_id": "R191",
+      "note": "NONE",
+      "ruler_name": "Intentional Motion Design"
+    },
+    {
+      "item_id": "R200",
+      "note": "NONE",
+      "ruler_name": "Simplicity Cult in Saas Pricing"
+    },
+    {
+      "item_id": "R204",
+      "note": "NONE",
+      "ruler_name": "Expert Overconfidence and Cognitive Laziness"
+    },
+    {
+      "item_id": "R205",
+      "note": "NONE",
+      "ruler_name": "Innovation Cycles in Art and Technology"
+    },
+    {
+      "item_id": "R001",
+      "note": "NONE",
+      "ruler_name": "Surveillance Capitalism Value Proposition"
+    },
+    {
+      "item_id": "R003",
+      "note": "NONE",
+      "ruler_name": "Quantum Cognitive Effects in Survey Design"
+    },
+    {
+      "item_id": "R006",
+      "note": "NONE",
+      "ruler_name": "Generative Algorithmic Composition"
+    },
+    {
+      "item_id": "R007",
+      "note": "NONE",
+      "ruler_name": "Accessible Electronic Prototyping Ecosystem"
+    },
+    {
+      "item_id": "R009",
+      "note": "NONE",
+      "ruler_name": "Entrepreneurial Risk Assessment Framework"
+    },
+    {
+      "item_id": "R010",
+      "note": "NONE",
+      "ruler_name": "Iterative Launch Process"
+    },
+    {
+      "item_id": "R012",
+      "note": "NONE",
+      "ruler_name": "Evolution of Game Art and Design"
+    },
+    {
+      "item_id": "R013",
+      "note": "NONE",
+      "ruler_name": "Innovation Fund Risk Management"
+    },
+    {
+      "item_id": "R018",
+      "note": "NONE",
+      "ruler_name": "Color and Typography Readability"
+    },
+    {
+      "item_id": "R019",
+      "note": "NONE",
+      "ruler_name": "Scientific Research Evaluation Framework"
+    },
+    {
+      "item_id": "R022",
+      "note": "NONE",
+      "ruler_name": "Coupon Code Feature Placement Strategy"
+    },
+    {
+      "item_id": "R023",
+      "note": "NONE",
+      "ruler_name": "Focused Action Selection"
+    },
+    {
+      "item_id": "R026",
+      "note": "NONE",
+      "ruler_name": "Index of Motion Graphic Title Design Terms"
+    },
+    {
+      "item_id": "R028",
+      "note": "NONE",
+      "ruler_name": "Gpu Acceleration Configuration"
+    },
+    {
+      "item_id": "R031",
+      "note": "NONE",
+      "ruler_name": "Questionnaire Validation and Modification Risk"
+    },
+    {
+      "item_id": "R032",
+      "note": "NONE",
+      "ruler_name": "Heckel's Diff Algorithm for Version Tracking"
+    },
+    {
+      "item_id": "R034",
+      "note": "NONE",
+      "ruler_name": "Negative Space Alphabet Challenge"
+    },
+    {
+      "item_id": "R035",
+      "note": "NONE",
+      "ruler_name": "Visual Evidence Recognition"
+    },
+    {
+      "item_id": "R036",
+      "note": "NONE",
+      "ruler_name": "Domain Name Call-to-action Strategy"
+    },
+    {
+      "item_id": "R037",
+      "note": "NONE",
+      "ruler_name": "Style Precedence and Override Behavior"
+    },
+    {
+      "item_id": "R038",
+      "note": "NONE",
+      "ruler_name": "Multiple Imputation Procedure"
+    },
+    {
+      "item_id": "R040",
+      "note": "NONE",
+      "ruler_name": "Commercial Advertising Souring of Artistic Vision"
+    },
+    {
+      "item_id": "R041",
+      "note": "NONE",
+      "ruler_name": "Consumer Anticipation of Objections"
+    },
+    {
+      "item_id": "R043",
+      "note": "NONE",
+      "ruler_name": "Alpha State Thinking and Creative Problem-solving"
+    },
+    {
+      "item_id": "R045",
+      "note": "NONE",
+      "ruler_name": "Wpi Consumer Value Proposition Framework"
+    },
+    {
+      "item_id": "R052",
+      "note": "NONE",
+      "ruler_name": "Interior Design Fixture Selection Challenge"
+    },
+    {
+      "item_id": "R063",
+      "note": "NONE",
+      "ruler_name": "Textbook Representation and State of Exception Legitimation"
+    },
+    {
+      "item_id": "R064",
+      "note": "NONE",
+      "ruler_name": "Optical Alignment in Typography"
+    },
+    {
+      "item_id": "R067",
+      "note": "NONE",
+      "ruler_name": "Schemat's Wasser Interactive Art Framework"
+    },
+    {
+      "item_id": "R076",
+      "note": "NONE",
+      "ruler_name": "Linguistic Fetish in Visual Communication"
+    },
+    {
+      "item_id": "R080",
+      "note": "NONE",
+      "ruler_name": "Information Design Community Networks"
+    },
+    {
+      "item_id": "R084",
+      "note": "NONE",
+      "ruler_name": "Data Visualization Research Lab Leadership"
+    },
+    {
+      "item_id": "R085",
+      "note": "NONE",
+      "ruler_name": "Discursive Strategy Abstraction"
+    },
+    {
+      "item_id": "R086",
+      "note": "NONE",
+      "ruler_name": "Commitment and Consistency Principle (2)"
+    },
+    {
+      "item_id": "R089",
+      "note": "NONE",
+      "ruler_name": "Vr Body Constraint and Physical Immersion"
+    },
+    {
+      "item_id": "R091",
+      "note": "NONE",
+      "ruler_name": "Autopoesis in Design Education"
+    },
+    {
+      "item_id": "R096",
+      "note": "NONE",
+      "ruler_name": "Transportation and Setup Costs in Construction Projects"
+    },
+    {
+      "item_id": "R100",
+      "note": "NONE",
+      "ruler_name": "Network Marketing Business Model"
+    },
+    {
+      "item_id": "R105",
+      "note": "NONE",
+      "ruler_name": "Probabilistic Forecasting with Prediction Intervals"
+    },
+    {
+      "item_id": "R111",
+      "note": "NONE",
+      "ruler_name": "Pmt Camera Typography Manipulation"
+    },
+    {
+      "item_id": "R112",
+      "note": "NONE",
+      "ruler_name": "Content Analysis Approaches in Visual Research"
+    },
+    {
+      "item_id": "R119",
+      "note": "NONE",
+      "ruler_name": "Strategic Human Resource Planning for Social Enterprises"
+    },
+    {
+      "item_id": "R123",
+      "note": "NONE",
+      "ruler_name": "Superquadric Parameterization in 3d Space"
+    },
+    {
+      "item_id": "R124",
+      "note": "NONE",
+      "ruler_name": "Foundation Model Integration Framework"
+    },
+    {
+      "item_id": "R129",
+      "note": "NONE",
+      "ruler_name": "Use of Proxies and Analogues in Market Sizing"
+    },
+    {
+      "item_id": "R134",
+      "note": "NONE",
+      "ruler_name": "Holistic Interpretation Problem in Index-aware Retrieval"
+    },
+    {
+      "item_id": "R136",
+      "note": "NONE",
+      "ruler_name": "Chatgpt Prompt Framework"
+    },
+    {
+      "item_id": "R137",
+      "note": "NONE",
+      "ruler_name": "Desire-friction Conversion Formula"
+    },
+    {
+      "item_id": "R138",
+      "note": "NONE",
+      "ruler_name": "Hjelmslev's Trichotomy and Linguistic Theory"
+    },
+    {
+      "item_id": "R140",
+      "note": "NONE",
+      "ruler_name": "Digital Culture Integration in Graphic Design"
+    },
+    {
+      "item_id": "R141",
+      "note": "NONE",
+      "ruler_name": "Contextual Redundancy and Representation Efficiency"
+    },
+    {
+      "item_id": "R142",
+      "note": "NONE",
+      "ruler_name": "Global Village Conceptual Framework"
+    },
+    {
+      "item_id": "R146",
+      "note": "NONE",
+      "ruler_name": "Debate As Leadership Tool"
+    },
+    {
+      "item_id": "R149",
+      "note": "NONE",
+      "ruler_name": "Perceptual Mapping Through Camouflage"
+    },
+    {
+      "item_id": "R150",
+      "note": "NONE",
+      "ruler_name": "Triple Bottom Line Business Approach"
+    },
+    {
+      "item_id": "R155",
+      "note": "NONE",
+      "ruler_name": "Persistence in Business Strategy"
+    },
+    {
+      "item_id": "R158",
+      "note": "NONE",
+      "ruler_name": "Duality in Design"
+    },
+    {
+      "item_id": "R160",
+      "note": "NONE",
+      "ruler_name": "Resource-based Value Assessment"
+    },
+    {
+      "item_id": "R164",
+      "note": "NONE",
+      "ruler_name": "Phenomenological Understanding"
+    },
+    {
+      "item_id": "R166",
+      "note": "NONE",
+      "ruler_name": "Agent-centric Economic Incentives"
+    },
+    {
+      "item_id": "R168",
+      "note": "NONE",
+      "ruler_name": "Hidden Issue Questioning Technique"
+    },
+    {
+      "item_id": "R172",
+      "note": "NONE",
+      "ruler_name": "Digital System Context Decomposition"
+    },
+    {
+      "item_id": "R173",
+      "note": "NONE",
+      "ruler_name": "Linkedin Network Building Protocol"
+    },
+    {
+      "item_id": "R175",
+      "note": "NONE",
+      "ruler_name": "Role-based Prompting Effect"
+    },
+    {
+      "item_id": "R176",
+      "note": "NONE",
+      "ruler_name": "Harvest Time Strategic Planning"
+    },
+    {
+      "item_id": "R179",
+      "note": "NONE",
+      "ruler_name": "Coincidence Wit in Graphic Design"
+    },
+    {
+      "item_id": "R183",
+      "note": "NONE",
+      "ruler_name": "Pattern Language Implementation Process"
+    },
+    {
+      "item_id": "R184",
+      "note": "NONE",
+      "ruler_name": "Doping in Professional Sports: Systemic Pressure and Rationalization"
+    },
+    {
+      "item_id": "R186",
+      "note": "NONE",
+      "ruler_name": "Cognitive Interview Analysis Framework"
+    },
+    {
+      "item_id": "R187",
+      "note": "NONE",
+      "ruler_name": "Credibility Through Transparency"
+    },
+    {
+      "item_id": "R189",
+      "note": "NONE",
+      "ruler_name": "Higher-order Polynomial Approximation in Numerical Methods"
+    },
+    {
+      "item_id": "R198",
+      "note": "NONE",
+      "ruler_name": "Survivor Bias in Success Narratives"
+    },
+    {
+      "item_id": "R199",
+      "note": "NONE",
+      "ruler_name": "Comfort Zone Constriction From Negative Influence"
+    },
+    {
+      "item_id": "R201",
+      "note": "NONE",
+      "ruler_name": "Physical Activity and Brain Health"
+    },
+    {
+      "item_id": "R202",
+      "note": "NONE",
+      "ruler_name": "Interactive Media Integration"
+    },
+    {
+      "item_id": "R206",
+      "note": "NONE",
+      "ruler_name": "Directional Changes (dc) in Financial Data"
+    },
+    {
+      "item_id": "R209",
+      "note": "NONE",
+      "ruler_name": "Procedural Vs Declarative Knowledge Retrieval"
+    },
+    {
+      "item_id": "R098",
+      "note": "NONE",
+      "ruler_name": "Aesthetic Refinement Through Iteration"
+    },
+    {
+      "item_id": "R017",
+      "note": "NONE",
+      "ruler_name": "Chemical Reaction Equation Automation"
+    },
+    {
+      "item_id": "R021",
+      "note": "NONE",
+      "ruler_name": "Index Section"
+    },
+    {
+      "item_id": "R027",
+      "note": "NONE",
+      "ruler_name": "Decentralized Strategic Command"
+    },
+    {
+      "item_id": "R033",
+      "note": "NONE",
+      "ruler_name": "Postmodern Critique of Realist Assumptions"
+    },
+    {
+      "item_id": "R046",
+      "note": "NONE",
+      "ruler_name": "Bitcoin Mining As Digital Ownership Model"
+    },
+    {
+      "item_id": "R057",
+      "note": "NONE",
+      "ruler_name": "Annual Percentage Rate Standardization"
+    },
+    {
+      "item_id": "R059",
+      "note": "NONE",
+      "ruler_name": "First Course Development Framework"
+    },
+    {
+      "item_id": "R069",
+      "note": "NONE",
+      "ruler_name": "Falsifiable Variable Measurement"
+    },
+    {
+      "item_id": "R079",
+      "note": "NONE",
+      "ruler_name": "Bar-hillel Paradox"
+    },
+    {
+      "item_id": "R118",
+      "note": "NONE",
+      "ruler_name": "Pass@k Evaluation Method"
+    },
+    {
+      "item_id": "R127",
+      "note": "NONE",
+      "ruler_name": "Guild of Handicraft Educational Model"
+    },
+    {
+      "item_id": "R133",
+      "note": "NONE",
+      "ruler_name": "Three-holes-in-the-cheese Model of Error Cascades"
+    },
+    {
+      "item_id": "R144",
+      "note": "NONE",
+      "ruler_name": "Abra-kadabra Number Classification"
+    },
+    {
+      "item_id": "R154",
+      "note": "NONE",
+      "ruler_name": "Aditya Birla Group's Parta System"
+    },
+    {
+      "item_id": "R162",
+      "note": "NONE",
+      "ruler_name": "Provincial Norms"
+    },
+    {
+      "item_id": "R178",
+      "note": "NONE",
+      "ruler_name": "If-then Plan for Moral Action"
+    }
+  ],
+  "schema_version": "1.0",
+  "source_sheet": {
+    "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
+    "sha256": "ea95c279e7cb7aa05d6587def3092612af3824d6dab20edae340d6af6c90b890"
+  }
+}

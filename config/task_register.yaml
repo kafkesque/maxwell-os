@@ -2359,13 +2359,14 @@ tasks:
 
 - id: T-191
   priority: MUST
-  state: open
+  state: done
   mover: owner
+  closed: '2026-10-22'
   title: 'RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 option 1, D-3116)'
   why: '195/208 anchor-ruler rows dangle on the removed t11 run (re-segmentation, not loss, D-3116). Option 1 re-samples the certified core from rechunk-v4-20260929 plus an owner blind-sheet re-adjudication, then re-derives the bridge ruler and bridge. Correctness core: until done the bridge stays RED and 94 percent of the anchor cannot measure the store.'
-  source: 'D-3116; BUG-956; governance/ANCHOR_208_BRIDGE_RULER_20261002.csv; scripts/build_anchor_store_bridge.py; scripts/build_anchor_bridge_ruler_208.py'
-  evidence: 'MEASURED 2026-10-20: live store is a single run rechunk-v4-20260929 = 7640 fbs rows; ruler 208 rows, 195 dangling (no casefold-exact store name); best-match Jaccard >=0.6 for only 14 of 195 and nearest matches are the wrong concepts.'
-  gate: 'Owner completes the blind-sheet re-adjudication; build_anchor_bridge_ruler_208.py re-derives a ruler keyed to rechunk-v4-20260929; build_anchor_store_bridge.py --check returns EXIT_CLEAN (0).'
+  source: 'D-3116; BUG-956; governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv; scripts/build_anchor_ruler_from_adjudication.py; scripts/build_anchor_store_bridge.py'
+  evidence: 'MEASURED 2026-10-20: live store is a single run rechunk-v4-20260929 = 7640 fbs rows; ruler 208 rows, 195 dangling. OWNER RULINGS (b sheet, 2026-10-22): 195 adjudicated = 44 MATCH + 151 NONE. MEASURED 2026-10-22: 44/44 MATCH fb_ids resolve to a store row (0 missing, 44 distinct names); scripts/build_anchor_ruler_from_adjudication.py derived a 57-row ruler (44 owner-MATCH keyed to their fb_id corpus name + 13 carried-forward rows), all 57 join EXACT; build_anchor_store_bridge.py --check = EXIT_CLEAN 0 (57/57 bridged, exact 57, ambiguous 0, unresolved 0); bridge selftest 21/21.'
+  gate: 'DONE 2026-10-22. build_anchor_ruler_from_adjudication.py derives the ruler from owner_ruling_fb_id; build_anchor_store_bridge.py --check returns EXIT_CLEAN (0). NONE rulings recorded in governance/ANCHOR_208_RECHUNKV4_DECLARED_NONE_20261022.json (151 declared NONE). REMAINING (separate gate, T-194): phase0_idempotency.py --all two-run proof before the re-anchored ruler is trusted across a store rebuild.'
 - id: T-192
   priority: SHOULD
   state: done

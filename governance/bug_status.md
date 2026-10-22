@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**255 open** / 473 closed of 728 ids.
+**256 open** / 473 closed of 729 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -261,4 +261,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-950 | (HIGH, OPEN 2026-10-20) — THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS "Failed to read response body: error | 2 |
 | BUG-951 | (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS | 1 |
 | BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
-| BUG-956 | (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS | 3 |
+| BUG-956 | (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS | 4 |
+| BUG-964 | (LOW, OPEN 2026-10-22) — gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified) | 1 |

@@ -168,7 +168,15 @@ store_bridge:
   # D-2785 folded 58 owner-adjudicated depth extras into the anchor family (150 -> 208 items). The bridge
   # therefore joins a 208-row item list (content ruler + folded extras), not the 150-row content ruler alone,
   # so `--check` re-derives the full bridge (BUG-624: the committed bridge no longer re-derived from 150 rows).
-  ruler_sheet: governance/ANCHOR_208_BRIDGE_RULER_20261002.csv
+  # T-191/D-3116 (2026-10-22): D-2881 re-chunking left 195/208 names dangling (BUG-956). The ruler is now DERIVED
+  # from the owner adjudication by scripts/build_anchor_ruler_from_adjudication.py — MATCH rulings keyed to their
+  # owner fb_id's corpus name (exact join), NONE rulings recorded in the declared-none manifest (ceiling shrinks
+  # LOUDLY), non-adjudicated rows carried forward unchanged. Do NOT hand-edit the derived ruler; re-derive it.
+  ruler_sheet: governance/ANCHOR_208_BRIDGE_RULER_RECHUNKV4_20261022.csv
+  ruler_apply:
+    adjudication_sheet: governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv
+    carried_forward_from: governance/ANCHOR_208_BRIDGE_RULER_20261002.csv
+    declared_none_manifest: governance/ANCHOR_208_RECHUNKV4_DECLARED_NONE_20261022.json
   ruler_encoding: utf-8-sig
   store: knowledge pipeline/maxwell.db
   store_table: fbs

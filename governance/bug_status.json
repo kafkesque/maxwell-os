@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 728,
-  "open_n": 255,
+  "total_ids": 729,
+  "open_n": 256,
   "closed_n": 473,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1281,7 +1281,12 @@
     {
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
-      "events": 3
+      "events": 4
+    },
+    {
+      "id": "BUG-964",
+      "title": "(LOW, OPEN 2026-10-22) \u2014 gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified)",
+      "events": 1
     }
   ],
   "closed": [

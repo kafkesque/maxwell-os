@@ -8,17 +8,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-22) · 728 bugs (255 open / 473 closed; highest OPEN = BUG-956) · 59 open tasks (MUST 13 / SHOULD 42 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-22) · 729 bugs (256 open / 473 closed; highest OPEN = BUG-964) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1252 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 344 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1252, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 255 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 29 · UNLABELLED 101 (BUG-757) of 256 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-191 | 🔴 MUST | RE-ANCHOR THE 208-ROW BRIDGE RULER TO rechunk-v4-20260929 (BUG-956 option 1, D-3116) | Owner completes the blind-sheet re-adjudication; build_anchor_bridge_r |
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 >
 > **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
@@ -19558,3 +19557,51 @@ RESOLVED 2026-10-21: all 35 undeclared sites triaged and cleared — `unknown 35
 **Resolution.** RESTORED + parity re-verified on 0.7.2. The parity surface is the per-model `max_context_window` (Priority 1) — already watched by the harness parity rule. `sampling.max_context_window` is a fallback default and is intentionally KEPT at 32768 (raising it is a no-op for every model carrying a per-model override).
 
 **Rail**: `scripts/agent_context_probe.py` (served_window == declared_context_limit); re-verified rc=0 2026-10-21.
+
+## BUG-956 UPDATE #3 (2026-10-22) — T-191 RE-ANCHOR LANDS; the bridge is GREEN (EXIT_CLEAN 0)
+
+**Owner rulings consumed (D-3034: a declaration must RESOLVE).** The blind-sheet re-adjudication is complete on the
+195 dangling rows: 44 MATCH + 151 NONE. The missing piece was a CONSUMER for `owner_ruling_fb_id` — the sheet held
+the rulings but no script read them, so `--check` stayed RED regardless. `scripts/build_anchor_ruler_from_adjudication.py`
+is that consumer: each MATCH ruling's 64-hex fb_id is resolved to its corpus NAME (an exact join), each NONE ruling
+is recorded in `governance/ANCHOR_208_RECHUNKV4_DECLARED_NONE_20261022.json`, and the 13 non-adjudicated ruler rows
+are carried forward unchanged. It does NOT re-implement the join; `build_anchor_store_bridge.py` still owns it.
+
+**RECEIPT (MEASURED 2026-10-22).** 44/44 MATCH fb_ids resolve to a store row (0 missing, 44 distinct names). Derived
+ruler = 57 rows (44 owner-MATCH + 13 carried). `build_anchor_store_bridge.py --check` = **EXIT_CLEAN 0**: 57/57
+anchor rows bridged (exact 57, normalised 0, ambiguous 0, unresolved 0); golden 61/1027 (retired, not gated). Bridge
+selftest 21/21. R5: the new script's critical logic was reviewed by gemma-4-E4B-it-MLX-4bit (different family) =
+NO DEFECTS, plus its own selftest.
+
+**HIDDEN CONFLICT FOUND + RESOLVED (D-3034).** Two adjudication sheets diverged: `...20261022.csv` (config `out`,
+18:41) wrote the literal string `"MATCH"` into the `owner_ruling_fb_id` column (a broken write — a placeholder where
+an id belongs), while `...20261022b.csv` (21:47) holds real 64-hex fb_ids. Reconciliation (195 rows): 134 both-empty,
+6 identical real fb_id, 33 no-b placeholder -> b real fb, 16 no-b `NONE` placeholder -> b empty, 5 b-only SPLIT
+MATCH, 1 R098 (no-b `MATCH`/dcb7dd collision -> b `NONE`, owner-accepted Qwen judgement). The b sheet is a STRICT
+REFINEMENT: no owner MATCH ruling lost. R111 is a SPLIT (gpt-oss MATCH vs Qwen NONE) → fail-closed NONE (D-2658),
+owner accepted Qwen's NONE.
+
+**STILL OPEN (separate gate, NOT this bug's subject).** `phase0_idempotency.py --all` (the definitive two-run proof)
+has NOT been executed. The re-anchored ruler is GREEN against the CURRENT store; if a store rebuild re-segments
+again the fb_ids could dangle, so idempotency must be proven before the anchor is trusted across a rebuild. This is
+tracked under T-194's gate, not as a BUG-956 regression.
+
+## BUG-964 (LOW, OPEN 2026-10-22) — gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified)
+
+**Observation (D-3036, hypothesis labelled until a receipt speaks).** R111 ("Pmt Camera Typography Manipulation")
+returned `NONE` confidence 0.1 from gpt-oss-20b-MXFP4-Q8 in the T-191 adjudication run, and `MATCH` confidence 0.85
+(fb_id 3b230d53... "Vertical Space Adjustment in Typography") in the NONE-MUDDY recheck. temp=0.0 is enforced (R7).
+
+**HYPOTHESIS (not a finding).** Either (a) MXFP4-Q8 quantization introduces sampling noise even at temp=0, or
+(b) the candidate list differed between the two runs. Candidate-set identity between the runs is UNVERIFIED: R111 has
+no name-cosine rows in ANCHOR_208_REANCHOR_CANDIDATES_20261020.csv and its triage content_top_fb_id is 4651c014...
+("Videosynthesizer Image Manipulation"), yet the model reported five candidates including "vertical spacing" — so at
+least one run's candidate list is NOT reproducible from the two sheets alone. THIS IS THE ACTUAL DEFECT: the
+candidate construction is not reconstructible from its declared inputs.
+
+**WHY IT MATTERS.** A two-family adjudication is only as reliable as the determinism of each family. If one family
+flips on identical input, the SPLIT/CONFLICT buckets carry noise. Impact here is bounded: R111 fail-closed to NONE
+and no b-sheet change. **RED-LOOP TARGET (D-3036):** one command that (1) reconstructs R111's candidate list from the
+declared sheets and diffs it against the list the run actually sent, and (2) re-issues the same call twice and
+compares. It is RED today because (1) cannot be built from the current artifacts (candidates are not recorded in the
+raw JSONL). Fix path: record the candidate fb_ids + prompt hash in the raw JSONL receipt so every verdict is auditable.

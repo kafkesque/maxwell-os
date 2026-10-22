@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-22) · 729 bugs (256 open / 473 closed; highest OPEN = BUG-964) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-22) · 730 bugs (257 open / 473 closed; highest OPEN = BUG-965) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1252 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 344 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1252, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 29 · UNLABELLED 101 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 29 · UNLABELLED 101 (BUG-757) of 257 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19605,3 +19605,25 @@ and no b-sheet change. **RED-LOOP TARGET (D-3036):** one command that (1) recons
 declared sheets and diffs it against the list the run actually sent, and (2) re-issues the same call twice and
 compares. It is RED today because (1) cannot be built from the current artifacts (candidates are not recorded in the
 raw JSONL). Fix path: record the candidate fb_ids + prompt hash in the raw JSONL receipt so every verdict is auditable.
+
+## BUG-965 (MED, OPEN 2026-10-22) — a single wedged call ABORTS the whole adjudication batch (C23 violation); progress recovered only by resume
+
+**Finding (MEASURED twice, same trace).** `scripts/adjudicate_reanchor_two_model.py` runs its calls through
+`ThreadPoolExecutor.map`. When ONE call exhausts MAX_RETRIES on the BUG-658 wall-clock deadline, `call_omlx` raises
+`RuntimeError`, `ex.map` re-raises it, and the ENTIRE batch dies — losing every call still queued. Measured
+2026-10-22 on the NONE-MUDDY recheck: run 1 died at 23/154, run 2 at 70/154, run 3 at 74/154, each on the identical
+`RuntimeError: OMLX call failed after 2 attempts: total wall-clock deadline (180s) exceeded`. The raw JSONL is the
+only reason progress survived (the script resumes from it), so no verdicts were lost — but three restarts were paid.
+
+**WHY IT IS MED, NOT LOW.** C23 (Resilient by Design) requires surviving a component failure without data loss. A
+batch that a single slow call can kill is not resilient, and the failure mode is INVISIBLE in the summary (the
+process exits with a traceback, no "N/154 done, M errored" receipt). A 4B/27B cold-load (42-134s TTFT) is close to
+the 180s deadline by construction, so this WILL recur on any large-model batch.
+
+**FIX (not applied).** Wrap `run_one` in a per-task try/except that records `{"ok": false, "error": ...}` into the
+raw JSONL and lets the batch continue (the merge already handles `a is None or b is None`), and print a final
+`N done / M errored` line. The `_bucket` already has an ERROR state for exactly this. Red-loop: a fixture whose
+first call raises must still complete the remaining calls and exit with an ERROR count, not a traceback.
+
+**INTERIM (this session).** Re-ran with `--workers 1` (no concurrent contention at the single-model server) and did
+not issue competing OMLX calls while it ran; the JSONL resume makes a restart lossless.

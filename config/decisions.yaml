@@ -31508,3 +31508,48 @@ decisions:
       -> RED: concept 43/44 (0.977273), expectation 417/418 (0.997608), missing Godel Incompleteness Theorem.'
     scope_measured: '44 certifications x sources = 418 expectations over 338 sources; per-source denominator distribution
       {1: 270, 2: 56, 3: 12}.'
+- id: D-3131
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: EVALUATION / GOLDEN AUTHORITY / KNOWLEDGE ARCHITECTURE
+  title: 'The retrieval ruler may never SHRINK by omission: a live golden query absent from the draft is a removal
+    no verdict covered (INV-11), and the two remaining pointer-authority defects are named rather than implied away'
+  decision: 'T-101''s remaining half is GROWTH (T-116), and growth is only safe on a writer that cannot silently
+    truncate the ruler. MEASURED 2026-10-23: scripts/reanchor_retrieval_goldens.py::_apply_reviewed writes config/golden/retrieval_queries.yaml
+    from the DRAFT''s query list alone, while judge_review reported only the opposite direction (a draft query absent
+    from the live set = an ADD, INV-7). A live query the draft omits was therefore DELETED with no verdict, no fault
+    and no report - the C13 .bak the only trace - and the first growth apply (a draft of NEW queries, which by construction
+    omits all 29 live ones) would have destroyed the owner''s 120 signed anchors. LANDED: spec INV-11 plus one rule
+    in judge_review, the ONE judgment both --check and --apply call (INV-6), so a removal is now a fault in both
+    and a retirement must be DECLARED with the existing retire-query/rewrite-query token (no new config knob: a
+    flag beside an existing declaration is a second way to say one thing, C12). A reviewed row whose query the draft
+    omits is REPORTED as orphan_reviewed_rows, never faulted, because the declared sheet legitimately carries the
+    one query v5 retired. NOT implied away, and registered rather than fixed here: BUG-969 (the stored id snapshot
+    is UNIONED into the denominator, so a receipt acts as an authority - a live no-op today, armed for the next
+    rebuild) and BUG-970 (an AMBIGUOUS label excludes a whole query from the denominator, making a set-valued ruler
+    LOOSER, against INV-4; unreachable today at 0 duplicated names, armed by the pooled pool T-116 introduces).
+    Both get a red loop before a fix (D-3036).'
+  bugs:
+  - BUG-968
+  - BUG-969
+  - BUG-970
+  files:
+  - scripts/reanchor_retrieval_goldens.py
+  - specs/retrieval_goldens.spec.md
+  - tests/test_retrieval_goldens_spec.py
+  - pipeline/golden.py
+  - config/golden/retrieval_queries.yaml
+  receipts:
+    red_loop: 'python3 scripts/reanchor_retrieval_goldens.py --selftest BEFORE the fix: ''!! a_live_query_absent_from_the_draft_is_REFUSED_never_silently_dropped'',
+      1 of 13 controls did NOT fire; AFTER: 13/13, and pytest tests/test_retrieval_goldens_spec.py 25/25.'
+    real_artifact: 'a copy of governance/golden_reanchor_proposed_v5.yaml with ONE live query removed: --check rc
+      0 with no fault BEFORE, rc 1 naming the query AFTER (''LIVE in the golden set but absent from the draft'').'
+    no_regression: --check on the declared signed sheet stays rc 0 (150 rows, 29 queries, 120 anchors, 150 signatures);
+      orphan_reviewed_rows names exactly one query, the one v5 retired on purpose.
+    armed_state: the live set and the declared draft are IN PHASE (29 vs 29, 0 omissions), so no loss has occurred;
+      MEASURED live no-op for BUG-969 (0 stored ids outside the store, 0 resolved-only ids) and unreachable for
+      BUG-970 (0 names with >=2 PASS rows in scope).
+    r5: gemma-4-E4B-it-MLX-4bit (different family) returned SHIP on 5/5 questions; its Q2 justification described
+      the fail-open correctly while labelling it OK, and the author trace pinned the caller count at 2/2 - an R5
+      SHIP is a smoke test, not a proof.

@@ -176,6 +176,45 @@ def test_inv7_a_draft_query_with_no_csv_rows_is_a_fault() -> None:
     assert any("carries no row for it" in f for f in rep["faults"])
 
 
+# ── INV-11 · a live query absent from the draft is a REMOVAL nobody judged (T-116 / BUG-968) ──────────
+def test_inv11_a_live_query_absent_from_the_draft_is_a_fault_not_a_silent_deletion() -> None:
+    rep = judge_review(_sheet(["anchor"]), ["q1"], mode="single", live=["q1", "q2"])
+    assert rep["dropped_by_omission"] == ["q2"]
+    assert any("absent from the draft" in f for f in rep["faults"])
+
+
+def test_inv11_a_declared_retirement_is_not_an_omission() -> None:
+    """The legitimate drop path must stay open: the query is IN the draft carrying `retire-query`."""
+    rep = judge_review(_sheet(["retire-query"]), ["q1"], mode="single", live=["q1", "q2"])
+    assert rep["dropped"] == ["q1"] and rep["dropped_by_omission"] == ["q2"]
+    only = judge_review(_sheet(["retire-query"]), ["q1"], mode="single", live=["q1"])
+    assert only["dropped"] == ["q1"] and not only["faults"]
+
+
+def test_inv11_both_production_callers_measure_the_live_set() -> None:
+    """The guard is defeated when `live` is omitted, so BOTH callers must supply it (fail-open is only
+    harmless when there is no golden file to delete from - the `else set()` branch)."""
+    assert SRC.count("rep = judge_review(rows, queries, live=sorted(live))") == 2
+    assert not judge_review(_sheet(["anchor"]), ["q1"], mode="single")["dropped_by_omission"]
+
+
+def test_inv11_the_real_sheet_has_no_omission_fault_and_names_its_one_orphan() -> None:
+    """The live artifact must PASS the new guard, and the report must name the query v5 retired on purpose.
+
+    The draft read here is the DECLARED `reviewed_draft`, not the generator's candidate draft: BUG-784 measured
+    a reader that named a GENERATOR's default path and so judged a sheet nobody had signed.
+    """
+    declared_draft = PROJECT_ROOT / str(REANCHOR["reviewed_draft"])
+    rows = list(csv.DictReader((PROJECT_ROOT / str(REANCHOR["reviewed_sheet"])).open(encoding="utf-8")))
+    draft = yaml.safe_load(declared_draft.read_text(encoding="utf-8"))
+    queries = [str(q.get("query", "")) for q in draft.get("queries") or []]
+    live = [str(q.get("query", "")) for q in (yaml.safe_load(GOLDEN_PATH.read_text()) or {}).get("queries") or []]
+    rep = judge_review(rows, queries, live=live)
+    assert not rep["faults"]
+    assert rep["dropped_by_omission"] == []
+    assert rep["orphan_reviewed_rows"] == [RETIRED_QUERY]
+
+
 # ── INV-8 · nothing is written without a C13 backup ───────────────────────────────────────────────────
 def test_inv8_the_apply_backs_up_before_writing() -> None:
     fn = _fns()["_apply_reviewed"]

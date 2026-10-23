@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 732,
-  "open_n": 259,
-  "closed_n": 473,
+  "total_ids": 735,
+  "open_n": 261,
+  "closed_n": 474,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1302,6 +1302,16 @@
       "id": "BUG-967",
       "title": "(LOW, OPEN 2026-10-23) \u2014 the Phase 0 receipt reports S0.5 as \"identical\" over two EMPTY sets",
       "events": 1
+    },
+    {
+      "id": "BUG-969",
+      "title": "(LOW, OPEN 2026-10-23) \u2014 the retrieval golden's stored id snapshot is UNIONED into the denominator, so a RECEIPT acts as an AUTHORITY",
+      "events": 1
+    },
+    {
+      "id": "BUG-970",
+      "title": "(LOW, OPEN 2026-10-23) \u2014 an AMBIGUOUS label EXCLUDES the whole query from the denominator, which makes the set-valued ruler LOOSER (INV-4",
+      "events": 1
     }
   ],
   "closed": [
@@ -1777,6 +1787,7 @@
     "BUG-960",
     "BUG-961",
     "BUG-962",
-    "BUG-963"
+    "BUG-963",
+    "BUG-968"
   ]
 }

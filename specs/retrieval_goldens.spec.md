@@ -96,3 +96,27 @@ never been SEEN failing is a comment (BUG-492).
 It does not claim the candidate pool is unbiased: the generator draws candidates from the **production leg's own
 top-N**, so a leg's recall on a set built from its own pool is **self-referential** (BUG-717 recorded the same
 asymmetry for rank-1). Measuring legs against a pooled candidate list is the next instrument, not this one.
+
+### INV-11 — A live query absent from the draft is a REMOVAL nobody judged (BUG-968, T-116)
+
+`--apply` writes the golden file from the **draft alone**. Before this invariant, a live query the draft did not
+carry was deleted by the write with **no verdict, no fault and no report** — the C13 `.bak` was the only trace.
+
+*Correct:* `judge_review` reports the omitted live queries in `dropped_by_omission` and raises one fault per query;
+`--check` (rc 1) and `--apply` (rc 2) both refuse, because both call the one judgment (INV-6).
+*Wrong:* an apply that silently shrinks the owner-signed ruler.
+
+The rule has **no config knob**: a retirement is already declarable in the sheet (`retire-query`/`rewrite-query`,
+INV-5), so a flag beside it would be a second way to say the same thing (C12). A query the sheet reviews but the
+draft does not carry is `orphan_reviewed_rows` — **reported, never a fault**: MEASURED 2026-10-23, the declared
+sheet carries exactly one such query (the one v5 retired on purpose), so faulting there would refuse the very
+sheet that produced the live set.
+
+**Declared fail-open:** the guard is defeated when a caller omits `live` (`live_set` becomes empty). Both
+production callers pass `live=sorted(live)` — MEASURED 2026-10-23, 2 of 2 call sites, pinned by
+`test_inv11_both_production_callers_measure_the_live_set` — and both compute it from the golden file with an
+`else set()` branch, so the omission case coincides with *no golden file exists*, where nothing can be deleted.
+
+**R5 (2026-10-23):** gemma-4-E4B-it-MLX-4bit returned SHIP on all five questions, and its Q2 justification
+described this fail-open correctly while labelling it OK — the author trace is what pinned the caller count.
+An R5 SHIP is a smoke test, not a proof.

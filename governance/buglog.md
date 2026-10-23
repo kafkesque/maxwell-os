@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1256 decisions (census stamp d8c1504ba09b1b37, 2026-10-23) · 732 bugs (259 open / 473 closed; highest OPEN = BUG-967) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1257 decisions (census stamp ef71afbd341c4c42, 2026-10-23) · 735 bugs (261 open / 474 closed; highest OPEN = BUG-970) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1256 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 348 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1256, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1257 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 349 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1257, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 259 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 259 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 32 · UNLABELLED 101 (BUG-757) of 261 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19734,3 +19734,65 @@ divergence is localised at S2 (`stage2_extract.py`). No number in D-3117/D-3118 
 NOT MEASURED rather than `identical: True` (the honest tri-state the harness facts already require: NOT RECORDED is
 not ABSENT), or resolve where S0.5 actually writes and read that path. Do NOT re-run `--all` merely to repair this
 row: that would overwrite the arms (BUG-966's second harm) for a cosmetic field.
+
+## BUG-968 (MED, FIXED 2026-10-23) — `--apply` deletes a LIVE owner-signed golden query that the draft merely omits (a removal no verdict covered)
+
+**MEASURED 2026-10-23.** `scripts/reanchor_retrieval_goldens.py::_apply_reviewed` builds the written set from
+`rep["plans"]`, which is derived from the **draft's** query list only, and then writes that set over
+`config/golden/retrieval_queries.yaml`. `judge_review` reported a draft query absent from the live set as an ADD
+(INV-7) and **never looked in the other direction**, so a live query missing from the draft was removed with no
+fault, no report and no verdict — the C13 `.bak` was the only trace. Red loop first (D-3036):
+`python3 scripts/reanchor_retrieval_goldens.py --selftest` → `!! a_live_query_absent_from_the_draft_is_REFUSED_never_silently_dropped`
+(1 of 13 controls did NOT fire). Re-run against the REAL artifact: a copy of `golden_reanchor_proposed_v5.yaml` with
+one query removed returned `--check` **rc 0 and no fault** before the fix, `rc 1` with the named query after it.
+
+**WHY IT WAS LATENT.** The live set and the declared reviewed draft are IN PHASE today (both 29 queries, 0
+omissions), so no loss has occurred. It was armed for T-116: the natural way to GROW the ruler is "generate a draft
+of NEW queries, get them signed, apply", and that draft omits all 29 live queries — so the first growth apply would
+have deleted the owner's first 120 signed anchors.
+
+**FIX (LANDED).** INV-11 in `specs/retrieval_goldens.spec.md` + one rule in `judge_review` (the ONE judgment both
+callers make, INV-6): `dropped_by_omission` is computed as `live_set - draft queries`, each entry raises a fault, and
+`orphan_reviewed_rows` (a reviewed row whose query the draft omits) is REPORTED, never faulted — measured: the
+declared sheet carries exactly one such query, the one v5 retired on purpose. No config knob: `retire-query` /
+`rewrite-query` already declare a removal, so a flag beside it would be a second way to say one thing (C12).
+Controls 13/13, pytest `tests/test_retrieval_goldens_spec.py` 25/25, real `--check` stays rc 0.
+
+## BUG-969 (LOW, OPEN 2026-10-23) — the retrieval golden's stored id snapshot is UNIONED into the denominator, so a RECEIPT acts as an AUTHORITY
+
+**MEASURED 2026-10-23.** `pipeline/golden.py::resolve_golden_anchors` resolves every `expected_names` entry and then
+executes `ids.extend(list(q.get("expected") or []))`, so the ids stored in `config/golden/retrieval_queries.yaml`
+join the expected set **even when every name resolved**. `specs/retrieval_goldens.spec.md` INV-2 declares those ids a
+"verified snapshot" of the last apply — a receipt — and D-2939 declares the pointer "not something an owner can or
+should sign". The union makes the receipt a second authority: it is the BUG-548 shape (the record is not the rule)
+in a metric's denominator.
+
+**MEASURED, IT IS A LIVE NO-OP TODAY.** All 29 queries / 120 names resolve in `rechunk-v4-20260929`, the stored ids
+are exactly the resolved ids (0 resolved-only ids, 0 stored ids absent from the store), so the union changes nothing
+now. **The harm is armed for the next rebuild**: stale ids stay in the denominator, `_resolvability` then fails the
+whole run (rc 2) even though every NAME resolved cleanly, and the documented `--allow-unresolvable` escape hatch
+turns that into a deflated recall measured against dead ids — the BUG-710 inversion, reached through a flag.
+
+**OWED FIX.** Use the stored ids only when a query carries NO `expected_names` (the real legacy fallback) and keep
+the snapshot in the file as evidence of the last apply; red loop first — a fixture holding one resolvable name plus
+one dead id must resolve to ONE id.
+
+## BUG-970 (LOW, OPEN 2026-10-23) — an AMBIGUOUS label EXCLUDES the whole query from the denominator, which makes the set-valued ruler LOOSER (INV-4 violation)
+
+**MEASURED 2026-10-23.** `pipeline/golden.py::resolve_name` returns `(None, "AMBIGUOUS", n)` when a name resolves to
+`n > 1` PASS rows, and `resolve_golden_anchors` drops the query into `excluded_queries` when no anchor survives —
+i.e. a duplicated label **removes a whole query's expectations** from the metric.
+
+**THE DEFECT.** Spec INV-4 declares the opposite direction: recall is micro over the expected set, so "enlarging a
+query's expected set makes the ruler STRICTER, not looser — a set that made recall easier would be a defect". For a
+SET-valued golden, both rows carrying the label are legitimate answers, so keeping them all is stricter and correct;
+refusing the label keeps the single-answer rule that D-3129 already retired for set semantics (a `concept_key`
+mapping to >1 store row is REPORTED, never collapsed). The refusal is inherited from the `single`-answer era.
+
+**NOT REACHABLE TODAY, ARMED BY GROWTH.** MEASURED 2026-10-23: 0 names have ≥2 PASS rows in the canonical run and 0
+across all runs. The store does carry 5 duplicate `concept_key`s across 7,640 rows, and a POOLED growth sheet
+(T-116) draws candidates from four legs — the shape most likely to surface an echo.
+
+**OWED FIX.** In `anchor_mode: set`, resolve a name to ALL matching rows, keep them all, and report the multiplicity;
+keep the refusal for a `single`-answer join. Red loop first: a fixture with two rows sharing one label must yield
+two expected ids and `multiplicity_reported == 1`, not an excluded query.

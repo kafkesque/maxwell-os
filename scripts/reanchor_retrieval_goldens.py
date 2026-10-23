@@ -277,11 +277,30 @@ def judge_review(
             added.append(qs)
         plan["verdict"] = "anchor-set" if mode == "set" else "anchor"
         plans.append(plan)
+    # T-116/G-1: a LIVE query absent from the draft is a REMOVAL nobody judged. `--apply` writes the target from
+    # the draft alone, so absence is not a neutral omission: it deletes an owner-signed query and every anchor on
+    # it, leaving the C13 `.bak` as the only trace. A retirement is DECLARED by carrying `retire-query`/`rewrite-query`
+    # IN the draft (INV-5/INV-7), never by being absent from it - so this is a fault, not a report, and it has no
+    # config knob: a declaration mechanism already exists, and a flag beside it would be a second way to say the
+    # same thing (C12). Reported on the SAME judgment both callers make (INV-6).
+    dropped_by_omission: list[str] = sorted(live_set - {str(q) for q in queries})
+    for qs in dropped_by_omission:
+        faults.append(
+            f"query {qs[:50]!r}: LIVE in the golden set but absent from the draft - applying this draft "
+            f"would DELETE it and its owner-signed anchors without a verdict (INV-7 covers an ADD; a removal "
+            f"is declared with the 'retire-query' or 'rewrite-query' token, never by omission)"
+        )
+    # Owner work that cannot be applied is REPORTED, never a gate: a reviewed row for a query the draft does not
+    # carry is not applied today. (MEASURED 2026-10-23: the live 20261011 sheet carries one such query - the one
+    # v5 retired on purpose - so faulting here would refuse the very sheet that produced the live set.)
+    orphans = sorted({str(r.get("query", "")) for r in rows} - {str(q) for q in queries})
     return {
         "mode": mode,
         "faults": faults,
         "plans": plans,
         "dropped": dropped,
+        "dropped_by_omission": dropped_by_omission,
+        "orphan_reviewed_rows": orphans,
         "unreviewed": unreviewed,
         "added": added,
         "abstentions": abstentions,
@@ -553,6 +572,17 @@ def controls() -> list[tuple[str, bool]]:
     missing = judge_review(
         _sheet(["anchor", "", ""]), ["q1", "q2"], mode="single", signature_required=True
     )
+    # T-116 / G-1 (D-3036 red loop): `--apply` rebuilds the written set from the DRAFT, so a LIVE query the draft
+    # does not carry would be DELETED by an apply that never judged it - named nowhere, traced only by the C13
+    # `.bak`. INV-7 covers an ADD; nothing covered a REMOVAL. A live query is declared retired by carrying the
+    # `retire-query` token IN the draft, never by being absent from it.
+    shrunk = judge_review(
+        _sheet(["anchor", "", ""]),
+        ["q1"],
+        mode="single",
+        signature_required=True,
+        live=["q1", "q2"],
+    )
     return [
         (
             "a_single_anchor_in_single_mode_is_accepted",
@@ -596,6 +626,11 @@ def controls() -> list[tuple[str, bool]]:
         (
             "a_draft_query_with_no_csv_rows_is_a_fault",
             any("carries no row for it" in f for f in missing["faults"]),
+        ),
+        (
+            "a_live_query_absent_from_the_draft_is_REFUSED_never_silently_dropped",
+            any("absent from the draft" in f for f in shrunk["faults"])
+            and shrunk.get("dropped_by_omission") == ["q2"],
         ),
         (
             "the_vocabulary_and_the_anchor_mode_have_ONE_home_in_config",

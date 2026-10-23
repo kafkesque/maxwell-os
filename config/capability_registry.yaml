@@ -470,12 +470,13 @@ unrouted:
   #: and the reason the override exists. The distinction is deliberate and uses the rail's own vocabulary, not a
   #: convenience: BUG-975 (a row inserted without its vec0 embedding) and BUG-976 (the single-concept writer omitted
   #: evidence_passages) are `bug_is_a_finding` — the WORK they imply already landed and the register keeps the record;
-  #: BUG-977 is `owner_gate` — the ten DISPOSITION-labelled rows cannot be re-labelled by any capability, because a
+  #: (BUG-977 retired 2026-10-23: its `owner_gate` override became STALE the moment the owner ruled the ten rows and
+  #: the writer enacted them — route_graph fault (v) named it, and a reason that outlived its item is not kept.)
+  #: [historical] BUG-977 was `owner_gate` — the ten DISPOSITION-labelled rows could not be re-labelled by any capability, because a
   #: content_type is a curation judgement and the next act is the OWNER'S WORD (D-2941/D-2898). Folding it into a
   #: route would hide a gate behind a script.
   BUG-975: bug_is_a_finding
   BUG-976: bug_is_a_finding
-  BUG-977: owner_gate
   #: D-3080/BUG-913 (2026-10-17): a bug whose TITLE names no owned artifact is the NORMAL shape for a finding
   #: ("we measured the world and here is what it does"), not a missing route. These two were appended to an
   #: APPEND-ONLY register, so their titles could not be made to name an artifact; the override is the rail's

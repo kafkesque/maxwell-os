@@ -203,6 +203,7 @@ def main() -> int:
 
     from pipeline.dedup_identity import concept_key as mint_ck
     from pipeline.omlx_call import call_omlx
+    from pipeline.practicality import classify_practicality
     from pipeline.schemas import match_domains_to_canonical, match_to_canonical
     from pipeline.serving_gate import derive_conf_and_review, derive_epistemic_status, derive_status
     from pipeline.stage5_verify import (
@@ -313,6 +314,10 @@ def main() -> int:
     fb["gen_model"] = gen_model
     fb["schema_version"] = "1"
     fb["pipeline_commit"] = get_pipeline_commit()
+    # BUG-981 (found by check_store_columns: `practicality` measured 6,585/6,586 non-blank inside s5_verified, the
+    # one blank being THIS path's row): the facet axis has a DECLARED deterministic deriver (pipeline/practicality.py,
+    # D2622, config/practicality.yaml) and writing nothing here made the row the store's only exception.
+    fb["practicality"] = classify_practicality(fb)
     fb["needs_human_review"] = 1 if needs_review else 0
 
     print(f"verify: passed={passed} score={score:.3f} status={status} reason={s5_reason} discipline={discipline} domains={domains}")

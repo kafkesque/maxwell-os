@@ -111,7 +111,7 @@ def main() -> int:
         row = conn.execute(
             "select fb_id, name, content_type, content_type_source, discipline_source, "
             "extraction_type_source, created_at, committed_at, epistemic_status, menu_hash, "
-            "verification_results, isor from fbs where fb_id = ?",
+            "verification_results, isor, practicality from fbs where fb_id = ?",
             (args.fb_id,),
         ).fetchone()
         if row is None:
@@ -160,6 +160,15 @@ def main() -> int:
                       "DERIVED (D-3034: never invented)")
                 return 1
             writes["epistemic_status"] = derive_epistemic_status(passed, _isor_rating(row["isor"]))
+
+        # BUG-981: `practicality` has a DECLARED deterministic deriver (D2622) and this row was the store's only blank.
+        # Derived from the row's OWN fields - never typed, never guessed.
+        if _blank(row["practicality"]):
+            from pipeline.practicality import classify_practicality
+            # the deriver reads BODY fields, so it gets the FULL row - a column subset would make it grade
+            # empty fields (the same trap BUG-979 measured on the NLI check)
+            full = conn.execute("select * from fbs where fb_id = ?", (args.fb_id,)).fetchone()
+            writes["practicality"] = classify_practicality(dict(full))
 
         if not writes:
             print("NOT OWED: every provenance cell is already stamped (idempotent — nothing written).")

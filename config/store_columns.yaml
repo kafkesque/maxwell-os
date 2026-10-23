@@ -487,11 +487,11 @@ measured:
       nonnull: 7635
       rows: 7635
     practicality:
-      distinct: 2
+      distinct: 3
       hollow: 0
-      mentions: 7
-      nonblank: 6585
-      nonnull: 6585
+      mentions: 9
+      nonblank: 6586
+      nonnull: 6586
       rows: 7635
     prerequisite_fbs:
       distinct: 1

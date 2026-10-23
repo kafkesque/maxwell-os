@@ -2,17 +2,11 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-GOLDEN",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "799d462",
+  "pipeline_commit": "27df631",
   "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
   "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated against the source, not copied from extractor output",
   "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
   "tier_b_rows": [
-    {
-      "source_id": "f8f802e878304781",
-      "name": "LLM-Based Application Patterns",
-      "concept_key": "8e4f7ce82774f358380c4651a9190cfadf8441a88b8c2dce96b244f41230f58e",
-      "rationale": "Recognize distinct application patterns like summarization, Q&A, and chatbots as foundational use cases for LLMs."
-    },
     {
       "source_id": "f8f802e878304781",
       "name": "LangChain's Modular Architecture",
@@ -96,12 +90,6 @@
       "name": "LLM Prompt Optimization",
       "concept_key": "4926d66cc3b4dc80b3c87cc1ad506cb6a8f054c22e2460f18f665d8401c39186",
       "rationale": "Recognize that effective prompts require iterative refinement and testing to achieve desired outputs."
-    },
-    {
-      "source_id": "b51204ce6c6a9950",
-      "name": "The Kernel of Strategy",
-      "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
-      "rationale": "A unique, defining condition or set of conditions that distinguishes an organization and enables a coherent strategic approach."
     },
     {
       "source_id": "b51204ce6c6a9950",
@@ -278,18 +266,25 @@
       "rationale": "Online networks of creative coders and educators can be formalized into structured communities that drive curriculum development."
     }
   ],
-  "tier_b_matched": [],
-  "tier_b_ruled_none": 0,
+  "tier_b_matched": [
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "The Kernel of Strategy",
+      "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
+      "rationale": "A unique, defining condition or set of conditions that distinguishes an organization and enables a coherent strategic approach."
+    }
+  ],
+  "tier_b_ruled_none": 1,
   "authority": {
     "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
     "sha256": "bcfeeaa51ff0a13016acf8e093f39913b0f14fbd190cd2e9c92b7dae2ede9660"
   },
   "counts": {
-    "certifications": 45,
-    "concepts": 44,
-    "expectations": 418,
+    "certifications": 46,
+    "concepts": 45,
+    "expectations": 419,
     "distinct_sources": 338,
-    "tier_b_matched": 0
+    "tier_b_matched": 1
   },
   "rows": [
     {
@@ -1205,6 +1200,18 @@
         "8d569bb0a35a14de"
       ],
       "content_type": "principle"
+    },
+    {
+      "item_id": "tierB:b51204ce:15e4aa9c",
+      "name": "The Kernel of Strategy",
+      "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
+      "concept_key_stored": null,
+      "key_agrees_with_store": null,
+      "fb_id_pointer": "",
+      "sources": [
+        "b51204ce6c6a9950"
+      ],
+      "content_type": null
     }
   ]
 }

@@ -505,6 +505,12 @@ unrouted:
   #: the owner gate). The override is not a route waiver for the work, only for the reading (D-3023 SHRINK-ONLY).
   BUG-909: bug_is_a_finding   # every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane)
   BUG-956: bug_is_a_finding   # the store halved 14,574 -> 7,640 (a canonical-run consolidation, NOT data loss) and the anchor-bridge rail witnessed it: a FINDING, not a file's route; the work is T-191 / D-3116 re-anchoring (owner gate)
+  #: BUG-964/967/972 appended 2026-10-22/23. Each is stated so the override is a DECISION, not a shrug
+  #: (D-3038). None of the three titles names an artifact owned by a declared capability, so they are the
+  #: per-item escape the BUG-913 fix made real. Stated separately so the debt count SUBTRACTS them.
+  BUG-964: bug_is_a_finding   # gpt-oss-20b same-row verdict flip (NONE->MATCH, 1/40=2.5%) is a finding about model-output determinism: the title names the model and a row id, no owned artifact. The determinism question belongs to the eval harness (a later task), not to a file's route
+  BUG-967: bug_is_a_finding   # the Phase 0 receipt reporting S0.5 "identical" over two EMPTY sets is a finding about a vacuous comparison, not a file's route; the fix is a guard in the receipt writer (a later task)
+  BUG-972: route_graph_incomplete   # scripts/r5_code_review.py EXISTS and is owned by NO declared capability; its `--out <path outside repo>` writes-then-dies is real work with no owner, so the honest class is a missing ROUTE, not a shrug
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
@@ -528,7 +534,9 @@ routing_debt:
   #: after the fix: BUG-911/BUG-912 overridden (-2), BUG-913 closed (-1), BUG-914 opened (+1) => 223. The ceiling is
   #: pinned to that reading, so the next unrouted item is a fault rather than a shrug. The raise above is retired;
   #: this line is the current number, and it may only go down.
-  unrouted_open_bugs: 223
+  #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
+  #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
+  unrouted_open_bugs: 221
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

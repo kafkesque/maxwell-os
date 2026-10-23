@@ -2,43 +2,57 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "799d462",
+  "pipeline_commit": "27df631",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
-    "sha256": "bdea54b7797bc206d0c4a54574c422450c8226da75d19e4e34b64d6835ca2c27"
+    "sha256": "937a544628d4a33ee7551325a8c40bc6a195b4de1efc166337c7961ec00af38a"
   },
   "result": {
-    "concept_recall": 1.0,
-    "expectation_recall": 1.0,
-    "concepts_expected": 44,
+    "concept_recall": 0.977778,
+    "expectation_recall": 0.997613,
+    "concepts_expected": 45,
     "concepts_hit": 44,
-    "expectations_expected": 418,
+    "expectations_expected": 419,
     "expectations_hit": 418,
-    "missing_concepts": [],
-    "missing_pairs_count": 0,
-    "missing_pairs": [],
+    "missing_concepts": [
+      {
+        "item_id": "tierB:b51204ce:15e4aa9c",
+        "name": "The Kernel of Strategy"
+      }
+    ],
+    "missing_pairs_count": 1,
+    "missing_pairs": [
+      {
+        "source_id": "b51204ce6c6a9950",
+        "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2"
+      }
+    ],
     "sources": {
       "count": 338,
-      "fully_recalled": 338,
+      "fully_recalled": 337,
       "denominator_distribution": {
         "1": 270,
         "2": 56,
-        "3": 12
+        "3": 11,
+        "4": 1
       }
     },
     "duplicate_pairs_count": 0,
     "duplicate_pairs": [],
     "key_integrity_faults": [],
     "key_integrity_fault_count": 0,
-    "red_reasons": [],
-    "verdict": "CLEAN",
+    "red_reasons": [
+      "concept_recall 0.977778 < floor 1.0",
+      "expectation_recall 0.997613 < floor 1.0"
+    ],
+    "verdict": "RED",
     "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
-    "tier_b_proposed": 45,
+    "tier_b_proposed": 43,
     "tier_b_present": 0,
-    "tier_b_omitted": 45,
-    "tier_b_matched": 0,
-    "tier_b_ruled_none": 0,
+    "tier_b_omitted": 43,
+    "tier_b_matched": 1,
+    "tier_b_ruled_none": 1,
     "tier_b_present_pairs": [],
     "tier_b_omissions": [
       {
@@ -50,11 +64,6 @@
         "source_id": "b51204ce6c6a9950",
         "concept_key": "1167ed41c67f2587b54f318e460bfcc288f287bfe6eb8a4581e621b2c22f2f30",
         "name": "Strategic Diagnosis"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
-        "name": "The Kernel of Strategy"
       },
       {
         "source_id": "b51204ce6c6a9950",
@@ -158,11 +167,6 @@
       },
       {
         "source_id": "f8f802e878304781",
-        "concept_key": "8e4f7ce82774f358380c4651a9190cfadf8441a88b8c2dce96b244f41230f58e",
-        "name": "LLM-Based Application Patterns"
-      },
-      {
-        "source_id": "f8f802e878304781",
         "concept_key": "aa106c45d6bb5a62ac57bbbc4caf6a54ad3bb364dfb9491f8f980c5cd24f84db",
         "name": "Prompt Types as Task Categories"
       },
@@ -240,6 +244,16 @@
         "source_id": "f988150fe424aa75",
         "concept_key": "82631bcea1481132121f11358d0e29db32d0cc2fc6f4ba5e510e67c476696f03",
         "name": "Educational Community Building"
+      },
+      {
+        "source_id": "f988150fe424aa75",
+        "concept_key": "8b068fe2150c72f038f72f6c256d5238239d7bb58643ebe7ec1291a8ee173187",
+        "name": "Creative Coding Community Networks"
+      },
+      {
+        "source_id": "f988150fe424aa75",
+        "concept_key": "8d2cecbbbbd8ac2b769b6b8ed9463fc352cf3211ba96408a79408d04c548a2e5",
+        "name": "Educational Resource Sustainability"
       }
     ]
   }

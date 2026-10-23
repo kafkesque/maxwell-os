@@ -24,7 +24,7 @@
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
-> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) UNBLOCKED 2026-10-23 (BUG-974): the proposer  |
+> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) EXECUTED 2026-10-23 (BUG-974 fix live): the p |
 >
 > **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >

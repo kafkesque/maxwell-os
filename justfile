@@ -119,6 +119,9 @@ health:
     #   line after a merge): a comment that documents another rail is a declaration with the wrong home (D-2649).
     python3 scripts/check_s5_score_axis.py --selftest || exit 1   # BUG-502: the score axis' known-answer controls
     python3 scripts/check_s5_score_axis.py || exit 1   # BUG-502: the ONE score-axis home must reproduce the stored corpus
+    python3 scripts/check_verification_sequence.py || exit 1   # T-196/D-3136: the per-record S5 sequence has ONE home, and the home still preserves the declared ORDER (a failed mechanism gate IS the factual verdict, the NLI is never asked) and the declared derivations; a fifth copy of the rule fails this rail
+    python3 scripts/check_extraction_recall.py --selftest || exit 1   # D-3130/T-194: the extraction-recall rail's known-answer controls must be SEEN to fire (a control nothing runs is a comment, BUG-492)
+    python3 scripts/check_extraction_recall.py || [ $? -eq 2 ]        # D-3130/T-194: 'nothing lost from the source' is MEASURED - a certified concept missing from the store is LOSS (RED); 2 = owner-owed tier-B proposal, loud NOT fatal (BUG-457). WIRED HERE 2026-10-23: the rail existed and was run by nothing, which scripts/check_rail_registry.py named as fault (i)
     python3 scripts/check_revoked_references.py --selftest || exit 1   # D-2645: the anti-resurrection rail known-answer controls
     python3 scripts/check_revoked_references.py || [ $? -eq 2 ]        # D-2645: a revoked SCOPE may be named by NO live file; 2 = owner-owed, loud NOT fatal
     python3 scripts/check_derivation_homes.py --selftest || exit 1     # D-2646: ONE DERIVED VALUE, ONE HOME - the known-answer controls

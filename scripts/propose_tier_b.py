@@ -78,6 +78,30 @@ def load_config() -> dict[str, Any]:
     return block
 
 
+def _req(block: dict[str, Any], key: str) -> Any:
+    """Return a DECLARED config value, or refuse loudly (C12 / D-2644 / BUG-982).
+
+    `block.get(key, <literal>)` is an UNDECLARED DEFAULT: the value is declared in
+    config/extraction_recall.yaml and the code would silently substitute another one if the declaration moved,
+    was renamed, or was deleted. MEASURED 2026-08..10 by scripts/check_config_defaults.py: five such reads in this
+    file pushed the shadowed-declared debt 300 -> 305, so the ladder was RED for a promise the docstring already
+    made ("Every value here is config (C12) — the script hardcodes nothing").
+
+    Args:
+        block: the `extraction_recall.proposer` mapping.
+        key: the declared key.
+
+    Returns:
+        The declared value (any YAML type; the caller casts).
+
+    Raises:
+        RuntimeError: when the key is absent — a missing bound is a configuration error, never a default.
+    """
+    if key not in block:
+        raise RuntimeError(f"{CONFIG_PATH.name}: extraction_recall.proposer.{key} is NOT declared (C12)")
+    return block[key]
+
+
 def resolve_source_files(pilot_ids: list[str]) -> dict[str, str]:
     """Reverse-map source_id -> source .md path via the authoritative metadata cache.
 
@@ -283,7 +307,7 @@ def _selftest() -> int:
 def _dry_run(cfg: dict[str, Any]) -> int:
     """Resolve and print the plan; write nothing."""
     proposer = cfg["proposer"]
-    pilots = [str(p).strip() for p in proposer.get("pilot_sources", []) if str(p).strip()]
+    pilots = [str(p).strip() for p in _req(proposer, "pilot_sources") if str(p).strip()]
     if not pilots:
         print("OWED: no proposer.pilot_sources declared (config/extraction_recall.yaml)")
         return EXIT_OWED
@@ -302,9 +326,10 @@ def _dry_run(cfg: dict[str, Any]) -> int:
     if missing:
         print(f"OWED: {len(missing)} pilot source_id(s) unresolved: {missing}")
         return EXIT_OWED
-    print(f"model: {proposer.get('model')} | max_window_chars={proposer.get('max_window_chars')} "
-          f"| max_windows={proposer.get('max_windows_per_source')} "
-          f"| max_candidates={proposer.get('max_candidates_per_source')}")
+    print(f"model: {proposer.get('model')} | max_window_chars={_req(proposer, 'max_window_chars')} "
+          f"| max_windows={_req(proposer, 'max_windows_per_source')} "
+          f"| max_candidates={_req(proposer, 'max_candidates_per_source')} "
+          f"| skip_existing_tier_a={_req(proposer, 'skip_existing_tier_a')}")
     print(f"tier_b_sheet: {cfg['golden'].get('tier_b_sheet')}")
     print("dry-run only — nothing written. Run without --dry-run to propose.")
     return EXIT_OK
@@ -314,7 +339,7 @@ def _run(cfg: dict[str, Any]) -> int:
     from pipeline.dedup_identity import concept_key as mint_key
 
     proposer = cfg["proposer"]
-    pilots = [str(p).strip() for p in proposer.get("pilot_sources", []) if str(p).strip()]
+    pilots = [str(p).strip() for p in _req(proposer, "pilot_sources") if str(p).strip()]
     if not pilots:
         print("OWED: no proposer.pilot_sources declared")
         return EXIT_OWED
@@ -322,10 +347,10 @@ def _run(cfg: dict[str, Any]) -> int:
     if not model:
         print("FAIL-CLOSED: proposer.model is empty (C12)")
         return EXIT_CONFIG
-    max_chars = int(proposer.get("max_window_chars", 6000))
-    max_windows = int(proposer.get("max_windows_per_source", 4))
-    max_cand = int(proposer.get("max_candidates_per_source", 15))
-    skip_a = bool(proposer.get("skip_existing_tier_a", True))
+    max_chars = int(_req(proposer, "max_window_chars"))
+    max_windows = int(_req(proposer, "max_windows_per_source"))
+    max_cand = int(_req(proposer, "max_candidates_per_source"))
+    skip_a = bool(_req(proposer, "skip_existing_tier_a"))
 
     files = resolve_source_files(pilots)
     missing = [p for p in pilots if p not in files]

@@ -118,7 +118,7 @@ measured:
     application:
       distinct: 6586
       hollow: 0
-      mentions: 94
+      mentions: 95
       nonblank: 6586
       nonnull: 7635
       rows: 7635
@@ -132,21 +132,21 @@ measured:
     boundary:
       distinct: 7634
       hollow: 0
-      mentions: 147
+      mentions: 148
       nonblank: 7635
       nonnull: 7635
       rows: 7635
     citation:
       distinct: 720
       hollow: 0
-      mentions: 45
+      mentions: 46
       nonblank: 7634
       nonnull: 7635
       rows: 7635
     classification_error:
       distinct: 0
       hollow: 0
-      mentions: 8
+      mentions: 9
       nonblank: 0
       nonnull: 7635
       rows: 7635
@@ -160,7 +160,7 @@ measured:
     classification_status:
       distinct: 1
       hollow: 0
-      mentions: 16
+      mentions: 17
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -188,14 +188,14 @@ measured:
     consequence:
       distinct: 7635
       hollow: 0
-      mentions: 65
+      mentions: 66
       nonblank: 7635
       nonnull: 7635
       rows: 7635
     content_type:
       distinct: 5
       hollow: 0
-      mentions: 138
+      mentions: 139
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -230,7 +230,7 @@ measured:
     definition:
       distinct: 7635
       hollow: 0
-      mentions: 212
+      mentions: 213
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -251,7 +251,7 @@ measured:
     discipline:
       distinct: 66
       hollow: 0
-      mentions: 229
+      mentions: 230
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -279,7 +279,7 @@ measured:
     domains:
       distinct: 1326
       hollow: 1049
-      mentions: 184
+      mentions: 185
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -307,21 +307,21 @@ measured:
     epistemic_status:
       distinct: 4
       hollow: 0
-      mentions: 17
+      mentions: 16
       nonblank: 6586
       nonnull: 6586
       rows: 7635
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 150
+      mentions: 152
       nonblank: 7635
       nonnull: 7635
       rows: 7635
     evidence_passages:
       distinct: 7635
       hollow: 0
-      mentions: 50
+      mentions: 52
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -349,14 +349,14 @@ measured:
     failure_mode:
       distinct: 7360
       hollow: 0
-      mentions: 34
+      mentions: 35
       nonblank: 7360
       nonnull: 7635
       rows: 7635
     fb_id:
       distinct: 7635
       hollow: 0
-      mentions: 216
+      mentions: 218
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -398,23 +398,23 @@ measured:
     is_convergent:
       distinct: 2
       hollow: 0
-      mentions: 52
+      mentions: 53
       nonblank: 7635
       nonnull: 7635
       rows: 7635
     is_summary:
       distinct: 1
       hollow: 0
-      mentions: 24
+      mentions: 25
       nonblank: 7635
       nonnull: 7635
       rows: 7635
     isor:
-      distinct: 362
+      distinct: 363
       hollow: 0
       mentions: 15
-      nonblank: 6585
-      nonnull: 6585
+      nonblank: 6586
+      nonnull: 6586
       rows: 7635
     jargon:
       distinct: 4388
@@ -440,7 +440,7 @@ measured:
     mechanism:
       distinct: 7635
       hollow: 0
-      mentions: 152
+      mentions: 153
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -454,7 +454,7 @@ measured:
     name:
       distinct: 7632
       hollow: 0
-      mentions: 423
+      mentions: 424
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -475,7 +475,7 @@ measured:
     pipeline_commit:
       distinct: 3
       hollow: 0
-      mentions: 81
+      mentions: 82
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -489,7 +489,7 @@ measured:
     practicality:
       distinct: 3
       hollow: 0
-      mentions: 9
+      mentions: 11
       nonblank: 6586
       nonnull: 6586
       rows: 7635
@@ -517,7 +517,7 @@ measured:
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 130
+      mentions: 131
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -531,7 +531,7 @@ measured:
     s5_reason:
       distinct: 8
       hollow: 0
-      mentions: 13
+      mentions: 12
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -552,7 +552,7 @@ measured:
     source_books:
       distinct: 1505
       hollow: 1
-      mentions: 47
+      mentions: 49
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -573,7 +573,7 @@ measured:
     source_ids:
       distinct: 1477
       hollow: 0
-      mentions: 36
+      mentions: 38
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -601,7 +601,7 @@ measured:
     status:
       distinct: 2
       hollow: 0
-      mentions: 145
+      mentions: 147
       nonblank: 7635
       nonnull: 7635
       rows: 7635
@@ -643,7 +643,7 @@ measured:
     verification_method:
       distinct: 3
       hollow: 0
-      mentions: 9
+      mentions: 7
       nonblank: 6586
       nonnull: 6586
       rows: 7635
@@ -657,7 +657,7 @@ measured:
     verifier_model:
       distinct: 1
       hollow: 0
-      mentions: 9
+      mentions: 10
       nonblank: 6586
       nonnull: 6586
       rows: 7635

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "generated": "2026-10-23T19:35:00+02:00",
+  "task": "T-196",
+  "decision": "D-3136",
+  "bugs": ["BUG-978", "BUG-979", "BUG-980", "BUG-981", "BUG-982", "BUG-983"],
+  "why": "S5's per-record verification sequence existed in FOUR files, each drifted (BUG-978 holes 1-6, BUG-979, BUG-980, BUG-981, BUG-982). A rule with four homes tells four truths.",
+  "home": {
+    "module": "pipeline/verify_record.py",
+    "entrypoint": "verify_one_record(fb, *, severe_evidence_ids=frozenset(), strict=False) -> VerificationOutcome",
+    "faces": ["VerificationOutcome.store_cells()", "VerificationOutcome.checkpoint_cells()"],
+    "input_contract": "hydrate_json_lists() — evidence_passages, evidence_passages_shown, source_ids, source_books (JSON TEXT -> list, fail-closed)"
+  },
+  "call_sites_rewired": [
+    "pipeline/stage5_verify.py::run_stage5 (the loop body is now a call; S5 owns only the severe-evidence population, --strict, progress line, checkpoint)",
+    "pipeline/insert_single_concept.py::main (was: no ISOR, label from None, hardcoded verifier identity)",
+    "scripts/reverify_one_row.py::compute/decide (was: ISOR echoed from the store; write set was a hand-picked subset)",
+    "scripts/reinject_bug198_singletons.py::_verify_s5 (was: no evidence short-circuit, hardcoded 'threshold 0.10' — a retired threshold)"
+  ],
+  "guard": {
+    "rail": "scripts/check_verification_sequence.py",
+    "wired_into": "justfile#health (after check_s5_score_axis)",
+    "fails_when": [
+      "the home does not resolve",
+      "any module under pipeline/ or scripts/ CALLS check_mechanism_quality or deberta_check outside the home (AST census, not text)",
+      "a failing mechanism gate produces fact_passed=True, or the NLI is asked after it failed, or a short-circuit is skipped",
+      "the score axis re-types a check's score, or a quarantined row exceeds the declared cap",
+      "a derived cell is blank or disagrees with its declared deriver",
+      "a STORE-SHAPED row (JSON text) derives a different n_sources or confidence than the native row"
+    ],
+    "red_loop": "the rail was written and RUN FIRST against the unmodified tree: 18 faults (module missing + 3 restating files); it went green only after every call site was rewired (D-3036)"
+  },
+  "fingerprint_invalidation": {
+    "declared_in": "config/pipeline_config.yaml#stage5.fingerprint_files (pipeline/verify_record.py added — BUG-614: the fingerprint must cover every module that changes the OUTPUT)",
+    "stored_input_fingerprint_id": "67e4f2512e916a033751d039b9fe7554eaaa365debe3b4b545ce6d85f41dc6f5",
+    "current_input_fingerprint_id": "ed813bc052f0e3c7f5deb18d6e89d12a6e713544ab3317ad156e6c3b8d991b13",
+    "next_s5_resume": "DISCARDS the stored checkpoint and re-verifies the input fail-closed (D2485/D-330). ACCEPTED in this commit, not left to be discovered mid-run."
+  },
+  "measured_after": {
+    "check_serving_gate": "7635 row(s) re-derived: 7635 MATCH, 0 status mismatch, 0 reason mismatch, 0 undecidable",
+    "check_s5_score_axis": "7635 re-derived: 6586 MATCH, 0 score mismatch, 0 review mismatch, 0 undecidable",
+    "check_label_provenance": "7635 classified: 7635 stamped, 0 missing, 0 unstampable",
+    "check_verification_sequence": "ok — ONE home, no outside caller, order preserved (604 files scanned)",
+    "check_store_columns": "debt 8 of ceiling 8, census moves 0 (the declared `isor` blank class is gone; the ceiling was NOT raised)",
+    "row_repair": "f523504e 'The Kernel of Strategy' — write set ['isor'] only: n_sources 0 -> 1, score 0.167, rating weak; status/confidence/label/facet unchanged",
+    "tests": "565 passed, 11 skipped, 0 failed (tests/test_single_concept_provenance.py updated: the site must call the HOME, and the home must call the deriver — asserted at both ends)",
+    "ruff": "pipeline/verify_record.py clean; pipeline/stage5_verify.py clean (6 PRE-EXISTING errors fixed: 4x B905 zip strict, 1x F541, 1x I001)",
+    "r5_review": "governance/r5_review_gate.py --file pipeline/verify_record.py -> APPROVE (gemma-4-E4B); --file pipeline/stage5_verify.py -> APPROVE (gemma-4-E4B), deterministic layers PASS"
+  },
+  "delegations": [
+    {"id": "DJ-20261023T172833Z-3c41", "model": "gemma-4-E4B-it-MLX-4bit", "state": "failed", "wall_s": 126.1, "cause": "max turns reached (5-file read loop)"},
+    {"id": "DJ-20261023T173039Z-d6c8", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "state": "failed", "wall_s": 195.6, "cause": "max turns reached (3-file read loop)"}
+  ],
+  "delegation_note": "Both REVIEW delegations FAILED and left no artifact; they are recorded as failed, never as approval. The R5 verdicts in force come from the governed gate (scripts/r5_review_gate.py), which is the declared review instrument for this repo.",
+  "not_done_here": [
+    "no threshold, weight or ordering changed",
+    "no label invented; no ceiling raised (D-2642)",
+    "no fifth writer tolerated: the rail refuses one",
+    "the pre-existing C11 layer's empty 'Undeclared imports:' line is recorded (BUG-983) and NOT fixed here"
+  ]
+}

@@ -47,35 +47,32 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
-from pipeline.serving_gate import (  # D274h / BUG-499 / BUG-502: ONE rule, never re-implemented (C21)
-    derive_conf_and_review,
-    derive_epistemic_status,
-    derive_status,
-)
 from pipeline.pipeline_paths import (
+    _CFG,  # D2405: C12 config-first threshold source
     CHECKPOINT_DIR,
+    GEN_MODEL,  # D2485: S5 input fingerprint (generator identity)
+    PROJECT_ROOT,  # D-330: repo root for the path-scoped S5 fingerprint
     S5_CHECKPOINT_INTERVAL,  # D2409: intra-stage incremental checkpoint cadence (FBs)
-    S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
+    S5_EVIDENCE_CONTAMINATION_RATIO,  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (C12 config-first)
     S5_NLI_MAX_HYPOTHESIS_CHARS,  # D2321: hypothesis(definition) truncation for NLI pairing
     S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
+    S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
-    S5_EVIDENCE_CONTAMINATION_RATIO,  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (C12 config-first)
     S5_QUARANTINE_CONF_CAP,  # noqa: F401  re-exported: tests/test_fail_closed_d2402_2405.py asserts against it  # D2310: confidence cap for QUARANTINE
+    SCHEMA_VERSION,  # D2485: S5 input fingerprint
     STAGE4_5_CHECKPOINT,  # F1/D2400: enriched S4 checkpoint (preferred when present)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
-    SCHEMA_VERSION,  # D2485: S5 input fingerprint
     TAXONOMY_VERSION,  # D2485: S5 input fingerprint
-    GEN_MODEL,  # D2485: S5 input fingerprint (generator identity)
     VERIFY_MODEL,  # D2485: S5 input fingerprint (classifier identity)
 )
-from pipeline.pipeline_paths import _CFG  # D2405: C12 config-first threshold source
-from pipeline.pipeline_paths import PROJECT_ROOT  # D-330: repo root for the path-scoped S5 fingerprint
 
 # fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
 # deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
 from pipeline.stamp import get_manifest_hash, get_pipeline_commit  # D2485: manifest fingerprint
-from pipeline.practicality import classify_practicality  # D2622: advisory applicability tier (C21 swappable backend)
+
+# classify_practicality / derive_* are NO LONGER IMPORTED HERE: they are asked by the ONE home of the
+# per-record sequence (pipeline/verify_record.py, T-196/D-3136). S5 imports the home, not the rules.
 
 # ── Constants ──────────────────────────────────────────────────────────────
 NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2298: from config (0.10, calibrated)
@@ -226,7 +223,7 @@ def _b2_majority_verdict(
     _n_clean = len(entail_scores)
     _n_entail = sum(1 for s in entail_scores if s >= thresh)
     _n_contra = sum(
-        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores)
+        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores, strict=True)
         if c > e and c > u
     )
     _entail_ratio = _n_entail / _n_clean if _n_clean else 0.0
@@ -280,7 +277,7 @@ def _or_entail_and_no_contra_verdict(
     _n_clean = len(entail_scores)
     _n_entail = sum(1 for s in entail_scores if s >= thresh)
     _n_contra = sum(
-        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores)
+        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores, strict=True)
         if c > e and c > u
     )
     if _n_entail >= 1 and _n_contra == 0:
@@ -342,7 +339,7 @@ def _paraphrase_similarity(definition: str, evidence_passages: list[str]) -> flo
     _def_v = list(_vecs[0])
     _best = 0.0
     for _row in _vecs[1:]:
-        _cos = sum(_a * _b for _a, _b in zip(_def_v, list(_row)))
+        _cos = sum(_a * _b for _a, _b in zip(_def_v, list(_row), strict=True))
         _best = max(_best, _cos)
     return _best
 
@@ -434,7 +431,7 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     if not _passed and PARAPHRASE_PATH_ENABLED:
         _n_entail = sum(1 for s in _entail_scores if s >= PARAPHRASE_ENTAIL_THRESHOLD)
         _n_contra = sum(
-            1 for (e, c, u) in zip(_entail_scores, _contra_scores, _neutral_scores)
+            1 for (e, c, u) in zip(_entail_scores, _contra_scores, _neutral_scores, strict=True)
             if c > e and c > u
         )
         _no_contra_ok = (not PARAPHRASE_REQUIRE_NO_CONTRA) or (_n_contra == 0)
@@ -907,7 +904,7 @@ def _adopt_fingerprint() -> int:
     bad = {k: {"stored": stored.get(k), "current": cur.get(k)} for k in substantive
            if stored.get(k) != cur.get(k)}
     if bad:
-        print(f"🛑 REFUSING to adopt (D-330): substantive S5 inputs differ — this checkpoint is NOT about the same input")
+        print("🛑 REFUSING to adopt (D-330): substantive S5 inputs differ — this checkpoint is NOT about the same input")
         for k, v in bad.items():
             print(f"     {k}: stored={v['stored']!r} current={v['current']!r}")
         print("   → the checkpoint must re-verify (run without --adopt-fingerprint).")
@@ -1161,117 +1158,24 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         print(f"  [{i}/{total}] {name}", end=" ")
 
         start = time.time()
-        results = []
 
-        # 1. Mechanism quality pre-filter (regex, tautology detection)
-        mech_passed, mech_score_float, mech_detail = check_mechanism_quality(fb)
-        results.append({
-            "check_name": "mechanism_quality",
-            "passed": mech_passed,
-            "score": mech_score_float,
-            "detail": mech_detail,
-        })
+        # T-196/D-3136 (MEASURED 2026-10-23): this loop body WAS the rule, and three other writers copied it —
+        # four copies, four behaviours (BUG-978 holes 1-6, BUG-979, BUG-980, BUG-981). The sequence now has ONE
+        # home and S5 asks it like every other writer does. `run_stage5` owns only what is S5-specific: the
+        # evidence-cleanliness population, the `--strict` posture, the per-record progress line and the
+        # checkpoint. Imported INSIDE the function: `verify_record` imports this module for the instruments, so a
+        # module-level import here would be a cycle.
+        from pipeline.verify_record import verify_one_record
 
-        # 2. Dual-encoder factual check
-        fact_passed: bool = True
-        fact_score: float = 1.0
-        fact_detail: str = "No verification needed"
-
-        method: str = "deberta-nli"
-
-        if fb.get("classification_status") == "FAILED":
-            # D2405: S4 classification failure must NEVER PASS — force QUARANTINE, skip NLI
-            fact_passed = False
-            fact_score = 0.0
-            fact_detail = f"S4 classification FAILED: {str(fb.get('classification_error', 'unknown'))[:120]}"
-            method = "classification_failed"
-        elif fb.get("fb_id") in severe_evidence_ids:
-            # D2496/BUG-181#1: contaminated evidence → QUARANTINE, skip NLI
-            fact_passed = False
-            fact_score = 0.0
-            fact_detail = "BUG-181#1: evidence_passages carry EPUB→MD conversion artifacts — QUARANTINE (no NLI)"
-            method = "evidence_contaminated"
-        elif not mech_passed:
-            # Tautological mechanism → auto-quarantine
-            fact_passed = False
-            fact_score = 0.0
-            fact_detail = f"MECH FAIL: {mech_detail}"
-            method = "mech_quality"
-
-        else:
-            # D2298: DeBERTa-only NLI (RoBERTa removed — zero signal on paraphrase evidence)
-            try:
-                fact_passed, fact_score, fact_detail = deberta_check(fb)
-                method = "deberta-nli"
-            except Exception as e:
-                fact_passed = False
-                fact_score = 0.0
-                fact_detail = f"Dual-encoder error — QUARANTINE: {e}"
-
-        results.append({
-            "check_name": "factual",
-            "passed": fact_passed,
-            "score": fact_score,
-            "detail": fact_detail,
-        })
-
-        # 2b. D2277: Enrichment verification — light check that S4 fields don't contradict core
-        enrich_passed, enrich_score, enrich_detail = _check_enrichment_quality(fb)
-        if not enrich_passed:
-            results.append({
-                "check_name": "enrichment_quality",
-                "passed": enrich_passed,
-                "score": enrich_score,
-                "detail": enrich_detail,
-            })
-
-        # 3. Determine status — DeBERTa-only (D2322 calibrated), via the single
-        #    serving-gate rule (D274h): status is a function of the verification record.
-        status, s5_reason = derive_status(results)
-
-        # Handle strict mode: any non-PASS → QUARANTINE
-        if strict and status != "PASS":
-            status = "QUARANTINE"
-
+        outcome = verify_one_record(fb, severe_evidence_ids=severe_evidence_ids, strict=strict)
+        status = outcome.status
         stats[status] += 1
 
-        # D2310: ISOR computed BEFORE confidence (confidence uses ISOR, not NLI).
-        from pipeline.schema_accessor import isor_score as _isor_score
-        isor = _isor_score(fb)
-
-        # D2310 / BUG-502: the score axis (confidence + human-review flag) has ONE home -
-        # pipeline/serving_gate.py::derive_conf_and_review. It used to be retyped here AND in
-        # scripts/reinject_bug198_singletons.py (two truths for one rule). MEASURED 2026-09-25: the
-        # ONE home reproduces the stored confidence_score 7,995/7,995 and the stored
-        # needs_human_review 7,995/7,995 (scripts/check_s5_score_axis.py).
-        confidence_score, needs_human = derive_conf_and_review(
-            fact_passed, mech_score_float, enrich_score, isor
-        )
-
         # Build verified FB. R14/C10: preserve generator provenance from Stage 4
-        # (gen_model stays = generator); verifier identity is captured in verifier_model below.
+        # (gen_model stays = generator); verifier identity is captured in verifier_model by the home.
         vfb = dict(fb)
         vfb["pipeline_commit"] = pipeline_commit
-        vfb["verification_results"] = results
-        vfb["confidence_score"] = confidence_score
-        vfb["status"] = status
-        vfb["s5_reason"] = s5_reason
-        vfb["needs_human_review"] = needs_human
-        vfb["verifier_model"] = f"{S5_NLI_MODEL_LARGE} (threshold {S5_NLI_PASS_THRESHOLD})"
-        vfb["verification_method"] = method
-
-        # D2284 epistemic label — BUG-499: this was the THIRD inline copy of the rule (the other two
-        # were the S5 checkpoint sync and the BUG-198 re-inject). The rule now has ONE home
-        # (pipeline/serving_gate.py::derive_epistemic_status) and its rating classes are declared in
-        # config/serving_gate.yaml (C12 / C21). Behaviour is unchanged: the config rules reproduce
-        # these branches in the same order — proved by re-deriving all 7,995 stored labels, 0 mismatch.
-        vfb["epistemic_status"] = derive_epistemic_status(fact_passed, isor["rating"])
-        vfb["isor"] = isor  # D2284: Full ISOR scores embedded in verified FB
-        # D2622: advisory applicability tier (immediately-applicable | context-dependent | abstract).
-        # This is an ADVISORY soft-facet for query-time re-ranking — it NEVER drops or
-        # quarantines an FB (status is derived above, independent of practicality). C16:
-        # a missing/malformed config/practicality.yaml raises here (fail-loud), not silently.
-        vfb["practicality"] = classify_practicality(fb)
+        vfb.update(outcome.checkpoint_cells())
 
         elapsed = time.time() - start
         icon = {"PASS": "✅", "QUARANTINE": "🚫"}.get(status, "❓")

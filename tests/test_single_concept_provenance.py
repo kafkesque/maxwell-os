@@ -140,7 +140,14 @@ def test_the_epistemic_label_is_CO_DERIVED_not_declared() -> None:
     (BUG-502's class) and `check_serving_gate` would refuse the row, which is exactly how this hole was found.
     """
     source = SITE.read_text(encoding="utf-8")
-    assert "derive_epistemic_status(" in source, "the co-derived label is no longer derived at the write site"
+    # T-196/D-3136: the rule now has ONE home, so the write site no longer names the deriver itself — it asks
+    # the per-record sequence, and the sequence asks the deriver. The invariant is unchanged and is asserted at
+    # BOTH ends: the site must call the home, and the home must call the rule.
+    assert "verify_one_record(" in source, "the write site no longer asks the ONE verification home"
+    home = (SITE.parent.parent / "pipeline" / "verify_record.py").read_text(encoding="utf-8")
+    assert "derive_epistemic_status(" in home, (
+        "the co-derived label is no longer derived anywhere: neither the write site nor the ONE home asks the rule"
+    )
     assert '"epistemic_status"' not in source.replace("fb[\"epistemic_status\"]", ""), (
         "epistemic_status reappeared as a DECLARED literal — it is derived from the record, never declared"
     )

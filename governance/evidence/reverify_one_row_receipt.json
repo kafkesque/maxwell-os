@@ -1,8 +1,20 @@
 {
-  "backup": "knowledge pipeline/backups/maxwell.db.pre_reverify_20261023_184413",
+  "backup": "knowledge pipeline/backups/maxwell.db.pre_reverify_20261023_192119",
   "bug": "BUG-979",
   "fb_id": "f523504ee9030e02bd02d5ca6ba6a5f9e174b217b83e805e73025323b44cc31d",
   "fresh": {
+    "cells": {
+      "confidence_score": 0.25,
+      "epistemic_status": "speculative",
+      "isor": "{\"score\": 0.167, \"rating\": \"weak\", \"n_sources\": 1, \"n_authors\": 0, \"n_domains\": 1, \"author_score\": 0.0, \"domain_score\": 0.333, \"count_score\": 0.333, \"detail\": \"ISOR weak: 0 authors, 1 domains, 1 sources \\u2192 composite 0.167\"}",
+      "needs_human_review": 0,
+      "practicality": "abstract",
+      "s5_reason": "vacuous",
+      "status": "QUARANTINE",
+      "verification_method": "mech_quality",
+      "verification_results": "[{\"check_name\": \"mechanism_quality\", \"passed\": false, \"score\": 0.0, \"detail\": \"Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}, {\"check_name\": \"factual\", \"passed\": false, \"score\": 0.0, \"detail\": \"MECH FAIL: Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}]",
+      "verifier_model": "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (threshold 0.5)"
+    },
     "confidence": 0.25,
     "enrich": 1.0,
     "epistemic_status": "speculative",
@@ -27,35 +39,36 @@
     "status": "QUARANTINE",
     "verification_method": "mech_quality"
   },
-  "generated": "2026-10-23T18:44:14",
+  "generated": "2026-10-23T19:21:20",
   "name": "The Kernel of Strategy",
   "post": {
     "confidence_score": 0.25,
     "epistemic_status": "speculative",
+    "isor": "{\"score\": 0.167, \"rating\": \"weak\", \"n_sources\": 1, \"n_authors\": 0, \"n_domains\": 1, \"author_score\": 0.0, \"domain_score\": 0.333, \"count_score\": 0.333, \"detail\": \"ISOR weak: 0 authors, 1 domains, 1 sources \\u2192 composite 0.167\"}",
     "needs_human_review": 0,
+    "practicality": "abstract",
     "s5_reason": "vacuous",
     "status": "QUARANTINE",
     "verification_method": "mech_quality",
-    "verification_results": "[{\"check_name\": \"mechanism_quality\", \"passed\": false, \"score\": 0.0, \"detail\": \"Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}, {\"check_name\": \"factual\", \"passed\": false, \"score\": 0.0, \"detail\": \"MECH FAIL: Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}]"
+    "verification_results": "[{\"check_name\": \"mechanism_quality\", \"passed\": false, \"score\": 0.0, \"detail\": \"Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}, {\"check_name\": \"factual\", \"passed\": false, \"score\": 0.0, \"detail\": \"MECH FAIL: Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}]",
+    "verifier_model": "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (threshold 0.5)"
   },
   "pre": {
-    "confidence_score": 0.9885,
-    "epistemic_status": "source-supported",
+    "confidence_score": 0.25,
+    "epistemic_status": "speculative",
+    "isor": "{\"score\": 0.0, \"rating\": \"weak\", \"n_sources\": 0, \"n_authors\": 0, \"n_domains\": 0, \"detail\": \"No source ids\"}",
     "needs_human_review": 0,
-    "s5_reason": "entail",
-    "status": "PASS",
-    "verification_method": "deberta-nli",
-    "verification_results": "[{\"check_name\": \"factual\", \"passed\": true, \"score\": 0.9885, \"detail\": \"ENTAIL (OR-entail + AND-no-contra): 1/1 entail, 0 contra, max=0.99\"}]"
+    "practicality": "abstract",
+    "s5_reason": "vacuous",
+    "status": "QUARANTINE",
+    "verification_method": "mech_quality",
+    "verification_results": "[{\"check_name\": \"mechanism_quality\", \"passed\": false, \"score\": 0.0, \"detail\": \"Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}, {\"check_name\": \"factual\", \"passed\": false, \"score\": 0.0, \"detail\": \"MECH FAIL: Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}]",
+    "verifier_model": "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (threshold 0.5)"
   },
   "schema_version": 1,
   "stats": {
     "changed": [
-      "verification_results",
-      "confidence_score",
-      "epistemic_status",
-      "status",
-      "s5_reason",
-      "verification_method"
+      "isor"
     ],
     "verified_in_transaction": true
   },

@@ -43,17 +43,11 @@ from pipeline.pipeline_paths import (  # noqa: E402
     S4_DEPTH_FOCUSED_CLASSIFICATION,
     S4_DEPTH_MAX_TOKENS,
     S4_TEMPORAL_SIGNALS,
-    S5_QUARANTINE_CONF_CAP,
     VERIFY_MODEL,
     VERIFY_REASONING_OFF_MODELS,
     VERIFY_REASONING_OFF_PREFIX,
 )
 from pipeline.omlx_call import call_omlx  # noqa: E402
-from pipeline.serving_gate import (  # noqa: E402  D274h / BUG-499 / BUG-502: ONE rule
-    derive_conf_and_review,
-    derive_epistemic_status,
-    derive_status,
-)
 from pipeline.schemas import (  # noqa: E402
     CANONICAL_DISCIPLINES,
     CANONICAL_DOMAINS,
@@ -75,14 +69,8 @@ from pipeline.stage4_merged_call import (  # noqa: E402
     classify_depth_focused,
 )
 from pipeline.intimacy_lattice import derive_context, resolve_intimacy  # noqa: E402
+from pipeline.stage5_verify import _load_dual_encoders  # noqa: E402
 from pipeline.stamp import stamp_record  # noqa: E402
-from pipeline.stage5_verify import (  # noqa: E402
-    _check_enrichment_quality,
-    _load_dual_encoders,
-    check_mechanism_quality,
-    deberta_check,
-)
-from pipeline.schema_accessor import isor_score  # noqa: E402
 from pipeline.stage6_commit import init_db, insert_fb  # noqa: E402
 
 RECOVERED = Path("knowledge pipeline/stage2_extract/t11/recovered_singletons.jsonl")
@@ -327,66 +315,25 @@ def _classify_s4(fb_data: dict) -> dict:
 
 
 def _verify_s5(fb: dict) -> dict:
-    """Run the S5 verification (mechanism + enrichment + DeBERTa NLI + ISOR).
+    """Return the verified FB by asking the ONE home of S5's per-record sequence (T-196/D-3136).
 
-    Mirrors the stage5_verify.py per-FB loop body exactly. Returns the verified FB.
+    WHY THIS IS A CALL AND NOT A COPY (MEASURED 2026-10-23). This function used to MIRROR
+    `stage5_verify.py`'s loop body "exactly", and the mirror had drifted three ways: it had no
+    evidence-contamination short-circuit (BUG-181#1), it never wrote the `practicality` facet (BUG-981), and it
+    hardcoded a verifier identity naming `threshold 0.10` — a threshold D-2863 had already moved to 0.5, so the
+    row would have named a rule it was not run under. A copy is not a mirror; it is a second truth.
+
+    Args:
+        fb: the S4 record to verify.
+
+    Returns:
+        `fb` extended with the checkpoint face of the verification outcome (native list/dict/bool, the shape the
+        S5 checkpoint and `insert_fb` both accept) plus its provenance stamp.
     """
-    results = []
-
-    mech_passed, mech_score_float, mech_detail = check_mechanism_quality(fb)
-    results.append({"check_name": "mechanism_quality", "passed": mech_passed, "score": mech_score_float, "detail": mech_detail})
-
-    fact_passed: bool
-    fact_score: float
-    fact_detail: str
-    method: str = "deberta-nli"
-
-    if fb.get("classification_status") == "FAILED":
-        fact_passed = False
-        fact_score = 0.0
-        fact_detail = f"S4 classification FAILED: {str(fb.get('classification_error', 'unknown'))[:120]}"
-        method = "classification_failed"
-    elif not mech_passed:
-        fact_passed = False
-        fact_score = 0.0
-        fact_detail = f"MECH FAIL: {mech_detail}"
-        method = "mech_quality"
-    else:
-        try:
-            fact_passed, fact_score, fact_detail = deberta_check(fb)
-            method = "deberta-nli"
-        except Exception as e:
-            fact_passed = False
-            fact_score = 0.0
-            fact_detail = f"Dual-encoder error — QUARANTINE: {e}"
-
-    results.append({"check_name": "factual", "passed": fact_passed, "score": fact_score, "detail": fact_detail})
-
-    enrich_passed, enrich_score, enrich_detail = _check_enrichment_quality(fb)
-    if not enrich_passed:
-        results.append({"check_name": "enrichment_quality", "passed": enrich_passed, "score": enrich_score, "detail": enrich_detail})
-
-    status, s5_reason = derive_status(results)  # D274h: the single serving-gate rule
-
-    isor = isor_score(fb)
-
-    # BUG-502: this was a verbatim SECOND copy of the S5 score axis - now the ONE home.
-    confidence_score, needs_human = derive_conf_and_review(
-        fact_passed, mech_score_float, enrich_score, isor
-    )
+    from pipeline.verify_record import verify_one_record
 
     vfb = dict(fb)
-    vfb["verification_results"] = results
-    vfb["confidence_score"] = confidence_score
-    vfb["status"] = status
-    vfb["s5_reason"] = s5_reason
-    vfb["needs_human_review"] = needs_human
-    vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold 0.10)"
-    vfb["verification_method"] = method
-
-    # BUG-499: this was the third inline copy of the D2284 rule - now the one home (C21).
-    vfb["epistemic_status"] = derive_epistemic_status(fact_passed, isor["rating"])
-    vfb["isor"] = isor
+    vfb.update(verify_one_record(fb).checkpoint_cells())
     return vfb
 
 

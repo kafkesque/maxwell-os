@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**260 open** / 485 closed of 745 ids.
+**260 open** / 487 closed of 747 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |

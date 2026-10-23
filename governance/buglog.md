@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 745 bugs (260 open / 485 closed; highest OPEN = BUG-976) · 59 open tasks (MUST 11 / SHOULD 44 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 747 bugs (260 open / 487 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
@@ -21,7 +21,7 @@
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 > | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) EXECUTED 2026-10-23 (BUG-974 fix live): the p |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -38,7 +38,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -20330,3 +20330,54 @@ Found while closing BUG-979, in the SAME file that BUG-978 fixed. Two defects, b
 `stage5.fingerprint_files` (an edit invalidates the S5 checkpoint fail-closed) and a faithful extraction of a
 five-branch verification loop needs its own red loop first (D-3036). **T-196** is that task. Until then the
 duplication is DECLARED in both places, with the 2,086/2,086 measurement as the invariant a control can check.
+
+## BUG-982 (MED — FIXED 2026-10-23) — ISOR was blind on the store's JSON-TEXT `source_ids`: a one-source row measured `n_sources=0`
+
+Found while extracting the verification sequence into its one home (T-196/D-3136), by repairing a real row and
+reading what came back. `pipeline/schema_accessor.fb_source_ids` accepts a LIST; the store persists `source_ids` as
+JSON TEXT, exactly as it persists `evidence_passages`. `scripts/reverify_one_row.py` hydrated `evidence_passages`
+and `evidence_passages_shown` (BUG-979's fix) but not `source_ids`, so the ISOR computation fell through to
+`source_books` (empty) and produced `{"score": 0.0, "n_sources": 0, ...}` for row `f523504e` — a row whose
+`source_ids` column holds `["b51204ce6c6a9950"]`.
+
+**MEASURED, in two steps, because the first write was wrong and had to be re-derived.** (1) The first `--apply`
+wrote `n_sources=0` (a blind value). (2) With the input contract enforced inside the home, the same repair
+re-derived `{"score": 0.167, "n_sources": 1, "n_authors": 0, "n_domains": 1, "rating": "weak"}` and wrote it. The
+value is not cosmetic: ISOR is 0.4 of the score axis' weight and it selects the epistemic label's rating class, so a
+blind ISOR is a blind confidence and a blind label.
+
+**FIX.** The contract moved from the caller into the rule: `pipeline/verify_record.py::hydrate_json_lists` parses
+every declared list column (`evidence_passages`, `evidence_passages_shown`, `source_ids`, `source_books`) and FAILS
+CLOSED on unparseable text; `verify_one_record` applies it before any check runs; `scripts/reverify_one_row.py` now
+imports that one function instead of carrying its own. `scripts/check_verification_sequence.py` asserts a
+store-shaped fixture derives the same `n_sources` and the same confidence as a native one, so a future reader that
+forgets the contract fails the ladder instead of writing a quiet zero.
+
+**SCOPE CHECKED, NOT ASSUMED (D-3034).** The other live `isor_score` callers were read, not suspected:
+`scripts/sync_s5_checkpoint_from_db.py` parses its JSON list fields by declared key before calling it, and
+`scripts/check_corroboration_collapse.py` coerces JSON-array TEXT in `fetch_population` — both correct as written.
+So this was ONE defective reader, and the fix is in the home that makes the next one impossible.
+
+## BUG-983 (MED — FIXED 2026-10-23) — the tier-B proposer declared its bounds and read them with silent code defaults
+
+Found by `scripts/check_config_defaults.py --check` while closing T-196, and it was ALREADY RED before today's work.
+`scripts/propose_tier_b.py` carries the docstring "Every value here is config (C12) — the script hardcodes nothing,
+not even the model name", and then read five DECLARED keys as `proposer.get(key, <literal>)`:
+`pilot_sources`, `max_window_chars` (default 6000), `max_windows_per_source` (4), `max_candidates_per_source` (15),
+`skip_existing_tier_a` (True). MEASURED: the shadowed-declared debt 300 → **305**, i.e. the ladder failed on a
+promise the file itself made. The failure mode is silent by construction — move, rename or delete the declaration and
+the script keeps running on a number nobody declared, which is exactly the C12→C12d class the owner keeps naming.
+
+**FIX (no ceiling touched).** A loud reader `_req(block, key)` refuses an absent key (`RuntimeError`, configuration
+error) and every one of the five reads goes through it; the dry-run now also PRINTS `skip_existing_tier_a`, because a
+declared bound that is read but never shown is a bound nobody can check. MEASURED AFTER: shadowed-declared back to
+**300** (the receipt's ceiling, unchanged — D-2644: a ceiling may only be LOWERED, and the fix landed UNDER it), the
+census re-recorded once for the mechanical fields the contract compares (`sites` 581→575, `modules` 626→640 — the new
+module is `pipeline/verify_record.py`), selftest green, `--dry-run` resolves all three pilot sources.
+
+**THE SECOND ORDER FINDING, recorded because it is a rail defect and not a bug.** The R5 gate's `c11_c12` layer
+printed `❌ C11 import⊂requirements: Undeclared imports:` with an EMPTY list, on two different files, twice. A
+finding that cannot NAME its evidence is the rail-registry's class (ii) — the printed verdict and the exit code
+disagree — and it is filed here rather than fixed, because the honest repair is to make the layer print the names it
+counted (or nothing at all). The pre-existing `mobi` finding it used to print is unchanged and still open under its
+own name.

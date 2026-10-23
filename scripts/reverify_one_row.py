@@ -14,11 +14,13 @@ own check functions (pipeline/stage5_verify.py), the SAME instrument the single-
 No rule is minted here and no model is consulted beyond the declared local NLI check (C1/D343: deterministic,
 LLM-free).
 
-WHAT IT MAY WRITE (declared, minimal). verification_results, confidence_score, needs_human_review, epistemic_status
-- the record and the two halves of the score axis plus the label that is CO-DERIVED from the same record
-(serving_gate.derive_epistemic_status, the ONE home). `status` and `s5_reason` are the S5 AGGREGATION's outputs and
-are NEVER written here: if the fresh factual verdict DISAGREES with the stored one, the tool REFUSES and names the
-row, because that row needs a full re-verification, not a cell edit.
+WHAT IT MAY WRITE (declared, T-196/D-3136). The STORE FACE of the ONE verification home
+(pipeline/verify_record.py::verify_one_record → store_cells()): the record, the score axis (confidence +
+review flag), the label co-derived from the same record, the ISOR payload the axis consumed, the facet tier and the
+verifier identity. It writes no subset of its own: a hand-picked subset is how this tool used to write a confidence
+derived WITH an ISOR rating beside a BLANK `isor` cell. `status` and `s5_reason` remain the AGGREGATION's outputs -
+if the fresh factual verdict DISAGREES with the stored one, the tool REFUSES and names the row, because that row
+needs a full re-verification, not a cell edit (a verdict change is available only through --allow-verdict-change).
 
 SAFETY. Dry-run is the default. --apply takes a C13 SQLite backup, opens ONE BEGIN IMMEDIATE, re-reads and
 re-derives the post-state INSIDE the transaction (D-2970) and commits only when every derived cell agrees.
@@ -43,73 +45,33 @@ ROOT: Path = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from pipeline.pipeline_paths import DB_PATH  # noqa: E402
-from pipeline.serving_gate import (  # noqa: E402
-    content_types_without_factual_claim,
-    derive_conf_and_review,
-    derive_epistemic_status,
-)
-from pipeline.stage5_verify import (  # noqa: E402
-    _check_enrichment_quality,
-    check_mechanism_quality,
-    deberta_check,
-)
+from pipeline.serving_gate import content_types_without_factual_claim  # noqa: E402
+from pipeline.verify_record import hydrate_json_lists as hydrate  # noqa: E402
+from pipeline.verify_record import verify_one_record  # noqa: E402
 
+RECEIPT: Path = ROOT / "governance" / "evidence" / "reverify_one_row_receipt.json"
+
+# T-196/D-3136: the ONE home of the sequence (this tool no longer asks the checks itself).
+#: The write set IS the home's store face (T-196/D-3136): the record, the score axis (whose inputs include ISOR,
+#: so a confidence derived WITH an ISOR rating may not be written beside a blank `isor` — D279 quartet atomicity),
+#: the label co-derived from the same record, the facet tier and the verifier identity. A hand-picked subset was
+#: how this tool left `isor` blank while writing a confidence that had consumed it.
 WRITE_COLUMNS: tuple[str, ...] = ("verification_results", "confidence_score", "needs_human_review",
-                                  "epistemic_status", "status", "s5_reason", "verification_method")
+                                  "epistemic_status", "status", "s5_reason", "verification_method",
+                                  "isor", "practicality", "verifier_model")
 # THE INPUT CONTRACT OF THE CHECKS, MEASURED (BUG-979 owed item 2). The store keeps these two columns as JSON TEXT;
 # pipeline/schema_accessor.fb_source_texts accepts only a LIST, so a raw store row makes the NLI check answer
 # "No evidence — QUARANTINE" for a row that plainly HAS evidence (MEASURED 2026-10-23 on f523504e: stored
 # passed=True, re-run passed=False, detail "No evidence"). A re-verification must therefore HYDRATE the row first.
-JSON_LIST_COLUMNS: tuple[str, ...] = ("evidence_passages", "evidence_passages_shown")
-RECEIPT: Path = ROOT / "governance" / "evidence" / "reverify_one_row_receipt.json"
-
-
-def _isor(raw: object) -> dict[str, Any]:
-    """Return the row's ISOR payload as a mapping; a blank/absent value is the declared empty mapping."""
-    if isinstance(raw, dict):
-        return raw
-    text = str(raw or "").strip()
-    if not text:
-        return {}
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError as exc:  # C16: loud, never silently an empty score
-        raise SystemExit(f"FAIL-CLOSED: isor is not parseable JSON: {text[:80]!r}") from exc
-    return parsed if isinstance(parsed, dict) else {}
-
-
-def hydrate(fb: dict[str, Any]) -> dict[str, Any]:
-    """Decode the JSON-LIST columns a store row carries as TEXT, so the checks read the shape they declare.
-
-    Args:
-        fb: a row as read from the store (JSON columns still TEXT).
-
-    Returns:
-        The same mapping with every JSON_LIST_COLUMNS value decoded into a list (an absent/blank value stays as-is).
-
-    Raises:
-        SystemExit: when a declared JSON column is not parseable (C16: never silently "no evidence").
-    """
-    out = dict(fb)
-    for col in JSON_LIST_COLUMNS:
-        value = out.get(col)
-        if isinstance(value, str) and value.strip().startswith("["):
-            try:
-                out[col] = json.loads(value)
-            except json.JSONDecodeError as exc:
-                raise SystemExit(f"FAIL-CLOSED: {col} is not parseable JSON: {value[:80]!r}") from exc
-    return out
-
-
 def compute(fb: dict[str, Any]) -> dict[str, Any]:
-    """Run the S5 checks over one stored row and derive the axis from what they say.
+    """Ask the ONE verification home what this row's record is, and return it in a flat, printable shape.
 
     Args:
-        fb: the FULL row (a column subset makes the enrichment check read empty fields and invents a defect).
+        fb: the FULL row (a column subset makes the checks and the derivers grade empty fields — BUG-979).
 
     Returns:
-        {"results": [...], "fact_passed": bool, "mech_score": float, "enrich": float,
-         "confidence": float, "needs_review": bool, "epistemic_status": str}
+        {"results", "fact_passed", "mech_score", "enrich", "confidence", "needs_review", "epistemic_status",
+         "status", "s5_reason", "verification_method", "cells"} where `cells` is the STORE face of the record.
 
     Raises:
         SystemExit: when the row's role is declared as carrying no factual claim (the axis is ABSENT by D-2942).
@@ -117,28 +79,13 @@ def compute(fb: dict[str, Any]) -> dict[str, Any]:
     if str(fb.get("content_type") or "") in content_types_without_factual_claim():
         raise SystemExit("REFUSED: this role is declared as carrying NO factual claim - its score axis is ABSENT "
                          "by design (D-2942/D-2957) and must never be manufactured here")
-    mech_passed, mech_score, mech_detail = check_mechanism_quality(fb)
-    if mech_passed:
-        fact_passed, fact_score, fact_detail, method = *deberta_check(fb), "deberta-nli"
-    else:
-        # BUG-980: the SAME ordering S5 declares - a failed mechanism gate IS the factual verdict, the NLI is never
-        # asked (stage5_verify.py). MEASURED 2026-10-23: 2,086/2,086 stored rows with mechanism_quality=false are
-        # QUARANTINE, so any other outcome would be a state the store has never held.
-        fact_passed, fact_score, fact_detail, method = False, 0.0, f"MECH FAIL: {mech_detail}", "mech_quality"
-    results = [
-        {"check_name": "mechanism_quality", "passed": bool(mech_passed), "score": float(mech_score), "detail": str(mech_detail)},
-        {"check_name": "factual", "passed": bool(fact_passed), "score": float(fact_score), "detail": str(fact_detail)},
-    ]
-    _ok, enrich, _detail = _check_enrichment_quality(fb)
-    isor = _isor(fb.get("isor"))
-    confidence, needs_review = derive_conf_and_review(bool(fact_passed), float(mech_score), float(enrich), isor)
-    from pipeline.serving_gate import derive_status  # PLC0415: the ONE home of (status, s5_reason)
-
-    status, s5_reason = derive_status(json.dumps(results))
-    return {"results": results, "fact_passed": bool(fact_passed), "mech_score": float(mech_score),
-            "enrich": float(enrich), "confidence": confidence, "needs_review": needs_review,
-            "epistemic_status": derive_epistemic_status(bool(fact_passed), isor.get("rating")),
-            "status": status, "s5_reason": s5_reason, "verification_method": method}
+    outcome = verify_one_record(fb)
+    return {"results": outcome.verification_results, "fact_passed": outcome.fact_passed,
+            "mech_score": outcome.mech_score, "enrich": outcome.enrich_score,
+            "confidence": outcome.confidence_score, "needs_review": outcome.needs_human_review,
+            "epistemic_status": outcome.epistemic_status, "status": outcome.status,
+            "s5_reason": outcome.s5_reason, "verification_method": outcome.verification_method,
+            "cells": outcome.store_cells()}
 
 
 def stored_factual(fb: dict[str, Any]) -> dict[str, Any] | None:
@@ -159,9 +106,7 @@ def decide(fb: dict[str, Any]) -> dict[str, Any]:
     """
     fresh = compute(hydrate(fb))
     pre = {c: fb.get(c) for c in WRITE_COLUMNS}
-    post = {"verification_results": json.dumps(fresh["results"]), "confidence_score": fresh["confidence"],
-            "needs_human_review": 1 if fresh["needs_review"] else 0, "epistemic_status": fresh["epistemic_status"],
-            "status": fresh["status"], "s5_reason": fresh["s5_reason"], "verification_method": fresh["verification_method"]}
+    post = {c: fresh["cells"][c] for c in WRITE_COLUMNS}
     changed = [c for c in WRITE_COLUMNS if str(pre[c]) != str(post[c])]
     verdict_changed = str(pre.get("status")) != str(post["status"])
     return {"pre": pre, "post": post, "fresh": fresh, "changed": changed, "verdict_changed": verdict_changed}
@@ -213,11 +158,10 @@ def selftest() -> int:
     checks: list[tuple[str, bool]] = [
         ("a record with only `factual` is exactly the BUG-979 shape", stored_factual(row([fact])) == fact),
         ("a record with NO factual check returns None (never an invented one)", stored_factual(row([])) is None),
-        ("the write set is DECLARED: every cell of the S5 outcome, and nothing outside it",
+        ("the write set is DECLARED: every cell of the home's store face, and nothing outside it",
          WRITE_COLUMNS == ("verification_results", "confidence_score", "needs_human_review", "epistemic_status",
-                           "status", "s5_reason", "verification_method")),
-        ("an unparseable ISOR payload FAILS CLOSED, not silently empty",
-         _raises(lambda: _isor("{not json"))),
+                           "status", "s5_reason", "verification_method", "isor", "practicality",
+                           "verifier_model")),
         ("a role with no factual claim is REFUSED (its axis is ABSENT by design)",
          _raises(lambda: compute({"content_type": sorted(content_types_without_factual_claim())[0]}))),
         ("a store row's JSON-TEXT evidence_passages is HYDRATED to a list (the shape the checks declare)",

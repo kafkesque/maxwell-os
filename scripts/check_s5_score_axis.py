@@ -214,7 +214,10 @@ def main() -> int:
         f"isor={S5_CONF_ISOR_WEIGHT} cap={S5_QUARANTINE_CONF_CAP} human_review_isor={S5_HUMAN_REVIEW_ISOR!r}"
         " (config/pipeline_config.yaml#stage5.confidence - BUG-504: no silent code default)"
     )
-    print("   ONE home: pipeline/serving_gate.py::derive_conf_and_review, imported by stage5_verify and reinject_bug198_singletons")
+    print(
+        "   ONE home: pipeline/serving_gate.py::derive_conf_and_review — the ONLY definition; no writer re-types "
+        "the axis (T-196/D-3136: the per-record sequence that asks it is pipeline/verify_record.py)"
+    )
     return EXIT_OK
 
 

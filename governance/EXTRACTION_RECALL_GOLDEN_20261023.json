@@ -2,15 +2,17 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-GOLDEN",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "ce6fba3",
+  "pipeline_commit": "015f673",
   "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
   "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated against the source, not copied from extractor output",
-  "tier_b": "NOT MEASURED: concepts the owner never certified, i.e. omissions, cannot be counted here - recall at the floor is a LOSS proof, never a completeness proof",
+  "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
+  "tier_b_rows": [],
   "authority": {
     "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
-    "sha256": "ea95c279e7cb7aa05d6587def3092612af3824d6dab20edae340d6af6c90b890"
+    "sha256": "bcfeeaa51ff0a13016acf8e093f39913b0f14fbd190cd2e9c92b7dae2ede9660"
   },
   "counts": {
+    "certifications": 45,
     "concepts": 44,
     "expectations": 418,
     "distinct_sources": 338
@@ -432,6 +434,18 @@
         "2688c4e67ee3ca71"
       ],
       "content_type": "principle"
+    },
+    {
+      "item_id": "R098",
+      "name": "Visual Sketching and Iteration Process",
+      "concept_key": "6b78c878f9a7c27894ee643cab1a1127136aa859341268440cecfdd2f38c74ff",
+      "concept_key_stored": "6b78c878f9a7c27894ee643cab1a1127136aa859341268440cecfdd2f38c74ff",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "dcb7dd522f753a49de2a28e87ed610e97d47f9dcc30b06b76cb1e70b58a96957",
+      "sources": [
+        "c7576e46f77f3073"
+      ],
+      "content_type": "process_template"
     },
     {
       "item_id": "R103",

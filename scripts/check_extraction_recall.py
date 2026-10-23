@@ -147,6 +147,51 @@ def read_certifications(cfg: dict[str, Any]) -> list[dict[str, str]]:
     return certs
 
 
+def load_tier_b(cfg: dict[str, Any]) -> list[dict[str, Any]]:
+    """PROPOSED-but-unruled tier-B candidates (T-195 completeness arm), keyed (source_id, concept_key).
+
+    The proposer (a local model, advisory only per D-2549) emits one JSONL line per candidate:
+    {"source_id": <id>, "name": <concept name>, "rationale": <advisory reason>}. concept_key is DERIVED
+    from the name (D-3129), so a tier-B row is keyed exactly like a tier-A row. A tier-B row is NEVER a
+    floor and NEVER auto-certified (D-2898): the owner must rule it MATCH for it to enter tier A.
+    """
+    from pipeline.dedup_identity import concept_key as mint_concept_key
+
+    rel = cfg["golden"].get("tier_b_sheet")
+    if not rel:
+        return []
+    path = PROJECT_ROOT / str(rel)
+    if not path.exists():
+        print(f"NOTE: tier_b_sheet declared but absent ({path}) - reporting 0 proposed candidates")
+        return []
+    rows: list[dict[str, Any]] = []
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as e:  # C16: no silent error
+                raise SystemExit(f"FAIL-CLOSED: tier_b_sheet has a non-JSON line: {e}") from e
+            sid = (obj.get("source_id") or "").strip()
+            name = (obj.get("name") or "").strip()
+            if not sid or not name:
+                raise SystemExit(
+                    f"FAIL-CLOSED: tier-B row missing source_id/name: {obj!r} "
+                    "(a declaration must resolve, D-3034)"
+                )
+            rows.append(
+                {
+                    "source_id": sid,
+                    "name": name,
+                    "concept_key": mint_concept_key(name),
+                    "rationale": (obj.get("rationale") or "").strip(),
+                }
+            )
+    return rows
+
+
 def _connect(store_rel: str) -> sqlite3.Connection:
     path = PROJECT_ROOT / store_rel
     if not path.exists():
@@ -203,12 +248,14 @@ def build_golden(cfg: dict[str, Any]) -> dict[str, Any]:
         "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
         "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated "
                   "against the source, not copied from extractor output",
-        "tier_b": "NOT MEASURED: concepts the owner never certified, i.e. omissions, cannot be counted "
-                  "here - recall at the floor is a LOSS proof, never a completeness proof",
+        "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified "
+                  "(D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
+        "tier_b_rows": load_tier_b(cfg),
         "authority": {"path": cfg["golden"]["source_sheet"], "sha256": sha256_file(sheet)},
         "counts": {
-            "concepts": len(golden_rows),
-            "expectations": sum(len(r["sources"]) for r in golden_rows),
+            "certifications": len(golden_rows),
+            "concepts": len({r["concept_key"] for r in golden_rows}),
+            "expectations": len({(s, r["concept_key"]) for r in golden_rows for s in r["sources"]}),
             "distinct_sources": len({s for r in golden_rows for s in r["sources"]}),
         },
         "rows": golden_rows,
@@ -309,6 +356,14 @@ def evaluate(golden: dict[str, Any], emitted: dict[tuple[str, str], int],
         key=lambda d: -d["emitted"],
     )
 
+    # TIER-B (T-195): proposed-but-unruled candidates are REPORTED separately and NEVER floored. Their
+    # presence is advisory evidence, not a certification; their absence is an omission, not a defect.
+    tier_b_rows = golden.get("tier_b_rows", [])
+    tb_by_key = {r["concept_key"]: r for r in tier_b_rows}
+    tb_pairs = {(r["source_id"], r["concept_key"]) for r in tier_b_rows}
+    tb_present = sorted(tb_pairs & pairs)
+    tb_omitted = sorted(tb_pairs - pairs)
+
     return {
         "concept_recall": concept_recall,
         "expectation_recall": expectation_recall,
@@ -333,7 +388,18 @@ def evaluate(golden: dict[str, Any], emitted: dict[tuple[str, str], int],
         "key_integrity_fault_count": len(faults),
         "red_reasons": red_reasons,
         "verdict": "RED" if red_reasons else "CLEAN",
-        "tier_b": golden["tier_b"],
+        "tier_b": golden.get("tier_b", "NOT MEASURED"),
+        "tier_b_proposed": len(tb_pairs),
+        "tier_b_present": len(tb_present),
+        "tier_b_omitted": len(tb_omitted),
+        "tier_b_present_pairs": [
+            {"source_id": s, "concept_key": k, "name": tb_by_key.get(k, {}).get("name", "")}
+            for s, k in tb_present[:MAX_LISTED]
+        ],
+        "tier_b_omissions": [
+            {"source_id": s, "concept_key": k, "name": tb_by_key.get(k, {}).get("name", "")}
+            for s, k in tb_omitted[:MAX_LISTED]
+        ],
     }
 
 
@@ -405,7 +471,8 @@ def check(cfg: dict[str, Any], target_override: str | None) -> int:
     for reason in result["red_reasons"]:
         print(f"  RED: {reason}")
     print(f"  receipt: {cfg['report_path']}")
-    print(f"  tier B: {result['tier_b']}")
+    print(f"  tier B: {result['tier_b_proposed']} proposed, {result['tier_b_present']} present, "
+          f"{result['tier_b_omitted']} omitted (advisory - never floored, never auto-certified)")
     return EXIT_CLEAN if result["verdict"] == "CLEAN" else EXIT_RED
 
 
@@ -430,10 +497,14 @@ def write_golden(cfg: dict[str, Any], apply: bool) -> int:
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
+    c = golden["counts"]
+    dup = c["certifications"] - c["concepts"]
     print(
-        f"wrote {cfg['golden']['path']}: {golden['counts']['concepts']} concepts, "
-        f"{golden['counts']['expectations']} (concept x source) expectations, "
-        f"{golden['counts']['distinct_sources']} sources"
+        f"wrote {cfg['golden']['path']}: {c['concepts']} concepts, "
+        f"{c['expectations']} (concept x source) expectations, "
+        f"{c['distinct_sources']} sources"
+        + (f" (from {c['certifications']} certifications; {dup} duplicate ruler->fb mapping(s) "
+           f"collapse to one concept)" if dup else "")
     )
     return EXIT_CLEAN
 
@@ -495,8 +566,37 @@ def selftest() -> int:
     assert dup["duplicate_pairs_count"] == 1, dup
     assert dup["duplicate_pairs"][0]["emitted"] == 2, dup["duplicate_pairs"]
 
+    # 7) TIER-B (T-195): a PROPOSED-but-unruled candidate is REPORTED and NEVER floored or auto-certified.
+    #    NEGATIVE CONTROL: a tier-B row ABSENT from the store must report a CLEAN omission (not RED), and a
+    #    PRESENT tier-B row must be reported as present WITHOUT being counted as a tier-A certification.
+    tb_candidate = {
+        "source_id": "s1",
+        "name": "Uncertified Candidate Concept",
+        "concept_key": mint("Uncertified Candidate Concept"),
+        "rationale": "fixture",
+    }
+    golden_tb = {"rows": [cert_a], "tier_b": "PROPOSED (fixture)", "tier_b_rows": [tb_candidate]}
+    tb_absent = evaluate(
+        golden_tb,
+        {("s1", cert_a["concept_key"]): 1, ("s2", cert_a["concept_key"]): 1},
+        [], cfg,
+    )
+    assert tb_absent["verdict"] == "CLEAN", "a tier-B omission must NOT RED"
+    assert tb_absent["tier_b_proposed"] == 1 and tb_absent["tier_b_omitted"] == 1, tb_absent
+    assert tb_absent["concept_recall"] == 1.0, "tier-B absence must not drag the tier-A floor"
+    assert tb_absent["concepts_expected"] == 1, "tier-B rows must not be counted as tier-A concepts"
+    tb_present = evaluate(
+        golden_tb,
+        {("s1", cert_a["concept_key"]): 1, ("s2", cert_a["concept_key"]): 1,
+         ("s1", tb_candidate["concept_key"]): 1},
+        [], cfg,
+    )
+    assert tb_present["verdict"] == "CLEAN", tb_present["red_reasons"]
+    assert tb_present["tier_b_present"] == 1 and tb_present["tier_b_omitted"] == 0, tb_present
+    assert tb_present["concepts_expected"] == 1, "a present tier-B row must NOT be auto-certified"
+
     print("✅ selftest passed: loss RED, presence CLEAN, attribution loss RED, key-choice negative "
-          "control, stale-key RED, multiplicity reported")
+          "control, stale-key RED, multiplicity reported, tier-B omission CLEAN / not auto-certified")
     return EXIT_CLEAN
 
 

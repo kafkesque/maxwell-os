@@ -18,6 +18,12 @@ extraction_recall:
     source_sheet: governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv
     match_note: MATCH
     path: governance/EXTRACTION_RECALL_GOLDEN_20261023.json
+    # T-195 completeness arm: a local model PROPOSES candidate concepts per source (advisory only,
+    # D-2549); the owner rules MATCH/NONE. A PROPOSED-but-unruled row is tier-B: REPORTED, never
+    # floored, never auto-certified (D-2898). null = no proposer output yet (the arm is inert until
+    # the owner picks pilot sources and the proposer emits a sheet). Format: JSONL, one candidate per
+    # line: {"source_id": "<id>", "name": "<concept name>", "rationale": "<advisory reason>"}.
+    tier_b_sheet: null
   store: "knowledge pipeline/maxwell.db"
   evaluate:
     # 'store'  -> recall of the certified core against the LIVE store (a baseline/stability receipt)

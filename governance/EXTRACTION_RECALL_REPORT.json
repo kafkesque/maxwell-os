@@ -2,11 +2,11 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "9a4da92",
+  "pipeline_commit": "015f673",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
-    "sha256": "02fc206bdf6d2a71b69bf3b10cb6b54c42e0a9c1f7a406df82e4d59d6f3ab49a"
+    "sha256": "87909c81f82c2a6dcfdce0a03da0e277c56c84cff8215dc0b9d3ab6c8ae752c6"
   },
   "result": {
     "concept_recall": 1.0,
@@ -33,6 +33,11 @@
     "key_integrity_fault_count": 0,
     "red_reasons": [],
     "verdict": "CLEAN",
-    "tier_b": "NOT MEASURED: concepts the owner never certified, i.e. omissions, cannot be counted here - recall at the floor is a LOSS proof, never a completeness proof"
+    "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
+    "tier_b_proposed": 0,
+    "tier_b_present": 0,
+    "tier_b_omitted": 0,
+    "tier_b_present_pairs": [],
+    "tier_b_omissions": []
   }
 }

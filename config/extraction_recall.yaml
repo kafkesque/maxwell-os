@@ -1,0 +1,34 @@
+# T-194 / D-3129 — source-to-expected-FB EXTRACTION RECALL (the "nothing lost" instrument).
+# SOTA-audit gap 1: Maxwell can prove extracted rows are schema-well-formed (stress_test_s2_exhaustive)
+# but CANNOT prove the extractor emitted every concept the source contains. This config declares the
+# golden, the key space, and the floors. C12: every value is here, never in the script.
+#
+# KEY RULE (D-3129, MEASURED): the golden keys on (source_id, concept_key), NOT on fb_id. The Phase 0
+# receipt a6323a7 measured fb_id survival 27% / 8-field body survival 0% across two runs on identical
+# bytes and an identical chunker, so an fb_id-keyed golden would rot on every rebuild. fb_id is carried
+# ONLY as a denormalized pointer. concept_key = sha256(sorted stopword-filtered tokens of the folded
+# name) (D-3118 Phase A, pipeline/dedup_identity.py), so it is recomputable from a checkpoint row that
+# predates S6 — which is what makes an S5-targeted recall run possible at all.
+extraction_recall:
+  golden:
+    # Owner-ratified certifications: the ONLY authoritative ruling columns are owner_ruling_fb_id /
+    # owner_ruling_note (suggested_* is advisory, D-2658). A MATCH row certifies "this concept exists
+    # in this source"; that certification is what makes the golden anti-circular — it was adjudicated
+    # against the source, not copied from the extractor's own output.
+    source_sheet: governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv
+    match_note: MATCH
+    path: governance/EXTRACTION_RECALL_GOLDEN_20261023.json
+  store: "knowledge pipeline/maxwell.db"
+  evaluate:
+    # 'store'  -> recall of the certified core against the LIVE store (a baseline/stability receipt)
+    # 's5'     -> recall against a NAMED run's S5 checkpoint (the extraction-recall rail; use this to
+    #             measure what a REBUILD loses)
+    target: store
+    # A checkpoint path is required when target: s5. Config-declared, never a CLI default.
+    s5_checkpoint: null
+  floors:
+    # The certified core is a FLOOR on the expectation, not the whole of it: recall below these means
+    # owner-ratified knowledge was LOST, which is a defect by definition (never a tuning matter).
+    concept_recall: 1.0
+    expectation_recall: 1.0
+  report_path: governance/EXTRACTION_RECALL_REPORT.json

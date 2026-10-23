@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "artifact_id": "EXTRACTION-RECALL-REPORT",
+  "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
+  "pipeline_commit": "ce6fba3",
+  "target": "store:knowledge pipeline/maxwell.db",
+  "golden": {
+    "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
+    "sha256": "02fc206bdf6d2a71b69bf3b10cb6b54c42e0a9c1f7a406df82e4d59d6f3ab49a"
+  },
+  "result": {
+    "concept_recall": 1.0,
+    "expectation_recall": 1.0,
+    "concepts_expected": 44,
+    "concepts_hit": 44,
+    "expectations_expected": 418,
+    "expectations_hit": 418,
+    "missing_concepts": [],
+    "missing_pairs_count": 0,
+    "missing_pairs": [],
+    "sources": {
+      "count": 338,
+      "fully_recalled": 338,
+      "denominator_distribution": {
+        "1": 270,
+        "2": 56,
+        "3": 12
+      }
+    },
+    "duplicate_pairs_count": 0,
+    "duplicate_pairs": [],
+    "key_integrity_faults": [],
+    "key_integrity_fault_count": 0,
+    "red_reasons": [],
+    "verdict": "CLEAN",
+    "tier_b": "NOT MEASURED: concepts the owner never certified, i.e. omissions, cannot be counted here - recall at the floor is a LOSS proof, never a completeness proof"
+  }
+}

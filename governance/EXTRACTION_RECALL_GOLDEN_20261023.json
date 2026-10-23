@@ -1,0 +1,922 @@
+{
+  "schema_version": 1,
+  "artifact_id": "EXTRACTION-RECALL-GOLDEN",
+  "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
+  "pipeline_commit": "ce6fba3",
+  "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
+  "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated against the source, not copied from extractor output",
+  "tier_b": "NOT MEASURED: concepts the owner never certified, i.e. omissions, cannot be counted here - recall at the floor is a LOSS proof, never a completeness proof",
+  "authority": {
+    "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
+    "sha256": "ea95c279e7cb7aa05d6587def3092612af3824d6dab20edae340d6af6c90b890"
+  },
+  "counts": {
+    "concepts": 44,
+    "expectations": 418,
+    "distinct_sources": 338
+  },
+  "rows": [
+    {
+      "item_id": "R053",
+      "name": "Gödel's Incompleteness Theorem",
+      "concept_key": "56e04916e3e6f1848477624b1b7554010214f0a09148d96e378e4f82a236d9fb",
+      "concept_key_stored": "56e04916e3e6f1848477624b1b7554010214f0a09148d96e378e4f82a236d9fb",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "39c7dcde6a635eeb170e772ea1f9a262d546f73b5b8794881a5576d40aa74bc0",
+      "sources": [
+        "9bd8f208e79fdb8e"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R117",
+      "name": "Potential Over Payday Focus",
+      "concept_key": "13afbb4db44e9dd0a6b3098bd703a8968d50c1718149ce2e4e18828554db87a5",
+      "concept_key_stored": "13afbb4db44e9dd0a6b3098bd703a8968d50c1718149ce2e4e18828554db87a5",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "b7c4f222492a2e7c335e261e63a2c549960787463f7095322af39783466c82dc",
+      "sources": [
+        "09a825fd5e0076f0"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R177",
+      "name": "Context-dependent Interpretation",
+      "concept_key": "a7aabe4bdaa83537fb3fd38f28ce6e3be3d151d74c26635fcd842616eb238013",
+      "concept_key_stored": "a7aabe4bdaa83537fb3fd38f28ce6e3be3d151d74c26635fcd842616eb238013",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "58cd49885808c5a48fa5ed47ce2271859e5df23cbbd91aa8dc6038f14730f158",
+      "sources": [
+        "0d77a4724ca31785",
+        "24a728a76ed2ee6c",
+        "5b440874dc407833",
+        "66134b982673e40a",
+        "707e865f34cb6a8c",
+        "8848fd529839c4af",
+        "aa81a4e244b4ba87",
+        "daf67324ec858472",
+        "e6aed6be88896b77",
+        "e6f0caeaf3dc321e"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R203",
+      "name": "Iterative Design and Implementation",
+      "concept_key": "e524c43149bf60cff5217eb39aab049939d05ec7e49725afe417e381fb92302c",
+      "concept_key_stored": "e524c43149bf60cff5217eb39aab049939d05ec7e49725afe417e381fb92302c",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "918ff14e6711e08478873390fd1cb5333947e0a85a1e9f0d1ce38747308812ae",
+      "sources": [
+        "054ea726b3a7c82b",
+        "0a1ccf507b4c00e2",
+        "0cefc6219d106a42",
+        "107cb998339c6a64",
+        "14c06d64f0f9dcd9",
+        "1634a19061f7835a",
+        "19d7ba3893f5c244",
+        "1a641744f6207c01",
+        "1d7981e000f98e3b",
+        "206aaec4aa25041d",
+        "25aa3408439aea8d",
+        "266e0519bfaa76e3",
+        "2b5968d5052becea",
+        "3360811ee77db188",
+        "375ff70ecb041409",
+        "3f9db214c55f5f1d",
+        "46377fe744a7e521",
+        "49c93d86fb9175be",
+        "67d710bf67010ce7",
+        "68433b3f6a45b922",
+        "6bc94e3042d3a506",
+        "6de82ba77fb28b09",
+        "7210ccd1de985cbb",
+        "73722ae863c435fb",
+        "738ff8d3fa275c42",
+        "757ffcf1ea05b577",
+        "833249400db9412a",
+        "87d729f328c010ee",
+        "8b2d4a12774888ca",
+        "8b8aad6f05b0876a",
+        "9569082967e68b0f",
+        "996c386d8ae6003b",
+        "9b8a89014c9ee369",
+        "9bd8f208e79fdb8e",
+        "9cd72d54fbebbf64",
+        "a054a86b19a76f12",
+        "a3c1f90d072a7640",
+        "a6a97c296f0c2153",
+        "ae1090a2d6ab92d0",
+        "b34be7c43681bc0b",
+        "b52216877d39ae43",
+        "bb3a2e704103f510",
+        "bbd710e516f5a7f3",
+        "bc251f0ca60bc23d",
+        "bc31fd7c7f6f920d",
+        "c5bb73e8382c1523",
+        "c70098af41f6a043",
+        "c7aa39984a569d69",
+        "c9e9c6dde3af7096",
+        "cae7f096f91c4287",
+        "cf56406f9e2c843f",
+        "d17be236beda3451",
+        "d8d7d17ea9242693",
+        "db09e6d09e6bf740",
+        "ded099c135d0eb46",
+        "f577ad14951f962a",
+        "f612b4343336e7f8",
+        "f6ec92d9ee12f4ce",
+        "f988150fe424aa75",
+        "fb2ce09c340fcf31",
+        "fd72f6c5d1821104",
+        "fd8bf91a74c5d3a7"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R004",
+      "name": "Lockdown Strategy Effectiveness",
+      "concept_key": "b15ca859004102f4387a72a282049d412f7e483ab3a8f6bd9072cec6859c8aa7",
+      "concept_key_stored": "b15ca859004102f4387a72a282049d412f7e483ab3a8f6bd9072cec6859c8aa7",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "613e228484f52c36b0dacbacd3a7c4bd8bc3a24817941c71ead63d655b410bda",
+      "sources": [
+        "544e403ce72dced3"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R020",
+      "name": "Complex System Fragility and Predictability",
+      "concept_key": "4498c3f995458c1973edca47602fd8d9d06e4215c5434af39d7258c2171095fd",
+      "concept_key_stored": "4498c3f995458c1973edca47602fd8d9d06e4215c5434af39d7258c2171095fd",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "8da4fe020a84daabec1c99779c70f463b45d1a0b6249027efdcd9e5cc2721e4f",
+      "sources": [
+        "87648aee6df8d977"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R071",
+      "name": "Lean Startup Product Development Process",
+      "concept_key": "fed5e26f6feef9ec1506563cba20735b66195175bf7900e85ebcb3b61ee5ce27",
+      "concept_key_stored": "fed5e26f6feef9ec1506563cba20735b66195175bf7900e85ebcb3b61ee5ce27",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "2a53e0f95bc03e7ee2e4070814d5368af66d434ddc3cae280fa4e9b4424e3251",
+      "sources": [
+        "5ae5d510fb8de706"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R132",
+      "name": "Random Walk Method for Pde Solution",
+      "concept_key": "f08ccf099c5d357333b59842fb37d37ee2cd01c9654b4eb5c47fcaa697de0d77",
+      "concept_key_stored": "f08ccf099c5d357333b59842fb37d37ee2cd01c9654b4eb5c47fcaa697de0d77",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "b21dd0873230fb117c5835465a241200434b7c9310d79b6cac58a785e716d9fd",
+      "sources": [
+        "1d8786587f6b4d64"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R181",
+      "name": "Industrial System Evaluation Through Technical Coefficients",
+      "concept_key": "d9d610a391b9837ca8261cd56df54e534ac5c5ddbf7463a9f3307f388d60f0ce",
+      "concept_key_stored": "d9d610a391b9837ca8261cd56df54e534ac5c5ddbf7463a9f3307f388d60f0ce",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "b0fb06a5e95697e6e922b5697add43dab317057394f8e8c06a9805452fe74d14",
+      "sources": [
+        "987bdd0e7bcb67d9"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R208",
+      "name": "False Memory Creation in Therapy",
+      "concept_key": "13ea3dd7927efb04c68fc60f2aa6cff2fa4225a3ea507c1153bdb44a2b05dc05",
+      "concept_key_stored": "13ea3dd7927efb04c68fc60f2aa6cff2fa4225a3ea507c1153bdb44a2b05dc05",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "edb14e790e34b876117ea32da63cb474311c6814bfb986d7acea9eb79ce815fa",
+      "sources": [
+        "78f67435cc1f5af2"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R210",
+      "name": "Anchoring Through Relatable Age",
+      "concept_key": "18cde6c7c7f748dec148307c3bf2a352fa750d5410f3e05f9a2d29bcad997978",
+      "concept_key_stored": "18cde6c7c7f748dec148307c3bf2a352fa750d5410f3e05f9a2d29bcad997978",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "bd5039434b58750504bf76fd9aac49a544cd905df555b1c483b585e24f01adf5",
+      "sources": [
+        "844d1d816a056e75"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R008",
+      "name": "Prolonged Stress Response in Inescapable Shock",
+      "concept_key": "c02c8cc55bfbfefbd23aac1539971dda9a98a3f283a81e79f12210f6e91da463",
+      "concept_key_stored": "c02c8cc55bfbfefbd23aac1539971dda9a98a3f283a81e79f12210f6e91da463",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "fd76a1c2c6b464e47c545fac14277b41d787e2191193edfd9829cef578d0ae12",
+      "sources": [
+        "d56481a880516cac"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R011",
+      "name": "Agent-centric Problem Solving",
+      "concept_key": "61a3104262c6b35b683d6f301ffb3c53d43d471a9a62c04b74278adc4fb13c18",
+      "concept_key_stored": "61a3104262c6b35b683d6f301ffb3c53d43d471a9a62c04b74278adc4fb13c18",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+      "sources": [
+        "1448baff454b11a1",
+        "15da781a87b25405",
+        "26d9bd396aa6df4a",
+        "2a9ccd8ff2a8ebcd",
+        "3278f291ec3be962",
+        "33fcb21d5b85c8bc",
+        "34b98909d59951c0",
+        "3c2fd5b4618ca808",
+        "3f9db214c55f5f1d",
+        "42cf8da6619d129f",
+        "491aa5b99ca34a13",
+        "4b5b760317170ed5",
+        "4e8ecf4fc0127ebf",
+        "52e70fb43a897ace",
+        "537c40b5eaf9c9cb",
+        "57cef10065a0a1c0",
+        "65349eb7a2874b3e",
+        "65454b4d7f63bb39",
+        "7040a7a118a184b9",
+        "71b0f02e9dc91623",
+        "72423467a8417cb4",
+        "7990c25f83c9e65d",
+        "87cea996c3e4e97f",
+        "8bbcaf484b7c7725",
+        "8cd467ae2f16ec8c",
+        "9325d37ca99078ad",
+        "98de0ad4074fc51e",
+        "a009112437afb386",
+        "b3184dc54dd0bf04",
+        "b779f5d0a15572c3",
+        "b9109ac30982356e",
+        "b9ac72e89409757d",
+        "bb9c097f7c4b2a64",
+        "c2a742fc6061fab8",
+        "d02c5276698c4b9b",
+        "d65e5338ab9ac889",
+        "d7e0b378eb348772",
+        "e2c4db28f48d080f",
+        "e35cf363b1d2705c",
+        "ea2076ed2ccc24e4",
+        "f11e40ec8455364b",
+        "f69844dc599c45be",
+        "f75496d7c480ea49",
+        "f820aa885a9df32f",
+        "f8f802e878304781",
+        "fd72f6c5d1821104",
+        "fea9e08b964afadb"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R029",
+      "name": "Assumption-driven Innovation",
+      "concept_key": "691ad1ed907e73a6c4f962045a8db1fa943abeea84d3e450c5bde122d7c3d1f6",
+      "concept_key_stored": "691ad1ed907e73a6c4f962045a8db1fa943abeea84d3e450c5bde122d7c3d1f6",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "0cc96ff9ef5f8a30fa2e729837f9808b36644d131ecc6f65f67ad5b898af933d",
+      "sources": [
+        "f81f3f33c61d1d88"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R042",
+      "name": "Destination-control Elevator Design",
+      "concept_key": "9340198db38977ef7cdfcaa5e88d19a4091c7815c412dc67010bdec26aa5148c",
+      "concept_key_stored": "9340198db38977ef7cdfcaa5e88d19a4091c7815c412dc67010bdec26aa5148c",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "8993664e2e4b51998497a481c2fc2334701d09bc3cd0aa0ee2685547636d9031",
+      "sources": [
+        "29fb928b30d1e0e3"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R048",
+      "name": "Visual Sketching and Iteration Process",
+      "concept_key": "6b78c878f9a7c27894ee643cab1a1127136aa859341268440cecfdd2f38c74ff",
+      "concept_key_stored": "6b78c878f9a7c27894ee643cab1a1127136aa859341268440cecfdd2f38c74ff",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "dcb7dd522f753a49de2a28e87ed610e97d47f9dcc30b06b76cb1e70b58a96957",
+      "sources": [
+        "c7576e46f77f3073"
+      ],
+      "content_type": "process_template"
+    },
+    {
+      "item_id": "R051",
+      "name": "Ve As Empty Theater and Universe",
+      "concept_key": "ce627a4ac54e0006b5aca4b127bbab258a010d271d8bb01af1ab031be6ba9262",
+      "concept_key_stored": "ce627a4ac54e0006b5aca4b127bbab258a010d271d8bb01af1ab031be6ba9262",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "8ab32cfab555b010875ca03039171aea8050e3612b5a0e0b692ee0e2f6b6fad3",
+      "sources": [
+        "086a105773ce73df"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R054",
+      "name": "SHAP-based explanation system for compliance",
+      "concept_key": "3586fde96de818781d4e064102e32d1437a8b26216598145b639c158c175417d",
+      "concept_key_stored": "3586fde96de818781d4e064102e32d1437a8b26216598145b639c158c175417d",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "37b37b25d6548150439f611f3924d98ed9fe1024339f059941efbe068f446544",
+      "sources": [
+        "0903245f385a4a1a"
+      ],
+      "content_type": "tool_instruction"
+    },
+    {
+      "item_id": "R066",
+      "name": "Volume of N-dimensional Sphere",
+      "concept_key": "7b4bbae09045ad740aeef0885b873cdaafb38a3ba2ef269359650665f0add666",
+      "concept_key_stored": "7b4bbae09045ad740aeef0885b873cdaafb38a3ba2ef269359650665f0add666",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "7d72774d0dba1ca19c6e3d8e6b939649d6eeee3b79bf87b7abe04ace9d3a209d",
+      "sources": [
+        "46377fe744a7e521"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R072",
+      "name": "Park24 Nondisruptive Car Parking Market",
+      "concept_key": "5e3db56a8f12b032d372828dd42a659f3e2f17c8b2ddaddd4fb821f82aa07d17",
+      "concept_key_stored": "5e3db56a8f12b032d372828dd42a659f3e2f17c8b2ddaddd4fb821f82aa07d17",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "8ecba80562168fc38021f71ebad04399c54a86e943eb2cb785aec30c7c98da4a",
+      "sources": [
+        "45b76096e1a0b121"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R077",
+      "name": "Conspicuous Consumption Signaling",
+      "concept_key": "f01d713370823e3962b779521d85c7fcf2c0baa40a8fad6a2a7fadde55fa6e0c",
+      "concept_key_stored": "f01d713370823e3962b779521d85c7fcf2c0baa40a8fad6a2a7fadde55fa6e0c",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "7d211c2d862def00f1a786375ccc22f26160b6eff364bbd35d093d0f9790fb2d",
+      "sources": [
+        "4e040f567c34ab51"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R078",
+      "name": "Parametric Design Through Constraint and Control",
+      "concept_key": "0a3554bf8456b0187ca7d7e351e61ac705e60e968121fed9f20c5df37cbe659f",
+      "concept_key_stored": "0a3554bf8456b0187ca7d7e351e61ac705e60e968121fed9f20c5df37cbe659f",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "28e299152d24a10f4dd99d40a94660e07cfb1bdcfd4b4d5f2374d4a50c79da75",
+      "sources": [
+        "8b8aad6f05b0876a",
+        "f988150fe424aa75"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R083",
+      "name": "Herding Behavior in Groups",
+      "concept_key": "eec71fca6af3923cc5763a7ec5c6218ec0d5a782e3968d48aad537772e566bfe",
+      "concept_key_stored": "eec71fca6af3923cc5763a7ec5c6218ec0d5a782e3968d48aad537772e566bfe",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "daca6f52f5b3f4a307b594bb64bd95d70290a7d6044b88d52e5a05476304e5b1",
+      "sources": [
+        "19d7ba3893f5c244"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R090",
+      "name": "Culture Jamming: Guerrilla Gardeners",
+      "concept_key": "a62a1023e0af87f60b43ca2d1bdb92a340448b90a7a3d28557f4f43e04bc81b2",
+      "concept_key_stored": "a62a1023e0af87f60b43ca2d1bdb92a340448b90a7a3d28557f4f43e04bc81b2",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "6e063550807707cf0da6b18e621d75402939cc423d15de16baa7feca7be31dcb",
+      "sources": [
+        "6c761693341bc8ef"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R094",
+      "name": "Progressive Feature Activation Pattern",
+      "concept_key": "f8aff5bac1dfc13225b65da36b2196cf38aaf4acf123e8ed7582156c518ea387",
+      "concept_key_stored": "f8aff5bac1dfc13225b65da36b2196cf38aaf4acf123e8ed7582156c518ea387",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "88ffd6ba2d6acc60b58663326fef13856483ce317304bf6e659b82d0087246c1",
+      "sources": [
+        "2688c4e67ee3ca71"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R103",
+      "name": "Visual Narrative Continuity Principle",
+      "concept_key": "22830fd3a9e78891ad81838ff00d30878d26707421345b33655c051dffff13b4",
+      "concept_key_stored": "22830fd3a9e78891ad81838ff00d30878d26707421345b33655c051dffff13b4",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "2851595233b6ae83e1118b8a014c38874ef90e6b0c91674a58df1371a97a137d",
+      "sources": [
+        "8848fd529839c4af"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R104",
+      "name": "Strategic Information Collection",
+      "concept_key": "49783b3e7e5af1165564437f17bd74672d6cda7f27780fc44094f9ed0c3ddbfb",
+      "concept_key_stored": "49783b3e7e5af1165564437f17bd74672d6cda7f27780fc44094f9ed0c3ddbfb",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "94032f5ddbce3b1fea11b1ecaa3d84c0103146f307bb431070ac88c32b55cdc8",
+      "sources": [
+        "231ee6ada3403524",
+        "6e76c5fe4ab43c9d"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R106",
+      "name": "Editing Film",
+      "concept_key": "938848f7dd16f52586678796332747e9185f8815adbabfae52d913dd883ea5f3",
+      "concept_key_stored": "938848f7dd16f52586678796332747e9185f8815adbabfae52d913dd883ea5f3",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "c5d39242dae853d332ca5f8949f50c98036f4551209804d6549c7cf9c99c31a2",
+      "sources": [
+        "ded099c135d0eb46"
+      ],
+      "content_type": "process_template"
+    },
+    {
+      "item_id": "R110",
+      "name": "Federated Information Architecture Model",
+      "concept_key": "074374fe2b2230c12157d25c5a507d9e5a74bf1afbb30c2791f33c190303f1cb",
+      "concept_key_stored": "074374fe2b2230c12157d25c5a507d9e5a74bf1afbb30c2791f33c190303f1cb",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "71680735bbf4a87b1821d6f2ab4061976673b524cf69f4577ce336d06e0841d8",
+      "sources": [
+        "4e0c898751581ab0"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R114",
+      "name": "North Star Goal Focus",
+      "concept_key": "93f027c905ef3b497a9c99e7efae7533f8470452380e11219447ac2cb8c5ecd4",
+      "concept_key_stored": "93f027c905ef3b497a9c99e7efae7533f8470452380e11219447ac2cb8c5ecd4",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "7dda55720f7bd06e50d38355793e9a1f61ad9f2fc5e3467a3ca7d2fde2fe1c53",
+      "sources": [
+        "adffadf36ba1b340"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R122",
+      "name": "Visual Hierarchy Through Type Contrast",
+      "concept_key": "5aa3f02d420e98cd2acafe22aa9966e79796b244148224c8e5d6338c307766c0",
+      "concept_key_stored": "5aa3f02d420e98cd2acafe22aa9966e79796b244148224c8e5d6338c307766c0",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "e2e67f1253173fe552c843a3d5babd209a457fef360b1fce9906f94dc0635438",
+      "sources": [
+        "cd38c25324bdb230"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R130",
+      "name": "William Morris's Typographic Philosophy",
+      "concept_key": "d3ea8aa06da6f09ded251bf82c29b2682c04366774f3ef42ade7fc2eb642318c",
+      "concept_key_stored": "d3ea8aa06da6f09ded251bf82c29b2682c04366774f3ef42ade7fc2eb642318c",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "fd9b95de0af8cdda115c428a4fd721e8224e9e6fe8e2ba2aa3d15579150c86fc",
+      "sources": [
+        "58ee8e42e874e8d1"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R135",
+      "name": "Problem-solving Framework for Design Iteration",
+      "concept_key": "ad4187097057ff5db3d2d106455e91a4235ad1578b1dfcc3282d978cf4c354ee",
+      "concept_key_stored": "ad4187097057ff5db3d2d106455e91a4235ad1578b1dfcc3282d978cf4c354ee",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "17edf2da249be38aab125e5cdb50620958bdaaa6250163f58879e26dc90e1fa6",
+      "sources": [
+        "6907df26ad2ac041"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R139",
+      "name": "Learning Through Failure in Creative Industries",
+      "concept_key": "4ef9b816fb05ca7c060bfb63537cf062b7388757fbc4f311dd0be14e6eeb0423",
+      "concept_key_stored": "4ef9b816fb05ca7c060bfb63537cf062b7388757fbc4f311dd0be14e6eeb0423",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "4b1ba5b90c161ea5ded1f7d88d2127981647b9078a708a41037878c48f761cec",
+      "sources": [
+        "995ffc6e90956273"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R145",
+      "name": "Color As Emotional and Cultural Storytelling",
+      "concept_key": "9bd221f3c9643cd8297c29366bc088ca94f21d9759ce47d4291ddaed9f7ff60c",
+      "concept_key_stored": "9bd221f3c9643cd8297c29366bc088ca94f21d9759ce47d4291ddaed9f7ff60c",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "9ddb97af911e6db0f1ec6a5460d72030e0cff0558485b8a92893a422a72aef3a",
+      "sources": [
+        "107cb998339c6a64",
+        "1084e775ff7e7cf0",
+        "146c2a79fae233df",
+        "17fd8e0f3a39e0ca",
+        "1936f2e077d22e15",
+        "35c37948616e513d",
+        "3dfc3766d1c56992",
+        "3e1eae97f4785bfa",
+        "4cb80f70635a94cd",
+        "4e040f567c34ab51",
+        "51a8b950d6d6581e",
+        "58a0e7dc52f47999",
+        "58ee8e42e874e8d1",
+        "7c9792f062d68a64",
+        "7e896681bc9437b5",
+        "86e1f2dc7a12e30b",
+        "88a340096e8133f1",
+        "8e63e62cfeeb3afe",
+        "90d523a55814f443",
+        "9762adc7888690ab",
+        "9bfd6bc73c2bd166",
+        "9c1abb3ac0e78ebe",
+        "a6a97c296f0c2153",
+        "a6ebb1d3937e5625",
+        "aca5fe0f0f14ca21",
+        "b52216877d39ae43",
+        "bbd710e516f5a7f3",
+        "c0210948bde31547",
+        "cae7f096f91c4287",
+        "cb932ec71669f682",
+        "ccfc2745aa43d7d5",
+        "de300131314805ce",
+        "e3e9766841102055",
+        "eacad9e4d291ab79",
+        "efe5c2bed38aed4c",
+        "f97214eb9350aca1"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R156",
+      "name": "Design Culture Object As Expression",
+      "concept_key": "7dc4381b4abfad73673cf200608516e0ab6bbf48d6232093424153c328ce7054",
+      "concept_key_stored": "7dc4381b4abfad73673cf200608516e0ab6bbf48d6232093424153c328ce7054",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "b0528355f9b7f0ccef5688928c8033672769fc48a3af13cf9b3dac97d6753809",
+      "sources": [
+        "c6815d0a258f55f9"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R157",
+      "name": "Strategic Perspective Shift Principle",
+      "concept_key": "816e907701ac61fc5978ae8d6513a01defe4af12004832dd778eebb9f6013746",
+      "concept_key_stored": "816e907701ac61fc5978ae8d6513a01defe4af12004832dd778eebb9f6013746",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "24b0bf84e7a8a53dacee6ec1704fca53a4989935b775778f064b77da93af6311",
+      "sources": [
+        "b51204ce6c6a9950"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R165",
+      "name": "Acknowledgment and Attribution in Academic and Creative Works",
+      "concept_key": "9f5c4cb5e59dd5ff84d38e711832813aea0d4b595108f6a886d8cf6214e46c6b",
+      "concept_key_stored": "9f5c4cb5e59dd5ff84d38e711832813aea0d4b595108f6a886d8cf6214e46c6b",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+      "sources": [
+        "011527896f2e0b76",
+        "01cfe1caf081973d",
+        "01f61be74762fff7",
+        "02bfefa53a4e7d13",
+        "054ea726b3a7c82b",
+        "07c00d1457d01be4",
+        "086a105773ce73df",
+        "09ec3009985929d3",
+        "0ae7ff57847cd237",
+        "0eb292b3dbf6f3ee",
+        "0f31d4c65d5324f8",
+        "1054ff5d61a87b40",
+        "107cb998339c6a64",
+        "16a4f8b9cfc7e3b2",
+        "16d582857e5a4298",
+        "1905c1d3c6ba2f70",
+        "19d7ba3893f5c244",
+        "1d8786587f6b4d64",
+        "1ff121a007dbf99f",
+        "202607f496d3d6b8",
+        "2646b3b0ebd83b16",
+        "26d9bd396aa6df4a",
+        "279c674300c7f5c4",
+        "2d50494675a5aa63",
+        "2d757b44c89e7a29",
+        "2f29d2673f9b57a9",
+        "3360811ee77db188",
+        "348497800906563c",
+        "3738bc35cf268e7c",
+        "3af42dcf4ccfd0a4",
+        "3b63734fbe1faf87",
+        "3c4c47f03d54d2ab",
+        "3f9db214c55f5f1d",
+        "3fcc847aadec7a54",
+        "3fdb15a7e2460776",
+        "42f3d6a672b7798b",
+        "45b76096e1a0b121",
+        "491aa5b99ca34a13",
+        "496660f95f20fa4a",
+        "49c93d86fb9175be",
+        "49d2cf611dbb5984",
+        "4b5b760317170ed5",
+        "4b5f29cab42e50b5",
+        "4cb80f70635a94cd",
+        "4cc21e4b1f80d3b1",
+        "4d5ccba97adc5f49",
+        "4e0c898751581ab0",
+        "4e5555e9d32799ae",
+        "5752867f76f005a9",
+        "57667e406112c631",
+        "58ee8e42e874e8d1",
+        "5aa0f2dd81d64d14",
+        "5ac5f49273a9efac",
+        "5ae5d510fb8de706",
+        "5cbee181cc68ba6d",
+        "5db6e6df67ba43e3",
+        "5f50fc481e0aaadb",
+        "6058670bb6c13df0",
+        "6112534389fe9da6",
+        "64167c47b4c15497",
+        "653414db9c6a3478",
+        "67942610fb8caa97",
+        "68433b3f6a45b922",
+        "697ca5f005378797",
+        "69d6ee2d73f2525b",
+        "6a26ab086c6ca70f",
+        "6bc94e3042d3a506",
+        "6eb68fcad708c815",
+        "717d4586d0d55524",
+        "71b0f02e9dc91623",
+        "729895c553225af8",
+        "7351e569ec392734",
+        "73722ae863c435fb",
+        "780ebdf88827c6c2",
+        "78e8b27b2caa6171",
+        "78f67435cc1f5af2",
+        "796809cb974450e8",
+        "7990c25f83c9e65d",
+        "7c35b2bfd3b9aa6e",
+        "7eee76b1d562e224",
+        "7f58492f49b966e0",
+        "7fbd09564308efb1",
+        "81903dda37097415",
+        "81e67eb8f45ef3d1",
+        "838612792ad0f50a",
+        "844d1d816a056e75",
+        "851a51421a625d08",
+        "87648aee6df8d977",
+        "8884f9e4d46fe5f8",
+        "890d4e128e682b75",
+        "8a959c8c0bb8d070",
+        "8aac6266c89f9bab",
+        "8ac2ab5c9ed08bdf",
+        "8bbcaf484b7c7725",
+        "8c869d002be8e2aa",
+        "8cd467ae2f16ec8c",
+        "8cdba81c6b4134ce",
+        "8e05c909989bb356",
+        "8f23178f2e59f473",
+        "90ca5a74b674a9c0",
+        "92d597f3efa1cd12",
+        "935ca3461eafa1a3",
+        "938a7e197116a468",
+        "938bb7260089be95",
+        "96091b4b9f8d1614",
+        "996c386d8ae6003b",
+        "9af23beab65c7207",
+        "9bfd6bc73c2bd166",
+        "9dd12fcc42dfb7f3",
+        "9df6129c040efc05",
+        "9ef39c9748be8e6b",
+        "a2cd971d1330ab1f",
+        "a3c1f90d072a7640",
+        "a3dc5c14e32e5ca9",
+        "a4d8aacdbca22099",
+        "a4e4f679e9c815df",
+        "a5b967153bfef1e3",
+        "a83e294dd9cd871e",
+        "a88408640d2d3b12",
+        "a97702cfea95f3b5",
+        "aa96d9fded63654e",
+        "adffadf36ba1b340",
+        "ae235296c2e58e63",
+        "ae9b69ab4f4ba3d0",
+        "b0b8104d442615eb",
+        "b259b7170adc7192",
+        "b3184dc54dd0bf04",
+        "b493cb22642868f1",
+        "b51204ce6c6a9950",
+        "b766fe63a7f7f205",
+        "b9ac72e89409757d",
+        "bacb760e584f44d9",
+        "bb3bdf5ea41fcc73",
+        "bb4136c56c57c28d",
+        "bbf6229ef89a4200",
+        "bc251f0ca60bc23d",
+        "bc31fd7c7f6f920d",
+        "be32a35e3e46a927",
+        "befa51db010f70eb",
+        "bfacd46a4aa6346c",
+        "bfbc4109c2a1ed4d",
+        "c18598696a918d39",
+        "c2a742fc6061fab8",
+        "c3f3a8e7f7494cbd",
+        "c507e27e61c9564f",
+        "c54e1865c4cb3546",
+        "c5bb73e8382c1523",
+        "c6b8b658c92b86f5",
+        "cd38c25324bdb230",
+        "ce8261ddef87876b",
+        "d14a2a43964c2932",
+        "d1958cd594a89919",
+        "d36add8b237ad72d",
+        "d44f6665d4d8435d",
+        "d56481a880516cac",
+        "d57a374e7cfa1bb1",
+        "d5efe7b27f01a8b5",
+        "d5f9110244ea23d7",
+        "d71f011dcc6faf1b",
+        "d7629f386db86154",
+        "d7e0b378eb348772",
+        "db09e6d09e6bf740",
+        "dcd516022c1f9189",
+        "dd0b4ab4338a47af",
+        "de36cb24e0de61f3",
+        "de97db68551c6e71",
+        "df0203ff4a364003",
+        "e1547d7fc96d3950",
+        "e2832dec4a0137d8",
+        "e311a71f00c9a496",
+        "e32b0a723010416f",
+        "e35cf363b1d2705c",
+        "e371b680198e8c5b",
+        "e38e14fd1487a10d",
+        "e3d2820af5b5c52a",
+        "e6f1659e6f1d2909",
+        "e86c880e9b1f4117",
+        "ea2076ed2ccc24e4",
+        "ea494dc5cfaedd60",
+        "ea8365ff3a035065",
+        "eacad9e4d291ab79",
+        "ec3a3dc1ce55b4a6",
+        "eddd329505dc0df1",
+        "f0076c3fd1a4f685",
+        "f1c9502036714bae",
+        "f2783b891eefdff7",
+        "f2a40f8e79fdc4b7",
+        "f460f4498b359dac",
+        "f577ad14951f962a",
+        "f63ea4ca37f0e0d1",
+        "f71f8f052b154f8b",
+        "f74ee2d61460bc24",
+        "f75496d7c480ea49",
+        "f81f3f33c61d1d88",
+        "f8f802e878304781",
+        "f930ef50053587b1",
+        "f988150fe424aa75",
+        "fbf13da7a26c7381",
+        "fc245af2949ff908",
+        "fc520d6130651b97",
+        "fd8bf91a74c5d3a7",
+        "fda6d9b24dc426ad"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R169",
+      "name": "Charismatic Leadership As Motivational Force",
+      "concept_key": "916f21df46993656a17407f4eeb54b0b420416c5c68de26b20e5820d2da3a721",
+      "concept_key_stored": "916f21df46993656a17407f4eeb54b0b420416c5c68de26b20e5820d2da3a721",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "67ae083a6e81f19aba96cd8b517e07a4b38f8bd68922085215bbc7e525c399a5",
+      "sources": [
+        "b51204ce6c6a9950",
+        "eddd329505dc0df1"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R188",
+      "name": "Embodied Conceptual Mapping",
+      "concept_key": "bb1b08b67f3f4a0f327dec184b5ea46b37c701a174b99fa2043b1fa37987cb61",
+      "concept_key_stored": "bb1b08b67f3f4a0f327dec184b5ea46b37c701a174b99fa2043b1fa37987cb61",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "f67803b1fb9899580175191f3d0590415fd4f40a479f208bd0681b0e036965b4",
+      "sources": [
+        "07c6d2f0aa03db25",
+        "1d5cdcad47000c46",
+        "3a0c20ab274efcd5",
+        "a99d2809c5a3e172",
+        "c7794d56e1709ed1",
+        "d8087007a885de14"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R190",
+      "name": "Design Thinking Integration for Organizational Momentum",
+      "concept_key": "271b3d76b485ce94a9abb6b4f6beb64a3bdb7c8dc68ad0af1f0aae3375ca8452",
+      "concept_key_stored": "271b3d76b485ce94a9abb6b4f6beb64a3bdb7c8dc68ad0af1f0aae3375ca8452",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "ef2ba82a46eca88070ac1d6a832db55e2daa718361b1a092aeca5c33d68738c2",
+      "sources": [
+        "f81f3f33c61d1d88"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R195",
+      "name": "Agentic System Design for Reliability and Security",
+      "concept_key": "672ed7b35140edf3176285967867c870af3563a47a3a03501a0e15a6b5ce41fd",
+      "concept_key_stored": "672ed7b35140edf3176285967867c870af3563a47a3a03501a0e15a6b5ce41fd",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "c4fd56d6cfb47bde909bcad1e9b101b3d6f1e655e25bfbb77e50f08436c8768b",
+      "sources": [
+        "26d9bd396aa6df4a",
+        "3278f291ec3be962",
+        "42cf8da6619d129f",
+        "6303fc6deee17947",
+        "b779f5d0a15572c3",
+        "b9b8b1eae3f3018e",
+        "bb6176aae541105b",
+        "bb9c097f7c4b2a64",
+        "bcfdb8eb3fe1f240",
+        "c2a742fc6061fab8",
+        "e2c4db28f48d080f",
+        "f69844dc599c45be",
+        "f75496d7c480ea49",
+        "f8f802e878304781",
+        "fd72f6c5d1821104"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R196",
+      "name": "Microsoft Inclusive Design Principles",
+      "concept_key": "41e67584eb9ee1d3ff82f774bb83e5cff287939e48bca77918abf9284601a13f",
+      "concept_key_stored": "41e67584eb9ee1d3ff82f774bb83e5cff287939e48bca77918abf9284601a13f",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "96f792529490376f108191241c767dd9a8243401e58b6628c0f6d1d36f4d3eae",
+      "sources": [
+        "976bf935adeea9d0"
+      ],
+      "content_type": "principle"
+    },
+    {
+      "item_id": "R207",
+      "name": "Audacious Marketing Vision",
+      "concept_key": "d6c622ff1214be90b162fb931d5a7c08ceb851c3a71afd34af898ea8b629bbde",
+      "concept_key_stored": "d6c622ff1214be90b162fb931d5a7c08ceb851c3a71afd34af898ea8b629bbde",
+      "key_agrees_with_store": true,
+      "fb_id_pointer": "42374842ed7d2e367dd781f16683be48c6896988197cea4289671e517093d487",
+      "sources": [
+        "8d569bb0a35a14de"
+      ],
+      "content_type": "principle"
+    }
+  ]
+}

@@ -31465,3 +31465,46 @@ decisions:
       0 (0.0); shared_name_identical_definition 199 vs different 190; corpus_confound false.'
     key_availability: 'D-3128: concept_key present and populated 7640/7640, distinct 7635 - so the golden can be
       keyed today without a migration.'
+- id: D-3130
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: EVALUATION / KNOWLEDGE ARCHITECTURE
+  title: A recall floor over an owner-certified core is a LOSS proof, never a COMPLETENESS proof
+  decision: 'Maxwell now has a source-to-expected-concept recall rail (scripts/check_extraction_recall.py, config/extraction_recall.yaml,
+    golden governance/EXTRACTION_RECALL_GOLDEN_20261023.json, receipt governance/EXTRACTION_RECALL_REPORT.json),
+    keyed (source_id, concept_key) per D-3129 with fb_id carried only as a denormalized pointer. This record fixes
+    what its verdict may be READ as, because the two directions of "nothing lost" are not symmetric. TIER A (built):
+    the expectation is the set of concepts the OWNER ruled MATCH in the adjudication sheet, so it is anti-circular
+    — the certification was adjudicated against the source, never copied from the extractor output — and recall
+    BELOW the floor (1.0, config-declared) proves owner-ratified knowledge was LOST, which is a defect by definition
+    and never a tuning matter. TIER B (NOT BUILT, named as T-195): the concepts the store never produced cannot
+    appear in tier A, so a verdict AT the floor is a LOSS proof and NEVER a completeness proof. A green rail must
+    therefore be reported as "no certified knowledge lost", never as "nothing lost from the source" — reporting
+    the second from tier A alone would be the vacuous-pass defect class BUG-967 records (agreement asserted over
+    a population that was never measured). Measured scope that makes the distinction load-bearing: 44 certifications
+    expand to 418 (concept x source) expectations over 338 sources, and 270 of those sources carry a single expectation,
+    so per-source recall is weak evidence and the verdict is stated at CONCEPT and EXPECTATION level. Multiplicity
+    is reported, never collapsed: a (source, concept_key) emitted more than once is the duplicate/echo signal D-3117
+    accumulates, not an ambiguity error. Companion facts: the rail evaluates the LIVE store (a stability baseline)
+    OR a named run''s S5 checkpoint (the rebuild rail, which is where it earns its keep); a golden whose recorded
+    authority sha256 no longer matches the sheet is OWED, not silently trusted; and a store row whose stored concept_key
+    disagrees with concept_key(name) is a RED key-integrity fault. Nothing here changes pipeline behaviour: it is
+    a measuring instrument plus the rule for reading it.'
+  bugs:
+  - BUG-967
+  files:
+  - scripts/check_extraction_recall.py
+  - config/extraction_recall.yaml
+  - governance/EXTRACTION_RECALL_GOLDEN_20261023.json
+  - governance/EXTRACTION_RECALL_REPORT.json
+  receipts:
+    baseline_store: concept 44/44 = 1.0, expectation 418/418 = 1.0, 338/338 sources fully recalled, 0 concept_key
+      integrity faults -> CLEAN.
+    red_loop_fixture: 'selftest: loss RED, presence CLEAN, source-attribution loss alone RED, stale-key RED, multiplicity
+      reported; plus a NEGATIVE CONTROL proving an fb_id-keyed join MISSES a reworded body the concept_key join
+      keeps.'
+    red_loop_real_data: 'a simulated rebuild (the live store minus one certified row, read through the S5 path)
+      -> RED: concept 43/44 (0.977273), expectation 417/418 (0.997608), missing Godel Incompleteness Theorem.'
+    scope_measured: '44 certifications x sources = 418 expectations over 338 sources; per-source denominator distribution
+      {1: 270, 2: 56, 3: 12}.'

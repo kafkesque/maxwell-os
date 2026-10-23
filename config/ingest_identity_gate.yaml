@@ -511,12 +511,22 @@ source_library:
       already_in_the_corpus: 'a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit'
       seen_by_an_ingest_record: "a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it"
       admit_candidate: "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST"
+      disposed: 'a file the owner has SETTLED by a receipted disposition (out_of_scope_by_kind, not_a_work, conversion_refused_permanently): counted once and never re-raised, so a lane whose number can never move becomes a decision the owner can record and the counter can finish (BUG-973)'
       refused_no_declared_corpus_home: 'its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)'
       refused_container_no_stage_reads_it: 'a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180''s misplaced class and not this reader''s act'
       refused_container_corrupt: 'a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates)'
       refused_name_repair_first: "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class"
       refused_not_in_its_kind_folder: 'the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns'
       refused_domain_not_a_corpus_domain: 'the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062)'
+
+    #: BUG-973 (2026-10-23): THE DISPOSED VOCABULARY AND ITS RECORD. A `disposed` row is SETTLED, not refused
+    #: (nothing waits for a pipeline act) and not a candidate (nothing waits for the owner's admission word).
+    #: `disposition_reasons` is the CLOSED reason vocabulary a disposition line may carry — a reason outside it
+    #: is FATAL in the reader (never a silent skip). The record lives at `admission_disposition_prefix`, one
+    #: JSONL line per disposed object, written by the OWNER (scripts/dispose_admission.py) and by the applier
+    #: (`conversion_refused_permanently` on a deterministic S0 refusal — limb 2).
+    disposition_reasons: [out_of_scope_by_kind, not_a_work, conversion_refused_permanently]
+    admission_disposition_prefix: 'governance/evidence/ADMISSION_DISPOSITION_'
 
     #: WHICH PROBE ANSWERS "ARE THESE BYTES A CONTAINER THE STAGE CAN OPEN" (BUG-886, D-3071).
     #: MEASURED 2026-10-17: the class above refused "a container the conversion stage cannot read" and decided it

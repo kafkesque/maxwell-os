@@ -97,6 +97,12 @@ DECISIONS = (
     #: HAS ONE MATERIALISATION (census_source_names.axis_vocabulary reads the corpus's own immediate
     #: subdirectories), so an admission would silently WIDEN it. That is a declared refusal, not a guess.
     "refused_domain_not_a_corpus_domain",
+    #: BUG-973 (2026-10-23): a file the owner has SETTLED by a receipted disposition (out_of_scope_by_kind,
+    #: not_a_work, conversion_refused_permanently). Its own class because its own meaning: it is NOT a refusal
+    #: (nothing waits for a pipeline act) and NOT a candidate (nothing waits for the owner's admission word) —
+    #: it is DECIDED. Counted once, never re-raised, so a lane whose number can never move becomes a decision
+    #: the owner can record and the counter can finish (D-3038 applied to a count).
+    "disposed",
 )
 
 CONTROL_LABELS = (
@@ -131,6 +137,9 @@ CONTROL_LABELS = (
     "EVERY_control_label_is_cited_by_INDEX_so_no_name_prints_green_with_nothing_behind_it",
     #: BUG-929 — the plan's DAY NAME is a slot, exactly as the acceptance's was (BUG-925).
     "a_SECOND_derivation_of_the_day_NEVER_replaces_the_plan_a_SIGNATURE_pins_and_a_REPEAT_does_not_rewrite",
+    #: BUG-973 — appended for the same reason: an index is how a control addresses this table.
+    "a_DISPOSED_row_is_SETTLED_NOT_refused_and_a_disposed_SUFFIX_is_neither_candidate_nor_refusal",
+    "a_disposition_REASON_outside_the_declared_vocabulary_is_FATAL_and_never_skipped",
 )
 
 
@@ -302,6 +311,56 @@ def raw_roots(pol: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {str(entry.get("id")): entry for entry in pol["source_library"]["roots"]}
 
 
+def disposed_sets(doc: dict[str, Any]) -> tuple[set[str], set[str]]:
+    """The DISPOSED sets, read once from the receipted disposition record (the owner and the applier WRITE it;
+    this reader NEVER writes it — C12). Returns (suffixes out of scope, source paths settled).
+
+    BUG-973 (2026-10-23): two shapes. `out_of_scope_by_kind` names a SUFFIX that is permanently out of scope
+    (one rule settles the 241 design assets); `not_a_work` / `conversion_refused_permanently` name a SOURCE
+    path that is settled. A reason outside the declared vocabulary is FATAL — never a silent skip (D-3038).
+    """
+    admission = doc["source_library"]["admission"]
+    reasons = [str(r) for r in (admission.get("disposition_reasons") or ())]
+    if not reasons:
+        raise AdmissionError(
+            f"FATAL: {POLICY}#source_library.admission.disposition_reasons is EMPTY — the disposed vocabulary "
+            f"must be DECLARED, never guessed (BUG-973)"
+        )
+    prefix = str(admission.get("admission_disposition_prefix") or "").strip()
+    if not prefix:
+        raise AdmissionError(
+            f"FATAL: {POLICY}#source_library.admission.admission_disposition_prefix is not declared (BUG-973)"
+        )
+    base = _PROJECT_ROOT / prefix
+    kinds: set[str] = set()
+    sources: set[str] = set()
+    for path in sorted(base.parent.glob(f"{base.name}*.jsonl")):
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise AdmissionError(
+                    f"FATAL: disposition record {path} carries a non-JSON line: {line[:80]!r}"
+                ) from exc
+            reason = str(rec.get("reason") or "")
+            if reason not in reasons:
+                raise AdmissionError(
+                    f"FATAL: disposition record {path} carries reason {reason!r}, outside the declared "
+                    f"vocabulary {reasons} (BUG-973)"
+                )
+            if reason == "out_of_scope_by_kind":
+                kind = str(rec.get("kind") or "").strip().lstrip(".").lower()
+                if kind:
+                    kinds.add(kind)
+            else:
+                source = str(rec.get("source") or "").strip()
+                if source:
+                    sources.add(source)
+    return kinds, sources
+
+
 def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     """The plan: every file classified by the door's key, and every refusal counted with its declared reason."""
     doc = pol or census.policy(POLICY)
@@ -345,6 +404,7 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     #: The DOMAIN names the corpus MATERIALISES (census_source_names.axis_vocabulary -> its own immediate
     #: subdirectories). Read, never restated: a second list here would be a second home for the topic vocabulary.
     domains = census.axis_vocabulary(doc, corpus_root)["domain"]
+    disp_kinds, disp_sources = disposed_sets(doc)
 
     counts = {name: 0 for name in DECISIONS}
     examples: dict[str, list[str]] = {name: [] for name in DECISIONS}
@@ -376,7 +436,7 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
         axis = axes[root["id"]]
         admits = entry.get("admits_to")
         target_root = home_path(homes, str(admits)) if admits else None
-        stat = {"id": root["id"], "files": 0, "seen": 0, "never_seen": 0, "admits_to": admits or None}
+        stat = {"id": root["id"], "files": 0, "seen": 0, "never_seen": 0, "disposed": 0, "admits_to": admits or None}
         for path in sorted(root["path"].rglob("*")):
             if not path.is_file() or path.name.startswith("."):
                 continue
@@ -427,13 +487,20 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
                     decision = "refused_container_corrupt"
                 else:
                     decision = "admit_candidate"
-                unseen_keys.add(key)
+                #: BUG-973 (2026-10-23): a DISPOSED row overrides whatever the ladder concluded — it is DECIDED,
+                #: never a refusal and never a candidate (a disposed .png would otherwise read
+                #: `refused_container_no_stage_reads_it` forever).
+                if suffix.lstrip(".") in disp_kinds or str(path) in disp_sources:
+                    decision = "disposed"
             counts[decision] += 1
             if decision in ("already_in_the_corpus", "seen_by_an_ingest_record"):
                 stat["seen"] += 1
                 seen_keys.add(key)
+            elif decision == "disposed":
+                stat["disposed"] += 1
             else:
                 stat["never_seen"] += 1
+                unseen_keys.add(key)
             if decision == "admit_candidate":
                 rows.append(
                     {
@@ -446,6 +513,8 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
                         "target": str((target_root / rel).with_suffix(".md")) if target_root else "",
                     }
                 )
+            elif decision == "disposed":
+                pass  # counted under `disposed` above — never a refusal, never a candidate (BUG-973)
             elif decision not in ("already_in_the_corpus", "seen_by_an_ingest_record"):
                 #: THE WORKLIST IS THE REFUSALS, and a work the door already KNOWS is not a refusal: the two seen
                 #: classes are counted and then left alone (they need no act and would double the list).
@@ -477,6 +546,7 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
         "files": sum(stat["files"] for stat in per_root),
         "seen": sum(stat["seen"] for stat in per_root),
         "never_seen": sum(stat["never_seen"] for stat in per_root),
+        "disposed": sum(stat["disposed"] for stat in per_root),
         "seen_keys": len(seen_keys),
         "unseen_keys": len(unseen_keys),
         "counts": counts,
@@ -539,7 +609,7 @@ def render(plan: dict[str, Any], plan_name: str = "") -> str:
     for entry in plan.get("refused") or []:
         by_decision.setdefault(str(entry["decision"]), []).append(entry)
     for name in DECISIONS:
-        if name in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record"):
+        if name in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record", "disposed"):
             continue
         held = by_decision.get(name) or []
         lines.append(f"### `{name}` — {len(held)} row(s)")
@@ -627,7 +697,8 @@ def brief(plan: dict[str, Any]) -> str:
         f"ADMISSION: {plan['files']} file(s) in the declared kind roots, {plan['seen']} the pipeline has seen "
         f"(by key {counts['already_in_the_corpus']}, by an ingest record {counts['seen_by_an_ingest_record']}) "
         f"|| never seen {plan['never_seen']} ({plan['unseen_keys']} key(s)): "
-        f"candidates {counts['admit_candidate']}, refused {refused} ({detail}) || plan: just admit-plan"
+        f"candidates {counts['admit_candidate']}, refused {refused} ({detail}), disposed {counts['disposed']} "
+        f"|| plan: just admit-plan"
     )
 
 
@@ -676,6 +747,12 @@ def selftest() -> int:
         (books / "epub" / "DOMAIN 6 AI + Computing" / "A Truncated Download.epub").write_bytes(
             b"PK\x03\x04\x14\x00\x00\x00\x08\x00" + b"\x00" * 512)
         write_pdf(books / "stray out of its kind folder.pdf")
+        #: BUG-973: a DISPOSED fixture — one work settled by SUFFIX (a design asset, out of scope by kind) and one
+        #: settled by SOURCE path (an epub the owner has said is not a work). Both must read `disposed`, never a
+        #: refusal and never a candidate.
+        (books / "A Design Asset.png").write_text("x", encoding="utf-8")
+        write_epub(books / "epub" / "DOMAIN 6 AI + Computing" / "Settled by owner.epub")
+        settled_source = str(books / "epub" / "DOMAIN 6 AI + Computing" / "Settled by owner.epub")
         #: THE NOTE ROOT DECLARES A SHARE of the ONE corpus root (D-3062): its own DOMAIN/<subtopic> path is
         #: CARRIED into the corpus, and a folder the corpus does not materialise as a DOMAIN is REFUSED.
         notes = base_dir / "notes"
@@ -689,6 +766,14 @@ def selftest() -> int:
         cache = base_dir / "book_metadata.jsonl"
         cache.write_text(
             json.dumps({"source_book": "Renamed Work.md", "author": "A Voice", "title": "Renamed Work"}) + "\n",
+            encoding="utf-8",
+        )
+        #: BUG-973: the disposition RECORD the reader joins — one line per settled object, the shape the owner's
+        #: `scripts/dispose_admission.py` and the applier write. `.png` settles the design asset by kind; the
+        #: source path settles the epub by name (a file the ladder would otherwise admit).
+        (base_dir / "ADMISSION_DISPOSITION_20261023-fixture.jsonl").write_text(
+            json.dumps({"reason": "out_of_scope_by_kind", "kind": ".png"}) + "\n"
+            + json.dumps({"reason": "not_a_work", "source": settled_source}) + "\n",
             encoding="utf-8",
         )
         #: BUG-907 — THE FIXTURE NAMES ITS OWN STAGE0 DECLARATION. This control used to compare the FIXTURE policy
@@ -733,6 +818,8 @@ def selftest() -> int:
                     "refusal_examples": 3,
                     "worklist_in_full": 3,
                     "decisions": {name: f"fixture meaning of {name}" for name in DECISIONS},
+                    "disposition_reasons": ["out_of_scope_by_kind", "not_a_work", "conversion_refused_permanently"],
+                    "admission_disposition_prefix": str(base_dir / "ADMISSION_DISPOSITION_"),
                     #: BUG-886/D-3071: the probe each ACCEPTED fixture kind declares. A fixture that skips this
                     #: block is FATAL (probes_from), which is the control that the declaration is required.
                     "container_integrity": {
@@ -978,7 +1065,8 @@ def selftest() -> int:
         unresolved = [e["rel"] for e in refused_rows
                       if not (roots_by_id[e["rel"].split("/", 1)[0]] / e["rel"].split("/", 1)[1]).is_file()]
         refusal_classes = [name for name in DECISIONS
-                           if name not in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record")]
+                           if name not in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record",
+                                          "disposed")]
         corrupt_rows = [e for e in refused_rows if e["decision"] == "refused_container_corrupt"]
         expect(CONTROL_LABELS[22],
                not unresolved
@@ -1010,6 +1098,33 @@ def selftest() -> int:
         try:
             build(no_defects)
             mark(CONTROL_LABELS[23], "an absent defect vocabulary did not raise")
+        except AdmissionError:
+            pass
+
+        # (26) BUG-973: a DISPOSED row is SETTLED, not refused and not a candidate. TWO-SIDED: the .png settled by
+        #      SUFFIX (which the ladder would otherwise refuse as `refused_container_no_stage_reads_it` forever, so
+        #      that class must still read exactly 1 — the .mobi alone) and the epub settled by SOURCE path (which
+        #      the ladder would otherwise admit). Neither may enter a refusal count, the candidate worklist, or the
+        #      unseen-key total, so the disposed key is excluded from every lane that waits for an act.
+        expect(CONTROL_LABELS[26],
+               counts["disposed"] == 2
+               and plan["disposed"] == 2
+               and counts["refused_container_no_stage_reads_it"] == 1
+               and not any("Settled by owner" in row["rel"] for row in plan["rows"])
+               and not any("A Design Asset" in e["rel"] for e in plan["refused"]),
+               f"disposed {plan['disposed']} (counts {counts['disposed']}), no-stage "
+               f"{counts['refused_container_no_stage_reads_it']} (must stay 1 — the .mobi alone), candidates "
+               f"{[r['rel'] for r in plan['rows'] if 'Settled' in r['rel']]}, refusals "
+               f"{[e['rel'] for e in plan['refused'] if 'Design' in e['rel']]}")
+
+        # (27) BUG-973: a disposition REASON outside the declared vocabulary is FATAL, never a silent skip (D-3038).
+        bad_reason = json.loads(json.dumps(pol))
+        bad_reason["source_library"]["admission"]["admission_disposition_prefix"] = str(base_dir / "BAD_DISPOSITION_")
+        (base_dir / "BAD_DISPOSITION_20261023.jsonl").write_text(
+            json.dumps({"reason": "made_up_reason", "kind": ".png"}) + "\n", encoding="utf-8")
+        try:
+            build(bad_reason)
+            mark(CONTROL_LABELS[27], "a disposition reason outside the declared vocabulary did not raise")
         except AdmissionError:
             pass
 

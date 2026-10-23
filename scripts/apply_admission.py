@@ -306,7 +306,13 @@ def applier_policy(doc: dict[str, Any]) -> dict[str, Any]:
     #: the plan refuses an unopenable container before an owner signs it and this writer asks again before it
     #: copies (BUG-886/D-3071). A second copy of the map inside this block would be a second home for one fact
     #: (C12), so the declaration is HANDED DOWN here and `probes_from` still refuses an absent or unknown one.
-    return dict(decl, container_integrity=(doc["source_library"]["admission"] or {}).get("container_integrity"))
+    #: BUG-973 (2026-10-23): the DISPOSED vocabulary and its record live ONE LEVEL UP, beside the decision
+    #: vocabulary, because BOTH the plan reader and this writer join it. Handed down here (never a second copy —
+    #: C12) so the deterministic-failure branch can record a `conversion_refused_permanently` disposition fail-closed.
+    admission = doc["source_library"].get("admission") or {}
+    return dict(decl, container_integrity=admission.get("container_integrity"),
+                admission_disposition_prefix=admission.get("admission_disposition_prefix"),
+                disposition_reasons=admission.get("disposition_reasons"))
 
 
 def resolve_root(value: str) -> Path:
@@ -673,6 +679,27 @@ def append_receipt(path: Path, record: dict[str, Any]) -> None:
         handle.write(line)
         handle.flush()
         os.fsync(handle.fileno())
+
+
+def record_conversion_refusal(decl: dict[str, Any], stamp: str, source: Path) -> None:
+    """BUG-973 limb 2 — a DETERMINISTIC S0 refusal is a permanent disposition, never a candidate re-proposed.
+
+    Appends ONE `conversion_refused_permanently` line (source = the row's ABSOLUTE path, the same string the
+    plan's `row["path"]` carries) to the declared disposition record, so `plan_admission.disposed_sets()` reads it
+    and the row is counted ONCE as `disposed` on every future plan. The reason vocabulary and the record prefix are
+    DECLARED (config `source_library.admission`), never spelled here; an absent declaration is FATAL, never a
+    silent skip (C16/D-3038). Crash-safe: the same append+fsync as a receipt row (D-3036).
+    """
+    prefix = str(decl.get("admission_disposition_prefix") or "").strip()
+    reasons = decl.get("disposition_reasons")
+    if not prefix or not isinstance(reasons, list) or "conversion_refused_permanently" not in reasons:
+        raise ApplierError(
+            f"FATAL: {POLICY}#source_library.admission.disposition_reasons / admission_disposition_prefix is not "
+            f"declared — a deterministic conversion refusal must land in the declared disposition record (BUG-973)"
+        )
+    path = resolve_root(f"{prefix}{stamp}.jsonl")
+    append_receipt(path, {"reason": "conversion_refused_permanently", "source": str(source),
+                          "schema": "1.0", "ts": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")})
 
 
 def read_receipts(decl: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1108,6 +1135,12 @@ def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: di
         record["quarantine"] = moved
         record["reason"] += (f" | the copy was MOVED out of the corpus to {moved[0]}" if moved
                              else " | nothing was left in the corpus")
+        #: BUG-973 limb 2 — a failure HERE (returncode non-zero, markdown absent, or markdown below the 100-byte
+        #: floor) is DETERMINISTIC for these bytes: re-proposing the row retries the same S0 and fails the same way
+        #: (MEASURED 2026-10-23, Proposal.docx 54 bytes). So it is recorded as a PERMANENT disposition beside the
+        #: receipt, not left to be re-attempted by every future `mode: all`. The row still FAILS loudly here — what
+        #: changes is only that the next plan counts it `disposed` instead of `admit_candidate`.
+        record_conversion_refusal(decl, run_stamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"), source)
         return record
     record.update(state="applied", md_sha256=sha256_bytes(md_target), reason=f"S0 rc=0 — {tail[:200]}")
     return record
@@ -1399,7 +1432,11 @@ def selftest() -> int:
                 #: BUG-886/D-3071: the declared probes and the declared quarantine. Both are REQUIRED by the
                 #: writer (an absent one is FATAL), so the fixture declares them the way the gate does.
                 "container_integrity": {"probes": {".epub": "zip", ".pdf": "pdf", ".md": "none"}},
-                "quarantine_prefix": str(tmp_root / "quarantine")}
+                "quarantine_prefix": str(tmp_root / "quarantine"),
+                #: BUG-973 limb 2: a deterministic S0 refusal is recorded in the DECLARED disposition record, so the
+                #: fixture declares the same two keys the gate's `admission` block does (an absent one is FATAL).
+                "admission_disposition_prefix": str(tmp_root / "ADMISSION_DISPOSITION_"),
+                "disposition_reasons": ["out_of_scope_by_kind", "not_a_work", "conversion_refused_permanently"]}
 
         accept_file = tmp_root / "ADMISSION_ACCEPTED_TEST.yaml"
         base_accept = {"schema_version": "1.0", "plan": str(plan_file), "plan_sha256": digest,
@@ -1625,6 +1662,17 @@ def selftest() -> int:
                and any(Path(p).is_file() for p in failed.get("quarantine") or [])
                and all(str(quarantine) in p for p in failed.get("quarantine") or []),
                (failed["state"], failed.get("quarantine")))
+
+        # 17b. BUG-973 limb 2: the SAME deterministic failure is ALSO a PERMANENT disposition, so the next plan reads
+        #      it `disposed` instead of re-proposing the row. The record carries the reason from the DECLARED
+        #      vocabulary and the row's ABSOLUTE source path (the string `plan_admission.disposed_sets()` joins on).
+        disp_file = tmp_root / "ADMISSION_DISPOSITION_TESTSTAMP.jsonl"
+        disp_lines = disp_file.read_text(encoding="utf-8").splitlines() if disp_file.is_file() else []
+        expect("a_deterministic_conversion_failure_is_ALSO_recorded_as_a_PERMANENT_disposition",
+               len(disp_lines) == 1
+               and json.loads(disp_lines[0]).get("reason") == "conversion_refused_permanently"
+               and json.loads(disp_lines[0]).get("source") == doomed["path"],
+               (disp_lines, doomed["path"]))
 
         # 18. D-3072/BUG-892: THE OWNER'S WORD IS ONE COMMAND, AND IT IS GIVEN ONCE. MEASURED 2026-10-17: the name
         #     lived inside a file the tool PRINTS, so every re-derivation reset it to the placeholder and the applier

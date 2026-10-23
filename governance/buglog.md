@@ -19875,3 +19875,33 @@ BEFORE the call (the reviewer costs a model load), or print the absolute path wh
 **WHY IT MATTERS NOW (future tax):** T-183 is one command from exhausting its signed scope, and the NEXT plan will read ~107 candidates again with the same 480 sitting beside them. A lane whose denominator never reaches zero cannot tell "nothing left to do" from "something is stuck", which is the one question the owner asks of it.
 
 **REMEDY (owed, in order):** (1) a DECLARED `disposed` disposition with its own vocabulary (`out_of_scope_by_kind`, `not_a_work`, `conversion_refused_permanently`) recorded beside the plan, so a disposed row is COUNTED ONCE and never re-raised; (2) a post-attempt class fed from S0's failure ledger so a deterministic conversion failure is named in the plan instead of being retried invisibly; (3) the owner's word on limb 1 (the 241 assets) — that is a disposition, not a pipeline act.
+
+## BUG-973 UPDATE #1 (2026-10-23) — LIMBS 1 AND 2 LANDED; the counter can now reach zero once the owner speaks
+
+**LIMB 1 LANDED — the `disposed` class exists and is a SETTLEMENT, not a refusal.** `scripts/plan_admission.py` now
+carries a declared `disposed` decision (config `source_library.admission.decisions.disposed`) with a CLOSED reason
+vocabulary `disposition_reasons: [out_of_scope_by_kind, not_a_work, conversion_refused_permanently]` and its record
+home `admission_disposition_prefix: governance/evidence/ADMISSION_DISPOSITION_`. A disposed row is COUNTED ONCE as
+`disposed` and never re-raised: it is neither a refusal nor a candidate, and it is excluded from `unseen_keys` and
+the refusal aggregations (the two aggregations that would have miscounted it were fixed — `render()`'s worklist
+skip-list and the selftest's `refusal_classes`). `scripts/dispose_admission.py` is the OWNER's disposition writer
+(fail-closed vocabulary/prefix, crash-safe tempfile→fsync→os.replace, `--kind` for out_of_scope_by_kind, `--source`
+for not_a_work/conversion_refused_permanently, `--file` bulk, `--dry-run`, `--selftest`). Selftest **28/28** green,
+including the two BUG-973 controls: a disposed suffix is neither candidate nor refusal while an in-scope `.mobi`
+still reads `refused_container_no_stage_reads_it` (count stays 1), and a disposition REASON outside the declared
+vocabulary is FATAL, never skipped.
+
+**LIMB 2 LANDED — a deterministic S0 refusal is a PERMANENT disposition.** `scripts/apply_admission.py` now writes a
+`conversion_refused_permanently` disposition line (source = the row's ABSOLUTE path) beside the receipt whenever a
+row fails deterministically — returncode non-zero, markdown absent, or markdown below the 100-byte floor — so the
+next plan reads it `disposed` instead of re-proposing it forever. The row still FAILS loudly and its bytes still
+move to quarantine (unchanged); what changes is only that the counter can finish. The prefix and vocabulary are
+handed down from the SAME config block the plan reader joins (never a second home), and an absent declaration is
+FATAL. A new control asserts the disposition line lands with the declared reason and the row's own source path.
+Selftest **82/82** green.
+
+**LIMB 3 REMAINS — the owner's word on the 241 assets.** That is a disposition the OWNER records, not a pipeline
+act. The 241 `refused_container_no_stage_reads_it` assets break down by suffix as: `.png` 69, `.xlsx` 37, `.jpg` 29,
+`.psd` 28, `.ai` 16, `.indd` 13, `.idml` 10, `.aep` 4, `.jsx` 4, `.lst` 4, `.ttc` 4, `.jpeg` 4, `.xls` 3, `.ppt` 4,
+`.zip` 2, `.rar` 1, `.djvu` 1, `.numbers` 1, `.gif` 3, and 3 with no suffix (settle by source). Until they are
+settled, `plan_admission.py --brief` keeps printing `refused 480` with `disposed 0`.

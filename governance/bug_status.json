@@ -1311,7 +1311,7 @@
     {
       "id": "BUG-973",
       "title": "(MED, OPEN 2026-10-23) \u2014 the admission plan has NO DISPOSED class, so its refusals are a permanent non-zero floor and a",
-      "events": 1
+      "events": 2
     }
   ],
   "closed": [

@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1252 decisions (census stamp 882d158eca1ebeb0, 2026-10-22) · 730 bugs (257 open / 473 closed; highest OPEN = BUG-965) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1253 decisions (census stamp 7bf379eec03cf054, 2026-10-23) · 730 bugs (257 open / 473 closed; highest OPEN = BUG-965) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1252 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 344 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1252, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1253 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 345 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1253, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 29 · UNLABELLED 101 (BUG-757) of 257 open.
 >
@@ -19627,3 +19627,49 @@ first call raises must still complete the remaining calls and exit with an ERROR
 
 **INTERIM (this session).** Re-ran with `--workers 1` (no concurrent contention at the single-model server) and did
 not issue competing OMLX calls while it ran; the JSONL resume makes a restart lossless.
+
+## BUG-956 UPDATE #4 (2026-10-23) — the NONE-MUDDY recheck CLOSES: 40/40 rows, 0 verdict changes, the ruling set stands
+
+**MEASURED, COMPLETE (80/80 calls).** The high-cosine tail of the NONE-MUDDY bucket — the 40 rows with
+`content_cos >= 0.596` (the other 37 sit at 0.550-0.596) — was re-adjudicated by a DIFFERENT family pair
+(Qwen3.8-27B-MLX-4bit + gpt-oss-20b-MXFP4-Q8) against the SAME candidate construction the two-family run used.
+
+| bucket | rows |
+|---|---|
+| NONE-AGREE (both families NONE) | 39 |
+| SPLIT (one MATCH, one NONE) — R111 only | 1 |
+| SAME / CONFLICT / ERROR | 0 / 0 / 0 |
+
+**ROWS DIFFERING FROM THE PRIOR TWO RUNS: exactly ONE — R111** (`Pmt Camera Typography Manipulation`), and the
+difference is gpt-oss-20b against ITSELF (NONE conf 0.1 -> MATCH conf 0.85 on 3b230d53 "Vertical Space Adjustment
+in Typography"), not a cross-family disagreement. **Cross-family agreement was 40/40**: gemma-4-E4B said NONE on all
+40 rows and Qwen3.8-27B said NONE on all 40 rows. The three text-generation families that have now looked at this
+tail (gemma, Qwen3.8, gpt-oss) agree on 39 rows; the only dissent is a model disagreeing with its own earlier answer.
+
+**CONSEQUENCE: NO RULING CHANGES.** The 40 rechecked rows all carried `owner_ruling_note=NONE`; the recheck
+CORROBORATES 39 of them and the 40th (R111) fail-closes to NONE (SPLIT -> NONE, D-2658) which is exactly the owner's
+accepted ruling. The b sheet is unchanged, so the derived 57-row ruler and the bridge artifact are untouched:
+`build_anchor_store_bridge.py --check` remains EXIT_CLEAN 0.
+
+**RECEIPT (auditable, R14-stamped).** `governance/ANCHOR_208_RECHECK_NONEMUDDY_RESULTS_20261022.json` —
+40 rows, each with the prior gemma/gpt-oss verdict+fb, the recheck Qwen/gpt-oss verdict+fb+confidence+reason, the
+re-derived bucket and a `differs_from_prior` flag; stamped with schema_version, gen_model, pipeline_commit and the
+sha256 of the raw JSONL (`governance/ANCHOR_208_REANCHOR_NONEMUDDY_QWEN_GPTOSS_20261022.jsonl`, 80 lines).
+The merge is deterministic and LLM-free, so the report is re-derivable from the receipt alone.
+
+## BUG-964 UPDATE #1 (2026-10-23) — the flip is REAL but RARE (1/40 = 2.5%) and it is gpt-oss-20b against ITSELF
+
+**MEASURED, no longer a hypothesis about frequency.** Across 40 rows adjudicated twice by the same
+gpt-oss-20b-MXFP4-Q8 at temp=0.0, the verdict changed on **1 row (2.5%)**: R111 NONE(0.1) -> MATCH(0.85). Every other
+row reproduced byte-identically in verdict. Over the same 40 rows the cross-FAMILY disagreement rate was 0/40
+(gemma-4-E4B vs Qwen3.8-27B, both NONE throughout, 27B and 4B agreeing).
+
+**WHAT THIS SETTLES AND WHAT IT DOES NOT.** Settled: the instability is confined to ONE model, it is rare, and it is
+NOT a property of the NONE-MUDDY tail (39/40 rows are stable). Not settled: whether the cause is MXFP4 quantisation
+noise or a differing candidate list — the raw JSONL still does not record the candidates sent, which remains the
+actual defect and the reason the red loop cannot yet be built. The receipt fix (candidate fb_ids + prompt hash per
+call) is still OWED.
+
+**OPERATIONAL CONSEQUENCE (D-3127).** A gpt-oss MATCH raised against a row where a DIFFERENT family says NONE is now
+inadmissible as a single vote: it is either noise (this bug) or the aggressive-matcher false positive already seen on
+R098 (the dcb7dd collision). MATCH on a guardrail row therefore requires two families agreeing on the SAME fb_id.

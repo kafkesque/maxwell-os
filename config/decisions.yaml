@@ -31338,3 +31338,57 @@ decisions:
   - pipeline/model_store_sweep.py
   - pipeline/model_store_census.py
   - config/engine.yaml
+- id: D-3127
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: ANCHOR / KNOWLEDGE ARCHITECTURE / ADJUDICATION
+  title: 'A lone gpt-oss-20b MATCH is inadmissible on a guardrail row: MATCH requires TWO families on the SAME fb_id'
+  decision: 'An adjudication verdict is only as reliable as the determinism of the family that cast it, so the NONE-MUDDY
+
+    recheck under BUG-956 was read as a MEASUREMENT of each family, not only as a verdict on 40 rows. MEASURED
+
+    2026-10-23 on the 40-row high-cosine tail (content_cos >= 0.596) of the T-191 re-anchor: cross-family agreement
+
+    between gemma-4-E4B-it-MLX-4bit and Qwen3.8-27B-MLX-4bit was 40/40 NONE, while gpt-oss-20b-MXFP4-Q8 at temp=0.0
+
+    reversed its OWN verdict on 1 row (R111: NONE 0.1 -> MATCH 0.85, 2.5%), and the same model produced the R098
+
+    dcb7dd collision (an aggressive-matcher false positive). BUG-964 records the flip. Therefore, for any row inside
+
+    the cosine guardrail (bucket NONE-MUDDY, content_cos >= none_guardrail_cos), a MATCH is recorded ONLY when two
+
+    DIFFERENT model families name the SAME fb_id; a single-family MATCH opposed by a cross-family NONE fails closed
+
+    to NONE (D-2658 - the bridge never guesses). gpt-oss-20b is demoted from NONE-MUDDY arbiter to second vote:
+    it
+
+    may CORROBORATE, never decide alone. The scope is deliberately narrow - it constrains the guardrail band only,
+
+    so SAME / CONFLICT / SPLIT rows and the clean AUTO-NONE band keep the existing two-family rule, and no already
+
+    ratified owner ruling moves. Receipt: 39 of 40 rows corroborated, the 40th (R111) fail-closed to NONE, which
+    is
+
+    the owner''s accepted ruling, so the b sheet, the derived 57-row ruler and the bridge verdict are unchanged.'
+  bugs:
+  - BUG-956
+  - BUG-964
+  files:
+  - governance/ANCHOR_208_RECHECK_NONEMUDDY_RESULTS_20261022.json
+  - governance/ANCHOR_208_REANCHOR_NONEMUDDY_QWEN_GPTOSS_20261022.jsonl
+  - governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv
+  - config/anchor_family.yaml
+  receipts:
+    recheck_40_rows: '80/80 calls over 40 rows. NONE-AGREE 39, SPLIT 1 (R111), SAME 0, CONFLICT 0, ERROR 0. Rows
+      differing from the
+
+      prior two runs: R111 ONLY, and the diff is gpt-oss-20b against ITSELF, not a cross-family disagreement.
+
+      Cross-family gemma-4-E4B vs Qwen3.8-27B: 40/40 both NONE.'
+    consequence: 'All 40 rechecked rows carried owner_ruling_note=NONE; 39 corroborated, R111 fail-closed to NONE
+      = the owner''s
+
+      accepted ruling. The b sheet is unchanged, so the derived 57-row ruler is unchanged and
+
+      build_anchor_store_bridge.py --check stays EXIT_CLEAN 0.'

@@ -1281,12 +1281,12 @@
     {
       "id": "BUG-956",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
-      "events": 4
+      "events": 5
     },
     {
       "id": "BUG-964",
       "title": "(LOW, OPEN 2026-10-22) \u2014 gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified)",
-      "events": 1
+      "events": 2
     },
     {
       "id": "BUG-965",

@@ -429,6 +429,7 @@ may_touch:
 - governance/PHASE0_IDEMPOTENCY_REPORT.md
 - governance/EXTRACTION_RECALL_GOLDEN_20261023.json
 - governance/EXTRACTION_RECALL_REPORT.json
+- governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1411,3 +1412,22 @@ widening_log:
     paths only (no glob), records receipts, and changes no pipeline behaviour.
   may_touch_untouched: false
   why: Two NAMED grants (the golden and its report); scripts/*.py and config/*.yaml were already declared.
+
+- date: '2026-10-23'
+  actor: assistant
+  reason: >-
+    T-195 STEP (b) LANDED: the advisory tier-B completeness proposer. scripts/propose_tier_b.py and
+    config/extraction_recall.yaml fall inside existing globs (scripts/*.py, config/*.yaml). The tier_b_sheet
+    JSONL is a governance RECEIPT with no declared home, and D-342 says a receipt that cannot be committed is
+    not a receipt. Owner word locked 2026-10-23 ("use your 3 recommended sources"); 45 advisory candidates
+    proposed (15/source), 0 present, 45 omitted in store - never floored, never auto-certified (D-2898). Tier-A
+    floor unchanged and CLEAN (44/44, 418/418).
+  additions:
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
+    why: 'the advisory tier-B candidate sheet the proposer writes: one JSONL line per PROPOSED-but-unruled candidate (source_id, name, rationale), keyed (source_id, concept_key) exactly like tier A so the owner can rule MATCH/NONE. It is never floored and never auto-certified (D-2898); it must live in the tree so the recall rail reports tier-B completeness rather than NOT MEASURED.'
+  owner_ack: >-
+    EXPLICIT 2026-10-23: the owner replied "use your 3 recommended sources", which is the word T-195's gate
+    names ("Owner picks the pilot sources"). This entry grants ONE NAMED path (no glob), records the advisory
+    receipt, and changes no pipeline behaviour.
+  may_touch_untouched: false
+  why: One NAMED grant (the tier-B sheet); scripts/*.py and config/*.yaml were already declared.

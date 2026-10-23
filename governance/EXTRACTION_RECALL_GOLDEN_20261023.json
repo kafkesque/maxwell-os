@@ -2,11 +2,282 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-GOLDEN",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "015f673",
+  "pipeline_commit": "053a51d",
   "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
   "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated against the source, not copied from extractor output",
   "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
-  "tier_b_rows": [],
+  "tier_b_rows": [
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM-Based Application Patterns",
+      "concept_key": "8e4f7ce82774f358380c4651a9190cfadf8441a88b8c2dce96b244f41230f58e",
+      "rationale": "Recognize distinct application patterns like summarization, Q&A, and chatbots as foundational use cases for LLMs."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LangChain's Modular Architecture",
+      "concept_key": "b80c2d85914abc14b44700e42786c0189ed180ae3faaeb66b15778a0ba3d72ed",
+      "rationale": "Understand how LangChain's object model enables modular composition of LLM-based workflows."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Engineering as a Design Discipline",
+      "concept_key": "14eba875d50c9744a8c02f2c98c3bd216b53629c5f3491016d296bc6e0393346",
+      "rationale": "View prompt engineering not as a one-off task but as a structured design discipline for shaping LLM behavior."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "RAG as a Retrieval-Augmentation Strategy",
+      "concept_key": "dee1fa139c9d9dfcf73818e60d50cd6f2e2b3a2c4d01934caf48cf2f4fd18f71",
+      "rationale": "Distinguish RAG as a method for enhancing LLM responses with external knowledge sources rather than pure generation."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Fine-Tuning as a Customization Technique",
+      "concept_key": "4270ec0c20bdb6a7dc443269b5ffb782c96b3af3419420cd8159ba9ba94d890b",
+      "rationale": "Recognize fine-tuning as a targeted approach to adapt general-purpose LLMs to specific domains or tasks."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Selection Based on Use Case",
+      "concept_key": "c20d1ed051dc037f6aea0377499d028c7bbe2c438225f57a4fbba166d11166d8",
+      "rationale": "Understand that different LLMs are better suited for specific tasks like reasoning, summarization, or classification."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Programmatic Prompt Execution",
+      "concept_key": "f4b7477681588e66d86e56534e1a7f03f37a62d02bfc00c7b4e9921b0a1f25cf",
+      "rationale": "Learn how to execute prompts programmatically to automate and scale LLM interactions."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Template Abstraction",
+      "concept_key": "17e13576456bd491a431af74785745d09de3e4035d284cb0f8938b1839021ae0",
+      "rationale": "Use prompt templates to encapsulate and reuse structured prompt designs across multiple LLM interactions."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Types as Task Categories",
+      "concept_key": "aa106c45d6bb5a62ac57bbbc4caf6a54ad3bb364dfb9491f8f980c5cd24f84db",
+      "rationale": "Classify prompts into types like classification, sentiment analysis, and summarization to guide implementation."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Reasoning in LLMs Through Examples",
+      "concept_key": "f300b8263b8cb901e11e0bc042aa48fadec8476bcf80d2238c22661e5936f0ec",
+      "rationale": "Understand how one-shot and two-shot learning enable LLMs to perform reasoning tasks with minimal instruction."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Step-by-Step Instruction Design",
+      "concept_key": "86c48059917edcd2a66f1034021c0a9dfa0fb9affa8c01fc24e424081d79299e",
+      "rationale": "Structure prompts to guide LLMs through multi-step reasoning by explicitly providing steps."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LangChain's Core Components",
+      "concept_key": "06e7d72bc45c7d22c2447d0fa775f136cf3ab6479d88e948c24be30aae1d29a2",
+      "rationale": "Identify the key LangChain components that form the foundation of LLM-based application development."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Adaptation Strategies",
+      "concept_key": "5c3453d7c8aa23d9894ddc3e1da51245556332c0327480b31929c4dc624956dc",
+      "rationale": "Distinguish between prompt engineering, RAG, and fine-tuning as methods to tailor LLMs to specific needs."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Use Case Mapping",
+      "concept_key": "3dc4a799568e7bce3d8eb5d186a0708eb5acd877d458fa5dcf3a24f8c12491b5",
+      "rationale": "Map real-world problems to specific LLM use cases like Q&A engines or chatbots for practical application."
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Prompt Optimization",
+      "concept_key": "4926d66cc3b4dc80b3c87cc1ad506cb6a8f054c22e2460f18f665d8401c39186",
+      "rationale": "Recognize that effective prompts require iterative refinement and testing to achieve desired outputs."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "The Kernel of Strategy",
+      "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
+      "rationale": "A unique, defining condition or set of conditions that distinguishes an organization and enables a coherent strategic approach."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Proximate Objective",
+      "concept_key": "f396e21ab74b9206d53013b3c733cef5cf9921e1cf9b33a8c86099c997aebbc4",
+      "rationale": "A specific, actionable goal that serves as the immediate target for strategic implementation and resource allocation."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Clarity Over Complexity",
+      "concept_key": "d7f7ce7b961949eb6245b89a75ea343fff6ac556bd8503cdbf1928eab8e4388f",
+      "rationale": "Effective strategy requires clear, focused direction rather than elaborate frameworks or abstract goals."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategy as Action Plan",
+      "concept_key": "ec6ad7bedc323626b595229c11b4d5bdfea33e2f48f3ec6f29d1bdc2de6f8c06",
+      "rationale": "True strategy is not a document or set of objectives, but a structured plan of specific actions and decisions."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Trigger Point Strategy",
+      "concept_key": "4343ab99dc862af793f094dc646b377851d63569a9d221edb67405565ed74760",
+      "rationale": "Strategic action begins with identifying critical moments or conditions that signal the need for decisive intervention."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "The Strategy Sin of Fluff",
+      "concept_key": "52a5db4f3cd27d3fdb1acdc2d1f9636b8b397dc184d55b5acce64faf4ec17e54",
+      "rationale": "Vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Alignment",
+      "concept_key": "2cf7896275e2c11d5407ff72aaab896fe22d51727f6a5750a6f3d59afaf9b1b7",
+      "rationale": "Ensuring that all strategic elements—diagnosis, objectives, and actions—are internally consistent and reinforce each other."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Differentiation Through Strategy",
+      "concept_key": "1b6f1029d8bfcd79e3edb33fa95dcbc575ebbbccbbbd65298e2ef1e2811d640c",
+      "rationale": "A successful strategy must clearly define what makes an organization unique and how that uniqueness creates competitive advantage."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Diagnosis",
+      "concept_key": "1167ed41c67f2587b54f318e460bfcc288f287bfe6eb8a4581e621b2c22f2f30",
+      "rationale": "The process of identifying the core problem or challenge that a strategy must address to be effective."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Coherent Action Framework",
+      "concept_key": "69412abb4e6b0463edf84c8bc8657309b868368f30ea9b370c4dd47027ff7d16",
+      "rationale": "A strategy must provide a clear framework for what actions to take and what to avoid to achieve desired outcomes."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Execution Force",
+      "concept_key": "99b2a000f3eed601bea72c4edcdd693ed5cc995ab845733a5961ab40f4feef54",
+      "rationale": "The commitment to forcefully implement a strategy despite obstacles, rather than waiting for perfect conditions."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Sin of Blue-Sky Objectives",
+      "concept_key": "3cb62852daabcdce28094aa4ebfe983a7563a5444b5cb359d083544d014a40f5",
+      "rationale": "Setting goals that are aspirational but disconnected from real-world constraints or actionable steps."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Simplicity",
+      "concept_key": "020d81c2c48adc63b0043d04e362a35042238ad3992d519bc220cf3ba1f5710c",
+      "rationale": "Effective strategies are often simple and focused, avoiding overcomplicated or convoluted approaches."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Relevance",
+      "concept_key": "504b02d5f12065c3112c82d7fe5e7efcc413392dc60ba19f5dc24990cf707afb",
+      "rationale": "A strategy must be grounded in the actual conditions and challenges faced by the organization or situation."
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Leadership as Decision-Making",
+      "concept_key": "2e954f147f343d9fd6b41372a94e13cd7e5b2959f2f8d46dbcc3a3ed70fab544",
+      "rationale": "Leadership in strategy is fundamentally about making hard choices and committing to specific, high-impact actions."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Creative Coding Pedagogy",
+      "concept_key": "6140448f50512e2f595cfcf76d6d6e086b370cb33a51b4d59454339d0cbc6a99",
+      "rationale": "Teaching programming through visual arts creates a more engaging and effective learning pathway than traditional computer science curricula."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Reactive Programming in Art",
+      "concept_key": "0b5531dfd1727f1c4d4af354d6568a1b4e274c515e9c30614496a7d39de0f049",
+      "rationale": "Visual experimentation with code can dramatically increase motivation and accelerate learning in creative coding contexts."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Community-Curated Learning",
+      "concept_key": "226465de554600c26d91bc5c27c8663bc8ec92cc87243d9a4972be11c8e1853f",
+      "rationale": "Collective wisdom from educators and practitioners can be systematically documented and shared to improve creative coding instruction."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Design By Numbers Influence",
+      "concept_key": "f53853dc7e7d64aa42efe8600599689ab0060c55f0e6c8eab67e219168800970",
+      "rationale": "Early educational tools like Design By Numbers laid foundational groundwork for modern visual programming approaches."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Aesthetics + Computation Synthesis",
+      "concept_key": "281be8c39a4a308e01427dcc66590fbdc5590ece2f73e37b35c2bca4b8f678d9",
+      "rationale": "Interdisciplinary collaboration between artists, designers, and coders creates novel forms of computational expression."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Processing 1.0 Origins",
+      "concept_key": "a4e1c2acf36ce33f0c6476cc567a77a7636d9939aaf5cb741cc19403a9d7813c",
+      "rationale": "Early visual programming tools emerged from experimental art projects and evolved into widely adopted educational platforms."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Curriculum Evolution Through Experimentation",
+      "concept_key": "54a66aee9ca75501c45406590033b8d176afb49c83682f19629751b82bbec748",
+      "rationale": "Effective creative coding curricula develop through iterative testing, removal of ineffective elements, and gradual refinement."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Online Educational Material Fragility",
+      "concept_key": "05210054b910866998dd885cc7353cdb55fa3feb22a95c1816afd9582393371b",
+      "rationale": "Digital educational resources are ephemeral and at risk of being lost, making physical documentation essential for preserving knowledge."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Code as Medium for Expression",
+      "concept_key": "00204b59ecf60add8de53b6cfedc349c3e05f51d091597f5af042d85788b0f7e",
+      "rationale": "Programming can function as a creative medium similar to traditional art forms, enabling new modes of artistic expression."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Educational Community Building",
+      "concept_key": "82631bcea1481132121f11358d0e29db32d0cc2fc6f4ba5e510e67c476696f03",
+      "rationale": "In-person gatherings of creative coders and educators can catalyze the development and sharing of innovative teaching strategies."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Bauhaus Pedagogy Preservation",
+      "concept_key": "2564529bec16555d866c1a7d2b018a62a44d69c4abe7a87ec4813f2abbede8e6",
+      "rationale": "Like Bauhaus teaching methods, contemporary creative coding pedagogy benefits from systematic documentation and knowledge sharing."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Visual Arts Programming Motivation",
+      "concept_key": "52d7914b8fc5f4b70b2c4be02699d1378bf8fcf9d2c39bb25ee1e155ee6f9d47",
+      "rationale": "Learning programming through visual arts applications increases student engagement and accelerates skill acquisition."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Interdisciplinary Research in Creative Coding",
+      "concept_key": "f0a8e95fd048877a8e67b3afeae3ec893c18949b5b7f9fd4dfb409d12e98f873",
+      "rationale": "Cross-disciplinary collaboration between computer science and visual arts education creates unique pedagogical approaches."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Educational Resource Sustainability",
+      "concept_key": "8d2cecbbbbd8ac2b769b6b8ed9463fc352cf3211ba96408a79408d04c548a2e5",
+      "rationale": "Physical publication of digital educational content ensures long-term accessibility and preservation of teaching methods."
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Creative Coding Community Networks",
+      "concept_key": "8b068fe2150c72f038f72f6c256d5238239d7bb58643ebe7ec1291a8ee173187",
+      "rationale": "Online networks of creative coders and educators can be formalized into structured communities that drive curriculum development."
+    }
+  ],
   "authority": {
     "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
     "sha256": "bcfeeaa51ff0a13016acf8e093f39913b0f14fbd190cd2e9c92b7dae2ede9660"

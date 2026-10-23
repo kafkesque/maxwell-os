@@ -23,7 +23,23 @@ extraction_recall:
     # floored, never auto-certified (D-2898). null = no proposer output yet (the arm is inert until
     # the owner picks pilot sources and the proposer emits a sheet). Format: JSONL, one candidate per
     # line: {"source_id": "<id>", "name": "<concept name>", "rationale": "<advisory reason>"}.
-    tier_b_sheet: null
+    tier_b_sheet: governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
+  # T-195 step (b): the ADVISORY tier-B proposer (D-2898: NEVER auto-certified). A local model emits
+  # candidate concepts the certified core may have OMITTED; the owner then rules MATCH/NONE. Every value
+  # here is config (C12) — the script hardcodes nothing, not even the model name.
+  proposer:
+    # The owner's locked word (2026-10-23): "use your 3 recommended sources".
+    pilot_sources:
+      - f8f802e878304781   # Roberto Infante — AI Agents and Applications With LangChain, LangGraph, and MCP
+      - b51204ce6c6a9950   # Richard Rumelt — Good Strategy/Bad Strategy
+      - f988150fe424aa75   # Golan Levin, Tega Brain — Code as Creative Medium
+    # Advisory single-shot GENERATION (D-2549): the generator family, not a delegate loop. temp=0.0 (R7)
+    # is enforced by omlx_call, never by this script.
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    max_window_chars: 6000        # source text window size fed to the model per call
+    max_windows_per_source: 4     # bound a PILOT to the first N windows (never the whole book)
+    max_candidates_per_source: 15 # cap proposals per source (advisory; owner still rules each)
+    skip_existing_tier_a: true    # drop a candidate whose concept_key already certifies a tier-A row
   store: "knowledge pipeline/maxwell.db"
   evaluate:
     # 'store'  -> recall of the certified core against the LIVE store (a baseline/stability receipt)

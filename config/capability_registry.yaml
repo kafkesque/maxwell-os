@@ -109,7 +109,15 @@ capabilities:
     check: python3 scripts/apply_relabel_store_write.py --selftest
     receipt: config/label_store_write_receipt.json
     cost_tier: T0
-    owns: [config/relabel_rulings.yaml, knowledge pipeline/maxwell.db, pipeline/schemas.py]
+    owns: [config/relabel_rulings.yaml, knowledge pipeline/maxwell.db, pipeline/schemas.py,
+           # D-3134/BUG-977 (2026-10-23): the STORE's own vocabulary and the paths that write INTO it were owned by
+           # NO capability, which is why BUG-975/976/977 read `no_artifact_named` and the routing debt grew past its
+           # ceiling the moment they were filed. The four declarations are TRUE statements, not a papering-over: each
+           # one writes or measures the governed store. The rule these bugs live under is the content_type column's
+           # (a disposition is not a ROLE, D-2965/BUG-741) and its census is the gate that owns it.
+           scripts/restamp_content_type_adjudications.py, config/content_type_restamp.yaml,
+           scripts/rule_content_type_census.py, pipeline/insert_single_concept.py,
+           scripts/repair_single_concept_provenance.py, pipeline/backfill_embeddings.py]
 
   # ── the delegation fleet (D-3020/D-3028) ──
   - id: fanout
@@ -457,6 +465,17 @@ reasons:
 #: that is not in the vocabulary above and refuses an entry for an item that is no longer open (a stale reason is the
 #: same defect as a stale declaration, D-405).
 unrouted:
+  #: BUG-975/976/977 (D-3134, 2026-10-23): each is a FINDING this session measured, filed into an APPEND-ONLY
+  #: register whose TITLE cannot be made to name an owned artifact — the same shape D-3080/BUG-913 documents below,
+  #: and the reason the override exists. The distinction is deliberate and uses the rail's own vocabulary, not a
+  #: convenience: BUG-975 (a row inserted without its vec0 embedding) and BUG-976 (the single-concept writer omitted
+  #: evidence_passages) are `bug_is_a_finding` — the WORK they imply already landed and the register keeps the record;
+  #: BUG-977 is `owner_gate` — the ten DISPOSITION-labelled rows cannot be re-labelled by any capability, because a
+  #: content_type is a curation judgement and the next act is the OWNER'S WORD (D-2941/D-2898). Folding it into a
+  #: route would hide a gate behind a script.
+  BUG-975: bug_is_a_finding
+  BUG-976: bug_is_a_finding
+  BUG-977: owner_gate
   #: D-3080/BUG-913 (2026-10-17): a bug whose TITLE names no owned artifact is the NORMAL shape for a finding
   #: ("we measured the world and here is what it does"), not a missing route. These two were appended to an
   #: APPEND-ONLY register, so their titles could not be made to name an artifact; the override is the rail's

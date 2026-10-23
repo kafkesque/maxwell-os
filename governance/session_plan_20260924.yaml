@@ -427,6 +427,8 @@ may_touch:
 #: cannot be committed is not a receipt (D-342). This is the report the Phase 0 harness (scripts/phase0_idempotency.py,
 #: inside scripts/*.py) writes; the config is inside config/*.yaml. Named here so the tree can be clean.
 - governance/PHASE0_IDEMPOTENCY_REPORT.md
+- governance/EXTRACTION_RECALL_GOLDEN_20261023.json
+- governance/EXTRACTION_RECALL_REPORT.json
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1382,3 +1384,30 @@ widening_log:
     receipt, and changes no pipeline behaviour.
   may_touch_untouched: false
   why: One widening, one NAMED grant (the D-3036 receipt).
+- date: '2026-10-23'
+  actor: assistant
+  reason: >-
+    T-194 LANDED (the step the register named next, and the one the SOTA-audit's gap map calls the
+    highest-leverage gap): the source-to-expected-concept extraction-recall rail. scripts/check_extraction_recall.py
+    and config/extraction_recall.yaml already fall inside existing globs (scripts/*.py, config/*.yaml). The two
+    paths below are governance RECEIPTS with no declared home, and D-342 is explicit that a receipt which cannot
+    be committed is not a receipt (D-3036: an act that leaves no trace did not happen). MEASURED 2026-10-23: the
+    golden holds 44 owner-certified concepts -> 418 (concept x source) expectations over 338 sources, and the
+    baseline receipt is CLEAN at concept 44/44, expectation 418/418, 338/338 sources, 0 concept_key integrity
+    faults; the red loop is proven twice (fixture selftest and a real-data simulated rebuild through the S5 path,
+    RED 43/44). A third governance face is corrected by this work under the same commit: the task register's
+    T-191 gate repeated the false claim that phase0_idempotency.py --all had never been executed (BUG-966).
+  additions:
+  - pattern: governance/EXTRACTION_RECALL_GOLDEN_20261023.json
+    why: 'the tier-A golden itself (D-3129/D-3130): the owner-MATCH certifications expressed in the generation-invariant key space (source_id, concept_key) with fb_id as a denormalized pointer, authority-stamped with the adjudication sheet''s sha256 so a stale golden is OWED rather than silently trusted. Without this file the rail has nothing to measure and the next rebuild has no loss baseline.'
+  - pattern: governance/EXTRACTION_RECALL_REPORT.json
+    why: 'the report the rail writes: recall per concept and per (source x concept) expectation, the missing lists, the duplicate/echo signal (reported, never collapsed), the key-integrity faults and the tier-B NOT-MEASURED declaration. It is the receipt a future rebuild is diffed against, so it must live in the tree with the golden it was computed from.'
+  owner_ack: >-
+    IMPLIED by the owner's standing directive, restated verbatim this sitting: "continue with the next critical
+    step starting with the highest leverage step ... before you commit an serious implementation do a forensic
+    audit ... and update and synch gov dependencies in the agreed clean structural organized manner". The owner
+    also approved the preceding step ("ok go"), and this entry lands the receipts of exactly the step the register
+    named next (T-194) plus the register correction the forensic audit found (BUG-966). It grants two NAMED
+    paths only (no glob), records receipts, and changes no pipeline behaviour.
+  may_touch_untouched: false
+  why: Two NAMED grants (the golden and its report); scripts/*.py and config/*.yaml were already declared.

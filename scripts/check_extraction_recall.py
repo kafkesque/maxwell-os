@@ -192,6 +192,47 @@ def load_tier_b(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def load_tier_b_rulings(cfg: dict[str, Any]) -> dict[tuple[str, str], dict[str, str]]:
+    """Owner MATCH/NONE rulings on tier-B candidates (T-195 step c), keyed (source_id, concept_key).
+
+    A ruling sheet row is {"source_id", "name", "owner_ruling_note"} with note in {MATCH, NONE}.
+    The OWNER is the only authority (D-2658/D-2898: suggested_* advisory, owner_ruling_* authoritative;
+    no LLM promotion). concept_key is DERIVED from the name (D-3129) so a ruling keys exactly like a
+    tier-A row and needs NO fb_id — a MATCH certifies "this concept exists in this source" even when
+    the store has not (yet) produced a row for it (D-3130: the omission is precisely the signal).
+    """
+    from pipeline.dedup_identity import concept_key as mint_concept_key
+
+    rel = cfg["golden"].get("tier_b_ruling_sheet")
+    if not rel:
+        return {}
+    path = PROJECT_ROOT / str(rel)
+    if not path.exists():
+        return {}
+    rulings: dict[tuple[str, str], dict[str, str]] = {}
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as e:  # C16: no silent error
+                raise SystemExit(f"FAIL-CLOSED: tier_b_ruling_sheet has a non-JSON line: {e}") from e
+            sid = (obj.get("source_id") or "").strip()
+            name = (obj.get("name") or "").strip()
+            note = (obj.get("owner_ruling_note") or "").strip().upper()
+            if not sid or not name:
+                raise SystemExit(f"FAIL-CLOSED: tier-B ruling missing source_id/name: {obj!r} (D-3034)")
+            if note not in ("MATCH", "NONE"):
+                raise SystemExit(f"FAIL-CLOSED: tier-B ruling note {note!r} not MATCH/NONE: {obj!r}")
+            key = (sid, mint_concept_key(name))
+            if key in rulings:
+                raise SystemExit(f"FAIL-CLOSED: duplicate tier-B ruling for (source_id, concept_key): {key}")
+            rulings[key] = {"name": name, "note": note}
+    return rulings
+
+
 def _connect(store_rel: str) -> sqlite3.Connection:
     path = PROJECT_ROOT / store_rel
     if not path.exists():
@@ -239,6 +280,35 @@ def build_golden(cfg: dict[str, Any]) -> dict[str, Any]:
                 "content_type": ctype,
             }
         )
+    # T-195 step (c): fold OWNER-MATCHed tier-B candidates into the floored expectation set.
+    # A MATCHed candidate has NO fb_id by definition (it is a concept the store may have OMITTED,
+    # D-3130), so it keys purely by (source_id, concept_key) — D-3129 — and carries an empty
+    # fb_id_pointer (a denormalized pointer that, for a tier-B row, legitimately points nowhere yet).
+    tier_b_rows = load_tier_b(cfg)
+    tier_b_rulings = load_tier_b_rulings(cfg)
+    tier_b_matched: list[dict[str, Any]] = []
+    tier_b_unruled: list[dict[str, Any]] = []
+    tier_b_ruled_none = 0
+    for r in tier_b_rows:
+        rule = tier_b_rulings.get((r["source_id"], r["concept_key"]))
+        if rule is None:
+            tier_b_unruled.append(r)
+        elif rule["note"] == "MATCH":
+            tier_b_matched.append(r)
+        else:
+            tier_b_ruled_none += 1
+    for r in tier_b_matched:
+        golden_rows.append({
+            "item_id": f"tierB:{r['source_id'][:8]}:{r['concept_key'][:8]}",
+            "name": r["name"],
+            "concept_key": r["concept_key"],
+            "concept_key_stored": None,
+            "key_agrees_with_store": None,
+            "fb_id_pointer": "",
+            "sources": [r["source_id"]],
+            "content_type": None,
+        })
+
     sheet = PROJECT_ROOT / cfg["golden"]["source_sheet"]
     return {
         "schema_version": SCHEMA_VERSION,
@@ -250,13 +320,16 @@ def build_golden(cfg: dict[str, Any]) -> dict[str, Any]:
                   "against the source, not copied from extractor output",
         "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified "
                   "(D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
-        "tier_b_rows": load_tier_b(cfg),
+        "tier_b_rows": tier_b_unruled,
+        "tier_b_matched": tier_b_matched,
+        "tier_b_ruled_none": tier_b_ruled_none,
         "authority": {"path": cfg["golden"]["source_sheet"], "sha256": sha256_file(sheet)},
         "counts": {
             "certifications": len(golden_rows),
             "concepts": len({r["concept_key"] for r in golden_rows}),
             "expectations": len({(s, r["concept_key"]) for r in golden_rows for s in r["sources"]}),
             "distinct_sources": len({s for r in golden_rows for s in r["sources"]}),
+            "tier_b_matched": len(tier_b_matched),
         },
         "rows": golden_rows,
     }
@@ -359,6 +432,8 @@ def evaluate(golden: dict[str, Any], emitted: dict[tuple[str, str], int],
     # TIER-B (T-195): proposed-but-unruled candidates are REPORTED separately and NEVER floored. Their
     # presence is advisory evidence, not a certification; their absence is an omission, not a defect.
     tier_b_rows = golden.get("tier_b_rows", [])
+    tier_b_matched = golden.get("tier_b_matched", [])
+    tier_b_ruled_none = int(golden.get("tier_b_ruled_none", 0))
     tb_by_key = {r["concept_key"]: r for r in tier_b_rows}
     tb_pairs = {(r["source_id"], r["concept_key"]) for r in tier_b_rows}
     tb_present = sorted(tb_pairs & pairs)
@@ -392,6 +467,8 @@ def evaluate(golden: dict[str, Any], emitted: dict[tuple[str, str], int],
         "tier_b_proposed": len(tb_pairs),
         "tier_b_present": len(tb_present),
         "tier_b_omitted": len(tb_omitted),
+        "tier_b_matched": len(tier_b_matched),
+        "tier_b_ruled_none": tier_b_ruled_none,
         "tier_b_present_pairs": [
             {"source_id": s, "concept_key": k, "name": tb_by_key.get(k, {}).get("name", "")}
             for s, k in tb_present[:MAX_LISTED]
@@ -595,8 +672,38 @@ def selftest() -> int:
     assert tb_present["tier_b_present"] == 1 and tb_present["tier_b_omitted"] == 0, tb_present
     assert tb_present["concepts_expected"] == 1, "a present tier-B row must NOT be auto-certified"
 
+    # 8) TIER-B OWNER-MATCH (T-195 step c): a MATCHed candidate is FLOORED and must RED when the store
+    #    omits it (D-3130 — the omission is the completeness signal), distinct from an unruled candidate
+    #    (case 7: advisory, CLEAN). The MATCHed row has NO fb_id (fb_id_pointer ""), proving a tier-B
+    #    ruling needs no store row to become a floor.
+    matched_tb = {
+        "item_id": "tierB:test:0001",
+        "name": "Owner Certified Omitted Concept",
+        "concept_key": mint("Owner Certified Omitted Concept"),
+        "sources": ["s1"],
+        "fb_id_pointer": "",
+    }
+    golden_matched = {
+        "rows": [cert_a, matched_tb],
+        "tier_b": "MATCHed floored (fixture)",
+        "tier_b_rows": [],
+        "tier_b_matched": [{"source_id": "s1", "name": matched_tb["name"],
+                            "concept_key": matched_tb["concept_key"]}],
+    }
+    matched_absent = evaluate(
+        golden_matched,
+        {("s1", cert_a["concept_key"]): 1, ("s2", cert_a["concept_key"]): 1},
+        [], cfg,
+    )
+    assert matched_absent["verdict"] == "RED", "an owner-MATCHed tier-B concept omitted by the store must RED"
+    assert matched_absent["missing_pairs_count"] == 1, matched_absent["missing_pairs"]
+    assert matched_absent["missing_pairs"][0]["concept_key"] == matched_tb["concept_key"], matched_absent["missing_pairs"]
+    assert matched_absent["concepts_expected"] == 2, "a MATCHed tier-B row must join the floored concept set"
+    assert matched_absent["tier_b_matched"] == 1, matched_absent["tier_b_matched"]
+
     print("✅ selftest passed: loss RED, presence CLEAN, attribution loss RED, key-choice negative "
-          "control, stale-key RED, multiplicity reported, tier-B omission CLEAN / not auto-certified")
+          "control, stale-key RED, multiplicity reported, tier-B omission CLEAN / not auto-certified, "
+          "tier-B owner-MATCH floored RED")
     return EXIT_CLEAN
 
 

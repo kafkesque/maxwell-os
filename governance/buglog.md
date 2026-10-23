@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (258 open / 480 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 739 bugs (258 open / 481 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
@@ -19,7 +19,7 @@
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
-> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE 2026-10-23: the owner word ("use your 3 recommended sour |
+> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) UNBLOCKED 2026-10-23 (BUG-974): the proposer  |
 >
 > **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -19970,3 +19970,28 @@ C16 logging + exception scoping, merge ERROR bucket, resume integrity, selftest 
 
 **INTERIM NOTE SUPERSEDED.** The `--workers 1` workaround is no longer required for correctness; concurrency
 still collapses a slow single-model server, so `--workers` remains a throughput knob, not a resilience one.
+
+## BUG-974 (MED, FIXED 2026-10-23) — the tier-B ruling path was INERT: the register claimed "rule MATCH → folds into the golden" but the instrument had no path to fold an fb_id-less candidate (0/45 tier-B candidates resolve to a store fb_id)
+
+**DISCOVERED.** The T-195 gate and the step-(b) handoff both said "certified tier-B rows enter the SAME golden
+through the SAME rail (`check_extraction_recall.py --build-golden --apply`)". But the ONLY ruling reader
+(`read_certifications`) requires `owner_ruling_fb_id` to be a valid 64-hex id that RESOLVES in the store, and
+`build_golden` FAIL-CLOSES on a certified fb_id absent from the store. Measured: **0 of 45** tier-B candidates
+have a matching fb_id in `maxwell.db` (they are by definition concepts the extractor OMITTED, D-3130). So the
+owner could not actually rule any candidate MATCH — the arm could REPORT omissions but never CLOSE the loop.
+
+**FIX LANDED.** Added `config/extraction_recall.yaml#golden.tier_b_ruling_sheet` (C12) and
+`load_tier_b_rulings()` in `check_extraction_recall.py`. An owner ruling is a JSONL line
+`{"source_id", "name", "owner_ruling_note"}` with note in {MATCH, NONE}; the key is DERIVED from the name
+(D-3129) so a MATCH needs NO fb_id. `build_golden` folds owner-MATCHed candidates into the floored expectation
+set keyed by (source_id, concept_key) with an EMPTY `fb_id_pointer`; NONE rules them out; an absent ruling leaves
+them advisory. `evaluate` reports `tier_b_matched` / `tier_b_ruled_none` alongside the advisory set.
+
+**RED-LOOP (D-3036, satisfied).** Selftest case 8 proves a MATCHed-but-absent candidate REDs (floored) while an
+unruled candidate stays CLEAN (advisory). Live smoke: ruling one real candidate ("The Kernel of Strategy",
+b51204ce6c6a9950) flipped the rail 44/44 → **RED** (44/45, 418/419); reverting the ruling restored CLEAN.
+Output: `✅ selftest passed: ... tier-B owner-MATCH floored RED`.
+
+**CONSEQUENCE (documented, not hidden).** An owner MATCH on a genuinely-omitted concept is the completeness
+signal D-3130 wants: it makes the loss rail go RED until that concept is EXTRACTED into the store. Ruling MATCH
+is therefore the TRIGGER for extraction work, not the end of the loop.

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-GOLDEN",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "053a51d",
+  "pipeline_commit": "799d462",
   "key_rule": "D-3129: (source_id, concept_key) is the key space; fb_id is a denormalized pointer",
   "tier_a": "owner-MATCH certifications (owner_ruling_note == MATCH) - anti-circular: adjudicated against the source, not copied from extractor output",
   "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
@@ -278,6 +278,8 @@
       "rationale": "Online networks of creative coders and educators can be formalized into structured communities that drive curriculum development."
     }
   ],
+  "tier_b_matched": [],
+  "tier_b_ruled_none": 0,
   "authority": {
     "path": "governance/ANCHOR_208_REANCHOR_ADJUDICATION_20261022b.csv",
     "sha256": "bcfeeaa51ff0a13016acf8e093f39913b0f14fbd190cd2e9c92b7dae2ede9660"
@@ -286,7 +288,8 @@
     "certifications": 45,
     "concepts": 44,
     "expectations": 418,
-    "distinct_sources": 338
+    "distinct_sources": 338,
+    "tier_b_matched": 0
   },
   "rows": [
     {

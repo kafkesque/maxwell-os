@@ -430,6 +430,7 @@ may_touch:
 - governance/EXTRACTION_RECALL_GOLDEN_20261023.json
 - governance/EXTRACTION_RECALL_REPORT.json
 - governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
+- governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

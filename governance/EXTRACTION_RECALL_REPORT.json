@@ -2,11 +2,11 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "4c9d805",
+  "pipeline_commit": "799d462",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
-    "sha256": "1d6a2d84a3fa9bbdcfdcf4475557185835a9c45be14ab1412858076f745afa20"
+    "sha256": "bdea54b7797bc206d0c4a54574c422450c8226da75d19e4e34b64d6835ca2c27"
   },
   "result": {
     "concept_recall": 1.0,
@@ -37,6 +37,8 @@
     "tier_b_proposed": 45,
     "tier_b_present": 0,
     "tier_b_omitted": 45,
+    "tier_b_matched": 0,
+    "tier_b_ruled_none": 0,
     "tier_b_present_pairs": [],
     "tier_b_omissions": [
       {

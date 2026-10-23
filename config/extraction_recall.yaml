@@ -24,6 +24,14 @@ extraction_recall:
     # the owner picks pilot sources and the proposer emits a sheet). Format: JSONL, one candidate per
     # line: {"source_id": "<id>", "name": "<concept name>", "rationale": "<advisory reason>"}.
     tier_b_sheet: governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
+    # T-195 step (c): the OWNER's MATCH/NONE rulings on tier-B candidates (authoritative, D-2658;
+    # NEVER auto-certified, D-2898). A MATCH folds the candidate into the golden's FLOORED
+    # expectation set keyed by (source_id, concept_key) WITHOUT requiring an fb_id in the store —
+    # the candidate is by definition a concept the store may have OMITTED (D-3130), so a ruling
+    # carries source_id + name and the key is DERIVED (D-3129). A NONE rules it out; an absent
+    # ruling leaves it advisory. JSONL, one per line:
+    # {"source_id": "<id>", "name": "<concept name>", "owner_ruling_note": "MATCH"|"NONE"}.
+    tier_b_ruling_sheet: governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl
   # T-195 step (b): the ADVISORY tier-B proposer (D-2898: NEVER auto-certified). A local model emits
   # candidate concepts the certified core may have OMITTED; the owner then rules MATCH/NONE. Every value
   # here is config (C12) — the script hardcodes nothing, not even the model name.

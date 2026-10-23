@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 739 bugs (258 open / 481 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 743 bugs (261 open / 482 closed; highest OPEN = BUG-977) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 258 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 258 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 261 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19995,3 +19995,196 @@ Output: `✅ selftest passed: ... tier-B owner-MATCH floored RED`.
 **CONSEQUENCE (documented, not hidden).** An owner MATCH on a genuinely-omitted concept is the completeness
 signal D-3130 wants: it makes the loss rail go RED until that concept is EXTRACTED into the store. Ruling MATCH
 is therefore the TRIGGER for extraction work, not the end of the loop.
+
+## BUG-975 (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not loadable), so the D-3130 row lands with FTS-only retrieval
+
+**DISCOVERED.** Closing D-3130 (owner MATCHed "The Kernel of Strategy", b51204ce6c6a9950) required a governed
+single-concept insert — no targeted extract path existed (stage2 has no `--source` filter; stage6 is
+checkpoint-only). The new `pipeline/insert_single_concept.py` reuses the real generator (Qwen3-Coder via
+`call_omlx`), verifier (`deberta_check`), deterministic classifier (`match_domains_to_canonical`), guarded
+`insert_fb`, and `insert_embedding`. `insert_embedding` needs the `vec0` virtual module loaded on the connection;
+the framework `python3` build lacks `SQLITE_OMIT_LOAD_EXTENSION`, so even after `load_sqlite_vec(conn)` the
+`INSERT INTO vec_fbs` raised `no such module: vec0`. The row is present and correct (fb_id non-empty,
+`source_ids=["b51204ce6c6a9950"]`, `domains=["organizational behavior"]`), but carries no `vec_fbs` vector —
+vector search falls back to FTS (non-critical, same degraded shape as the existing `S6_VEC_PYTHON` gate, D-2717).
+
+**ALSO MEASURED (reproduces BUG-305).** `deberta_check` returned `passed=False score=0.000` on a verbatim-grounded
+principle, so the row landed `status=QUARANTINE, needs_human_review=1` (honest fail-closed). The serving-gate
+CRITICAL cluster (BUG-297/299/305) is the reason this and ~2,984 other rows sit in QUARANTINE; re-verification
+must be re-run after BUG-305 lands, not before.
+
+**REMAINING (bounded).** (1) Run the insert under the vec0-capable interpreter (`S6_VEC_PYTHON`, Homebrew 3.14) or
+backfill the single row's embedding, so the new row is vector-retrievable. (2) Do NOT re-run a full cluster for one
+concept — the (source_id, concept_key) dedup guard already prevents a duplicate if the source is later re-extracted.
+
+
+## BUG-976 (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" (NOT a BUG-305 contra); the S5 verifier is sound
+
+**CORRECTION — supersedes BUG-975's "ALSO MEASURED (reproduces BUG-305)" line.** That reading misattributed
+`passed=False score=0.000` as a BUG-305 contra. Forensic re-run on the SAME row content with evidence populated
+returned `passed=True score=0.9885 detail="ENTAIL (OR-entail + AND-no-contra): 1/1 entail, 0 contra, max=0.99"`.
+DeBERTa ENTAILs a verbatim principle→definition pair at 0.99. There is NO live BUG-305 contra on the S5 serving
+gate for the principle class — the "signal" was an empty-evidence artifact of the NEW script.
+
+**ROOT CAUSE.** `insert_single_concept.py` (built this session, D-3130 closer) set `source_text` on the fb but NOT
+`evidence_passages` / `evidence_passages_shown` / `source_principles`. `deberta_check` reads evidence via
+`fb_source_texts_shown()` → `fb_source_texts()` → `evidence_passages` → `source_principles[]`, all absent, so it
+fail-closed to `(False, 0.0, "No evidence — QUARANTINE")`. The row landed QUARANTINE with score 0.0 for the WRONG
+reason (no evidence), not because the meter contradicted it.
+
+**FIX (2026-10-23).** `pipeline/insert_single_concept.py` now sets `evidence_passages=[source_text]` and
+`evidence_passages_shown=[source_text[:6000]]` (D2283 core field, honest provenance). The 'The Kernel of Strategy'
+row was re-verified on its stored `source_text` and repaired: `status QUARANTINE/0.0/unknown → PASS/0.9885/entail`,
+`needs_human_review 1→0`, `evidence_passages` persisted.
+
+**CONSEQUENCE.** The BUG-975 "~2,984 rows sit in QUARANTINE because of BUG-305" attribution must be re-examined:
+rows quarantined with detail "No evidence" were quarantined for missing evidence, not NLI contra. BUG-305 remains
+OPEN only for the R2 definition-anchored path (scripts/definition_nli_verify.py); its S5 manifestation was never
+reproduced. Re-verify the QUARANTINE shelf on the REAL reason before re-scoring.
+
+## BUG-977 (HIGH — OPEN 2026-10-23) — a premise measured BEFORE the act it licensed was never re-taken: 10 rows carry a DISPOSITION as their content_type, SIX of them SERVED, while the gate that owns the rule printed "0 dispositions"
+
+**MEASURED 2026-10-23** (store 7,641 rows, `python3 scripts/restamp_content_type_adjudications.py --check`):
+`content_type` census = principle 6,574 | process_template 777 | process_instance 157 | tool_instruction 98 |
+growth_edge 25 | **noise_drop 8** | **quarantine 2**. The last two are DISPOSITIONS, not roles (BUG-741), and the
+serving layer's own predicate (`pipeline/retrieve.py#_status_predicate`, D2330, asked — never copied) puts SIX of
+them in the DEFAULT ANSWER PATH:
+
+| served | label | row |
+|---|---|---|
+| YES | quarantine | Dependency-driven Career Fragility |
+| YES | noise_drop | Symbolic Resonance in Cultural Narratives |
+| YES | noise_drop | Musical Text Composition and Interpretation |
+| YES | noise_drop | Coordinate Transformation Complexity in Radar Systems |
+| YES | noise_drop | Recognition-driven Serotonin Reward Mechanism |
+| YES | noise_drop | Risk Classification Framework |
+| no | noise_drop | Credential-based Professional Development |
+| no | noise_drop | Systemic Blind Spot |
+| no | noise_drop | Logic Approach Vs Random Variable Approach |
+| no | quarantine | Llm Prompt Injection for Data Extraction |
+
+**ROOT CAUSE (three links, each MEASURED, none inferred).**
+(1) **THE PREMISE PREDATED THE ACT IT LICENSED.** D-2965 justified its lane with "MEASURED 2026-10-12 on the live
+artifact: 7,640 rows · 0 blanks · 0 dispositions — this gate is NEUTRAL today and closes a pathway that is ARMED,
+not a defect that is firing." The D-2590 sidecar commit stamped `committed_at 2026-10-12T09:58:32` on all ten rows.
+The leaf gate that refuses exactly these labels landed in `d69de66` at **2026-10-12 21:09:54** — **eleven hours
+later**. So the pathway the gate declared ARMED *did* fire, between the measurement and the gate, and the premise
+was never re-taken afterwards. This is D-3034's rule applied to a MEASUREMENT: a number that licensed an act must be
+re-taken after the act.
+(2) **THE INSTRUMENT'S SCOPE COULD NOT CONTAIN THE DEFECT (D-2956 clause 4).** `classify()` answers "what may this
+gate WRITE", so its population is the owner's adjudication map — 546 rows, of which **19** resolve to the store. It
+therefore printed `disposition 1 | disposition_served 0` while ten rows the rule forbids sat in the store. A rule
+measured over a population that cannot hold the defect is a scoping error, not a blind spot in the reading.
+(3) **NO RETRO RAIL.** D-2965's gate is a WRITE gate (`insert_fb`), and the register itself says a store-wide
+"the router agrees with every label" parity rail would measure HISTORY and need re-baselining — so nothing ever read
+the committed census against the vocabulary. Forward-only was a decision; forgetting the past was not.
+
+**FIXED, three parts.**
+(a) **THE CENSUS LIVES IN THE INSTRUMENT THAT OWNS THE RULE.** `scripts/restamp_content_type_adjudications.py`
+now also measures the WHOLE STORE (`store_census` / `store_census_verdict`) into four classes — a disposition in the
+served path, a disposition outside it, a label in NEITHER vocabulary, and a BLANK label (the BUG-726 shape the store
+ruler cannot see) — with the serving question still asked of `pipeline/retrieve.py#_status_predicate`, never a copy
+(C21). **Per-class shrink-only ceilings, never one total** (D-2956): a single number would let a repaired row be
+replaced by a NEW undeclared label while the total still read 10. Declaration: `config/content_type_restamp.yaml#store_census`.
+(b) **CONTROLS + WIRING.** Ten new known-answer controls on a FIXTURE store (never the live one, BUG-491):
+`--selftest` 13 → **23/23**, including a SUBSTITUTION control (a repaired row cannot mask a new defect), both
+fail-closed directions of the declaration (a class with no ceiling; a ceiling for a class the census never
+produces), and the ROLE-is-counted-nowhere control. Wired into `just health` as `--check || [ $? -eq 2 ]`: rc **2** =
+OWNER-OWED (loud, not fatal, BUG-457) so the ladder keeps running and the debt keeps a row; rc 1 = a class grew past
+its ceiling. The new `--check` is READ-ONLY and writes NO receipt — a health rail that dirtied the worktree would be
+judged by the rail that reads it (BUG-563).
+(c) **THE OWNER'S RULING IS HANDED OVER NOOB-PROOF (D-3100).** `scripts/rule_content_type_census.py` walks the ten
+rows one at a time and appends the answer to the owner's OWN warrant map (`governance/content_type_adjudication.json`,
+read from `config/content_types.yaml#adjudication_map` — never re-typed), atomically, refusing duplicates and
+refusing any word outside the two declared vocabularies. **The last hand-off of this shape told the owner to append a
+line to a JSONL and ended in `zsh: command not found` (the reason `scripts/rule_tier_b.py` exists); this bug does not
+repeat that.**
+
+**THE OWNER'S STEP — four lines, copy-paste (nothing to edit by hand).**
+```
+cd "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0"
+python3 scripts/rule_content_type_census.py            # prints the 10 rows; nothing is written
+python3 scripts/rule_content_type_census.py --apply     # asks one row at a time; ROLE | DISPOSITION | skip
+python3 scripts/restamp_content_type_adjudications.py --check   # the write set appears; then --apply
+```
+Expected after `--apply`: `wrote N ruling(s) -> governance/content_type_adjudication.json`. Then the gate's dry run
+shows the ruled rows in `apply` (a ROLE) or `disposition`/`disposition_served` (a disposition, which is its own act,
+BUG-741b) — and `--apply` writes the label with authorship `human_verbatim`, because a HUMAN chose it (BUG-742).
+If a row is `skip`ped it stays in the debt and the census keeps reporting it: **no silent default.**
+
+**NOT DONE DELIBERATELY.** No label was moved by a script — a content_type is a curation judgement and D-2898
+forbids auto-certification; no ceiling was raised (D-2642); no disposition COLUMN was created (D-2952: the column
+lands with its writer, and the served rows need the owner's word first, not a badge).
+
+**TWO REAL QUESTIONS THE CENSUS RAISES, RECORDED NOT ANSWERED.** `Risk Classification Framework` is labelled
+`noise_drop` while being a NAMED FRAMEWORK — the same class BUG-729 measured on the router side ("framework" names an
+artifact that is USED, not a method that is EXECUTED), so this may be a mislabel in the OTHER direction. And six of
+the ten are SERVED while carrying a label that says "not knowledge": that is noise in the answer path today, which is
+why this bug is HIGH rather than MED despite a count of ten.
+
+---
+
+## BUG-978 (MED — CLOSED 2026-10-23) — the single-concept path ASSERTED its ontology as code literals and wrote its only row with FOUR blank cells; the role and the authorship now come from a declaration
+
+**MEASURED 2026-10-23.** `pipeline/insert_single_concept.py` (D-3130's governed single-insert path) wrote exactly
+one row — `f523504ee9030e02bd02d5ca6ba6a5f9e174b217b83e805e73025323b44cc31d`, *The Kernel of Strategy* — carrying
+`content_type_source='' | discipline_source='' | extraction_type_source='' | created_at=''`, while the other
+**7,640/7,640** rows carry all four. That is the **BUG-742** class (a label present, its AUTHORSHIP absent) plus the
+blank time stamp `check_store_columns` reads as **CONSTANT-OR-BLANK on a declared `value` column** — that rail went
+RED on it (rc 1), which is this bug's red loop. The same write site held **ten ontology literals in code**, including
+`"content_type": "principle"`: **C12** (a value that can be declared, hardcoded) and **BUG-712's "asserted, never
+computed" shape at a NEW site** — a ROLE claim the tool has no warrant to make.
+
+**FIXED.** (1) `config/pipeline_config.yaml#single_concept` now DECLARES the path's ontology (13 values); the site
+holds none. (2) `pipeline/insert_single_concept.py::declared_ontology` READS that block and validates every value
+against its CLOSED home (`leaf_label_fault` for the ROLE — a disposition is refused, D-2965/BUG-741; `EXTRACTION_TYPES`
+and the `schemas.py` Literals for the axes), failing closed on an absent block, a missing key, a blank, or an
+undeclared value. (3) `apply_declared_ontology` stamps the ontology **plus all three `*_source` cells plus
+`created_at`/`committed_at`** — provenance-completeness BY CONSTRUCTION, so the next 43 tier-B inserts (T-195) cannot
+inherit the hole. (4) `scripts/repair_single_concept_provenance.py` repaired the one row **derivatively, never
+inventively**: the three authorships came from the SAME declaration reader the producer uses (so repair and producer
+cannot disagree, C21) and `created_at` was re-derived from the row's own `committed_at` — on this path extraction and
+commit are the same act. C13 backup (`backups/maxwell.db.pre_bug977_20261023_145703`, 209.3 MiB), ONE
+`BEGIN IMMEDIATE`, post-state re-derived INSIDE the transaction, 4 cells written on 1 row.
+
+**AUTHORSHIP IS `deterministic`, AND THAT IS A FINDING.** The tier-B ruling sheet
+(`governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl`) carries **MATCH/NONE only** — the owner ruled
+PRESENCE, never the ROLE. So `human_verbatim` would be a provenance LIE and `llm_extracted_from_source` would be
+false too (no LLM emitted the label). A DECLARED RULE authored it: `deterministic`, the C29 value for exactly that
+(D-2947/D-343). Pinned by a control so a future edit cannot quietly upgrade the claim.
+
+**CONTROLS.** `tests/test_single_concept_provenance.py` — **15 controls**: the declaration resolves and is complete;
+the ROLE is admissible at the leaf; every axis is a member of its closed home; the authorship is deterministic and
+never `human_verbatim`; a stamped record is provenance-complete; **8 fail-closed shapes** (absent block, missing key,
+blank value, disposition-as-role, undeclared role/form/depth, minted provenance value); and a **SOURCE-LEVEL control
+read as an AST** — no dict literal in the module may carry an ontology axis as a literal value (the D-2968 precedent,
+because no runtime assertion can see a literal that simply looks correct). The AST form is deliberate: the module's
+docstring QUOTES the old literals as history, and a control that could not tell history from code would forbid its own
+receipt. R5 (deterministic layers + ONE cross-family reviewer, gemma-4-E4B-it): **APPROVE** on the producer, the
+repair script and the gate change; `ruff` clean.
+
+**OWED, NAMED.** `check_store_columns --check` still reports the census MOVES this insert caused (rows 7,640 → 7,641
+across 45 columns, plus CODE-CENSUS moves from the new files) — one `--record` is owed ONCE the store settles, never
+a hand-edit (D-2649/D-2942). The pre-existing `stage0_convert.py` C11 finding (`mobi` is imported but undeclared in
+requirements) is NOT this bug and remains open under its own name.
+
+---
+
+## BUG-712 (MED — STILL OPEN 2026-10-23) — STATUS RE-VERIFIED, and BUG-977 is NOT an extension of it: the re-stamp write set measures 0, and the residual is ONE row deferred by the warrant rule
+
+**MEASURED 2026-10-23** (`scripts/restamp_content_type_adjudications.py --check`): map rows 546 | **resolve to store
+19** | `apply 0` | `already 18` | `absent 527` | `stale 0` | `disposition 1` (NOT OWED — its practical content is
+already true) | `disposition_served 0` | `unknown 0`. **The re-stamp is DISCHARGED**: there is nothing left for the
+warrant path to write.
+
+**WHY IT IS NOT CLOSED.** The residual is the ONE row D-2953's warrant rule withholds: the strict tension form's
+surviving genuine `claim_status` is a router PREDICTION that is 50% precise at n=2 (BUG-735), and below the declared
+bench floor a label may be moved by an OWNER WARRANT only. That is an **accepted negative recorded, not a pending
+question** (D-3038) — and closing the bug would put a mislabelled row back into the invisible middle, which is the one
+thing this register must not do. So BUG-712 stays OPEN at MED with its state now measured, and its residual is
+**owner-warrant-gated**, not script-gated.
+
+**THE BOUNDARY, STATED SO IT CANNOT BE RE-ABSORBED.** BUG-712 is about labels the owner ADJUDICATED and the store did
+not carry; BUG-977 is about labels NO ONE EVER RULED that the vocabulary cannot hold at all. Same column, different
+question, different act, different owner — and D-2956 clause 4 is why they were invisible together: one instrument's
+population (the map) could not contain the other's defect. They now have one home each.

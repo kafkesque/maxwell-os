@@ -2,35 +2,25 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "27df631",
+  "pipeline_commit": "e97452c",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
     "sha256": "937a544628d4a33ee7551325a8c40bc6a195b4de1efc166337c7961ec00af38a"
   },
   "result": {
-    "concept_recall": 0.977778,
-    "expectation_recall": 0.997613,
+    "concept_recall": 1.0,
+    "expectation_recall": 1.0,
     "concepts_expected": 45,
-    "concepts_hit": 44,
+    "concepts_hit": 45,
     "expectations_expected": 419,
-    "expectations_hit": 418,
-    "missing_concepts": [
-      {
-        "item_id": "tierB:b51204ce:15e4aa9c",
-        "name": "The Kernel of Strategy"
-      }
-    ],
-    "missing_pairs_count": 1,
-    "missing_pairs": [
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2"
-      }
-    ],
+    "expectations_hit": 419,
+    "missing_concepts": [],
+    "missing_pairs_count": 0,
+    "missing_pairs": [],
     "sources": {
       "count": 338,
-      "fully_recalled": 337,
+      "fully_recalled": 338,
       "denominator_distribution": {
         "1": 270,
         "2": 56,
@@ -42,11 +32,8 @@
     "duplicate_pairs": [],
     "key_integrity_faults": [],
     "key_integrity_fault_count": 0,
-    "red_reasons": [
-      "concept_recall 0.977778 < floor 1.0",
-      "expectation_recall 0.997613 < floor 1.0"
-    ],
-    "verdict": "RED",
+    "red_reasons": [],
+    "verdict": "CLEAN",
     "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
     "tier_b_proposed": 43,
     "tier_b_present": 0,

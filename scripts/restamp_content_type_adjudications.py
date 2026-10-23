@@ -68,6 +68,15 @@ from pipeline.pipeline_paths import DB_PATH  # noqa: E402 - the ONE home for the
 CONFIG = ROOT / "config" / "content_type_restamp.yaml"
 SENTINEL = "OWNER_RULING_OWED"
 
+#: The four ways a STORED label can fail the vocabulary census. One class per DEFECT, never one total, because a
+#: single number lets a repaired row be replaced by a differently-broken one while the count is unchanged (D-2956).
+STORE_CLASSES: tuple[str, ...] = (
+    "store_disposition_served",
+    "store_disposition_held",
+    "store_undeclared",
+    "store_blank",
+)
+
 
 def load_config() -> dict[str, Any]:
     """Load the gate's declarations; a missing or partial config is a DEFECT, not an empty config (C16)."""
@@ -159,6 +168,104 @@ def live_state(con: sqlite3.Connection, cfg: dict[str, Any], ids: list[str]) -> 
     return out
 
 
+def store_census(con: sqlite3.Connection, cfg: dict[str, Any], types: set[str], dispositions: set[str],
+                 *, served_sql: str | None = None) -> dict[str, list[dict[str, Any]]]:
+    """Measure EVERY stored label against the declared vocabulary (BUG-977).
+
+    WHY THIS IS NOT `classify` (MEASURED 2026-10-23, and it is the whole finding). `classify` answers a question
+    about the WARRANT — "what may this gate write" — so its population is the owner's adjudication map, 19 rows.
+    It therefore printed `disposition 1 | disposition_served 0` while the store carried TEN rows whose
+    content_type IS a disposition, six of them in the served path. A rule measured over a population that cannot
+    contain the defect is not a blind spot in the reading, it is a scoping error (D-2956 clause 4), so the census
+    reads the STORE and nothing else. Both runs in the same invocation; they answer different questions.
+
+    The serving question is asked of the SERVING layer's own predicate (pipeline/retrieve.py#_status_predicate,
+    D2330) — never a copy of `status = 'PASS'` here (C21). `served_sql` exists so the known-answer controls can
+    hand in a fixture predicate WITHOUT the census losing its production home.
+
+    Args:
+        con: an open connection to the store.
+        cfg: the gate's declaration (table/id/label/name columns + the census block).
+        types: the declared ROLE vocabulary, read from its one home.
+        dispositions: the declared DISPOSITION vocabulary, read from its one home.
+        served_sql: fixture override for the serving predicate (production passes None).
+
+    Returns:
+        {class: [row, ...]} for the four classes in STORE_CLASSES; a role label is COUNTED nowhere (it is correct).
+    """
+    block = cfg.get("store_census") or {}
+    if served_sql is None:
+        from pipeline.retrieve import (
+            _status_predicate,  # noqa: PLC0415 - the serving layer owns this predicate
+        )
+
+        served_sql = _status_predicate(False)
+
+    table, idc = str(cfg["table"]), str(cfg["id_column"])
+    label = str(cfg["label_column"])
+    name_col = str(block.get("name_column") or "")
+    if not name_col:
+        raise SystemExit("FAIL-CLOSED: store_census.name_column is absent - the census cannot name a row it owes (D-3034)")
+
+    out: dict[str, list[dict[str, Any]]] = {k: [] for k in STORE_CLASSES}
+    sql = (f"SELECT {idc}, {name_col}, {label}, CASE WHEN ({served_sql}) THEN 1 ELSE 0 END "
+           f"FROM {table}")
+    for fid, name, raw_label, served in con.execute(sql):
+        ct = str(raw_label or "").strip()
+        entry = {"fb_id": str(fid), "name": str(name or ""), "label": ct, "served": bool(served)}
+        if not ct:
+            out["store_blank"].append(entry)
+        elif ct in types:
+            continue
+        elif ct in dispositions:
+            out["store_disposition_served" if served else "store_disposition_held"].append(entry)
+        else:
+            out["store_undeclared"].append(entry)
+    return out
+
+
+def store_census_verdict(census: dict[str, list[dict[str, Any]]], cfg: dict[str, Any]) -> tuple[int, list[str]]:
+    """Read the census against its per-class ceilings; return (exit_code, reasons).
+
+    Fail-closed in BOTH directions (D-3034/C16): a class the census measures without a declared ceiling is an
+    unread claim, and a ceiling declaring a class the census never produces is a declaration with no referent.
+    Above its ceiling a class is a REFUSAL (the debt grew past a shrink-only declaration, D-2642); at or under it
+    the reading is OWNER-OWED — loud, never fatal (BUG-457), so the ladder keeps running and the debt keeps a row.
+
+    Args:
+        census: the output of `store_census`.
+        cfg: the gate's declaration (store_census.debt + store_census.exit).
+
+    Returns:
+        (exit_code, human-readable reasons) — 0 clean, 2 owner-owed, 1 refused.
+    """
+    block = cfg.get("store_census") or {}
+    if not block.get("enabled"):
+        return 0, ["store_census disabled by declaration - the census is NOT read"]
+    debt = block.get("debt") or {}
+    exits = block.get("exit") or {}
+    missing = [k for k in STORE_CLASSES if k not in debt]
+    if missing:
+        raise SystemExit(f"FAIL-CLOSED: store_census.debt declares no ceiling for {missing} (D-2956)")
+    orphans = [k for k in debt if k not in STORE_CLASSES]
+    if orphans:
+        raise SystemExit(f"FAIL-CLOSED: store_census.debt declares class(es) this census never produces: {orphans} (D-3034)")
+
+    above: list[str] = []
+    within: list[str] = []
+    for name in STORE_CLASSES:
+        measured, ceiling = len(census[name]), int(debt[name])
+        if measured > ceiling:
+            above.append(f"{name}={measured} > ceiling {ceiling}")
+        elif measured:
+            within.append(f"{name}={measured}/{ceiling}")
+    if above:
+        return int(exits.get("above_debt", 1)), above + within
+    if within:
+        return int(exits.get("within_debt", 2)), within
+    return 0, ["store census CLEAN: every stored content_type is a declared ROLE"]
+
+
 def classify(cfg: dict[str, Any], schema: dict[str, Any], rows: list[dict[str, Any]],
              live: dict[str, dict[str, Any]], types: set[str], served: set[str]) -> dict[str, list[dict[str, Any]]]:
     """Bucket every map row; nothing is dropped and every refusal carries its reason (C16).
@@ -230,6 +337,9 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true", help="write (default is dry-run: nothing is mutated)")
     ap.add_argument("--json", default=None, help="receipt path override (default: the config's receipt)")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls for this gate's OWN decisions (BUG-492)")
+    ap.add_argument("--check", action="store_true",
+                    help="READ-ONLY live reading (the store census incl.): prints, decides the exit code, writes NO receipt "
+                         "(a health rail that writes would dirty the worktree it is judged by, BUG-563)")
     args = ap.parse_args()
     if args.selftest:
         return selftest()
@@ -267,6 +377,16 @@ def main() -> int:
                   f"The store has no home for a curation ruling: status is a VERIFICATION verdict (BUG-499 class).")
         value = str(cfg["provenance_value"])
         owed = value == SENTINEL
+        census = store_census(con, cfg, types, dispositions)
+        census_rc, census_reasons = store_census_verdict(census, cfg)
+        debt = (cfg.get("store_census") or {}).get("debt") or {}
+        print("\nSTORE CENSUS (the whole store, not the map - BUG-977):")
+        for name in STORE_CLASSES:
+            print(f"  {name:26} {len(census[name]):5d} / ceiling {debt.get(name)}")
+            for e in census[name][:12]:
+                print(f"    {e['fb_id'][:12]} {e['label']!r:14} served={e['served']!s:5} {e['name'][:64]!r}")
+        print("  verdict: " + ("; ".join(census_reasons) or "clean"))
+
         receipt = {
             "schema_version": 1, "generated": time.strftime("%Y-%m-%dT%H:%M:%S"), "tool": "scripts/restamp_content_type_adjudications.py",
             "map": str(schema["path"]), "store_rows_resolved": len(rows) - len(buckets["absent"]),
@@ -277,6 +397,11 @@ def main() -> int:
             "disposition_writer": str((cfg.get("dispositions") or {}).get("writer") or ""),
             "provenance_value": value, "provenance_ruling_owed": owed,
             "applied": 0, "wrote": False,
+            "store_census": {
+                "counts": {k: len(v) for k, v in census.items()},
+                "ceiling": debt, "exit": census_rc, "reasons": census_reasons,
+                "rows": census,
+            },
         }
         if not args.apply:
             print(f"\n[dry-run] the write set is {len(buckets['apply'])} row(s); nothing was mutated. "
@@ -306,14 +431,21 @@ def main() -> int:
                     raise SystemExit(f"FAIL-CLOSED: {len(bad)} cell(s) did not take after commit: {bad[:5]} - investigate before proceeding")
                 receipt["applied"], receipt["wrote"] = n, True
                 print(f"[apply] wrote {n} label(s) + provenance '{value}' and RE-READ every cell: all took")
-        out = Path(args.json) if args.json else ROOT / str(cfg["receipt"])
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        print(f"receipt -> {out.relative_to(ROOT)}")
+        if args.check:
+            print("[--check] read-only: no receipt written (a health rail must not dirty the worktree it is judged by, BUG-563)")
+        else:
+            out = Path(args.json) if args.json else ROOT / str(cfg["receipt"])
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            print(f"receipt -> {out.relative_to(ROOT)}")
         # A NOT-served disposition row is NOT a refusal: an inert RED is as uninformative as a green lie, so
         # only a refusal and a SERVED disposition (the owed act) hold the exit code at "ruling OWED".
         refused = sum(len(buckets[k]) for k in ("stale", "disposition_served", "unknown"))
-        return int((cfg.get("exit") or {}).get("refused", 1)) if refused else int((cfg.get("exit") or {}).get("clean", 0))
+        if refused:
+            return int((cfg.get("exit") or {}).get("refused", 1))
+        if census_rc:
+            return census_rc
+        return int((cfg.get("exit") or {}).get("clean", 0))
     finally:
         con.close()
 
@@ -383,6 +515,75 @@ def selftest() -> int:
     ]
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
+        print(("  ok   " if ok else "  FAIL ") + name)
+
+    # ── THE STORE CENSUS (BUG-977) — known answers on a FIXTURE store, never the live one (BUG-491) ──────────
+    import copy as _copy
+
+    fix_cfg = _copy.deepcopy(cfg)
+    fix_cfg["store_census"]["debt"] = {
+        "store_disposition_served": 1, "store_disposition_held": 1,
+        "store_undeclared": 1, "store_blank": 1,
+    }
+    fixture = sqlite3.connect(":memory:")
+    try:
+        fixture.execute("CREATE TABLE fbs (fb_id TEXT, name TEXT, content_type TEXT, status TEXT)")
+        fixture.executemany(
+            "INSERT INTO fbs VALUES (?,?,?,?)",
+            [("r1", "a role", "principle", "PASS"),
+             ("d_served", "served noise", "noise_drop", "PASS"),
+             ("d_held", "held noise", "noise_drop", "QUARANTINE"),
+             ("und", "a label in no vocabulary", "made_up_type", "PASS"),
+             ("blank", "a discarded label", "", "PASS")],
+        )
+        served_fixture = "status = 'PASS'"  # FIXTURE predicate: these controls test the bucketing, not the contract
+        cen = store_census(fixture, fix_cfg, types, dispositions, served_sql=served_fixture)
+        ids_of = lambda name: [e["fb_id"] for e in cen[name]]  # noqa: E731 - a one-line projection
+
+        checks2: list[tuple[str, bool]] = [
+            ("a DISPOSITION label IN the served path is caught by the STORE census (BUG-977)",
+             ids_of("store_disposition_served") == ["d_served"]),
+            ("a DISPOSITION label OUTSIDE the served path is caught too", ids_of("store_disposition_held") == ["d_held"]),
+            ("a label in NEITHER vocabulary is caught as UNDECLARED", ids_of("store_undeclared") == ["und"]),
+            ("a BLANK label is caught (the shape the store ruler cannot see, BUG-726)", ids_of("store_blank") == ["blank"]),
+            ("a declared ROLE is counted in NO class", all("r1" not in ids_of(n) for n in STORE_CLASSES)),
+            ("the census NAMES the row it owes (name + served state)",
+             cen["store_disposition_served"][0]["name"] == "served noise"
+             and cen["store_disposition_served"][0]["served"] is True),
+            ("every class AT its ceiling reads OWNER-OWED, never clean (BUG-457)",
+             store_census_verdict(cen, fix_cfg)[0] == 2),
+        ]
+        # a class ABOVE its shrink-only ceiling is a REFUSAL ...
+        over = _copy.deepcopy(fix_cfg)
+        over["store_census"]["debt"]["store_disposition_served"] = 0
+        checks2.append(("a class ABOVE its ceiling is REFUSED, not merely loud (D-2642)",
+                        store_census_verdict(cen, over)[0] == 1))
+        # ... and one number cannot conceal a substitution: repairing the served row while a NEW undeclared appears
+        fixture.execute("UPDATE fbs SET content_type='principle' WHERE fb_id='d_served'")
+        fixture.execute("INSERT INTO fbs VALUES ('und2','a second stranger','also_made_up','PASS')")
+        sub = store_census(fixture, fix_cfg, types, dispositions, served_sql=served_fixture)
+        checks2.append(("per-class ceilings make a SUBSTITUTION visible (a repaired row cannot mask a new defect)",
+                        store_census_verdict(sub, fix_cfg)[0] == 1))
+        # a DECLARATION must resolve, in both directions
+        for label, mutate in (
+            ("a class with no declared ceiling FAILS CLOSED",
+             lambda c: c["store_census"]["debt"].pop("store_blank")),
+            ("a ceiling for a class the census never produces FAILS CLOSED (D-3034)",
+             lambda c: c["store_census"]["debt"].__setitem__("store_ghost", 0)),
+        ):
+            broken = _copy.deepcopy(fix_cfg)
+            mutate(broken)
+            try:
+                store_census_verdict(cen, broken)
+                checks2.append((label, False))
+            except SystemExit:
+                checks2.append((label, True))
+    finally:
+        fixture.close()
+
+    checks.extend(checks2)
+    bad = [name for name, ok in checks if not ok]
+    for name, ok in checks2:
         print(("  ok   " if ok else "  FAIL ") + name)
     print("selftest: " + str(len(checks) - len(bad)) + "/" + str(len(checks)) + " controls held")
     return 1 if bad else 0

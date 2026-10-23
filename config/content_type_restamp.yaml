@@ -95,3 +95,37 @@ dispositions:
 
 # EXIT (BUG-457 tri-state): 0 the queue is exactly what the receipt says | 1 a ruling is OWED (loud) | 2 cannot evaluate.
 exit: {clean: 0, refused: 1, cannot_evaluate: 2}
+
+# -----------------------------------------------------------------------------------------------------------
+# THE STORE CENSUS — what the VOCABULARY admits, measured over the WHOLE STORE rather than over the map (BUG-977).
+#
+# WHY THIS EXISTS (MEASURED 2026-10-23, live store, 7,641 rows). The `dispositions:` block above answers "what do we
+# DO with a row the OWNER ruled a disposition" — and it asks that question of the MAP's ids only (19 of 546 resolve
+# to the store). So the ONE instrument that owns the rule "a disposition is not a content_type" never measured the
+# STORE, and 10 rows carrying content_type='noise_drop' (8) | 'quarantine' (2), SIX of them status=PASS i.e. in the
+# default answer path, sat there while this gate printed `disposition 1 | disposition_served 0`. That is D-2956
+# clause 4 in its purest form: the instrument's SCOPE is part of the instrument. The census below is the missing
+# half — the SAME rule, over the population that matters, with the serving question still asked of the serving
+# layer's own predicate (C21: never a copy of `status = 'PASS'` here).
+#
+# A DEBT PER CLASS, NEVER ONE TOTAL (D-2956). A single number would let a repaired disposition row be replaced by a
+# NEW undeclared label while the total still read 10 — the substitution this register exists to prevent. Each class
+# carries its own shrink-only ceiling (D-2642: a ceiling is never raised), MEASURED 2026-10-23.
+#
+# THE CEILINGS ARE A DEBT AWAITING A RULING, NOT A LICENCE. Every one of the 10 rows needs an OWNER word (which ROLE
+# it carries, or the declared withdrawal act); none of them can be repaired by a script, because the label is a
+# curation judgement (D-2898: never auto-certified). The ceiling therefore SHRINKS to 0 as the owner rules; it can
+# never grow, and a class above its ceiling is a REFUSAL rather than a loud reading.
+store_census:
+  enabled: true
+  direction: shrink_only
+  name_column: name
+  debt:
+    store_disposition_served: 6   # a DISPOSITION where a ROLE belongs, IN the path a query answers from — noise served
+    store_disposition_held: 4     # a DISPOSITION where a ROLE belongs, outside the served path — inert, still not a role
+    store_undeclared: 0           # a label in NEITHER vocabulary — a fault with no ruling to wait for
+    store_blank: 0                # the D-2938 "computed then discarded" shape, which the store ruler cannot see (BUG-726)
+  # EXIT (BUG-457 tri-state). `within_debt` is OWNER-OWED — loud, never fatal, so the health ladder keeps running and
+  # the debt keeps a row (this is the repo-wide meaning of rc 2; `cannot_evaluate` shares it because both mean "a
+  # human must speak before this is clean"). `above_debt` is a REFUSAL: a class grew past a shrink-only ceiling.
+  exit: {within_debt: 2, above_debt: 1}

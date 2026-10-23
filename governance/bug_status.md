@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**258 open** / 481 closed of 739 ids.
+**261 open** / 482 closed of 743 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -175,7 +175,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-705 | (HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code — and 2,258 neutral rows are recoverable | 1 |
 | BUG-706 | (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee | 1 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
-| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 12 |
+| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 13 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an | 1 |
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |
@@ -265,3 +265,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-964 | (LOW, OPEN 2026-10-22) — gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified) | 2 |
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
+| BUG-975 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not | 1 |
+| BUG-976 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" | 1 |
+| BUG-977 | (HIGH — OPEN 2026-10-23) — a premise measured BEFORE the act it licensed was never re-taken: 10 rows carry a DISPOSITION as their | 1 |

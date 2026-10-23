@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 739,
-  "open_n": 258,
-  "closed_n": 481,
+  "total_ids": 743,
+  "open_n": 261,
+  "closed_n": 482,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -851,7 +851,7 @@
     {
       "id": "BUG-712",
       "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
-      "events": 12
+      "events": 13
     },
     {
       "id": "BUG-719",
@@ -1296,6 +1296,21 @@
     {
       "id": "BUG-972",
       "title": "(LOW, OPEN 2026-10-23) \u2014 `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback",
+      "events": 1
+    },
+    {
+      "id": "BUG-975",
+      "title": "(LOW, OPEN 2026-10-23) \u2014 `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not",
+      "events": 1
+    },
+    {
+      "id": "BUG-976",
+      "title": "(LOW, OPEN 2026-10-23) \u2014 `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned \"No evidence \u2014 QUARANTINE\"",
+      "events": 1
+    },
+    {
+      "id": "BUG-977",
+      "title": "(HIGH \u2014 OPEN 2026-10-23) \u2014 a premise measured BEFORE the act it licensed was never re-taken: 10 rows carry a DISPOSITION as their",
       "events": 1
     }
   ],
@@ -1780,6 +1795,7 @@
     "BUG-970",
     "BUG-971",
     "BUG-973",
-    "BUG-974"
+    "BUG-974",
+    "BUG-978"
   ]
 }

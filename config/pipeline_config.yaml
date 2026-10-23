@@ -1320,3 +1320,37 @@ mcp:
     max_system_chars: 4000
     max_files: 20
     allow_absolute_paths: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SINGLE-CONCEPT INSERT — the declared ONTOLOGY of the targeted extraction path (D-3130 / BUG-977).
+#   WHY THIS BLOCK EXISTS (MEASURED 2026-10-23). pipeline/insert_single_concept.py is the governed
+#   path for one (source, concept) pair that a tier-B owner ruling MATCHed but S2 omitted. Before this
+#   block it ASSERTED its whole ontology as code literals — "content_type": "principle" among them —
+#   which is three defects in one line: C12 (a value that can be declared is hardcoded), a ROLE claim
+#   the tool has no warrant to make (BUG-712's "asserted, never computed" shape), and a provenance hole
+#   (the label arrived with content_type_source='' on the one row this path ever wrote, while the other
+#   7,640 rows carry a stamp — the BUG-742 class: a label present, its AUTHORSHIP absent).
+#   The tier-B ruling sheet carries MATCH/NONE only (governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl),
+#   i.e. the owner ruled PRESENCE, never the ROLE — so `human_verbatim` would be a FALSE stamp here and
+#   `llm_extracted_from_source` would be false too (no LLM emitted the label). The label is authored by
+#   THIS DECLARED RULE, which is exactly what the C29 value `deterministic` means (D-2947/D-343).
+#   NOT routed through stage4_merge._resolve_content_type on purpose: that router's contract is to
+#   CORRECT an S2 label it was given, and this path has no S2 label to correct. Feeding it a synthetic
+#   one to launder a literal would be the drift it exists to prevent. A controlled role change is
+#   `content_type` below — one value, one home (C12), refused by leaf_label_fault if it is not a ROLE.
+#   Every value is validated by tests/test_single_concept_provenance.py against the CLOSED vocabularies
+#   (pipeline/content_types.py + pipeline/schemas.py), so this block cannot drift into an undeclared value.
+single_concept:
+  content_type: principle              # ROLE (5-value axis). leaf_label_fault refuses a disposition/undeclared value
+  extraction_type: empirical_pattern   # epistemic FORM (4-value axis)
+  content_type_source: deterministic    # C29: a declared rule authored the role, no LLM (D-2947/D-343)
+  extraction_type_source: deterministic # C29: same rule authored the form
+  discipline_source: llm_extracted_from_source  # C29: the generator's `discipline` is read FROM the passage
+  depth: domain                        # scope is a SEPARATE axis, never the role discriminator (D282)
+  evidence: cited
+  context: business
+  accessibility: self-evident
+  intimacy_boundary: public
+  difficulty_level: intermediate
+  temporal_scope: timeless
+  origin: single_source

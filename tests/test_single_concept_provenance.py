@@ -132,6 +132,19 @@ def test_the_write_site_carries_no_ontology_literal() -> None:
     assert not offenders, f"an ontology LITERAL reappeared at the write site: {offenders}"
 
 
+def test_the_epistemic_label_is_CO_DERIVED_not_declared() -> None:
+    """Hole 5 (D-2284/BUG-499). `epistemic_status` is a LABEL about the verification record, so it must never be a
+    declaration: S5 stamps it in stage5_verify.py:1268 through `serving_gate.derive_epistemic_status`, and this path
+    bypasses S5 — so it must ask the SAME rule. A declared value here would be a second author of one label
+    (BUG-502's class) and `check_serving_gate` would refuse the row, which is exactly how this hole was found.
+    """
+    source = SITE.read_text(encoding="utf-8")
+    assert "derive_epistemic_status(" in source, "the co-derived label is no longer derived at the write site"
+    assert '"epistemic_status"' not in source.replace("fb[\"epistemic_status\"]", ""), (
+        "epistemic_status reappeared as a DECLARED literal — it is derived from the record, never declared"
+    )
+
+
 def test_the_declaration_lives_in_config_not_code() -> None:
     """C12: the values that CAN be declared MUST be — the site reads a declaration, it does not hold one."""
     source = SITE.read_text(encoding="utf-8")

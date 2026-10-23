@@ -196,7 +196,7 @@ def main() -> int:
     from pipeline.dedup_identity import concept_key as mint_ck
     from pipeline.omlx_call import call_omlx
     from pipeline.schemas import match_domains_to_canonical, match_to_canonical
-    from pipeline.serving_gate import derive_status
+    from pipeline.serving_gate import derive_epistemic_status, derive_status
     from pipeline.stage5_verify import deberta_check
     from pipeline.stage6_commit import insert_embedding, insert_fb
     from pipeline.stamp import get_pipeline_commit, make_hash_id
@@ -264,6 +264,11 @@ def main() -> int:
     passed, score, detail = deberta_check(fb)
     verification_results = json.dumps([{"check_name": "factual", "passed": passed, "score": score, "detail": detail}])
     status, s5_reason = derive_status(verification_results)
+    # BUG-978 hole 5 (D-2284/BUG-499): the label is CO-DERIVED from the SAME record that derives `status` -
+    # S5 stamps it in stage5_verify.py:1268 and this path bypasses S5, so it must ask the ONE rule itself.
+    # `isor` is absent by design here (no ISOR rating is computed for a single insert), and the derivation
+    # FAILS CLOSED to the declared fallback rather than inventing a rating.
+    fb["epistemic_status"] = derive_epistemic_status(passed, None)
     fb["verification_results"] = verification_results
     fb["verifier_model"] = "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (threshold 0.5)"
     fb["confidence_score"] = round(float(score), 4)

@@ -307,9 +307,9 @@ measured:
     epistemic_status:
       distinct: 4
       hollow: 0
-      mentions: 14
-      nonblank: 6591
-      nonnull: 6591
+      mentions: 16
+      nonblank: 6592
+      nonnull: 6592
       rows: 7641
     evidence:
       distinct: 2
@@ -412,7 +412,7 @@ measured:
     isor:
       distinct: 362
       hollow: 0
-      mentions: 12
+      mentions: 14
       nonblank: 6591
       nonnull: 6591
       rows: 7641
@@ -650,7 +650,7 @@ measured:
     verification_results:
       distinct: 4909
       hollow: 1049
-      mentions: 18
+      mentions: 19
       nonblank: 7641
       nonnull: 7641
       rows: 7641

@@ -47,6 +47,39 @@ AUTHORSHIP_COLUMNS: dict[str, str] = {
 }
 
 
+def _factual_passed(verification_results: object) -> bool | None:
+    """The `factual` check's verdict from the row's OWN record (the serving gate's co-derivation input).
+
+    Returns None when the record carries no factual check — the caller then REFUSES rather than deriving a
+    label from a record that cannot answer (D-3034: a value must resolve).
+    """
+    import json as _json
+
+    try:
+        record = _json.loads(verification_results) if isinstance(verification_results, str) else verification_results
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(record, list):
+        return None
+    for check in record:
+        if isinstance(check, dict) and check.get("check_name") == "factual" and "passed" in check:
+            return bool(check["passed"])
+    return None
+
+
+def _isor_rating(isor_raw: object) -> str | None:
+    """The ISOR rating from the row's own `isor` cell, or None (the derivation fails closed on absence)."""
+    import json as _json
+
+    isor = isor_raw
+    if isinstance(isor, str) and isor.strip():
+        try:
+            isor = _json.loads(isor)
+        except ValueError:
+            return None
+    return isor.get("rating") if isinstance(isor, dict) else None
+
+
 def _blank(v: object) -> bool:
     """True when a stored cell is EITHER shape of absent (NULL or a non-NULL blank, BUG-737)."""
     return v is None or str(v).strip() == ""
@@ -77,7 +110,8 @@ def main() -> int:
     try:
         row = conn.execute(
             "select fb_id, name, content_type, content_type_source, discipline_source, "
-            "extraction_type_source, created_at, committed_at from fbs where fb_id = ?",
+            "extraction_type_source, created_at, committed_at, epistemic_status, "
+            "verification_results, isor from fbs where fb_id = ?",
             (args.fb_id,),
         ).fetchone()
         if row is None:
@@ -88,7 +122,8 @@ def main() -> int:
         print(f"before: content_type_source={row['content_type_source']!r} "
               f"discipline_source={row['discipline_source']!r} "
               f"extraction_type_source={row['extraction_type_source']!r} "
-              f"created_at={row['created_at']!r} committed_at={row['committed_at']!r}")
+              f"created_at={row['created_at']!r} committed_at={row['committed_at']!r} "
+              f"epistemic_status={row['epistemic_status']!r}")
 
         writes: dict[str, str] = {}
         for column, key in AUTHORSHIP_COLUMNS.items():
@@ -101,6 +136,19 @@ def main() -> int:
                       "(D-3034: a value must RESOLVE, never be invented)")
                 return 1
             writes["created_at"] = str(row["committed_at"])
+
+        # hole 5 (D-2284/BUG-499): the epistemic LABEL is co-derived from the row's OWN record — the same rule
+        # S5 uses (stage5_verify.py:1268) and the same one scripts/check_serving_gate.py re-derives with. A
+        # derivation whose input is absent is REFUSED, never guessed.
+        if _blank(row["epistemic_status"]):
+            from pipeline.serving_gate import derive_epistemic_status
+
+            passed = _factual_passed(row["verification_results"])
+            if passed is None:
+                print("REFUSED: the row carries no readable `factual` verdict, so the epistemic label cannot be "
+                      "DERIVED (D-3034: never invented)")
+                return 1
+            writes["epistemic_status"] = derive_epistemic_status(passed, _isor_rating(row["isor"]))
 
         if not writes:
             print("NOT OWED: every provenance cell is already stamped (idempotent — nothing written).")
@@ -133,15 +181,18 @@ def main() -> int:
                 raise RuntimeError(f"expected 1 row, updated {cur.rowcount} — rolling back")
             # post-state re-derived INSIDE the transaction, before COMMIT (the D-2970 pattern)
             after = conn.execute(
-                "select content_type_source, discipline_source, extraction_type_source, created_at "
-                "from fbs where fb_id = ?", (args.fb_id,)
+                "select content_type_source, discipline_source, extraction_type_source, created_at, "
+                "epistemic_status from fbs where fb_id = ?", (args.fb_id,)
             ).fetchone()
-            still_blank = [c for c in (*AUTHORSHIP_COLUMNS, "created_at") if _blank(after[c])]
+            still_blank = [c for c in (*AUTHORSHIP_COLUMNS, "created_at", "epistemic_status") if _blank(after[c])]
             if still_blank:
                 raise RuntimeError(f"post-state still blank on {still_blank} — rolling back")
             for column, key in AUTHORSHIP_COLUMNS.items():
                 if after[column] != ontology[key]:
                     raise RuntimeError(f"post-state {column}={after[column]!r} != declared {ontology[key]!r}")
+            if "epistemic_status" in writes and after["epistemic_status"] != writes["epistemic_status"]:
+                raise RuntimeError(f"post-state epistemic_status={after['epistemic_status']!r} != derived "
+                                   f"{writes['epistemic_status']!r}")
             conn.commit()
         except Exception:
             conn.rollback()

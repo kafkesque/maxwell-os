@@ -19,8 +19,9 @@ REASONS:
                                     write it by hand for a source S0 has already deterministically failed).
 
 --dry-run prints the exact line(s) and writes nothing. The disposition `source` must be the ABSOLUTE
-path the admission plan prints for the row (plan_admission matches `str(path)` exactly), and the
-`--kind` is a suffix like `.png` (the reader normalises case and the leading dot).
+path the admission plan prints for the row (plan_admission matches `str(path)` exactly) AND must RESOLVE
+to a file on disk — a source that does not resolve settles NOTHING and is refused (D-3034). The `--kind`
+is a suffix like `.png` (the reader normalises case and the leading dot).
 """
 from __future__ import annotations
 
@@ -97,6 +98,12 @@ def build_line(reason: str | None, kind: str | None, source: str | None) -> dict
                 f"FATAL: --source must be an ABSOLUTE path (plan_admission matches str(path) exactly, so a "
                 f"relative path would silently settle NOTHING) — got {source!r}"
             )
+        if not Path(source).is_file():
+            raise SystemExit(
+                f"FATAL: --source does not resolve to a file on disk, so this disposition would settle "
+                f"NOTHING (plan_admission matches str(path) against real files only, D-3034) — got {source!r}. "
+                f"Dispose the file's CURRENT path."
+            )
         rec = {"reason": reason, "source": source}
     rec["schema"] = "1.0"
     rec["ts"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -148,8 +155,9 @@ def _lines_from_file(path: str) -> list[dict[str, Any]]:
 
 
 def selftest() -> int:
-    """Known-answer controls: the vocabulary is read not guessed, the reason gate is fail-closed, and the
-    write is crash-safe and round-trips (a red loop must be seen green before limb 2 leans on it)."""
+    """Known-answer controls: the vocabulary is read not guessed, the reason gate is fail-closed, a source
+    that does not resolve to a file is refused (D-3034), and the write is crash-safe and round-trips (a red
+    loop must be seen green before limb 2 leans on it)."""
     import tempfile as _tempfile
 
     failures: list[str] = []
@@ -158,39 +166,47 @@ def selftest() -> int:
         if not cond:
             failures.append(f"{name}: {detail}")
 
-    vocab = disposition_vocabulary()
-    expect("vocabulary declared", vocab == ["out_of_scope_by_kind", "not_a_work", "conversion_refused_permanently"],
-           f"read {vocab}")
+    #: a REAL source file, because the writer now refuses a source that does not resolve to a file on disk.
+    with _tempfile.TemporaryDirectory(prefix="dispose_selftest_") as tmp:
+        work = Path(tmp) / "Work.docx"
+        work.write_text("x", encoding="utf-8")
+        work_src = str(work)
+        missing_src = str(Path(tmp) / "missing.docx")
 
-    #: kind normalises the leading dot and case (the reader does the same, so the two sides must agree).
-    line = build_line("out_of_scope_by_kind", ".PNG", None)
-    expect("kind normalised", line["kind"] == "png" and line["reason"] == "out_of_scope_by_kind"
-           and "source" not in line, f"read {line}")
+        vocab = disposition_vocabulary()
+        expect("vocabulary declared", vocab == ["out_of_scope_by_kind", "not_a_work", "conversion_refused_permanently"],
+               f"read {vocab}")
 
-    line = build_line("not_a_work", None, "/abs/path/Work.docx")
-    expect("source kept", line["source"] == "/abs/path/Work.docx" and "kind" not in line, f"read {line}")
+        #: kind normalises the leading dot and case (the reader does the same, so the two sides must agree).
+        line = build_line("out_of_scope_by_kind", ".PNG", None)
+        expect("kind normalised", line["kind"] == "png" and line["reason"] == "out_of_scope_by_kind"
+               and "source" not in line, f"read {line}")
 
-    def raises(reason: str | None, kind: str | None, source: str | None) -> bool:
-        try:
-            build_line(reason, kind, source)
-            return False
-        except SystemExit:
-            return True
+        line = build_line("not_a_work", None, work_src)
+        expect("source kept", line["source"] == work_src and "kind" not in line, f"read {line}")
 
-    expect("reason gate closed", raises("made_up_reason", None, None), "a reason outside the vocabulary did not raise")
-    expect("kind/source mutex (kind)", raises("out_of_scope_by_kind", None, "/x"), "kind reason took a source")
-    expect("kind/source mutex (source)", raises("not_a_work", ".png", None), "source reason took a kind")
-    expect("source absolute gate closed", raises("not_a_work", None, "relative/path/Work.docx"),
-           "a relative source did not raise")
+        def raises(reason: str | None, kind: str | None, source: str | None) -> bool:
+            try:
+                build_line(reason, kind, source)
+                return False
+            except SystemExit:
+                return True
 
-    #: crash-safe write + round-trip into a THROWAWAY folder (a selftest never writes the live record).
-    with _tempfile.TemporaryDirectory(prefix="dispose_") as tmp:
+        expect("reason gate closed", raises("made_up_reason", None, None), "a reason outside the vocabulary did not raise")
+        expect("kind/source mutex (kind)", raises("out_of_scope_by_kind", None, "/x"), "kind reason took a source")
+        expect("kind/source mutex (source)", raises("not_a_work", ".png", None), "source reason took a kind")
+        expect("source absolute gate closed", raises("not_a_work", None, "relative/path/Work.docx"),
+               "a relative source did not raise")
+        expect("source resolution gate closed", raises("not_a_work", None, missing_src),
+               "a source that does not resolve to a file did not raise")
+
+        #: crash-safe write + round-trip into the SAME throwaway folder (a selftest never writes the live record).
         paths = write_disposition([build_line("out_of_scope_by_kind", ".png", None),
-                                   build_line("not_a_work", None, "/abs/Work.docx")],
+                                   build_line("not_a_work", None, work_src)],
                                   str(Path(tmp) / "ADMISSION_DISPOSITION_"))
         expect("one stamped file", len(paths) == 1 and paths[0].is_file(), f"wrote {paths}")
         got = [json.loads(t) for t in paths[0].read_text(encoding="utf-8").splitlines() if t.strip()]
-        expect("round-trip", len(got) == 2 and got[0]["kind"] == "png" and got[1]["source"] == "/abs/Work.docx",
+        expect("round-trip", len(got) == 2 and got[0]["kind"] == "png" and got[1]["source"] == work_src,
                f"read {got}")
 
     if failures:
@@ -225,7 +241,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     written = write_disposition(lines, disposition_prefix())
-    print(f"disposed {len(lines)} object(s) -> {' '.join(str(p) for p in written)}")
+    print(f"wrote {len(lines)} disposition line(s) -> {' '.join(str(p) for p in written)}")
+    print("verify the settlement: python3 scripts/plan_admission.py --brief  (the refused count must drop)")
     return 0
 
 

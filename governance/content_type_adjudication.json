@@ -3827,6 +3827,76 @@
       "proposed_content_type": "growth_edge",
       "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): definitional_with_prescriptive,open_tension",
       "confidence": "high"
+    },
+    {
+      "fb_id": "31747d7edebec8198e9c0f6c8f3264d6c202f662623e17706649a73823b73a8e",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "quarantine"
+    },
+    {
+      "fb_id": "ffc145ef648afb7203a93a97d1c4171fb4fc54f000099dee581c2a21a7dcda9e",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "noise_drop"
+    },
+    {
+      "fb_id": "ab935d3561c651a42adaa6142a6a0701c47f50a52aeecc464a590036f08bbc24",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "quarantine"
+    },
+    {
+      "fb_id": "ff3b9d60fca8c6d75c4ac769ea155f3119a8a41873fe75bab612248fa76d1a3b",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "noise_drop"
+    },
+    {
+      "fb_id": "32cd25785a3ae8d3f0e10e6eaab976cf1f1c501f904694b7c46ec21938434c74",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "noise_drop"
+    },
+    {
+      "fb_id": "576a8b2c89de3df2c08a57df2c780648cdf92d0a9ac1338f68e1a8fd4604b92e",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_content_type": "principle"
+    },
+    {
+      "fb_id": "9a0c8c21fda71ea3bfe250ca56b1b59705b7f9fb933c58e704ffd47942695a07",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_disposition": "quarantine"
+    },
+    {
+      "fb_id": "91ef1346351125099db1a6bbfa2db1da25094cd2f8cf4898c3272dfcc0ac92fd",
+      "current": "noise_drop",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_content_type": "principle"
+    },
+    {
+      "fb_id": "dbb546109e4250bc69ba15096e4472a577bbc49ac42848905e1697c5ceda1085",
+      "current": "quarantine",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_content_type": "principle"
+    },
+    {
+      "fb_id": "e27048359de3c3406fc086b53c885c5890001c7d04ef8ec11e9a9828b495fb31",
+      "current": "quarantine",
+      "confidence": "high",
+      "reason": "owner ruling (BUG-977 census)",
+      "proposed_content_type": "principle"
     }
   ],
   "last_updated": "2026-10-12"

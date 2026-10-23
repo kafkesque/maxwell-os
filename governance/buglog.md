@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 744 bugs (262 open / 482 closed; highest OPEN = BUG-979) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 745 bugs (260 open / 485 closed; highest OPEN = BUG-976) · 59 open tasks (MUST 11 / SHOULD 44 / WORTH 4; OWNER-moved 2, pipeline-moved 57; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 262 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 262 open.
+> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 260 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21,7 +21,7 @@
 > | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
 > | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) EXECUTED 2026-10-23 (BUG-974 fix live): the p |
 >
-> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -38,7 +38,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -20224,3 +20224,109 @@ confidence the derivation does not produce, and did not touch the rail's populat
 turned a named gap into a green lie. It also did not file this as part of BUG-977: that bug is the content_type
 vocabulary, this one is the score axis, and D-2956 clause 4 is the reason they were both invisible in the same
 place — each instrument reads its own population.
+
+## BUG-977 (HIGH — FIXED / CLOSED 2026-10-23) — the disposition rows are GONE, and the act that removed them is a declared writer now
+
+**The owner walked the ten rows** (`scripts/rule_content_type_census.py`, 10 rulings appended to
+`governance/content_type_adjudication.json`, 10 unique ids, no duplicate minted): 4 ROLES + 6 DISPOSITIONS.
+**MEASURED, and the sequence is the receipt** (D-3134 clause 1 — the premise re-taken after every act):
+
+| step | act | census (served / held) | store rows |
+|---|---|---|---|
+| 1 | the walker's 10 rulings land in the map | 6 / 4 (ceiling 6/4) | 7,641 |
+| 2 | `restamp_content_type_adjudications.py --apply` writes 4 ROLE labels, authorship `human_verbatim` (BUG-742's declared value), every cell RE-READ | 4 / 2 | 7,641 |
+| 3 | `withdraw_curation_rows.py --apply --confirm <6 ids>` enacts the 6 DISPOSITION rulings | **0 / 0** | 7,635 |
+
+Step 3 is the part that did not exist: `config/content_type_restamp.yaml` had declared the act
+(`withdraw_with_archive`) and named the writer **OWED** while the trigger had never fired. It fired at step 2
+(four disposition-ruled rows in the default answer path) and the writer was built for that population — never a
+column, because D-2952 says a column lands with its writer, and a curation column consulted by nothing would have
+left the `content_type` violation in place while adding a second axis.
+
+**WHY WITHDRAWAL AND NOT A COLUMN (the ontology, not a preference).** The store admits ROLEs: D-2965's commit gate
+REFUSES a disposition as a `content_type` and the 5-role axis is CLOSED, so a row whose `content_type` is
+`noise_drop`/`quarantine` is not an ill-labelled knowledge object — it is a record the CURRENT contract would never
+have admitted. The pipeline's own answer to such a record is to keep it OFF the store (a quarantine record goes to
+the S4 HOLD SHELF, `stage4.quarantine_output`, "never a commit source", D2616; a noise_drop record is dropped), and
+the ruling keeps its home in the adjudication map with its reason and confidence. **MEASURED RESULT:** 3 rows
+`dropped` (Credential-based Professional Development, Musical Text Composition and Interpretation, Recognition-driven
+Serotonin Reward Mechanism), 3 rows `hold` (Symbolic Resonance in Cultural Narratives, Logic Approach Vs Random
+Variable Approach, Coordinate Transformation Complexity in Radar Systems). Archive:
+`archive/curation_withdrawals/20261023T164040Z/` — all 79 columns, sha256 `6f074102abf5a265…`, the ruling per row,
+every pruned edge, and a restore recipe.
+
+**THE PROTOCOL IS purge_superseded_runs' OWN**, applied to a different population (D-2956 cl.4 is why it is a second
+script and not a flag: `runs` never selects a row, and a curated row may live in ANY run — the canonical-run
+protection there protects RUNS). Dry-run default; `--confirm` must match the plan exactly; C13 backup; ONE
+`BEGIN IMMEDIATE` that prunes 72 graph edges, drops 6 `vec_fbs` vectors, deletes the rows and REBUILDS the
+external-content FTS (`fbs_fts` has only an AFTER INSERT trigger, so a stale index would keep answering).
+**Verification inside the transaction:** residual 0 · dangling edges 0 · rows 7,641 → 7,635 (delta 6, expected 6) ·
+fts 7,635 = fbs 7,635 · vec orphans 0 · `integrity_check ok`. 12/12 fixture controls; R5 gate APPROVE.
+
+**TWO THINGS THE BUILD FOUND, both now named rather than absorbed.** (a) `pipeline.sqlite_vec_loader` degrades to a
+SILENT no-op when the interpreter lacks the `sqlite_vec` package — which would have left a deleted row with a LIVE
+vector (the BUG-713 harm). MEASURED: the `python3` on PATH (miniforge3) cannot load the extension while
+`/opt/homebrew/bin/python3` can, so `vec_loader.interpreter` is now DECLARED in
+`config/curation_withdrawal.yaml` and the tool re-execs once instead of failing an owner's run over a PATH detail.
+(b) The gate's exit code went to 1 the moment the owner's rulings landed (`disposition_served` = BLOCKING), i.e.
+`just health` was RED for a REAL owed act — the correct alarm, and it cleared by ENACTING the act, not by teaching
+the ladder to tolerate it.
+
+## BUG-979 (MED — FIXED / CLOSED 2026-10-23) — the half-verified row is now measured, and the measurement CONVICTS it
+
+**What the recompute found.** Running the missing check on the stored row (`f523504ee903…`, "The Kernel of
+Strategy") returned `mechanism_quality FAILED — "Mechanism too short (134 chars < 150) — likely vacuous"`. Under
+S5's DECLARED order that failure IS the factual verdict (stage5_verify.py sets `fact_passed=False`,
+`detail="MECH FAIL: …"`, `method="mech_quality"`, and never asks the NLI), and the store has no counter-example: of
+the **2,086 stored rows whose record carries `mechanism_quality=false`, 2,086 are QUARANTINE**. So the honest outcome
+was not "add the missing cell and stay green" — it was:
+
+| cell | before | after |
+|---|---|---|
+| `mechanism_quality` | **absent** | `passed=false, score=0.0, "too short (134 < 150)"` |
+| `factual` | `passed=true, 0.9885` | `passed=false, 0.0, "MECH FAIL: …"` |
+| `confidence_score` | 0.9885 | **0.25** (0.35·0 + 0.25·1.0 + 0.4·0, i.e. the declared weights) |
+| `needs_human_review` | 0 | 0 (derived: no failed-ISOR 'strong' rating — there is no ISOR here) |
+| `epistemic_status` | source-supported | **speculative** |
+| `status` / `s5_reason` | PASS / entail | **QUARANTINE / vacuous** |
+| `verification_method` | deberta-nli | **mech_quality** |
+
+**THE ROW I INSERTED LAST SESSION WAS NEVER FIT TO SERVE, and saying so is the fix.** The rail
+`check-s5-score-axis` is now green over 7,635 rows (6,586 MATCH, 0 undecidable) because the row is decidable and
+matches its own record — not because anything was softened. Population unchanged: `s5_reason='vacuous'` is NOT the
+sidecar marker, so the row stays inside `s5_verified` (6,586) and the declared universes still partition the store.
+
+**THE TRAP BUG-979's owed item (2) warned about, MEASURED.** A stored row carries `evidence_passages` as JSON TEXT;
+`pipeline.schema_accessor.fb_source_texts` accepts only a LIST, so a naive re-run answered `"No evidence —
+QUARANTINE"` for a row that plainly has evidence (stored `passed=True`, re-run `passed=False`). A re-verification
+must HYDRATE the row first — declared as `JSON_LIST_COLUMNS` in `scripts/reverify_one_row.py`, with a control. The
+first dry-run therefore REFUSED, which is the intended behaviour of a red loop: the disagreement between the two
+readings was the finding, not noise.
+
+**THE INSTRUMENT.** `scripts/reverify_one_row.py` (new): one named 64-hex id, dry-run default, C13 backup, ONE
+`BEGIN IMMEDIATE`, post-state RE-DERIVED inside the transaction, 8/8 fixture controls, receipt at
+`governance/evidence/reverify_one_row_receipt.json`. It reproduces the check ORDER (mech gate precedes NLI) and asks
+the ONE home for every derivation (`derive_status`, `derive_conf_and_review`, `derive_epistemic_status`) — it
+re-states no rule. **A VERDICT CHANGE IS NEVER IMPLICIT:** `--allow-verdict-change` is required to move
+`status`/`s5_reason`, because editing a cell and overturning a verdict are different acts.
+
+## BUG-980 (MED — FIXED 2026-10-23) — the single-record path ran the two checks INDEPENDENTLY and re-typed the score axis
+
+Found while closing BUG-979, in the SAME file that BUG-978 fixed. Two defects, both "a rule with a second home":
+1. **The order was lost.** `pipeline/insert_single_concept.py` ran `check_mechanism_quality` and `deberta_check`
+   independently and derived `status` from the factual check alone, so a row failing the mechanism gate would have
+   been written `mechanism_quality=false` **with `status=PASS`** — a state the store has NEVER held (0 of 2,086).
+   Fixed: the gate now precedes the NLI exactly as S5 declares, and its failure IS the factual verdict.
+2. **The score axis was re-typed.** `confidence_score = round(score, 4)` (the NLI score) and
+   `needs_human_review = 1 if status == "QUARANTINE"` — neither is what `derive_conf_and_review` produces, i.e. the
+   BUG-502 defect class in a writer that had just been taught to stop asserting ontology. Fixed: both cells now come
+   from the one home. **MEASURED CONSEQUENCE, and it is why this matters:** the confidence this path wrote (0.9885)
+   was unreachable by the rule (max without an ISOR rating is 0.35·mech + 0.25·enrich = 0.60), so the value was not
+   merely wrong, it was outside the derivation's range.
+
+**WHY THE EXTRACTION IS STILL OWED (registered, not skipped).** S5's per-record sequence exists ONLY inline in
+`run_stage5`'s loop, so every non-S5 writer must restate it — which is how it was half-restated twice. The fix is a
+`verify_one_record()` in the pipeline that both call; it is NOT done here because `pipeline/stage5_verify.py` is in
+`stage5.fingerprint_files` (an edit invalidates the S5 checkpoint fail-closed) and a faithful extraction of a
+five-branch verification loop needs its own red loop first (D-3036). **T-196** is that task. Until then the
+duplication is DECLARED in both places, with the 2,086/2,086 measurement as the invariant a control can check.

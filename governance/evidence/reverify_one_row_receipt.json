@@ -1,0 +1,63 @@
+{
+  "backup": "knowledge pipeline/backups/maxwell.db.pre_reverify_20261023_184413",
+  "bug": "BUG-979",
+  "fb_id": "f523504ee9030e02bd02d5ca6ba6a5f9e174b217b83e805e73025323b44cc31d",
+  "fresh": {
+    "confidence": 0.25,
+    "enrich": 1.0,
+    "epistemic_status": "speculative",
+    "fact_passed": false,
+    "mech_score": 0.0,
+    "needs_review": false,
+    "results": [
+      {
+        "check_name": "mechanism_quality",
+        "detail": "Mechanism too short (134 chars < 150) \u2014 likely vacuous. QUARANTINE.",
+        "passed": false,
+        "score": 0.0
+      },
+      {
+        "check_name": "factual",
+        "detail": "MECH FAIL: Mechanism too short (134 chars < 150) \u2014 likely vacuous. QUARANTINE.",
+        "passed": false,
+        "score": 0.0
+      }
+    ],
+    "s5_reason": "vacuous",
+    "status": "QUARANTINE",
+    "verification_method": "mech_quality"
+  },
+  "generated": "2026-10-23T18:44:14",
+  "name": "The Kernel of Strategy",
+  "post": {
+    "confidence_score": 0.25,
+    "epistemic_status": "speculative",
+    "needs_human_review": 0,
+    "s5_reason": "vacuous",
+    "status": "QUARANTINE",
+    "verification_method": "mech_quality",
+    "verification_results": "[{\"check_name\": \"mechanism_quality\", \"passed\": false, \"score\": 0.0, \"detail\": \"Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}, {\"check_name\": \"factual\", \"passed\": false, \"score\": 0.0, \"detail\": \"MECH FAIL: Mechanism too short (134 chars < 150) \\u2014 likely vacuous. QUARANTINE.\"}]"
+  },
+  "pre": {
+    "confidence_score": 0.9885,
+    "epistemic_status": "source-supported",
+    "needs_human_review": 0,
+    "s5_reason": "entail",
+    "status": "PASS",
+    "verification_method": "deberta-nli",
+    "verification_results": "[{\"check_name\": \"factual\", \"passed\": true, \"score\": 0.9885, \"detail\": \"ENTAIL (OR-entail + AND-no-contra): 1/1 entail, 0 contra, max=0.99\"}]"
+  },
+  "schema_version": 1,
+  "stats": {
+    "changed": [
+      "verification_results",
+      "confidence_score",
+      "epistemic_status",
+      "status",
+      "s5_reason",
+      "verification_method"
+    ],
+    "verified_in_transaction": true
+  },
+  "tool": "scripts/reverify_one_row.py"
+}

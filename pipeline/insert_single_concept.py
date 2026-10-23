@@ -204,8 +204,12 @@ def main() -> int:
     from pipeline.dedup_identity import concept_key as mint_ck
     from pipeline.omlx_call import call_omlx
     from pipeline.schemas import match_domains_to_canonical, match_to_canonical
-    from pipeline.serving_gate import derive_epistemic_status, derive_status
-    from pipeline.stage5_verify import check_mechanism_quality, deberta_check
+    from pipeline.serving_gate import derive_conf_and_review, derive_epistemic_status, derive_status
+    from pipeline.stage5_verify import (
+        _check_enrichment_quality,
+        check_mechanism_quality,
+        deberta_check,
+    )
     from pipeline.stage6_commit import insert_embedding, insert_fb
     from pipeline.stamp import get_pipeline_commit, make_hash_id
 
@@ -275,7 +279,16 @@ def main() -> int:
     # unevaluable row is never a pass" (C16). Both checks are LOCAL and free (regex + NLI), so the path runs the
     # same pair S5 runs, in the same order, through the same functions (C21) - never a re-implementation.
     mech_passed, mech_score, mech_detail = check_mechanism_quality(fb)
-    passed, score, detail = deberta_check(fb)
+    if mech_passed:
+        passed, score, detail = deberta_check(fb)
+        method = "deberta-nli"
+    else:
+        # BUG-980 (MEASURED 2026-10-23): S5's DECLARED ORDER is that the mechanism gate PRECEDES the NLI and its
+        # failure IS the factual verdict (pipeline/stage5_verify.py: `fact_passed = False`, `detail = "MECH FAIL:
+        # ..."`, `method = "mech_quality"`, the NLI never asked). Running the two checks INDEPENDENTLY mints a state
+        # the store has never held: of the 2,086 stored rows whose record carries mechanism_quality=false, 2,086 are
+        # QUARANTINE - there is no counter-example, so a PASS row with a failed gate would be one.
+        passed, score, detail, method = False, 0.0, f"MECH FAIL: {mech_detail}", "mech_quality"
     verification_results = json.dumps([
         {"check_name": "mechanism_quality", "passed": mech_passed, "score": mech_score, "detail": mech_detail},
         {"check_name": "factual", "passed": passed, "score": score, "detail": detail},
@@ -285,17 +298,22 @@ def main() -> int:
     # S5 stamps it in stage5_verify.py:1268 and this path bypasses S5, so it must ask the ONE rule itself.
     # `isor` is absent by design here (no ISOR rating is computed for a single insert), and the derivation
     # FAILS CLOSED to the declared fallback rather than inventing a rating.
+    # BUG-980: the SCORE AXIS is ONE rule with two outputs (BUG-502) - re-typed here it produced a confidence equal
+    # to the NLI score and a review flag keyed on `status`, both of which the corpus does not derive (measured:
+    # scripts/check_s5_score_axis.py reproduces 6,585/6,585 claim-carrying rows from the ONE home). Ask that home.
+    _ok, enrich, _enrich_detail = _check_enrichment_quality(fb)
+    confidence, needs_review = derive_conf_and_review(bool(passed), float(mech_score), float(enrich), {})
     fb["epistemic_status"] = derive_epistemic_status(passed, None)
     fb["verification_results"] = verification_results
     fb["verifier_model"] = "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (threshold 0.5)"
-    fb["confidence_score"] = round(float(score), 4)
+    fb["confidence_score"] = confidence
     fb["status"] = status
     fb["s5_reason"] = s5_reason
-    fb["verification_method"] = "deberta-nli"
+    fb["verification_method"] = method
     fb["gen_model"] = gen_model
     fb["schema_version"] = "1"
     fb["pipeline_commit"] = get_pipeline_commit()
-    fb["needs_human_review"] = 1 if status == "QUARANTINE" else 0
+    fb["needs_human_review"] = 1 if needs_review else 0
 
     print(f"verify: passed={passed} score={score:.3f} status={status} reason={s5_reason} discipline={discipline} domains={domains}")
     if args.dry_run:

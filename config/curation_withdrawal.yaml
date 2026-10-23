@@ -1,0 +1,94 @@
+# config/curation_withdrawal.yaml - the WRITER for the act `withdraw_with_archive` (C12: no value is typed in code).
+#
+# WHY THIS FILE EXISTS (MEASURED 2026-10-23, live store, 7,641 rows).
+# config/content_type_restamp.yaml declared the act and the trigger for a DISPOSITION ruling on a STORED row:
+#   act_for_stored_row: withdraw_with_archive | writer: OWED | writer_trigger: a disposition-ruled row whose
+#   stored state is in the SERVED path.
+# THE TRIGGER FIRED. The owner walked the ten BUG-977 rows on 2026-10-23 (scripts/rule_content_type_census.py):
+# 4 were ruled a ROLE (written by the re-stamp gate with authorship human_verbatim) and 6 were ruled a DISPOSITION
+# - 4 of those in the default served path (`status = 'PASS'`, pipeline/retrieve.py#_status_predicate(False)).
+# A declaration that names no writer is a declaration that resolves to nothing (D-3034), so the writer is built HERE,
+# against the population that needs it, on the day the trigger fired.
+#
+# WHY A WITHDRAWAL, AND NOT A COLUMN (the ontology, not a preference).
+# The store admits ROLEs. D-2965's commit gate REFUSES a disposition as a content_type at the leaf, and
+# pipeline/content_types.yaml declares the 5-role axis CLOSED: "a disposition is not a content_type".
+# A stored row whose content_type is `noise_drop`/`quarantine` is therefore not an ill-labelled knowledge object -
+# it is a record the CURRENT contract would never have admitted. The pipeline's own answer to such a record is to
+# keep it OFF the store: a quarantine record goes to the S4 HOLD SHELF (`stage4.quarantine_output`, "never a commit
+# source", D2616) and a noise_drop record is dropped. There is no third home, and inventing a store column for it
+# would (a) leave the content_type violation in place - the owner ruled there is NO clean role - and (b) create a
+# second axis that the serving predicate must consult, i.e. the "inert badge" D-2952 refuses to build before a
+# writer exists. So the act is: TAKE THE ROW OUT OF THE STORE, archive-first (R-D410), and keep the ruling - with
+# its reason and confidence - in the adjudication map, which is where the ruling already lives.
+#
+# THE PRECEDENT IS DECLARED, NOT INVENTED. scripts/purge_superseded_runs.py (D-2936/D-2937) is the same protocol
+# for a different population: archive -> delete -> rebuild the text index -> verify, one transaction, dry-run by
+# default, --confirm exact, C13 backup. THE POPULATION IS PART OF THE INSTRUMENT (D-2956 clause 4), which is why
+# this is a second script and not a flag on that one: `runs` never selects a row, and a curated row may live in ANY
+# run - including the canonical one, whose protection there is a protection about RUNS, not about rows the owner has
+# ruled out of the corpus.
+schema_version: 1
+bug: [BUG-741, BUG-977]
+decision: D-3135
+
+# THE WARRANT AND THE VOCABULARIES - both READ from their one home, never restated here (D-2646/D-2967).
+map_schema_home: config/content_types.yaml#adjudication_map
+vocab_home: config/content_types.yaml
+vocab_type_keys: [content_types]
+vocab_disposition_keys: [dispositions]
+
+# THE STORE.
+table: fbs
+id_column: fb_id
+label_column: content_type
+name_column: name
+
+# WHERE A WITHDRAWN ROW GOES (R-D410: archive, never delete blind). One directory per run of this tool, containing
+# withdrawn_rows.jsonl (the FULL row, every one of the 79 columns) + MANIFEST.json (sha256, the ruling behind each
+# row, the retention shelf, every pruned graph edge, and the restore recipe).
+archive_root: archive/curation_withdrawals
+backup_subdir: backups
+backup_prefix: maxwell.db.pre_withdrawal_
+
+# THE GRAPH EDGES THAT MUST BE PRUNED IN THE SAME TRANSACTION. A surviving row that points at a withdrawn id is a
+# dangling edge: retrieval joins by id, so the reference would silently resolve to nothing (the BUG-711 shape).
+# MEASURED 2026-10-23 before the first run: 73 surviving rows / 76 edges, none of them a row's ONLY edge.
+reference_columns: [prerequisite_fbs, related_fbs, contradicts_fbs, source_principle_ids]
+# A prune that would leave a reference column empty on a surviving row is REFUSED (the column's declared role is
+# `value` - it must be non-blank - and an emptied relation is a loss no archive can express).
+refuse_emptying_reference: true
+
+# THE RETENTION THE RULING NAMES. A disposition says what should happen to the OBJECT; the act carries that intent
+# into the archive instead of flattening both values into one bucket. `hold` is not "keep serving": it is the S4
+# HOLD SHELF's meaning (D2616) - kept for a later identification pass, never a commit source.
+retention:
+  noise_drop:
+    retention: dropped
+    why: "D2591: a descriptive/historical summary or bare fact with no prescriptive filter, no template and no transferable value. The pipeline would not have committed it; the archive keeps the evidence that it existed."
+  quarantine:
+    retention: hold
+    why: "D2591 + D-2757: carries SOME value but no clean role. Kept on the archive's hold shelf for a later identification pass (the same meaning as the S4 quarantine shelf, D2616: never a commit source)."
+  classified:
+    retention: refused
+    why: "'classified' is not a curation ruling - a row carrying it has a role and must never be withdrawn by this tool. Declared so the vocabulary is TOTAL over config/content_types.yaml#dispositions (a value with no declared retention fails closed)."
+
+# WHAT THE MANIFEST SAYS THE HOLD SHELF IS, so a later reader knows where to look. Read from the pipeline's own
+# declaration (stage4.quarantine_output) at print time - restated here only as a pointer, never as a second copy.
+hold_shelf_home: config/pipeline_config.yaml#stage4.quarantine_output
+
+# THE VECTOR LEGS NEED AN INTERPRETER THAT CAN LOAD sqlite-vec. A withdrawn row must lose its VECTOR as well as
+# its row: a stale vector stays in the KNN candidate pool and steals a served row's slot (the BUG-713 harm), and
+# `pipeline.sqlite_vec_loader` degrades to a SILENT no-op when the `sqlite_vec` package is missing - the one state
+# that would leave a deleted row with a live vector. MEASURED 2026-10-23 on this machine: `python3` on PATH
+# (miniforge3) does NOT carry the package; the interpreter below does (3.14.6, sqlite_vec importable). The tool
+# re-execs ONCE into it rather than failing an owner's run over a PATH detail. An absent/unresolvable value fails
+# CLOSED with a named reason - never a silent skip of the vector leg.
+vec_loader:
+  interpreter: /opt/homebrew/bin/python3
+  why: "measured 2026-10-23: the only interpreter on this machine that imports sqlite_vec; the default python3 does not, and the loader degrades silently"
+
+receipt: governance/evidence/curation_withdrawal_receipt.json
+# EXIT (BUG-457 tri-state): 0 nothing is owed (the store holds no withdrawable row) | 1 a row is OWED but this run
+# did not act (dry-run with an actionable set, or a REFUSAL) | 2 cannot evaluate (fail-closed input defect).
+exit: {clean: 0, owed: 1, cannot_evaluate: 2}

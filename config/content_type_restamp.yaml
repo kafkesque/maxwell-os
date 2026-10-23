@@ -86,7 +86,8 @@ backup_prefix: maxwell.db.pre_restamp_
 # with the first row that needs it - a trigger the gate evaluates mechanically on every run.
 dispositions:
   act_for_stored_row: withdraw_with_archive   # a role is WRITTEN; a disposition is ENACTED
-  writer: OWED                                # does not exist yet; named here and reported by the gate every run
+  writer: scripts/withdraw_curation_rows.py   # RESOLVED 2026-10-23 (D-3135): the trigger below fired on the owner's BUG-977 walk
+  writer_config: config/curation_withdrawal.yaml
   writer_trigger: a disposition-ruled row whose stored state is in the SERVED path
   # "is this row served?" is asked of the SERVING layer's own predicate (D2330), never restated here (C21).
   served_predicate_home: pipeline/retrieve.py#_status_predicate
@@ -121,8 +122,14 @@ store_census:
   direction: shrink_only
   name_column: name
   debt:
-    store_disposition_served: 6   # a DISPOSITION where a ROLE belongs, IN the path a query answers from — noise served
-    store_disposition_held: 4     # a DISPOSITION where a ROLE belongs, outside the served path — inert, still not a role
+    # MEASURED TRAJECTORY (D-3134 clause 1: a measurement that licences an act is RE-TAKEN after the act; D-2642:
+    # a ceiling is never raised). 2026-10-23: 6/4 (census built) -> 4/2 (the owner's 4 ROLE rulings written by this
+    # gate, authorship human_verbatim) -> 0/0 (the owner's 6 DISPOSITION rulings ENACTED by the writer this block
+    # names: 3 dropped + 3 held, 6 rows withdrawn archive-first, 72 graph edges pruned, vectors removed, FTS rebuilt;
+    # store 7,641 -> 7,635 rows). The floor is 0 and it is now reached: any new label outside the ROLE vocabulary is
+    # a REFUSAL, not a reading.
+    store_disposition_served: 0   # a DISPOSITION where a ROLE belongs, IN the path a query answers from — noise served
+    store_disposition_held: 0     # a DISPOSITION where a ROLE belongs, outside the served path — inert, still not a role
     store_undeclared: 0           # a label in NEITHER vocabulary — a fault with no ruling to wait for
     store_blank: 0                # the D-2938 "computed then discarded" shape, which the store ruler cannot see (BUG-726)
   # EXIT (BUG-457 tri-state). `within_debt` is OWNER-OWED — loud, never fatal, so the health ladder keeps running and

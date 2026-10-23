@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**262 open** / 482 closed of 744 ids.
+**260 open** / 485 closed of 745 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -267,5 +267,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
 | BUG-975 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not | 1 |
 | BUG-976 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" | 1 |
-| BUG-977 | (HIGH — OPEN 2026-10-23) — a premise measured BEFORE the act it licensed was never re-taken: 10 rows carry a DISPOSITION as their | 1 |
-| BUG-979 | (MED — OPEN 2026-10-23) — the single-concept path ran HALF the verification: the score axis needs BOTH checks, and the one row it wrote is | 1 |

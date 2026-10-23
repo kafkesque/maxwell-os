@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (261 open / 477 closed; highest OPEN = BUG-973) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (260 open / 478 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 85 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 261 open.
+> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 260 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19924,3 +19924,25 @@ fourth is an `.idlk` InDesign lock file that the 19-kind list did not name (sett
 The other three are no-suffix files under `.../hustle/Refund Bible 2023…/` (settle by `--source <abs path>`).
 Once those four are settled, `refused` drops to 239 (185 rename-first = T-176, 53 not-in-kind = T-184,
 1 corrupt) and `disposed` reaches 241.
+
+## BUG-973 (MED, FIXED 2026-10-23) — LIMB 3 COMPLETE: 241/241 disposed, `refused_container_no_stage_reads_it` reaches 0, and the silent-dead-disposition root cause is closed
+
+**LIMB 3 COMPLETE — all 241 assets disposed.** The owner's remaining 4 rows are settled (receipt
+`governance/evidence/ADMISSION_DISPOSITION_20261023T121154Z.jsonl`, commit 85784a9): `.idlk` by kind
+(`out_of_scope_by_kind`) plus three no-suffix files under `.../hustle/Refund Bible 2023…/` by source
+(`not_a_work`). `plan_admission.py --brief` now reads `refused 239, disposed 241` — and
+`refused_container_no_stage_reads_it` is **0** for the first time since the class existed.
+
+**ROOT CAUSE OF THE REPEATED DEAD DISPOSITIONS (closed).** `dispose_admission.py` wrote a disposition
+without verifying it RESOLVES, and reported `disposed N object(s)` where N was LINES WRITTEN, not rows
+settled — so a placeholder/typo'd source settled NOTHING and looked identical to success (the two
+accidental `/absolute/path/to/file` records, the relative-path case, and this turn's "still off"). Fixed
+in 85784a9: `--source` now fails closed unless it RESOLVES TO A FILE ON DISK (`is_file()`, D-3034), the
+message reads `wrote N disposition line(s)` + a verify hint, and a selftest control asserts a nonexistent
+source is FATAL. The prior absolute-path guard (ad3233e) fixed only "relative"; this closes the deeper
+"does not exist" hole.
+
+**What remains is OTHER tasks, not this bug:** `refused_name_repair_first` 185 = T-176 (rename ride),
+`refused_not_in_its_kind_folder` 53 = T-184 (placement), `refused_container_corrupt` 1 = the Keylight
+PDF. Each has its own owner-lane mover; BUG-973's denominator (the DISPOSED class + the 241 assets +
+a permanently-refused conversion candidate) is now a lane that can reach zero.

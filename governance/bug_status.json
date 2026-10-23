@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 738,
-  "open_n": 261,
-  "closed_n": 477,
+  "open_n": 260,
+  "closed_n": 478,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1307,11 +1307,6 @@
       "id": "BUG-972",
       "title": "(LOW, OPEN 2026-10-23) \u2014 `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback",
       "events": 1
-    },
-    {
-      "id": "BUG-973",
-      "title": "(MED, OPEN 2026-10-23) \u2014 the admission plan has NO DISPOSED class, so its refusals are a permanent non-zero floor and a",
-      "events": 3
     }
   ],
   "closed": [
@@ -1791,6 +1786,7 @@
     "BUG-968",
     "BUG-969",
     "BUG-970",
-    "BUG-971"
+    "BUG-971",
+    "BUG-973"
   ]
 }

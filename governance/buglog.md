@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 743 bugs (261 open / 482 closed; highest OPEN = BUG-977) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 744 bugs (262 open / 482 closed; highest OPEN = BUG-979) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 261 open.
+> Open BUGS by severity (population = the census's 262 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 83 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 262 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20188,3 +20188,39 @@ thing this register must not do. So BUG-712 stays OPEN at MED with its state now
 not carry; BUG-977 is about labels NO ONE EVER RULED that the vocabulary cannot hold at all. Same column, different
 question, different act, different owner — and D-2956 clause 4 is why they were invisible together: one instrument's
 population (the map) could not contain the other's defect. They now have one home each.
+
+## BUG-979 (MED — OPEN 2026-10-23) — the single-concept path ran HALF the verification: the score axis needs BOTH checks, and the one row it wrote is UNDECIDABLE by the rail that owns the axis
+
+**MEASURED 2026-10-23** (`python3 scripts/check_s5_score_axis.py`, and it is what stopped `just health` at its rail):
+`{'MATCH': 6591, 'NOT_APPLICABLE': 1049, 'UNDECIDABLE': 1}` — the one UNDECIDABLE row is
+`f523504ee903…` (*The Kernel of Strategy*), "no factual/mechanism_quality check in verification_results — an
+unevaluable row is never a pass (C16)". The path ran `deberta_check` (the factual check) and never ran
+`check_mechanism_quality`, which every other row's record carries, so the score axis cannot be re-derived.
+
+**WHY IT IS NOT A ONE-LINE REGRESSION.** The failure is a POPULATION question, one level up from BUG-978: the path
+was written against ONE verifier (R5's "verifier ≠ generator" pair) and the store's contract is TWO checks whose
+OUTPUT is a single axis (`serving_gate.derive_conf_and_review`). The path therefore had no way to know, from its own
+code, that a row it considers verified is unevaluable by the register's own ruler.
+
+**FIXED (the prevention half).** `pipeline/insert_single_concept.py` now runs the SAME pair, in the SAME order,
+through the SAME functions S5 uses (`check_mechanism_quality` then `deberta_check`) and writes BOTH checks into
+`verification_results` — both are local and free (regex + NLI), so this costs no model call and re-implements
+nothing (C21). Controls: 16/16. **No further row this path writes can be unevaluable.**
+
+**OWED, NAMED — three things, in this order.**
+(1) **THE EXISTING ROW**: its record must be RECOMPUTED through the same pair (deterministic, LLM-free) and its
+`confidence_score`/`needs_human_review` re-derived through `serving_gate.derive_conf_and_review` — the ONE home.
+The repair script already re-derives the epistemic label and REFUSES when a derivation's input is absent; this is
+the same shape and belongs in it, not in a one-off.
+(2) **THE SCORE AXIS' DERIVATION INPUTS ARE UNVERIFIED HERE**: the rail compares the stored confidence against
+`derive_conf_and_review(fact, mech, enrich, isor)` and this path computes no `enrich` and no `isor` — so writing a
+confidence from the two checks alone may read SCORE_MISMATCH rather than MATCH. That is a measurement owed BEFORE
+the repair writes, never after (D-3036: the red loop first).
+(3) **`just health` is RED at `check-s5-score-axis` until (1) lands.** Declared loudly rather than quieted: the row
+is `PASS` and therefore SERVED, and an unevaluable SERVED row is the exact shape C16 forbids hiding.
+
+**WHAT THIS SESSION DID NOT DO, DELIBERATELY.** It did not invent a `mechanism_quality` score, did not set a
+confidence the derivation does not produce, and did not touch the rail's population — each of those would have
+turned a named gap into a green lie. It also did not file this as part of BUG-977: that bug is the content_type
+vocabulary, this one is the score axis, and D-2956 clause 4 is the reason they were both invisible in the same
+place — each instrument reads its own population.

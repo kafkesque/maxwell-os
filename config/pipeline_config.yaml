@@ -1354,3 +1354,17 @@ single_concept:
   difficulty_level: intermediate
   temporal_scope: timeless
   origin: single_source
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE D-279/D-2640 STAMP QUARTET's fourth member, for the SINGLE-CONCEPT path (BUG-978, 2026-10-23).
+#   The quartet is menu_hash + content_type_source + discipline_source + extraction_type_source, and it is ATOMIC:
+#   scripts/check_label_provenance.py refuses a PARTIAL quartet outside its declared pre-boundary as a BROKEN STAMP
+#   ("a partial quartet outside the boundary is missing, never stamped" - its own known-answer control). So filling
+#   three of four turned a provenance HOLE into a BROKEN STAMP, which is how this key was found (the rail caught it
+#   on the row the repair had just fixed).
+#   THE VALUE IS THE STORE'S OWN DECLARED ABSENCE SENTINEL, not an invention: 1,049 D-2590 sidecar rows already
+#   carry the literal NOT_APPLICABLE for "no closed menu was applied to this record", and D-2957 calls that an OWED
+#   shape, not a normalisation. This path applies no closed menu at all (its role comes from a tier-B owner ruling,
+#   not a menu classification), so NOT_APPLICABLE is the TRUE value here - a SHA-256 of a menu that never ran would
+#   be a fabricated measurement (D-3034).
+single_concept_menu_hash: NOT_APPLICABLE

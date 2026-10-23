@@ -447,8 +447,8 @@ measured:
     menu_hash:
       distinct: 2
       hollow: 0
-      mentions: 33
-      nonblank: 7640
+      mentions: 35
+      nonblank: 7641
       nonnull: 7641
       rows: 7641
     name:

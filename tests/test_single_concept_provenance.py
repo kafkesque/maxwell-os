@@ -84,7 +84,8 @@ def test_the_label_authorship_is_deterministic_never_human_verbatim() -> None:
 
 def test_a_stamped_record_is_provenance_complete() -> None:
     """The four cells that were blank on the one row this path wrote are all populated BY CONSTRUCTION."""
-    fb = apply_declared_ontology({}, declared_ontology(_cfg()), committed_at="2026-10-23T00:00:00+00:00")
+    fb = apply_declared_ontology({}, declared_ontology(_cfg()), committed_at="2026-10-23T00:00:00+00:00",
+                                cfg_menu_hash=CFG.get("single_concept_menu_hash"))
     for cell in ("content_type", "content_type_source", "discipline_source", "extraction_type_source"):
         assert str(fb.get(cell) or "").strip(), cell
     assert fb["created_at"] == fb["committed_at"] == "2026-10-23T00:00:00+00:00"

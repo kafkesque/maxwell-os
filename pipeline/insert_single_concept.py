@@ -149,7 +149,8 @@ def declared_ontology(cfg: dict, *, where: str = "config/pipeline_config.yaml#si
     return ontology
 
 
-def apply_declared_ontology(fb: dict, ontology: dict[str, str], *, committed_at: str) -> dict:
+def apply_declared_ontology(fb: dict, ontology: dict[str, str], *, committed_at: str,
+                            cfg_menu_hash: str | None = None) -> dict:
     """Stamp the declared ontology, every label's AUTHORSHIP, and the row's timestamps onto `fb`.
 
     WHY (BUG-977, MEASURED 2026-10-23). The one row this path wrote before this function existed carried
@@ -170,6 +171,13 @@ def apply_declared_ontology(fb: dict, ontology: dict[str, str], *, committed_at:
         The same `fb`, stamped.
     """
     fb.update(ontology)
+    # D-279/BUG-978: the stamp quartet is ATOMIC (check_label_provenance refuses a partial one as a BROKEN STAMP),
+    # and this path applies NO closed menu - so the store's declared absence sentinel is the TRUE value, read from
+    # the declaration (C12), never typed here.
+    fb["menu_hash"] = str(cfg_menu_hash or "").strip()
+    if not fb["menu_hash"]:
+        raise SystemExit("FAIL-CLOSED: config/pipeline_config.yaml#single_concept_menu_hash is absent — the D-279\n"
+                         "quartet cannot be completed without it (D-3034)")
     fb["created_at"] = fb["committed_at"] = committed_at
     return fb
 
@@ -259,7 +267,8 @@ def main() -> int:
     }
 
     ontology = declared_ontology(cfg)
-    apply_declared_ontology(fb, ontology, committed_at=datetime.now(UTC).isoformat())
+    apply_declared_ontology(fb, ontology, committed_at=datetime.now(UTC).isoformat(),
+                            cfg_menu_hash=cfg.get("single_concept_menu_hash"))
 
     passed, score, detail = deberta_check(fb)
     verification_results = json.dumps([{"check_name": "factual", "passed": passed, "score": score, "detail": detail}])

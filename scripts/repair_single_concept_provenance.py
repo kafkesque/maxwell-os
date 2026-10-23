@@ -110,7 +110,7 @@ def main() -> int:
     try:
         row = conn.execute(
             "select fb_id, name, content_type, content_type_source, discipline_source, "
-            "extraction_type_source, created_at, committed_at, epistemic_status, "
+            "extraction_type_source, created_at, committed_at, epistemic_status, menu_hash, "
             "verification_results, isor from fbs where fb_id = ?",
             (args.fb_id,),
         ).fetchone()
@@ -123,12 +123,23 @@ def main() -> int:
               f"discipline_source={row['discipline_source']!r} "
               f"extraction_type_source={row['extraction_type_source']!r} "
               f"created_at={row['created_at']!r} committed_at={row['committed_at']!r} "
-              f"epistemic_status={row['epistemic_status']!r}")
+              f"epistemic_status={row['epistemic_status']!r} menu_hash={row['menu_hash']!r}")
 
         writes: dict[str, str] = {}
         for column, key in AUTHORSHIP_COLUMNS.items():
             if _blank(row[column]):
                 writes[column] = ontology[key]
+        # D-279/BUG-978: the quartet is ATOMIC - a PARTIAL one is a BROKEN STAMP (check_label_provenance refuses it,
+        # and did, on the row the first repair fixed). This path applies NO closed menu, so the store's declared
+        # absence sentinel (read from the declaration, C12) is the TRUE fourth member, never a fabricated digest.
+        if _blank(row["menu_hash"]):
+            sentinel = str(cfg.get("single_concept_menu_hash") or "").strip()
+            if not sentinel:
+                print("REFUSED: config/pipeline_config.yaml#single_concept_menu_hash is absent - the D-279 quartet "
+                      "cannot be completed, and a partial quartet is a broken stamp (D-3034)")
+                return 1
+            writes["menu_hash"] = sentinel
+
         if _blank(row["created_at"]):
             if _blank(row["committed_at"]):
                 # no time stamp anywhere on the row: inventing one would be a fabricated measurement
@@ -182,9 +193,10 @@ def main() -> int:
             # post-state re-derived INSIDE the transaction, before COMMIT (the D-2970 pattern)
             after = conn.execute(
                 "select content_type_source, discipline_source, extraction_type_source, created_at, "
-                "epistemic_status from fbs where fb_id = ?", (args.fb_id,)
+                "epistemic_status, menu_hash from fbs where fb_id = ?", (args.fb_id,)
             ).fetchone()
-            still_blank = [c for c in (*AUTHORSHIP_COLUMNS, "created_at", "epistemic_status") if _blank(after[c])]
+            still_blank = [c for c in (*AUTHORSHIP_COLUMNS, "created_at", "epistemic_status", "menu_hash")
+                           if _blank(after[c])]
             if still_blank:
                 raise RuntimeError(f"post-state still blank on {still_blank} — rolling back")
             for column, key in AUTHORSHIP_COLUMNS.items():

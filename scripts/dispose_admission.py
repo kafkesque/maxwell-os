@@ -92,6 +92,11 @@ def build_line(reason: str | None, kind: str | None, source: str | None) -> dict
     else:
         if kind or not source:
             raise SystemExit(f"FATAL: {reason} takes --source (an absolute path) and NOT --kind")
+        if not Path(source).is_absolute():
+            raise SystemExit(
+                f"FATAL: --source must be an ABSOLUTE path (plan_admission matches str(path) exactly, so a "
+                f"relative path would silently settle NOTHING) — got {source!r}"
+            )
         rec = {"reason": reason, "source": source}
     rec["schema"] = "1.0"
     rec["ts"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -175,6 +180,8 @@ def selftest() -> int:
     expect("reason gate closed", raises("made_up_reason", None, None), "a reason outside the vocabulary did not raise")
     expect("kind/source mutex (kind)", raises("out_of_scope_by_kind", None, "/x"), "kind reason took a source")
     expect("kind/source mutex (source)", raises("not_a_work", ".png", None), "source reason took a kind")
+    expect("source absolute gate closed", raises("not_a_work", None, "relative/path/Work.docx"),
+           "a relative source did not raise")
 
     #: crash-safe write + round-trip into a THROWAWAY folder (a selftest never writes the live record).
     with _tempfile.TemporaryDirectory(prefix="dispose_") as tmp:

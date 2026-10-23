@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 738,
-  "open_n": 259,
-  "closed_n": 479,
+  "open_n": 258,
+  "closed_n": 480,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1289,11 +1289,6 @@
       "events": 2
     },
     {
-      "id": "BUG-966",
-      "title": "(MED, OPEN 2026-10-23) \u2014 two governance faces asserted an UNEXECUTED gate whose receipt was committed and already ratified",
-      "events": 1
-    },
-    {
       "id": "BUG-967",
       "title": "(LOW, OPEN 2026-10-23) \u2014 the Phase 0 receipt reports S0.5 as \"identical\" over two EMPTY sets",
       "events": 1
@@ -1779,6 +1774,7 @@
     "BUG-962",
     "BUG-963",
     "BUG-965",
+    "BUG-966",
     "BUG-968",
     "BUG-969",
     "BUG-970",

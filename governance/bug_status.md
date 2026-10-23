@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**259 open** / 479 closed of 738 ids.
+**258 open** / 480 closed of 738 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -263,6 +263,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
 | BUG-956 | (HIGH, OPEN 2026-10-20) — THE KNOWLEDGE STORE **HALVED** (14,574 → 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS | 5 |
 | BUG-964 | (LOW, OPEN 2026-10-22) — gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified) | 2 |
-| BUG-966 | (MED, OPEN 2026-10-23) — two governance faces asserted an UNEXECUTED gate whose receipt was committed and already ratified | 1 |
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |

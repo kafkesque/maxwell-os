@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import sqlite3
 import sys
@@ -149,6 +150,56 @@ def _suggest(bucket: str, a: dict, b: dict, model_a: str = "", model_b: str = ""
     return "", f"ERROR: {a.get('error') or b.get('error')}"
 
 
+def run_one(item_id: str, ruler: str, cands: list[dict], model: str,
+            lock: threading.Lock, raw_fh: io.TextIOBase) -> tuple[tuple[str, str], dict]:
+    # C23: a single RAISED call must not kill the whole batch. Record it as an ERROR
+    # receipt line and let the remaining calls finish; the merge already buckets it ERROR.
+    try:
+        rec = _ask(ruler, cands, model)
+    except Exception as e:  # noqa: BLE001 — C16: the error is logged to the receipt AND stderr, not silent
+        rec = {"ok": False, "error": f"{e.__class__.__name__}: {e}"}
+        print(f"  [errored] {item_id} {model}: {e}", file=sys.stderr)
+    line = {"item_id": item_id, "model": model, **rec}
+    with lock:
+        raw_fh.write(json.dumps(line, ensure_ascii=False) + "\n")
+        raw_fh.flush()
+    return (item_id, model), rec
+
+
+def _selftest() -> int:
+    """Red-loop for BUG-965: a call that RAISES must be recorded and the batch must continue."""
+    global call_omlx_json
+    original = call_omlx_json
+    calls: list[str] = []
+
+    def fake_call(prompt: str, model: str = None) -> dict:
+        calls.append(model or "")
+        if len(calls) == 1:
+            raise RuntimeError("OMLX call failed after 2 attempts: total wall-clock deadline (180s) exceeded")
+        return {"verdict": "NONE", "fb_id": "", "confidence": 0.99, "reason": "fixture"}
+
+    call_omlx_json = fake_call
+    try:
+        lock = threading.Lock()
+        raw_fh = io.StringIO()
+        tasks = [("i1", "R1", [], "m-A"), ("i2", "R2", [], "m-A"), ("i3", "R3", [], "m-A")]
+        results: dict[tuple[str, str], dict] = {}
+        with ThreadPoolExecutor(max_workers=3) as ex:
+            for key, rec in ex.map(lambda t: run_one(*t, lock, raw_fh), tasks):
+                results[key] = rec
+        errored = sum(1 for r in results.values() if not r.get("ok"))
+        ok = len(results) - errored
+        assert errored == 1, f"expected exactly 1 errored call, got {errored}"
+        assert ok == 2, f"expected 2 ok calls, got {ok}"
+        lines = [json.loads(l) for l in raw_fh.getvalue().splitlines() if l.strip()]
+        assert len(lines) == 3, f"expected 3 receipt lines, got {len(lines)}"
+        assert any(not l.get("ok") for l in lines), "the raised call must be recorded as not-ok (C16)"
+    finally:
+        call_omlx_json = original
+    print("✅ selftest passed: a raising call is recorded as ERROR and the batch continues (C23/C16)")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None, help="adjudicate only the first N rows (selftest)")
@@ -157,7 +208,11 @@ def main() -> int:
     ap.add_argument("--items", default=None, help="comma-separated item_ids to adjudicate (default: all rows)")
     ap.add_argument("--out", default=None, help="override output CSV path (relative to repo root)")
     ap.add_argument("--raw", default=None, help="override raw JSONL receipt path (relative to repo root)")
+    ap.add_argument("--selftest", action="store_true", help="run the BUG-965 red-loop fixture (no server)")
     args = ap.parse_args()
+
+    if args.selftest:
+        return _selftest()
 
     cfg = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
     ac = cfg.get("reanchor_adjudication")
@@ -243,14 +298,6 @@ def main() -> int:
     lock = threading.Lock()
     raw_fh = raw_path.open("a", encoding="utf-8")
 
-    def run_one(item_id: str, ruler: str, cands: list[dict], model: str) -> tuple[tuple[str, str], dict]:
-        rec = _ask(ruler, cands, model)
-        line = {"item_id": item_id, "model": model, **rec}
-        with lock:
-            raw_fh.write(json.dumps(line, ensure_ascii=False) + "\n")
-            raw_fh.flush()
-        return (item_id, model), rec
-
     tasks = [
         (row["item_id"], row["ruler_name"], row["_cands"], model)
         for row in rows
@@ -274,7 +321,7 @@ def main() -> int:
                 results[(rec["item_id"], rec["model"])] = rec
 
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        for key, rec in ex.map(lambda t: run_one(*t), tasks):
+        for key, rec in ex.map(lambda t: run_one(*t, lock, raw_fh), tasks):
             results[key] = rec
 
     raw_fh.close()
@@ -323,7 +370,11 @@ def main() -> int:
         w.writerows(out_rows)
     tmp.replace(out_path)  # atomic (C6)
 
+    errored_calls = sum(1 for rec in results.values() if not rec.get("ok"))
+    done_calls = len(results) - errored_calls
+
     print("\n=== ADJUDICATION SUMMARY ===")
+    print(f"  calls: {done_calls} done / {errored_calls} errored (of {len(results)} recorded)")
     total = sum(counts.values())
     for k in sorted(counts, key=lambda x: order.get(x, 9)):
         print(f"  {k:12s} {counts[k]:4d}")

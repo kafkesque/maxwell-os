@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (260 open / 478 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (259 open / 479 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 260 open.
+> Open BUGS by severity (population = the census's 259 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 259 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19946,3 +19946,27 @@ source is FATAL. The prior absolute-path guard (ad3233e) fixed only "relative"; 
 `refused_not_in_its_kind_folder` 53 = T-184 (placement), `refused_container_corrupt` 1 = the Keylight
 PDF. Each has its own owner-lane mover; BUG-973's denominator (the DISPOSED class + the 241 assets +
 a permanently-refused conversion candidate) is now a lane that can reach zero.
+
+## BUG-965 (MED, FIXED 2026-10-23) — a single wedged call no longer aborts the batch: per-task ERROR capture + `N done / M errored` receipt (C23/C16)
+
+**FIX LANDED.** `scripts/adjudicate_reanchor_two_model.py` wrapped `run_one` so a RAISED `call_omlx`
+(`RuntimeError` after MAX_RETRIES on the BUG-658 wall-clock deadline) no longer propagates through
+`ThreadPoolExecutor.map` and kills the batch. The raised call is converted to a `{"ok": false, "error": ...}`
+receipt line, written to the raw JSONL (so resume stays lossless) AND printed to stderr (`[errored] item model:
+...`, C16 — never silent), and the batch continues to the remaining calls. The merge already bucketed a not-ok
+judge as ERROR, so no merge change was needed.
+
+**RED-LOOP (D-3036, satisfied).** `--selftest` is a no-server fixture: the FIRST call raises the exact
+wall-clock `RuntimeError` and the remaining two calls must still complete. It asserts exactly 1 errored / 2 ok,
+3 receipt lines, and that the raised call is recorded as not-ok. Output: `✅ selftest passed: a raising call is
+recorded as ERROR and the batch continues (C23/C16)`.
+
+**VISIBILITY (the second harm, closed).** The summary now prints
+`calls: N done / M errored (of K recorded)` before the bucket table, so a partial-death batch is no longer
+invisible behind a bare traceback.
+
+**R5.** Reviewed by gemma-4-E4B-it-MLX-4bit (generator ≠ verifier): APPROVE on all six checks — C23 resilience,
+C16 logging + exception scoping, merge ERROR bucket, resume integrity, selftest red-loop, and C12/C17/C18.
+
+**INTERIM NOTE SUPERSEDED.** The `--workers 1` workaround is no longer required for correctness; concurrency
+still collapses a slow single-model server, so `--workers` remains a throughput knob, not a resilience one.

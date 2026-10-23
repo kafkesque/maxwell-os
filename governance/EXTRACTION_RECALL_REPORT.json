@@ -2,7 +2,7 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "015f673",
+  "pipeline_commit": "54d3688",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",

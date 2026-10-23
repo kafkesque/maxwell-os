@@ -19905,3 +19905,22 @@ act. The 241 `refused_container_no_stage_reads_it` assets break down by suffix a
 `.psd` 28, `.ai` 16, `.indd` 13, `.idml` 10, `.aep` 4, `.jsx` 4, `.lst` 4, `.ttc` 4, `.jpeg` 4, `.xls` 3, `.ppt` 4,
 `.zip` 2, `.rar` 1, `.djvu` 1, `.numbers` 1, `.gif` 3, and 3 with no suffix (settle by source). Until they are
 settled, `plan_admission.py --brief` keeps printing `refused 480` with `disposed 0`.
+
+
+## BUG-973 UPDATE #2 (2026-10-23) — LIMB 3: 237 OF 241 SETTLED BY THE OWNER; 4 ROWS REMAIN
+
+**LIMB 3 IN MOTION — the owner ran `dispose_admission.py`.** 19 kinds settled by suffix
+(`out_of_scope_by_kind`), covering 237 of the 241 `refused_container_no_stage_reads_it` assets
+(receipt `governance/evidence/ADMISSION_DISPOSITION_20261023T111924Z.jsonl`, commit b242a11).
+`plan_admission.py --brief` now reads `refused 243, disposed 237` (was `refused 480, disposed 0`).
+
+**A guard was added.** `dispose_admission.py --source` now fails closed unless the path is ABSOLUTE
+(commit ad3233e): the reader matches `str(path)` exactly, so a relative path would silently settle
+NOTHING (C16 — no silent dead disposition). Selftest control added; selftest green. Two accidental
+records carrying the literal placeholder `/absolute/path/to/file` were removed before commit.
+
+**4 ROWS REMAIN (owner-owed) — UPDATE #1 said "3 with no suffix" and undercounted by one.** The
+fourth is an `.idlk` InDesign lock file that the 19-kind list did not name (settle by `--kind .idlk`).
+The other three are no-suffix files under `.../hustle/Refund Bible 2023…/` (settle by `--source <abs path>`).
+Once those four are settled, `refused` drops to 239 (185 rename-first = T-176, 53 not-in-kind = T-184,
+1 corrupt) and `disposed` reaches 241.

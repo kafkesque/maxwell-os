@@ -224,6 +224,11 @@ def load_tier_b_rulings(cfg: dict[str, Any]) -> dict[tuple[str, str], dict[str, 
             note = (obj.get("owner_ruling_note") or "").strip().upper()
             if not sid or not name:
                 raise SystemExit(f"FAIL-CLOSED: tier-B ruling missing source_id/name: {obj!r} (D-3034)")
+            if "<" in sid or ">" in sid or "<" in name or ">" in name:
+                raise SystemExit(
+                    f"FAIL-CLOSED: tier-B ruling carries a placeholder token (D-3034): {obj!r} — a ruling "
+                    f"must RESOLVE to a real source_id and name, not an example/template line"
+                )
             if note not in ("MATCH", "NONE"):
                 raise SystemExit(f"FAIL-CLOSED: tier-B ruling note {note!r} not MATCH/NONE: {obj!r}")
             key = (sid, mint_concept_key(name))
@@ -701,9 +706,27 @@ def selftest() -> int:
     assert matched_absent["concepts_expected"] == 2, "a MATCHed tier-B row must join the floored concept set"
     assert matched_absent["tier_b_matched"] == 1, matched_absent["tier_b_matched"]
 
+    # 9) TIER-B RULING PLACEHOLDER GUARD (D-3034 red-loop): an example/template line the owner
+    #    copy-pasted ("<id>"/"<concept name>") declares NOTHING and must FAIL-CLOSED, never fold into
+    #    the golden as a dangling ruling key (the BUG-974-class inert line). Regression guard for the
+    #    2026-10-23 template artifact.
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False,
+                                     dir=str(PROJECT_ROOT / "governance")) as _fh:
+        _fh.write('{"source_id": "<id>", "name": "<concept name>", "owner_ruling_note": "MATCH"}\n')
+        _tmp_rel = Path(_fh.name).relative_to(PROJECT_ROOT)
+    try:
+        try:
+            load_tier_b_rulings({"golden": {"tier_b_ruling_sheet": str(_tmp_rel)}})
+        except SystemExit as _e:
+            assert "placeholder" in str(_e), _e
+        else:
+            raise AssertionError("a placeholder ruling must FAIL-CLOSED (D-3034)")
+    finally:
+        Path(_fh.name).unlink(missing_ok=True)
+
     print("✅ selftest passed: loss RED, presence CLEAN, attribution loss RED, key-choice negative "
           "control, stale-key RED, multiplicity reported, tier-B omission CLEAN / not auto-certified, "
-          "tier-B owner-MATCH floored RED")
+          "tier-B owner-MATCH floored RED, tier-B placeholder ruling FAIL-CLOSED")
     return EXIT_CLEAN
 
 

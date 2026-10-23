@@ -122,14 +122,24 @@ def run_interactive(cfg: dict) -> None:
         print("No unruled tier-B candidates remain.")
         return
     print(f"{len(cands)} unruled candidate(s). For each, type MATCH / NONE / skip (m/n/s), then Enter.\n")
-    for c in cands:
+    for idx, c in enumerate(cands, 1):
         name = c.get("name", "")
         sid = c.get("source_id", "")
         rationale = c.get("rationale", "")
-        print(f"── {name}  ({sid})")
+        print(f"[{idx}/{len(cands)}] ── {name}  ({sid})")
         print(f"   rationale: {rationale}")
         while True:
-            ans = input("   MATCH / NONE / skip? [m/n/s]: ").strip().lower()
+            try:
+                ans = input("   MATCH / NONE / skip? [m/n/s]: ").strip().lower()
+            except EOFError:
+                # D-3100 (MEASURED 2026-10-23): this walker is an OWNER tool, and run with stdin closed it died with
+                # a traceback instead of saying what was left. A manual step that crashes is a step the owner
+                # cannot run, so EOF now STOPS the walk cleanly and names the remainder: every ruling already
+                # given is on disk (atomic append per ruling), so nothing is lost.
+                remaining = len(cands) - idx + 1
+                print(f"\nEOF: the walk stopped. {remaining} candidate(s) still unruled; "
+                      f"nothing was lost (each ruling appends as you type it).")
+                return
             if ans in ("m", "match"):
                 record_ruling(cfg, sid, name, "MATCH")
                 break
@@ -177,7 +187,22 @@ def selftest() -> int:
     return 0
 
 
+USAGE = """usage: python3 scripts/rule_tier_b.py [--walk | --list | --count | --rule <source_id> <name> MATCH|NONE | --selftest]
+
+  (no flag)   walk the unruled tier-B candidates, one typed ruling each (MATCH / NONE / skip)
+  --count     print "<unruled> unruled / <total> total" and exit
+  --list      print one candidate per line, tab-separated: source_id, name, rationale
+  --rule      record ONE ruling non-interactively (the walk's equivalent, for a single candidate)
+  --selftest  known-answer controls only (no store, no prompt)
+
+The ruling sheet is governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl (append-only, one line per ruling).
+Rulings carry PRESENCE only (MATCH = the concept is in the source and must be expected; NONE = it is not)."""
+
+
 def main() -> int:
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print(USAGE)
+        return 0
     if "--selftest" in sys.argv:
         return selftest()
     cfg = load_cfg()

@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 747 bugs (260 open / 487 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 748 bugs (260 open / 488 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
@@ -20381,3 +20381,19 @@ finding that cannot NAME its evidence is the rail-registry's class (ii) — the 
 disagree — and it is filed here rather than fixed, because the honest repair is to make the layer print the names it
 counted (or nothing at all). The pre-existing `mobi` finding it used to print is unchanged and still open under its
 own name.
+
+## BUG-984 (LOW — FIXED 2026-10-23) — the owner's tier-B ruling walker crashed instead of saying what was left
+
+Found while writing the owner's copy-paste instructions for T-195 (D-3100: a manual step handed over in prose is a
+step the owner cannot run — and this one could not be run AT ALL). `scripts/rule_tier_b.py` with stdin closed died
+with `EOFError` inside `input()` and printed a traceback; `--help` was not a recognized flag, so it fell through to
+the interactive walk and crashed the same way. MEASURED before: `python3 scripts/rule_tier_b.py --help` →
+`Traceback ... line 132, in run_interactive`. A tool that answers `--help` with a crash tells the owner nothing about
+what it does or how far along the 43 rulings are.
+
+**FIX.** `--help`/`-h` print a declared USAGE block (walk / --list / --count / --rule / --selftest, plus where the
+ruling sheet lives and what MATCH vs NONE means); `EOFError` now STOPS the walk cleanly and NAMES the remainder
+(`43 candidate(s) still unruled; nothing was lost`), because every ruling is appended atomically as it is typed, so a
+stopped walk loses no decisions; the walk prints `[k/N]` progress. MEASURED after: `--help` prints usage, `--count`
+reports `43 unruled / 45 total`, `</dev/null` exits 0 with the remainder named, `--selftest` green (5 controls).
+The 5 ruff findings in this file are PRE-EXISTING (B904 x2, I001, F401 `yaml`, E741) and are not addressed here.

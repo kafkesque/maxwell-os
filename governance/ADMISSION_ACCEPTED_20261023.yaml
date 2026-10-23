@@ -1,0 +1,184 @@
+schema_version: '1.0'
+plan: governance/ADMISSION_PLAN_20261023.json
+plan_sha256: 14680e5c7447035fd4717c146d51cda4c7ef20054b6f99b6d52acc54a1a827a8
+scope_sha256: c6e98dfabb62f3c792eb2e71bd93b9fc62db4f04ca6d7b52de80331b0d9edda0
+accepted_by: human
+accepted_on: '2026-10-23'
+mode: all
+rows:
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/GodMan_10236902.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/robert c holub
+  reception theory.pdf
+- books/pdf/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.pdf
+- books/pdf/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking
+  for Designers (Sheryl Cababa) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/The Psychology Behind Design.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie
+  Rodriguez, Piotr Kaczmarek_liber3.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/_Principles of three dimensional
+  design._Wucius Wong_liber3.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.pdf
+- books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things,
+  Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and…
+  (Michael Bierut).pdf
+- books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking,
+  and Design (Eric Zimmerman) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/ saul bass.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements
+  of Typographic Style.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster
+  Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch
+  to screen (Cristóbal Henestrosa Matus, José Scaglione) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS-
+  AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and
+  Anatomy (Frank Calderon) (Z-Library).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light -
+  James Gurney.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals (
+  PDFDrive.com ).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human
+  Anatomy - 1E (2016).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The
+  Artist's Complete Guide To Facial Expression.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the
+  Hot Wheels Way (Scott Robertson) (Z-Library).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing
+  Perspective Made Easy.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the
+  Absolute Beginner.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.pdf
+- books/pdf/DOMAIN 4 Business/Business guide.pdf
+- books/pdf/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers
+  So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).pdf
+- books/pdf/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made
+  by James) (Z-Library).pdf
+- books/pdf/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a
+  Graphic Designer without Losing your Soul 150dpi.pdf
+- books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations
+  Manual (Chase Hughes) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations
+  Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret
+  of the Illuminati (Robert Anton Wilson) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness
+  for Satisfying Sex By Barry W. McCarthy.pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton
+  Wilson) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by
+  Charles Platt.pdf.pdf'.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build
+  your own alien instruments (Reed Ghazala) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic
+  Components Volume 1.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.pdf
+- books/pdf/DOMAIN 6 AI + Computing/210912-LB-Network-Map.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING
+  FUNDAMENTALS- CRC PRESS, 1st ed. .pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook
+  for Visual Designers and Artists, 2 edition.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics/kupdf.net_semiotics.pdf
+- journals_notes/DOMAIN 2 Design/Typography/ThePrinciplesoftheNewTypography.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Acustic.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Automation.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Editing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Kerdesek.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mastering.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mixing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook7.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook8.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook9.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Signal processing.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap
+  Table/Cap-Table.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1
+  Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1
+  Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1
+  Folder/CAPABILITIES-PRINT-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1
+  Folder/CAPABILITIES-WEBSITE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1
+  Folder/CAPABILITIES-GENERIC-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1
+  Folder/CASESTUDY-TROPOLIS-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1
+  Folder/CASESTUDY-GENERIC-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1
+  Folder/DELIVERY-IDENTITY-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1
+  Folder/DELIVERY-PRINT-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1
+  Folder/DELIVERY-WEBSITE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx
+- journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample
+  Business Plan - Wooden Grain Toy Company.doc
+- journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample
+  Lean Business Plan - Wooden Grain Toy Company.doc
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/SEO-for-Beginners.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Business guide.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC
+  Template - powerpoint.pptx
+- journals_notes/DOMAIN 4 Business/reports/SEO-Trends-2021.pdf
+- journals_notes/DOMAIN 4 Business/reports/State of Independence 2021 Report.pdf
+- journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020.pdf
+- journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Amazon Refund
+  Sauce 🙎🏿‍♂️/AMAZON REFUND.pdf

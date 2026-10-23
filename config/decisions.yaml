@@ -31553,3 +31553,68 @@ decisions:
     r5: gemma-4-E4B-it-MLX-4bit (different family) returned SHIP on 5/5 questions; its Q2 justification described
       the fail-open correctly while labelling it OK, and the author trace pinned the caller count at 2/2 - an R5
       SHIP is a smoke test, not a proof.
+- id: D-3132
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: EVALUATION / GOLDEN AUTHORITY / ONTOLOGY OF THE RULER
+  title: 'The retrieval ruler has THREE authorities and all three were wrong: the stored snapshot is EVIDENCE not
+    an authority (INV-12), a duplicated label must ENLARGE a set-valued set never exclude the query (INV-13), and
+    the anchor-mode vocabulary has ONE declared home with no default (BUG-971)'
+  decision: 'A golden set is a RULER, and a ruler with a second authority is not a ruler. BUG-969: resolve_golden_anchors
+    unioned the stored expected snapshot into the denominator unconditionally, so the RECEIPT of the last apply
+    competed with the owner-signed NAME - armed harm: after a rebuild the ids are dead, _resolvability hard-fails
+    the run (rc 2) though every name resolved, and --allow-unresolvable would deflate recall against dead ids (the
+    BUG-710 inversion reached via a flag); the sharper limb is that a name which STOPPED resolving was kept alive
+    by its stale id, masking exactly the fact the rail exists to print. Fixed to the declared intent (name_then_id
+    = prefer the name, keep ids as a LEGACY FALLBACK), with the ignored snapshot REPORTED so the fallback can never
+    be silent. BUG-970: an AMBIGUOUS label EXCLUDED the whole query, making a set-valued ruler LOOSER - the direction
+    INV-4 forbids - so in anchor_mode set every PASS row sharing a label now enters the expected set and the multiplicity
+    is reported, while the single-answer join keeps its refusal (one-of-two there is a coin flip). BUG-971, found
+    by auditing the fix rather than by a report: the anchor-mode vocabulary lived as a code tuple in the applier
+    AND would have been a second copy in the resolver, and the applier read the mode with a get(..., single) DEFAULT,
+    so an absent declaration silently changed the ruler semantics - fixed by declaring anchor_modes ONCE in config
+    and making BOTH readers refuse to start without it. The mode is never a knob per caller: the resolver consults
+    the ONE declaration the applier obeys. What this does NOT claim: the ruler is still self-referential in its
+    CANDIDATE POOL (T-116) and its tier-B completeness half stays NOT MEASURED (T-195/D-3130); a green retrieval
+    rail still proves only that the certified anchors are reachable.'
+  bugs:
+  - BUG-969
+  - BUG-970
+  - BUG-971
+  - BUG-972
+  files:
+  - pipeline/golden.py
+  - pipeline/retrieval_benchmark.py
+  - scripts/reanchor_retrieval_goldens.py
+  - config/pipeline_config.yaml
+  - specs/retrieval_goldens.spec.md
+  - tests/test_retrieval_goldens_spec.py
+  - governance/buglog.md
+  receipts:
+    red_loop: 'D-3036 satisfied BEFORE any fix: the five new predicates were run against pipeline/golden.py AS AT
+      HEAD (loaded via git show HEAD:pipeline/golden.py) and 1 of 4 held - the dead id was unioned in (expected
+      set [alpha, dead] where only alpha was a live name), a query whose only name was DEAD was KEPT by its stale
+      snapshot id, and a duplicated label EXCLUDED the query. After the fix: python3 pipeline/golden.py --selftest
+      = 5/5 known-answer control(s) fire.'
+    no_regression_live: 'MEASURED 2026-10-23 on the real golden + store: 29/29 queries carry names AND a snapshot;
+      120 names -> 116 distinct ids; the snapshot holds the same 116 (0 resolved-only, 0 snapshot-only); per-query
+      expected sets BEFORE vs AFTER: 0 differing, 120 expected entries. The fix removes the armed harm without moving
+      a metric.'
+    armed_state: 'BUG-970 is ARMED NOT EXERCISED: 0 PASS names duplicated in the canonical run and 0 across all
+      runs (measured); the store holds 5 duplicate concept_keys across 7640 rows (D-3129: report, never collapse).
+      BUG-969 harm is armed for the next rebuild, not live.'
+    one_home_proof: 'BUG-971 measured TWO-SIDED: the old control the_vocabulary_and_the_anchor_mode_have_ONE_home_in_config
+      PASSED while its claim was false (code tuple, no config home); against HEAD inputs the OLD predicate is True
+      and the STRENGTHENED one is False. After the fix applier and resolver agree (set, (single,set)) and both refuse
+      an absent mode or an empty vocabulary. reanchor --selftest 13/13, reanchor --check on the real signed sheet
+      rc 0, pytest tests/test_retrieval_goldens_spec.py 32 passed.'
+    r5: 'DECLARED GATE, not an ad-hoc prompt: python3 scripts/r5_code_review.py --file pipeline/golden.py --reviewer
+      gemma-4-E4B-it-MLX-4bit = APPROVE, recorded in the declared journal governance/r5_reviews.jsonl (file sha256_16=6b21a0817ca6181f).
+      HONEST LIMIT: an earlier ad-hoc delegate review of the same code returned VERDICT SHIP with Q1 answered YES
+      to a question whose answer is NO (the snapshot does not enter the denominator when names exist), and two cross-family
+      retries (Ornith-1.5-9B, MiniCPM5-2B) failed at the harness - so an R5 SHIP is a smoke test and the AUTHOR
+      TRACE (five controls, the HEAD red loop, the live no-op measurement) is what carries this decision.'
+    audit_finding: 'BUG-972 REGISTERED, not silently fixed: --out outside the repo writes the verdict then dies
+      at out.relative_to(REPO), and --out itself is a second home for verdicts beside the declared journal (this
+      turn created one and removed it after confirming it was the only trace). Remedy owed.'

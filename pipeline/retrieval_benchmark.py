@@ -373,6 +373,12 @@ def main() -> int:
         print(f"  ⚠️  golden anchor UNRESOLVED {_u['name']!r} ({_u['why']}) <- {_u['query'][:40]}")
     for _a in anchor_report["ambiguous"]:
         print(f"  ⚠️  golden anchor AMBIGUOUS  {_a['name']!r} ({_a['n']} rows) <- {_a['query'][:40]}")
+    for _m in anchor_report["multiplicity"]:
+        print(f"  ⚠️  golden label {_m['name']!r} matched {_m['n']} PASS rows — ALL kept in the "
+              f"expected set (BUG-970: a set-valued ruler may not go LOOSER) <- {_m['query'][:40]}")
+    if anchor_report["snapshot_ignored"]:
+        print(f"  ·   {len(anchor_report['snapshot_ignored'])} golden query(ies) carry a stored id "
+              f"snapshot that is EVIDENCE only — the names are the ruler (BUG-969)")
     if anchor_report["excluded_queries"]:
         print(f"  ⚠️  {len(anchor_report['excluded_queries'])} golden query(ies) EXCLUDED from the "
               f"denominator (no resolvable anchor — BUG-710)")

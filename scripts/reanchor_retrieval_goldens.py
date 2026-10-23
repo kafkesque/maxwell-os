@@ -128,8 +128,23 @@ OWNER_SIGNATURE_REQUIRED: bool = bool(REANCHOR_CFG.get("owner_signature_required
 # `single` reading was hardcoded in TWO places. The mode is now DECLARED and never INFERRED from the sheet: an
 # inferred mode is a ruler whose meaning depends on the data it measured (and T-101 exists because the ruler was
 # saturated - one accepted answer per query is the easiest ruler the format can express).
-ANCHOR_MODE: str = str(REANCHOR_CFG.get("anchor_mode", "single")).strip()
-ANCHOR_MODES: tuple = ("single", "set")
+# BUG-971 (2026-10-23): THE MODE AND ITS VOCABULARY HAVE ONE HOME, AND NEITHER IS A DEFAULT.
+# MEASURED before this line: `anchor_mode` was read with `.get("anchor_mode", "single")`, so an ABSENT key
+# silently made a set-valued ruler single (the D-2982 fail-open class, in a gate), and the implemented token
+# list was a code tuple here AND a second copy in the resolver - two homes for one closed vocabulary. The
+# resolver now reads the SAME declaration, so a changed vocabulary cannot drift between reader and writer.
+if "anchor_mode" not in REANCHOR_CFG:
+    raise SystemExit(
+        "FAIL-CLOSED (C16): config/pipeline_config.yaml does not declare retrieval_benchmark.reanchor."
+        "anchor_mode - a missing declaration is not `single`, it is a ruler whose semantics nobody wrote down."
+    )
+ANCHOR_MODE: str = str(REANCHOR_CFG["anchor_mode"]).strip()
+ANCHOR_MODES: tuple = tuple(str(m).strip() for m in (REANCHOR_CFG.get("anchor_modes") or ()))
+if not ANCHOR_MODES:
+    raise SystemExit(
+        "FAIL-CLOSED (C16): config/pipeline_config.yaml declares no retrieval_benchmark.reanchor."
+        "anchor_modes - the implemented token list must be DECLARED, never carried as a code tuple."
+    )
 if ANCHOR_MODE not in ANCHOR_MODES:
     raise SystemExit(
         f"FAIL-CLOSED (C16): config/pipeline_config.yaml declares retrieval_benchmark.reanchor."
@@ -633,8 +648,12 @@ def controls() -> list[tuple[str, bool]]:
             and shrunk.get("dropped_by_omission") == ["q2"],
         ),
         (
+            # BUG-971 (2026-10-23): this control PASSED while the claim was false - `ANCHOR_MODES` was a
+            # code tuple, so `ANCHOR_MODE in ANCHOR_MODES` held with no config home at all. It now asks the
+            # only question that makes the label true: does the IMPLEMENTED list EQUAL the DECLARED one?
             "the_vocabulary_and_the_anchor_mode_have_ONE_home_in_config",
-            len(DECISIONS) >= 2 and ANCHOR_MODE in ANCHOR_MODES,
+            len(DECISIONS) >= 2 and bool(ANCHOR_MODES) and ANCHOR_MODE in ANCHOR_MODES
+            and ANCHOR_MODES == tuple(str(m).strip() for m in (REANCHOR_CFG.get("anchor_modes") or ())),
         ),
         (
             "the_writer_reads_the_declared_reviewed_inputs_never_the_generators_output",

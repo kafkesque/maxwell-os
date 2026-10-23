@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1257 decisions (census stamp ef71afbd341c4c42, 2026-10-23) · 735 bugs (261 open / 474 closed; highest OPEN = BUG-970) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1258 decisions (census stamp c71824678f2af3f0, 2026-10-23) · 737 bugs (260 open / 477 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1257 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 349 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1257, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1258 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 350 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1258, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 32 · UNLABELLED 101 (BUG-757) of 261 open.
+> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 260 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19796,3 +19796,70 @@ across all runs. The store does carry 5 duplicate `concept_key`s across 7,640 ro
 **OWED FIX.** In `anchor_mode: set`, resolve a name to ALL matching rows, keep them all, and report the multiplicity;
 keep the refusal for a `single`-answer join. Red loop first: a fixture with two rows sharing one label must yield
 two expected ids and `multiplicity_reported == 1`, not an excluded query.
+
+## BUG-969 UPDATE #1 (2026-10-23) — FIXED: the stored id snapshot is now EVIDENCE, never a second authority in the denominator
+
+**RED LOOP FIRST (D-3036).** The five new control predicates were run against `pipeline/golden.py` **as it was at
+HEAD** (loaded from `git show HEAD:pipeline/golden.py`): **1 of 4** held. The dead id was UNIONED into the expected
+set (`['bbbb…', 'aaaa…']` where only `bbbb…` was a live name), and — the sharper limb — a query whose **only name
+was dead** was KEPT alive by its stale snapshot id, so an unresolvable owner-signed name was masked by a receipt.
+
+**THE FIX.** `resolve_golden_anchors` consults the names when they exist and treats `q["expected"]` as the **LEGACY
+FALLBACK** for a query that carries no `expected_names` (and for the legacy `id` anchor mode). What was ignored is
+now REPORTED (`report["snapshot_ignored"]`, printed by `pipeline/retrieval_benchmark.py`), so an ignored snapshot
+can never be silent. This is exactly the reading the config already declared —
+`serving.golden_anchor_mode: name_then_id` "prefer expected_names, keep expected ids as a legacy **fallback**" — the
+code had been *unioning* where the declaration said *fall back*.
+
+**PROOF.** `python3 pipeline/golden.py --selftest` → **5/5** known-answer controls (a new `--selftest` on this module;
+before today the resolver had no controls at all). **MEASURED LIVE (2026-10-23), the no-regression receipt:** 29 of 29
+queries carry names AND a snapshot; 120 names resolve to 116 distinct ids; the snapshot holds the same 116; the
+name-resolved set and the snapshot set are EQUAL (0 resolved-only, 0 snapshot-only) and the per-query expected sets
+are **identical before and after** (0 differing sets, 120 expected entries). So the fix removes the armed harm
+without moving a single metric. Paired tests: `test_inv12_*` in `tests/test_retrieval_goldens_spec.py` (32 passed).
+
+## BUG-970 UPDATE #1 (2026-10-23) — FIXED: a duplicated label ENLARGES a set-valued ruler instead of excluding the query
+
+**RED LOOP FIRST.** Same HEAD run: two PASS rows sharing one label made the query **EXCLUDED** — measured, not
+argued — which is the direction INV-4 forbids ("enlarging a query's expected set makes the ruler STRICTER, not
+looser"). In set mode that turns a duplicate in the store into a *missing* anchor set.
+
+**THE FIX.** New `resolve_name_all()` returns EVERY PASS row carrying the label (ordered by `fb_id`, deterministic);
+in `anchor_mode: set` they all enter the expected set and the multiplicity is REPORTED
+(`report["multiplicity"]`, printed by the benchmark); in `anchor_mode: single` the existing refusal stands, because
+one-of-two there is a coin flip. The MODE IS NOT A SECOND KNOB: the resolver reads the ONE declaration the applier
+already obeys (`retrieval_benchmark.reanchor.anchor_mode`), fail-closed on an absent block or an unknown token (C12).
+**ARMED, NOT EXERCISED (measured 2026-10-23):** 0 PASS names are duplicated in the canonical run and 0 across all
+runs — the rail is armed by T-116's pooled pool, and the store already holds 5 duplicate `concept_key`s across 7,640
+rows (D-3129: report them, never collapse them).
+
+## BUG-971 (LOW, FIXED 2026-10-23) — the anchor-mode vocabulary had TWO homes and its reader DEFAULTED to `single`
+
+**FOUND BY THE AUDIT of the fix above, not by a report.** `scripts/reanchor_retrieval_goldens.py` carried the
+implemented token list as a **code tuple** `("single", "set")` while `pipeline/golden.py` (after BUG-970) would have
+carried a second copy — two homes for one closed vocabulary. In the same read the applier did
+`REANCHOR_CFG.get("anchor_mode", "single")`, so an **absent** key silently changed the ruler's semantics to `single`:
+the D-2982 fail-open class, inside a gate.
+
+**MEASURED two-sided (2026-10-23).** The existing control `the_vocabulary_and_the_anchor_mode_have_ONE_home_in_config`
+**PASSED while its own claim was false** (it asked `ANCHOR_MODE in ANCHOR_MODES`, which holds for a code tuple with no
+config home at all — a dead control carrying a true-sounding label, BUG-492's class). Against HEAD's config the OLD
+predicate is `True`; the STRENGTHENED predicate is `False` (measured: `!!`), because it compares the implemented list
+with the DECLARED one.
+
+**THE FIX.** `retrieval_benchmark.reanchor.anchor_modes: [single, set]` is now the ONE home; both readers derive from
+it and both REFUSE to start when the mode key is absent or the list is empty (C16). Verified: applier and resolver
+report the same mode and the same vocabulary (`set`, `('single','set')`); `reanchor --selftest` **13/13**;
+`golden --selftest` **5/5**; `reanchor --check` on the real signed sheet rc 0.
+
+## BUG-972 (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback
+
+**MEASURED 2026-10-23, by doing it:** `python3 scripts/r5_code_review.py --file pipeline/golden.py --reviewer
+gemma-4-E4B-it-MLX-4bit --out /tmp/r5_golden_969_970.json` printed `VERDICT APPROVE`, appended the verdict line, and
+then raised `ValueError: '/tmp/r5_golden_969_970.json' is not in the subpath of '<repo>'` from
+`out.relative_to(REPO)` — so a run that SUCCEEDED reports failure, and an operator following the traceback re-runs it,
+duplicating the verdict. Two defects in one line: the printer resolves a path it never validated, and `--out` lets a
+verdict land OUTSIDE the declared journal (`config/r5_review_gate.yaml#verdict_journal = governance/r5_reviews.jsonl`),
+i.e. a **second home for verdicts** — which this very turn created and then removed by re-running with the default
+out, after confirming the stray artifact was the only trace. **REMEDY OWED:** refuse an `--out` outside the repo
+BEFORE the call (the reviewer costs a model load), or print the absolute path when the relative one does not resolve.

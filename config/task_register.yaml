@@ -407,9 +407,15 @@ tasks:
     D-3116, a different instrument); (2) its candidate pool must be POOLED across the legs (production, fts, vector,
     hybrid), because the current pool is the production leg own top-N and is self-referential (D-2991, BUG-717); (3)
     the new anchors are signed by the human, then the EXISTING applier is the only writer (python3
-    scripts/reanchor_retrieval_goldens.py --check then --apply) - no second instrument and no new format. Do NOT grow
-    while BUG-969 or BUG-970 is open: growth multiplies both (more queries x more anchors x a pooled pool that
-    surfaces echoes).'
+    scripts/reanchor_retrieval_goldens.py --check then --apply) - no second instrument and no new format.
+    UNBLOCKED 2026-10-23 (D-3132): the three ruler defects that gated growth are CLOSED - BUG-969 (the stored
+    snapshot is now EVIDENCE: it is read only as the legacy fallback for a query with no expected_names, and what was
+    ignored is REPORTED), BUG-970 (in anchor_mode set a duplicated label now ENLARGES the expected set and reports its
+    multiplicity instead of excluding the query) and BUG-971 (the mode vocabulary has ONE declared home, with no
+    default). GROWTH IS NOW SAFE TO ATTEMPT: the ruler cannot shrink by omission (INV-11), cannot count a receipt as
+    an authority (INV-12) and cannot go looser on a duplicate label (INV-13). MEASURED live at closure: 0 differing
+    expected sets, 120 expected entries, 0 duplicated names - so the growth that follows is measured against the SAME
+    ruler, not a moved one.'
 - id: T-117
   priority: MUST
   state: done

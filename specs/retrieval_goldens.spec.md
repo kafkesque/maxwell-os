@@ -120,3 +120,37 @@ production callers pass `live=sorted(live)` — MEASURED 2026-10-23, 2 of 2 call
 **R5 (2026-10-23):** gemma-4-E4B-it-MLX-4bit returned SHIP on all five questions, and its Q2 justification
 described this fail-open correctly while labelling it OK — the author trace is what pinned the caller count.
 An R5 SHIP is a smoke test, not a proof.
+
+### INV-12 — The stored snapshot is EVIDENCE, never an AUTHORITY (BUG-969, 2026-10-23)
+`resolve_golden_anchors` used to `ids.extend(q["expected"])` **unconditionally**, so the receipt of the last apply
+sat in the denominator beside the names — a **second authority** in a metric (the BUG-548 shape: *the record is not
+the rule*). Consequence when armed: after a rebuild, ids minted by an earlier corpus are dead, `_resolvability`
+fails the whole run (rc 2) **though every NAME resolved**, and `--allow-unresolvable` would deflate recall against
+dead ids — the BUG-710 inversion reached through a flag.
+*Correct:* the snapshot is the **legacy fallback** for a query that carries no `expected_names` (and for the legacy
+`id` anchor mode). Where names exist they are the ruler, and what was ignored is reported as `snapshot_ignored`.
+*Wrong:* a stored id that keeps a query measurable after the owner-signed name stopped resolving — an unresolvable
+name must EXCLUDE the query (an unreported stale id masks exactly the fact the rail exists to print).
+
+**Measured live (2026-10-23):** 29 of 29 queries carry both names and a snapshot, the name-resolved set equals the
+snapshot set (116 distinct ids, 0 resolved-only, 0 snapshot-only), and the per-query expected sets are **identical**
+before and after the change — the fix is a live no-op that removes the armed harm, not a metric shift.
+
+### INV-13 — A duplicated label ENLARGES a set-valued ruler, never excludes the query (BUG-970, 2026-10-23)
+An `AMBIGUOUS` label (>1 PASS row) used to EXCLUDE the whole query from the denominator. In a **set-valued** ruler
+that makes the metric **looser** — the direction INV-4 forbids (*enlarging a query's expected set makes the ruler
+stricter*). The refusal is correct only for a **single-answer join**, where choosing one of two rows is a coin flip.
+*Correct:* in `anchor_mode: set`, every PASS row sharing the label is in the expected set and the multiplicity is
+reported (`report["multiplicity"]`, printed by the benchmark); in `anchor_mode: single` the refusal stands.
+*Wrong:* one duplicated label silently dropping 116 owner-signed anchors from the measurement.
+
+The **mode is not a second knob**: the resolver reads the ONE declaration the applier already obeys
+(`retrieval_benchmark.reanchor.anchor_mode`), fail-closed on an absent block or an unknown token (C12).
+**Measured live (2026-10-23):** 0 PASS names are duplicated in the canonical run and 0 across all runs, so this
+rail is *armed, not exercised* — it is armed by T-116's pooled candidate pool, and the store already holds 5
+duplicate `concept_key`s across 7,640 rows (D-3129: report them, never collapse them).
+
+**Proof (both invariants):** `python3 pipeline/golden.py --selftest` — 5/5 known-answer controls. The controls were
+run against the resolver **as it was at HEAD** first (`RED LOOP`, D-3036): 1 of 4 predicates held — the dead id was
+unioned in, a dead name was rescued by a stale id, and a duplicated label excluded the query. Paired tests:
+`tests/test_retrieval_goldens_spec.py` (`test_inv12_*`, `test_inv13_*`).

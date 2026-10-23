@@ -997,6 +997,12 @@ retrieval_benchmark:
     # 2026-10-14: owner word GRANTED = `set` (T-101). The reviewed sheet's 120 anchors now apply as the expected
     # SET recall@k is micro-averaged over. `--apply` remains gated by owner_signature_required and C13 backup.
     anchor_mode: set
+    # BUG-971 (2026-10-23): THE VOCABULARY IS DECLARED HERE, ONCE. `anchor_mode` names a token; until today the
+    # IMPLEMENTED tokens were a code tuple `("single", "set")` in the applier AND a second one in the resolver
+    # (pipeline/golden.py, BUG-970) - two homes for one closed vocabulary, which is the drift this OS refuses.
+    # The same read also DEFAULTED to `single` when the key was absent, so a missing declaration silently changed
+    # the ruler's semantics (the D-2982 fail-open class). A reader that finds no list, or no mode, must REFUSE.
+    anchor_modes: [single, set]
     # BUG-784 (2026-10-14): WHERE THE REVIEWED SHEET LIVES. MEASURED: `--check`/`--apply` defaulted to
     # `governance/golden_reanchor_candidates_20261011.csv` + `governance/golden_reanchor_proposed_20261011.yaml`,
     # which are the GENERATOR's outputs (both carry EMPTY `decision`/`owner_signature` columns). The pre-flight read

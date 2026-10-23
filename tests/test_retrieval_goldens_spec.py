@@ -277,3 +277,82 @@ def test_the_owners_reviewed_sheet_applies_under_a_declared_set() -> None:
     assert rep["dropped"] == [RETIRED_QUERY]
     assert rep["added"] == []
     assert rep["abstentions"] == 19
+
+
+# ── INV-12 · the stored snapshot is EVIDENCE, never an AUTHORITY (BUG-969) ────────────────────────────
+# ── INV-13 · a duplicated label ENLARGES a set-valued ruler, never excludes the query (BUG-970) ────────
+import sqlite3  # noqa: E402
+
+from pipeline.golden import CANONICAL_RUN, resolve_golden_anchors  # noqa: E402
+
+DEAD_ID = "a" * 64
+ALPHA_ID = "b" * 64
+DUP_IDS = ("c" * 64, "d" * 64)
+
+
+def _resolver_fixture(rows: list[tuple[str, str]]) -> sqlite3.Connection:
+    """(fb_id, name) PASS rows for the canonical run, in an in-memory fbs table (no store, no files)."""
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute(
+        "create table fbs (fb_id text primary key, name text, pipeline_run_id text, status text)"
+    )
+    conn.executemany(
+        "insert into fbs values (?,?,?,'PASS')", [(fb, nm, CANONICAL_RUN) for fb, nm in rows]
+    )
+    return conn
+
+
+def _resolve(queries: list[dict], rows: list[tuple[str, str]] | None = None,
+             ruler_mode: str | None = None) -> tuple[list[dict], dict]:
+    conn = _resolver_fixture(rows if rows is not None else [(ALPHA_ID, "Alpha")])
+    try:
+        return resolve_golden_anchors(conn, queries, "canonical_run", ruler_mode=ruler_mode)
+    finally:
+        conn.close()
+
+
+def test_inv12_a_stored_snapshot_never_enters_the_denominator_when_names_resolve() -> None:
+    kept, rep = _resolve([{"query": "q", "expected_names": ["Alpha"], "expected": [DEAD_ID]}])
+    assert kept[0]["expected"] == [ALPHA_ID]
+    assert rep["snapshot_ignored"] == [{"query": "q", "n": 1}]
+
+
+def test_inv12_a_query_with_no_names_still_reads_its_ids_and_is_counted() -> None:
+    kept, rep = _resolve([{"query": "q", "expected": [DEAD_ID]}])
+    assert kept[0]["expected"] == [DEAD_ID]
+    assert rep["legacy_fallback"] == [{"query": "q", "n": 1}]
+
+
+def test_inv12_a_dead_name_is_never_rescued_by_a_stale_id() -> None:
+    kept, rep = _resolve([{"query": "q", "expected_names": ["Ghost"], "expected": [DEAD_ID]}])
+    assert kept == []
+    assert len(rep["unresolved"]) == 1 and len(rep["excluded_queries"]) == 1
+
+
+def test_inv12_the_live_golden_carries_both_so_the_snapshot_is_ignored_29_of_29() -> None:
+    queries = yaml.safe_load(GOLDEN_PATH.read_text(encoding="utf-8"))["queries"]
+    both = [q for q in queries if q.get("expected_names") and q.get("expected")]
+    assert len(both) == len(queries) == 29
+
+
+def test_inv13_a_set_valued_ruler_keeps_every_row_sharing_a_label() -> None:
+    kept, rep = _resolve([{"query": "q", "expected_names": ["Dup"]}],
+                         rows=[(DUP_IDS[0], "Dup"), (DUP_IDS[1], "Dup")], ruler_mode="set")
+    assert sorted(kept[0]["expected"]) == sorted(DUP_IDS)
+    assert [m["n"] for m in rep["multiplicity"]] == [2]
+    assert rep["excluded_queries"] == []
+
+
+def test_inv13_a_single_valued_ruler_still_refuses_an_ambiguous_label() -> None:
+    kept, rep = _resolve([{"query": "q", "expected_names": ["Dup"]}],
+                         rows=[(DUP_IDS[0], "Dup"), (DUP_IDS[1], "Dup")], ruler_mode="single")
+    assert kept == []
+    assert len(rep["ambiguous"]) == 1 and rep["multiplicity"] == []
+
+
+def test_inv13_the_ruler_mode_is_the_appliers_declared_mode_not_a_second_knob() -> None:
+    src = (PROJECT_ROOT / "pipeline" / "golden.py").read_text(encoding="utf-8")
+    assert 'required_mapping(_CFG, "retrieval_benchmark"' in src
+    assert 'required(_REANCHOR, "anchor_mode"' in src
+    assert REANCHOR["anchor_mode"] in ("single", "set")

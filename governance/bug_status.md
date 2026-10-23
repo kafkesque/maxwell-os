@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**261 open** / 474 closed of 735 ids.
+**260 open** / 477 closed of 737 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -266,5 +266,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-965 | (MED, OPEN 2026-10-22) — a single wedged call ABORTS the whole adjudication batch (C23 violation); progress recovered only by resume | 1 |
 | BUG-966 | (MED, OPEN 2026-10-23) — two governance faces asserted an UNEXECUTED gate whose receipt was committed and already ratified | 1 |
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
-| BUG-969 | (LOW, OPEN 2026-10-23) — the retrieval golden's stored id snapshot is UNIONED into the denominator, so a RECEIPT acts as an AUTHORITY | 1 |
-| BUG-970 | (LOW, OPEN 2026-10-23) — an AMBIGUOUS label EXCLUDES the whole query from the denominator, which makes the set-valued ruler LOOSER (INV-4 | 1 |
+| BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |

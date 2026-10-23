@@ -31392,3 +31392,76 @@ decisions:
       accepted ruling. The b sheet is unchanged, so the derived 57-row ruler is unchanged and
 
       build_anchor_store_bridge.py --check stays EXIT_CLEAN 0.'
+- id: D-3128
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: IDENTITY / KNOWLEDGE ARCHITECTURE / GOVERNANCE
+  title: 'D-3118 Phase A is MEASURED-LANDED: concept_key exists in the live store and is populated 7640/7640'
+  decision: 'D-3118 (RATIFIED 2026-10-21) closes with the line "concept_key column verified absent 2026-10-21".
+    That line is superseded by measurement, so it is RESOLVED here rather than rewritten (the registry is append_only
+    and a receipt is a prefix rule). MEASURED 2026-10-23 against knowledge pipeline/maxwell.db read-only: PRAGMA
+    table_info(fbs) lists concept_key, and ALL 7640 rows carry a non-empty value (7640/7640 populated, 0 hollow).
+    The key is minted INSIDE pipeline/stage6_commit.py at the insert path, from concept_key(fb_name(fb)) - derived
+    from the name at commit, never a passed-in value - and pipeline/migrate_concept_key.py is the declared backfill
+    for rows committed before the column existed. pipeline/dedup_identity.py defines concept_key(name) as sha256
+    over the SORTED, stopword-filtered content-tokens of normalize_name(name) (NFKC+NFKD fold, lowercase, alnum-only),
+    with the stopword set loaded from config/dedup_identity.yaml#concept_key.stopwords (C12, never a code default)
+    and a documented fallback to unfiltered tokens for an all-stopword name. config/store_columns.yaml records distinct
+    7635 / hollow 0 across 7640 rows, so concept_key is a MATCH key and deliberately NOT unique: the 5 shared keys
+    are the live duplicate concept_keys D-3117 accumulates, not a defect. Consequence: nothing is blocked on Phase
+    A any more - what remains open inside D-3118 is ONLY the Phase B (embedding-recall) cosine threshold calibration,
+    which D-3118 itself already flags as unmeasured. This record shares its defect class with BUG-966: a governance
+    sentence that did not resolve against the tree it described.'
+  bugs:
+  - BUG-966
+  files:
+  - pipeline/dedup_identity.py
+  - pipeline/stage6_commit.py
+  - pipeline/migrate_concept_key.py
+  - config/store_columns.yaml
+  receipts:
+    store_measurement: 'PRAGMA table_info(fbs) contains concept_key; select count(*), sum(non-empty) = 7640 / 7640.
+      config/store_columns.yaml: distinct 7635, hollow 0.'
+    mint_path: stage6_commit.py insert_fb -> concept_key(fb_name(fb)); column also created defensively by _migrate_add_column(conn,
+      "fbs", "concept_key", "TEXT").
+- id: D-3129
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: EVALUATION / IDENTITY / KNOWLEDGE ARCHITECTURE
+  title: 'A golden addresses a concept by concept_key, never by fb_id: the Phase 0 receipt makes fb_id-keyed goldens
+    rot on rebuild'
+  decision: 'Every golden and expected-set in Maxwell addresses a CONCEPT by concept_key (generation-invariant)
+    and carries fb_id only as a denormalized pointer that is never the join key. The measured basis is the Phase
+    0 receipt a6323a7 (governance/PHASE0_IDEMPOTENCY_REPORT.md), restated here because two governance faces wrongly
+    reported it as unexecuted (BUG-966): on identical source bytes and an identical chunker, a rerun reproduces
+    only 27% of fb_ids (jaccard 0.2726) and 72% of names (0.7204), and ZERO 8-field bodies (0.0), while 199 shared
+    names keep an identical definition against 190 that do not. fb_id = sha256(name|definition) is therefore generation-SENSITIVE
+    by construction (D-2949/D-3118), so a golden keyed on fb_id would rot on every rebuild - silently converting
+    a recall rail into a false-alarm generator and forcing the golden to be re-keyed a second time, which is the
+    exact future tax T-194''s own rationale warns about. concept_key is the already-ratified remedy (D-3118 Phase
+    A) and is measured live today (D-3128: 7640/7640 rows populated). RULES: (1) T-194''s source-to-expected-FB
+    golden is keyed by (source_id, concept_key), with fb_id stored as a denormalized pointer; (2) the same rule
+    binds T-101''s retrieval golden at its next re-anchor; (3) a concept_key mapping to MORE THAN ONE store row
+    is NOT an ambiguity error - unlike the bridge name-join, where >=2 rows is AMBIGUOUS and never picked - it is
+    the duplicate/echo signal D-3117 accumulates and must be REPORTED, never collapsed; (4) recall is measured as
+    emitted-concepts over expected-concepts in this key space, so a body-wording variation no longer counts as a
+    miss. SCOPE: keys and reporting only - no pipeline behaviour changes here, and the anchor ruler itself stays
+    name-joined, because it is a bridge over owner rulings rather than a recall golden. Also recorded: the Phase
+    0 receipt reports stage0_5_extract_metadata as identical=True over two EMPTY sets (BUG-967), so a NOT-MEASURED
+    stage must be reported as such and never as agreement.'
+  bugs:
+  - BUG-966
+  - BUG-967
+  files:
+  - governance/PHASE0_IDEMPOTENCY_REPORT.md
+  - governance/MARKET_RESEARCH_20261022_SOTA_RAG_REFERENCE.md
+  - governance/ANCHOR_208_BRIDGE_RULER_RECHUNKV4_20261022.csv
+  - config/task_register.yaml
+  receipts:
+    phase0_receipt: 'governance/PHASE0_IDEMPOTENCY_REPORT.md (commit a6323a7): S0/S1/S1.3/S1.5 jaccard 1.0; S5 fb_id
+      463 vs 466 with intersection 199 (jaccard 0.2726); name 389 shared (0.7204); body_hash_8field intersection
+      0 (0.0); shared_name_identical_definition 199 vs different 190; corpus_confound false.'
+    key_availability: 'D-3128: concept_key present and populated 7640/7640, distinct 7635 - so the golden can be
+      keyed today without a migration.'

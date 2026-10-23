@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1253 decisions (census stamp 7bf379eec03cf054, 2026-10-23) · 730 bugs (257 open / 473 closed; highest OPEN = BUG-965) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1255 decisions (census stamp 8f27a80b073e28d0, 2026-10-23) · 732 bugs (259 open / 473 closed; highest OPEN = BUG-967) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1253 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 345 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1253, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1255 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 347 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1255, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 257 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 83 · 🟩 LOW 29 · UNLABELLED 101 (BUG-757) of 257 open.
+> Open BUGS by severity (population = the census's 259 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 259 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19673,3 +19673,63 @@ call) is still OWED.
 **OPERATIONAL CONSEQUENCE (D-3127).** A gpt-oss MATCH raised against a row where a DIFFERENT family says NONE is now
 inadmissible as a single vote: it is either noise (this bug) or the aggressive-matcher false positive already seen on
 R098 (the dcb7dd collision). MATCH on a guardrail row therefore requires two families agreeing on the SAME fb_id.
+
+## BUG-966 (MED, OPEN 2026-10-23) — two governance faces asserted an UNEXECUTED gate whose receipt was committed and already ratified
+
+**THE FALSE CLAIM, quoted exactly from both faces (MEASURED 2026-10-23).**
+(1) `governance/buglog.md`, inside the BUG-956 UPDATE #4 block, line 19584-19585: "`phase0_idempotency.py --all`
+(the definitive two-run proof) **has NOT been executed**."
+(2) `governance/MARKET_RESEARCH_20261022_SOTA_RAG_REFERENCE.md`, audit-gap map, "Partial" section: "Idempotency
+harness built + selftest green, but the real two-run `--all` has NOT been executed".
+
+**IT WAS EXECUTED, AND NOT RECENTLY — the receipt is older than the claim.** `scripts/phase0_idempotency.py --all`
+ran on 2026-10-20/21 and produced `governance/PHASE0_IDEMPOTENCY_REPORT.md`, committed in `a6323a7` ("D-3117/D-3118
+Phase 0 instrument: idempotency harness + decisive receipt"). Both arms are still on disk, with the wall-clock
+ordering visible per stage: `knowledge pipeline/stage1_5_embed_cluster/idem_a` 17:49 -> `.../idem_b` 22:54;
+`stage2_extract/idem_a` 20:01 -> `idem_b` 00:47; `stage5_verify/idem_a` (Oct 20 22:43) -> `idem_b` (Oct 21 03:23).
+The result was ALREADY consumed by RATIFIED decisions: D-3117 cites "Phase 0 receipt a6323a7 measures body survival
+0%", D-3118 cites "measured 72 percent name survival by the Phase 0 receipt", and
+`governance/session_plan_20260924.yaml` records "fb_id survival 27% / jaccard 0.2726, name survival 72% / 0.7204,
+body_hash_8field survival 0%". A gate cannot be simultaneously unexecuted and the measured basis of two ratified
+decisions.
+
+**WHY THIS IS A CASCADE, NOT A TYPO (the future tax it was about to charge).** An agent reading the register (this
+session's own plan did exactly that) is directed to `phase0_idempotency.py --all`, which would (a) spend a second
+two-arm S0->S5 run to re-answer a measured question, and (b) more seriously, write into the SAME run ids `idem_a` /
+`idem_b`, OVERWRITING the very per-stage checkpoints the committed receipt is derived from. That destroys the
+receipt's re-derivability — the opposite of what the gate exists for, and a direct breach of the D-3036 rule that an
+act must leave a trace a later reader can join. The second harm is silent: the report bytes stay, the numbers stop
+being re-derivable from the tree.
+
+**WHAT THE MEASURED RESULT ACTUALLY IS (restated where the false claim stood).** S0/S1/S1.3/S1.5 identical
+(jaccard 1.0); S2/S4/S5 divergent — `fb_id` survival 27% (jaccard 0.2726), `name` survival 72% (0.7204),
+`body_hash_8field` survival **0%**, `shared_name_identical_definition` 199 vs `shared_name_different_definition`
+190. On the SAME source bytes and the SAME chunker, a rerun does NOT reproduce the content-addressed store. The gate
+is therefore CLOSED WITH A NEGATIVE ANSWER, not open: the anchor ruler must never be trusted across a rebuild on the
+strength of `fb_id`, which is exactly what D-3118/D-3129 act on.
+
+**RULE (D-3034 applied to gate prose).** A sentence that says a gate is unexecuted is a DECLARATION, so it must
+RESOLVE before it is written: name the receipt path and test that it exists. A gate with a receipt is reported as
+"executed", with its verdict — never as "not executed". The two faces above are corrected by append (this entry and
+the MARKET_RESEARCH correction block), because both files carry committed history that is not rewritten.
+
+## BUG-967 (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets
+
+**MEASURED 2026-10-23.** `governance/PHASE0_IDEMPOTENCY_REPORT.md` carries the stage row
+`stage0_5_extract_metadata.py  a=0  b=0  identical=True  jaccard=0.0`, while BOTH arm checkpoints are ABSENT:
+`knowledge pipeline/stage0_5_extract_metadata/idem_a/checkpoint.jsonl` and `.../idem_b/checkpoint.jsonl` do not
+exist. The `fingerprint()` helper records a missing checkpoint as `{"count": 0, "missing": True, "digests": set()}`,
+and `diff()` compares the two empty digest sets and prints `identical: True`.
+
+**THE DEFECT.** "Identical" over two empty sets is a VACUOUS PASS: agreement was never tested, and S0.5 is the one
+stage in the S0 band the instrument does not actually cover. The row is also internally contradictory (identical
+True next to jaccard 0.0), which is the visible tell that the two counters mean different things — one is a boolean
+over sets, the other normalises by the union and has no defined value at zero.
+
+**WHAT IT DOES NOT CHANGE.** The Phase 0 conclusion stands: S0.5 mints no `fb_id` and no body field, and the
+divergence is localised at S2 (`stage2_extract.py`). No number in D-3117/D-3118 depends on the S0.5 row.
+
+**FIX OWED (at the instrument's next run, not now — the arms are the receipt).** Report a missing checkpoint as
+NOT MEASURED rather than `identical: True` (the honest tri-state the harness facts already require: NOT RECORDED is
+not ABSENT), or resolve where S0.5 actually writes and read that path. Do NOT re-run `--all` merely to repair this
+row: that would overwrite the arms (BUG-966's second harm) for a cosmetic field.

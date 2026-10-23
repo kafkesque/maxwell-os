@@ -87,3 +87,20 @@ Each `measurement hook` column is a re-runnable check. The durable receipts: (1)
 `phase0_idempotency.py --all` for A-idempotency; (2) build the recall golden for A2; (3) run
 `audit_false_convergence.py` + `stress_test_s2_exhaustive.py` after each pipeline change; (4)
 bench S1.5 late-vs-early chunking on the retrieval golden (T-101).
+
+## CORRECTION 2026-10-23 (BUG-966) — the A-idempotency hook is MEASURED, not pending; re-running it needs NEW run ids
+
+**The "Partial" line above is superseded.** It reads "Idempotency harness built + selftest green, but the real
+two-run `--all` has NOT been executed". The real two-run `--all` WAS executed on 2026-10-20/21; the receipt is
+`governance/PHASE0_IDEMPOTENCY_REPORT.md`, committed in `a6323a7`, and its numbers are already load-bearing in
+D-3117 (body survival 0%) and D-3118 (name survival 72%). Measured verdict: **S0/S1/S1.3/S1.5 identical
+(jaccard 1.0); S2/S4/S5 divergent — `fb_id` survival 27% (0.2726), `name` survival 72% (0.7204), 8-field body
+survival 0%, shared-name identical-definition 199 vs different-definition 190.** A-idempotency is therefore CLOSED
+NEGATIVE: the content-addressed store does not reproduce across a rerun on identical bytes and an identical chunker.
+This is why the recall golden must be keyed on the generation-invariant `concept_key` (D-3129) and not on `fb_id`.
+
+**Amended re-measure hook (1).** `phase0_idempotency.py --all` reuses the run ids declared in
+`config/phase0_idempotency.yaml` (`runs: [idem_a, idem_b]`) and would OVERWRITE the per-stage checkpoints the
+committed receipt is derived from, silently destroying its re-derivability (BUG-966). A re-measurement is therefore
+only admissible with a FRESH run-id pair declared in the config first, so the old arms and the new arms coexist as
+two joinable traces. Do not re-run `--all` on the current ids to "confirm" a number that is already a receipt.

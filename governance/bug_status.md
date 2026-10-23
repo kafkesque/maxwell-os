@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**260 open** / 477 closed of 737 ids.
+**261 open** / 477 closed of 738 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -267,3 +267,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-966 | (MED, OPEN 2026-10-23) — two governance faces asserted an UNEXECUTED gate whose receipt was committed and already ratified | 1 |
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
+| BUG-973 | (MED, OPEN 2026-10-23) — the admission plan has NO DISPOSED class, so its refusals are a permanent non-zero floor and a | 1 |

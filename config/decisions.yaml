@@ -31618,3 +31618,64 @@ decisions:
     audit_finding: 'BUG-972 REGISTERED, not silently fixed: --out outside the repo writes the verdict then dies
       at out.relative_to(REPO), and --out itself is a second home for verdicts beside the declared journal (this
       turn created one and removed it after confirming it was the only trace). Remedy owed.'
+- id: D-3133
+  state: RESOLVED
+  date: '2026-10-23'
+  by: assistant
+  category: GOVERNANCE / OWNER-LANE / ADMISSION
+  title: 'An owner-lane row is proven by RUNNING its declared command, not by reading it: T-183 said the owner owed
+    one command, the machine said the checkpoint was produced by different code, and the blocker was pipeline-side'
+  decision: 'A row labelled mover: owner is a CLAIM that the next act is the owner word and that the owner word
+    is SUFFICIENT (D-3035). T-183 asserted exactly that and its declared command was RUN for the first time today:
+    just admit-apply --dry-run read DECIDED 106 act(s), 3 outstanding, and then REFUSED the batch because the S0
+    checkpoint was produced by DIFFERENT code (stored fc38a1c59bee8def vs current 9f82af10fdb8a629, BUG-933) - so
+    the owner had already signed (governance/ADMISSION_ACCEPTED_20261018T192457Z.yaml, accepted_by human, mode all,
+    109 rows) and no command of his could have advanced one row. THE RULE THIS ESTABLISHES: an owner-lane row is
+    verified by EXECUTING its declared next command in a dry run, and the state it reaches is what the row records;
+    a row that names an owner act it has never run is a proposal about the owner, not a reading of the machine.
+    THE BLOCKER WAS RESOLVED AS A DECLARATION, NOT A BYPASS: the two reader commits since that checkpoint (7346911
+    pdftotext text-layer fallback; 97c96e9 BUG-962 swapping a read_text for artifact_encoding.open_artifact) were
+    READ before the rebind and both are ADDITIVE for an already-converted work - the fallback fires only where Docling
+    UNDER-PRODUCED and that same condition was a REFUSAL (no_output) before it, and 97c96e9 reads an artifact already
+    on disk - so no prior conversion can change; the rebind was executed with that reason recorded in checkpoint.jsonl.code_fingerprint.rebinds.jsonl
+    and no checkpoint line was re-derived. WHAT THE TRANCHE PROVED: applied 1, already_applied 1 (same bytes, another
+    library path), failed 1 - Proposal.docx at 54 bytes of markdown, i.e. the MIN_OUTPUT_BYTES floor working, and
+    MEASURED that the failed copy left NOTHING in the corpus (BUG-887 holds). Corpus census moved 1363 md -> 1364
+    md; the plan reads candidates 109 -> 107. WHAT THIS DOES NOT CLAIM: the signed scope is exhausted, NOT the lane
+    - the plan still prints 480 refusals on every health run and BUG-973 records that it has no DISPOSED class,
+    so three disposition words (241 assets out of scope, 185 waiting on the T-176 rename ride, 53 on T-184) and
+    a next plan-plus-signature cycle remain, and they are the owner lane in its true sense.'
+  bugs:
+  - BUG-973
+  - BUG-933
+  - BUG-887
+  - BUG-898
+  files:
+  - config/task_register.yaml
+  - governance/buglog.md
+  - scripts/apply_admission.py
+  - scripts/plan_admission.py
+  - pipeline/stage0_convert.py
+  - config/ingest_identity_gate.yaml
+  - knowledge pipeline/stage0_convert/rechunk-v4-20260929/checkpoint.jsonl.code_fingerprint.rebinds.jsonl
+  receipts:
+    owner_lane_tested: 'python3 scripts/apply_admission.py --dry-run BEFORE the rebind: "DECIDED 106 act(s) a prior
+      receipt already decided (skipped/deferred/duplicate_of_admitted) - not re-attempted; 3 outstanding, this run
+      attempts 3" followed by "BLOCKED S0 checkpoint ... produced by DIFFERENT code (stored fc38a1c59bee8def, current
+      9f82af10fdb8a629), so every conversion of this batch would be refused by the guard and its copy would be quarantined
+      (BUG-933). Nothing was copied." No owner command could have advanced this row.'
+    rebind_reason: 'Both candidate commits were READ, not assumed: git show 7346911 shows the fallback reached only
+      via underproduced=True, whose pre-commit branch was return _failure("no_output", ...) - i.e. a former REFUSAL,
+      so an already-converted work cannot change; git show 97c96e9 -- pipeline/stage0_convert.py shows 3 lines:
+      read_text(utf-8, errors=replace) -> artifact_encoding.open_artifact(...).read(), a read of an EXISTING artifact.
+      Rebind executed: stored fc38a1c59bee8def -> 9f82af10fdb8a629, reason in checkpoint.jsonl.code_fingerprint.rebinds.jsonl
+      (2136 bytes), prior checkpoint lines unchanged.'
+    tranche: 'python3 scripts/apply_admission.py --apply --limit 3 -> {"already_applied": 1, "failed": 1, "applied":
+      1}; receipt governance/evidence/ADMISSION_APPLIED_20261023T085916Z.jsonl. Failure text verbatim: "Pandoc rc=0
+      and wrote 54 bytes of markdown for Proposal.docx (below the 100-byte floor)". Census: 1363 md -> 1364 md,
+      containers unchanged apart from the admitted PDF; find under the target tree returns NOTHING for the failed
+      name, so BUG-887 (a failed conversion leaving its container in the corpus) does not recur.'
+    lane_state: 'plan_admission.py --brief AFTER: candidates 107, refused 480 unchanged (container no stage reads
+      it 241, name repair first 185, not in its kind folder 53, container corrupt 1). So the second reading is the
+      receipt for BUG-973: the refusal floor did not move by one, which is what a counter with no DISPOSED class
+      looks like.'

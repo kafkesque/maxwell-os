@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1258 decisions (census stamp c71824678f2af3f0, 2026-10-23) · 737 bugs (260 open / 477 closed; highest OPEN = BUG-972) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 738 bugs (261 open / 477 closed; highest OPEN = BUG-973) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1258 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 350 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1258, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 84 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 260 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 85 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 261 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -19863,3 +19863,15 @@ verdict land OUTSIDE the declared journal (`config/r5_review_gate.yaml#verdict_j
 i.e. a **second home for verdicts** — which this very turn created and then removed by re-running with the default
 out, after confirming the stray artifact was the only trace. **REMEDY OWED:** refuse an `--out` outside the repo
 BEFORE the call (the reviewer costs a model load), or print the absolute path when the relative one does not resolve.
+
+## BUG-973 (MED, OPEN 2026-10-23) — the admission plan has NO DISPOSED class, so its refusals are a permanent non-zero floor and a deterministic-failure candidate is re-proposed forever
+
+**MEASURED three readings, unchanged: 480 refusals** — `refused_container_no_stage_reads_it` **241**, `refused_name_repair_first` **185**, `refused_not_in_its_kind_folder` **53**, `refused_container_corrupt` **1** (governance/ADMISSION_PLAN_20261018T220946ZZ.json and `plan_admission.py --brief` today, before and after a tranche).
+
+**LIMB 1 — 241 are not works.** Measured by suffix inside that class: `.png` 69, `.xlsx` 37, `.jpg` 29, `.psd` 28, `.ai` 16, `.indd` 13, `.idml` 10, `.aep` 4, `.jsx` 4, `.lst` 4, `.ttc` 4, `.jpeg` 4 … 240 of them under `journals_notes` — design working files and screenshots that live under a root which declares a SHARE of the corpus (D-3062). They will never be admitted, and nothing can record that: the counter prints 480 on **every** health run forever, so a number that can never move becomes noise (the alarm-fatigue shape, and D-3038's "what we reject we register" applied to a count instead of a decision).
+
+**LIMB 2 — a candidate can fail at CONVERSION and stay a candidate.** MEASURED 2026-10-23: `journals_notes/…/business-notes/docs/Proposal.docx` was admitted-then-converted and S0 refused it — *"Pandoc rc=0 and wrote 54 bytes of markdown … (below the 100-byte floor)"* — which is the floor doing its job (a receipt is not a work). But the plan reads "never seen", S0's refusal goes to the failure ledger (BUG-898, deliberately retried), and **no post-attempt class exists**, so the same row is re-proposed in every future plan and any `mode: all` signature re-attempts it. The corpus stayed CLEAN (no stray container: BUG-887's fix holds — measured, `find` finds nothing under the target tree).
+
+**WHY IT MATTERS NOW (future tax):** T-183 is one command from exhausting its signed scope, and the NEXT plan will read ~107 candidates again with the same 480 sitting beside them. A lane whose denominator never reaches zero cannot tell "nothing left to do" from "something is stuck", which is the one question the owner asks of it.
+
+**REMEDY (owed, in order):** (1) a DECLARED `disposed` disposition with its own vocabulary (`out_of_scope_by_kind`, `not_a_work`, `conversion_refused_permanently`) recorded beside the plan, so a disposed row is COUNTED ONCE and never re-raised; (2) a post-attempt class fed from S0's failure ledger so a deterministic conversion failure is named in the plan instead of being retried invisibly; (3) the owner's word on limb 1 (the 241 assets) — that is a disposition, not a pipeline act.

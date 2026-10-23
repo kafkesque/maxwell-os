@@ -31,6 +31,7 @@ Exit codes: 0 OK, 2 OWED (no pilot_sources declared / none resolvable), 3 config
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -247,7 +248,20 @@ def propose_window(
     return out
 
 
-def emit(path: Path, rows: list[dict[str, str]]) -> None:
+def window_sha16(window: str) -> str:
+    """Return the first 16 hex chars of a window's sha256 — the CITED WINDOW's own identity.
+
+    MEASURED (2026-10-23, BUG-985): the first tier-B sheet recorded (source_id, name, rationale) and NOT
+    which window of the book the model actually read, so a reviewer could not reproduce the claim "this
+    candidate came from this source" without re-scanning the whole work. A candidate's provenance is part
+    of the candidate (D-2956 cl.4): the sheet now carries `window_index` (deterministic under `windowize`)
+    and `window_sha16` (which also DETECTS a re-converted source, where the same index would silently
+    point at different bytes).
+    """
+    return hashlib.sha256(window.encode("utf-8")).hexdigest()[:16]
+
+
+def emit(path: Path, rows: list[dict[str, Any]]) -> None:
     """Crash-safe write (C6): tempfile -> fsync -> os.replace. One JSON line per candidate."""
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), suffix=".tmp")
@@ -283,8 +297,10 @@ def _selftest() -> int:
     with tempfile.TemporaryDirectory() as td:
         p = Path(td) / "tb.jsonl"
         rows = [
-            {"source_id": "f8f802e878304781", "name": "X", "rationale": "r1"},
-            {"source_id": "b51204ce6c6a9950", "name": "Y", "rationale": "r2"},
+            {"source_id": "f8f802e878304781", "name": "X", "rationale": "r1",
+             "window_index": 0, "window_sha16": window_sha16("w0")},
+            {"source_id": "b51204ce6c6a9950", "name": "Y", "rationale": "r2",
+             "window_index": 1, "window_sha16": window_sha16("w1")},
         ]
         emit(p, rows)
         lines = [json.loads(l) for l in p.read_text(encoding="utf-8").strip().splitlines()]
@@ -300,7 +316,11 @@ def _selftest() -> int:
     want = text.split()
     assert got == want, "windowing must preserve every token in order"
 
-    print("✅ proposer selftest passed: fold reuse, tier-A skip, dedup key space, crash-safe JSONL, windowing")
+    # 6) CITED WINDOW (BUG-985): the stamp is stable for identical bytes and CHANGES with the window.
+    assert window_sha16("abc") == window_sha16("abc") and window_sha16("abc") != window_sha16("abd")
+    assert len(window_sha16("abc")) == 16
+    print("✅ proposer selftest passed: fold reuse, tier-A skip, dedup key space, crash-safe JSONL, "
+          "windowing, cited-window stamp")
     return EXIT_OK
 
 
@@ -385,7 +405,8 @@ def _run(cfg: dict[str, Any]) -> int:
                 if key in seen:
                     continue
                 seen.add(key)
-                src_rows.append({"source_id": pid, "name": c["name"], "rationale": c["rationale"]})
+                src_rows.append({"source_id": pid, "name": c["name"], "rationale": c["rationale"],
+                                 "window_index": wi, "window_sha16": window_sha16(w)})
                 if len(src_rows) >= max_cand:
                     break
             if len(src_rows) >= max_cand:

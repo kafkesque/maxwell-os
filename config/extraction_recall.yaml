@@ -32,6 +32,20 @@ extraction_recall:
     # ruling leaves it advisory. JSONL, one per line:
     # {"source_id": "<id>", "name": "<concept name>", "owner_ruling_note": "MATCH"|"NONE"}.
     tier_b_ruling_sheet: governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl
+  # T-195 step (c2): the MEASURED sheet the owner rules FROM (D-3100: a manual task is handed over with the
+  # reading that decides it, not with a memory). A tier-B MATCH is FLOORED at expectation_recall 1.0, so a
+  # wrong MATCH leaves the recall rail permanently RED until the concept is extracted and a wrong NONE loses
+  # the concept silently — the ruling must rest on a READING. This sheet records, per candidate, only what
+  # was MEASURED: source grounding (verbatim hits, concept-token coverage, the best-matching paragraph) and
+  # store novelty (bge-m3 cosine against the store rows of THAT source). It carries NO verdict: a model's
+  # opinion is not a reading, and a ruling is the OWNER's (D-2658 advisory-only, D-2898 never auto-certified).
+  # Producer: scripts/tier_b_evidence.py (no LLM verdict; embeddings only). Consumer: scripts/rule_tier_b.py.
+  tier_b_evidence:
+    path: governance/EXTRACTION_RECALL_TIER_B_EVIDENCE_20261023.json
+    max_excerpt_chars: 420      # the reading shown to the owner is capped, never the whole book
+    prefer_explanatory_chars: 800  # excerpt ranking: up to this length a longer passage is STRONGER evidence
+                                   # than a shorter one with the same token coverage (a heading that repeats
+                                   # the words is not an explanation of them)
   # T-195 step (b): the ADVISORY tier-B proposer (D-2898: NEVER auto-certified). A local model emits
   # candidate concepts the certified core may have OMITTED; the owner then rules MATCH/NONE. Every value
   # here is config (C12) — the script hardcodes nothing, not even the model name.

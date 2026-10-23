@@ -1,0 +1,1846 @@
+{
+  "schema_version": "1",
+  "artifact_id": "EXTRACTION-RECALL-TIER-B-EVIDENCE",
+  "gen_model": "none (deterministic text math; bge-m3 embeddings for store cosine — no LLM verdict)",
+  "pipeline_commit": "faa0299",
+  "authority": "ADVISORY EVIDENCE ONLY (D-2658/D-2898): it carries no ruling and certifies nothing. The owner's MATCH/NONE in the ruling sheet is the only authority.",
+  "method": {
+    "token_space": "pipeline.dedup_identity.content_tokens — the SAME tokens concept_key mints from",
+    "grounding": "folded-name occurrences + concept-token coverage + the best-covering source paragraph",
+    "novelty": "bge-m3 cosine of the candidate name vs the store rows of THAT source (top 3)",
+    "excerpt_cap_chars": 420,
+    "prefer_explanatory_chars": 800,
+    "reference_band": {
+      "semantic_near_threshold": 0.8,
+      "source": "config/pipeline_config.yaml#stage4.semantic_near_threshold (QUOTED, not invented)",
+      "meaning": "at/above this cosine a candidate is as close to a stored row of its source as the pipeline already calls 'semantically near' — evidence AGAINST a MATCH, never proof"
+    }
+  },
+  "owed": [],
+  "warnings": [],
+  "rows": [
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM-Based Application Patterns",
+      "concept_key": "8e4f7ce82774f358380c4651a9190cfadf8441a88b8c2dce96b244f41230f58e",
+      "rationale": "Recognize distinct application patterns like summarization, Q&A, and chatbots as foundational use cases for LLMs.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "application",
+          "based",
+          "llm",
+          "patterns"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 1374,
+        "excerpt_name_coverage": "4/4",
+        "excerpt_kind": "prose",
+        "excerpt": "LLM-powered agent-based systems typically follow one of two core design patterns: agentic workflows and agents. Each pattern shapes how the application operates, as illustrated in figure 5.1. Because these terms are often used interchangeably---but have important differences---it's essential to understand exactly what is meant by agentic workflow and agent before diving deeper:",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Llm Api Request Patterns",
+          "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+          "cos": 0.7086
+        },
+        {
+          "name": "Token-based Cost Optimization in Llm Usage",
+          "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+          "cos": 0.6543
+        },
+        {
+          "name": "Agent-centric Problem Solving",
+          "fb_id": "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+          "cos": 0.6532
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LangChain's Modular Architecture",
+      "concept_key": "b80c2d85914abc14b44700e42786c0189ed180ae3faaeb66b15778a0ba3d72ed",
+      "rationale": "Understand how LangChain's object model enables modular composition of LLM-based workflows.",
+      "grounding": {
+        "name_verbatim_hits": 1,
+        "name_tokens": [
+          "architecture",
+          "langchain",
+          "modular",
+          "s"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 430,
+        "excerpt_name_coverage": "4/4",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "- [Core challenges in building applications powered by large language models]{#chapter-1.html_p2} - [LangChain's modular architecture and components]{#chapter-1.html_p3} - [Patterns for engines, chatbots, and agents]{#chapter-1.html_p4} - [Foundations of prompt engineering and Retrieval-Augmented Generation]{#chapter-1.html_p5}",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Domain-specific Model Customization",
+          "fb_id": "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+          "cos": 0.5903
+        },
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.5771
+        },
+        {
+          "name": "Quantitative Evaluation in Ai Systems",
+          "fb_id": "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497",
+          "cos": 0.5644
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Engineering as a Design Discipline",
+      "concept_key": "14eba875d50c9744a8c02f2c98c3bd216b53629c5f3491016d296bc6e0393346",
+      "rationale": "View prompt engineering not as a one-off task but as a structured design discipline for shaping LLM behavior.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "design",
+          "discipline",
+          "engineering",
+          "prompt"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 3864,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "I've mentioned prompts several times, but I haven't shown you any examples yet. A prompt is the instruction you give the LLM to complete a task and generate a response. It's such a key part of any LLM application that developing LLM applications often involves spending a lot of time designing and refining prompts through trial and error. Various patterns and techniques are already forming around prompts, leading to …",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Prompt Engineering for Contextual Retrieval",
+          "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+          "cos": 0.7178
+        },
+        {
+          "name": "Prompt Engineering for Llm Cognition",
+          "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+          "cos": 0.7173
+        },
+        {
+          "name": "Prompt Template Implementation",
+          "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+          "cos": 0.651
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "RAG as a Retrieval-Augmentation Strategy",
+      "concept_key": "dee1fa139c9d9dfcf73818e60d50cd6f2e2b3a2c4d01934caf48cf2f4fd18f71",
+      "rationale": "Distinguish RAG as a method for enhancing LLM responses with external knowledge sources rather than pure generation.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "augmentation",
+          "rag",
+          "retrieval",
+          "strategy"
+        ],
+        "name_tokens_present": "3/4",
+        "name_tokens_missing": [
+          "augmentation"
+        ],
+        "excerpt_index": 1998,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "…r context. A fix is to rephrase the question into a clearer, more detailed form before passing it to the retrieval system.]{#chapter-8.html_p20} - [*Ineffective question for retrieval*---Using the original question for both retrieval and generation can fail, especially when the query is broad or abstract. Broad questions may not pinpoint relevant content, resulting in less accurate context. You can address this by …",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Retrieval-augmented Generation Process",
+          "fb_id": "9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf",
+          "cos": 0.7476
+        },
+        {
+          "name": "Prompt Engineering for Contextual Retrieval",
+          "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+          "cos": 0.6241
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.5894
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Fine-Tuning as a Customization Technique",
+      "concept_key": "4270ec0c20bdb6a7dc443269b5ffb782c96b3af3419420cd8159ba9ba94d890b",
+      "rationale": "Recognize fine-tuning as a targeted approach to adapt general-purpose LLMs to specific domains or tasks.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "customization",
+          "fine",
+          "technique",
+          "tuning"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 522,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…designing these inputs so that the model understands the task and produces useful, accurate responses. Done well, it allows developers to guide the model's behavior, adapt it to domain-specific needs, and even handle problems the model wasn't explicitly trained on. A common technique here is *in-context learning*, where the model infers patterns from examples embedded directly in the prompt---no fine-tuning required",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Domain-specific Model Customization",
+          "fb_id": "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+          "cos": 0.6822
+        },
+        {
+          "name": "Supervised Fine-tuning for Instruction Following",
+          "fb_id": "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+          "cos": 0.676
+        },
+        {
+          "name": "Dimensionality Reduction Trade-offs",
+          "fb_id": "fb712f0fc9ac7a8d0d44a5ae67b05accabd9d99f554264ae343925baf4815a0c",
+          "cos": 0.6044
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Selection Based on Use Case",
+      "concept_key": "c20d1ed051dc037f6aea0377499d028c7bbe2c438225f57a4fbba166d11166d8",
+      "rationale": "Understand that different LLMs are better suited for specific tasks like reasoning, summarization, or classification.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "based",
+          "case",
+          "llm",
+          "on",
+          "selection",
+          "use"
+        ],
+        "name_tokens_present": "6/6",
+        "name_tokens_missing": [],
+        "excerpt_index": 1387,
+        "excerpt_name_coverage": "5/6",
+        "excerpt_kind": "prose",
+        "excerpt": "The concepts of LLM-based workflows and agents are closely related and often overlap, with no sharp dividing line between them. Both approaches are most valuable when your application needs to break complex tasks into smaller steps, make decisions based on previous results, access external tools or data, or maintain context throughout extended interactions. It's best to adopt agentic workflows or agents when your us…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Token-based Cost Optimization in Llm Usage",
+          "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+          "cos": 0.6053
+        },
+        {
+          "name": "Agent-centric Problem Solving",
+          "fb_id": "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+          "cos": 0.5831
+        },
+        {
+          "name": "Prompt Engineering for Contextual Retrieval",
+          "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+          "cos": 0.5782
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Programmatic Prompt Execution",
+      "concept_key": "f4b7477681588e66d86e56534e1a7f03f37a62d02bfc00c7b4e9921b0a1f25cf",
+      "rationale": "Learn how to execute prompts programmatically to automate and scale LLM interactions.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "execution",
+          "programmatic",
+          "prompt"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 1372,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "Large language models (LLMs) are driving a new generation of applications that require more than simple prompt--response exchanges. As applications become more complex, agentic workflows have become essential---a pattern where the LLM orchestrates a structured, multistep process using predefined components and explicit state management. Agentic workflows follow a well-defined and consistent sequence of steps. Instea…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Prompt Template Implementation",
+          "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+          "cos": 0.6897
+        },
+        {
+          "name": "Multi-step Agent Planning and Execution",
+          "fb_id": "f0a42b865a5ea7196210a54870f6bceff03adc51cdc870611441155de66ed9f8",
+          "cos": 0.6878
+        },
+        {
+          "name": "Tool-driven Agent Execution",
+          "fb_id": "44a4e528cb06a36aed19ed57c2a5f2d5954f563e4f16f2b908da03277e8a613c",
+          "cos": 0.6759
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Template Abstraction",
+      "concept_key": "17e13576456bd491a431af74785745d09de3e4035d284cb0f8938b1839021ae0",
+      "rationale": "Use prompt templates to encapsulate and reuse structured prompt designs across multiple LLM interactions.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "abstraction",
+          "prompt",
+          "template"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 1975,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "- [LangChain provides abstraction classes for Retrieval-Augmented Generation (RAG) components. This enables swapping of vector stores (ChromaDB to Pinecone), embedding models (OpenAI to Cohere), or LLMs (GPT to Claude) with minimal code changes.]{#chapter-7.html_p221} - [LangChain's content ingestion phase uses these classes:]{#chapter-7.html_p222} - `BaseLoader`---Imports text sources (PDFs, web pages, databases) i…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Prompt Template Implementation",
+          "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+          "cos": 0.8494
+        },
+        {
+          "name": "Prompt Engineering for Contextual Retrieval",
+          "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+          "cos": 0.6767
+        },
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.6474
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Prompt Types as Task Categories",
+      "concept_key": "aa106c45d6bb5a62ac57bbbc4caf6a54ad3bb364dfb9491f8f980c5cd24f84db",
+      "rationale": "Classify prompts into types like classification, sentiment analysis, and summarization to guide implementation.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "categories",
+          "prompt",
+          "task",
+          "types"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 652,
+        "excerpt_name_coverage": "2/4",
+        "excerpt_kind": "prose",
+        "excerpt": "Creating effective prompts is crucial for getting the best results in LangChain applications. Whether your app is focused on text classification, sentiment analysis, summarization, text generation, or question answering, each task requires a carefully designed prompt. In the following sections, we'll dive into how to craft prompts tailored to these specific tasks, ensuring your application functions as intended.",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Prompt Template Implementation",
+          "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+          "cos": 0.659
+        },
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.6152
+        },
+        {
+          "name": "Task-specific Dataset Creation",
+          "fb_id": "5492eb56da628eb1f8c8ef5f4de6a3ba7415f433d82bef5bfb6edc3ad8c1a528",
+          "cos": 0.6125
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Reasoning in LLMs Through Examples",
+      "concept_key": "f300b8263b8cb901e11e0bc042aa48fadec8476bcf80d2238c22661e5936f0ec",
+      "rationale": "Understand how one-shot and two-shot learning enable LLMs to perform reasoning tasks with minimal instruction.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "examples",
+          "llms",
+          "reasoning",
+          "through"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 514,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "LLMs are applied across a wide range of tasks, from text classification to code generation and logical reasoning. Following are some of the most common use cases, along with real-world examples for further exploration:",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.6695
+        },
+        {
+          "name": "Prompt Engineering for Llm Cognition",
+          "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+          "cos": 0.6229
+        },
+        {
+          "name": "Llm Api Request Patterns",
+          "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+          "cos": 0.6064
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "Step-by-Step Instruction Design",
+      "concept_key": "86c48059917edcd2a66f1034021c0a9dfa0fb9affa8c01fc24e424081d79299e",
+      "rationale": "Structure prompts to guide LLMs through multi-step reasoning by explicitly providing steps.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "design",
+          "instruction",
+          "step",
+          "step"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 384,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…eak human.\" They can revise a contract, turn logs into meaningful answers, draft code, and plan the next step---and then invoke the right tools and data to actually accomplish the task. Combined with retrieval and tool use, an application stops feeling like a rigid machine and begins to feel more like a collaborative partner. The potential is significant, but turning that potential into production systems isn't sim…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Supervised Fine-tuning for Instruction Following",
+          "fb_id": "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+          "cos": 0.704
+        },
+        {
+          "name": "Ai-augmented Development Workflow",
+          "fb_id": "aa33fa09c235ae213f4840b5c3e4b57d54981e15f15e22cd6d42f0f3c8f98de5",
+          "cos": 0.6211
+        },
+        {
+          "name": "Multimodal Context Integration",
+          "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+          "cos": 0.6034
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LangChain's Core Components",
+      "concept_key": "06e7d72bc45c7d22c2447d0fa775f136cf3ab6479d88e948c24be30aae1d29a2",
+      "rationale": "Identify the key LangChain components that form the foundation of LLM-based application development.",
+      "grounding": {
+        "name_verbatim_hits": 1,
+        "name_tokens": [
+          "components",
+          "core",
+          "langchain",
+          "s"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 494,
+        "excerpt_name_coverage": "4/4",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "…s (1)*--- Extract content from sources (files, web pages, SaaS tools, and databases) and convert it into LangChain `Document` objects.]{#chapter-1.html_p73} - [*Text splitters (2)*--- Break large texts into smaller chunks/`Document` objects so they fit within context limits and can be embedded, indexed, and retrieved effectively.]{#chapter-1.html_p74} - [`Document`--- LangChain's core container for content + metada…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.5658
+        },
+        {
+          "name": "Llm Api Request Patterns",
+          "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+          "cos": 0.5273
+        },
+        {
+          "name": "Multimodal Context Integration",
+          "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+          "cos": 0.5227
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Adaptation Strategies",
+      "concept_key": "5c3453d7c8aa23d9894ddc3e1da51245556332c0327480b31929c4dc624956dc",
+      "rationale": "Distinguish between prompt engineering, RAG, and fine-tuning as methods to tailor LLMs to specific needs.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "adaptation",
+          "llm",
+          "strategies"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 2131,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "The result we've obtained with the `ParentDocumentRetriever` is particularly useful when used as context for LLM synthesis, as it provides broader details around the specific information. Next, I'll introduce another technique that uses embedding strategies to further optimize RAG retrieval accuracy.",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Llm Api Request Patterns",
+          "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+          "cos": 0.6123
+        },
+        {
+          "name": "Prompt Engineering for Llm Cognition",
+          "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+          "cos": 0.6088
+        },
+        {
+          "name": "Token-based Cost Optimization in Llm Usage",
+          "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+          "cos": 0.6087
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Use Case Mapping",
+      "concept_key": "3dc4a799568e7bce3d8eb5d186a0708eb5acd877d458fa5dcf3a24f8c12491b5",
+      "rationale": "Map real-world problems to specific LLM use cases like Q&A engines or chatbots for practical application.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "case",
+          "llm",
+          "mapping",
+          "use"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 1731,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…========+====================================================+ | Retrieval Augmented Generation (RAG)\\ | Use case involving the generation of text (typically an answer) augmented with information retrieved from a content store optimized for semantic searches, typically a vector store\\ | Q&A\\ | +---------------------------------------+----------------------------------------------------------------------------------…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Token-based Cost Optimization in Llm Usage",
+          "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+          "cos": 0.6094
+        },
+        {
+          "name": "Llm Api Request Patterns",
+          "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+          "cos": 0.5966
+        },
+        {
+          "name": "Multimodal Context Integration",
+          "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+          "cos": 0.5905
+        }
+      ]
+    },
+    {
+      "source_id": "f8f802e878304781",
+      "name": "LLM Prompt Optimization",
+      "concept_key": "4926d66cc3b4dc80b3c87cc1ad506cb6a8f054c22e2460f18f665d8401c39186",
+      "rationale": "Recognize that effective prompts require iterative refinement and testing to achieve desired outputs.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "llm",
+          "optimization",
+          "prompt"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 2553,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "…uce poor retrieval results because vector stores match semantic similarity, not logical precision. Query optimization transforms unclear queries into effective retrieval inputs.]{#chapter-9.html_p167} - [Query rewriting (Rewrite-Retrieve-Read) uses an LLM to reformulate the user's question into clearer, more specific versions before searching. \"Fix my code\" becomes \"How to resolve `ImportError: No module named pand…",
+        "source_file": "knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 1073931
+      },
+      "store_rows_for_source": 33,
+      "store_best": [
+        {
+          "name": "Prompt Engineering for Llm Cognition",
+          "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+          "cos": 0.7483
+        },
+        {
+          "name": "Llm Text Generation with Structured Prompts",
+          "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+          "cos": 0.7277
+        },
+        {
+          "name": "Prompt Engineering for Contextual Retrieval",
+          "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+          "cos": 0.6847
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "The Kernel of Strategy",
+      "concept_key": "15e4aa9c1c01983fac5f3194711b44d72467b5a9fe6071a4c68a36c1fb454ed2",
+      "rationale": "A unique, defining condition or set of conditions that distinguishes an organization and enables a coherent strategic approach.",
+      "grounding": {
+        "name_verbatim_hits": 2,
+        "name_tokens": [
+          "kernel",
+          "strategy"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 225,
+        "excerpt_name_coverage": "2/2",
+        "excerpt_kind": "prose",
+        "excerpt": "A good strategy has an essential logical structure that I call the *kernel*. The kernel of a strategy contains three elements: a diagnosis, a guiding policy, and coherent action. The guiding policy specifies the approach to dealing with the obstacles called out in the diagnosis. It is like a signpost, marking the direction forward but not defining the details of the trip. Coherent actions are feasible coordinated po…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5957
+        },
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.5905
+        },
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.5762
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Proximate Objective",
+      "concept_key": "f396e21ab74b9206d53013b3c733cef5cf9921e1cf9b33a8c86099c997aebbc4",
+      "rationale": "A specific, actionable goal that serves as the immediate target for strategic implementation and resource allocation.",
+      "grounding": {
+        "name_verbatim_hits": 22,
+        "name_tokens": [
+          "objective",
+          "proximate"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 809,
+        "excerpt_name_coverage": "2/2",
+        "excerpt_kind": "prose",
+        "excerpt": "…top nor did he operate a system that heaped blame on his department managers. Instead, he congratulated them for achieving the proximate goal of the first campaign and moved on to the second. There are little or no payoffs to incremental improvements in chain-link systems, but Marco avoided this problem by shutting down the normal system of local measurement and reward, refocusing on *change itself* as the objective",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Equity Compensation Segmentation",
+          "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+          "cos": 0.6327
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.6264
+        },
+        {
+          "name": "Strategic-operational Decision Hierarchy",
+          "fb_id": "913cf686f7cdda2d937d3ecae06da441cdebc93731d68f1e6ceaeea18892c246",
+          "cos": 0.6146
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Clarity Over Complexity",
+      "concept_key": "d7f7ce7b961949eb6245b89a75ea343fff6ac556bd8503cdbf1928eab8e4388f",
+      "rationale": "Effective strategy requires clear, focused direction rather than elaborate frameworks or abstract goals.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "clarity",
+          "complexity",
+          "over",
+          "strategic"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 217,
+        "excerpt_name_coverage": "2/4",
+        "excerpt_kind": "prose",
+        "excerpt": "The gap between good strategy and the jumble of things people label \"strategy\" has grown over the years. In 1966, when I first began to study business strategy, there were only three books on the subject and no articles. Today, my personal library shelves are fat with books about strategy. Consulting firms specialize in strategy, PhDs are granted in strategy, and there are countless articles on the subject. But this…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.5946
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.5718
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5701
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategy as Action Plan",
+      "concept_key": "ec6ad7bedc323626b595229c11b4d5bdfea33e2f48f3ec6f29d1bdc2de6f8c06",
+      "rationale": "True strategy is not a document or set of objectives, but a structured plan of specific actions and decisions.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "action",
+          "plan",
+          "strategy"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 12,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "prose",
+        "excerpt": "[]{.calibre3}\"Richard Rumelt really 'gets it'! Too many strategy books delve into esoteric subjects and forget that a strategy is really about action. Rumelt reinforces that a strategy is the set of actions an organization or team should implement and, just as important, the actions an organization should avoid as they drive forward in their market. As General George S. Patton is oft quoted, 'A good plan violently e…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.594
+        },
+        {
+          "name": "Past Behavior Predicts Future Actions",
+          "fb_id": "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+          "cos": 0.5615
+        },
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.5442
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Trigger Point Strategy",
+      "concept_key": "4343ab99dc862af793f094dc646b377851d63569a9d221edb67405565ed74760",
+      "rationale": "Strategic action begins with identifying critical moments or conditions that signal the need for decisive intervention.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "point",
+          "strategy",
+          "trigger"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 9,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…xotic, muddled, and undifferentiated. This is hardly surprising, since in recent years the very idea of 'strategy' has been dumbed down by a deluge of naïve advice and simplistic frameworks. Rumelt cuts through the clutter and reminds managers that the essence of strategy is a clear and differentiated point of view that supports forceful and coherent action. Drawing on a wealth of examples, Rumelt identifies the cr…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.6384
+        },
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.626
+        },
+        {
+          "name": "Technology's Dual Nature",
+          "fb_id": "310734924aca8bd18add1df79a4df7ccfd56b60a7ad91988fadeb15cda4ed7a3",
+          "cos": 0.605
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "The Strategy Sin of Fluff",
+      "concept_key": "52a5db4f3cd27d3fdb1acdc2d1f9636b8b397dc184d55b5acce64faf4ec17e54",
+      "rationale": "Vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "fluff",
+          "sin",
+          "strategy"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 372,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "In the several years since that seminar, I have had the opportunity to discuss the bad strategy concept with a number of senior executives. In the process, I have condensed my list of its key hallmarks to the four listed in the beginning of this chapter: fluff, the failure to face the challenge, mistaking goals for strategy, and bad strategic objectives.",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.5373
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.5226
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5218
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Alignment",
+      "concept_key": "2cf7896275e2c11d5407ff72aaab896fe22d51727f6a5750a6f3d59afaf9b1b7",
+      "rationale": "Ensuring that all strategic elements—diagnosis, objectives, and actions—are internally consistent and reinforce each other.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "alignment",
+          "strategic"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 622,
+        "excerpt_name_coverage": "1/2",
+        "excerpt_kind": "prose",
+        "excerpt": "…g or drawing upon sources of *advantage*. Indeed, the heart of the matter in strategy is usually advantage. Just as a lever uses mechanical advantage to multiply force, strategic advantage multiplies the effectiveness of resources and/or actions. Importantly, not all advantage is competitive. In nonprofit and public policy situations, good strategy creates advantage by magnifying the effects of resources and actions",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.6761
+        },
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.6582
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.653
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Differentiation Through Strategy",
+      "concept_key": "1b6f1029d8bfcd79e3edb33fa95dcbc575ebbbccbbbd65298e2ef1e2811d640c",
+      "rationale": "A successful strategy must clearly define what makes an organization unique and how that uniqueness creates competitive advantage.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "differentiation",
+          "strategy",
+          "through"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 465,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…pecialty shops that had been Chen Brothers' target market. Accordingly, management was formulating a new strategy of linking together small local food producers under a common brand that could be sold through Whole Foods. This change in strategy had no impact on the company's overall goals, but clearly meant a radical restructuring of its current strategic objectives. Instead of penetration objectives for different…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Surveillance Paradox of Power",
+          "fb_id": "48fe5422514a706f767b94a8e5448c453b773075845ccba2f88215a1724a3c46",
+          "cos": 0.628
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.6154
+        },
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.6135
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Diagnosis",
+      "concept_key": "1167ed41c67f2587b54f318e460bfcc288f287bfe6eb8a4581e621b2c22f2f30",
+      "rationale": "The process of identifying the core problem or challenge that a strategy must address to be effective.",
+      "grounding": {
+        "name_verbatim_hits": 2,
+        "name_tokens": [
+          "diagnosis",
+          "strategic"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 611,
+        "excerpt_name_coverage": "2/2",
+        "excerpt_kind": "prose",
+        "excerpt": "Furthermore, a good strategic diagnosis does more than explain a situation---it also defines a domain of action. Whereas a social scientist seeks a diagnosis that best predicts outcomes, good strategy tends to be based on the diagnosis promising leverage over outcomes. For instance, we know from research that K--12 student performance is better explained by social class and culture than by expenditures per student o…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.6633
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.63
+        },
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.6219
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Coherent Action Framework",
+      "concept_key": "69412abb4e6b0463edf84c8bc8657309b868368f30ea9b370c4dd47027ff7d16",
+      "rationale": "A strategy must provide a clear framework for what actions to take and what to avoid to achieve desired outcomes.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "action",
+          "coherent",
+          "framework"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 9,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…gers that the essence of strategy is a clear and differentiated point of view that supports forceful and coherent action. Drawing on a wealth of examples, Rumelt identifies the critical features that distinguish powerful strategies from wimpy ones---and offers a cache of advice on how to build a strategy that is actually worthy of the name. If you're certain your company is already poised to outperform its rivals a…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Charismatic Leadership As Motivational Force",
+          "fb_id": "67ae083a6e81f19aba96cd8b517e07a4b38f8bd68922085215bbc7e525c399a5",
+          "cos": 0.585
+        },
+        {
+          "name": "New Thought Success Philosophy",
+          "fb_id": "5cd16fa1a16316233829bae8260ece9d32298988e0e464b03848bc3f7d156dbb",
+          "cos": 0.5778
+        },
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.5678
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Execution Force",
+      "concept_key": "99b2a000f3eed601bea72c4edcdd693ed5cc995ab845733a5961ab40f4feef54",
+      "rationale": "The commitment to forcefully implement a strategy despite obstacles, rather than waiting for perfect conditions.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "execution",
+          "force",
+          "strategic"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 622,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…g or drawing upon sources of *advantage*. Indeed, the heart of the matter in strategy is usually advantage. Just as a lever uses mechanical advantage to multiply force, strategic advantage multiplies the effectiveness of resources and/or actions. Importantly, not all advantage is competitive. In nonprofit and public policy situations, good strategy creates advantage by magnifying the effects of resources and actions",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.663
+        },
+        {
+          "name": "Strategic Design Through User-centric Innovation",
+          "fb_id": "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+          "cos": 0.6374
+        },
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.576
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Sin of Blue-Sky Objectives",
+      "concept_key": "3cb62852daabcdce28094aa4ebfe983a7563a5444b5cb359d083544d014a40f5",
+      "rationale": "Setting goals that are aspirational but disconnected from real-world constraints or actionable steps.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "blue",
+          "objectives",
+          "sin",
+          "sky",
+          "strategic"
+        ],
+        "name_tokens_present": "5/5",
+        "name_tokens_missing": [],
+        "excerpt_index": 474,
+        "excerpt_name_coverage": "4/5",
+        "excerpt_kind": "prose",
+        "excerpt": "The second form of bad strategic objectives is one that is \"blue sky.\" A good strategy defines a critical challenge. What is more, it builds a bridge between that challenge and action, between desire and immediate objectives that lie within grasp. Thus, the objectives a good strategy sets should stand a good chance of being accomplished, given existing resources and competence. (See the discussion of proximate objec…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Goal-oriented Agent Decomposition",
+          "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+          "cos": 0.5695
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5544
+        },
+        {
+          "name": "Strategic Design Through User-centric Innovation",
+          "fb_id": "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+          "cos": 0.5397
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Simplicity",
+      "concept_key": "020d81c2c48adc63b0043d04e362a35042238ad3992d519bc220cf3ba1f5710c",
+      "rationale": "Effective strategies are often simple and focused, avoiding overcomplicated or convoluted approaches.",
+      "grounding": {
+        "name_verbatim_hits": 1,
+        "name_tokens": [
+          "simplicity",
+          "strategic"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 884,
+        "excerpt_name_coverage": "2/2",
+        "excerpt_kind": "prose",
+        "excerpt": "A high-quality strategic resource yielding a powerful competitive advantage makes for great strategic simplicity. Consider Xerox's patents on plain paper copying. By the mid-1950s these patents were rock solid, and it became clear that buyers would be willing to pay three thousand dollars or more for a Xerox machine---a device that cost about seven hundred dollars to manufacture. Given this large and protected compe…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.6199
+        },
+        {
+          "name": "Equity Compensation Segmentation",
+          "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+          "cos": 0.6008
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5963
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Relevance",
+      "concept_key": "504b02d5f12065c3112c82d7fe5e7efcc413392dc60ba19f5dc24990cf707afb",
+      "rationale": "A strategy must be grounded in the actual conditions and challenges faced by the organization or situation.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "relevance",
+          "strategic"
+        ],
+        "name_tokens_present": "2/2",
+        "name_tokens_missing": [],
+        "excerpt_index": 458,
+        "excerpt_name_coverage": "1/2",
+        "excerpt_kind": "prose",
+        "excerpt": "You can call these annual exercises \"strategic planning\" if you like, but they are not strategy. They cannot deliver what senior managers want: a pathway to substantially higher performance. To obtain higher performance, leaders must identify the critical obstacles to forward progress and then develop a coherent approach to overcoming them. This may require product innovation, or new approaches to distribution, or a…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Subjective Reality Vs. Objective Representation",
+          "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+          "cos": 0.5719
+        },
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.5586
+        },
+        {
+          "name": "Equity Compensation Segmentation",
+          "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+          "cos": 0.5553
+        }
+      ]
+    },
+    {
+      "source_id": "b51204ce6c6a9950",
+      "name": "Strategic Leadership as Decision-Making",
+      "concept_key": "2e954f147f343d9fd6b41372a94e13cd7e5b2959f2f8d46dbcc3a3ed70fab544",
+      "rationale": "Leadership in strategy is fundamentally about making hard choices and committing to specific, high-impact actions.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "decision",
+          "leadership",
+          "making",
+          "strategic"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 565,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "… of the most successful managers in history. He had written, spoken, and been interviewed extensively on leadership, strategy, and management. However, like dipping into the Bible, you could find whatever you wanted in his body of work. Yes, Welch thought formal strategic planning was a waste of time, but he also said, \"The first step of making strategy real is figuring out the big 'aha' to gain sustainable competi…",
+        "source_file": "knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "source_chars": 761815
+      },
+      "store_rows_for_source": 67,
+      "store_best": [
+        {
+          "name": "Strategic Perspective Shift Advantage",
+          "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+          "cos": 0.6081
+        },
+        {
+          "name": "Strategy-to-execution Gap",
+          "fb_id": "66b590c93935ac459edb6fea83f3ae22790dc24db9d54620e43558a066eb465b",
+          "cos": 0.5923
+        },
+        {
+          "name": "Ground Offensive Strategy for Kuwait Liberation",
+          "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+          "cos": 0.5628
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Creative Coding Pedagogy",
+      "concept_key": "6140448f50512e2f595cfcf76d6d6e086b370cb33a51b4d59454339d0cbc6a99",
+      "rationale": "Teaching programming through visual arts creates a more engaging and effective learning pathway than traditional computer science curricula.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "coding",
+          "creative",
+          "pedagogy"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 1508,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "… 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Creative coding, 3, 4, 196, 228, 237–250 - Critical design, 5, 94, 212 - Critical engineering, 5, 113 - Critique, 5, 6, 94, 110, 132, 196, 233–234 - Crowdsourcing, 82 - Curves, 152,…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5939
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.5579
+        },
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.547
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Reactive Programming in Art",
+      "concept_key": "0b5531dfd1727f1c4d4af354d6568a1b4e274c515e9c30614496a7d39de0f049",
+      "rationale": "Visual experimentation with code can dramatically increase motivation and accelerate learning in creative coding contexts.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "art",
+          "programming",
+          "reactive"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 1286,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…n introductory image processing. Exercises of this sort appear in Casey Reas and Ben Fry's Processing: A Programming Handbook for Visual Designers and Artists (2007);³⁴ in Ira Greenberg's Processing: Creative Coding and Computational Art (2007);³⁵ in Dan Shiffman's Learning Processing (2008);³⁶ in Andrew Glassner's Processing for Visual Artists: How to Create Expressive Images and Interactive Art (2010);³⁷ in Reas …",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Global Scale Data Perception",
+          "fb_id": "8b8d383216325ec60fd44956d944aa744e1ea02ca70180e8d5dc60095c04f901",
+          "cos": 0.6153
+        },
+        {
+          "name": "Media Semiotics and Representation",
+          "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+          "cos": 0.6124
+        },
+        {
+          "name": "Generative Landscape Design Principles",
+          "fb_id": "0660dd038b45e560a5f16ece713a1cb8d8e00efc65638d232628c24d0eb745e3",
+          "cos": 0.6065
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Community-Curated Learning",
+      "concept_key": "226465de554600c26d91bc5c27c8663bc8ec92cc87243d9a4972be11c8e1853f",
+      "rationale": "Collective wisdom from educators and practitioners can be systematically documented and shared to improve creative coding instruction.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "community",
+          "curated",
+          "learning"
+        ],
+        "name_tokens_present": "2/3",
+        "name_tokens_missing": [
+          "curated"
+        ],
+        "excerpt_index": 39,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "… primers on our bookshelves, which dealt above all with how to write code, rather than what to make when learning to code and why. This book is our attempt to address this gap and capture an evolving vernacular. It is a book for artists, designers, and poets who are already working with code as a creative medium, or who are curious about doing so. It is for computer scientists, software developers, and engineers wh…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Bot Opt-in Requirement",
+          "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+          "cos": 0.5792
+        },
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.5588
+        },
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5577
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Design By Numbers Influence",
+      "concept_key": "f53853dc7e7d64aa42efe8600599689ab0060c55f0e6c8eab67e219168800970",
+      "rationale": "Early educational tools like Design By Numbers laid foundational groundwork for modern visual programming approaches.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "design",
+          "influence",
+          "numbers"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 690,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "It is helpful to consider the typology of audiovisual systems and the design strategies they use. Sound visualization, for example, is a common feature in desktop music players, VJ software, and phonology tools. Principles of image sonification underpin film scores, game music, and some tools for the visually impaired. The term “visual music,” used by creators of some color organs and abstract films, can even refer …",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Global Scale Data Perception",
+          "fb_id": "8b8d383216325ec60fd44956d944aa744e1ea02ca70180e8d5dc60095c04f901",
+          "cos": 0.5615
+        },
+        {
+          "name": "Color Perception and Visual Task Alignment",
+          "fb_id": "4b4b10887b3dd6c85af94e2514f63e0668ed7bff7a93784b45c092da572c420e",
+          "cos": 0.5565
+        },
+        {
+          "name": "User-centered Design Priority",
+          "fb_id": "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+          "cos": 0.5389
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Aesthetics + Computation Synthesis",
+      "concept_key": "281be8c39a4a308e01427dcc66590fbdc5590ece2f73e37b35c2bca4b8f678d9",
+      "rationale": "Interdisciplinary collaboration between artists, designers, and coders creates novel forms of computational expression.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "aesthetics",
+          "computation",
+          "synthesis"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 31,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…ulting collection of cryptic experiments called Reactive 006 opened the door for me to join John Maeda's Aesthetics + Computation Group (ACG) at the MIT Media Lab in 1999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.6265
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.6249
+        },
+        {
+          "name": "Relational Creativity in Interactive Systems",
+          "fb_id": "93867ad699c43b18996c26b0b55f913f411e7157fc2fed49a02d81be8a4d77f2",
+          "cos": 0.6144
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Processing 1.0 Origins",
+      "concept_key": "a4e1c2acf36ce33f0c6476cc567a77a7636d9939aaf5cb741cc19403a9d7813c",
+      "rationale": "Early visual programming tools emerged from experimental art projects and evolved into widely adopted educational platforms.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "0",
+          "1",
+          "origins",
+          "processing"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 31,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the initial set of examples for Processing 1.0, which Ben Fry and I released in 2001. My two years in ACG clarified my future and led to my first experiences teaching code",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Design As Conversational Expression",
+          "fb_id": "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+          "cos": 0.4593
+        },
+        {
+          "name": "Bot Opt-in Requirement",
+          "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+          "cos": 0.4553
+        },
+        {
+          "name": "Ar Art Exhibition Design Pattern",
+          "fb_id": "239d50a7ea7156c52cf15a7b12ffad61b97ee8b6b95a33db79ea295248693dfe",
+          "cos": 0.4253
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Curriculum Evolution Through Experimentation",
+      "concept_key": "54a66aee9ca75501c45406590033b8d176afb49c83682f19629751b82bbec748",
+      "rationale": "Effective creative coding curricula develop through iterative testing, removal of ineffective elements, and gradual refinement.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "curriculum",
+          "evolution",
+          "experimentation",
+          "through"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 36,
+        "excerpt_name_coverage": "1/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…he strange way of writing that is code? How can we engage “code people” with a sophisticated visual arts curriculum? Code as Creative Medium tackles these difficult questions by curating over 30 years of exploration in visual arts education. It not only offers guidance on new ways to involve students; instructors will find themselves challenged and inspired as well. I've taught visual arts students for two decades …",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5481
+        },
+        {
+          "name": "Bot Opt-in Requirement",
+          "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+          "cos": 0.5314
+        },
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.5256
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Online Educational Material Fragility",
+      "concept_key": "05210054b910866998dd885cc7353cdb55fa3feb22a95c1816afd9582393371b",
+      "rationale": "Digital educational resources are ephemeral and at risk of being lost, making physical documentation essential for preserving knowledge.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "educational",
+          "fragility",
+          "material",
+          "online"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 1289,
+        "excerpt_name_coverage": "2/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…nt, Time Paint, and A-Paint (or Alive-Paint).⁴¹ By 1999, Maeda had formalized this type of inquiry as an educational assignment. In his book Design by Numbers, he presents an exercise involving the construction of an ultra-minimal paint program: a loop that continually sets a canvas pixel to black, at the location of the cursor. In a section entitled “Special Brushes,” Maeda writes: “Perhaps the most entertaining e…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5479
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.5466
+        },
+        {
+          "name": "Shared Conceptual Model",
+          "fb_id": "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+          "cos": 0.5278
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Code as Medium for Expression",
+      "concept_key": "00204b59ecf60add8de53b6cfedc349c3e05f51d091597f5af042d85788b0f7e",
+      "rationale": "Programming can function as a creative medium similar to traditional art forms, enabling new modes of artistic expression.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "code",
+          "expression",
+          "medium"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 535,
+        "excerpt_name_coverage": "3/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…le He's Technological Art,” Forbes, October 29, 2018. 4. Geoff Cox and Christopher Alex McLean, “Vocable Code,” in Speaking Code: Coding as Aesthetic and Political Expression (Cambridge, MA: MIT Press, 2013), 18–38. 5. Stephanie Dinkins, “Five Artificial Intelligence Insiders in Their Own Words,” New York Times, October 19, 2018. 6. Andrea L. Guzman, “Voices in and of the Machine: Source Orientation toward Mobile V…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.564
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.5523
+        },
+        {
+          "name": "Creative Ai As Cultural Expansion",
+          "fb_id": "9b9ebf6d8ab77c49773039582d5740dba41f66f2e8380345160c9d5abab9f68c",
+          "cos": 0.5396
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Educational Community Building",
+      "concept_key": "82631bcea1481132121f11358d0e29db32d0cc2fc6f4ba5e510e67c476696f03",
+      "rationale": "In-person gatherings of creative coders and educators can catalyze the development and sharing of innovative teaching strategies.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "building",
+          "community",
+          "educational"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 39,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…s—a companion to help plan a semester's journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.4778
+        },
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.4696
+        },
+        {
+          "name": "Data Visualization Storytelling Through Decomposition",
+          "fb_id": "877430701e5f7bee5b81b781b4d530eed2cc5df8380cba4a8419010e6ea877b5",
+          "cos": 0.4511
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Bauhaus Pedagogy Preservation",
+      "concept_key": "2564529bec16555d866c1a7d2b018a62a44d69c4abe7a87ec4813f2abbede8e6",
+      "rationale": "Like Bauhaus teaching methods, contemporary creative coding pedagogy benefits from systematic documentation and knowledge sharing.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "bauhaus",
+          "pedagogy",
+          "preservation"
+        ],
+        "name_tokens_present": "3/3",
+        "name_tokens_missing": [],
+        "excerpt_index": 1419,
+        "excerpt_name_coverage": "2/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…essor. Montreal: Drawn & Quarterly, 2014. 2. Davis, Meredith. Teaching Design: A Guide to Curriculum and Pedagogy for College Design Faculty and Teachers Who Use Design in Their Classrooms. New York: Simon and Schuster, 2017. 3. Itten, Johannes. Design and Form: The Basic Course at the Bauhaus and Later. New York: Van Nostrand Reinhold Company, 1975. 4. Jaffe, Nick, Becca Barniskis, and Barbara Hackett Cox. Teachin…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5446
+        },
+        {
+          "name": "Media Semiotics and Representation",
+          "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+          "cos": 0.5258
+        },
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.5195
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Visual Arts Programming Motivation",
+      "concept_key": "52d7914b8fc5f4b70b2c4be02699d1378bf8fcf9d2c39bb25ee1e155ee6f9d47",
+      "rationale": "Learning programming through visual arts applications increases student engagement and accelerates skill acquisition.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "arts",
+          "motivation",
+          "programming",
+          "visual"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 30,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…my own and then through an evening extension class in 1997—and there were no resources I knew of at that time that were devoted to coding through the visual arts. My class only provided examples and exercises in the domains of math and text. (My final assignment was to make an accounting system for a fictional bank.) It was a challenge and a chore, but I knew I needed programming skills to make what I wanted to make",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.5462
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.5306
+        },
+        {
+          "name": "Polar Interaction for Conceptual Clarity",
+          "fb_id": "795ea06b14c170280d8f4346a1a4da4008d4bacf0ee7435f76b36f8500b37757",
+          "cos": 0.5214
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Interdisciplinary Research in Creative Coding",
+      "concept_key": "f0a8e95fd048877a8e67b3afeae3ec893c18949b5b7f9fd4dfb409d12e98f873",
+      "rationale": "Cross-disciplinary collaboration between computer science and visual arts education creates unique pedagogical approaches.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "coding",
+          "creative",
+          "interdisciplinary",
+          "research"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 115,
+        "excerpt_name_coverage": "3/4",
+        "excerpt_kind": "prose",
+        "excerpt": "…ting technologies, in particular, are often discouragingly brittle and impersonal, making the hurdles of creative work even steeper. In an educational environment, methodologies from traditional computer science classrooms (such as emphasizing solitary work policed by plagiarism detectors) can exacerbate individual frustration and erode group morale.³⁴ The creative coding educator, in addition to explaining interdi…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.6591
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.6346
+        },
+        {
+          "name": "Color Perception and Cultural Context",
+          "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+          "cos": 0.6063
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Educational Resource Sustainability",
+      "concept_key": "8d2cecbbbbd8ac2b769b6b8ed9463fc352cf3211ba96408a79408d04c548a2e5",
+      "rationale": "Physical publication of digital educational content ensures long-term accessibility and preservation of teaching methods.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "educational",
+          "resource",
+          "sustainability"
+        ],
+        "name_tokens_present": "2/3",
+        "name_tokens_missing": [
+          "sustainability"
+        ],
+        "excerpt_index": 39,
+        "excerpt_name_coverage": "1/3",
+        "excerpt_kind": "prose",
+        "excerpt": "…s—a companion to help plan a semester's journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.5518
+        },
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.5426
+        },
+        {
+          "name": "Design As Conversational Expression",
+          "fb_id": "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+          "cos": 0.5403
+        }
+      ]
+    },
+    {
+      "source_id": "f988150fe424aa75",
+      "name": "Creative Coding Community Networks",
+      "concept_key": "8b068fe2150c72f038f72f6c256d5238239d7bb58643ebe7ec1291a8ee173187",
+      "rationale": "Online networks of creative coders and educators can be formalized into structured communities that drive curriculum development.",
+      "grounding": {
+        "name_verbatim_hits": 0,
+        "name_tokens": [
+          "coding",
+          "community",
+          "creative",
+          "networks"
+        ],
+        "name_tokens_present": "4/4",
+        "name_tokens_missing": [],
+        "excerpt_index": 1508,
+        "excerpt_name_coverage": "4/4",
+        "excerpt_kind": "fragment/list",
+        "excerpt": "…ation, 9, 50, 81–85, 150, 194, 209, 228 - Color, 18, 24, 44, 96, 145, 153, 155–156, 170, 171, 173, 199 - Community building, 3, 4, 9, 193, 232 - Computational art, history, 150, 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Crea…",
+        "source_file": "knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md",
+        "source_chars": 547159
+      },
+      "store_rows_for_source": 45,
+      "store_best": [
+        {
+          "name": "Visual Representation As Mediated Framework",
+          "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+          "cos": 0.62
+        },
+        {
+          "name": "Media Semiotics and Representation",
+          "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+          "cos": 0.6093
+        },
+        {
+          "name": "Semiotic Layered Meaning",
+          "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+          "cos": 0.6033
+        }
+      ]
+    }
+  ]
+}

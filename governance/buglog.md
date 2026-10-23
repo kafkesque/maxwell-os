@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 748 bugs (260 open / 488 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 750 bugs (260 open / 490 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
 >
@@ -20397,3 +20397,45 @@ ruling sheet lives and what MATCH vs NONE means); `EOFError` now STOPS the walk 
 stopped walk loses no decisions; the walk prints `[k/N]` progress. MEASURED after: `--help` prints usage, `--count`
 reports `43 unruled / 45 total`, `</dev/null` exits 0 with the remainder named, `--selftest` green (5 controls).
 The 5 ruff findings in this file are PRE-EXISTING (B904 x2, I001, F401 `yaml`, E741) and are not addressed here.
+
+## BUG-985 (LOW — FIXED FORWARD 2026-10-23) — a tier-B candidate did not record WHICH window of the source it came from
+
+Found while answering the owner's question "haven't Qwen and gpt-oss already ruled these 43?" (measured answer: no —
+see D-3137). `scripts/propose_tier_b.py` emitted `{source_id, name, rationale}` and nothing else, so the sheet could
+not reproduce its own central claim: *this candidate came from this source*. A reviewer had to re-scan the WHOLE work
+(760 KB for Rumelt) to check one label, and could not tell whether the model had read a window that even mentions it —
+the claim was a sentence with no referent (D-3034). MEASURED before: 45/45 rows in
+`governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl` carry exactly three keys.
+
+**FIX (forward-only; nothing invented backwards).** `_run` now stamps every candidate with `window_index` (the index
+into the deterministic `windowize(text, max_window_chars)` sequence) and `window_sha16` (sha256 prefix of that
+window's bytes). The index alone is not enough: a re-converted source keeps the index and changes the bytes, so the
+sha turns a silent mis-citation into a visible one. `scripts/tier_b_evidence.py` now READS the pair when present and
+records `cited_window: {index, verified}`; a mismatch is reported as a WARNING that names the consequence ("the
+source bytes changed since the proposal; the whole-source scan is authoritative"), never downgraded to silence (C16).
+The 45 existing rows carry no window pointer and are covered by the whole-source grounding scan instead — stated in
+the artifact's `method`, not left to be inferred. Selftest 6 controls green (stamp stable for identical bytes,
+different for a changed window, 16 hex chars).
+
+## BUG-986 (MED — FIXED 2026-10-23) — the extraction-recall ladder line I wired yesterday ran the rail with NO FLAG (usage, exit 3), so `just health` would FAIL and measure nothing
+
+MEASURED before, on the tree as committed by `faa0299`:
+`python3 scripts/check_extraction_recall.py` → prints the argparse help text and exits **3** (`EXIT_CONFIG`), while the
+justfile allowed only `|| [ $? -eq 2 ]`. Two consequences, and the second is the worse one: (a) `just health` stops at
+that line, so the whole ladder after it never runs; (b) the rail I declared "WIRED HERE 2026-10-23" in that very line
+measured NOTHING — the wiring was a declaration with no referent (D-3034), which is exactly the rail-registry fault
+(i) it was written to clear. The defect survived the session that introduced it because the ladder was never run whole
+(`just health` does not fit a shell budget in this environment) — the D-3134 lesson one level up: the measurement that
+licenced the act was never re-taken after the act.
+
+A second finding, measured while fixing it: the rail's `--check` WRITES `governance/EXTRACTION_RECALL_REPORT.json`
+(tracked), so wiring `--check` into health would dirty the worktree on every pass and overwrite the receipt with
+whichever command ran last. A ladder step must not mutate the tree it is auditing.
+
+**FIX.** (1) The line is now `--check --no-report || [ $? -eq 2 ]`: it asks for the verdict and allows the declared
+owner-owed code, like every other rail in the ladder. (2) `check_extraction_recall.py` grew a declared `--no-report`
+flag; `check()` takes `write_report: bool` and, when false, prints `receipt: NOT WRITTEN (--no-report: ladder posture,
+read-only)` instead of claiming a file it did not write. `--check` alone keeps its record-the-receipt behaviour.
+MEASURED after: `--check --no-report` → `concept 45/45 = 1.0, expectation 419/419 = 1.0 -> CLEAN`, rc 0, and
+`git status` shows the report untouched; `--selftest` green (10 controls); `just --list` parses (an added comment line
+with extra leading whitespace had broken the justfile on the first attempt — caught by parsing it, not by assuming).

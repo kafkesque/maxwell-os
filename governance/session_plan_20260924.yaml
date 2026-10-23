@@ -431,11 +431,22 @@ may_touch:
 - governance/EXTRACTION_RECALL_REPORT.json
 - governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
 - governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl
+- governance/EXTRACTION_RECALL_TIER_B_EVIDENCE_*.json
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-23'
+  actor: assistant
+  owner_ack: 'D-3137 — the tier-B ruling handover (the owner asked whether the models had already ruled the 43; measured: no)'
+  addendum: 'D-3137 TIER-B EVIDENCE — scripts/tier_b_evidence.py writes the MEASURED sheet the owner rules FROM (source grounding + the reading passage + store novelty cosine). It is a DATED DERIVED artifact, re-derived on every run: a per-file grant would turn each regeneration into a new red line on the worktree rail (the BUG-563 shape), so the family is granted by prefix. The sheet is evidence that must be VERSIONED, not excluded (an advisory record that cannot be committed is not a record, D-342). Nothing outside this prefix becomes committable.'
+  additions:
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_EVIDENCE_*.json
+    why: T-195/D-3137 advisory evidence sheet (schema_version/gen_model/pipeline_commit stamped, R14) — re-derived by scripts/tier_b_evidence.py, consumed by scripts/rule_tier_b.py.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the one dated tier-B evidence family the ruling walker reads. No pipeline/** path, no pinned artifact, no will_not_touch family.'
 - date: '2026-10-21'
   actor: assistant
   owner_ack: 'owner 2026-10-21 (verbatim: "dispose both") — the two ORPHAN FETCHABLE-BY-ID hub snapshots'

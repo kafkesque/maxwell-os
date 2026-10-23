@@ -493,8 +493,15 @@ def _distribution(values: list[int]) -> dict[str, int]:
     return dict(sorted(out.items(), key=lambda kv: int(kv[0])))
 
 
-def check(cfg: dict[str, Any], target_override: str | None) -> int:
-    """Load the golden (refusing a stale one), evaluate, write the receipt, return the tri-state code."""
+def check(cfg: dict[str, Any], target_override: str | None, write_report: bool = True) -> int:
+    """Load the golden (refusing a stale one), evaluate, optionally write the receipt, return the tri-state.
+
+    `write_report=False` is the LADDER posture: `just health` must be able to ask this rail for its verdict
+    WITHOUT mutating the tree (MEASURED 2026-10-23: `--check` rewrote the tracked
+    governance/EXTRACTION_RECALL_REPORT.json on every run, so a health pass left a dirty worktree and the
+    receipt was overwritten by whichever command happened to run last). `--check` alone keeps the original
+    behaviour: measure AND record, for a deliberate receipt run.
+    """
     golden_path = PROJECT_ROOT / cfg["golden"]["path"]
     if not golden_path.exists():
         print(f"OWED: golden missing ({golden_path}) - run --build-golden --apply")
@@ -532,18 +539,19 @@ def check(cfg: dict[str, Any], target_override: str | None) -> int:
         "result": result,
     }
     out_path = PROJECT_ROOT / cfg["report_path"]
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=str(out_path.parent), suffix=".tmp")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(report, fh, indent=2, ensure_ascii=False)
-            fh.write("\n")
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.replace(tmp, out_path)
-    finally:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
+    if write_report:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=str(out_path.parent), suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                json.dump(report, fh, indent=2, ensure_ascii=False)
+                fh.write("\n")
+                fh.flush()
+                os.fsync(fh.fileno())
+            os.replace(tmp, out_path)
+        finally:
+            if os.path.exists(tmp):
+                os.unlink(tmp)
 
     print(
         f"recall vs {target_desc}: concept {result['concepts_hit']}/{result['concepts_expected']} "
@@ -552,7 +560,8 @@ def check(cfg: dict[str, Any], target_override: str | None) -> int:
     )
     for reason in result["red_reasons"]:
         print(f"  RED: {reason}")
-    print(f"  receipt: {cfg['report_path']}")
+    print(f"  receipt: {cfg['report_path']}" if write_report
+          else "  receipt: NOT WRITTEN (--no-report: ladder posture, read-only)")
     print(f"  tier B: {result['tier_b_proposed']} proposed, {result['tier_b_present']} present, "
           f"{result['tier_b_omitted']} omitted (advisory - never floored, never auto-certified)")
     return EXIT_CLEAN if result["verdict"] == "CLEAN" else EXIT_RED
@@ -737,6 +746,8 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="evaluate recall and write the report")
     parser.add_argument("--target", choices=["store", "s5"], default=None,
                         help="override the configured evaluation target")
+    parser.add_argument("--no-report", action="store_true",
+                        help="with --check: print the verdict, write NO receipt (the read-only LADDER posture)")
     parser.add_argument("--selftest", action="store_true", help="fixture proof, no store reads")
     args = parser.parse_args()
 
@@ -752,7 +763,7 @@ def main() -> int:
         if code != EXIT_CLEAN or not args.apply:
             return code
     if args.check:
-        return check(cfg, args.target)
+        return check(cfg, args.target, write_report=not args.no_report)
     return code
 
 

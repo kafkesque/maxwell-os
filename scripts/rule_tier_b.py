@@ -41,6 +41,10 @@ def load_cfg() -> dict:
     cfg = data["extraction_recall"]["golden"]
     if not cfg.get("tier_b_sheet") or not cfg.get("tier_b_ruling_sheet"):
         raise SystemExit("FAIL-CLOSED: golden.tier_b_sheet / tier_b_ruling_sheet missing in config (C12)")
+    # The MEASURED sheet the walk shows (scripts/tier_b_evidence.py). Optional on purpose: a ruling must
+    # never be BLOCKED by a missing evidence sheet, but its absence is SAID OUT LOUD per candidate rather
+    # than silently rendering a bare question (D-3100: a ruling rests on a reading, not on a recollection).
+    cfg["evidence_path"] = (data["extraction_recall"].get("tier_b_evidence") or {}).get("path")
     return cfg
 
 
@@ -116,18 +120,66 @@ def record_ruling(cfg: dict, source_id: str, name: str, note: str) -> None:
     print(f"  ✓ recorded {note}: {obj['name']!r} ({obj['source_id']})")
 
 
+def load_evidence(cfg: dict) -> dict[tuple[str, str], dict]:
+    """Index the evidence sheet by (source_id, name). Absent/undeclared -> empty (the walk says so)."""
+    rel = cfg.get("evidence_path")
+    if not rel:
+        return {}
+    path = PROJECT_ROOT / str(rel)
+    if not path.exists():
+        return {}
+    try:
+        envelope = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"FAIL-CLOSED: evidence sheet {rel} is not valid JSON: {e} (C16)") from e
+    band = (envelope.get("method") or {}).get("reference_band") or {}
+    band_v = band.get("semantic_near_threshold")
+    rows = envelope.get("rows", [])
+    if isinstance(band_v, (int, float)):
+        for r in rows:
+            r["_band"] = float(band_v)
+    return {(str(r.get("source_id")), str(r.get("name"))): r for r in rows}
+
+
+def evidence_lines(cfg: dict, ev: dict[tuple[str, str], dict], source_id: str, name: str) -> list[str]:
+    """Render the MEASURED evidence for one candidate: grounding, store proximity, and the reading itself."""
+    row = ev.get((source_id, name))
+    if row is None:
+        return ["   EVIDENCE: none recorded — run `python3 scripts/tier_b_evidence.py` for the reading"]
+    g = row.get("grounding") or {}
+    band = float(row.get("_band") or 0.0)
+    out = [f"   EVIDENCE (measured, advisory — the ruling is yours): source {g.get('name_tokens_present')} "
+           f"concept token(s), {g.get('name_verbatim_hits')} verbatim hit(s)"]
+    best = row.get("store_best") or []
+    if best:
+        top = best[0]
+        near = float(top.get("cos") or 0.0)
+        mark = "≈ at/above the store's semantic_near band — the store may already carry it" if band and near >= band else "below the store's semantic_near band"
+        out.append(f"   store: {top.get('cos')} {str(top.get('name'))[:44]!r} ({mark})")
+    elif row.get("store_novelty"):
+        out.append(f"   store: {row['store_novelty']}")
+    if g.get("excerpt"):
+        out.append(f"   reading: {g['excerpt']}")
+    return out
+
+
 def run_interactive(cfg: dict) -> None:
     cands = list_candidates(cfg)
     if not cands:
         print("No unruled tier-B candidates remain.")
         return
-    print(f"{len(cands)} unruled candidate(s). For each, type MATCH / NONE / skip (m/n/s), then Enter.\n")
+    ev = load_evidence(cfg)
+    print(f"{len(cands)} unruled candidate(s). For each, type MATCH / NONE / skip (m/n/s), then Enter.")
+    print("The evidence line is MEASURED (source tokens, verbatim hits, closest stored row, the reading). "
+          "It carries no verdict: MATCH/NONE is yours (D-2658/D-2898).\n")
     for idx, c in enumerate(cands, 1):
         name = c.get("name", "")
         sid = c.get("source_id", "")
         rationale = c.get("rationale", "")
         print(f"[{idx}/{len(cands)}] ── {name}  ({sid})")
         print(f"   rationale: {rationale}")
+        for line in evidence_lines(cfg, ev, sid, name):
+            print(line)
         while True:
             try:
                 ans = input("   MATCH / NONE / skip? [m/n/s]: ").strip().lower()

@@ -104,7 +104,7 @@ columns:
   discipline_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 while the anchor records 142 reliable-pair and 60 human labels for this axis"}
   extraction_type_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 - the weakest anchor axis (joint-vote 202 of 251) is also the one with no store-side provenance"}
 ceiling:
-  debt: 8
+  debt: 7
   direction: shrink_only
 measured:
   columns:
@@ -536,7 +536,7 @@ measured:
       nonnull: 7649
       rows: 7649
     schema_version:
-      distinct: 2
+      distinct: 1
       hollow: 0
       mentions: 137
       nonblank: 7649

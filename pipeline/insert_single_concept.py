@@ -345,7 +345,7 @@ def main() -> int:
     from pipeline.omlx_call import call_omlx
     from pipeline.schemas import match_domains_to_canonical, match_to_canonical
     from pipeline.stage6_commit import insert_embedding, insert_fb
-    from pipeline.stamp import get_pipeline_commit, make_hash_id
+    from pipeline.stamp import get_pipeline_commit, make_hash_id, SCHEMA_VERSION
 
     ck = mint_ck(args.name)
     if dedup_present(PROJECT_ROOT / args.db, args.source_id, ck):
@@ -491,7 +491,7 @@ def main() -> int:
     # `checkpoint_cells()` is the NATIVE face (list/dict/bool); insert_fb serialises it into the store's TEXT
     # columns itself (pipeline/stage6_commit.py::_safe_json), so the writer never re-types a cell.
     fb.update(outcome.checkpoint_cells())
-    fb["schema_version"] = "1"
+    fb["schema_version"] = SCHEMA_VERSION  # R14/C12: read the declared '3.0' (ONE home), never a code literal "1"
     fb["pipeline_commit"] = get_pipeline_commit()
 
     print(f"verify: passed={outcome.fact_passed} score={outcome.fact_score:.3f} status={outcome.status} "

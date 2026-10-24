@@ -20629,3 +20629,26 @@ PRE-EXISTING / DATA DRIFT (not from cea5f8b):
 **WHY THIS MATTERS.** This is BUG-778's class at full strength: the masked receipt let a commit (cea5f8b) land that broke 6 rails, and no face counted it because `just health` opened UNKNOWN. The receipt re-collection is the instrument that closes that blind spot, and it has now been re-collected — the masking is permanently gone, not merely understood.
 
 **OWED.** (1) Fix the 6 cea5f8b regressions in consequential order — each is a deterministic declared-home fix (route insert_single_concept.py through the ONE S5 home; read `failure_mode_min_length` loudly via `pipeline_paths.required()`; declare the utf-8-sig home for check_extraction_recall.py; delegate tier_b_owner_sheet.py:243 to `scripts/lib/artifact_encoding.py`; re-index `curation_withdrawals`; re-derive the 5 spec failures). (2) Triage the 7 drift reds — each its own forensic act: the store-writing ones (corroboration-bit 14 rows, vec-integrity 15 rows) need C13 backup + a byte receipt; the empty-store is a wrong-path probe to locate and remove, and the artifact-authority/declared-inputs drifts are completed-run-citation defects.
+
+## BUG-994 (HIGH — OPEN 2026-10-24) — store-columns drifted from the single-concept path's 15-row write (NOT BUG-766, closed 2026-10-21)
+
+MEASURED read-only on the live store (7,649 rows = 6,600 s5_verified + 1,049 sidecar). The drift the ladder
+attributed to BUG-766 is actually the single-concept path (D-3130, BUG-975..991) writing 15 principle rows with a
+shape `config/store_columns.yaml` never declared. Three sub-causes:
+
+1. **`schema_version='1'` hardcoded** at `pipeline/insert_single_concept.py:494` — the R14 stamp read a code literal
+   instead of the declared `'3.0'` (C12 / the BUG-990 "named from a code default" class, missed by BUG-990 which
+   fixed identity axes but not schema_version). **FIXED this session**: writer reads `SCHEMA_VERSION` (ONE home,
+   `pipeline_paths`); 15 rows repaired `'1'→'3.0'` (C13 backup `backups/maxwell.db.pre_schema_version_repair_20261024_161046`,
+   receipt before=15 remaining=0); census re-recorded — the schema_version STATE-VIOLATION is GONE.
+
+2. **One evidence row** `f523504ee903…` ("The Kernel of Strategy", 2026-10-23) carries blank
+   pipeline_run_id / citation / primary_source — BUG-990 deliberately left it as evidence; its repair is OWED/decided, not this bug.
+
+3. **The intentional single-concept shape** (menu_hash='NOT_APPLICABLE', blank taxonomy_match_method / keywords /
+   related_fbs / source_authors / source_diversity — declared in `config/pipeline_config.yaml#single_concept`) was
+   never re-declared in `store_columns.yaml`. OWED: re-declare those columns for the single-concept population once
+   the path stabilizes (BUG-975/976 still OPEN). A DECLARATION re-cut, NOT a `status: debt` hack — the debt ceiling
+   is shrink-only (7), so absorbing them as debt would be refused.
+
+Remaining red: 9 drifts (7 CONSTANT-OR-BLANK + pipeline_run_id/menu_hash STATE-VIOLATION), all from (2)+(3).

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 756,
-  "open_n": 261,
-  "closed_n": 495,
+  "open_n": 260,
+  "closed_n": 496,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -964,11 +964,6 @@
       "events": 1
     },
     {
-      "id": "BUG-777",
-      "title": "(HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor",
-      "events": 1
-    },
-    {
       "id": "BUG-778",
       "title": "(HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own",
       "events": 1
@@ -1665,6 +1660,7 @@
     "BUG-769",
     "BUG-770",
     "BUG-776",
+    "BUG-777",
     "BUG-779",
     "BUG-782",
     "BUG-783",

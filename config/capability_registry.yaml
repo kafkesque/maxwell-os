@@ -531,6 +531,11 @@ unrouted:
   BUG-964: bug_is_a_finding   # gpt-oss-20b same-row verdict flip (NONE->MATCH, 1/40=2.5%) is a finding about model-output determinism: the title names the model and a row id, no owned artifact. The determinism question belongs to the eval harness (a later task), not to a file's route
   BUG-967: bug_is_a_finding   # the Phase 0 receipt reporting S0.5 "identical" over two EMPTY sets is a finding about a vacuous comparison, not a file's route; the fix is a guard in the receipt writer (a later task)
   BUG-972: route_graph_incomplete   # scripts/r5_code_review.py EXISTS and is owned by NO declared capability; its `--out <path outside repo>` writes-then-dies is real work with no owner, so the honest class is a missing ROUTE, not a shrug
+  #: BUG-992 appended 2026-10-24 (the T-122 classification_status REPAIR residual). The title names "the S4 writer"
+  #: (prose, no owned path), so it does NOT route; its WORK is T-198, which names pipeline/stage4_merge.py and
+  #: therefore ROUTES to pipeline_merge. So the bug is a FINDING whose work already has a home — the honest class
+  #: is bug_is_a_finding, not a missing ROUTE (D-3038: the disposition is registered with its reason, not a shrug).
+  BUG-992: bug_is_a_finding
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

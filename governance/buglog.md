@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 756 bugs (261 open / 495 closed; highest OPEN = BUG-992) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 756 bugs (260 open / 496 closed; highest OPEN = BUG-992) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1267 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 648 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1267, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 261 open.
+> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 260 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -13383,7 +13383,7 @@ external Anytype column (D-2994's declared residual). (5) The `borp_min_sources`
 name (the S1.5 `>= 2 works` rule, alive and enforced) and is untouched: the rail targets `borp_score`.
 
 
-## BUG-777 (HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor rows are now AMBIGUOUS
+## BUG-777 (HIGH — FIXED 2026-10-24) — the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor rows are now AMBIGUOUS
 > **RULING LANDED 2026-10-14 (T-124 / D-2999).** The ambiguity policy this bug waited on is now DECLARED:
 > the DEFAULT is `declared_unresolved` (counted and reported — never dropped, never narrowed to "the first row",
 > never guessed by a model, D-2898); a resolution is allowed ONLY by a DECLARED, ORDERED, DETERMINISTIC rule that
@@ -13414,13 +13414,13 @@ anchor layer.
 **THE LADDER CONSEQUENCE (see BUG-778).** `just health` STOPS here (rc 1 is not the tolerated owner-owed 2), so
 every rail below this line has been UNREACHABLE - measured this session: 5 of the 68 remaining rails are red.
 
-**STATUS.** OPEN. The remedy is NOT a blind re-baseline: writing a bridge whose entries collapsed to 13 would delete
-195 declarations. The order is (i) decide the ambiguity policy (a name that resolves to N rows is either declared
-unresolved or resolved by a rule, and that rule is the D-2959 content-identity rule generalised - an owner-gated
-ruling if it picks a winner), (ii) re-derive with the new ruler sheet/candidates, (iii) re-baseline as its own
-declared act (D-2861 precedent). Evidence: this entry; `governance/ANCHOR_208_BRIDGE_RULER_20261002.csv`;
-`governance/ANCHOR_STORE_BRIDGE_20260926.json` (built 2026-10-08, commit 57906e0);
-`governance/SESSION-HANDOFF-20261014-D2995.md`.
+**STATUS.** FIXED 2026-10-24. The order above was followed in full: (i) the ambiguity policy RULED (D-2999,
+`declared_unresolved` default + three ordered deterministic rungs, fail-closed); (ii) the owner's re-anchoring
+carried the ruler from 208 to 57 rows (`ANCHOR_208_BRIDGE_RULER_RECHUNKV4_20261022.csv` + adjudication sheet); (iii)
+the bridge was re-baselined as its own declared act (D-2861). MEASURED 2026-10-24: `--check` re-derives 57/57 anchor
+rows (exact 57, normalised 0), 0 AMBIGUOUS, 0 UNRESOLVED — the join is byte-identical to the committed artifact; the
+only drift was `inputs.store.rows` 7640 -> 7649 (the store grew 9 rows). The bridge now re-derives clean, so the
+anchor's authority propagates to the corpus again.
 
 ## BUG-778 (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own cause
 

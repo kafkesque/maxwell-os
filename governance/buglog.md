@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 759 bugs (259 open / 500 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 759 bugs (256 open / 503 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 259 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 32 · UNLABELLED 101 (BUG-757) of 259 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 82 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 256 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20743,3 +20743,27 @@ Kernel of Strategy' (fb_id `164e4761…`, rowid 23647) landed `status=PASS, s5_r
 — no "No evidence" path. (A SEPARATE BUG-181-class data defect was found en route — a calibre `dummy_split_011`
 empty-link artifact tripping `_is_garbage_passage` max_underscore=2 — fixed by cleaning the passage; that is a
 passage-cleanliness fix, not this bug's root cause.)
+
+## BUG-975 (LOW — FIXED 2026-10-24) — `insert_single_concept.py` fails-closed on an unloadable vec0 instead of landing an FTS-only row
+
+**CLOSURE.** The 15 single-concept rows' vectors were backfilled under the vec0-capable interpreter, and
+`scripts/verify_vec_integrity.py` reads `vec_fbs live=7649/100%, 0 RED`. The writer now CHECKS
+`load_sqlite_vec(conn).loaded` and refuses (SystemExit naming the `S6_VEC_PYTHON` route) when vec0 is not loadable —
+the silent FTS-only shape is gone: no vector write, no row. BUG-976 (omitted evidence) and BUG-991 (vacuous
+mechanism) were the two separate defects that surfaced in the same D-3130 insert and are each closed.
+
+## BUG-920 (HIGH — FIXED 2026-10-24) — `resume_has_work` is the ONE home the resume and audit both use; a checkpoint honour is now checked against bytes
+
+**CLOSURE (fix landed 2026-10-18; this heading records the disposition).** `pipeline/stage0_convert.py` gained
+`resume_has_work` (recorded `output_path` must EXIST and clear `MIN_OUTPUT_BYTES`), used by BOTH the resume and the
+new audit; the standing instrument `python3 pipeline/stage0_convert.py --audit-checkpoint` reads the checkpoint and
+reports the phantom lines rc 2 (OWNER-OWED, loud, never fatal). The 3 phantom lines are left INERT + NAMED +
+RE-CONVERTIBLE by decision (no purge, D-3038). The residual name-keyed checkpoint is a SEPARATE finding (BUG-899,
+still open), not this bug.
+
+## BUG-956 (HIGH — FIXED 2026-10-24) — the halving is a canonical-run consolidation, re-anchored (T-191) and re-checked 40/40 with no ruling changes
+
+**CLOSURE.** T-191 re-anchor landed (`build_anchor_store_bridge.py --check` EXIT_CLEAN 0); the NONE-MUDDY recheck
+(UPDATE #4) re-adjudicated the 40-row high-cosine tail with a DIFFERENT family pair (Qwen3.8-27B + gpt-oss-20b):
+cross-family agreement 40/40, the one dissent (R111) is gpt-oss against itself and fail-closes to NONE (D-2658).
+Receipt `governance/ANCHOR_208_RECHECK_NONEMUDDY_RESULTS_20261022.json` (R14-stamped, 80-line JSONL).

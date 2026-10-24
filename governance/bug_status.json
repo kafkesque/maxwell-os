@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 759,
-  "open_n": 259,
-  "closed_n": 500,
+  "open_n": 256,
+  "closed_n": 503,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1234,11 +1234,6 @@
       "events": 1
     },
     {
-      "id": "BUG-920",
-      "title": "(HIGH, OPEN 2026-10-18) \u2014 AN S0 ARTEFACT CAN EXIST WITH NO RECEIPT AT ALL, BECAUSE THE CHECKPOINT IS WRITTEN ONCE AT THE END",
-      "events": 3
-    },
-    {
       "id": "BUG-921",
       "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
       "events": 3
@@ -1269,11 +1264,6 @@
       "events": 1
     },
     {
-      "id": "BUG-956",
-      "title": "(HIGH, OPEN 2026-10-20) \u2014 THE KNOWLEDGE STORE **HALVED** (14,574 \u2192 7,640 rows) AND NOBODY SAW IT BECAUSE THE ANCHOR-BRIDGE RAIL WAS",
-      "events": 5
-    },
-    {
       "id": "BUG-964",
       "title": "(LOW, OPEN 2026-10-22) \u2014 gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified)",
       "events": 2
@@ -1286,11 +1276,6 @@
     {
       "id": "BUG-972",
       "title": "(LOW, OPEN 2026-10-23) \u2014 `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback",
-      "events": 1
-    },
-    {
-      "id": "BUG-975",
-      "title": "(LOW, OPEN 2026-10-23) \u2014 `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not",
       "events": 1
     },
     {
@@ -1744,6 +1729,7 @@
     "BUG-916",
     "BUG-917",
     "BUG-918",
+    "BUG-920",
     "BUG-922",
     "BUG-923",
     "BUG-924",
@@ -1773,6 +1759,7 @@
     "BUG-952",
     "BUG-953",
     "BUG-955",
+    "BUG-956",
     "BUG-957",
     "BUG-958",
     "BUG-959",
@@ -1788,6 +1775,7 @@
     "BUG-971",
     "BUG-973",
     "BUG-974",
+    "BUG-975",
     "BUG-976",
     "BUG-977",
     "BUG-978",

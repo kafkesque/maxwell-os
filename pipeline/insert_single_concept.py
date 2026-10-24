@@ -525,7 +525,15 @@ def main() -> int:
     try:
         from pipeline.sqlite_vec_loader import load_sqlite_vec
 
-        load_sqlite_vec(conn)  # D-2915: vec0 must be loaded before insert_embedding
+        vec_load = load_sqlite_vec(conn)  # D-2915: vec0 must be loaded before insert_embedding
+        if not vec_load.loaded:
+            from pipeline.pipeline_paths import S6_VEC_PYTHON
+
+            raise SystemExit(
+                f"FAIL-CLOSED: sqlite-vec not loadable in this interpreter ({vec_load.error}); "
+                f"re-run under the vec0-capable interpreter '{S6_VEC_PYTHON}' — refusing to write "
+                "an FTS-only row (BUG-975/D-2717)"
+            )
         ok = insert_fb(conn, fb)
         if not ok:
             raise SystemExit("FAIL-CLOSED: insert_fb refused the row (see ❌ lines above)")

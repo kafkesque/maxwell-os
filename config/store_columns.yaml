@@ -63,11 +63,11 @@ columns:
   failure_mode: {role: value, population: s5_verified, outside: unconstrained, why: "required on every S5 row (6,591/6,591) AND written on 774 process_template rows outside it - `unconstrained` is DECLARED, so those 774 rows are reported LOUD (OUTSIDE-COVERAGE) instead of being called a spill."}
   type_body: {role: value, population: sidecar, outside: absent, why: "D-2590: the sidecar tier's own role-specific body - non-blank and distinct on all 1,049 sidecar rows, absent on every S5 row (whose body fields are the columns above)."}
   menu_hash: {role: value, population: s5_verified, outside: unconstrained, why: "MEASURED 2026-10-24: distinct 2 inside the S5 tier - the closed-menu hash (6,585 rows) PLUS the declared absence sentinel 'NOT_APPLICABLE' (15 single-concept rows, D-3130, that ran no closed menu). No longer `state` (one fact per row) because the single-concept path is a second, menu-less manufacturing route. The 1,049 sidecar rows carry 'NOT_APPLICABLE' too, declared UNCONSTRAINED so it stays LOUD and OWED (BUG-737)."}
-  pipeline_run_id: {role: sparse, why: "MEASURED 2026-10-24: one value on 7,648/7,649 rows (rechunk-v4-20260929) - the store holds ONE run's artifact (D-2943). The SINGLE blank is the BUG-990 evidence row f523504e (QUARANTINE, vacuous), deliberately kept with blank identity as evidence; `sparse` names that ONE defect row rather than pretending the store has none. Its repair is a separate owed decision (BUG-994), after which this reverts to `state`."}
-  citation: {role: sparse, why: "non-blank 7,648/7,649 (720 distinct) - the single blank is the BUG-990 evidence row f523504e (QUARANTINE, vacuous), kept as evidence; `sparse` names it and it reverts to default `value` once that row is repaired (BUG-994)."}
-  primary_source: {role: sparse, why: "non-blank 7,648/7,649 (968 distinct) - the single blank is the BUG-990 evidence row f523504e; `sparse` names it and it reverts to `value` on repair (BUG-994)."}
+  pipeline_run_id: {role: state, why: "MEASURED 2026-10-24: ONE value on 7,649/7,649 rows (rechunk-v4-20260929) - the store holds ONE run's artifact (D-2943). REVERTED from `sparse` to `state` on the BUG-990 evidence row's withdrawal (BUG-994): the single blank (f523504e) is gone, so `sparse` (0 < nonblank < rows) became a false claim and the single-run stamp is `state` (one fact per row)."}
+  citation: {role: value, why: "REVERTED from `sparse` to default `value` on the BUG-990 evidence row's withdrawal (BUG-994): non-blank 7,649/7,649 (720 distinct) - the single blank (f523504e) is gone, so the column now satisfies `value` (non-blank on every row, varies)."}
+  primary_source: {role: value, why: "REVERTED from `sparse` to `value` on the BUG-990 evidence row's withdrawal (BUG-994): non-blank 7,649/7,649 (968 distinct) - the single blank (f523504e) is gone."}
   source_authors: {role: sparse, why: "non-blank 7,634/7,649 (1,505 distinct) - the 15 single-concept rows (D-3130) are blank because source_provenance reads book identity but not the author list; `sparse` keeps that 15-row gap visible."}
-  source_diversity: {role: sparse, why: "MEASURED 2026-10-24 (BUG-989): non-blank 7,648/7,649 (94 distinct) - the value is DERIVED (== |source_ids|, D-2309/D-2993) and the 14 single-concept PASS rows were re-derived to 1 by scripts/repair_single_concept_diversity.py; the producer now writes it. The SINGLE remaining blank is the BUG-990 evidence row f523504e (QUARANTINE, vacuous), deliberately kept as evidence; `sparse` names it and it reverts to default `value` once that row is withdrawn (BUG-994)."}
+  source_diversity: {role: value, why: "REVERTED from `sparse` to default `value` on the BUG-990 evidence row's withdrawal (BUG-994): non-blank 7,649/7,649 (94 distinct). The value is DERIVED (== |source_ids|, D-2309/D-2993); the 14 single-concept PASS rows were re-derived to 1 (BUG-989) and the single f523504e blank is gone."}
   verifier_model: {role: state, population: s5_verified, outside: absent, why: "MEASURED 2026-10-12: ONE value inside the S5 tier (6,591/6,591 rows, distinct 1) - the pinned DeBERTa-v3-large NLI + threshold that judged those rows. RESHAPED 2026-10-12 (BUG-737, scripts/normalize_absent_shape.py): the 1,049 sidecar rows now carry a TRUE NULL, so count(verifier_model) reads 6,591 and can no longer claim a value on a row no verifier judged (D-2957). The manufacturing point is closed too: pipeline/stage6_commit.py now writes _safe_str(...) or None, so a new run cannot reintroduce the blank."}
   # ---- state: one value that IS this run's fact (a stamp or a genuinely single-state flag) ----
   provenance: {role: state, why: "constant 'llm_extracted_from_source' - the store is entirely LLM-extracted, which is a fact about this run and not a label"}
@@ -144,7 +144,7 @@ measured:
       distinct: 720
       hollow: 0
       mentions: 49
-      nonblank: 7648
+      nonblank: 7649
       nonnull: 7649
       rows: 7649
     classification_error:
@@ -267,7 +267,7 @@ measured:
       nonnull: 7649
       rows: 7649
     discipline_raw:
-      distinct: 978
+      distinct: 977
       hollow: 0
       mentions: 50
       nonblank: 6410
@@ -331,7 +331,7 @@ measured:
       rows: 7649
     evidence_passages_shown:
       distinct: 7649
-      hollow: 1
+      hollow: 0
       mentions: 16
       nonblank: 7649
       nonnull: 7649
@@ -414,7 +414,7 @@ measured:
       nonnull: 7649
       rows: 7649
     isor:
-      distinct: 370
+      distinct: 369
       hollow: 0
       mentions: 15
       nonblank: 6600
@@ -458,7 +458,7 @@ measured:
     name:
       distinct: 7646
       hollow: 0
-      mentions: 427
+      mentions: 428
       nonblank: 7649
       nonnull: 7649
       rows: 7649
@@ -487,7 +487,7 @@ measured:
       distinct: 1
       hollow: 0
       mentions: 48
-      nonblank: 7648
+      nonblank: 7649
       nonnull: 7649
       rows: 7649
     practicality:
@@ -508,8 +508,8 @@ measured:
       distinct: 968
       hollow: 0
       mentions: 22
-      nonblank: 7648
-      nonnull: 7648
+      nonblank: 7649
+      nonnull: 7649
       rows: 7649
     procedural_skill:
       distinct: 0
@@ -549,13 +549,13 @@ measured:
     source_authors:
       distinct: 1505
       hollow: 0
-      mentions: 24
-      nonblank: 7634
-      nonnull: 7634
+      mentions: 25
+      nonblank: 7635
+      nonnull: 7635
       rows: 7649
     source_books:
-      distinct: 1505
-      hollow: 1
+      distinct: 1504
+      hollow: 0
       mentions: 49
       nonblank: 7649
       nonnull: 7649
@@ -571,8 +571,8 @@ measured:
       distinct: 94
       hollow: 0
       mentions: 36
-      nonblank: 7648
-      nonnull: 7648
+      nonblank: 7649
+      nonnull: 7649
       rows: 7649
     source_ids:
       distinct: 1477
@@ -617,7 +617,7 @@ measured:
       nonnull: 6585
       rows: 7649
     taxonomy_version:
-      distinct: 3
+      distinct: 2
       hollow: 0
       mentions: 26
       nonblank: 7649
@@ -652,7 +652,7 @@ measured:
       nonnull: 6600
       rows: 7649
     verification_results:
-      distinct: 4921
+      distinct: 4920
       hollow: 1049
       mentions: 20
       nonblank: 7649

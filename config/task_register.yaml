@@ -627,10 +627,12 @@ tasks:
     and the census that moves must move DOWNWARD only (D-2642 shrink-only)'
 - id: T-124
   priority: MUST
-  state: open
+  state: done
   mover: pipeline
-  title: 'the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail
-    triage and re-records'
+  closed: '2026-10-24'
+  title: 'CLOSED: the RED ladder (BUG-777 + BUG-778) masking is discharged — receipt re-collected (193 lines, worst
+    rc=1), 13 faults re-homed to BUG-993 (6 cea5f8b regressions + 7 drift); limbs (a) D-2999 ruling, (b) bridge re-baselined
+    57/57, (c) check_rail_mutations GREEN'
   why: 'A ladder that stops at its first red line makes every "nothing cascades" claim a claim about a PREFIX - and the
     masking is now MEASURED (BUG-778: the rails below the stop were run individually and their causes recorded). Limb
     (a) needs a ruling: the anchor<->corpus content join no longer resolves the ruler to unique corpus rows, so it returns
@@ -647,8 +649,11 @@ tasks:
     is not a missing feature but an UNCOLLECTED receipt (D-2983''s instrument exists and is honest). In the same pass:
     the archive index went GREEN through its own remedy, the silent-repair DRIFT went GREEN (delegated to the decode
     home, ceiling lowered to its measurement) - and the store-columns row in BUG-778''s table was WRONG, which is why
-    limb (b) now points at BUG-766/T-125 for the store reshape instead of a re-record. Limbs (a) and (c) are untouched:
-    (a) is the owner''s ruling and (c) is a harness fix.'
+    limb (b) now points at BUG-766/T-125 for the store reshape instead of a re-record. DISCHARGED 2026-10-24: (a) the
+    D-2999 ruling landed (exact_id -> served_run_name_and_author -> single_corpus_row, else declared_unresolved); (b)
+    the bridge re-baselined 57/57 exact; (c) check_rail_mutations now GREEN; and the receipt re-collection (186->193
+    lines, worst rc=1) unmasks the TRUE fault set — 13 faults re-homed to BUG-993, the masking mechanism itself resolved
+    (BUG-778 FIXED).'
   source:
   - BUG-777
   - BUG-778

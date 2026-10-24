@@ -313,7 +313,11 @@ tasks:
     is delegated to the ONE decode home, three already-paid entries are deleted instead of reported STALE, and the SHRINK-ONLY
     ceiling is lowered to its measurement). What is left in THIS task is (1) alone: the ceiling can only be met by DECLARING
     encodings in code, and the debt is GROWING (it was 159/396 on 2026-10-11, 161/405 on 2026-10-14), so the campaign
-    needs a per-file pass, not a re-record.'
+    needs a per-file pass, not a re-record. ITEM (1) DISCHARGED 2026-10-24: the undeclared-encoding campaign is
+    COMPLETE - write slice ab342e4 (74 write sites / 55 files) and read slice e0fbf9f (145 files) both landed, and the
+    SHRINK-ONLY ceilings are LOWERED to zero (files 0 / sites 0 / writes 0 / unresolvable 0, D-2644). The "item (1)
+    alone" scope is now DISCHARGED, so the gate field FOURTEEN-line WHOLE-SET reading (2026-10-17) is the live scope
+    that re-prices this task to that backlog.'
   source:
   - BUG-759
   - D-2644

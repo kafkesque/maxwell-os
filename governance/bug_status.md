@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**255 open** / 505 closed of 760 ids.
+**254 open** / 506 closed of 760 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -175,7 +175,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-705 | (HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code — and 2,258 neutral rows are recoverable | 1 |
 | BUG-706 | (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee | 1 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
-| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 13 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an | 1 |
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |

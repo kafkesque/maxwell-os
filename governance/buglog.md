@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (255 open / 505 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (254 open / 506 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 255 open.
+> Open BUGS by severity (population = the census's 254 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 254 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -63,7 +63,7 @@
 >
 > _the face is a VIEW: 12 of 81 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
-> **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
+> **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341 · 🟧 BUG-391.
 <!-- GOV-INDEX:END -->
 
 <!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
@@ -20819,3 +20819,39 @@ manifested on FOUR facets, each now measured-closed:
 **WHY NOT A COLUMN, RESTATED.** No disposition COLUMN was created (D-2952: a column lands with its writer; C28: bloat
 is opt-in; BUG-499: `status` is a VERIFICATION verdict, not a curation decision). A disposition now has its own act —
 it is simply not a role.
+
+
+## BUG-712 (MED — CLOSED 2026-10-24) — the ONE residual row is a ruled FALSE POSITIVE (A/B-tested): the claim_status survivor describes the principle's DOMAIN, not the record's verification state, so "no move" is correct and the residual is 0
+
+**THE A/B TEST (three end-states, measured against the receipt).** The residual was ONE row the strict tension
+form's `claim_status` alternative flags as an open tension, below the D-2953 bench floor so no auto-move. The row is
+`Open-mindedness in Scientific Disagreement`, and the flagged sentence is (from
+`governance/content_type_calibration_20261012.json#samples.claim_status`):
+
+> "edge cases include situations where the expert consensus is weak or contested; here, the principle may still
+> guide a cautious, provisional stance"
+
+Three candidate dispositions were tested against that receipt:
+  (A)  WARRANT THE MOVE — write principle→(open tension). REJECTED: the sentence explicitly says "the principle may
+       still guide a cautious, provisional stance" — it is a principle ABOUT handling contested cases, not a record
+       whose own status is contested. Moving it would MISLABEL a genuine principle, and it would be the owner
+       rubber-stamping the router's token match — the exact defect D-2953 exists to prevent.
+  (B)  ACCEPTED NEGATIVE + CLOSE WITHOUT RULING — REJECTED (this supersedes the 2026-10-23 note that leaned B, which
+       was written before the sentence was read): "we decline to rule" is NOT a D-3038 accepted negative. An accepted
+       negative rejects a PROPOSAL with a reason; it is not a refusal to decide. Closing without ruling leaves the row
+       in the invisible middle the register forbids.
+  (A2) DISPOSITION "NO MOVE — FALSE POSITIVE" — ACCEPTED: the token `contested` sits inside a domain-description
+       clause (the principle describes how it handles disagreement), which is the SAME boundary-class shape
+       BUG-735/D-2966 fixed for the `boundary` field, now surfacing in a claim_status-shaped clause. The correct act
+       is therefore NOT to move the label but to REJECT the router's proposal WITH a reason: the residual is
+       discharged by inspection, "no move" is correct, residual 0.
+
+**RESIDUAL = 0.** The 12 owner-adjudicated cells were written (D-2964); the disposition row is satisfied-in-effect
+(BUG-741); the 2 strict-form survivors are now both resolved — the subject_matter false positive was removed by
+D-2966, and this claim_status survivor is ruled a false positive above. BUG-712 closes on zero residual, not on a
+deferral.
+
+**LATENT FINDING, RECORDED NOT RE-OPENED (D-3038).** The strict form's `claim_status` alternative still fires on a
+domain-description token, the same leak D-2966 closed for `boundary`. It is n=1 and sub-floor, so it can never
+auto-move anything; the owner has now ruled this one instance a false positive. Recorded here so it cannot be
+re-proposed as an unexplained residual.

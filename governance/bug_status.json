@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 760,
-  "open_n": 255,
-  "closed_n": 505,
+  "open_n": 254,
+  "closed_n": 506,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -849,11 +849,6 @@
       "events": 1
     },
     {
-      "id": "BUG-712",
-      "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
-      "events": 13
-    },
-    {
       "id": "BUG-719",
       "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an",
       "events": 1
@@ -1593,6 +1588,7 @@
     "BUG-708",
     "BUG-709",
     "BUG-710",
+    "BUG-712",
     "BUG-713",
     "BUG-714",
     "BUG-715",

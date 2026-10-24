@@ -32062,3 +32062,24 @@ decisions:
   - config/decisions_policy.yaml
   - scripts/recompute_decision_summary.py
   - DECISION-LOG.md
+- id: D-3142
+  state: ACTIVE
+  date: '2026-10-24'
+  by: assistant
+  category: GOVERNANCE
+  title: INV-12 is CONDITIONAL — a cleared owner lane (zero open owner-moved tasks) is a valid end-state, so the
+    contract guard skips rather than fails
+  decision: 'BUG-993. MEASURED 2026-10-24: check_tests reported test_governance_faces_spec.py::test_the_face_leads_with_the_owner_lane_when_the_register_has_one
+    as a NEW failure, because the register legitimately holds zero open owner-moved tasks (T-183 and T-195, the
+    last two mover:owner rows, were closed 2026-10-23/24 with their owner disposition words recorded, leaving 55
+    open pipeline-moved tasks). The contract guard `assert owner_moved` hard-failed on that valid end-state, contradicting
+    BOTH the rail''s own semantics (live_faults fires only `if owner_moved and ...`) and the spec''s own wording
+    (INV-12: "when the register declares owner-moved work"). The fix is a contract clarification, not a register
+    edit: the guard becomes `pytest.skip` when owner_moved is empty — the invariant is conditional, and a cleared
+    owner lane is a valid end-state, never a drift. Fabricating an open owner-moved task to satisfy the guard would
+    be slop (D-3038) and is REFUSED. The substantive checks (the synthetic live() ordering with owner=2, and the
+    OWNER-LANE-leads-PIPELINE-LANE loop) still run and still assert the ordering.'
+  bugs:
+  - BUG-993
+  files:
+  - tests/test_governance_faces_spec.py

@@ -48,6 +48,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from pipeline.omlx_call import call_omlx_json
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 
 CONFIG_PATH = ROOT / "config" / "anchor_family.yaml"
 
@@ -231,7 +232,7 @@ def main() -> int:
     max_candidates = int(ac["max_candidates"])
     workers = args.workers or int(ac["max_workers"])
 
-    with src.open(newline="", encoding="utf-8-sig") as f:
+    with artifact_encoding.open_artifact(src, ROOT) as f:  # D-2646: declared encoding (BOM stripped), never a guess
         reader = csv.DictReader(f)
         fieldnames = [fn.strip() for fn in (reader.fieldnames or [])]
         rows = [{k.strip(): v for k, v in row.items()} for row in reader]
@@ -239,7 +240,7 @@ def main() -> int:
     # name-cos top-5 candidates per item_id (candidate sheet) — the breadth source
     # that fixes the never-shown retrieval bug (R208's true match was cand3).
     cand_by_id: dict[str, list[str]] = {}
-    with cand_src.open(newline="", encoding="utf-8-sig") as f:
+    with artifact_encoding.open_artifact(cand_src, ROOT) as f:  # D-2646: declared encoding (BOM stripped), never a guess
         for raw in csv.DictReader(f):
             c = {k.strip(): v for k, v in raw.items()}
             fbs: list[str] = []

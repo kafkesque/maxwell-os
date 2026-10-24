@@ -38,6 +38,9 @@ from typing import Any, Dict, List, Tuple
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+
 REGISTRY = ROOT / "config" / "anchor_family.yaml"
 FB_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 PLACEHOLDERS = frozenset({"MATCH", "NONE"})
@@ -74,7 +77,7 @@ def load_config() -> dict:
 
 def read_adjudication(path: Path) -> List[Dict[str, str]]:
     """Read the adjudication sheet, stripped of BOM/whitespace, and refuse a broken-format sheet (D-3034)."""
-    with path.open(newline="", encoding="utf-8-sig") as fh:
+    with artifact_encoding.open_artifact(path, ROOT) as fh:  # D-2646: declared encoding (BOM stripped), never a guess
         rows = [{k.strip(): (v or "").strip() for k, v in r.items() if k is not None} for r in csv.DictReader(fh)]
     rows = [r for r in rows if r.get("item_id")]
     bad = [r["item_id"] for r in rows if r.get("owner_ruling_fb_id", "") in PLACEHOLDERS]
@@ -137,7 +140,7 @@ def classify(rows: List[Dict[str, str]], names: Dict[str, str]) -> Tuple[List[di
 
 def read_carried_forward(old_ruler: Path, adjudicated: set) -> List[dict]:
     """Ruler rows NOT covered by the adjudication sheet are carried forward unchanged (they already join)."""
-    with old_ruler.open(newline="", encoding="utf-8-sig") as fh:
+    with artifact_encoding.open_artifact(old_ruler, ROOT) as fh:  # D-2646: declared encoding (BOM stripped), never a guess
         rows = [{k.strip(): (v or "").strip() for k, v in r.items() if k is not None} for r in csv.DictReader(fh)]
     return [{"item_id": r["item_id"], "name": r["name"]}
             for r in rows if r.get("item_id") and r["item_id"] not in adjudicated]

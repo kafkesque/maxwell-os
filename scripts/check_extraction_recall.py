@@ -52,6 +52,8 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+
 CONFIG_PATH = PROJECT_ROOT / "config" / "extraction_recall.yaml"
 FB_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 PLACEHOLDERS = frozenset({"MATCH", "NONE", "TRUE", "FALSE", "YES", "NO"})
@@ -132,7 +134,7 @@ def read_certifications(cfg: dict[str, Any]) -> list[dict[str, str]]:
     sheet = PROJECT_ROOT / cfg["golden"]["source_sheet"]
     match_note = str(cfg["golden"]["match_note"])
     certs: list[dict[str, str]] = []
-    with open(sheet, newline="", encoding="utf-8-sig") as fh:
+    with artifact_encoding.open_artifact(sheet, PROJECT_ROOT) as fh:  # D-2646: declared encoding (BOM stripped), never a guess
         for row in csv.DictReader(fh):
             cleaned = {(k or "").lstrip("\ufeff ").strip(): (v or "").strip() for k, v in row.items()}
             if cleaned.get("owner_ruling_note") != match_note:

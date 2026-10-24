@@ -51,6 +51,7 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 CONFIG_PATH = PROJECT_ROOT / "config" / "extraction_recall.yaml"
 SCHEMA_VERSION = "1"
 ARTIFACT_ID = "tier_b_owner_sheet"
@@ -240,7 +241,7 @@ def build_rows(cfg: dict[str, Any]) -> list[dict[str, Any]]:
         reading, before, after, locate = "", "", "", ""
         if source_file:
             if sid not in sources:
-                text = (PROJECT_ROOT / source_file).read_text(encoding="utf-8", errors="replace")
+                text = artifact_encoding.open_artifact(PROJECT_ROOT / source_file, PROJECT_ROOT).read()  # D-2646/BUG-511
                 sources[sid] = split_paragraphs(text)
             paras = sources[sid]
             para = paras.get(idx) if isinstance(idx, int) else None

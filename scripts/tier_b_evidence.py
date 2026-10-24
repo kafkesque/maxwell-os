@@ -49,6 +49,8 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+
 CONFIG_PATH = ROOT / "config" / "extraction_recall.yaml"
 
 EXIT_OK = 0
@@ -304,7 +306,7 @@ def build(cfg: dict[str, Any]) -> dict[str, Any]:
                                 "name_tokens_missing": [], "excerpt": ""}
             owed.append(f"{sid}: source file NOT RESOLVED (grounding not measured)")
         else:
-            text = Path(path).read_text(encoding="utf-8", errors="replace")
+            text = artifact_encoding.open_artifact(Path(path), ROOT).read()  # D-2646/BUG-511: no silent U+FFFD
             folded = normalize_name(text)
             grounding = measure_grounding(name, rationale, text, folded,
                                           paragraphs_with_tokens(text), max_chars, explanatory)

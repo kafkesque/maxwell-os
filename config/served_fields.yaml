@@ -82,24 +82,6 @@ declared:
       LANDED 2026-10-14 (D-2994): pipeline/feedback.py::feedback_wire assembles exactly that tuple and all three
       surfaces publish it; `state` is the token that resolves the ambiguity (measured | no_feedback). The four
       neutral-prior literals also left pipeline/retrieve.py for config/feedback.yaml#serving.neutral_prior.
-  - field: classification_status
-    word: keep-and-repair
-    anchor: 'owner 2026-10-14 (unblocking the T-107 change-set; the word is keep-and-repair for classification_status)'
-    owed: T-107
-    granted: 2026-10-14
-    granted_by: 'owner instruction 2026-10-14 - the T-107 change-set was explicitly unblocked'
-    recommendation: keep-and-repair
-    why: >-
-      LANDED 2026-10-24 (T-122/D-2994): the repair is DONE. classification_status now mirrors the row's own `status`
-      per the D2184 enum (PASS->CLEAN 4513, QUARANTINE->FAILED 3135; FAILED == quarantined), re-derived
-      deterministically and LLM-free by scripts/repair_classification_status.py (C13 backup + C6 one transaction +
-      R14 receipt in governance/evidence/). The undeclared threshold literal moved into config
-      (stage4.failure_mode_min_length; read via pipeline_paths.S4_FAILURE_MODE_MIN_LENGTH) and is wired in BOTH
-      _classify_s4 and stage4_merge.py. The repair's --check is the fail-closed parity rail (config/derivations.yaml,
-      homed). One residual (BUG-992): the S4 producer still derives from failure_mode length, not status, so a
-      long-fm row quarantined by NLI would be written CLEAN again — the parity rail catches it; the writer-rule fix
-      is owed (T-198).
-
 #: THE RETIRED WORDS (D-2993/D-2994). ONE home for the completed disposition of a field that LEFT the wire: a live
 #: claim lives in `declared`; a finished one lives here, and the rail checks it in BOTH directions - a retired field
 #: that some declared surface still advertises is a DEFECT (the retirement did not land), and a retirement with no

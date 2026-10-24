@@ -42,6 +42,8 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+
 CONFIG_PATH = PROJECT_ROOT / "config" / "extraction_recall.yaml"
 METADATA_PATH = PROJECT_ROOT / "knowledge pipeline" / "checkpoints" / "book_metadata.jsonl"
 
@@ -388,7 +390,7 @@ def _run(cfg: dict[str, Any]) -> int:
     all_rows: list[dict[str, str]] = []
     for pid in pilots:
         fp = files[pid]
-        text = Path(fp).read_text(encoding="utf-8", errors="replace")
+        text = artifact_encoding.open_artifact(Path(fp), PROJECT_ROOT).read()  # D-2646/BUG-511: no silent U+FFFD
         names, keys = read_tier_a(golden_path, pid) if skip_a else ([], set())
         windows = windowize(text, max_chars)[:max_windows]
         print(f"[{pid}] {Path(fp).name}: {len(windows)} window(s), {len(keys)} tier-A key(s) to skip")

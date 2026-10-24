@@ -983,7 +983,7 @@ def _bug_list(record: dict) -> list[str]:
 def mint_validate(record: dict, decisions: list, allow_gap: bool = False) -> list[str]:
     """Every reason a record may NOT be inserted - checked BEFORE a byte is written (D-2648/D-2649).
 
-    allow_gap (BUG-989, D-3141): True ONLY on the declared `--backfill` route, which restores ids the LOG already
+    allow_gap (BUG-989, D-3141): True ONLY on the declared `--restore-ids` route, which restores ids the LOG already
     names but the registry never minted (D-3134..D-3137). It relaxes the NEXT-FREE clause alone - a known,
     DECLARED gap is not a silent hole - while every other check (canonical state, no duplicate, bugs exist, files
     exist, no whole-payload clone) still runs. The default path is unchanged: forward-only, next-free enforced.
@@ -1006,14 +1006,14 @@ def mint_validate(record: dict, decisions: list, allow_gap: bool = False) -> lis
         problems.append("carries a legacy `status:` key alongside `state:` - one fact in two places (BUG-483)")
     # D-2660 CLAUSE 1 - the id is the NEXT FREE id. A namespace is extended, never sampled: a skipped id is a hole
     # that cannot be told apart from a record somebody removed (C21), and BUG-550 was found by reading ids in order.
-    # Relaxed ONLY on the declared --backfill route (BUG-989): the ids being restored are ALREADY named in the log,
+    # Relaxed ONLY on the declared --restore-ids route (BUG-989): the ids being restored are ALREADY named in the log,
     # so the gap is a KNOWN omission, not a silent hole - and the authorising decision (D-3141) records it as such.
     if not allow_gap:
         expected = next_free_decision_id(decisions)
         if normalized_id(record) != normalized_id({"id": expected}):
             problems.append("id " + str(record.get("id")) + " is not the next FREE id (" + expected + ") - the mint "
                             "APPENDS, so an id that skips one is a hole indistinguishable from a deleted record "
-                            "(D-2660); use --backfill only to restore an id the log already names")
+                            "(D-2660); use --restore-ids only to restore an id the log already names")
     # CLAUSE 2 - the bugs it names EXIST in the register, and its own payload NAMES at least one of them. A record
     # whose payload names a bug it does not cite IS the BUG-550 signature (D-2659 carried BUG-542's rationale).
     bugs = _bug_list(record)
@@ -1231,16 +1231,16 @@ def mint_main(argv: list[str]) -> int:
     bad record BY HAND; it cannot make this path emit one. Preview is the default; --apply writes. The file is read
     as YAML, so the same path accepts JSON (JSON is a subset of YAML).
     """
-    allow_gap = "--backfill" in argv
-    args = [a for a in argv[1:] if a not in ("--mint", "--apply", "--backfill")]
-    unknown = [a for a in argv[1:] if a.startswith("--") and a not in ("--mint", "--apply", "--backfill")]
+    allow_gap = "--restore-ids" in argv
+    args = [a for a in argv[1:] if a not in ("--mint", "--apply", "--restore-ids")]
+    unknown = [a for a in argv[1:] if a.startswith("--") and a not in ("--mint", "--apply", "--restore-ids")]
     if unknown or len(args) != 1:
         raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: --mint <record.yaml|record.json|-> [--apply]"
-                         + " [--backfill]"
+                         + " [--restore-ids]"
                          + (" - unknown flag(s) " + str(unknown) if unknown else "")
                          + " - one record file, refusing rather than guessing")
     if allow_gap and "--apply" not in argv:
-        raise SystemExit("FAIL-CLOSED (" + WRITER + "): --backfill is a declared RESTORE route (BUG-989/D-3141) and "
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): --restore-ids is a declared RESTORE route (BUG-989/D-3141) and "
                          "must be applied in the same invocation it is previewed - refuse rather than preview a gap "
                          "restoration that is not written")
     raw = sys.stdin.read() if args[0] == "-" else Path(args[0]).read_text(encoding="utf-8")

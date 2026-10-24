@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import yaml  # noqa: E402
+from scripts.lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 
 REGISTRY = ROOT / "config" / "anchor_family.yaml"
 
@@ -84,7 +85,7 @@ def suggest_for(bucket: str, cand1_fb_id: str) -> str:
 
 def build(cfg: dict, source_sheet: Path, out_path: Path) -> int:
     """Read the candidate sheet + store, write the sorted triage sheet."""
-    with open(source_sheet, newline="", encoding="utf-8-sig") as fh:
+    with artifact_encoding.open_artifact(source_sheet, ROOT) as fh:  # D-2646: declared encoding (BOM stripped), never a guess
         reader = csv.DictReader(fh)
         # The candidate sheet carries a leading space on the first header field;
         # normalize ALL fieldnames so column access is whitespace-stable.

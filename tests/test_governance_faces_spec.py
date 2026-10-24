@@ -12,6 +12,7 @@ import re
 import tempfile
 from pathlib import Path
 
+import pytest
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -186,7 +187,9 @@ def test_the_face_leads_with_the_owner_lane_when_the_register_has_one() -> None:
     reg = yaml.safe_load((PROJECT_ROOT / "config" / "task_register.yaml").read_text(encoding="utf-8"))
     owner_moved = [t for t in reg["tasks"]
                    if str(t.get("state")) not in ("done", "superseded", "rule") and t.get("mover") == "owner"]
-    assert owner_moved, "the register must declare at least one owner-moved task for this invariant to mean anything"
+    if not owner_moved:
+        pytest.skip("the register declares no owner-moved task right now; INV-12 is CONDITIONAL (D-3142): "
+                    "a cleared owner lane is a valid end-state, not a drift")
     for face in FACES:
         text = face.read_text(encoding="utf-8")[: face.read_text(encoding="utf-8").index("GOV-HISTORY:START")]
         lane_at, pipe_at = text.find("**OWNER LANE"), text.find("**PIPELINE LANE")

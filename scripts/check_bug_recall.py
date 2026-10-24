@@ -76,6 +76,7 @@ CONTROL_LABELS: tuple[str, ...] = (
     "a_finding_related_ONLY_by_a_sibling_citation_is_not_a_neighbour",
     "a_neighbour_sharing_fewer_references_than_the_declared_minimum_is_not_a_relation",
     "a_decision_citation_resolves_regardless_of_the_hyphen_the_register_wrote",
+    "a_tool_path_citation_resolves_as_a_trace",
 )
 
 class RecallError(SystemExit):
@@ -521,6 +522,13 @@ def selftest() -> int:
                    rulings=fixture_rulings, caps=fixture_caps)
     check(CONTROL_LABELS[16] + "_and_the_resolver_folds_the_hyphen",
           "decision:D3047" in norm["counts"]["cited_references_that_do_not_resolve"], False)
+    #: A `tools/` path is a FIRST-CLASS code family (36 .py modules, the T-114 encoding campaign's third
+    #: family) and a trace a later reader can OPEN: the declared artifact root must cover it, or a fix that
+    #: landed in tools/ reads UNTRACED (BUG-997). A separate measure() keeps the main fixture's census
+    #: arithmetic (11 ids / 8 open) untouched.
+    tool_trace = measure(fixture_doc, register_lines=["## BUG-060 (MED - FIXED 2026-01-01) - cites tools/delegate_safe.py"],
+                         rulings=fixture_rulings, caps=fixture_caps)
+    check(CONTROL_LABELS[17], "BUG-060" in tool_trace["counts"]["closed_findings_with_no_trace"], False)
 
     failed = 0
     for label, ok, _total in results:

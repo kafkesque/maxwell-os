@@ -69,7 +69,7 @@ sources:
 #: inside the thing it names is REPORTED rather than counted as a trace.
 traces:
   artifact:
-    pattern: '(?<![\w./-])(?:scripts|pipeline|config|agent|governance|src|tests|temp)/[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(?:py|yaml|yml|json|md|sh|toml|txt)(?![\w/.])'
+    pattern: '(?<![\w./-])(?:scripts|pipeline|config|agent|governance|src|tests|temp|tools)/[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(?:py|yaml|yml|json|md|sh|toml|txt)(?![\w/.])'
     must_resolve: true
     proves: 'a later reader can OPEN the thing that was fixed'
   decision:

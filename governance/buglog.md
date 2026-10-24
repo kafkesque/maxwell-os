@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (254 open / 506 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 761 bugs (254 open / 507 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
@@ -20855,3 +20855,32 @@ deferral.
 domain-description token, the same leak D-2966 closed for `boundary`. It is n=1 and sub-floor, so it can never
 auto-move anything; the owner has now ruled this one instance a false positive. Recorded here so it cannot be
 re-proposed as an unexplained residual.
+
+
+## BUG-997 (MED — CLOSED 2026-10-24) — the recall's artifact trace vocabulary omitted `tools/`, so a fix that landed in the 36-file code family read UNTRACED
+
+**DEFECT, MEASURED (not asserted).** `config/bug_recall.yaml#traces.artifact.pattern` (D-3047) declared the
+artifact roots `scripts|pipeline|config|agent|governance|src|tests|temp` and omitted `tools` — a first-class code
+family (36 `.py` modules) that the same sitting's T-114 encoding campaign treats as the third code family beside
+`scripts/` and `pipeline/`. A citation that does not match a declared pattern is INVISIBLE to the reader (never
+extracted, so never even reported as unresolved): a closed finding whose remedy landed in a `tools/` script read
+UNTRACED even though a later reader can OPEN the thing that was fixed.
+
+**THE TWO FALSE POSITIVES (the debt this closes).** The live recall counted 29 `untraced_closed` (ceiling 27,
+row T-177). Two of them cite a `tools/` artifact that RESOLVES and IS the remedy:
+  - BUG-243 → `tools/delegate_safe.py` (the DELEGATE-001 provider guard the fix landed in);
+  - BUG-256 → `tools/model_eval_suite.py` (`_usable_numeric_gold` / `_usable_letter_gold`).
+MEASURED over the whole 760-finding register: 51 findings cite a resolving `tools/` path and none cite a `tools/`
+path that fails to resolve, so adding the root mints ZERO new unresolved references.
+
+**FIX (one declared root + one red loop).** `tools` added to `traces.artifact.pattern` in
+`config/bug_recall.yaml`; a 23rd known-answer control (`a_tool_path_citation_resolves_as_a_trace`) in
+`scripts/check_bug_recall.py` runs a fixture finding that cites `tools/delegate_safe.py` and asserts it reads
+NOT untraced, so removing the root goes RED (D-3036). Selftest 23/23. Live result: `untraced_closed` 29 → 27 (at
+ceiling, no longer above), `unresolved_reference` unchanged at 64, `chronic_open` unchanged at 14.
+
+**REJECTED AND REGISTERED (D-3038) — not added, and the reasons, so none can be re-proposed as this gap.**
+`specs/` (16 findings), `evals/` (3), `archive/` (40) and `backups/` (9) also cite resolving paths, but none is a
+code family where a fix's remedy lives: `archive/` is the C19 dead-code home (a citation to a file retired there
+is not "the thing that was fixed"), `backups/` are data snapshots, and `specs/`+`evals/` are design/eval artifacts.
+Broadening "trace" past "the remedy a later reader can open" would turn the reading into a weaker one (D-2644).

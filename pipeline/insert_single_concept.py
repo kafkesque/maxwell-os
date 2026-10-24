@@ -82,20 +82,38 @@ def source_provenance(conn, source_id: str) -> dict:
     row with no book cannot be attributed, cannot be audited against the source, and scores 0 on the
     author axis of ISOR (`n_authors 0`), i.e. the provenance hole propagates into ranking.
     """
+    from pipeline.book_metadata import compute_source_id
+
     rows = conn.execute(
-        "select source_books, primary_source, citation from fbs where status='PASS' "
-        "and source_ids like ? and coalesce(citation,'')<>'' limit 1", (f"%{source_id}%",)).fetchall()
+        "select source_authors from fbs where status='PASS' and source_ids like ? limit 500",
+        (f"%{source_id}%",)).fetchall()
     if not rows:
         raise SystemExit(f"FAIL-CLOSED: no PASS row for source {source_id} — its book identity cannot be "
                          "derived, and a guessed one is a fabricated provenance (D-3034)")
-    books, primary, citation = rows[0]
-    decoded = {"source_books": _decode(books), "primary_source": _decode(primary), "citation": citation}
-    blank = [k for k, v in decoded.items()
-             if v in (None, "", [], {}) or (isinstance(v, str) and not v.strip())]
-    if blank:
-        raise SystemExit(f"FAIL-CLOSED: source {source_id} carries a blank {blank} in the store — copying "
-                         "it forward would mint the same hole (BUG-990)")
-    return decoded
+    for (authors_json,) in rows:
+        for entry in _decode(authors_json) or []:
+            if not isinstance(entry, dict):
+                continue
+            book = str(entry.get("book") or "").strip()
+            author = str(entry.get("author") or "").strip()
+            title = str(entry.get("title") or "").strip()
+            if not (book and author and title):
+                continue
+            if compute_source_id(author, title) != source_id:
+                continue
+            decoded = {
+                "source_books": [book],
+                "primary_source": {"book": book, "reason": "single source"},
+                "citation": f"{author} ({title})",
+            }
+            blank = [k for k, v in decoded.items()
+                     if v in (None, "", [], {}) or (isinstance(v, str) and not v.strip())]
+            if blank:
+                raise SystemExit(f"FAIL-CLOSED: source {source_id} resolves to a book with blank {blank} "
+                                 "— copying it forward would mint the same hole (BUG-990)")
+            return decoded
+    raise SystemExit(f"FAIL-CLOSED: source {source_id} matches PASS rows but no source_authors entry "
+                     "re-derives to it — refusing a fabricated provenance (D-3034/BUG-995)")
 
 
 _IDENTITY_AXES: tuple[str, ...] = ("pipeline_run_id", "source_books", "primary_source", "citation", "gen_model")

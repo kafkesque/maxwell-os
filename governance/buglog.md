@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 758 bugs (260 open / 498 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 759 bugs (259 open / 500 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 260 open.
+> Open BUGS by severity (population = the census's 259 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 32 · UNLABELLED 101 (BUG-757) of 259 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20724,3 +20724,22 @@ refuses a raise, D-2642). Receipt: `python3 scripts/check_undeclared_encoding.py
 undeclared-encoding: files 150 of ceiling 150 | sites 384 of ceiling 384 | writes 74 of ceiling 74 |
 unresolvable 0 of ceiling 0` (EXIT 2 — at ceiling, not over). The 150 files / 384 sites that remain are OWED debt
 INSIDE the shrink-only ceiling, not a drift; further shrinkage is a low-priority future task, not a correctness gate.
+
+
+## BUG-995 (HIGH — FIXED 2026-10-24) — source_provenance copied a neighbour row's book identity (wrong author)
+- **Symptom:** T-197 re-insert of 'The Kernel of Strategy' (source_id `b51204ce6c6a9950` = Rumelt) was stamped with `citation = "Alan Cooper … About Face"`, `primary_source = About Face`, `source_books` = a 15-book convergent list.
+- **Root cause:** `pipeline/insert_single_concept.py::source_provenance` resolved book identity with `select … where source_ids like %id% … limit 1`. A shared source_id sits on MANY convergent rows whose PRIMARY source is a different book, so `limit 1` grabbed the lowest-rowid (About Face) face and copied it.
+- **Fix:** resolve the identity by RE-DERIVING the source_id from each `source_authors` entry's author+title via `pipeline/book_metadata.compute_source_id(author, title)` and matching — never copy a neighbour row's face. Fail-closed if no entry re-derives.
+- **Note:** `resolve_source_id("Good StrategyBad Strategy (Rumelt, Richard).md")` returns `0157f13ad53e41a8` (a DIFFERENT hash) while `compute_source_id("Richard Rumelt","Good Strategy/Bad Strategy")` returns the canonical `b51204ce6c6a9950` — a filename-metadata inconsistency; the author|title path is the ONE reliable home.
+- **T-197 closure:** evidence row f523504e withdrawn (BUG-990 blank provenance) → re-inserted as PASS (score 0.996, entail) with correct Rumelt provenance → BUG-976 (omitted `evidence_passages` → deberta_check "No evidence") was ALREADY fixed 2026-10-23 (writer now sets `evidence_passages=[source_text]`); a SEPARATE BUG-181-class data defect — a calibre `dummy_split_011` empty-link artifact whose 3 underscores tripped `_is_garbage_passage` max_underscore=2 — was found and fixed by cleaning the passage → BUG-991 (vacuous mechanism) fixed by full kernel passage (mechanism 454 chars). T-197 CLOSED / BUG-991 FIXED / BUG-976 FIXED.
+
+## BUG-976 (LOW — FIXED 2026-10-24) — `insert_single_concept.py` omitted `evidence_passages`; writer now sets them, row re-verified PASS
+
+**CLOSURE.** Root cause was the writer setting `source_text` but NOT `evidence_passages` /
+`evidence_passages_shown` / `source_principles`, so `deberta_check` fail-closed to `(False, 0.0, "No evidence")`
+on an honest premise. The writer now sets `evidence_passages=[source_text]` and
+`evidence_passages_shown=[source_text[:6000]]` (confirmed in code, lines 450–451). The T-197 re-insert of 'The
+Kernel of Strategy' (fb_id `164e4761…`, rowid 23647) landed `status=PASS, s5_reason=entail` with evidence populated
+— no "No evidence" path. (A SEPARATE BUG-181-class data defect was found en route — a calibre `dummy_split_011`
+empty-link artifact tripping `_is_garbage_passage` max_underscore=2 — fixed by cleaning the passage; that is a
+passage-cleanliness fix, not this bug's root cause.)

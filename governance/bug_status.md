@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**260 open** / 498 closed of 758 ids.
+**259 open** / 500 closed of 759 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -264,6 +264,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
 | BUG-975 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not | 1 |
-| BUG-976 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" | 1 |
 | BUG-992 | (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row | 1 |
 | BUG-993 | (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the | 1 |

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**260 open** / 496 closed of 756 ids.
+**260 open** / 497 closed of 757 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -198,7 +198,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-773 | (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert | 3 |
 | BUG-774 | (MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed | 1 |
 | BUG-775 | (MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares | 1 |
-| BUG-778 | (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own | 1 |
 | BUG-780 | (HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them | 1 |
 | BUG-781 | (HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the | 1 |
 | BUG-789 | (MED — OPEN) — the local model server's app config carries a Hugging Face token in plaintext | 1 |
@@ -267,3 +266,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-975 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not | 1 |
 | BUG-976 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" | 1 |
 | BUG-992 | (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row | 1 |
+| BUG-993 | (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the | 1 |

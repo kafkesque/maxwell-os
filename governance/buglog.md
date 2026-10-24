@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 756 bugs (260 open / 496 closed; highest OPEN = BUG-992) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 757 bugs (260 open / 497 closed; highest OPEN = BUG-993) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1267 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 648 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1267, D-2987/BUG-765)
 >
@@ -13422,7 +13422,7 @@ rows (exact 57, normalised 0), 0 AMBIGUOUS, 0 UNRESOLVED — the join is byte-id
 only drift was `inputs.store.rows` 7640 -> 7649 (the store grew 9 rows). The bridge now re-derives clean, so the
 anchor's authority propagates to the corpus again.
 
-## BUG-778 (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own cause
+## BUG-778 (HIGH — FIXED 2026-10-24) — a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own cause
 
 **DISCOVERED** while completing the cascade check for D-2995. The ladder's prefix behaviour is DECLARED (BUG-573/
 BUG-582: it stops at the first non-zero line and reports a prefix), but the CONSEQUENCE had no owner: a rail that has
@@ -20597,3 +20597,35 @@ of a correct write.
 from `status` at S5 time (serving_gate is already the sole status writer), have S4 leave it NULL for a status-derived
 step to fill, or make the writer status-aware — and it gets a red loop first (D-3036). MUST land before any S4
 re-injection. Registered as T-198.
+
+
+## BUG-993 (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the T-122/tier-B commit (cea5f8b) that the masked receipt had been hiding
+
+**FOUND 2026-10-24** by re-collecting the ladder receipt (`python3 scripts/run_ladder.py --collect health`, 193 declaring lines, 1103.4s) — the exact act BUG-778's "AND THE PREFIX ITSELF" section named as the cheapest high-leverage repair. This is the FIRST whole-set measurement since 2026-10-14 (the receipt was stale, so `just health` opened UNKNOWN and every "the rails are green" claim made since was a claim about a PREFIX). The re-collection DISCHARGES BUG-778's masking mechanism — the receipt is now current, `just health` opens with the measured fault set — and reveals the masking had been hiding MORE than BUG-778's 2026-10-14 count of 5.
+
+**MEASURED 2026-10-24: 13 FAULT lines (worst rc=1 over 193 lines), two classes.**
+
+REGRESSIONS FROM cea5f8b (the T-122 classification_status REPAIR + tier-B extraction-recall commit, landed 2026-10-24 14:31):
+| rail | fault (verbatim) |
+| --- | --- |
+| check_verification_sequence | `pipeline/insert_single_concept.py: calls check_mechanism_quality() outside the ONE home (T-196/D-3136)` — the NEW single-concept writer duplicated the S5 rule |
+| check_config_defaults | `NEW shadowed-declared key: failure_mode_min_length @ pipeline/pipeline_paths.py:462` (declared 300 -> measured 301) — the C12 migration read the key with a code default, not `required()` |
+| check_encoding_homes | `DRIFT scripts/check_extraction_recall.py names utf-8-sig with no allow entry` |
+| check_silent_repair | `DRIFT scripts/tier_b_owner_sheet.py:243 repairs silently (replace) with no entry` (C16) |
+| build_archive_index | `on disk but in NEITHER the index nor the declared exclusions: curation_withdrawals` |
+| check_tests | `5 NEW failure(s) outside the declared red set` (test_config_defaults_census_spec, test_governance_faces_spec, test_handoff_obligation, 2× test_served_fields_spec) |
+
+PRE-EXISTING / DATA DRIFT (not from cea5f8b):
+| rail | fault | home |
+| --- | --- | --- |
+| check_undeclared_encoding | files 151/150, sites 385/384 | T-114 |
+| check_store_columns | debt 7/8 + menu_hash OUTSIDE-COVERAGE (1049 rows) | BUG-766 |
+| check_corroboration_bit | 14 rows `source_diversity=0` but the evidence set holds 1 distinct canonical work (the bit itself is EXACT: P(≥2 works\|conv=1)=898/898) | T-119/T-120 territory |
+| verify_vec_integrity | `vec_fbs: live 7634 != fbs 7649` (vector index 15 rows behind) | new |
+| verify_artifact_authority | `checkpoint_enriched_kindsafe.jsonl: sha256 + size DRIFT` | new |
+| verify_declared_inputs | `rechunk-v4-20260929/checkpoint.jsonl` input MOVED with NO acknowledgement (C-3 class) | new |
+| check_store_authority | `EMPTY-STORE: pipeline/maxwell.db (0 bytes) carries NO table` — a probe connected to the WRONG path (relative `pipeline/maxwell.db`, not the spaced DB_PATH) and CREATED the file at 14:11 (BUG-549 shape) | new |
+
+**WHY THIS MATTERS.** This is BUG-778's class at full strength: the masked receipt let a commit (cea5f8b) land that broke 6 rails, and no face counted it because `just health` opened UNKNOWN. The receipt re-collection is the instrument that closes that blind spot, and it has now been re-collected — the masking is permanently gone, not merely understood.
+
+**OWED.** (1) Fix the 6 cea5f8b regressions in consequential order — each is a deterministic declared-home fix (route insert_single_concept.py through the ONE S5 home; read `failure_mode_min_length` loudly via `pipeline_paths.required()`; declare the utf-8-sig home for check_extraction_recall.py; delegate tier_b_owner_sheet.py:243 to `scripts/lib/artifact_encoding.py`; re-index `curation_withdrawals`; re-derive the 5 spec failures). (2) Triage the 7 drift reds — each its own forensic act: the store-writing ones (corroboration-bit 14 rows, vec-integrity 15 rows) need C13 backup + a byte receipt; the empty-store is a wrong-path probe to locate and remove, and the artifact-authority/declared-inputs drifts are completed-run-citation defects.

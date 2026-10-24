@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import ast
 import os
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -109,13 +110,21 @@ def rewrite(source: str, non_text_open: tuple[str, ...]) -> tuple[str, int]:
 
 
 def _crash_safe_write(path: Path, data: bytes) -> None:
-    """C6: tempfile in the same directory -> fsync -> os.replace (atomic on POSIX)."""
+    """C6: tempfile in the same directory -> fsync -> os.replace (atomic on POSIX), preserving mode.
+
+    `tempfile.mkstemp` mints a 0600 file and `os.replace` carries THAT mode forward, so rewriting an
+    executable module would silently drop its exec bit — a declared command written as a BARE path must
+    stay executable (BUG-842/T-146). The original mode is read first and re-applied to the tempfile
+    before the atomic replace.
+    """
+    mode = stat.S_IMODE(path.stat().st_mode)
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
     try:
         with os.fdopen(fd, "wb") as fh:
             fh.write(data)
             fh.flush()
             os.fsync(fh.fileno())
+        os.chmod(tmp, mode)
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -180,6 +189,19 @@ def selftest() -> int:
     for name, passed in checks:
         print(("  ok   " if passed else "  FAIL ") + name)
         ok = ok and passed
+    # C6/BUG-842 control: the crash-safe write must PRESERVE the executable bit (a declared bare-path
+    # command that loses its +x on rewrite is a silent break, T-146), and stay so on a second write.
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "exe_mod.py"
+        p.write_bytes(b"x = 1\n")
+        p.chmod(0o755)
+        _crash_safe_write(p, b"x = 2\n")
+        preserved = stat.S_IMODE(p.stat().st_mode) == 0o755
+        _crash_safe_write(p, b"x = 3\n")
+        preserved = preserved and stat.S_IMODE(p.stat().st_mode) == 0o755
+    mode_ok = preserved
+    print(("  ok   " if mode_ok else "  FAIL ") + "crash-safe write preserves the executable bit")
+    ok = ok and mode_ok
     print("declare-encoding selftest: " + ("all ok" if ok else "FAIL"))
     return 0 if ok else 1
 

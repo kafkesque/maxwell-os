@@ -20652,3 +20652,34 @@ shape `config/store_columns.yaml` never declared. Three sub-causes:
    is shrink-only (7), so absorbing them as debt would be refused.
 
 Remaining red: 9 drifts (7 CONSTANT-OR-BLANK + pipeline_run_id/menu_hash STATE-VIOLATION), all from (2)+(3).
+
+
+## BUG-994 (HIGH — RESOLVED 2026-10-24) — the 9 store-columns drifts cleared by DECLARATION, not debt
+
+The 9 drift signals BUG-994 opened were all traced to TWO causes, and both are now DECLARED (never absorbed as
+debt — the shrink-only ceiling of 7 is unchanged):
+
+**Cause 1 — the 15 single-concept rows (D-3130) are a second, menu-less manufacturing route.** Five `value`
+declarations were measured blank on exactly those 15 rows, and `menu_hash` (declared `state`, one fact per row)
+measured distinct 2. Re-declared in `config/store_columns.yaml`:
+- `taxonomy_match_method`, `keywords`, `related_fbs` → `role: sparse` (s5_verified, `outside: absent`): the
+  single-concept path skips the S4 taxonomy matcher / enrichment / cross-reference graph, so those fields are
+  genuinely absent there; `sparse` keeps the 15-row gap visible.
+- `source_authors`, `source_diversity` → `role: sparse` (table-wide): source_provenance reads book identity but not
+  the author list, and the single-concept rows never pass S1.5 embed_cluster.
+- `menu_hash` → `role: value` (s5_verified): the closed-menu hash (6,585 rows) PLUS the declared absence sentinel
+  `NOT_APPLICABLE` (15 rows) = distinct 2, so it is no longer one fact per row.
+
+**Cause 2 — the BUG-990 evidence row f523504e (QUARANTINE, vacuous).** It alone is blank on `pipeline_run_id`,
+`citation`, `primary_source`, kept deliberately as evidence. Re-declared:
+- `pipeline_run_id` → `role: sparse` (was `state`): the ONE blank names the evidence row, not a legitimate absence.
+- `citation`, `primary_source` → explicit `role: sparse` (were default `value`).
+
+All three sparse declarations name the evidence row and state that they REVERT to `state`/`value` when the row is
+repaired. **OWED (separate decision, not absorbed here):** repair the evidence row's blank identity
+(pipeline_run_id / source_books / citation / primary_source via `served_run()` + `source_provenance()`), then
+re-declare the three columns back. The stray 0-byte `pipeline/maxwell.db` (the BUG-457 sqlite3.connect fingerprint)
+was also removed this session.
+
+Receipt: `python3 scripts/check_store_columns.py --check` → `OWED store-columns: debt 7 of ceiling 7 | 49 declared
+column(s) | census moves 0` — ZERO drift lines remaining (only the two DECLARED OUTSIDE-COVERAGE notes).

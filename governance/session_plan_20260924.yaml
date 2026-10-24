@@ -327,6 +327,12 @@ may_touch:
 - config/golden/MASTER-ROUNDTABLE-EVAL-PROMPT-v9-S4S5-BULLETPROOF.md
 - prompts/stage/n5_modular.md
 - tools/model_eval_suite.py
+#: T-114 (2026-10-24) — THE UNDECLARED-ENCODING CAMPAIGN'S CODE FAMILY. tools/ is the third code family the
+#: mechanical `encoding='utf-8'` pass declares, alongside scripts/ (scripts/*.py) and pipeline/ (pipeline/**).
+#: scripts/declare_encoding.py --apply landed 16 tools/*.py write sites this commit; the reads slice (the remaining
+#: T-114 limb, 310 read sites) lands in tools/ again. Granted as the family, mirroring scripts/*.py — nothing
+#: outside tools/*.py becomes committable.
+- tools/*.py
 - governance/BUG698_*
 - governance/DECISION_PROPOSALS_D2939_D2940_20261011.md
 - governance/LABEL_ONTOLOGY_PROOF_20261011.md
@@ -1488,3 +1494,27 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'The widened set is EXACTLY the two dated tier-B families produced this sitting (advisory panel record + owner ruling instrument). No pipeline/** path, no pinned artifact and no will_not_touch family is involved.'
+
+- date: '2026-10-24'
+  actor: assistant
+  reason: >-
+    T-114 WRITES SLICE — the undeclared-encoding campaign's write limb landed in tools/. The mechanical
+    `encoding='utf-8'` declaration (scripts/declare_encoding.py --apply; crash-safe C6, forensic-audited byte-exact
+    and idempotent, 74 write sites across 55 files) touched 16 tools/*.py files. tools/ is the third code family the
+    campaign declares, a peer of scripts/ (scripts/*.py) and pipeline/ (pipeline/**), both already granted as
+    families. The reads slice (the remaining T-114 limb, 310 read sites) will land in tools/ again, so the family is
+    granted once rather than re-widened per commit. Nothing outside tools/*.py becomes committable.
+  owner_ack: >-
+    the owner's instruction that opened T-114 this sitting: "I started T-114 / I ran: python3
+    scripts/check_undeclared_encoding.py --list / continue with it" — the undeclared-encoding campaign is the
+    declared task, and this widening covers exactly its tools/ code family.
+  additions:
+  - pattern: tools/*.py
+    why: >-
+      T-114 undeclared-encoding campaign — mechanical encoding='utf-8' declaration on text writes/reads; 16 write
+      sites landed this commit, the reads slice (310 read sites) lands here again.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: >-
+    The widened set is EXACTLY tools/*.py — the encoding campaign's third code family, mirroring the already-granted
+    scripts/*.py and pipeline/**. No will_not_touch family, no pinned artifact, no pipeline/** crossing.

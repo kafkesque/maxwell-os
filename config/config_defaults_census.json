@@ -1,8 +1,8 @@
 {
  "counts": {
-  "modules": 643,
+  "modules": 644,
   "shadowed_declared": 300,
-  "sites": 575,
+  "sites": 574,
   "undeclared": 3
  },
  "coverage": {

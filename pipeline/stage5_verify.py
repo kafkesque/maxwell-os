@@ -742,6 +742,32 @@ def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
     return passed, round(max(grade, 0.0), 3), detail
 
 
+def mechanism_floor_check(fb: dict) -> tuple[bool, str]:
+    """The mechanism FLOOR (length + tautology) as a SHARED measurement — NOT a decision check.
+
+    D-3140/T-197 (BUG-991): the single-concept generator enforces this floor at generation time so it never
+    writes an unservable row; D-3136/T-196 keeps the DECISION check (check_mechanism_quality) at ONE home
+    (pipeline/verify_record.py). This function is the shared MEASUREMENT both call, so the floor has ONE
+    definition (D-2642) without making the generator a second home for the decision.
+    """
+    mechanism = fb.get("mechanism", "").strip()
+    # 1. Minimum mechanism length
+    if len(mechanism) < MECHANISM_MIN_LENGTH:
+        return False, (
+            f"Mechanism too short ({len(mechanism)} chars < {MECHANISM_MIN_LENGTH}) — likely vacuous."
+        )
+    # 2. Tautological "because" detection
+    mech_lower = mechanism.lower()
+    for banned_prefix in BANNED_MECHANISM_PREFIXES:
+        if mech_lower.startswith(banned_prefix) or banned_prefix in mech_lower:
+            # "X works because it enables X" is tautological
+            return False, (
+                f"Mechanism contains tautological pattern '{banned_prefix}' — "
+                "restates definition rather than explaining causal chain."
+            )
+    return True, "Mechanism floor OK"
+
+
 def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
     """Pre-filter: check mechanism quality before NLI to prevent citation echo gaming.
 
@@ -760,28 +786,13 @@ def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
         (passed, score, detail). score=0.0 means auto-quarantine. score=0.5 means
         escalate to LLM regardless of NLI outcome.
     """
-    mechanism = fb.get("mechanism", "").strip()
+    ok_floor, floor_detail = mechanism_floor_check(fb)
+    if not ok_floor:
+        return False, 0.0, floor_detail + " QUARANTINE."
+
     source_books = fb.get("source_books", [])
     n_sources = len(source_books) if isinstance(source_books, list) else 0
     evidence = fb.get("evidence", "cited")
-
-    # 1. Minimum mechanism length
-    if len(mechanism) < MECHANISM_MIN_LENGTH:
-        return False, 0.0, (
-            f"Mechanism too short ({len(mechanism)} chars < {MECHANISM_MIN_LENGTH}) — "
-            "likely vacuous. QUARANTINE."
-        )
-
-    # 2. Tautological "because" detection
-    mech_lower = mechanism.lower()
-    for banned_prefix in BANNED_MECHANISM_PREFIXES:
-        if mech_lower.startswith(banned_prefix) or banned_prefix in mech_lower:
-            # Check if the because-clause is the ONLY content
-            # "X works because it enables X" is tautological
-            return False, 0.0, (
-                f"Mechanism contains tautological pattern '{banned_prefix}' — "
-                "restates definition rather than explaining causal chain. QUARANTINE."
-            )
 
     # 3. Citation echo override: high source count + axiomatic evidence
     if n_sources > CITATION_ECHO_SOURCE_THRESHOLD and evidence == "axiomatic":

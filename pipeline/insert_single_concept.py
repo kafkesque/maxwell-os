@@ -373,7 +373,7 @@ def main() -> int:
     # returned a sub-floor one-liner and S5 quarantined it downstream (BUG-991). The floor and the register
     # are read from their ONE homes (stage5.mechanism_min_length via the verifier's own constant, and
     # single_concept.extraction_type), never typed here (C12c).
-    from pipeline.stage5_verify import MECHANISM_MIN_LENGTH, check_mechanism_quality
+    from pipeline.stage5_verify import MECHANISM_MIN_LENGTH, mechanism_floor_check
 
     mech_min = MECHANISM_MIN_LENGTH
     sc = cfg.get("single_concept") or {}
@@ -456,7 +456,7 @@ def main() -> int:
     # D-3140 (T-197/BUG-991): enforce the mechanism floor AT THE GENERATOR, reusing the ONE HOME
     # (check_mechanism_quality) instead of letting S5 quarantine an unservable row downstream. One targeted
     # retry — temp=0.0, so a sterner prompt is a DIFFERENT input, not a re-roll of the same answer.
-    ok_mech, _mech_score, mech_detail = check_mechanism_quality(fb)
+    ok_mech, mech_detail = mechanism_floor_check(fb)
     if not ok_mech:
         repair_prompt = (
             "Your mechanism for this concept was rejected by the quality gate:\n"
@@ -475,7 +475,7 @@ def main() -> int:
             repaired_mech = ""
         if repaired_mech:
             fb["mechanism"] = repaired_mech
-        ok_mech, _mech_score, mech_detail = check_mechanism_quality(fb)
+        ok_mech, mech_detail = mechanism_floor_check(fb)
         if not ok_mech:
             raise SystemExit(
                 f"FAIL-CLOSED: generator mechanism still rejected after one retry — {mech_detail}. "

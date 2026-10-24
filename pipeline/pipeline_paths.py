@@ -459,7 +459,7 @@ S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage
 
 # ── Stage 4 settings (D2082: Type-aware routing) ───────────────────────
 S4_DEDUP_COSINE_THRESHOLD = float(_CFG.get("stage4", {}).get("dedup_cosine_threshold", 0.92))       # D2231: C12 (was hardcoded)
-S4_FAILURE_MODE_MIN_LENGTH = int(_CFG.get("stage4", {}).get("failure_mode_min_length", 10))         # D2488/T-122: C12 (was hardcoded 10 in stage4_merge + _classify_s4)
+S4_FAILURE_MODE_MIN_LENGTH = int(required(_CFG, "stage4", "failure_mode_min_length", where=_CFG_HOME))  # D2488/T-122/D-2644: C12 read loudly (was a code default 10)
 S4_SEMANTIC_NEAR_THRESHOLD = float(_CFG.get("stage4", {}).get("semantic_near_threshold", 0.80))     # D2231: C12 (was hardcoded)
 S4_RELATED_FBS_MAX_NEIGHBORS = int(_CFG.get("stage4", {}).get("related_fbs_max_neighbors", 20))       # BUG-188: per-FB related_fbs neighbor cap (was unbounded O(n²) → 32M edges → 2GB truncation)
 S4_RELATED_FBS_EXCLUDE_DOMAINS = list(_CFG.get("stage4", {}).get("related_fbs_exclude_domains", ["emerging"]))  # BUG-188: fallback domains excluded from domain_overlap (shared fallback ≠ relationship)

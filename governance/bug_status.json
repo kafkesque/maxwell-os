@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 760,
-  "open_n": 256,
-  "closed_n": 504,
+  "open_n": 255,
+  "closed_n": 505,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -899,11 +899,6 @@
       "events": 2
     },
     {
-      "id": "BUG-741",
-      "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible",
-      "events": 4
-    },
-    {
       "id": "BUG-743",
       "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE",
       "events": 1
@@ -1617,6 +1612,7 @@
     "BUG-735",
     "BUG-739",
     "BUG-740",
+    "BUG-741",
     "BUG-742",
     "BUG-744",
     "BUG-745",

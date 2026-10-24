@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (256 open / 504 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (255 open / 505 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 82 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 255 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 255 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20786,3 +20786,36 @@ reference) — the exact match contradicted its own declaration and inflated the
 `chronic_open` 16 unchanged (unrelated class). The 21 remaining unresolved decision refs are GENUINELY absent ids
 (D-271, D-795, D-1074, D-1075, D-2648, D-2650, D-2651, D-2653, D-2904, D-3055, D-2537, D150, D2534, D274,
 D3251, D410, D824, plus sentinels D-0000/D-999/D-9002) — the missing-D-record drafting work, not this defect.
+
+## BUG-741 (MED — CLOSED 2026-10-24) — the disposition/content_type conflation is discharged on ALL four facets, and the two named residuals are each closed by a measured act
+
+**CLOSURE (register disposition — the fixes landed under D-2965/D-2967/BUG-977; this heading closes the bug).**
+The `proposed` field conflated two closed, disjoint vocabularies (content_type roles vs dispositions), and the defect
+manifested on FOUR facets, each now measured-closed:
+
+1. **The MAP (field split, D-2967).** `config/content_types.yaml#adjudication_map` now declares
+   `role_key: proposed_content_type` / `disposition_key: proposed_disposition` / `legacy_conflated_key: proposed`
+   (refused loudly if present). The key names the vocabulary; the value is a property of the closed vocabulary.
+2. **The LEAF WRITE GATE (D-2965).** `pipeline.content_types.leaf_label_fault` refuses `disposition:<v>` before any
+   DB use; a control asserts the scope split so the shared S2 validator stays permissive while the leaf refuses.
+3. **THE ROUTER TIER-1 (D-2967).** `_ADJUDICATION_MAP` admits ROLES only (542 → 167 entries); a disposition is never
+   admitted as a role, and three shapes RAISE at import instead of being skipped (legacy key, both keys, undeclared
+   role).
+4. **THE GENERAL CASE (writer, BUG-977).** A disposition ruling on a SERVED row is a WITHDRAWAL, archive-first —
+   `scripts/withdraw_curation_rows.py` (built 2026-10-23) is the declared `withdraw_with_archive` act; the serving
+   predicate is read from `pipeline/retrieve.py`, never restated.
+
+**THE TWO NAMED RESIDUALS, EACH DISCHARGED BY A MEASURED ACT.**
+- (a) *The withdrawal writer was OWED* — now BUILT: `scripts/withdraw_curation_rows.py` exists and fired under
+  BUG-977 (3 dropped + 3 hold, archive `archive/curation_withdrawals/20261023T164040Z/`).
+- (b) *Map hygiene: ONE fb_id (334554e09e9c) carried 5 identical role rows* (silently last-wins in tier 1) — now
+  DEDUPED: the 5 rows were EXACT duplicates (`growth_edge` / confidence `high` / current `principle` / identical
+  D-2748 reason), so 4 were dropped atomically (C6, C13 backup `governance/content_type_adjudication.json.pre_dedup_*`).
+  **MEASURED after:** map 556 → 552 rows; role rows 175 → 171 with 171 distinct fb_ids; disposition rows 381 with
+  381 distinct fb_ids — zero duplicate fb_ids in either vocabulary. The gate's dry run is UNCHANGED (apply 0 |
+  already 22 | disposition 1 NOT OWED — `27fabecb4f68` is already not in the served path | store census CLEAN),
+  so the dedup moved no label and no resolution.
+
+**WHY NOT A COLUMN, RESTATED.** No disposition COLUMN was created (D-2952: a column lands with its writer; C28: bloat
+is opt-in; BUG-499: `status` is a VERIFICATION verdict, not a curation decision). A disposition now has its own act —
+it is simply not a role.

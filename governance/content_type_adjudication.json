@@ -3,8 +3,8 @@
   "decision": "D-2747",
   "generated": "2026-10-02",
   "source": "checkpoint.jsonl rechunk-v4-20260929",
-  "n_rows": 546,
-  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152} | BUG-714 (D-2947, owner 2026-10-12): 14 legacy tool_instruction rows re-adjudicated — 10 principle, 3 keep tool_instruction, 1 noise_drop (ARED). | D-2946 (2026-10-12): removed 27 keyword-heuristic 'named system/protocol/workflow, not a single command' entries (conf=med) — baked ti_to_pt_keywords false positives; those fb_ids now fall through to the corrected tier-2/3/4 rules. | D-2967 (BUG-741, 2026-10-12): the destination is SPLIT BY VOCABULARY — every row carries exactly one of proposed_content_type (a declared content_type role, 171 rows) or proposed_disposition (a declared disposition, 375 rows). The conflated 'proposed' key is gone so tier 1 (pipeline/content_types.py) can never read a disposition as a role; the router now RAISES if the 'proposed' key reappears. The KEY names the vocabulary: the kind is a property of the value.",
+  "n_rows": 552,
+  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152} | BUG-714 (D-2947, owner 2026-10-12): 14 legacy tool_instruction rows re-adjudicated — 10 principle, 3 keep tool_instruction, 1 noise_drop (ARED). | D-2946 (2026-10-12): removed 27 keyword-heuristic 'named system/protocol/workflow, not a single command' entries (conf=med) — baked ti_to_pt_keywords false positives; those fb_ids now fall through to the corrected tier-2/3/4 rules. | D-2967 (BUG-741, 2026-10-12): the destination is SPLIT BY VOCABULARY — every row carries exactly one of proposed_content_type (a declared content_type role, 171 rows) or proposed_disposition (a declared disposition, 375 rows). The conflated 'proposed' key is gone so tier 1 (pipeline/content_types.py) can never read a disposition as a role; the router now RAISES if the 'proposed' key reappears. The KEY names the vocabulary: the kind is a property of the value.; dedup exact-duplicate role rows (334554e09e9c x5 -> 1, D-2967 map-hygiene residual)",
   "rows": [
     {
       "fb_id": "c848cbeb28c6eaffd40e0417f8515bf123726613c8aba82414d44d7dd6e851ac",
@@ -497,27 +497,6 @@
       "confidence": "high"
     },
     {
-      "fb_id": "334554e09e9caaf436e2e45274511a531c8a75c3dc70d73ebef1415199be36a3",
-      "current": "principle",
-      "proposed_content_type": "growth_edge",
-      "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): exact_dup,open_tension",
-      "confidence": "high"
-    },
-    {
-      "fb_id": "334554e09e9caaf436e2e45274511a531c8a75c3dc70d73ebef1415199be36a3",
-      "current": "principle",
-      "proposed_content_type": "growth_edge",
-      "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): exact_dup,open_tension",
-      "confidence": "high"
-    },
-    {
-      "fb_id": "334554e09e9caaf436e2e45274511a531c8a75c3dc70d73ebef1415199be36a3",
-      "current": "principle",
-      "proposed_content_type": "growth_edge",
-      "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): exact_dup,open_tension",
-      "confidence": "high"
-    },
-    {
       "fb_id": "845ddd34c439d55c9b5d6c3129e9e47fea7d92f8fcfb53c69e060434a0dbed8e",
       "current": "principle",
       "proposed_disposition": "quarantine",
@@ -907,13 +886,6 @@
       "current": "principle",
       "proposed_content_type": "growth_edge",
       "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): open_tension",
-      "confidence": "high"
-    },
-    {
-      "fb_id": "334554e09e9caaf436e2e45274511a531c8a75c3dc70d73ebef1415199be36a3",
-      "current": "principle",
-      "proposed_content_type": "growth_edge",
-      "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): exact_dup,open_tension",
       "confidence": "high"
     },
     {
@@ -3899,5 +3871,5 @@
       "proposed_content_type": "principle"
     }
   ],
-  "last_updated": "2026-10-12"
+  "last_updated": "2026-10-24"
 }

@@ -248,7 +248,7 @@ def main() -> None:
     bak = VC.with_name(f"verified_core.jsonl.bak_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_pre_revote")
     shutil.copy2(VC, bak)
     print(f"\n[C13] backup: {bak}")
-    VC.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in vc))
+    VC.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in vc), encoding='utf-8')
     print("[done] verified_core.jsonl updated")
 
 

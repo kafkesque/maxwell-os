@@ -892,7 +892,7 @@ def _acquire_single_writer_lock() -> None:
             )
         print(f"   ⚠️  reclaiming stale S5 lock (pid {held} is gone)")
         S5_LOCK_PATH.unlink(missing_ok=True)
-    S5_LOCK_PATH.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
+    S5_LOCK_PATH.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n", encoding='utf-8')
     import atexit
     atexit.register(lambda: S5_LOCK_PATH.unlink(missing_ok=True))
     print(f"   🔒 S5 single-writer lock held (pid {os.getpid()})")
@@ -992,7 +992,7 @@ def _write_input_fingerprint() -> None:
     try:
         S5_INPUT_FINGERPRINT_PATH.parent.mkdir(parents=True, exist_ok=True)
         S5_INPUT_FINGERPRINT_PATH.write_text(
-            json.dumps(payload, indent=2, sort_keys=True) + "\n"
+            json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding='utf-8'
         )
     except Exception as e:
         print(f"   ⚠️  Could not persist S5 input fingerprint: {e}")

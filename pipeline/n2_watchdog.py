@@ -57,7 +57,7 @@ def main() -> None:
     except Exception:
         order, total = [], 0
 
-    with open(WATCH, "a") as w:
+    with open(WATCH, "a", encoding='utf-8') as w:
         w.write(f"=== n2_watchdog started {datetime.datetime.now():%Y-%m-%d %H:%M:%S} (pid={os.getpid()}) ===\n")
         w.flush()
         while True:

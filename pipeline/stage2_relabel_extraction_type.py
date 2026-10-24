@@ -139,7 +139,7 @@ def _acquire_lock(checkpoint_path: str) -> Path:
         except (ValueError, OSError):
             # stale lock (owner dead) — safe to take over
             pass
-    lock_path.write_text(f"{os.getpid()}\n")
+    lock_path.write_text(f"{os.getpid()}\n", encoding='utf-8')
     return lock_path
 
 

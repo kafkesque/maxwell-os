@@ -239,7 +239,7 @@ def run_prefilter(in_place: bool = False, min_len: int = None,
         "total": len(segments),
         "kept": len(kept),
         "dropped": len(dropped),
-    }) + "\n")
+    }) + "\n", encoding='utf-8')
 
     # BUG-614: bind the prefilter completion flag to the code that produced it.
     from pipeline.stamp import write_stage_code_fingerprint

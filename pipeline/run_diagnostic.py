@@ -122,7 +122,7 @@ def _acquire_process_lock() -> bool:
             _PID_FILE.unlink(missing_ok=True)
 
     # Write current PID
-    _PID_FILE.write_text(str(_ospid.getpid()))
+    _PID_FILE.write_text(str(_ospid.getpid()), encoding='utf-8')
     return True
 
 def _release_process_lock() -> None:
@@ -186,7 +186,7 @@ def _start_caffeinate() -> bool:
             ["/usr/bin/caffeinate", "-i", "-d", "-s"],
             stdout=_sp3.DEVNULL, stderr=_sp3.DEVNULL,
         )
-        _CAFFEINATE_PID_FILE.write_text(str(proc.pid))
+        _CAFFEINATE_PID_FILE.write_text(str(proc.pid), encoding='utf-8')
         print(f"☕ Caffeinate started (PID {proc.pid}) — laptop will NOT sleep")
         return True
     except Exception as e:
@@ -249,7 +249,7 @@ def _save_diag_state(state: dict) -> None:
     import os as _os2
     _path = _get_diag_state_path()
     tmp = str(_path) + ".tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding='utf-8') as f:
         _json.dump(state, f, indent=2, default=str)
         f.flush()
         _os2.fsync(f.fileno())

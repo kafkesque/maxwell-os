@@ -118,7 +118,7 @@ def main() -> None:
         lines.append("---")
         lines.append("")
 
-    OUT.write_text("\n".join(lines))
+    OUT.write_text("\n".join(lines), encoding='utf-8')
     print(f"wrote {OUT.name}: {len(rows)} rows (band={args.band})")
 
 

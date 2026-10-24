@@ -74,7 +74,7 @@ def log(msg: str) -> None:
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{timestamp}] {msg}"
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG_FILE, "a") as f:
+    with open(LOG_FILE, "a", encoding='utf-8') as f:
         f.write(line + "\n")
     print(line)
 
@@ -130,7 +130,7 @@ def _load_state() -> dict:
 def _save_state(state: dict) -> None:
     """Save watchdog state atomically."""
     tmp = STATE_FILE.with_suffix(".tmp")
-    tmp.write_text(json.dumps(state, indent=2))
+    tmp.write_text(json.dumps(state, indent=2), encoding='utf-8')
     tmp.replace(STATE_FILE)
 
 def _reset_state() -> None:

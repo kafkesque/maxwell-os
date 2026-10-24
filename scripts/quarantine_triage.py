@@ -107,7 +107,7 @@ def write_csv(records: list[dict]) -> Path:
         "discipline_raw", "domains_raw", "definition", "mechanism", "source_books",
         "evidence_passages",
     ]
-    with OUT_CSV.open("w", newline="") as f:
+    with OUT_CSV.open("w", newline="", encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
         for r in records:

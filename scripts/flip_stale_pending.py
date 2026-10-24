@@ -95,7 +95,7 @@ def main() -> int:
         "flipped": len(flipped), "fb_ids": sorted(flipped),
         "gen_model": "flip_stale_pending.py (deterministic; no generation)",
         "pipeline_commit": "v3.0-D2634-followup",
-    }, indent=2, ensure_ascii=False) + "\n")
+    }, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
     print(f"[R14] manifest: {MANIFEST}")
     return 0
 

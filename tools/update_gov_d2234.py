@@ -60,7 +60,7 @@ else:
     idx = len(log_text)
 
 new_log = log_text[:idx] + d2234 + "\n" + log_text[idx:]
-log_path.write_text(new_log)
+log_path.write_text(new_log, encoding='utf-8')
 print("✅ Updated DECISION-LOG.md with D2234")
 
 # Update aggregated_remaining_tasks.md
@@ -71,5 +71,5 @@ tasks_text = tasks_path.read_text()
 tasks_text = tasks_text.replace("T-009 (P1): ❌", "T-009 (P1): ✅ DONE D2234")
 tasks_text = tasks_text.replace("T-015 (P1): ❌", "T-015 (P1): ✅ DONE D2234 (DM at 9, target 12)")
 
-tasks_path.write_text(tasks_text)
+tasks_path.write_text(tasks_text, encoding='utf-8')
 print("✅ Updated aggregated_remaining_tasks.md")

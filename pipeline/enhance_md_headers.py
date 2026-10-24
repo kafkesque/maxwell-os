@@ -208,7 +208,7 @@ def enhance_book(md_path: Path, dry_run: bool = False, force_llm: bool = False) 
     if not dry_run and regex_added > 0:
         # Crash-safe write
         tmp_path = md_path.with_suffix('.tmp')
-        tmp_path.write_text(enhanced_text)
+        tmp_path.write_text(enhanced_text, encoding='utf-8')
         tmp_path.replace(md_path)
 
     return {

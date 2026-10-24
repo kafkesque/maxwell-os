@@ -140,7 +140,7 @@ def main() -> int:
     res = evaluate(cfg, rowids, mat, meta)
     res["store"] = {"vec_rows": len(rowids), "fbs_rows": len(meta), "dim": int(mat.shape[1]), "k": cfg["k"]}
     dest = ROOT / "governance" / "KNN_ARM_EVAL_20260923.json"
-    dest.write_text(json.dumps(res, indent=2))
+    dest.write_text(json.dumps(res, indent=2), encoding='utf-8')
     print(json.dumps(res, indent=2))
     print(f"\nwritten: {dest.relative_to(ROOT)}", file=sys.stderr)
     return 0

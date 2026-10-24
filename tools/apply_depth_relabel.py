@@ -45,7 +45,7 @@ def main() -> int:
                 print(f"  {current_id}: {m2.group(2)} -> {relabels[current_id]}")
                 changed += 1
 
-    golden.write_text("\n".join(lines) + "\n")
+    golden.write_text("\n".join(lines) + "\n", encoding='utf-8')
 
     # verify parse + distribution (D2367: also count list-form expected_fb — the
     # old isinstance(dict) filter silently excluded CONV-037/039-style list entries)

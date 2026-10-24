@@ -101,7 +101,7 @@ def main() -> None:
         print(f"  {k}: {v}")
 
     # Write back
-    with open(gs_path, "w") as f:
+    with open(gs_path, "w", encoding='utf-8') as f:
         yaml.dump(gs, f, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
 
     print(f"\n✅ Written to {gs_path}")

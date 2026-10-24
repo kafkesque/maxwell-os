@@ -46,7 +46,7 @@ def main() -> int:
         for c in curve:
             print(f"   coverage {c['coverage']:.0%} (n={c['n']:3d}) accuracy {c['accuracy']:.3f}")
     dest=ROOT/'governance'/'depth_selective_prediction.json'
-    tmp=dest.with_suffix('.json.tmp'); tmp.write_text(json.dumps(out,indent=2)); os.replace(tmp,dest)
+    tmp=dest.with_suffix('.json.tmp'); tmp.write_text(json.dumps(out,indent=2), encoding='utf-8'); os.replace(tmp,dest)
     print('wrote',dest)
     return 0
 if __name__=='__main__': raise SystemExit(main())

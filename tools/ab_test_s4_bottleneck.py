@@ -266,7 +266,7 @@ def main() -> None:
             "silent failures are reproduced. Investigate the per-FB mismatches above.",
         ]
 
-    OUT_MD.write_text("\n".join(md) + "\n")
+    OUT_MD.write_text("\n".join(md) + "\n", encoding='utf-8')
     OUT_JSON.write_text(json.dumps({
         "model": args.model, "n": n, "seed": args.seed,
         "batch_size": args.batch_size, "max_tokens": args.max_tokens,
@@ -274,7 +274,7 @@ def main() -> None:
         "path_b": {"total_s": b_total, "avg_s": b_total / n, "accuracy": b_acc, "failures": b_fail_count},
         "parity": parity, "speedup_x": speedup, "gate_pass": gate_pass,
         "rows": rows,
-    }, indent=2) + "\n")
+    }, indent=2) + "\n", encoding='utf-8')
 
     print(f"\n📄 Report: {OUT_MD}")
     print(f"📄 Data:   {OUT_JSON}")

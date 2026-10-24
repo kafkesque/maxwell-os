@@ -185,7 +185,7 @@ def main() -> int:
 
     if args.discover:
         candidates = discover(seeds, STAGE1_CHECKPOINT)
-        CANDIDATES_PATH.write_text(json.dumps(candidates, indent=2, ensure_ascii=False))
+        CANDIDATES_PATH.write_text(json.dumps(candidates, indent=2, ensure_ascii=False), encoding='utf-8')
         print(f"✅ {len(candidates)} candidates -> {CANDIDATES_PATH.name}")
         for name, c in candidates.items():
             print(f"  {name}: depth={c['depth']} books={c['books']}")
@@ -194,7 +194,7 @@ def main() -> int:
     if args.generate:
         candidates = json.loads(CANDIDATES_PATH.read_text())
         drafts = generate(candidates, args.model)
-        DRAFTS_PATH.write_text(json.dumps(drafts, indent=2, ensure_ascii=False))
+        DRAFTS_PATH.write_text(json.dumps(drafts, indent=2, ensure_ascii=False), encoding='utf-8')
         print(f"✅ {len(drafts)} drafts -> {DRAFTS_PATH.name}")
         return 0
 

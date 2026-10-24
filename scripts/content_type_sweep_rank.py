@@ -152,7 +152,7 @@ def main() -> None:
         "counts": counts,
         "backlog": backlog,
     }
-    OUT_JSON.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    OUT_JSON.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding='utf-8')
 
     # human-readable markdown
     lines: List[str] = []
@@ -173,7 +173,7 @@ def main() -> None:
         reason = (r["reason"] or "")[:60]
         lines.append(f"| {r['rank']} | {r['example_id']} | {name} | {disc} | {r['status']} | {r['content_type'] or ''} | {conf} | {reason} |")
     lines.append("")
-    OUT_MD.write_text("\n".join(lines))
+    OUT_MD.write_text("\n".join(lines), encoding='utf-8')
 
     print(f"wrote {OUT_JSON.name} + {OUT_MD.name}")
     print("counts:", json.dumps(counts, indent=2))

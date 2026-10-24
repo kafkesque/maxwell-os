@@ -188,7 +188,7 @@ def _write_resume_marker(stage_id: str, *, paused: bool = False) -> None:
         "run_id": get_run_id(),
         "timestamp": time.time(),
     }
-    _RESUME_MARKER.write_text(_json.dumps(state))
+    _RESUME_MARKER.write_text(_json.dumps(state), encoding='utf-8')
 
 
 def _clear_resume_marker() -> None:
@@ -254,7 +254,7 @@ def _write_checkpoint_manifest(stage_id: str) -> None:
     }
     mp = _manifest_path(stage_id)
     mp.parent.mkdir(parents=True, exist_ok=True)
-    mp.write_text(json.dumps(manifest, indent=2))
+    mp.write_text(json.dumps(manifest, indent=2), encoding='utf-8')
 
 
 def _checkpoint_is_valid(stage_id: str) -> bool:

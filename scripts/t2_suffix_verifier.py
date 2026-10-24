@@ -187,7 +187,7 @@ def main() -> int:
         "pipeline_commit": "deterministic-rule", "policy": cfg.get("policy"),
         "whole_kb": {"rows_scanned": len(rows), "findings": counts, "items": findings},
         "model_flagged_pairs": {"n": len(flagged), "verdicts": flagged_counts, "items": flagged},
-    }, indent=2))
+    }, indent=2), encoding='utf-8')
     print("T2 suffix verifier (deterministic — no model)")
     print("  KB rows scanned          : " + str(len(rows)))
     print("  whole-KB suffix findings : " + json.dumps(counts, sort_keys=True))

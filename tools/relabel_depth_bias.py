@@ -105,7 +105,7 @@ def main() -> int:
     relabel_count = sum(1 for r in results if r["recommend"])
     print("=" * 78)
     print(f"recommend relabel: {relabel_count}/{len(results)}")
-    json.dump(results, open(OUT_JSON, "w"), indent=2)
+    json.dump(results, open(OUT_JSON, "w", encoding='utf-8'), indent=2)
     print(f"flag list -> {OUT_JSON}")
     return 0
 

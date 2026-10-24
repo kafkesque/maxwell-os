@@ -53,7 +53,7 @@ def _load() -> dict:
 def _save(data: dict) -> None:
     bak = SETTINGS_PATH.with_suffix(f".json.bak-leverab-{datetime.now():%Y%m%d-%H%M%S}")
     shutil.copy2(SETTINGS_PATH, bak)
-    with open(SETTINGS_PATH, "w") as f:
+    with open(SETTINGS_PATH, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=2)
     print(f"  backup: {bak.name}")
 
@@ -115,7 +115,7 @@ def measure(model: str, label: str, n_prompts: int, max_tokens: int, timeout: in
     print(f"[{label}] mean decode {mean:.2f} tok/s (median {med:.2f}, n={len(rates)})")
     row = {"label": label, "model": model, "mean": round(mean, 2),
            "median": round(med, 2), "n": len(rates), "ts": datetime.now().isoformat()}
-    with open(RESULTS, "a") as f:
+    with open(RESULTS, "a", encoding='utf-8') as f:
         f.write(json.dumps(row) + "\n")
 
 

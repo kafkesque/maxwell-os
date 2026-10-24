@@ -175,7 +175,7 @@ def done_keys() -> set[tuple[str, str]]:
 
 def append(row: dict) -> None:
     """Append one result row to the checkpoint (crash-safe append)."""
-    with CKPT.open('a') as fh:
+    with CKPT.open('a', encoding='utf-8') as fh:
         fh.write(json.dumps(row) + chr(10))
 
 

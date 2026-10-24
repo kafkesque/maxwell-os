@@ -301,7 +301,7 @@ def monitor_run(cmd: list[str], run_id: str | None = None) -> dict:
             for k, v in stage_analyses.items()
         },
     }
-    with open(history_file, "a") as f:
+    with open(history_file, "a", encoding='utf-8') as f:
         f.write(json.dumps(history_entry, default=str) + "\n")
 
     # Print summary

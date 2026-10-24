@@ -73,7 +73,7 @@ def prefilter(threshold: float) -> None:
         "total_groups": len(groups),
         "subset_pairs": len(subset),
         "pairs": subset,
-    }, indent=2, ensure_ascii=False) + "\n")
+    }, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
 
     print(f"total candidate groups: {len(groups)}")
     print(f"pairs with def+mech Jaccard >= {threshold}: {len(subset)}")

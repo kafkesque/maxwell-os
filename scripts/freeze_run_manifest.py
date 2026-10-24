@@ -141,7 +141,7 @@ def main() -> int:
 
     manifest = build_manifest()
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    args.out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding='utf-8')
 
     print(f"🧊 Run manifest frozen → {args.out}")
     print(f"   git_head:      {manifest['git_head']}")

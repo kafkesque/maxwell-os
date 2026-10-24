@@ -250,7 +250,7 @@ def main():
 
         if args.output:
             out_path = Path(args.output)
-            with open(out_path, "w") as f:
+            with open(out_path, "w", encoding='utf-8') as f:
                 json.dump(results, f, indent=2, default=str)
             print(f"📄 Results saved to {out_path}")
 

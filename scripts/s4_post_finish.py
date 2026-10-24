@@ -224,13 +224,13 @@ def main() -> int:
         report = {"timestamp": _dt.datetime.now().isoformat(), "state": state,
                   "status": "STOPPED", "note": "Do NOT advance. "
                   "INTERRUPTED → resume S4; CONDITIONAL → re-run to retry; FAILED → fix then re-run."}
-        REPORT_PATH.write_text(json.dumps(report, indent=2))
+        REPORT_PATH.write_text(json.dumps(report, indent=2), encoding='utf-8')
         print(f"🛑 state={state} — stopping. See {REPORT_PATH}")
         return 1 if state != "RUNNING" else 0
 
     # CLEAN
     report = run_chain(args.advance)
-    REPORT_PATH.write_text(json.dumps(report, indent=2))
+    REPORT_PATH.write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(f"\n📋 report written to {REPORT_PATH}")
     print(f"   final status: {report.get('status')}")
     return 0

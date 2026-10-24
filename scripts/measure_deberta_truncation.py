@@ -151,7 +151,7 @@ def main() -> int:
 
     gov_dir = _ROOT / "governance"
     gov_dir.mkdir(parents=True, exist_ok=True)
-    (gov_dir / "measure_deberta_truncation.json").write_text(json.dumps(stats, indent=2) + "\n")
+    (gov_dir / "measure_deberta_truncation.json").write_text(json.dumps(stats, indent=2) + "\n", encoding='utf-8')
 
     d = stats["definition"]
     e = stats["evidence_max_passage"]
@@ -187,7 +187,7 @@ The binding constraint is the **256-char truncation**, not DeBERTa's 512-token
 window: {d['pct_over_hyp_chars']}% of definitions exceed 256 chars (content lost),
 but only {d['pct_over_512_tokens']}% would exceed 512 tokens if untruncated.
 """
-    (gov_dir / "measure_deberta_truncation.md").write_text(md)
+    (gov_dir / "measure_deberta_truncation.md").write_text(md, encoding='utf-8')
     print(md)
     return 0
 

@@ -187,7 +187,7 @@ def main() -> int:
         "input": str(AGG),
         "summary": s,
         "rows_changed": len(result["changed"]),
-    }, indent=2, ensure_ascii=False) + "\n")
+    }, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
     print(f"[R14] manifest: {MANIFEST}")
     print("[done] verified_core.jsonl updated")
     return 0

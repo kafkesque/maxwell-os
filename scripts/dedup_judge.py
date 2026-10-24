@@ -106,7 +106,7 @@ def judge(stems: List[str]) -> None:
         for i in distinct:
             plan["distinct_kept"].append(members[i]["fb_id"])
 
-    OUT_PLAN.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\n")
+    OUT_PLAN.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
     print(f"\nwrote {OUT_PLAN}")
     print(f"  duplicate_of entries: {len(plan['duplicate_of'])}")
     print(f"  distinct kept: {len(plan['distinct_kept'])}")

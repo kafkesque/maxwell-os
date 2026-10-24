@@ -61,7 +61,7 @@ def main() -> None:
                             found[fid] = rec
 
     n = 0
-    with open(OUT, "w") as out:
+    with open(OUT, "w", encoding='utf-8') as out:
         for fid, rec in found.items():
             rec["application"] = APPLICATIONS[fid[:8]]
             out.write(json.dumps(rec, ensure_ascii=False) + "\n")

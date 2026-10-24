@@ -251,7 +251,7 @@ def _rescore(cfg: dict[str, Any], models: list[str], sheet: Path) -> None:
     report["measured_at"] = prior.get("measured_at", "")
     report["sheet"] = prior.get("sheet", "")
     report["raw_answers"] = prior["raw_answers"]
-    OUT_JSON.write_text(json.dumps(report, indent=2))
+    OUT_JSON.write_text(json.dumps(report, indent=2), encoding='utf-8')
     _write_md(report, models)
     print("re-scored from stored answers (no model calls)\n" + "=" * 88)
     for task, entry in sorted(report["tasks"].items()):
@@ -310,7 +310,7 @@ def _write_md(report: dict[str, Any], models: list[str]) -> None:
               "enough to reject a judge that does not beat the constant answer, not enough to "
               "certify one. The proper instrument (Krippendorff alpha + a per-task n_min) is still "
               "unbuilt — market research A1/A2."]
-    OUT_MD.write_text("\n".join(lines) + "\n")
+    OUT_MD.write_text("\n".join(lines) + "\n", encoding='utf-8')
 
 
 def main() -> int:
@@ -354,7 +354,7 @@ def main() -> int:
     report["sheet"] = str(SHEET.relative_to(ROOT))
     report["raw_answers"] = answers
 
-    OUT_JSON.write_text(json.dumps(report, indent=2))
+    OUT_JSON.write_text(json.dumps(report, indent=2), encoding='utf-8')
     _write_md(report, models)
 
 

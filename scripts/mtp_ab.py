@@ -89,7 +89,7 @@ def find_model_block(settings: dict, model: str) -> dict:
 def crash_safe_write(path: Path, data: dict) -> None:
     """Crash-safe JSON write: tempfile -> fsync -> os.replace (C6)."""
     tmp = path.with_suffix(path.suffix + ".tmp")
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding='utf-8') as f:
         json.dump(data, f, indent=1)
         f.flush()
         os.fsync(f.fileno())
@@ -226,7 +226,7 @@ def measure_batch(model: str, label: str, max_tokens: int, n_prompts: int, timeo
             existing = [json.loads(l) for l in f if l.strip()]
     existing.extend(rows)
     tmp = results_path.with_suffix(results_path.suffix + ".tmp")
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding='utf-8') as f:
         for r in existing:
             f.write(json.dumps(r) + "\n")
         f.flush()

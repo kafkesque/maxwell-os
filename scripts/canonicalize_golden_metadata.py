@@ -66,7 +66,7 @@ def main() -> int:
         else:
             left.append((field, raw, canon or "MISSING/CROSS-KIND"))
 
-    GOLDEN.write_text("".join(lines))
+    GOLDEN.write_text("".join(lines), encoding='utf-8')
 
     meta = json.loads(META.read_text())
     meta["golden_sha256"] = hashlib.sha256(GOLDEN.read_bytes()).hexdigest()
@@ -75,7 +75,7 @@ def main() -> int:
         "D2506: surgical line-level canonicalization of dormant stage2 golden "
         f"domain/discipline alias->canonical ({len(changed)} values); cross-kind/missing untouched"
     )
-    META.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
+    META.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
 
     print(f"✅ canonicalized {len(changed)} value(s):")
     for field, old, new in changed:

@@ -185,7 +185,7 @@ def main() -> None:
     x9 = run_x9(fbs)
 
     out = {"timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": MODEL, "x8": x8, "x9": x9}
-    with open(OUT_PATH, "w") as f:
+    with open(OUT_PATH, "w", encoding='utf-8') as f:
         json.dump(out, f, indent=2)
     print(f"\nResults saved to {OUT_PATH}")
 

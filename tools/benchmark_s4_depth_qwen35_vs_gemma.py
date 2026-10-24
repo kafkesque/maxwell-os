@@ -207,7 +207,7 @@ def main() -> None:
         },
         "results": {"gptoss": gptoss, "gemma": gemma, "qwen35": qwen35},
     }
-    with open(OUT_PATH, "w") as f:
+    with open(OUT_PATH, "w", encoding='utf-8') as f:
         json.dump(out, f, indent=2)
     print(f"\nResults saved to {OUT_PATH}")
 

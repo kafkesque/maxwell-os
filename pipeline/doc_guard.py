@@ -108,7 +108,7 @@ def snapshot() -> dict:
         }
 
     SNAPSHOT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    SNAPSHOT_FILE.write_text(json.dumps(snap, indent=2))
+    SNAPSHOT_FILE.write_text(json.dumps(snap, indent=2), encoding='utf-8')
     return snap
 
 

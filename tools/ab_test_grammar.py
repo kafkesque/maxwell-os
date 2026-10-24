@@ -98,7 +98,7 @@ def main() -> int:
         if not r["valid_json"]:
             print(f"  ❌ {r['name'][:40]:40} -> {r['status']}")
     if args.out:
-        Path(args.out).write_text(json.dumps(summary, indent=2))
+        Path(args.out).write_text(json.dumps(summary, indent=2), encoding='utf-8')
         print(f"wrote {args.out}")
     return 0
 

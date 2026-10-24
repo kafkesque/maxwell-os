@@ -279,7 +279,7 @@ class PrincipleJournal:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         # Touch file if not exists
         if not self.path.exists():
-            self.path.write_text("")
+            self.path.write_text("", encoding='utf-8')
 
     def append(self, record):
         """Append one JSONL line. Thread-safe via O_APPEND (fail-loud write).

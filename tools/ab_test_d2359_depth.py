@@ -216,7 +216,7 @@ def main() -> None:
             print(f"\n  B vs A speedup: {a/b:.2f}x   C vs A speedup: {a/summaries['C']['avg_secs']:.2f}x")
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(OUT_PATH, "w") as f:
+    with open(OUT_PATH, "w", encoding='utf-8') as f:
         json.dump({"created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                    "model": MODEL, "n_fbs": len(fbs),
                    "summaries": summaries, "rows": all_rows}, f, indent=2, default=str)

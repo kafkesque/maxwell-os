@@ -179,7 +179,7 @@ def main() -> int:
         ec["expected_fb_count"] = len(checkpoint_recs)
         ec["s4_expected_fb_count"] = len(checkpoint_recs)
         ec["written_at"] = datetime.now(timezone.utc).timestamp()
-        with open(EXPECTED, "w") as f:
+        with open(EXPECTED, "w", encoding='utf-8') as f:
             json.dump(ec, f, indent=2)
         print(f"✅ expected_count → {len(checkpoint_recs)}")
 

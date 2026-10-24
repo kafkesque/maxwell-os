@@ -179,7 +179,7 @@ def scan() -> None:
             ],
         })
 
-    OUT_CAND.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in cand_rows))
+    OUT_CAND.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in cand_rows), encoding='utf-8')
     OUT_SUM.write_text(json.dumps({
         "principle_rows": len(rows),
         "exact_dup_groups": len(exact_groups),
@@ -187,7 +187,7 @@ def scan() -> None:
         "total_candidate_groups": len(all_groups),
         "confirmed_stem_groups": len(confirmed),
         "confirmed_stems": sorted(CONFIRMED_STEMS),
-    }, indent=2, ensure_ascii=False) + "\n")
+    }, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
     print(f"\nwrote {OUT_CAND} ({len(cand_rows)} groups)")
     print(f"wrote {OUT_SUM}")
 

@@ -204,7 +204,7 @@ def main() -> int:
         "residual": {axis: dict(verify["stats"][axis]) for axis in AXIS_COLUMN},
     }
     out = REPO / "governance" / ("axis_propagation_manifest_" + stamp + ".json")
-    out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+    out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding='utf-8')
     print("rows remaining to update after write: " + str(len(verify_updates)))
     print("R14 manifest: " + str(out.relative_to(REPO)))
     if verify_updates or report["merge_conflicts"]:

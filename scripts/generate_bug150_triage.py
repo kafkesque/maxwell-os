@@ -112,7 +112,7 @@ def main() -> int:
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(lines) + "\n")
+    out.write_text("\n".join(lines) + "\n", encoding='utf-8')
     print(f"\n✅ wrote {out} ({len(bucketed)} rows)")
     return 0
 

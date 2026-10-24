@@ -187,7 +187,7 @@ def main() -> None:
 
     # Write detailed report
     report_path = Path("governance/evidence_audit_report.json")
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding='utf-8') as f:
         json.dump({"stats": stats, "results": results}, f, indent=2, ensure_ascii=False)
     print(f"\n📄 Detailed report: {report_path}")
 

@@ -108,7 +108,7 @@ def main() -> int:
            "axes": {a: score_axis(cfg, ruler, store, a) for a in cfg["axes"]},
            "incumbent_reference_quoted": cfg["incumbent_reference"],
            "qualifier": cfg["qualifier"]}
-    (ROOT / cfg["output_json"]).write_text(json.dumps(out, indent=2))
+    (ROOT / cfg["output_json"]).write_text(json.dumps(out, indent=2), encoding='utf-8')
     for axis, r in out["axes"].items():
         print(f"{axis:16s} prev={r['agreement_previous_ruler']} (n={r['n_scored_previous']})"
               f"  current={r['agreement_current_ruler']} (n={r['n_scored_current']})"

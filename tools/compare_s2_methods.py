@@ -495,7 +495,7 @@ if __name__ == "__main__":
     out_path = PROJECT_ROOT / "governance" / "s2_comparison_results.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = out_path.with_suffix(".json.tmp")
-    with open(tmp_path, "w") as f:
+    with open(tmp_path, "w", encoding='utf-8') as f:
         json.dump(results, f, indent=2, default=str)
     tmp_path.replace(out_path)
     print(f"\nResults saved to {out_path}")

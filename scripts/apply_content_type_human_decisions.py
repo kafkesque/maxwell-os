@@ -40,7 +40,7 @@ def main() -> None:
     ts = datetime.now(timezone.utc).isoformat()
 
     # 1. append to ledger
-    with LEDGER.open("a") as f:
+    with LEDGER.open("a", encoding='utf-8') as f:
         for eid, d in decisions.items():
             rec = {
                 "example_id": eid,

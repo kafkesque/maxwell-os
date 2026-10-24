@@ -251,10 +251,10 @@ def main() -> None:
             md_lines.append("</details>")
             md_lines.append("")
 
-    with open(jsonl_path, "w") as f:
+    with open(jsonl_path, "w", encoding='utf-8') as f:
         for rec in records:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    with open(md_path, "w") as f:
+    with open(md_path, "w", encoding='utf-8') as f:
         f.write("\n".join(md_lines) + "\n")
 
     print(f"\n{'=' * 88}")

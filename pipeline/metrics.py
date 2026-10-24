@@ -39,7 +39,7 @@ class StageTimer:
             **self.metadata,
         }
         METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(METRICS_PATH, "a") as f:
+        with open(METRICS_PATH, "a", encoding='utf-8') as f:
             f.write(json.dumps(record) + "\n")
         return False  # don't suppress exceptions
 
@@ -52,7 +52,7 @@ def log_metric(stage: str, **kwargs) -> None:
         **kwargs,
     }
     METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(METRICS_PATH, "a") as f:
+    with open(METRICS_PATH, "a", encoding='utf-8') as f:
         f.write(json.dumps(record) + "\n")
 
 

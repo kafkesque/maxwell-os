@@ -311,7 +311,7 @@ def build(apply: bool) -> None:
         "straggler_fb_ids": [r["fb_id"] for r in stragglers],
         "expansion_queue_rows": len(queue),
         "expansion_queue_fb_ids": [r["fb_id"] for r in queue],
-    }, indent=2, ensure_ascii=False) + "\n")
+    }, indent=2, ensure_ascii=False) + "\n", encoding='utf-8')
     print(f"[R14] manifest: {MANIFEST}")
     print("[done] verified_core.jsonl merged + stamped")
 

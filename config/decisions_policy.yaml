@@ -186,11 +186,19 @@ reference_rail:
 # scripts/check_decision_membership.py, and the id SPELLING rule is imported from the reconciler (D-2646/C21).
 membership:
   log: DECISION-LOG.md
-  # The two surfaces the log NAMES a decision on: the D2552 table row ('| D-2689 | ACTIVE | ... |') and the
-  # historical heading ('## ... D-2689 ...'). MEASURED 2026-09-27: 152 rows + 53 headings, 194 distinct ids.
+  # The THREE surfaces the log NAMES a decision on: the D2552 table row ('| D-2689 | ACTIVE | ... |'), the
+  # historical heading ('## ... D-2689 ...'), and the BARE PARAGRAPH entry ('D-3134 (ACTIVE 2026-10-23): ...').
+  # MEASURED 2026-09-27: 152 rows + 53 headings, 194 distinct ids. The third form is added 2026-10-24 by BUG-989:
+  # D-3134..D-3137 were appended as bare paragraphs and the first two patterns could not see them, so the join
+  # printed a GREEN over four records the log named that the registry never minted (the BUG-757/D-2985 shape). A
+  # line-start D-id followed by a parenthesised annotation is an ENTRY (the decision is the line's subject); a D-id
+  # elsewhere in prose is a REFERENCE and is deliberately NOT matched - matching it would fire on every inline
+  # citation (D-3034 etc.) and on list labels 'D1/D2/D3'. Measured: exactly 8 lines match (D-2688, D-2747, D-2802,
+  # D-2804 - all minted - plus D-3134..D-3137), zero false positives.
   id_patterns:
   - '^\|\s*(D-?\d+[a-z]?)\s*\|'
   - '^#{1,4}[^\n]*?\b(D-?\d+[a-z]?)\b'
+  - '^(D-?\d+[a-z]?)\s*\('
   # Pinned BY IDENTITY, never by a count: a ceiling would let a NEW orphan hide inside it. The list may only
   # SHRINK - an id here that becomes a record, or that the log stops naming, is a STALE declaration and fails
   # the rail (D-405). MEASURED 2026-09-27, each classified: D-271 / D-272 / D-275 are DATED SECTION HEADINGS

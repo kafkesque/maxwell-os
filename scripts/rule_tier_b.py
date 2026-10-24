@@ -45,6 +45,12 @@ def load_cfg() -> dict:
     # never be BLOCKED by a missing evidence sheet, but its absence is SAID OUT LOUD per candidate rather
     # than silently rendering a bare question (D-3100: a ruling rests on a reading, not on a recollection).
     cfg["evidence_path"] = (data["extraction_recall"].get("tier_b_evidence") or {}).get("path")
+    # The owner sheet's column names, so --from-csv reads the SAME names the sheet was generated with (C12:
+    # a header the writer chose once is not re-typed here). Absent block -> the generated defaults.
+    sheet = (data["extraction_recall"].get("tier_b_adjudication") or {}).get("owner_sheet") or {}
+    cfg["decision_column"] = str(sheet.get("decision_column") or "owner_decision")
+    cfg["note_column"] = str(sheet.get("note_column") or "owner_note")
+    cfg["valid_decisions"] = [str(v).upper() for v in (sheet.get("valid_decisions") or sorted(VALID_NOTES))]
     return cfg
 
 
@@ -139,6 +145,65 @@ def load_evidence(cfg: dict) -> dict[tuple[str, str], dict]:
         for r in rows:
             r["_band"] = float(band_v)
     return {(str(r.get("source_id")), str(r.get("name"))): r for r in rows}
+
+
+def record_from_csv(cfg: dict, sheet_path: Path, dry_run: bool) -> int:
+    """Record the rulings TYPED INTO THE OWNER SHEET (BUG-988: a sheet with no decision column is unusable).
+
+    The owner reviews a spreadsheet and types one word per row; this turns that column into the ruling sheet
+    without a paste, so the reading and the ruling live in the same artifact (D-3100).
+
+    The sheet must carry `source_id` plus `candidate_name` (or `name`), and the decision column the sheet was
+    GENERATED with (config: tier_b_adjudication.owner_sheet.decision_column). A blank cell means "not ruled
+    yet" and is skipped, never guessed; an unknown token FAIL-CLOSES rather than being coerced, because a typo
+    must never become a floor (D-3034); an already-ruled candidate is SKIPPED, so re-running after a partial
+    fill is safe and idempotent.
+    """
+    import csv as _csv
+
+    if not sheet_path.exists():
+        raise SystemExit(f"FAIL-CLOSED: owner sheet not found: {sheet_path}")
+    col = str(cfg.get("decision_column") or "owner_decision")
+    with sheet_path.open(newline="", encoding="utf-8") as fh:
+        reader = _csv.DictReader(fh)
+        fields = [f.strip() for f in (reader.fieldnames or [])]
+        if col not in fields:
+            raise SystemExit(f"FAIL-CLOSED: unknown column {col!r} in {sheet_path.name} "
+                             f"(header offers: {fields[:6]}...) — regenerate it with "
+                             f"scripts/tier_b_owner_sheet.py (C12: the header is written, never guessed)")
+        if "source_id" not in fields or not ({"candidate_name", "name"} & set(fields)):
+            raise SystemExit(f"FAIL-CLOSED: {sheet_path.name} needs source_id and candidate_name/name columns")
+        existing = {(r.get("source_id"), r.get("name"))
+                    for r in _read_jsonl(PROJECT_ROOT / cfg["tier_b_ruling_sheet"])}
+        planned: list[tuple[str, str, str]] = []
+        blank = 0
+        already = 0
+        for i, row in enumerate(reader, start=2):  # 2 = first data line, so a message names the real line
+            decision = str(row.get(col) or "").strip().upper()
+            if not decision:
+                blank += 1
+                continue
+            if decision not in VALID_NOTES:
+                raise SystemExit(f"FAIL-CLOSED: line {i}: {col}={decision!r} is not one of "
+                                 f"{sorted(VALID_NOTES)} (fix the cell; a typo must never become a ruling)")
+            sid = str(row.get("source_id") or "").strip()
+            name = str(row.get("candidate_name") or row.get("name") or "").strip()
+            if not sid or not name:
+                raise SystemExit(f"FAIL-CLOSED: line {i} has an empty source_id/candidate_name (D-3034)")
+            if (sid, name) in existing:
+                already += 1
+                continue
+            existing.add((sid, name))
+            planned.append((sid, name, decision))
+    for sid, name, decision in planned:
+        if dry_run:
+            print(f"  would record {decision}: {name!r} ({sid})")
+        else:
+            record_ruling(cfg, sid, name, decision)
+    verb = "would record" if dry_run else "recorded"
+    print(f"{verb} {len(planned)} ruling(s); skipped {already} already-ruled; skipped {blank} blank row(s)"
+          + (" [DRY-RUN: nothing written]" if dry_run else ""))
+    return 0
 
 
 def evidence_lines(cfg: dict, ev: dict[tuple[str, str], dict], source_id: str, name: str) -> list[str]:
@@ -239,12 +304,17 @@ def selftest() -> int:
     return 0
 
 
-USAGE = """usage: python3 scripts/rule_tier_b.py [--walk | --list | --count | --rule <source_id> <name> MATCH|NONE | --selftest]
+USAGE = """usage: python3 scripts/rule_tier_b.py [--walk | --list | --count | --rule <source_id> <name> MATCH|NONE
+                                         | --from-csv <sheet.csv> [--dry-run] | --selftest]
 
   (no flag)   walk the unruled tier-B candidates, one typed ruling each (MATCH / NONE / skip)
   --count     print "<unruled> unruled / <total> total" and exit
   --list      print one candidate per line, tab-separated: source_id, name, rationale
   --rule      record ONE ruling non-interactively (the walk's equivalent, for a single candidate)
+  --from-csv  record every ruling TYPED INTO THE OWNER SHEET (scripts/tier_b_owner_sheet.py): one CSV row
+              per candidate, the answer in the owner_decision column (MATCH / NONE; blank = not ruled).
+              --dry-run prints what would be recorded and writes nothing. Re-running is safe: an
+              already-ruled (source_id, name) is SKIPPED, never doubled.
   --selftest  known-answer controls only (no store, no prompt)
 
 The ruling sheet is governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl (append-only, one line per ruling).
@@ -266,6 +336,14 @@ def main() -> int:
         u, t = count_candidates(cfg)
         print(f"{u} unruled / {t} total")
         return 0
+    if "--from-csv" in sys.argv:
+        # the owner sheet's decision column -> the ruling sheet (BUG-988/D-3100)
+        try:
+            i = sys.argv.index("--from-csv")
+            target = sys.argv[i + 1]
+        except (ValueError, IndexError):
+            raise SystemExit("usage: --from-csv <owner-sheet.csv> [--dry-run]")
+        return record_from_csv(cfg, Path(target), dry_run="--dry-run" in sys.argv)
     if "--rule" in sys.argv:
         # non-interactive: --rule "<source_id>" "<name>" MATCH|NONE
         try:

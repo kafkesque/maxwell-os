@@ -198,6 +198,7 @@ models:
     reasoning_off_prefix: 'Reasoning: low'
     reasoning_off_models:
     - gpt-oss-20b-MXFP4-Q8
+    - Ornith-1.5-35B-A3B-REAP-19B
     max_tokens: 1024
     chat_template_kwargs:
       enable_thinking: false
@@ -506,6 +507,12 @@ stage4:
   quarantine_output: quarantined.jsonl
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
+  # D2488/T-122 (C12): failure_mode minimum length in chars. MUST match
+  # pipeline/schemas.py::FB.failure_mode min_length (the D2488 schema source). A short/empty
+  # failure_mode fails S4 classification (FAILED -> quarantine). Was an undeclared literal `10`
+  # in BOTH pipeline/stage4_merge.py (D2488 gate) and scripts/reinject_bug198_singletons.py
+  # ::_classify_s4 (orphan_magic_threshold, config/derivations.yaml).
+  failure_mode_min_length: 10
   # BUG-614 (D-2806): config-owned S4 code-fingerprint source list (C12), mirroring
   # stage5.fingerprint_files (D-330). The S4 routing/classification modules + the
   # content-type axis config determine S4 output; ANY edit (committed or not)

@@ -432,6 +432,17 @@ may_touch:
 - governance/EXTRACTION_RECALL_TIER_B_20261023.jsonl
 - governance/EXTRACTION_RECALL_TIER_B_RULINGS_20261023.jsonl
 - governance/EXTRACTION_RECALL_TIER_B_EVIDENCE_*.json
+#: D-3137/D-3138 (2026-10-23/24) — the tier-B ADJUDICATION + OWNER-REVIEW families. Both are DATED DERIVED artifacts
+#: (re-derived by scripts/tier_b_adjudicate.py and scripts/tier_b_owner_sheet.py, schema_version + pipeline_commit
+#: stamped, R14), so a per-file grant would turn each regeneration into a new red line on the worktree rail (the
+#: BUG-563 shape). BUG-988: the OWNER-REVIEW family is the one artifact the human gate is TYPED INTO (owner_decision
+#: column) and the one the procedure is printed in — a ruling sheet that cannot be committed is not a record (D-342).
+#: Nothing outside these prefixes becomes committable.
+- governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_*.json
+- governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_*.csv
+- governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.csv
+- governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.html
+- governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1443,3 +1454,37 @@ widening_log:
     receipt, and changes no pipeline behaviour.
   may_touch_untouched: false
   why: One NAMED grant (the tier-B sheet); scripts/*.py and config/*.yaml were already declared.
+
+- date: '2026-10-24'
+  actor: assistant
+  reason: >-
+    T-195 STEP (d)/(d2) LANDED — the ADVISORY tier-B adjudication panel and the OWNER'S ruling instrument. The scripts
+    (scripts/tier_b_adjudicate.py, scripts/tier_b_owner_sheet.py, scripts/rule_tier_b.py) sit inside the existing
+    scripts/*.py grant and the rules inside config/*.yaml, so NOTHING was needed for them. What had no home was the
+    two dated artifact families: the panel's own record (envelope + two CSVs) and the owner's review sheet (CSV to
+    type the ruling into, HTML to read it in, markdown procedure). Both are re-derived on every run, so a per-file
+    grant would turn each regeneration into a red line on the worktree rail (BUG-563); granted by prefix instead.
+    BUG-988 is why the owner family must be committable at all: the review CSV is the ONE artifact the human gate is
+    TYPED INTO, and a ruling sheet that cannot be committed is not a record (D-342).
+  owner_ack: >-
+    EXPLICIT 2026-10-24, the owner's own words this sitting: "run the gov synch now" (the instruction to sync after
+    the panel), plus the two defects he named that define the sheet's contents — "there are no section for owner
+    decision in csv" and "I cant find any of fb that are under name and concept key in t11 checkpoints". He also
+    stated the panel's purpose directly: "the more llm agree the better and those advisory can promoted to my
+    acceptence / so I only need to review manually review the ones that conflicts and split". This entry grants five
+    PREFIX paths (no single-file laundering surface), records two advisory/owner artifacts, and changes no pipeline
+    behaviour.
+  additions:
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_*.json
+    why: 'the 4-model advisory envelope (authority string ADVISORY EVIDENCE ONLY, D-2658/D-2898/D-3137): per candidate the four votes, the agreement class, needs_review and the store_best cosines. It is the record of the ADJUDICATE act, which must be versioned or the panel cannot be audited later (D-342).'
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_*.csv
+    why: 'the same rows as a table (full + disagreement-only). Written by the same script in the same run; a per-file grant would split one artifact into two red lines.'
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.csv
+    why: 'BUG-988/D-3138 — the owner''s ruling sheet: one row per candidate needing review, the source passage at owner length, the book + paragraph index, the closest store row WITH its run, and the EMPTY owner_decision / owner_note columns the ruling is typed into. This is the artifact the human gate writes to; it cannot be left uncommittable.'
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.html
+    why: 'the reading face of the same sheet (self-contained, no JS, no external assets), so the owner reviews without reading a CSV in a spreadsheet. Derived in the same run as the CSV.'
+  - pattern: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.md
+    why: 'the numbered procedure the owner follows (D-3100: exact command, expected output, and the branch to take if it differs). A manual step named only in prose is a step the owner cannot run.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the two dated tier-B families produced this sitting (advisory panel record + owner ruling instrument). No pipeline/** path, no pinned artifact and no will_not_touch family is involved.'

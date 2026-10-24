@@ -154,6 +154,14 @@ def controls() -> list[tuple[str, bool]]:
         ("named_ids reads the D2552 TABLE ROW and the historical HEADING, and normalises both spellings",
          named_ids("| D-9001 | OPEN | x |\n## 2026-09-27 - D9002 does a thing\n", 
                    [r"^\|\s*(D-?\d+[a-z]?)\s*\|", r"^#{1,4}[^\n]*?\b(D-?\d+[a-z]?)\b"]) == ["D9001", "D9002"]),
+        # BUG-989: the third surface is the BARE PARAGRAPH entry ('D-3134 (ACTIVE ...): **...**'), which neither
+        # the table row nor the heading pattern could see. The new pattern matches a line-START D-id followed by a
+        # parenthesised annotation ONLY - an inline prose reference ('D-9002 limb (iv)') and a list label ('D1')
+        # must NOT be treated as a naming, or every prose citation would need a record (a rail nobody can satisfy
+        # is not a rail, BUG-540).
+        ("named_ids reads the BARE PARAGRAPH entry and leaves prose references and list labels unmatched (BUG-989)",
+         named_ids("D-9001 (ACTIVE 2026-10-24): **A rule.**\nD-9002 limb (iv) SATISFIED\nD1 — a list label\n",
+                   [r"^(D-?\d+[a-z]?)\s*\("]) == ["D9001"]),
         ("a policy with no membership block is a NAMED fault, not a traceback (BUG-487)",
          bool(policy_problems({}))),
         ("a policy whose membership block is missing its subject set is a NAMED fault",

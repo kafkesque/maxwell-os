@@ -90,14 +90,15 @@ declared:
     granted_by: 'owner instruction 2026-10-14 - the T-107 change-set was explicitly unblocked'
     recommendation: keep-and-repair
     why: >-
-      constant 'CLEAN' on 7,640/7,640 rows (PRE and POST the 2026-10-13 relabel store write: verified at the row
-      level, so the write did not flatten this axis) while the store's own `status` column holds 3,137 QUARANTINE
-      rows and the register that owns the column calls it a FALSE status (config/store_columns.yaml `status: debt`),
-      with a derived-value home that is an orphan carrying a magic threshold (config/derivations.yaml
-      `orphan_magic_threshold`). Two statuses on one row is the D-2987 defect on the wire: an agent reads 'CLEAN'
-      and cannot see the quarantine. THE REPAIR (next act, not this one): the writer is
-      scripts/reinject_bug198_singletons.py::_classify_s4 with its threshold as an undeclared literal - move it into
-      config, re-prove the stored values, and publish the row-level status the payload already carries.
+      LANDED 2026-10-24 (T-122/D-2994): the repair is DONE. classification_status now mirrors the row's own `status`
+      per the D2184 enum (PASS->CLEAN 4513, QUARANTINE->FAILED 3135; FAILED == quarantined), re-derived
+      deterministically and LLM-free by scripts/repair_classification_status.py (C13 backup + C6 one transaction +
+      R14 receipt in governance/evidence/). The undeclared threshold literal moved into config
+      (stage4.failure_mode_min_length; read via pipeline_paths.S4_FAILURE_MODE_MIN_LENGTH) and is wired in BOTH
+      _classify_s4 and stage4_merge.py. The repair's --check is the fail-closed parity rail (config/derivations.yaml,
+      homed). One residual (BUG-992): the S4 producer still derives from failure_mode length, not status, so a
+      long-fm row quarantined by NLI would be written CLEAN again — the parity rail catches it; the writer-rule fix
+      is owed (T-198).
 
 #: THE RETIRED WORDS (D-2993/D-2994). ONE home for the completed disposition of a field that LEFT the wire: a live
 #: claim lives in `declared`; a finished one lives here, and the rail checks it in BOTH directions - a retired field
@@ -220,10 +221,9 @@ tier_policy:
       where today they publish NOTHING and 1,393 of their neighbours publish a false 0.0 (BUG-767)
 
 coverage:
-  max_declared_debt: 2      # CEILING — SHRINK-ONLY. Was 3; LOWERED to 2 on 2026-10-14 by the T-107 change-set,
-                            # which retired borp_score off all three surfaces (its declaration moved to `retired`).
-                            # The remaining two are still ADVERTISED and still owe their change-set:
-                            # feedback_score (keep-and-declare; the wire shape landed, the fields stay) and
-                            # classification_status (keep-and-repair; the store-side repair is the next act).
-                            # The only act that may RAISE this is a DECISION (D-2644).
+  max_declared_debt: 1      # CEILING — SHRINK-ONLY. Was 3; LOWERED to 2 on 2026-10-14 (borp_score retired) and to 1
+                            # on 2026-10-24 (T-122 landed: classification_status's keep-and-repair change-set is DONE,
+                            # re-derived from the row's own status per D2184). The remaining one is still ADVERTISED
+                            # and still owes its change-set: feedback_score (keep-and-declare; the wire shape landed,
+                            # the fields stay). The only act that may RAISE this is a DECISION (D-2644).
   min_declared_debt: 0      # FLOOR — the state this file exists to reach: every advertised field is true.

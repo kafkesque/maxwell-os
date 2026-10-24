@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**260 open** / 490 closed of 750 ids.
+**261 open** / 495 closed of 756 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -267,3 +267,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
 | BUG-975 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` writes the FB but cannot write its vector under the framework `python3` (vec0 not | 1 |
 | BUG-976 | (LOW, OPEN 2026-10-23) — `insert_single_concept.py` omitted `evidence_passages`, so `deberta_check` returned "No evidence — QUARANTINE" | 1 |
+| BUG-992 | (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row | 1 |

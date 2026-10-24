@@ -2,19 +2,19 @@
   "schema_version": 1,
   "artifact_id": "EXTRACTION-RECALL-REPORT",
   "gen_model": "none (deterministic ruling consumer and set math; no LLM)",
-  "pipeline_commit": "19fbaa3",
+  "pipeline_commit": "d0a565c",
   "target": "store:knowledge pipeline/maxwell.db",
   "golden": {
     "path": "governance/EXTRACTION_RECALL_GOLDEN_20261023.json",
-    "sha256": "937a544628d4a33ee7551325a8c40bc6a195b4de1efc166337c7961ec00af38a"
+    "sha256": "0b8ba1cb99c2104ddae535fc2237566aeedb438a0f59acc539f939ff519caefc"
   },
   "result": {
     "concept_recall": 1.0,
     "expectation_recall": 1.0,
-    "concepts_expected": 45,
-    "concepts_hit": 45,
-    "expectations_expected": 419,
-    "expectations_hit": 419,
+    "concepts_expected": 59,
+    "concepts_hit": 59,
+    "expectations_expected": 433,
+    "expectations_hit": 433,
     "missing_concepts": [],
     "missing_pairs_count": 0,
     "missing_pairs": [],
@@ -24,8 +24,10 @@
       "denominator_distribution": {
         "1": 270,
         "2": 56,
-        "3": 11,
-        "4": 1
+        "3": 9,
+        "6": 1,
+        "8": 1,
+        "10": 1
       }
     },
     "duplicate_pairs_count": 0,
@@ -35,213 +37,12 @@
     "red_reasons": [],
     "verdict": "CLEAN",
     "tier_b": "PROPOSED-but-unruled candidates (T-195): REPORTED, never floored, never auto-certified (D-2898) - the owner must rule MATCH for a tier-B row to enter tier A",
-    "tier_b_proposed": 43,
+    "tier_b_proposed": 0,
     "tier_b_present": 0,
-    "tier_b_omitted": 43,
-    "tier_b_matched": 1,
-    "tier_b_ruled_none": 1,
+    "tier_b_omitted": 0,
+    "tier_b_matched": 15,
+    "tier_b_ruled_none": 30,
     "tier_b_present_pairs": [],
-    "tier_b_omissions": [
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "020d81c2c48adc63b0043d04e362a35042238ad3992d519bc220cf3ba1f5710c",
-        "name": "Strategic Simplicity"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "1167ed41c67f2587b54f318e460bfcc288f287bfe6eb8a4581e621b2c22f2f30",
-        "name": "Strategic Diagnosis"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "1b6f1029d8bfcd79e3edb33fa95dcbc575ebbbccbbbd65298e2ef1e2811d640c",
-        "name": "Differentiation Through Strategy"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "2cf7896275e2c11d5407ff72aaab896fe22d51727f6a5750a6f3d59afaf9b1b7",
-        "name": "Strategic Alignment"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "2e954f147f343d9fd6b41372a94e13cd7e5b2959f2f8d46dbcc3a3ed70fab544",
-        "name": "Strategic Leadership as Decision-Making"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "3cb62852daabcdce28094aa4ebfe983a7563a5444b5cb359d083544d014a40f5",
-        "name": "Strategic Sin of Blue-Sky Objectives"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "4343ab99dc862af793f094dc646b377851d63569a9d221edb67405565ed74760",
-        "name": "Trigger Point Strategy"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "504b02d5f12065c3112c82d7fe5e7efcc413392dc60ba19f5dc24990cf707afb",
-        "name": "Strategic Relevance"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "52a5db4f3cd27d3fdb1acdc2d1f9636b8b397dc184d55b5acce64faf4ec17e54",
-        "name": "The Strategy Sin of Fluff"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "69412abb4e6b0463edf84c8bc8657309b868368f30ea9b370c4dd47027ff7d16",
-        "name": "Coherent Action Framework"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "99b2a000f3eed601bea72c4edcdd693ed5cc995ab845733a5961ab40f4feef54",
-        "name": "Strategic Execution Force"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "d7f7ce7b961949eb6245b89a75ea343fff6ac556bd8503cdbf1928eab8e4388f",
-        "name": "Strategic Clarity Over Complexity"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "ec6ad7bedc323626b595229c11b4d5bdfea33e2f48f3ec6f29d1bdc2de6f8c06",
-        "name": "Strategy as Action Plan"
-      },
-      {
-        "source_id": "b51204ce6c6a9950",
-        "concept_key": "f396e21ab74b9206d53013b3c733cef5cf9921e1cf9b33a8c86099c997aebbc4",
-        "name": "Proximate Objective"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "06e7d72bc45c7d22c2447d0fa775f136cf3ab6479d88e948c24be30aae1d29a2",
-        "name": "LangChain's Core Components"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "14eba875d50c9744a8c02f2c98c3bd216b53629c5f3491016d296bc6e0393346",
-        "name": "Prompt Engineering as a Design Discipline"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "17e13576456bd491a431af74785745d09de3e4035d284cb0f8938b1839021ae0",
-        "name": "Prompt Template Abstraction"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "3dc4a799568e7bce3d8eb5d186a0708eb5acd877d458fa5dcf3a24f8c12491b5",
-        "name": "LLM Use Case Mapping"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "4270ec0c20bdb6a7dc443269b5ffb782c96b3af3419420cd8159ba9ba94d890b",
-        "name": "Fine-Tuning as a Customization Technique"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "4926d66cc3b4dc80b3c87cc1ad506cb6a8f054c22e2460f18f665d8401c39186",
-        "name": "LLM Prompt Optimization"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "5c3453d7c8aa23d9894ddc3e1da51245556332c0327480b31929c4dc624956dc",
-        "name": "LLM Adaptation Strategies"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "86c48059917edcd2a66f1034021c0a9dfa0fb9affa8c01fc24e424081d79299e",
-        "name": "Step-by-Step Instruction Design"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "aa106c45d6bb5a62ac57bbbc4caf6a54ad3bb364dfb9491f8f980c5cd24f84db",
-        "name": "Prompt Types as Task Categories"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "b80c2d85914abc14b44700e42786c0189ed180ae3faaeb66b15778a0ba3d72ed",
-        "name": "LangChain's Modular Architecture"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "c20d1ed051dc037f6aea0377499d028c7bbe2c438225f57a4fbba166d11166d8",
-        "name": "LLM Selection Based on Use Case"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "dee1fa139c9d9dfcf73818e60d50cd6f2e2b3a2c4d01934caf48cf2f4fd18f71",
-        "name": "RAG as a Retrieval-Augmentation Strategy"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "f300b8263b8cb901e11e0bc042aa48fadec8476bcf80d2238c22661e5936f0ec",
-        "name": "Reasoning in LLMs Through Examples"
-      },
-      {
-        "source_id": "f8f802e878304781",
-        "concept_key": "f4b7477681588e66d86e56534e1a7f03f37a62d02bfc00c7b4e9921b0a1f25cf",
-        "name": "Programmatic Prompt Execution"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "00204b59ecf60add8de53b6cfedc349c3e05f51d091597f5af042d85788b0f7e",
-        "name": "Code as Medium for Expression"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "05210054b910866998dd885cc7353cdb55fa3feb22a95c1816afd9582393371b",
-        "name": "Online Educational Material Fragility"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "0b5531dfd1727f1c4d4af354d6568a1b4e274c515e9c30614496a7d39de0f049",
-        "name": "Reactive Programming in Art"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "226465de554600c26d91bc5c27c8663bc8ec92cc87243d9a4972be11c8e1853f",
-        "name": "Community-Curated Learning"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "2564529bec16555d866c1a7d2b018a62a44d69c4abe7a87ec4813f2abbede8e6",
-        "name": "Bauhaus Pedagogy Preservation"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "281be8c39a4a308e01427dcc66590fbdc5590ece2f73e37b35c2bca4b8f678d9",
-        "name": "Aesthetics + Computation Synthesis"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "52d7914b8fc5f4b70b2c4be02699d1378bf8fcf9d2c39bb25ee1e155ee6f9d47",
-        "name": "Visual Arts Programming Motivation"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "54a66aee9ca75501c45406590033b8d176afb49c83682f19629751b82bbec748",
-        "name": "Curriculum Evolution Through Experimentation"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "6140448f50512e2f595cfcf76d6d6e086b370cb33a51b4d59454339d0cbc6a99",
-        "name": "Creative Coding Pedagogy"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "82631bcea1481132121f11358d0e29db32d0cc2fc6f4ba5e510e67c476696f03",
-        "name": "Educational Community Building"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "8b068fe2150c72f038f72f6c256d5238239d7bb58643ebe7ec1291a8ee173187",
-        "name": "Creative Coding Community Networks"
-      },
-      {
-        "source_id": "f988150fe424aa75",
-        "concept_key": "8d2cecbbbbd8ac2b769b6b8ed9463fc352cf3211ba96408a79408d04c548a2e5",
-        "name": "Educational Resource Sustainability"
-      }
-    ]
+    "tier_b_omissions": []
   }
 }

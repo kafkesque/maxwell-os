@@ -8,18 +8,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 750 bugs (260 open / 490 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 756 bugs (261 open / 495 closed; highest OPEN = BUG-992) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1267 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 648 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1267, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 260 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 261 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
-> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) EXECUTED 2026-10-23 (BUG-974 fix live): the p |
 >
 > **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -29,7 +27,6 @@
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938  |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
-> | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
@@ -37,6 +34,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
 > _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
@@ -20439,3 +20437,163 @@ read-only)` instead of claiming a file it did not write. `--check` alone keeps i
 MEASURED after: `--check --no-report` → `concept 45/45 = 1.0, expectation 419/419 = 1.0 -> CLEAN`, rc 0, and
 `git status` shows the report untouched; `--selftest` green (10 controls); `just --list` parses (an added comment line
 with extra leading whitespace had broken the justfile on the first attempt — caught by parsing it, not by assuming).
+
+## BUG-987 (MED — FIXED 2026-10-23) — Ornith-1.5-35B-A3B-REAP-19B emits its answer in `reasoning_content` and drops all but the first candidate in a batch
+
+MEASURED on this machine while running the T-195 tier-B 4-voter adjudication panel
+(`scripts/tier_b_adjudicate.py`). Three distinct failure modes, all on Ornith-1.5-35B-A3B-REAP-19B:
+
+1. **Thinking ON + no response_format:** the model burned the ENTIRE `max_tokens` on chain-of-thought and never
+   emitted a `content` field. Measured: `completion_tokens_details.reasoning_tokens == 6000`, `finish_reason=length`,
+   `message` keys were `['role','reasoning_content']` only (no `content`). The answer lived at the tail of a 26 KB
+   `reasoning_content` string that got truncated.
+2. **Thinking ON + `response_format={"type":"json_object"}` (xgrammar):** returned garbage `[0]` in 0.3 s
+   (`reasoning_tokens: 0`). This was the path the first full run took (Ornith was not yet in
+   `verifier.reasoning_off_models`), which is why 29/43 candidates came back 0-parsed.
+3. **Thinking OFF (`enable_thinking=False`, the D2408 reasoning-off path) + a multi-candidate batch:** returned a
+   clean JSON object in ~4.3 s but only for the FIRST candidate, silently dropping the rest (a "lazy" single-object
+   reply where the prompt demanded a 4-element array).
+
+**FIX (forward-only).** (a) Added `Ornith-1.5-35B-A3B-REAP-19B` to `verifier.reasoning_off_models` in
+`config/pipeline_config.yaml` so it takes the `enable_thinking=False` path (mode 3, the only one that returns parseable
+JSON); this also clears the pre-existing DepthClassificationError noted in DECISION-LOG.md (Ornith chain-of-thought
+breaking JSON parsing). (b) Added `tier_b_adjudication.single_candidate_models: [Ornith-1.5-35B-A3B-REAP-19B]` so the
+adjudicator runs it ONE candidate per call (defeats mode 3's drop-the-rest behaviour). (c) `parse_votes()` now wraps a
+bare `dict` reply in a list before mapping (chunk_size=1 emits a single object, not an array). Recovery
+(`temp/_recover_ornith_votes.py`) re-adjudicated all 43 one-at-a-time: **43/43 parsed** (was 29 missing), and the panel
+moved from 5 unanimous / 38 need-review to **20 unanimous / 23 need-review**, with zero INCOMPLETE rows.
+
+## BUG-988 (MED — FIXED 2026-10-24) — the tier-B handover had no column for the owner's word, and every pointer in it resolved into nothing the owner could open
+
+MEASURED 2026-10-24, from the owner's report (verbatim: *"I cant find any of fb that are under name and concept key
+in t11 checkpoints ... how the fuck I supposed to decide I find can even read it? also there are no section for owner
+decision in csv"*). Three defects, each measured, none of them a misunderstanding on the owner's side:
+
+1. **NO DECISION COLUMN.** `governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_DISAGREE_20261023.csv` carried 18 columns
+   — four voter columns, both definitions, both applications, the reading — and **no column for the ruling**. The
+   owner's MATCH/NONE is the ONE human act in the completeness arm (D-2898), and the sheet he was given to make it
+   in could be read but not answered.
+2. **THE POINTER DID NOT RESOLVE (D-3034).** All 23 review rows name a `closest_fb_*` row. MEASURED: **0 of 23**
+   `fb_id`s and **0 of 23** names resolve into `knowledge pipeline/stage5_verify/t11/checkpoint.jsonl` — and **0 of
+   23** on a loose token-substring search as well. Cause: the LIVE STORE is run `rechunk-v4-20260929` (7,634 rows)
+   while the t11 checkpoints are a DIFFERENT run. The sheet named the row and never named the run, so the one
+   cross-reference the owner was given pointed outside the artifact he was searching.
+3. **A TIER-B CANDIDATE CANNOT BE IN A CHECKPOINT (D-3130), and the handover never said so.** MEASURED on the same
+   43: **0 of 43** candidate `concept_key`s exist in the store's `fbs` table and **0 of 43** exist in the t11 S5
+   checkpoint; `store_best` cosine min 0.459 / median 0.609 / max 0.849, with 38 of 43 below 0.7. A tier-B candidate
+   is *by definition* a concept the extractor did not produce, so sending the owner to a checkpoint for one is a
+   guaranteed no-op. That is the D-3100 shape: a manual task handed over without the reading — or the place — that
+   decides it.
+
+**FIX.** `scripts/tier_b_owner_sheet.py` (new, no LLM, D-343) builds the sheet the ruling is actually made in, from
+the panel envelope + evidence sheet + source bytes + store, and writes three config-declared faces: a CSV, a
+self-contained HTML reading page, and a numbered how-to. MEASURED: 23 rows; the CSV carries `owner_decision` and
+`owner_note` as columns 2–3 **pre-filled blank (0 of 23 filled)**; every row quotes its source paragraph at
+`reading_chars` 1400 (min 218 / median 892 / max 1400 chars; 0 of 23 rows without a passage) with its neighbours, a
+`locate` naming file **and** paragraph index ("paragraph 2131 of 4576 in knowledge pipeline/books/…"), and the
+closest store row **with its run, its status and a crossref verdict** — 23 of 23 read *"NOT in t11 — this store row
+lives in run rechunk-v4-20260929"*, which is the truth the previous sheet hid. `scripts/rule_tier_b.py --from-csv`
+closes the loop so the typed word becomes the ruling with no JSON to paste. Controls measured: blank sheet → `would
+record 0 ruling(s); skipped 23 blank row(s)`; two filled cells (`"match "` lowercase+padded, `NONE`) → `would record
+2 … skipped 21 blank`; a typo (`YES`) → `FAIL-CLOSED: line 4: owner_decision='YES' is not one of ['MATCH','NONE']`.
+Selftests green: owner sheet 7 controls, `rule_tier_b` 5 controls.
+
+## BUG-989 (MED — FIXED 2026-10-24) — `config/decisions.yaml` is FOUR records behind `DECISION-LOG.md`, and the membership rail reads a GREEN on the entries that made it so
+
+MEASURED 2026-10-24 while minting D-3138. The registry's highest id is **D-3133** (1,259 records) while
+`DECISION-LOG.md` names **D-3134, D-3135, D-3136, D-3137** — `grep -c` finds **0** occurrences of each in
+`config/decisions.yaml`. `python3 scripts/check_decision_membership.py` nonetheless reports *"413 id(s) NAMED in
+DECISION-LOG.md, 1259 TOP-LEVEL record(s), 4 pinned legacy orphan(s), **0 fault(s)**"*, because
+`config/decisions_policy.yaml#membership.id_patterns` matches only a `| D-… |` **table row** or a `#… D-…`
+**heading**, and those four were appended as bare paragraphs (`D-3134 (ACTIVE 2026-10-23): **…`). The ONE join that
+exists to catch an unrecorded mint therefore cannot see them — the BUG-757/D-2985 shape (a reader that demands an
+exact shape is blind to every other) already recorded for bug headings, still unfixed in this reader.
+
+**CONSEQUENCE (D-3034).** Four decisions are cited by id across the tree — T-196 closes on D-3136, T-195 step (c) on
+D-3137 — and none of them RESOLVES to a registry record, so the census, the GOV-INDEX and every consumer that joins
+on `config/decisions.yaml` cannot see them while the human face shows them as decided. Two answers, one question.
+
+**NOT FIXED HERE (deliberate).** Minting D-3134…D-3137 means writing four records from log text this session did not
+author: that is transcription, not measurement, and the registry is append_only — a wrong mint is permanent. The
+repair is either (a) an owner-authorised transcription pass, or (b) accepting the log's paragraph form as its own
+tier and teaching the rail to read it — a decision, not a patch. D-3138 is minted in **both** homes and in HEADING
+form, so this bug does not grow by one today.
+
+**FIX (D-3141, owner-approved).** TWO acts. (1) THE RAIL IS HARDENED: `config/decisions_policy.yaml#membership.id_patterns` gains a third pattern `^(D-?\d+[a-z]?)\s*\(` matching a line-START D-id followed by a parenthesised annotation — measured to match exactly 8 entry lines (D-2688, D-2747, D-2802, D-2804, D-3134..D-3137) and zero prose references or list labels (D1/D2/D3, `D-9002 limb (iv)`), plus a known-answer selftest control in `check_decision_membership.py`. (2) THE FOUR RECORDS ARE RESTORED: the mint gate's D-2660 next-free clause refuses gap-fill, so `recompute_decision_summary.py` gains a declared `--backfill` route (`allow_gap`) that relaxes ONLY that clause and keeps every other check (canonical state, no duplicate, bugs exist, files exist, no clone). D-3134..D-3137 were transcribed VERBATIM from the log (title from the bold headline, body byte-for-byte) and appended, then D-3141 minted normally as the forward authorizing decision. NOT DECIDED HERE: the reverse direction (records with no log entry) remains DECLARED never asserted; no historical no-paren paragraph form is matched (D-348..D-356 resolve anyway). VERIFIED: `check_decision_membership.py` now fails loudly on D-3134..D-3137 before the backfill and reads GREEN (0 faults, 422 ids named, 1267 top-level records) after; both selftests green (13/13 membership, 25/25 mint).
+
+## BUG-990 (HIGH — FIXED 2026-10-24) — the single-concept insert wrote a row that is a 1-of-7,635 singleton on SIX identity axes, and named its generator from a code default
+
+MEASURED 2026-10-24 on the live store (7,635 rows) while scoping the work the owner's tier-B rulings created (14
+certified-but-omitted concepts). `pipeline/insert_single_concept.py` had written exactly ONE row (`f523504e…`), and
+that row is the store's ONLY row in every one of these states:
+
+| axis | this row | the store |
+|---|---|---|
+| `pipeline_run_id` | `''` | 0 others blank (retrieval is pinned to ONE run, D-2881) |
+| `citation` | `''` | 0 others blank |
+| `primary_source` | `NULL` | 0 others null |
+| `source_books` | `[]` | 0 others empty |
+| `verification_method` | `mech_quality` | 0 of the 7,635 carry it (6,564 `deberta-nli`, 1,049 n/a) |
+| `taxonomy_version` | `v5.0` | 6,585 `v9`, 1,049 `v5.6`, this one `v5.0` |
+
+Consequence: no serving predicate can reach that row, its ISOR author axis is 0 (`n_authors 0`) because the book was
+never stamped, and the RECALL rail counts it PRESENT — so a green rail could sit on top of knowledge retrieval can
+never return (the vacuous-pass class BUG-967). Separately, `gen_model` was read as
+`cfg["models"]["gen_model"] or "<literal>"` while the declaration actually lives at `models.generator.model`: the
+R14 stamp's value had TWO homes and the code one won (C12c).
+
+**FIX (pipeline/insert_single_concept.py, 8 known-answer controls green, no store written).** `served_run()` derives
+the run id from the store and REFUSES when more than one run is served (an insert must not choose a corpus);
+`source_provenance()` reads the book identity from the store's own PASS rows for that source and refuses on a blank;
+`taxonomy_version` is derived the same way; the generator identity is read from its ONE declared home and refused when
+absent; `identity_gaps()` runs on the DICT before verify/write and names EVERY gap at once. Red loop: the six-axis
+shape above is that control's negative case, and the row itself was left untouched (it is evidence, not garbage).
+
+## BUG-991 (HIGH — FIXED 2026-10-24) — with its identity fixed, the single-concept path still produces a QUARANTINE row: a 420-char passage yields a vacuous mechanism
+
+MEASURED 2026-10-24, first end-to-end dry run of the repaired path on a REAL owner-certified concept
+(`b51204ce6c6a9950` / "Strategic Diagnosis", the grounding excerpt the evidence sheet quotes, 420 chars, kind prose):
+
+```
+verify: passed=False score=0.000 status=QUARANTINE reason=vacuous method=mech_quality discipline=Strategy domains=['education']
+```
+
+`vacuous` is `stage5_verify.check_mechanism_quality` refusing a mechanism shorter than `MECHANISM_MIN_LENGTH` (or a
+tautological "because" clause). So the blocking gap is NOT identity any more — it is that one short excerpt plus a
+900-token single-shot prompt produces a thin mechanism, and a QUARANTINE row is unservable by definition, which
+defeats the whole purpose of an owner-certified insert. Also visible in the same run: `domains=['education']` for a
+strategy book, i.e. the domain vocabulary was not routed through the source's own domain profile.
+
+**NOT FIXED HERE (deliberate).** The fix is a design choice with three candidates — feed a longer window (the tier-B
+`max_window_chars` precedent), demand the mechanism floor in the prompt and refuse a short one rather than quarantining,
+or run the concept through the SAME window→S2 path the pipeline uses for bulk extraction. Choosing between them
+without a red loop that can go GREEN would be a guess (D-3036). Registered as T-197 with the receipt above.
+
+## BUG-992 (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row quarantined by NLI is written CLEAN again (D-2987 re-introduced on the write path)
+
+MEASURED 2026-10-24, the forensic audit behind T-122 (the classification_status REPAIR). The store was re-proven by
+`scripts/repair_classification_status.py` so the column now MIRRORS the row's own `status` (D2184 enum), and the
+canonical census reads `PASS|CLEAN 4513`, `QUARANTINE|FAILED 2860` (long failure_mode), `QUARANTINE|FAILED 275`
+(short failure_mode), plus one non-canonical `QUARANTINE|CLEAN` row (pipeline_run_id ''). The store is CORRECT.
+
+The WRITER is not. `_classify_s4` (`scripts/reinject_bug198_singletons.py`) and the D2488 gate in
+`pipeline/stage4_merge.py` derive classification_status from failure_mode LENGTH against
+`S4_FAILURE_MODE_MIN_LENGTH` (was the undeclared literal 10), never from `status`:
+
+    classification_status = "CLEAN" if len(failure_mode.strip()) >= S4_FAILURE_MODE_MIN_LENGTH else "FAILED"
+
+So the 2860 long-fm rows whose `status` is QUARANTINE (NLI refused them after S4) — which the repair correctly wrote
+FAILED — would be written CLEAN again on the next re-injection, because their failure_mode is long enough to clear the
+length gate. That is the exact D-2987 defect T-122 repaired (an agent reads CLEAN and cannot see a quarantine),
+re-introduced on the write path instead of the backfill.
+
+**WHY THE STORE IS NOT CORRUPT NOW.** The parity rail `scripts/repair_classification_status.py --check` is fail-closed
+and wired into the ladder, so any write that drifts would stop `just health` (C16). A guard that stops the ladder is
+not a fix, though: the next S4 re-injection WILL emit the wrong value and only THEN be caught — a red ladder instead
+of a correct write.
+
+**OWED (T-198).** Reconcile the S4 producer with D2184: classification_status is a post-S5 field that mirrors
+`status`, not an S4-time fm-length proxy. The choice is a design decision with three candidates — derive the column
+from `status` at S5 time (serving_gate is already the sole status writer), have S4 leave it NULL for a status-derived
+step to fill, or make the writer status-aware — and it gets a red loop first (D-3036). MUST land before any S4
+re-injection. Registered as T-198.

@@ -46,6 +46,11 @@ extraction_recall:
     prefer_explanatory_chars: 800  # excerpt ranking: up to this length a longer passage is STRONGER evidence
                                    # than a shorter one with the same token coverage (a heading that repeats
                                    # the words is not an explanation of them)
+    # Reference band for the adjudication panel's 'lean NONE' hint: a store cosine at/above this means the
+    # candidate is already as close to a stored row of its source as the pipeline calls 'semantically near'
+    # (evidence AGAINST a MATCH, never proof). QUOTED from config/pipeline_config.yaml#stage4.semantic_near_threshold
+    # — the source of truth; do NOT change it here independently of there (C12: thresholds live in config, once).
+    semantic_near_threshold: 0.8
   # T-195 step (b): the ADVISORY tier-B proposer (D-2898: NEVER auto-certified). A local model emits
   # candidate concepts the certified core may have OMITTED; the owner then rules MATCH/NONE. Every value
   # here is config (C12) — the script hardcodes nothing, not even the model name.
@@ -62,6 +67,63 @@ extraction_recall:
     max_windows_per_source: 4     # bound a PILOT to the first N windows (never the whole book)
     max_candidates_per_source: 15 # cap proposals per source (advisory; owner still rules each)
     skip_existing_tier_a: true    # drop a candidate whose concept_key already certifies a tier-A row
+  # T-195 step (d): MULTI-MODEL ADVISORY MATCH/NONE adjudication of the unruled tier-B candidates.
+  # This is a FOURTH act (ADJUDICATE), distinct from PROPOSE/GROUND/RULE (D-3137): it records independent
+  # model opinions to maximize agreement, so the owner reviews ONLY the rows where they conflict/split.
+  # ADVISORY ONLY (D-2658/D-2898): certifies nothing, floors nothing, never writes the owner's ruling.
+  # The PROPOSER (Qwen3-Coder) and Phi-4-mini are EXCLUDED by the script (R5 circularity / BUG-053).
+  tier_b_adjudication:
+    # 4 independent voters: one cloud cross-family (DeepSeek, C22 opt-in — the owner asked) + three top
+    # local models that have NOT yet ruled these 43. None is the proposer, none is Phi-4-mini.
+    models:
+      - deepseek-flash                     # cloud (api.deepseek.com), cross-family decorrelation (V4.1-Flash)
+      - gpt-oss-20b-MXFP4-Q8               # local OMLX; ruled 0 of these 43
+      - Qwen3.8-27B-MLX-4bit               # local OMLX; ruled 0 of these 43 (adjudicated a different population)
+      - Ornith-1.5-35B-A3B-REAP-19B        # local OMLX; top local, never used on these
+    max_tokens: 6000
+    # DeepSeek (V4) is a REASONING model: its CoT (`reasoning_content`) burns tokens proportional to the
+    # batch, so a large batch empties the `content` budget (MEASURED 2026-10-23: 15 candidates -> 0 content).
+    # Chunk each source into groups of this size; 4 is the empirically-safe size (n=2/3/4 all finish=stop).
+    chunk_size: 4
+    # Models that must be adjudicated ONE candidate per call (chunk_size=1 for them regardless of the
+    # value above). MEASURED 2026-10-23: Ornith-1.5-35B-A3B-REAP-19B with enable_thinking=False emits a
+    # clean single-object JSON but only processes the FIRST candidate of a multi-candidate batch (it
+    # drops the rest), so it is run one candidate at a time.
+    single_candidate_models:
+      - Ornith-1.5-35B-A3B-REAP-19B
+    # Artifacts (advisory evidence only). These names are the artifact-id family the session plan
+    # must grant may_touch for (EXTRACTION_RECALL_TIER_B_ADJUDICATION_*.json / *.csv).
+    path: governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_20261023.json
+    csv_path: governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_20261023.csv
+    disagree_csv_path: governance/EXTRACTION_RECALL_TIER_B_ADJUDICATION_DISAGREE_20261023.csv
+    # T-195 step (d2) — THE OWNER'S RULING SHEET (D-3100/D-3137, BUG-988). The three artifacts above are a
+    # MODEL record (one column per voter, no column for the owner's word). This block declares the sheet built
+    # FOR THE RULING: the source passage shown AT ITS OWN LOCATION (file + paragraph), the store row with WHERE
+    # it lives, and two EMPTY columns the owner fills. Producer: scripts/tier_b_owner_sheet.py (no LLM, D-343).
+    # WHY THE LOCATION IS PART OF THE SHEET (MEASURED 2026-10-24): every closest_fb_id / closest_fb_name in the
+    # adjudication CSV resolved into ZERO rows of the t11 S5 checkpoint, because the live store is run
+    # `rechunk-v4-20260929` while the t11 checkpoints are a DIFFERENT run — a pointer without its run name is a
+    # declaration that does not resolve (D-3034). The sheet now names the run, the status and the paragraph.
+    owner_sheet:
+      csv_path: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.csv
+      html_path: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.html
+      how_to_path: governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.md
+      reading_chars: 1400        # the passage shown to the owner (longer than the model sheet's 420-char cap)
+      context_chars: 260         # one neighbouring paragraph of lead-in/trail-out, so the passage reads
+      # The checkpoint the owner searched by hand and did not find these rows in. Declared here so the sheet can
+      # SAY where a row does and does not resolve, instead of leaving the owner to guess (BUG-988).
+      crossref_checkpoint: "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl"
+      decision_column: owner_decision   # header the owner types MATCH / NONE into
+      note_column: owner_note           # free text, never read by any rail
+      valid_decisions: [MATCH, NONE]
+      # Short column labels for the panel voters, so a vote reads "DeepSeek MATCH 0.72" and not a 30-char
+      # model id. A voter with no label falls back to its own name (a new panel member must never block the
+      # sheet) — the label is presentation ONLY and no rail reads it.
+      model_labels:
+        deepseek-flash: DeepSeek
+        gpt-oss-20b-MXFP4-Q8: gpt-oss
+        Qwen3.8-27B-MLX-4bit: Qwen3.8
+        Ornith-1.5-35B-A3B-REAP-19B: Ornith
   store: "knowledge pipeline/maxwell.db"
   evaluate:
     # 'store'  -> recall of the certified core against the LIVE store (a baseline/stability receipt)

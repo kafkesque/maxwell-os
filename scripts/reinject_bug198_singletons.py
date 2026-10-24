@@ -42,6 +42,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
     GEN_MODEL,
     S4_DEPTH_FOCUSED_CLASSIFICATION,
     S4_DEPTH_MAX_TOKENS,
+    S4_FAILURE_MODE_MIN_LENGTH,  # D2488/T-122: C12 (was undeclared literal 10 — orphan_magic_threshold)
     S4_TEMPORAL_SIGNALS,
     VERIFY_MODEL,
     VERIFY_REASONING_OFF_MODELS,
@@ -256,8 +257,12 @@ def _classify_s4(fb_data: dict) -> dict:
     # failure_mode → classification FAILED → S5 quarantines (skip NLI). Faithful to
     # the S4 gate (never silently flow a hollow principle into SQLite).
     fm_len = len(failure_mode.strip())
-    classification_status = "CLEAN" if fm_len >= 10 else "FAILED"
-    classification_error = None if fm_len >= 10 else f"failure_mode too short ({fm_len} chars < 10)"
+    classification_status = "CLEAN" if fm_len >= S4_FAILURE_MODE_MIN_LENGTH else "FAILED"
+    classification_error = (
+        None
+        if fm_len >= S4_FAILURE_MODE_MIN_LENGTH
+        else f"failure_mode too short ({fm_len} chars < {S4_FAILURE_MODE_MIN_LENGTH})"
+    )
 
     return {
         "fb_id": fb_data.get("fb_id"),

@@ -13,18 +13,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1259 decisions (census stamp 429b820bc7592a0b, 2026-10-23) · 750 bugs (260 open / 490 closed; highest OPEN = BUG-976) · 58 open tasks (MUST 11 / SHOULD 43 / WORTH 4; OWNER-moved 2, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1267 decisions (census stamp 7d6071d34b3345b1, 2026-10-24) · 756 bugs (261 open / 495 closed; highest OPEN = BUG-992) · 56 open tasks (MUST 10 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1259 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 644 · ⚖ ratified 148 | closed: ✅ resolved 351 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1259, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1267 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 648 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1267, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 260 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 40 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 260 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 41 · 🟨 MED 82 · 🟩 LOW 33 · UNLABELLED 101 (BUG-757) of 261 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | the applier reads an ACCEPTED plan (a file the disposition has signed) |
-> | T-195 | 🟠 SHOULD | TIER-B COMPLETENESS ARM: propose-and-verify the concepts the certified core omits (the half of "nothing lost"  | STEP (b) DONE + STEP (c) EXECUTED 2026-10-23 (BUG-974 fix live): the p |
 >
 > **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -34,7 +32,6 @@
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938  |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
-> | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
@@ -42,6 +39,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
 > _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
@@ -5403,3 +5401,96 @@ D-3135 (ACTIVE 2026-10-23): **A DISPOSITION RULING ON A STORED ROW IS ENACTED BY
 D-3136 (ACTIVE 2026-10-23): **A RULE WITH FOUR HOMES TELLS FOUR TRUTHS — the per-record verification sequence has ONE home, and a rail keeps it single.** T-196, closing the BUG-978/979/980/981 family. MEASURED before the act: the sequence (mechanism gate → short-circuits → NLI → enrichment → verdict → ISOR → score axis → label → facet tier) existed in FOUR files, and each copy had drifted — `insert_single_concept.py` computed no ISOR at all and derived its label from `None`; `reverify_one_row.py` echoed a stored ISOR instead of computing one; `reinject_bug198_singletons.py` had no evidence-contamination short-circuit and hardcoded a verifier identity naming `threshold 0.10`, a threshold D-2863 had already moved to 0.5, so the copy NAMED a rule it did not run. Four copies, four behaviours, five bugs. The rule now has one home, `pipeline/verify_record.py::verify_one_record`, and `scripts/check_verification_sequence.py` (a ladder rail) fails if a fifth copy appears (AST census, not text: a docstring that names a check is a sentence, not a call — the rail's first draft matched its own documentation). Five clauses generalise beyond this bug. (1) **THE INPUT CONTRACT IS PART OF THE RULE.** MEASURED twice in one day: the store keeps list-shaped cells as JSON TEXT while every check expects a list, so a raw store row made the NLI answer "No evidence" (BUG-979) and made ISOR report `n_sources=0` for a row carrying one source id (measured 2026-10-23, when a repair wrote exactly that blind value before the contract was enforced). Hydration therefore lives IN the home (`hydrate_json_lists`), so a caller cannot get it wrong, and the rail asserts a store-shaped row derives what a native row derives. This is D-2956 clause 4 one level down: the shape of an instrument's INPUT is part of the instrument. (2) **ONE RECORD, TWO TYPED FACES, BOTH OWNED HERE.** The store takes `verification_results`/`isor` as JSON text and the review flag as 0/1; the S5 checkpoint takes list/dict/bool. `store_cells()` and `checkpoint_cells()` produce both, so no caller re-types a cell — a conversion each writer retypes is a rule with N homes wearing a smaller costume. (3) **A DERIVED IDENTITY IS DERIVED.** `verifier_model` is now built from the declared model + threshold, because a typed copy had already drifted to a retired threshold. (4) **A WRITER'S WRITE SET IS THE HOME'S STORE FACE, not a hand-picked subset:** the subset is how a confidence derived WITH an ISOR rating was written beside a BLANK `isor` cell (D279 quartet atomicity applied to the score axis). (5) **THE HOME JOINS THE FINGERPRINT AND THE INVALIDATION IS DECLARED, NEVER DISCOVERED:** `pipeline/verify_record.py` is added to `stage5.fingerprint_files` (BUG-614: the fingerprint must cover every module that changes the OUTPUT), and the checkpoint's stored input fingerprint (`67e4f251…`) no longer matches the current one (`ed813bc0…`), so the next S5 resume DISCARDS and re-verifies — recorded in `governance/evidence/t196_verification_home_receipt.json` rather than left to be discovered mid-run. MEASURED AFTER the act (D-3134 clause 1): `check_serving_gate` 7,635/7,635 MATCH, `check_s5_score_axis` 6,586 MATCH / 0 undecidable, `check_label_provenance` 7,635 stamped, the new rail green, `ruff check pipeline/stage5_verify.py` clean, R5 gate APPROVE on the home and on S5 (gemma); and repairing the single-concept row through the home wrote exactly ONE cell (`isor`) with `n_sources=1`, closing the store's declared `isor` blank so the column's CONSTANT-OR-BLANK debt class disappears while the ceiling stays at 8 (never raised, D-2642). NOT DECIDED HERE: the sequence is not reordered, no threshold or weight moves, no label is invented, and the two DELEGATED reviews that failed (gemma and Qwen3-Coder, both "max turns reached", journalled `failed` with their measured wall times) are recorded as FAILED runs, not as approvals — the R5 verdicts in force are the governed gate's, not a subagent's report.
 
 D-3137 (ACTIVE 2026-10-23): **A FLOORED RULING IS HANDED OVER WITH ITS READING — PROPOSE, GROUND and RULE are three different acts, and only the last one is the owner's.** T-195 step (c), asked as a direct question: *haven't Qwen and gpt-oss already done these 43 MATCH/NONE classifications, and if not, can't they be run now?* MEASURED, because the answer decides whether 43 human rulings are owed at all. (a) The ruling sheet holds **2** lines — `The Kernel of Strategy` MATCH, `LLM-Based Application Patterns` NONE — against **45** proposed candidates, so **43 are unruled**. (b) Qwen3-Coder did not rule them; it **PROPOSED** them (`config/extraction_recall.yaml#proposer.model`), and every one of the 45 rows carries exactly `{source_id, name, rationale}` — a proposal, which D-2898 forbids certifying. (c) gpt-oss-20b + Qwen3.8 **did** emit MATCH/NONE verdict columns, but over a DIFFERENT population: `ANCHOR_208_REANCHOR_ADJUDICATION_*` covers the **195 dangling anchor names** of the T-191 re-anchor, and the name overlap with the 43 tier-B candidates is **0/43** — a verdict vocabulary that matches is not a reusable verdict (D-3034: a declaration must RESOLVE to this object). So no prior model pass can be spent here, and the owner's gate cannot be delegated away. What CAN be built is what was missing: the reading the ruling stands on. `scripts/tier_b_evidence.py` now measures, per candidate, source grounding (`name_verbatim_hits`, concept-token coverage in the SAME token space `concept_key` mints from — `pipeline.dedup_identity.content_tokens`, one home) plus store novelty (bge-m3 cosine against the store rows of THAT source, top 3), and `rule_tier_b.py` prints all of it inside the walk. Five clauses generalise. (1) **A FLOORED RULING IS HANDED OVER WITH ITS READING.** `expectation_recall` is 1.0, so a wrong MATCH leaves the recall rail permanently RED until the concept is extracted and a wrong NONE loses the concept silently: the ruling must rest on a measurement, not a recollection (D-3100 taken one level down — the handover owes the *evidence*, not only the command). (2) **THE GROUNDING INSTRUMENT MUST BE DECORRELATED FROM THE PROPOSER.** Asking the proposing family to confirm its own proposals measures agreement with itself, and BUG-053 is the standing finding that open-ended delegated judgement hallucinates; the instruments used here are the **bytes** (a scan, which cannot hallucinate) and a **non-generative embedder** (bge-m3), the same third-signal principle the re-anchor bridge uses (D-2658). (3) **A CITATION MUST CONTAIN ITS OWN EVIDENCE.** MEASURED while building it: cutting a long paragraph at its first `max_excerpt_chars` characters showed a passage whose matched tokens sat BEYOND the cut, and markdown books split into list items so the best token coverage often lands on a table-of-contents line — the sheet now windows AROUND the first matched token and labels each reading `prose` or `fragment/list` (38/45 prose, 7 flagged), so the owner knows what they are reading. (4) **QUOTE THE STORE'S DECLARED BAND; DO NOT INVENT ONE.** The "already carried under another label" signal is reported against `config/pipeline_config.yaml#stage4.semantic_near_threshold` = 0.8 (the store's own notion of near), not a number picked here; measured result: **1 of 45** at or above it (`Prompt Template Abstraction` 0.8494 → a stored `Prompt Template Implementation`), so 42 candidates are genuinely novel for their source and one should be ruled with the collision in view. (5) **A CANDIDATE'S PROVENANCE IS PART OF THE CANDIDATE.** The proposer now stamps `window_index` + `window_sha16` (BUG-985) so "this candidate came from this source" is checkable instead of trusted, and the evidence sheet VERIFIES the stamp when present rather than believing it. MEASURED AFTER the act (D-3134 cl.1): evidence sheet writes 45 rows, `owed []` and `warnings []`; `check_extraction_recall --check --no-report` → concept 45/45, expectation 419/419 CLEAN (rc 0, report untouched); the walk renders `[k/43]` with rationale, tokens, verbatim hits, closest stored row and the reading, and `--count` still reports `43 unruled / 45 total`; the proposer's 6-control and the evidence script's 5-control selftests are green, both wired into `justfile#health`; `check_config_defaults` stays at 300 shadowed-declared (no ceiling raised) and `check_rail_registry` ok. NOT DECIDED HERE: **no candidate is ruled, no model verdict is recorded anywhere, no floor, weight or threshold moves, and no new candidates are proposed** — a MATCH/NONE remains the owner's typed word, and this decision only guarantees that when the owner types it, the reading that decides it is already on the screen.
+
+## D-3138 — A HANDOVER TO THE OWNER CARRIES THE DECISION COLUMN AND A POINTER THAT RESOLVES (2026-10-24)
+
+T-195 step (d2), forced by the owner's report: *"I cant find any of fb that are under name and concept key in t11
+checkpoints … how the fuck I supposed to decide I find can even read it? also there are no section for owner decision
+in csv"*. BUG-988 is the measurement; this record fixes what the four acts owe each other.
+
+**THE ACT COUNT IS FOUR, AND ONLY ONE OF THEM IS THE OWNER'S.** PROPOSE (Qwen3-Coder, advisory) → GROUND (bytes +
+bge-m3) → ADJUDICATE (a 4-model panel, advisory, D-3137) → RULE (the owner). MEASURED this sitting: the panel
+(deepseek-flash + gpt-oss-20b-MXFP4-Q8 + Qwen3.8-27B-MLX-4bit + Ornith-1.5-35B-A3B-REAP-19B, proposer and Phi-4-mini
+excluded by R5/BUG-053) returned **20 of 43 unanimous** (6 UNANIMOUS MATCH, 14 UNANIMOUS NONE) and **23 need review**
+(5 MAJORITY MATCH, 12 MAJORITY NONE, 6 SPLIT), with **zero INCOMPLETE** rows after BUG-987 was fixed. Unanimity is a
+reason to look once, not a ruling: what it buys the owner is ONE acceptance step for twenty rows instead of twenty
+decisions — it never buys the act itself (D-2658/D-2898).
+
+**FIVE CLAUSES, EACH ONE A DEFECT THAT WAS MEASURED.**
+
+1. **A REVIEW SHEET WITHOUT A DECISION COLUMN IS NOT A REVIEW SHEET.** The adjudication CSV carried 18 columns and
+   none for the owner's word, so the one human gate in the arm had no instrument. A handover owes the COLUMN, and a
+   COMMAND that consumes it — `scripts/rule_tier_b.py --from-csv` — so the ruling is typed once, in the artifact the
+   reading is in, and becomes the ruling sheet with no JSON to paste (D-3100 taken to its end).
+2. **A POINTER MUST NAME THE RUN IT LIVES IN.** MEASURED: 0 of 23 `closest_fb_id`s and 0 of 23 names resolve into the
+   t11 S5 checkpoint, because the live store is run `rechunk-v4-20260929` and the checkpoints are a different run. The
+   sheet now prints the run, the status and a crossref verdict per row ("NOT in t11 — this store row lives in run
+   rechunk-v4-20260929"). A pointer that cannot say where it resolves is a declaration with no referent (D-3034).
+3. **AN ABSENCE THAT IS BY CONSTRUCTION MUST BE STATED, WITH THE COUNT THAT PROVES IT.** A tier-B candidate is a
+   concept the extractor did NOT produce (D-3130), so a checkpoint can never contain it: MEASURED 0 of 43 concept keys
+   in the store and 0 of 43 in the t11 S5 checkpoint, median store cosine 0.609 (38/43 under 0.7). Handing the owner
+   a checkpoint to search for these is a guaranteed no-op; the sheet says so in one line before row 1.
+4. **A QUOTE WITHOUT A LOCATION CANNOT BE CHECKED.** Every row now names the book AND the paragraph index
+   ("paragraph 2131 of 4576 in …"), with the neighbouring paragraphs, so the reading is verified in the source rather
+   than trusted from the sheet (D-3137 cl.3, one level deeper).
+5. **THE RULING COLUMN IS EMPTY AND STAYS EMPTY UNTIL THE OWNER TYPES.** Measured: 0 of 23 rows pre-filled. A sheet
+   that pre-fills a verdict has ruled for the owner; `--from-csv` treats a blank cell as NOT RULED (skips it), refuses
+   an unknown token fail-closed (`owner_decision='YES'` → rc 1), and skips an already-ruled candidate so a re-run
+   after a partial fill cannot double a ruling.
+
+**RECEIPTS.** `scripts/tier_b_owner_sheet.py` writes 23 rows to
+`governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.{csv,html,md}` (config:
+`extraction_recall.tier_b_adjudication.owner_sheet`, reading_chars 1400 / context_chars 260 / crossref_checkpoint
+declared). Selftests: owner sheet **7 controls** green (index-preserving splitter, nearest-present neighbour, window
+carries its cited token and respects the cap, z-library parenthetical stripped, decision+note are columns 2–3);
+`rule_tier_b --selftest` **5 controls** green. `--from-csv` controls: blank → `0 record / 23 blank`; two filled →
+`2 / 21 blank`; typo → FAIL-CLOSED at the exact line. Panel envelope and disagreement CSV unchanged and re-verified:
+0 INCOMPLETE, 0 model errors.
+
+**NOT DECIDED HERE.** No candidate is ruled. The 20 unanimous rows await ONE owner acceptance (not twenty decisions),
+the 23 review rows await the owner's word in the new sheet, and nothing is floored, certified or promoted by this
+record — a floor still moves only on `check_extraction_recall.py --build-golden` after the owner's ruling lands. Also
+registered, not repaired: BUG-989 — `config/decisions.yaml` sits four records behind this log (D-3134…D-3137) and the
+membership join cannot see paragraph-form entries, so its "0 fault(s)" is a false green; D-3138 is therefore minted in
+both homes and in HEADING form.
+
+## D-3139 — AN INSERT DERIVES ITS IDENTITY FROM THE STORE, AND A ROW THAT CANNOT BE SERVED IS NOT A RECORD (2026-10-24)
+
+T-195 follow-through. The owner ruled all 45 tier-B candidates (23 typed into the sheet he asked for, 20 unanimous
+under his standing word "those advisory can promoted to my acceptence"), the golden was rebuilt and the rail now
+measures the real gap: **concept 45/59 (0.7627), expectation 419/433 (0.9677) → RED**, naming **14 owner-certified
+concepts the store does not contain**. Turning those 14 green requires a governed single-concept insert, and the
+forensic audit of that path (BUG-990) found it had produced exactly one row which is the store's ONLY row on six
+identity axes at once.
+
+**CLAUSES.**
+
+1. **IDENTITY IS DERIVED, NEVER ASSERTED.** `pipeline_run_id`, `source_books`, `primary_source`, `citation` and
+   `taxonomy_version` are READ from the store's own PASS rows (the served run, the source's book identity, the
+   version that source speaks) and the path REFUSES when what it reads is ambiguous or blank. A declared value would
+   be a second home for a fact the store already holds (C12), and the one row that carried literals here became a
+   1-of-7,635 orphan.
+2. **AN AMBIGUOUS STORE MUST NOT BE CHOSEN FOR.** If more than one run id is served, the insert refuses instead of
+   picking a corpus (D-3034). The path follows the store; it does not decide what the store serves (D-2881 owns that).
+3. **THE GENERATOR'S IDENTITY HAS ONE HOME.** `models.generator.model` — not a literal behind a `or` fallback. An R14
+   stamp whose value has two homes is a stamp that can disagree with itself (C12c).
+4. **THE GATE RUNS ON THE DICT, BEFORE VERIFY AND BEFORE ANY WRITE, AND NAMES EVERY GAP AT ONCE.** Six single-cause
+   refusals teach nobody; one list names the shape (8 known-answer controls, green, no store touched).
+5. **THE ROW THAT CANNOT BE SERVED IS THE REAL DEFECT, AND IT IS NOT SOLVED BY IDENTITY ALONE.** Receipt (BUG-991):
+   with identity fixed, a real certified concept still verifies `status=QUARANTINE reason=vacuous` because a 420-char
+   excerpt yields a mechanism under `MECHANISM_MIN_LENGTH`. So this decision does NOT claim the 14 gaps can be closed
+   today; it claims the path can no longer mint an unreachable row while trying, and it registers the remaining
+   design choice as T-197 rather than guessing it (D-3036).
+
+**RECEIPTS.** `pipeline/insert_single_concept.py --selftest` → 8/8 controls. Golden rebuild: 59 concepts / 433
+(concept x source) expectations / 338 sources from 60 certifications. Rail AFTER the owner's rulings: RED at
+45/59 and 419/433, `missing_concepts` listing all 14 by name (5 Infante / 6 Rumelt / 3 Levin-Brain). Tier-A floor
+unchanged: 44 of the 59 are the previously certified core, all present.
+
+**NOT DECIDED HERE.** No concept was inserted; no store byte was written by this change (dry run only). The
+`f523504e` orphan row was LEFT IN PLACE: it is the evidence for BUG-990, and repairing it is its own act with its
+own receipt.
+
+## D-3140 — THE MECHANISM FLOOR IS ENFORCED AT THE GENERATOR, NOT LEFT FOR S5 TO QUARANTINE (2026-10-24)
+
+T-197 / BUG-991. The single-concept prompt was a DRIFTED SECOND HOME for the extraction contract (the D-3136 shape): it named `mechanism` with no register or length guidance, while the bulk path's SYSTEM_PROMPT carries the full register calibration (causal_mechanism vs empirical_pattern, "never a restatement"). MEASURED: the 420-char Rumelt excerpt ("a good strategic diagnosis … defines a domain of action … promising leverage over outcomes") is SUFFICIENT for a ≥150-char mechanism, yet the generator returned a sub-floor one-liner and S5 quarantined it — so the defect is the CONTRACT, not the input length, and candidate fix #1 (longer window) was therefore NOT adopted (measured unnecessary). FIVE CLAUSES. (1) THE CONTRACT CLAUSE: a field the bulk path defines with register + length rules but the single path names bare is a rule with two homes telling two truths (D-3136). (2) THE ONE-HOME CLAUSE: the floor and the register are read from their existing homes — `stage5.mechanism_min_length` via the verifier's own `MECHANISM_MIN_LENGTH` constant, and `single_concept.extraction_type` — never re-typed (C12c). (3) THE FAIL-CLOSED-AT-GENERATOR CLAUSE: `check_mechanism_quality` (the ONE home) runs on the draft fb BEFORE `verify_one_record`; a rejection triggers ONE targeted retry (temp=0.0, so a sterner prompt is a DIFFERENT input, not a re-roll of the same answer), then FAIL-CLOSED rather than writing a row S5 would quarantine — an unservable row is not a record (BUG-967). (4) THE RECEIPT CLAUSE: the named red loop went RED→GREEN — before `status=QUARANTINE reason=vacuous method=mech_quality domains=['education']`, after `status=PASS score=0.986 reason=entail method=deberta-nli domains=['organizational behavior','leadership']`; 8/8 selftest controls green, no store byte written. (5) NOT DECIDED HERE: the domains routing (model-derived domains for a strategy book) is BUG-712's class and is NOT fixed here; the 14-row insert is the remaining act of T-197, whose named red-loop command is now GREEN.

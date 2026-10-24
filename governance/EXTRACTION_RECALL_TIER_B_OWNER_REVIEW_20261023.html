@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>tier-B owner review — 23 rows to rule</title>
+<style>
+ body{font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;margin:0;
+       background:#f6f7f9;color:#14181d}
+ .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+ h1{font-size:26px;margin:0 0 4px} .sub{color:#5b6570;margin:0 0 24px}
+ .legend{background:#fff;border:1px solid #dfe3e8;border-left:5px solid #2f6fed;border-radius:8px;
+          padding:14px 20px;margin-bottom:26px}
+ .legend h2{font-size:17px;margin:0 0 8px} .legend p{margin:8px 0}
+ .card{background:#fff;border:1px solid #dfe3e8;border-radius:8px;padding:16px 20px;margin:0 0 20px}
+ .card h2{font-size:19px;margin:0 0 6px;line-height:1.3}
+ .no{display:inline-block;min-width:1.9em;text-align:center;background:#14181d;color:#fff;
+      border-radius:6px;font-size:15px;padding:1px 6px;margin-right:6px}
+ .badge{font-size:12px;font-weight:600;color:#7a4b00;background:#fff4d6;border:1px solid #f0d79a;
+         border-radius:999px;padding:2px 9px;vertical-align:middle;white-space:nowrap}
+ .votes{font-size:13px;color:#3c4650;background:#f2f4f7;border-radius:6px;padding:6px 10px;margin:6px 0 10px}
+ .where{font-size:13.5px;color:#3c4650;margin:0 0 8px}
+ .where code{font-size:12px;background:#f2f4f7;padding:1px 5px;border-radius:4px}
+ .kind{color:#5b6570}
+ blockquote{margin:0 0 10px;padding:12px 16px;border-left:4px solid #2f6fed;background:#f8faff;
+             font-family:Georgia,"Times New Roman",serif;font-size:16.5px}
+ .ctx{font-size:13px;color:#67717c;margin:0 0 4px;padding-left:4px}
+ .ctx .lbl{display:inline-block;min-width:3.6em;color:#9aa3ad;text-transform:uppercase;font-size:11px;
+            letter-spacing:.04em}
+ .cmp{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+ .cmp h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#5b6570;margin:0 0 6px}
+ .cmp p{margin:0 0 7px;font-size:14.5px}
+ .cos{font-weight:400;text-transform:none;letter-spacing:0;color:#9aa3ad}
+ .small{font-size:12.5px;color:#7a4b00}
+ .decide{margin:14px 0 0;font-size:13.5px;color:#3c4650;border-top:1px dashed #dfe3e8;padding-top:10px}
+ .decide a{float:right;color:#2f6fed;text-decoration:none}
+ @media(max-width:720px){.cmp{grid-template-columns:1fr}}
+</style></head><body><div class="wrap" id="top">
+<h1>tier-B owner review — 23 rows need your word</h1>
+<p class="sub">23 split or majority rows out of 43 unruled candidates. Every unanimous row was already
+  promoted by agreement and is not here. Advisory only: nothing is ruled until you type it.
+  Generated from <code>governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.csv</code> · pipeline_commit d0a565c ·
+  schema 1.</p>
+
+<section class="legend">
+  <h2>Read this once, then start at row 1</h2>
+  <p><b>These rows cannot be found in any t11 checkpoint, and that is not a mistake.</b> A tier-B candidate is
+     by definition a concept the extractor did <i>not</i> produce (D-3130). Measured on these 43: <b>0</b> of
+     their concept keys exist in the store and <b>0</b> in the t11 S5 checkpoint. So the checkpoint is the wrong
+     place to look — the right place is the <b>book</b>, at the paragraph named on each card.</p>
+  <p><b>MATCH</b> = this source really does teach this concept. It becomes a <b>floor</b>: the pipeline must
+     extract it, and the recall rail stays RED until it does. <b>NONE</b> = the source does not teach it as a
+     concept. A wrong MATCH pins a RED rail; a wrong NONE loses the concept silently — so rule from the passage,
+     never from the label.</p>
+  <p><b>The panel is advisory only.</b> Four models voted; where they split you decide (D-2658/D-2898/D-3137).
+     A vote is an opinion, not evidence: the evidence is the <b>quote</b> and its <b>location</b>.</p>
+  <p><b>The closest store row</b> is shown so you can see whether the concept already exists under another
+     name. Its cosine is the store's own "semantically near" measure; at or above
+     <b>0.8</b> the pipeline already calls the two near, which is
+     a reason to look closely — never proof of anything.</p>
+</section>
+
+<section class="card" id="r1">
+  <h2><span class="no">1</span> LLM Adaptation Strategies
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.5 · gpt-oss NONE 0.88 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 2131 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>The result we&#x27;ve obtained with the `ParentDocumentRetriever` is particularly useful when used as context for LLM synthesis, as it provides broader details around the specific information. Next, I&#x27;ll introduce another technique that uses embedding strategies to further optimize RAG retrieval accuracy.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…:::: {#chapter-8.html_p127 .browsable-container .listing-container} ::: code-area-container ``` code-area Document(metadata={&#x27;doc_id&#x27;: &#x27;34645d23-ed05-4a53-b3af-c8ab21e3f513&#x27;, &#x27;language&#x27;: &#x27;en&#x27;, &#x27;source&#x27;: &#x27;https://en.wikivoyage.org/wiki/South_Cornwall&#x27;, &#x27;title&#x27;:…</div><div class="ctx"><span class="lbl">after</span>…### [8.4.2]{.num-string} Embedding child chunks with MultiVectorRetriever {.readable-text-h3}…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The three main ways of tailoring a general-purpose LLM to a task: prompt engineering, retrieval-augmented generation, and fine-tuning.</p>
+      <p><b>Application.</b> Choose the cheapest sufficient adaptation: start with prompting, add RAG for missing knowledge, and fine-tune only for behaviour or format gaps.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6123 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Llm Api Request Patterns</p>
+      <p><b>Definition.</b> Large Language Models can be queried through multiple API interfaces including direct HTTP requests, OpenAI-compatible libraries, and local model serving tools like Ollama. These different approaches require varying levels of configuration and support different interaction patterns.</p>
+      <p><b>Application.</b> When a developer needs to interact with an LLM, choose the interface that best matches the project’s constraints: use raw HTTP requests for maximum control and minimal dependencies, or use a high‑level library (e.g., LangChain, OpenAI Python SDK, or Ollama client) for rapid prototyping and easier code maintenance.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>1</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r2">
+  <h2><span class="no">2</span> LLM Prompt Optimization
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.78 · gpt-oss NONE 0.78 · Qwen3.8 NONE 0.85 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 2553 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(fragment/list)</span></p>
+  <blockquote>- [Vague or overly complex questions produce poor retrieval results because vector stores match semantic similarity, not logical precision. Query optimization transforms unclear queries into effective retrieval inputs.]{#chapter-9.html_p167} - [Query rewriting (Rewrite-Retrieve-Read) uses an LLM to reformulate the user&#x27;s question into clearer, more specific versions before searching. &quot;Fix my code&quot; becomes &quot;How to resolve `ImportError: No module named pandas` in Python?&quot;]{#chapter-9.html_p168} - [Multi-query retrieval generates three to five variations of the original question, retrieves documents for each variation, and merges results using Reciprocal Rank Fusion (RRF). This captures diverse phrasings of the same intent.]{#chapter-9.html_p169} - [The coarse-to-fine retrieval technique searches using high-level summaries (500-word chunks) to find relevant sections and then re-searches within those sections using fine-grained chunks (100-word chunks). This narrows the scope progressively.]{#chapter-9.html_p170} - [Step-back prompting generates a broader version of the question before retrieval to first retrieve foundational knowledge. &quot;How do I configure SSL in Flask?&quot; becomes &quot;What is SSL, and how do web frameworks handle it?&quot;]{#chapter-9.html_p171} - [Hypothetical Document Embeddings (HyDE) generates a fake answer to the user&#x27;s question. It then searches for documents similar …</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…This concludes our exploration of question transformation techniques for enhancing retrieval effectiveness. In the next chapter, you&#x27;ll learn additional methods to improve RAG performance.…</div><div class="ctx"><span class="lbl">after</span>…# [[10]{.num-string} ]{.chapter-title-numbering} [Query generation, routing, and retrieval postprocessing]{.chapter-title-text} {.readable-text-h1}…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The iterative refinement and testing of prompts to reliably produce desired model outputs.</p>
+      <p><b>Application.</b> Apply it by testing prompt variants against sample inputs and revising wording until outputs are consistently correct.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.7483 · PASS</span></h3>
+      <p><b>Name.</b> Prompt Engineering for Llm Cognition</p>
+      <p><b>Definition.</b> Prompt engineering enables large language models to exhibit cognitive behaviors such as reasoning, goal decomposition, and tool use by structuring input to elicit desired output patterns. The approach transforms how LLMs are interacted with, unlocking latent cognitive capabilities through carefully designed prompts rather than architectural changes.</p>
+      <p><b>Application.</b> When designing prompts for an LLM to perform reasoning, goal decomposition, or tool use → do structure the prompt with contextual cues, examples, or explicit reasoning frameworks such as Chain‑of‑Thought to guide the model.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>2</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r3">
+  <h2><span class="no">3</span> LLM Use Case Mapping
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek NONE 0.75 · gpt-oss MATCH 0.86 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 1731 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>…=============================================================================================================================================================================================================================================================+====================================================+ | Retrieval Augmented Generation (RAG)\ | Use case involving the generation of text (typically an answer) augmented with information retrieved from a content store optimized for semantic searches, typically a vector store\ | Q&amp;A\ | +---------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------+ | Text chunk\ | A fragment of text from a document. Documents are split into chunks for more effective searching, especially when stored in specialized unstructured text stores such as vector stores.\ | Text fragment, chunk, text node, node\ | +---------------------------------------+-------------------------------------------------------------------------------------------------------------------------------…</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…##### [Table 6.2]{.num-string} RAG glossary {.browsable-container-h5}…</div><div class="ctx"><span class="lbl">after</span>…You&#x27;re now ready to reimplement RAG with LangChain. We&#x27;ll tackle that in the next chapter.…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The practice of matching real-world business problems to specific LLM application patterns such as Q&amp;A engines or chatbots.</p>
+      <p><b>Application.</b> Use it to choose an appropriate LLM architecture for a given problem before beginning implementation.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6094 · PASS</span></h3>
+      <p><b>Name.</b> Token-based Cost Optimization in Llm Usage</p>
+      <p><b>Definition.</b> The cost of using large language models is determined by the number of input and output tokens, with output tokens typically being more expensive due to sequential generation. Efficient LLM usage requires optimizing for token count to minimize costs while maintaining performance.</p>
+      <p><b>Application.</b> When deploying a commercial LLM in a cost‑sensitive workflow → do a token‑budget audit, limit input prompt length, use KV caching for repeated prompts, and select a provider/model tier that offers the lowest per‑token rate for the required output length.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>3</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r4">
+  <h2><span class="no">4</span> Programmatic Prompt Execution
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.8 · gpt-oss MATCH 0.88 · Qwen3.8 NONE 0.85 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 1372 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>Large language models (LLMs) are driving a new generation of applications that require more than simple prompt--response exchanges. As applications become more complex, agentic workflows have become essential---a pattern where the LLM orchestrates a structured, multistep process using predefined components and explicit state management. Agentic workflows follow a well-defined and consistent sequence of steps. Instead of adapting their behavior dynamically during execution, they emphasize reliability, transparency, and control. In this approach, the LLM makes decisions within clearly defined boundaries, ensuring that each stage of the process remains structured and reproducible. Later in the book, we&#x27;ll explore agent architectures that build on these principles to achieve greater autonomy and adaptability.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…- [An overview of agentic workflows and agents]{#chapter-5.html_p2} - [LangGraph fundamentals and state management]{#chapter-5.html_p3} - [Transitioning from LangChain chains to an agentic workflow]{#chapter-5.html_p4}…</div><div class="ctx"><span class="lbl">after</span>…## [5.1]{.num-string} Understanding agentic workflows and agents {.readable-text-h2}…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Running prompts via code rather than a chat UI so LLM calls can be automated and scaled.</p>
+      <p><b>Application.</b> Wrap prompt calls in scripted pipelines to process many inputs automatically.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6897 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Prompt Template Implementation</p>
+      <p><b>Definition.</b> A method for generating dynamic prompts by combining template structures with input parameters, allowing for reusable and adaptable prompt creation in LLM interactions.</p>
+      <p><b>Application.</b> </p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>4</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r5">
+  <h2><span class="no">5</span> Prompt Engineering as a Design Discipline
+      <span class="badge">MAJORITY MATCH (3-1)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.72 · gpt-oss MATCH 0.88 · Qwen3.8 NONE 0.85 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 3864 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>I&#x27;ve mentioned prompts several times, but I haven&#x27;t shown you any examples yet. A prompt is the instruction you give the LLM to complete a task and generate a response. It&#x27;s such a key part of any LLM application that developing LLM applications often involves spending a lot of time designing and refining prompts through trial and error. Various patterns and techniques are already forming around prompts, leading to the emergence of a discipline called *prompt engineering*. This field focuses on crafting prompts that yield the best possible answers. I&#x27;ll dedicate the next chapter to teaching you the fundamentals of prompt engineering. For now, let&#x27;s start with a straightforward prompt.:</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…### [A.1.2]{.num-string} Prompt engineering examples {.readable-text-h3}…</div><div class="ctx"><span class="lbl">after</span>…:::: {#appendix-a.html_p47 .browsable-container .listing-container} ::: code-area-container ``` code-area prompt_input = &quot;&quot;&quot;Write a short message to remind users to be vigilant about phishing attacks.&quot;&quot;&quot; response = llm.invoke(prompt_input)…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Prompt engineering as a design discipline treats prompt creation as an iterative process of shaping, testing, and refining instructions to reliably guide LLM behavior.</p>
+      <p><b>Application.</b> Apply it by budgeting time for prompt iteration and treating prompt patterns as design artifacts rather than one-off strings.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.7178 · PASS</span></h3>
+      <p><b>Name.</b> Prompt Engineering for Contextual Retrieval</p>
+      <p><b>Definition.</b> Prompt engineering enables precise control over language model responses by structuring input to guide specific outputs within defined contexts. This approach leverages contextual constraints to ensure traceability, consistency, and reliability in model-generated content.</p>
+      <p><b>Application.</b> When building a chatbot that must provide verifiable answers, embed the retrieved context and a strict output format (e.g., JSON) in the prompt so the model only uses that context and returns data in the required structure.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>5</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r6">
+  <h2><span class="no">6</span> Prompt Types as Task Categories
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.65 · gpt-oss NONE 0.9 · Qwen3.8 NONE 0.8 · Ornith MATCH 0.82</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 652 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>Creating effective prompts is crucial for getting the best results in LangChain applications. Whether your app is focused on text classification, sentiment analysis, summarization, text generation, or question answering, each task requires a carefully designed prompt. In the following sections, we&#x27;ll dive into how to craft prompts tailored to these specific tasks, ensuring your application functions as intended.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…## [2.4]{.num-string} Prompt types {.readable-text-h2}…</div><div class="ctx"><span class="lbl">after</span>…Although these prompting techniques are key to developing LangChain applications, we&#x27;ll use ChatGPT for now to keep things simple and explain prompt engineering concepts more clearly. The patterns you learn here will directly apply to the LLM apps we build wit…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Grouping prompts by downstream task—classification, sentiment analysis, summarization, generation, QA.</p>
+      <p><b>Application.</b> Pick a prompt design pattern according to the task category the application targets.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6590 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Prompt Template Implementation</p>
+      <p><b>Definition.</b> A method for generating dynamic prompts by combining template structures with input parameters, allowing for reusable and adaptable prompt creation in LLM interactions.</p>
+      <p><b>Application.</b> </p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>6</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r7">
+  <h2><span class="no">7</span> RAG as a Retrieval-Augmentation Strategy
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.86 · gpt-oss MATCH 0.85 · Qwen3.8 NONE 0.9 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 1998 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(fragment/list)</span></p>
+  <blockquote>- [*Poor question formulation*---If a user&#x27;s question is unclear, the vector store may return weak context, leading to poor results. The LLM struggles when working with unclear queries and subpar context. A fix is to rephrase the question into a clearer, more detailed form before passing it to the retrieval system.]{#chapter-8.html_p20} - [*Ineffective question for retrieval*---Using the original question for both retrieval and generation can fail, especially when the query is broad or abstract. Broad questions may not pinpoint relevant content, resulting in less accurate context. You can address this by breaking down broad questions into specific subquestions to retrieve more precise information.]{#chapter-8.html_p21} - [*Limited data relevance in the content store*---Most RAG systems rely only on vector stores, but adding structured data sources, such as relational databases, tables, or graph databases, can improve results. Route queries to the appropriate content store based on the type of data needed to enhance answer accuracy.]{#chapter-8.html_p22} - [*Limited querying capabilities against structured data*---While vector stores and LLMs excel with natural language, relational and graph databases don&#x27;t process it directly, creating a barrier to using structured content. Use an LLM to generate structured queries (e.g., SQL) tailored to each data source to overcome this.]{#c…</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…Walking through the workflow of the Q&amp;A stage of the RAG architecture, shown in the previous figure, you&#x27;ll encounter several pitfalls that can lead to suboptimal answers. Each issue has a targeted solution, as described here and summarized in table 8.1 that f…</div><div class="ctx"><span class="lbl">after</span>…##### [Table 8.1]{.num-string} Common issues in naive RAG architecture and recommended solutions {.browsable-container-h5}…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> RAG is a strategy that augments LLM generation by retrieving relevant external context and supplying it to the model.</p>
+      <p><b>Application.</b> Use retrieval to ground responses in external knowledge rather than relying solely on parametric generation.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.7476 · PASS</span></h3>
+      <p><b>Name.</b> Retrieval-augmented Generation Process</p>
+      <p><b>Definition.</b> Retrieval-Augmented Generation (RAG) is a technique that combines information retrieval with language model generation to produce responses grounded in external knowledge sources. The process involves retrieving relevant context from a document store and using that context to guide the language model&#x27;s answer generation.</p>
+      <p><b>Application.</b> When a user asks a question that requires up‑to‑date or domain‑specific information → retrieve relevant documents from a vector or keyword database and provide that context to the language model so it can generate a grounded answer.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>7</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r8">
+  <h2><span class="no">8</span> Reasoning in LLMs Through Examples
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.72 · gpt-oss NONE 0.92 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 514 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>LLMs are applied across a wide range of tasks, from text classification to code generation and logical reasoning. Following are some of the most common use cases, along with real-world examples for further exploration:</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…## [1.3]{.num-string} Typical LLM use cases {.readable-text-h2}…</div><div class="ctx"><span class="lbl">after</span>…- [*Text classification and sentiment analysis*---This includes categorizing news articles or recommending stocks based on sentiment analysis. For example, GoDaddy uses LLMs to automatically classify support tickets, as described in the article &quot;LLM from the T…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The technique of demonstrating a reasoning or classification task with one or two worked examples in the prompt so the LLM infers the pattern instead of relying on explicit instructions.</p>
+      <p><b>Application.</b> When asking a model to classify, extract, or reason over new inputs, prepend one or two solved examples in the same output format to anchor the behaviour.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6695 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Llm Text Generation with Structured Prompts</p>
+      <p><b>Definition.</b> A method for generating text with specific content requirements using large language models, where structured prompts with clear facts and formatting instructions improve output quality and alignment with desired parameters.</p>
+      <p><b>Application.</b> When generating content with LLMs that must include specific facts and stylistic constraints → use structured prompts that explicitly list facts and formatting instructions to guide the model.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>8</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r9">
+  <h2><span class="no">9</span> Step-by-Step Instruction Design
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.55 · gpt-oss MATCH 0.87 · Qwen3.8 NONE 0.95 · Ornith NONE 0.75</p>
+  <p class="where"><b>Read it here:</b> AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) — <code>paragraph 384 of 4576 in knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>Here\&#x27;s why that&#x27;s so exciting: LLMs allow software to &quot;speak human.&quot; They can revise a contract, turn logs into meaningful answers, draft code, and plan the next step---and then invoke the right tools and data to actually accomplish the task. Combined with retrieval and tool use, an application stops feeling like a rigid machine and begins to feel more like a collaborative partner. The potential is significant, but turning that potential into production systems isn&#x27;t simple. It still requires careful work to integrate data flows, design effective prompts, ground answers with retrieval, orchestrate multi-step workflows, and monitor how the system behaves once it&#x27;s deployed.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…In late 2022, something changed. Large language models (LLMs) stopped feeling like experimental demonstrations and started becoming genuinely useful. A quick attempt to summarize a paragraph evolved into a chatbot capable of answering questions, and a small sc…</div><div class="ctx"><span class="lbl">after</span>…My own journey into this field followed a similar path to many developers. I began by experimenting in Jupyter Notebooks, exploring APIs, and learning where the models succeeded and where they struggled. Those early explorations gradually evolved into small, a…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Prompt design that spells out the intermediate steps an LLM should follow to reach an answer.</p>
+      <p><b>Application.</b> Decompose a complex prompt into enumerated steps so the model&#x27;s reasoning follows a predictable path.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.7040 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Supervised Fine-tuning for Instruction Following</p>
+      <p><b>Definition.</b> Supervised fine-tuning (SFT) is a training technique that aligns large language models with desired behaviors by optimizing model responses to specific instructions or prompts. It involves adjusting model parameters using labeled data that maps inputs to preferred outputs, enabling the model to better follow user queries and generate relevant responses.</p>
+      <p><b>Application.</b> When training a large language model with labeled instruction-response pairs → do supervised fine-tuning to minimize prediction error and align outputs with desired behavior.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>9</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r10">
+  <h2><span class="no">10</span> Aesthetics + Computation Synthesis
+      <span class="badge">MAJORITY MATCH (3-1)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.72 · gpt-oss MATCH 0.78 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 31 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>Outside of class, when I finally knew enough C to start making visual things, everything changed. My motivation kicked in and I learned more in a few weeks than I had learned in months prior. The resulting collection of cryptic experiments called Reactive 006 opened the door for me to join John Maeda&#x27;s Aesthetics + Computation Group (ACG) at the MIT Media Lab in 1999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the initial set of examples for Processing 1.0, which Ben Fry and I released in 2001. My two years in ACG clarified my future and led to my first experiences teaching code.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…When I was first learning to code, this book would have made a world of difference. I had been trying to learn for three years on and off—on my own and then through an evening extension class in 1997—and there were no resources I knew of at that time that were…</div><div class="ctx"><span class="lbl">after</span>…As I discovered firsthand, the teaching style for learning to code within computer science rarely worked for visual arts students, so those of us who taught visual artists and designers invented new approaches to immerse students in this way of thinking and ma…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The principle that bringing artists, designers, and programmers into the same research context produces a novel synthesis of aesthetic and computational practice.</p>
+      <p><b>Application.</b> Structure teams or curricula that deliberately mix visual-arts and coding expertise so that neither discipline dominates the exploration.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6265 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Semiotic Layered Meaning</p>
+      <p><b>Definition.</b> Visual and textual communication operates across multiple semiotic levels — denotation, connotation, and myth — each layer adding meaning that is distinct in scope and interpretation. These layers interact to create rich, multi-dimensional communication that can be understood differently based on context and viewer background.</p>
+      <p><b>Application.</b> When observing a symbol that carries cultural or ideological meaning → do analyze its denotative, connotative, and mythic layers to anticipate varied interpretations and manage ambiguity in design or storytelling.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>10</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r11">
+  <h2><span class="no">11</span> Bauhaus Pedagogy Preservation
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.9 · gpt-oss MATCH 0.75 · Qwen3.8 NONE 0.95 · Ornith NONE 0.9</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 1419 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>1. Barry, Lynda. Syllabus: Notes from an Accidental Professor. Montreal: Drawn &amp; Quarterly, 2014. 2. Davis, Meredith. Teaching Design: A Guide to Curriculum and Pedagogy for College Design Faculty and Teachers Who Use Design in Their Classrooms. New York: Simon and Schuster, 2017. 3. Itten, Johannes. Design and Form: The Basic Course at the Bauhaus and Later. New York: Van Nostrand Reinhold Company, 1975. 4. Jaffe, Nick, Becca Barniskis, and Barbara Hackett Cox. Teaching Artist Handbook, Volume One: Tools, Techniques, and Ideas to Help Any Artist Teach. Chicago: University of Chicago Press, 2015. 5. Klee, Paul, and Sibyl Moholy-Nagy. Pedagogical Sketchbook. London: Faber &amp; Faber, 1953. 6. Lostritto, Carl. Computational Drawing: From Foundational Exercises to Theories of Representation. San Francisco: ORO Editions / Applied Research + Design, 2019. 7. Lupton, Ellen. The ABC&#x27;s of Triangle, Circle, Square: The Bauhaus and Design Theory. New York: Princeton Architectural Press, 2019. 8. Schlemmer, Oskar. Man: Teaching Notes from the Bauhaus. Cambridge, MA: MIT Press, 1971. 9. Tufte, Edward R. The Visual Display of Quantitative Information. Cheshire, CT: Graphics Press, 2001. 10. Wong, Wucius. Principles of Two-Dimensional Design. New York: John Wiley &amp; Sons, 1972.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…1. Allahyari, Morehshin, and Daniel Rourke. The 3D Additivist Cookbook. Amsterdam: The Institute of Network Cultures, 2017. Accessed July 20, 2020. https://additivism.org/cookbook. 2. Armstrong, Helen, ed. Digital Design Theory: Readings from the Field. New Yo…</div><div class="ctx"><span class="lbl">after</span>…Handbooks for Computational Art and Design…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Bauhaus Pedagogy Preservation is the systematic documentation and continuation of Bauhaus-style design teaching methods.</p>
+      <p><b>Application.</b> Archive and share foundational design exercises to sustain pedagogical traditions.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5446 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Semiotic Layered Meaning</p>
+      <p><b>Definition.</b> Visual and textual communication operates across multiple semiotic levels — denotation, connotation, and myth — each layer adding meaning that is distinct in scope and interpretation. These layers interact to create rich, multi-dimensional communication that can be understood differently based on context and viewer background.</p>
+      <p><b>Application.</b> When observing a symbol that carries cultural or ideological meaning → do analyze its denotative, connotative, and mythic layers to anticipate varied interpretations and manage ambiguity in design or storytelling.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>11</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r12">
+  <h2><span class="no">12</span> Code as Medium for Expression
+      <span class="badge">MAJORITY MATCH (3-1)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.72 · gpt-oss MATCH 0.85 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 535 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>…The New School, Spring 2019). 2. Takayuki Arai et al., “Hands-On Speech Science Exhibition for Children at a Science Museum” (paper presented at WOCCI 2012, Portland, OR, September 2012). 3. Melissa Brinks, “The Weird and Wonderful World of Nicole He&#x27;s Technological Art,” Forbes, October 29, 2018. 4. Geoff Cox and Christopher Alex McLean, “Vocable Code,” in Speaking Code: Coding as Aesthetic and Political Expression (Cambridge, MA: MIT Press, 2013), 18–38. 5. Stephanie Dinkins, “Five Artificial Intelligence Insiders in Their Own Words,” New York Times, October 19, 2018. 6. Andrea L. Guzman, “Voices in and of the Machine: Source Orientation toward Mobile Virtual Assistants,” Computers in Human Behavior 90 (2019): 343–350. 7. Nicole He, “Fifteen Unconventional Uses of Voice Technology,” Medium.com, November 26, 2018. 8. Nicole He, “Talking to Computers” (lecture, awwwards conference, New York, NY, November 28, 2018). 9. Halcyon M. Lawrence, “Inauthentically Speaking: Speech Technology, Accent Bias and Digital Imperialism” (lecture, SIGCIS Command Lines: Software, Power &amp; Performance, Mountain View, CA, March 2017), video, 1:26–17:16. 10. Halcyon M. Lawrence and Lauren Neefe, “When I Talk to Siri,” TechStyle: Flash Readings 4 (podcast), September 6, 2017, 10:14. 11. Shannon Mattern, “Urban Auscultation; or, Perceiving the Action of the Heart,” Places Journal, April 2020. 12. Mar…</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…- Tim Anderson, Marc Blank, Bruce Daniels, and Dave Lebling, Zork, 1977–1979, interactive text-based computer game. - Isaac Blankensmith with Smooth Technology, Paper Signals, 2017, system for making voice-controlled paper objects. - Mike Bodge, Meme Buddy, 20…</div><div class="ctx"><span class="lbl">after</span>…[122. Presented as a device for measuring the hypothetical “Despondency Index” of a given locale, Natalie Jeremijenko and Kate Rich&#x27;s Suicide Box (1996) nevertheless records very real data regarding suicide jumpers from the Golden Gate Bridge.]…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Code as Medium for Expression is the principle that programming languages and computational processes can serve as artistic materials for creative and expressive work.</p>
+      <p><b>Application.</b> Use code as a material for artistic projects, emphasizing aesthetic, conceptual, and expressive outcomes rather than only functional software.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5640 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Semiotic Layered Meaning</p>
+      <p><b>Definition.</b> Visual and textual communication operates across multiple semiotic levels — denotation, connotation, and myth — each layer adding meaning that is distinct in scope and interpretation. These layers interact to create rich, multi-dimensional communication that can be understood differently based on context and viewer background.</p>
+      <p><b>Application.</b> When observing a symbol that carries cultural or ideological meaning → do analyze its denotative, connotative, and mythic layers to anticipate varied interpretations and manage ambiguity in design or storytelling.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>12</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r13">
+  <h2><span class="no">13</span> Community-Curated Learning
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.8 · gpt-oss MATCH 0.88 · Qwen3.8 NONE 0.9 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 39 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>…he clock,” a project that asks students to develop a dynamic representation of time. We had been educated in different countries—Golan in the USA and Tega in Australia—and yet it became clear that we shared an extensive tradition of such assignments: traded, like folk tales, by those teaching code in art and design schools around the world. These pedagogic traditions, however, were mostly absent from the programming primers on our bookshelves, which dealt above all with how to write code, rather than what to make when learning to code and why. This book is our attempt to address this gap and capture an evolving vernacular. It is a book for artists, designers, and poets who are already working with code as a creative medium, or who are curious about doing so. It is for computer scientists, software developers, and engineers who are looking for more open-ended, expressive, or poignant ways to apply their skills. And it is a playbook for educators in all of these fields—a companion to help plan a semester&#x27;s journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…Thank you, Tega and Golan, for such a thoughtful and generous gift to our expanding community. I&#x27;m amazed at how far we&#x27;ve come in the last twenty years. With this book as our guide, we can travel so much further. Onward!…</div><div class="ctx"><span class="lbl">after</span>…It&#x27;s difficult to overstate the importance of computational literacy in 21st-century life. Computer programming, once an esoteric skill in engineering and business, has now acquired broad applicability in fine arts, design, architecture, music, humanities, jou…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Learning resources assembled and refined collectively by a community of practitioners.</p>
+      <p><b>Application.</b> Gather and publish shared teaching notes from a community of creative-coding educators.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5792 · PASS</span></h3>
+      <p><b>Name.</b> Bot Opt-in Requirement</p>
+      <p><b>Definition.</b> A prescriptive rule for automated chatbots: if a bot interacts with real individuals, those individuals must first explicitly opt-in by following the bot, otherwise the bot risks being blocked or terminated.</p>
+      <p><b>Application.</b> When a chatbot is about to interact with a real user → do require that user to explicitly opt‑in by following the bot before any message is sent.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>13</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r14">
+  <h2><span class="no">14</span> Creative Coding Community Networks
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.88 · gpt-oss MATCH 0.9 · Qwen3.8 NONE 0.95 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 1508 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(fragment/list)</span></p>
+  <blockquote>- CAD, 101, 124, 129 - Challenges or difficulties when teaching, 216–218 - Chance. See Randomness - Children&#x27;s media, 98 - Circles, 155, 156, 161, 164–166, 169, 171, 183 - Classroom, 8–9, 190, 231–236 - Climate change, 136, 198 - Collaboration, 9, 50, 81–85, 150, 194, 209, 228 - Color, 18, 24, 44, 96, 145, 153, 155–156, 170, 171, 173, 199 - Community building, 3, 4, 9, 193, 232 - Computational art, history, 150, 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Creative coding, 3, 4, 196, 228, 237–250 - Critical design, 5, 94, 212 - Critical engineering, 5, 113 - Critique, 5, 6, 94, 110, 132, 196, 233–234 - Crowdsourcing, 82 - Curves, 152, 163–165, 168 - Cybernetics, 21, 42, 122</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…- Bauhaus movement, vii, 47 - Beginners, 188–193, 201–205, 209–211, 224–229, 232–233 - BioArt, 198, 212 - Biometrics, 24, 116, 137–142, 178, 179 - Blockchain, 101 - Body, 40, 50, 53, 65, 68, 74, 88, 115–122, 125, 137–142, 144, 178, 201, 248 - Bot, 75–78, 88, 9…</div><div class="ctx"><span class="lbl">after</span>…- Dada, 173, 207, 227 - Dance, 137–139, 222–223 - Data collection, sensing, 109–113, 116, 144, 247 - Data visualization, 24, 30, 61–65, 124, 138, 167, 170, 171–172, 173, 175, 179, 205, 210, 245 - Datasets, 155, 156, 170, 171–172, 178, 179, 175, 173, 205 - Debu…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Creative coding community networks are structured groups of practitioners and educators who share resources and drive curriculum development.</p>
+      <p><b>Application.</b> Build and participate in formal or informal communities to exchange creative-coding teaching practices and materials.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6200 · PASS</span></h3>
+      <p><b>Name.</b> Visual Representation As Mediated Framework</p>
+      <p><b>Definition.</b> Visual representations function as flexible, open-ended frameworks that mediate between conceptual ideas and their material realization. These frameworks can be transformed through various operations while maintaining their mediating role in communication and design.</p>
+      <p><b>Application.</b> When a design team is sketching concepts and needs to iterate quickly, use flexible visual media (drawings, sketches, diagrams) that can be re-oriented, erased, overlaid, or added to, so the representation continues to mediate between ideas and outcomes without losing communicative value.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>14</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r15">
+  <h2><span class="no">15</span> Creative Coding Pedagogy
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.7 · gpt-oss MATCH 0.92 · Qwen3.8 NONE 0.9 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 1508 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(fragment/list)</span></p>
+  <blockquote>- CAD, 101, 124, 129 - Challenges or difficulties when teaching, 216–218 - Chance. See Randomness - Children&#x27;s media, 98 - Circles, 155, 156, 161, 164–166, 169, 171, 183 - Classroom, 8–9, 190, 231–236 - Climate change, 136, 198 - Collaboration, 9, 50, 81–85, 150, 194, 209, 228 - Color, 18, 24, 44, 96, 145, 153, 155–156, 170, 171, 173, 199 - Community building, 3, 4, 9, 193, 232 - Computational art, history, 150, 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Creative coding, 3, 4, 196, 228, 237–250 - Critical design, 5, 94, 212 - Critical engineering, 5, 113 - Critique, 5, 6, 94, 110, 132, 196, 233–234 - Crowdsourcing, 82 - Curves, 152, 163–165, 168 - Cybernetics, 21, 42, 122</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…- Bauhaus movement, vii, 47 - Beginners, 188–193, 201–205, 209–211, 224–229, 232–233 - BioArt, 198, 212 - Biometrics, 24, 116, 137–142, 178, 179 - Blockchain, 101 - Body, 40, 50, 53, 65, 68, 74, 88, 115–122, 125, 137–142, 144, 178, 201, 248 - Bot, 75–78, 88, 9…</div><div class="ctx"><span class="lbl">after</span>…- Dada, 173, 207, 227 - Dance, 137–139, 222–223 - Data collection, sensing, 109–113, 116, 144, 247 - Data visualization, 24, 30, 61–65, 124, 138, 167, 170, 171–172, 173, 175, 179, 205, 210, 245 - Datasets, 155, 156, 170, 171–172, 178, 179, 175, 173, 205 - Debu…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> An approach to teaching programming through visual and artistic practice rather than conventional computer science instruction.</p>
+      <p><b>Application.</b> Design a curriculum that introduces coding concepts via image- and interaction-based exercises to boost engagement and learning.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5939 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Semiotic Layered Meaning</p>
+      <p><b>Definition.</b> Visual and textual communication operates across multiple semiotic levels — denotation, connotation, and myth — each layer adding meaning that is distinct in scope and interpretation. These layers interact to create rich, multi-dimensional communication that can be understood differently based on context and viewer background.</p>
+      <p><b>Application.</b> When observing a symbol that carries cultural or ideological meaning → do analyze its denotative, connotative, and mythic layers to anticipate varied interpretations and manage ambiguity in design or storytelling.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>15</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r16">
+  <h2><span class="no">16</span> Educational Community Building
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.68 · gpt-oss MATCH 0.8 · Qwen3.8 NONE 0.85 · Ornith NONE 0.7</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 39 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>…he clock,” a project that asks students to develop a dynamic representation of time. We had been educated in different countries—Golan in the USA and Tega in Australia—and yet it became clear that we shared an extensive tradition of such assignments: traded, like folk tales, by those teaching code in art and design schools around the world. These pedagogic traditions, however, were mostly absent from the programming primers on our bookshelves, which dealt above all with how to write code, rather than what to make when learning to code and why. This book is our attempt to address this gap and capture an evolving vernacular. It is a book for artists, designers, and poets who are already working with code as a creative medium, or who are curious about doing so. It is for computer scientists, software developers, and engineers who are looking for more open-ended, expressive, or poignant ways to apply their skills. And it is a playbook for educators in all of these fields—a companion to help plan a semester&#x27;s journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…Thank you, Tega and Golan, for such a thoughtful and generous gift to our expanding community. I&#x27;m amazed at how far we&#x27;ve come in the last twenty years. With this book as our guide, we can travel so much further. Onward!…</div><div class="ctx"><span class="lbl">after</span>…It&#x27;s difficult to overstate the importance of computational literacy in 21st-century life. Computer programming, once an esoteric skill in engineering and business, has now acquired broad applicability in fine arts, design, architecture, music, humanities, jou…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Educational Community Building is the practice of fostering practitioner communities to develop and share teaching strategies.</p>
+      <p><b>Application.</b> Convene educators to collaboratively refine curricula and share classroom practices.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.4778 · PASS</span></h3>
+      <p><b>Name.</b> Visual Representation As Mediated Framework</p>
+      <p><b>Definition.</b> Visual representations function as flexible, open-ended frameworks that mediate between conceptual ideas and their material realization. These frameworks can be transformed through various operations while maintaining their mediating role in communication and design.</p>
+      <p><b>Application.</b> When a design team is sketching concepts and needs to iterate quickly, use flexible visual media (drawings, sketches, diagrams) that can be re-oriented, erased, overlaid, or added to, so the representation continues to mediate between ideas and outcomes without losing communicative value.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>16</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r17">
+  <h2><span class="no">17</span> Interdisciplinary Research in Creative Coding
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek NONE 0.82 · gpt-oss MATCH 0.92 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 115 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>…ook also provides strategies for sustaining classrooms that minimize frustration and maximize the freedom to make mistakes. We recognize that developing fluency in a new medium can demand silencing one&#x27;s inner critic, at least for a while. Computing technologies, in particular, are often discouragingly brittle and impersonal, making the hurdles of creative work even steeper. In an educational environment, methodologies from traditional computer science classrooms (such as emphasizing solitary work policed by plagiarism detectors) can exacerbate individual frustration and erode group morale.³⁴ The creative coding educator, in addition to explaining interdisciplinary techniques and showing inspiring projects, must also be sensitive to the mood of their classroom and students. As author and educator bell hooks observes, the necessity of actively orchestrating the emotional dimensions of a classroom is often overlooked. For hooks, excitement, “generated by collective effort,” reinforces a group&#x27;s mutual investment in each other&#x27;s work and is a key ingredient in establishing an environment that is conducive to learning, empowerment, and transformation.³⁵ The Classroom Techniques and the Interviews sections of this book compile the wisdom of numerous educators regarding how they build classroom communities and help individuals cope with frustration. These sections share techniques …</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…------------------------------------------------------------------------…</div><div class="ctx"><span class="lbl">after</span>…This book contains three primary sections: Assignments, Exercises, and Interviews.…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Interdisciplinary research in creative coding would combine computer science and visual arts methods in creative-coding pedagogy.</p>
+      <p><b>Application.</b> Use cross-disciplinary collaboration when designing creative-coding curricula or research projects.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6591 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Semiotic Layered Meaning</p>
+      <p><b>Definition.</b> Visual and textual communication operates across multiple semiotic levels — denotation, connotation, and myth — each layer adding meaning that is distinct in scope and interpretation. These layers interact to create rich, multi-dimensional communication that can be understood differently based on context and viewer background.</p>
+      <p><b>Application.</b> When observing a symbol that carries cultural or ideological meaning → do analyze its denotative, connotative, and mythic layers to anticipate varied interpretations and manage ambiguity in design or storytelling.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>17</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r18">
+  <h2><span class="no">18</span> Processing 1.0 Origins
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek NONE 0.72 · gpt-oss MATCH 0.82 · Qwen3.8 NONE 0.95 · Ornith NONE 0.85</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 31 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>Outside of class, when I finally knew enough C to start making visual things, everything changed. My motivation kicked in and I learned more in a few weeks than I had learned in months prior. The resulting collection of cryptic experiments called Reactive 006 opened the door for me to join John Maeda&#x27;s Aesthetics + Computation Group (ACG) at the MIT Media Lab in 1999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the initial set of examples for Processing 1.0, which Ben Fry and I released in 2001. My two years in ACG clarified my future and led to my first experiences teaching code.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…When I was first learning to code, this book would have made a world of difference. I had been trying to learn for three years on and off—on my own and then through an evening extension class in 1997—and there were no resources I knew of at that time that were…</div><div class="ctx"><span class="lbl">after</span>…As I discovered firsthand, the teaching style for learning to code within computer science rarely worked for visual arts students, so those of us who taught visual artists and designers invented new approaches to immerse students in this way of thinking and ma…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The historical account of how early ACG experiments became the examples shipped with Processing 1.0 in 2001.</p>
+      <p><b>Application.</b> Cite as background context when tracing the lineage of creative-coding tools rather than as a reusable principle.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.4593 · PASS</span></h3>
+      <p><b>Name.</b> Design As Conversational Expression</p>
+      <p><b>Definition.</b> Design serves as a medium for expressing ideas, fostering dialogue, and creating shared understanding among stakeholders. It enables communication of vision, possibility, and ideal states beyond conventional constraints.</p>
+      <p><b>Application.</b> When stakeholders are collaborating on a project and need to share abstract ideas or future possibilities, use design as a conversational medium by creating visual or experiential artifacts that invite dialogue and co‑creation.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>18</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r19">
+  <h2><span class="no">19</span> Visual Arts Programming Motivation
+      <span class="badge">MAJORITY NONE (1-3)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.74 · gpt-oss NONE 0.6 · Qwen3.8 NONE 0.8 · Ornith NONE 0.85</p>
+  <p class="where"><b>Read it here:</b> Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3 — <code>paragraph 30 of 1060 in knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin_ Tega Brain liber3.md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>When I was first learning to code, this book would have made a world of difference. I had been trying to learn for three years on and off—on my own and then through an evening extension class in 1997—and there were no resources I knew of at that time that were devoted to coding through the visual arts. My class only provided examples and exercises in the domains of math and text. (My final assignment was to make an accounting system for a fictional bank.) It was a challenge and a chore, but I knew I needed programming skills to make what I wanted to make.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…[c0-fig-0001.jpg] [c0-fig-0002.jpg] [c0-fig-0003.jpg]…</div><div class="ctx"><span class="lbl">after</span>…Outside of class, when I finally knew enough C to start making visual things, everything changed. My motivation kicked in and I learned more in a few weeks than I had learned in months prior. The resulting collection of cryptic experiments called Reactive 006 …</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Visual Arts Programming Motivation is the pedagogical principle that teaching programming through visual-art projects increases engagement and persistence.</p>
+      <p><b>Application.</b> Design coding assignments around generating images or interactive visuals to sustain student motivation.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5462 · PASS</span></h3>
+      <p><b>Name.</b> Color Perception and Cultural Context</p>
+      <p><b>Definition.</b> Color perception and meaning are deeply influenced by both physiological constraints of human vision and cultural context, with no universal emotional or symbolic associations. The interpretation of color requires audience-specific validation rather than reliance on general principles.</p>
+      <p><b>Application.</b> When designing visual communication for a specific audience → validate color meanings with that audience before finalizing the palette.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>19</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r20">
+  <h2><span class="no">20</span> Coherent Action Framework
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.78 · gpt-oss NONE 0.92 · Qwen3.8 MATCH 0.95 · Ornith NONE 0.8</p>
+  <p class="where"><b>Read it here:</b> Good StrategyBad Strategy (Rumelt, Richard) — <code>paragraph 9 of 2419 in knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>&quot;In his provocative new book, Richard Rumelt lays bare an uncomfortable truth: Most companies have strategies that are quixotic, muddled, and undifferentiated. This is hardly surprising, since in recent years the very idea of &#x27;strategy&#x27; has been dumbed down by a deluge of naïve advice and simplistic frameworks. Rumelt cuts through the clutter and reminds managers that the essence of strategy is a clear and differentiated point of view that supports forceful and coherent action. Drawing on a wealth of examples, Rumelt identifies the critical features that distinguish powerful strategies from wimpy ones---and offers a cache of advice on how to build a strategy that is actually worthy of the name. If you&#x27;re certain your company is already poised to outperform its rivals and outrun the future, don&#x27;t buy this book. If, on the other hand, you have a sliver of doubt, pick it up pronto!&quot;</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…---**Brian Farrell,** chairman, president, and CEO of THQ Inc.…</div><div class="ctx"><span class="lbl">after</span>…---**Gary Hamel,** coauthor of *Competing for the Future*…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> The requirement that a strategy specify a set of mutually reinforcing actions that implement the guiding policy and avoid conflicting moves.</p>
+      <p><b>Application.</b> Use it to check whether proposed initiatives reinforce one another and align with the strategy&#x27;s guiding policy.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5850 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Charismatic Leadership As Motivational Force</p>
+      <p><b>Definition.</b> Charismatic leadership uses emotional appeal, storytelling, and visionary communication to inspire motivation and self-sacrifice in followers. It is a method of overcoming inertia and driving action by making difficult adjustments feel meaningful and purposeful.</p>
+      <p><b>Application.</b> When a leader wants to motivate followers to make personal sacrifices for a shared purpose → do employ storytelling, metaphors, expressive facial cues, and set high expectations to frame the change as part of a meaningful narrative.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>20</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r21">
+  <h2><span class="no">21</span> Proximate Objective
+      <span class="badge">SPLIT (2-2)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.88 · gpt-oss NONE 0.92 · Qwen3.8 NONE 0.9 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> Good StrategyBad Strategy (Rumelt, Richard) — <code>paragraph 809 of 2419 in knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>The first logical problem in chain-link situations is to identify the bottlenecks, and Marco did that---quality, sales&#x27; technical competence, and cost. The second, and greatest, problem is that incremental change may not pay off and may even make things worse. That is why systems get stuck. Marco&#x27;s solution to this problem was to take personal responsibility for the final result and direct others&#x27; attention to the three bottlenecks, one after another. There were no immediate returns to the first campaign, but he did not stop nor did he operate a system that heaped blame on his department managers. Instead, he congratulated them for achieving the proximate goal of the first campaign and moved on to the second. There are little or no payoffs to incremental improvements in chain-link systems, but Marco avoided this problem by shutting down the normal system of local measurement and reward, refocusing on *change itself* as the objective.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…If one has not internalized the concept of quality matching and the problems of change in chain-link systems, then Marco&#x27;s explanation of his actions may seem banal---he identified the three problems and worked on them in turn. But if one has these concepts, t…</div><div class="ctx"><span class="lbl">after</span>…One of the tasks of the interviewer is to listen for what is not said. Marco did not say, &quot;We turned it around by increasing the pressure for []{.calibre3}profit.&quot; He did not say, &quot;We developed new measures of quality and demanded improvements.&quot; He did not say…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> A proximate objective is a specific, near-term, achievable goal that serves as the immediate target for coordinated action and resource allocation.</p>
+      <p><b>Application.</b> Break a daunting long-term ambition into proximate objectives so teams can focus on achievable milestones and build momentum through incremental wins.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.6327 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Equity Compensation Segmentation</p>
+      <p><b>Definition.</b> Equity compensation in startup and corporate contexts can be segmented into distinct components that serve different functional purposes: one component reflects the founder&#x27;s role and contribution, while another compensates for foregone salary or opportunity cost. This segmentation enables more precise valuation and fairer distribution of equity.</p>
+      <p><b>Application.</b> When allocating equity to founders or key contributors in a startup or mature corporation, separate the equity into a role‑based component that rewards leadership, strategic direction, and risk assumption, and a salary‑forgone component that compensates for foregone salary or opportunity cost. This ensures each component reflects its true economic value and aligns incentives with the company’s goals.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>21</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r22">
+  <h2><span class="no">22</span> Strategic Relevance
+      <span class="badge">MAJORITY MATCH (3-1)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.6 · gpt-oss MATCH 0.78 · Qwen3.8 NONE 0.95 · Ornith MATCH 0.72</p>
+  <p class="where"><b>Read it here:</b> Good StrategyBad Strategy (Rumelt, Richard) — <code>paragraph 458 of 2419 in knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>You can call these annual exercises &quot;strategic planning&quot; if you like, but they are not strategy. They cannot deliver what senior managers want: a pathway to substantially higher performance. To obtain higher performance, leaders must identify the critical obstacles to forward progress and then develop a coherent approach to overcoming them. This may require product innovation, or new approaches to distribution, or a change in organizational structure. Or it may exploit insights into the implications of changes in the environment---in technology, consumer tastes, laws, resource prices, or competitive behavior. The leader&#x27;s responsibility is to decide which of these pathways will be the most fruitful and design a way to marshal the organization&#x27;s knowledge, resources, and energy to that end. Importantly, opportunities, challenges, and changes don&#x27;t come along in nice annual packages. The need for true strategy work is episodic, not necessarily annual.</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…There is nothing wrong with planning. It is an essential part of management. Take, for example, a rapidly growing retail chain. It needs a plan to guide property acquisition, construction, training, and so on. This is what a resource plan does---it makes sure …</div><div class="ctx"><span class="lbl">after</span>…#### [[]{#dummy_split_009.html_filepos171697 .calibre3}**BAD STRATEGIC OBJECTIVES**]{.calibre17} {.calibre41}…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Strategic relevance is the requirement that a strategy be grounded in the actual, concrete obstacles and conditions blocking an organization&#x27;s progress rather than in generic planning exercises.</p>
+      <p><b>Application.</b> Before drafting strategy, list the specific critical obstacles to higher performance and test whether each proposed initiative directly removes one of them.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5719 · PASS</span></h3>
+      <p><b>Name.</b> Subjective Reality Vs. Objective Representation</p>
+      <p><b>Definition.</b> Human consciousness and subjective experience persist and even intensify in the face of objective systemic changes, particularly when those systems prioritize representation over lived experience. This principle describes a dynamic tension between internal mental states and external structural conditions.</p>
+      <p><b>Application.</b> When an organization or society implements highly symbolic or abstract systems—such as digital interfaces, legal codes, or corporate branding—without direct experiential feedback, do conduct regular experiential audits and incorporate user‑centered design to mitigate amplified subjective distortions.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status PASS)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>22</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<section class="card" id="r23">
+  <h2><span class="no">23</span> Strategy as Action Plan
+      <span class="badge">MAJORITY MATCH (3-1)</span></h2>
+  <p class="votes">DeepSeek MATCH 0.6 · gpt-oss MATCH 0.97 · Qwen3.8 NONE 0.95 · Ornith MATCH 0.82</p>
+  <p class="where"><b>Read it here:</b> Good StrategyBad Strategy (Rumelt, Richard) — <code>paragraph 12 of 2419 in knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md</code>
+     <span class="kind">(prose)</span></p>
+  <blockquote>[]{.calibre3}&quot;Richard Rumelt really &#x27;gets it&#x27;! Too many strategy books delve into esoteric subjects and forget that a strategy is really about action. Rumelt reinforces that a strategy is the set of actions an organization or team should implement and, just as important, the actions an organization should avoid as they drive forward in their market. As General George S. Patton is oft quoted, &#x27;A good plan violently executed now is better than a perfect plan executed next week.&#x27; *Good Strategy/Bad Strategy* focuses the reader on developing a set of actions around identified trigger points and passionately implementing those actions. The book contains many case examples that illustrate Rumelt&#x27;s points. Richard Rumelt reinforces that a strategy is not a goal or objectives. It is the battle plan for action that is designed upon a unique set of attributes or conditions (kernels) that sets an organization apart from its competitors (leverages) and results in exceptional and sustainable profits.&quot;</blockquote>
+  <div class="ctx"><span class="lbl">before</span>…---**Gary Hamel,** coauthor of *Competing for the Future*…</div><div class="ctx"><span class="lbl">after</span>…---**Chuck Harrington,** CEO of Parsons Corporation…</div>
+  <div class="cmp">
+    <div><h3>candidate (the model's proposal)</h3>
+      <p><b>Definition.</b> Strategy as action plan holds that real strategy is a coherent set of specific actions and decisions to pursue (and avoid), not a list of goals or a glossy document.</p>
+      <p><b>Application.</b> Evaluate a strategy by asking what concrete actions it commits the organization to and which actions it explicitly rules out.</p></div>
+    <div><h3>closest row already in the store
+      <span class="cos">cos 0.5940 · QUARANTINE</span></h3>
+      <p><b>Name.</b> Ground Offensive Strategy for Kuwait Liberation</p>
+      <p><b>Definition.</b> A military strategy for reversing Iraq&#x27;s invasion and occupation of Kuwait through a ground offensive, with air power as a potential precursor that would only be supplemented by ground forces if initial air power failed to resolve the conflict.</p>
+      <p><b>Application.</b> When planning a military response to an invasion in a similar geopolitical context → do first deploy air power to attempt resolution, then prepare ground forces as a contingency if air power proves insufficient.</p>
+      <p class="small">NOT in t11 — this store row lives in run rechunk-v4-20260929 (status QUARANTINE)</p></div>
+  </div>
+  <p class="decide">Type <code>MATCH</code> or <code>NONE</code> into column <code>owner_decision</code> of the CSV
+     for row <b>23</b> (optional note in <code>owner_note</code>).
+     <a href="#top">back to top</a></p>
+</section>
+<p class="sub">End of sheet — write your decisions into
+  <code>governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.csv</code>, then run
+  <code>python3 scripts/rule_tier_b.py --from-csv governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_20261023.csv</code>.</p>
+</div></body></html>

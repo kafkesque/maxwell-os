@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "task": "T-122",
+  "decision": "D-2994 (owner word keep-and-repair) / D-2987 (two-statuses defect)",
+  "deriver": "repair-classification-status.py",
+  "mapping": {
+    "PASS": "CLEAN",
+    "FLAG": "FALLBACK",
+    "QUARANTINE": "FAILED"
+  },
+  "canonical_run": "rechunk-v4-20260929",
+  "backup": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/backups/maxwell.db.bak_classification_status_20261024_120417",
+  "before": {
+    "cells": {
+      "PASS|CLEAN": 4513,
+      "QUARANTINE|CLEAN": 3135
+    },
+    "by_status": {
+      "PASS": 4513,
+      "QUARANTINE": 3135
+    },
+    "non_canonical": 1
+  },
+  "rows_changed": 3135,
+  "after": {
+    "cells": {
+      "PASS|CLEAN": 4513,
+      "QUARANTINE|FAILED": 3135
+    },
+    "by_status": {
+      "PASS": 4513,
+      "QUARANTINE": 3135
+    },
+    "non_canonical": 1
+  },
+  "unevaluable_refused": [],
+  "pipeline_commit": "d0a565cb38d6780891dafab5f22555fa42c909a0",
+  "timestamp_utc": "2026-10-24T12:04:19.114534+00:00"
+}

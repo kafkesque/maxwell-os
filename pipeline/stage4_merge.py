@@ -63,6 +63,7 @@ from pipeline.pipeline_paths import (
     FB_NAME_MAX_WORDS,  # BUG-149: C12 — name word cap (was hardcoded 5)
     S4_CHECKPOINT_INTERVAL,  # D2370: intra-stage incremental checkpoint cadence (clusters)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
+    S4_FAILURE_MODE_MIN_LENGTH,  # D2488/T-122: C12 (was hardcoded 10)
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
     S4_DEPTH_BATCH_ENABLED,  # D2477: wire D2354 batch depth into stage4
     S4_DEPTH_BATCH_SIZE,  # D2477: batch depth chunk size
@@ -2015,8 +2016,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # failure_mode had no runtime gate — an empty/short failure_mode flowed silently
         # into S5/S6. Fail-closed parity with D2371: quarantine + retry on resume.
         _fm = str(fb_data.get("failure_mode") or "").strip()
-        if len(_fm) < 10:
-            print(f"→ ❌ Empty/short failure_mode ({len(_fm)} chars < 10) — FB QUARANTINED (D2488)")
+        if len(_fm) < S4_FAILURE_MODE_MIN_LENGTH:
+            print(f"→ ❌ Empty/short failure_mode ({len(_fm)} chars < {S4_FAILURE_MODE_MIN_LENGTH}) — FB QUARANTINED (D2488)")
             failed += 1
             failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "empty_failure_mode"})
             continue

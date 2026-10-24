@@ -37,6 +37,87 @@ def _connect(db: Path):
     return sqlite3.connect(db)
 
 
+def _decode(cell):
+    """Return a stored TEXT cell in the SHAPE it was written with (list/dict/str), else the raw string.
+
+    The store keeps structured cells as JSON TEXT. Reproducing a cell must preserve its shape, or a new row
+    differs from its siblings in a way no rail can distinguish from a defect (BUG-990).
+    """
+    if not isinstance(cell, str):
+        return cell
+    try:
+        return json.loads(cell)
+    except json.JSONDecodeError:
+        return cell
+
+
+def served_run(conn) -> str:
+    """The `pipeline_run_id` the store SERVES — DERIVED from the store, refused when ambiguous (D-2881).
+
+    WHY (BUG-990, MEASURED 2026-10-24). Retrieval is pinned to ONE run, and the single row this path had
+    written (`f523504e…`) carried `pipeline_run_id = ''`: it is **1 of 7,635** rows in that state, so no
+    serving predicate could ever reach it. An insert that cannot be served is not a record of anything, and
+    the recall rail would have gone GREEN on a row the owner's own query could never return — the vacuous-pass
+    class BUG-967 records. Deriving the run (rather than declaring a second home for it) means the path
+    follows the store automatically; refusing on MORE THAN ONE run id means it never guesses which corpus
+    an inserted row joins (D-3034).
+    """
+    rows = conn.execute(
+        "select pipeline_run_id, count(*) n from fbs where status='PASS' and coalesce(pipeline_run_id,'')<>'' "
+        "group by 1 order by n desc").fetchall()
+    if not rows:
+        raise SystemExit("FAIL-CLOSED: no PASS row carries a pipeline_run_id — the served run cannot be "
+                         "derived, so an inserted row would be unreachable (BUG-990/C16)")
+    if len(rows) > 1:
+        raise SystemExit(f"FAIL-CLOSED: the store serves {len(rows)} run ids {[r[0] for r in rows]} — an "
+                         "insert must not CHOOSE a corpus (D-3034)")
+    return str(rows[0][0])
+
+
+def source_provenance(conn, source_id: str) -> dict:
+    """The book identity for `source_id`, READ from the store's own PASS rows for that source (never typed).
+
+    WHY (BUG-990). The row this path had written carried `source_books = []`, `primary_source = NULL` and
+    `citation = ''` while every other row of its source carries all three — **1 of 7,635** on each axis. A
+    row with no book cannot be attributed, cannot be audited against the source, and scores 0 on the
+    author axis of ISOR (`n_authors 0`), i.e. the provenance hole propagates into ranking.
+    """
+    rows = conn.execute(
+        "select source_books, primary_source, citation from fbs where status='PASS' "
+        "and source_ids like ? and coalesce(citation,'')<>'' limit 1", (f"%{source_id}%",)).fetchall()
+    if not rows:
+        raise SystemExit(f"FAIL-CLOSED: no PASS row for source {source_id} — its book identity cannot be "
+                         "derived, and a guessed one is a fabricated provenance (D-3034)")
+    books, primary, citation = rows[0]
+    decoded = {"source_books": _decode(books), "primary_source": _decode(primary), "citation": citation}
+    blank = [k for k, v in decoded.items()
+             if v in (None, "", [], {}) or (isinstance(v, str) and not v.strip())]
+    if blank:
+        raise SystemExit(f"FAIL-CLOSED: source {source_id} carries a blank {blank} in the store — copying "
+                         "it forward would mint the same hole (BUG-990)")
+    return decoded
+
+
+_IDENTITY_AXES: tuple[str, ...] = ("pipeline_run_id", "source_books", "primary_source", "citation", "gen_model")
+
+
+def identity_gaps(fb: dict) -> list[str]:
+    """The identity axes a record MUST carry before it may be written (empty list = admissible).
+
+    WHY (BUG-990). Six axes made the one row this path wrote a 1-of-7,635 singleton; five of them are
+    checkable here without a DB, so the check runs on the DICT (before any write) and names every gap at
+    once instead of failing one at a time.
+    """
+    gaps: list[str] = []
+    for axis in _IDENTITY_AXES:
+        v = fb.get(axis)
+        if v in (None, "", [], {}) or (isinstance(v, str) and not v.strip()):
+            gaps.append(axis)
+    if not str(fb.get("taxonomy_version") or "").strip():
+        gaps.append("taxonomy_version")
+    return gaps
+
+
 def dedup_present(db: Path, source_id: str, concept_key: str) -> bool:
     import sqlite3
 
@@ -182,21 +263,80 @@ def apply_declared_ontology(fb: dict, ontology: dict[str, str], *, committed_at:
     return fb
 
 
+def selftest() -> int:
+    """Known-answer controls for the identity gate (BUG-990): no store, no model, no write."""
+    checks: list[tuple[str, bool]] = []
+    good = {"pipeline_run_id": "run-x", "source_books": ["b.md"], "primary_source": {"book": "b.md"},
+            "citation": "Author (Book)", "gen_model": "m", "taxonomy_version": "v9"}
+    checks.append(("a fully identified record has NO gap", identity_gaps(good) == []))
+    holes = dict(good, pipeline_run_id="", source_books=[])
+    checks.append(("a blank run id and an empty book list are BOTH named at once",
+                   identity_gaps(holes) == ["pipeline_run_id", "source_books"]))
+    checks.append(("a whitespace-only citation is a hole, not a value",
+                   identity_gaps(dict(good, citation="  ")) == ["citation"]))
+    checks.append(("a missing taxonomy_version is a hole",
+                   identity_gaps(dict(good, taxonomy_version="")) == ["taxonomy_version"]))
+    checks.append(("_decode restores a stored list", _decode('["a","b"]') == ["a", "b"]))
+    checks.append(("_decode restores a bare string", _decode("plain text") == "plain text"))
+    import sqlite3
+
+    amb = sqlite3.connect(":memory:")
+    amb.execute("create table fbs (status text, pipeline_run_id text)")
+    amb.executemany("insert into fbs values ('PASS', 'r1'), ('PASS', 'r1'), ('PASS', 'r2')", [])
+    try:
+        served_run(amb)
+        checks.append(("two served run ids REFUSE the insert", False))
+    except SystemExit:
+        checks.append(("two served run ids REFUSE the insert", True))
+    one = sqlite3.connect(":memory:")
+    one.execute("create table fbs (status text, pipeline_run_id text)")
+    one.execute("insert into fbs values ('PASS', 'r1')")
+    checks.append(("one served run id is DERIVED", served_run(one) == "r1"))
+    bad = 0
+    for label, ok in checks:
+        print(("  ✓ " if ok else "  ✗ ") + label)
+        bad += 0 if ok else 1
+    if bad:
+        print(f"FAIL: {bad} control(s) failed")
+        return 1
+    print(f"✅ insert_single_concept selftest passed: {len(checks)} controls")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--source-id", required=True)
-    ap.add_argument("--name", required=True)
-    ap.add_argument("--source-text-file", required=True)
+    # NOT argparse-required: --selftest must reach the controls without the three production arguments
+    # (argparse refuses first, which made the control unreachable — the BUG-445 shape: a control that can
+    # never RUN is not a control). They are enforced immediately after the selftest branch instead.
+    ap.add_argument("--source-id", default=None)
+    ap.add_argument("--name", default=None)
+    ap.add_argument("--source-text-file", default=None)
     ap.add_argument("--discipline", default=None)
     ap.add_argument("--domains", default="")
     ap.add_argument("--db", default="knowledge pipeline/maxwell.db")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
+    if args.selftest:
+        return selftest()
 
     import yaml
 
     cfg = yaml.safe_load((PROJECT_ROOT / "config" / "pipeline_config.yaml").read_text(encoding="utf-8"))
-    gen_model = cfg.get("models", {}).get("gen_model") or "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit"
+    # C12c (BUG-990): the generator identity was read with a CODE default here while
+    # config/pipeline_config.yaml#models.gen_model was None — so the R14 stamp on the row named a model the
+    # declaration never mentioned. A stamp whose value has two homes is not a stamp.
+    # ONE HOME (C12): the declared generator identity is models.generator.model — the value this path used to
+    # supply from a literal had no home at all in this file's reader, so the stamp and the declaration could
+    # disagree silently.
+    gen_model = str(((cfg.get("models") or {}).get("generator") or {}).get("model") or "").strip()
+    if not gen_model:
+        raise SystemExit("FAIL-CLOSED: config/pipeline_config.yaml#models.generator.model is absent — the "
+                         "generator identity may not come from a code default (C12c/R14)")
+    for flag, val in (("--source-id", args.source_id), ("--name", args.name),
+                      ("--source-text-file", args.source_text_file)):
+        if not str(val or "").strip():
+            raise SystemExit(f"FAIL-CLOSED: {flag} is required (pass --selftest for the controls)")
     source_text = Path(args.source_text_file).read_text(encoding="utf-8").strip()
     if not source_text:
         raise SystemExit("FAIL-CLOSED: empty source text (D-3034: a ruling must resolve to real bytes)")
@@ -211,12 +351,45 @@ def main() -> int:
     if dedup_present(PROJECT_ROOT / args.db, args.source_id, ck):
         raise SystemExit(f"ALREADY PRESENT: ({args.source_id}, {ck}) — no insert needed (D-3034)")
 
+    # BUG-990: derive the three identity axes the one row this path had written did NOT carry. Each is READ from
+    # the store (measured), never declared in a second home, and each REFUSES rather than guessing.
+    conn = _connect(PROJECT_ROOT / args.db)
+    try:
+        run_id = served_run(conn)
+        provenance = source_provenance(conn, args.source_id)
+        tax = conn.execute(
+            "select taxonomy_version, count(*) n from fbs where status='PASS' and source_ids like ? "
+            "and coalesce(taxonomy_version,'')<>'' group by 1 order by n desc limit 1",
+            (f"%{args.source_id}%",)).fetchall()
+        if not tax:
+            raise SystemExit(f"FAIL-CLOSED: source {args.source_id} carries no taxonomy_version — the inserted "
+                             "row would be the store's only blank on that axis (BUG-990)")
+        taxonomy_version = str(tax[0][0])
+    finally:
+        conn.close()
+
+    # D-3140 (T-197/BUG-991): the single-concept prompt was a DRIFTED SECOND HOME for the extraction
+    # contract (the D-3136 shape) — it named `mechanism` with no register/length guidance, so the generator
+    # returned a sub-floor one-liner and S5 quarantined it downstream (BUG-991). The floor and the register
+    # are read from their ONE homes (stage5.mechanism_min_length via the verifier's own constant, and
+    # single_concept.extraction_type), never typed here (C12c).
+    from pipeline.stage5_verify import MECHANISM_MIN_LENGTH, check_mechanism_quality
+
+    mech_min = MECHANISM_MIN_LENGTH
+    sc = cfg.get("single_concept") or {}
+    extraction_type = str(sc.get("extraction_type") or "")
+    if not extraction_type:
+        raise SystemExit("FAIL-CLOSED: config/pipeline_config.yaml#single_concept.extraction_type is absent (C12)")
     prompt = (
         "Extract ONE knowledge principle from the source passage below. "
         f"Concept name: {args.name!r}.\n"
         "Return ONLY a JSON object with keys: definition (1-2 sentences), application, "
         "failure_mode, elaboration, mechanism, boundary, consequence, discipline (one canonical "
         "label), domains (list of 1-5 labels). No prose, no markdown fences.\n\n"
+        "MECHANISM (the field that carries HOW the concept works — a causal/associative chain, never a "
+        f"restatement of the definition): write 2-3 full sentences, at least {mech_min} characters, in the "
+        f"declared epistemic register {extraction_type!r}. A mechanism shorter than {mech_min} characters, "
+        "or one that merely restates the definition, is rejected and the whole extraction is discarded.\n\n"
         f"SOURCE PASSAGE:\n{source_text[:6000]}"
     )
     raw = call_omlx(prompt, model=gen_model, max_tokens=900)
@@ -259,14 +432,55 @@ def main() -> int:
         "evidence_passages": [source_text],
         "evidence_passages_shown": [source_text[:6000]],
         "source_ids": [args.source_id],
-        "source_books": [],
+        "source_books": provenance["source_books"],
+        "primary_source": provenance["primary_source"],
+        "citation": provenance["citation"],
+        "pipeline_run_id": run_id,
+        "taxonomy_version": taxonomy_version,
+        "gen_model": gen_model,
         "is_summary": 0,
         "is_convergent": 0,
     }
 
+    # BUG-990: the identity gate runs on the DICT, before verify and before any write, and names EVERY gap at
+    # once. Six axes made the one row this path had written a 1-of-7,635 singleton in the store.
+    gaps = identity_gaps(fb)
+    if gaps:
+        raise SystemExit(f"FAIL-CLOSED: the record is missing identity axis/axes {gaps} — writing it would mint "
+                         "a row no serving predicate can reach or no audit can attribute (BUG-990)")
+
     ontology = declared_ontology(cfg)
     apply_declared_ontology(fb, ontology, committed_at=datetime.now(UTC).isoformat(),
                             cfg_menu_hash=cfg.get("single_concept_menu_hash"))
+
+    # D-3140 (T-197/BUG-991): enforce the mechanism floor AT THE GENERATOR, reusing the ONE HOME
+    # (check_mechanism_quality) instead of letting S5 quarantine an unservable row downstream. One targeted
+    # retry — temp=0.0, so a sterner prompt is a DIFFERENT input, not a re-roll of the same answer.
+    ok_mech, _mech_score, mech_detail = check_mechanism_quality(fb)
+    if not ok_mech:
+        repair_prompt = (
+            "Your mechanism for this concept was rejected by the quality gate:\n"
+            f"{mech_detail}\n\n"
+            "Rewrite ONLY the mechanism field as a JSON object {\"mechanism\": \"...\"} of at least "
+            f"{mech_min} characters, as a complete causal/associative chain in the {extraction_type!r} register, "
+            "never a restatement of the definition.\n\n"
+            f"SOURCE PASSAGE:\n{source_text[:6000]}"
+        )
+        repair_raw = call_omlx(repair_prompt, model=gen_model, max_tokens=500).strip()
+        if repair_raw.startswith("```"):
+            repair_raw = repair_raw.strip("`").lstrip("json").strip()
+        try:
+            repaired_mech = str(json.loads(repair_raw).get("mechanism", "") or "").strip()
+        except json.JSONDecodeError:
+            repaired_mech = ""
+        if repaired_mech:
+            fb["mechanism"] = repaired_mech
+        ok_mech, _mech_score, mech_detail = check_mechanism_quality(fb)
+        if not ok_mech:
+            raise SystemExit(
+                f"FAIL-CLOSED: generator mechanism still rejected after one retry — {mech_detail}. "
+                "Refusing to write an unservable row (BUG-967/D-3140)"
+            )
 
     # T-196/D-3136 (MEASURED 2026-10-23): this path used to RESTATE S5's per-record sequence, and the copy had
     # drifted: no ISOR at all (the store's only blank `isor` cell), a label derived from `None`, and a hardcoded
@@ -277,7 +491,6 @@ def main() -> int:
     # `checkpoint_cells()` is the NATIVE face (list/dict/bool); insert_fb serialises it into the store's TEXT
     # columns itself (pipeline/stage6_commit.py::_safe_json), so the writer never re-types a cell.
     fb.update(outcome.checkpoint_cells())
-    fb["gen_model"] = gen_model
     fb["schema_version"] = "1"
     fb["pipeline_commit"] = get_pipeline_commit()
 

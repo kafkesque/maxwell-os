@@ -1,0 +1,2596 @@
+{
+ "schema_version": "1",
+ "artifact_id": "EXTRACTION-RECALL-TIER-B-ADJUDICATION",
+ "gen_model": "panel ['deepseek-flash', 'gpt-oss-20b-MXFP4-Q8', 'Qwen3.8-27B-MLX-4bit', 'Ornith-1.5-35B-A3B-REAP-19B'] — ADVISORY model opinions only",
+ "pipeline_commit": "d0a565c",
+ "authority": "ADVISORY EVIDENCE ONLY (D-2658/D-2898/D-3137): records model opinions, certifies nothing, floors nothing, and never writes the owner's ruling.",
+ "models": [
+  "deepseek-flash",
+  "gpt-oss-20b-MXFP4-Q8",
+  "Qwen3.8-27B-MLX-4bit",
+  "Ornith-1.5-35B-A3B-REAP-19B"
+ ],
+ "reference_band": 0.8,
+ "rows": [
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LangChain's Modular Architecture",
+   "concept_key": "b80c2d85914abc14b44700e42786c0189ed180ae3faaeb66b15778a0ba3d72ed",
+   "rationale": "Understand how LangChain's object model enables modular composition of LLM-based workflows.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.66,
+     "reason": "The source explicitly covers LangChain's modular architecture and components as a framework for composing LLM workflows, and no listed store row covers it.",
+     "definition": "LangChain's modular architecture is a component-based object model that lets developers compose LLM applications from interchangeable modules such as models, prompts, retrievers, and agents.",
+     "application": "Use it to design LLM workflows by wiring reusable LangChain components instead of building monolithic application code."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.92,
+     "reason": "The source explicitly discusses LangChain’s modular architecture and its component-based design, which is not covered by any high‑cosine store row.",
+     "definition": "LangChain’s modular architecture is a design where LLM workflows are built from interchangeable, composable components such as chains, prompts, memory, and tools.",
+     "application": "Use it to construct flexible, reusable LLM pipelines by assembling and wiring components according to the task requirements."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The source explicitly lists 'LangChain's modular architecture' as a core component, and the low cosine similarity to existing rows indicates it is a distinct architectural concept not yet covered.",
+     "definition": "A software design pattern in LangChain that allows developers to compose LLM applications by combining interchangeable components like prompts, models, and parsers.",
+     "application": "Use this architecture to build complex workflows by chaining together specific modules for data retrieval, generation, and output formatting."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly presents LangChain's modular architecture as a distinct named concept with its own section, teaching how its object model enables modular composition of LLM-based workflows, and no listed store row covers this specific topic.",
+     "definition": "LangChain's modular architecture is a design framework whose object model allows developers to compose LLM-based workflows from discrete, reusable components.",
+     "application": "Use it to structure and build complex language model applications by assembling modular building blocks rather than writing monolithic code."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Domain-specific Model Customization",
+     "fb_id": "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+     "cos": 0.5903
+    },
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.5771
+    },
+    {
+     "name": "Quantitative Evaluation in Ai Systems",
+     "fb_id": "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497",
+     "cos": 0.5644
+    }
+   ],
+   "reading": "- [Core challenges in building applications powered by large language models]{#chapter-1.html_p2} - [LangChain's modular architecture and components]{#chapter-1.html_p3} - [Patterns for engines, chatbots, and agents]{#chapter-1.html_p4} - [Foundations of prompt engineering and Retrieval-Augmented Generation]{#chapter-1.html_p5}",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Prompt Engineering as a Design Discipline",
+   "concept_key": "14eba875d50c9744a8c02f2c98c3bd216b53629c5f3491016d296bc6e0393346",
+   "rationale": "View prompt engineering not as a one-off task but as a structured design discipline for shaping LLM behavior.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source frames prompt engineering as an iterative design and refinement discipline, which is a distinct mental model not covered by the more specific prompt-engineering store rows.",
+     "definition": "Prompt engineering as a design discipline treats prompt creation as an iterative process of shaping, testing, and refining instructions to reliably guide LLM behavior.",
+     "application": "Apply it by budgeting time for prompt iteration and treating prompt patterns as design artifacts rather than one-off strings."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.88,
+     "reason": "The text frames prompt engineering as a structured, iterative design process, distinct from the more generic prompt‑engineering rows already present.",
+     "definition": "Prompt engineering as a design discipline treats prompts as engineered artifacts, systematically crafted, tested, and refined to shape LLM behavior.",
+     "application": "Apply it by iteratively designing prompt templates, running experiments, and refining wording to achieve consistent, high‑quality LLM outputs."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The concept is already semantically covered by existing store rows such as 'Prompt Engineering for Llm Cognition' and 'Prompt Engineering for Contextual Retrieval', which have high cosine similarity.",
+     "definition": "The systematic practice of crafting and refining instructions to guide Large Language Model behavior and output quality.",
+     "application": "Apply iterative testing and refinement of prompt structures to ensure the LLM consistently produces accurate and relevant responses for specific tasks."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The prose explicitly frames prompt engineering as a structured discipline involving deliberate design and refinement through patterns and techniques, which is a distinct, extractable mental model.",
+     "definition": "Prompt engineering is a structured design discipline in which prompts are carefully designed and iteratively refined rather than treated as one-off tasks.",
+     "application": "Use this framing to justify spending dedicated time on prompt design, testing, and iteration when building LLM applications."
+    }
+   },
+   "match": 3,
+   "none": 1,
+   "error": 0,
+   "agreement": "MAJORITY MATCH (3-1)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Prompt Engineering for Contextual Retrieval",
+     "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+     "cos": 0.7178
+    },
+    {
+     "name": "Prompt Engineering for Llm Cognition",
+     "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+     "cos": 0.7173
+    },
+    {
+     "name": "Prompt Template Implementation",
+     "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+     "cos": 0.651
+    }
+   ],
+   "reading": "I've mentioned prompts several times, but I haven't shown you any examples yet. A prompt is the instruction you give the LLM to complete a task and generate a response. It's such a key part of any LLM application that developing LLM applications often involves spending a lot of time designing and refining prompts through trial and error. Various patterns and techniques are already forming around prompts, leading to …",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "RAG as a Retrieval-Augmentation Strategy",
+   "concept_key": "dee1fa139c9d9dfcf73818e60d50cd6f2e2b3a2c4d01934caf48cf2f4fd18f71",
+   "rationale": "Distinguish RAG as a method for enhancing LLM responses with external knowledge sources rather than pure generation.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.86,
+     "reason": "The concept is already covered by the store row 'Retrieval-augmented Generation Process', and the reading fragment is about query reformulation for retrieval rather than a new RAG principle.",
+     "definition": "RAG is a strategy that augments LLM generation by retrieving relevant external context and supplying it to the model.",
+     "application": "Use retrieval to ground responses in external knowledge rather than relying solely on parametric generation."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.85,
+     "reason": "The source explains RAG as a strategy that augments LLM responses with retrieved external knowledge, a concept not captured by the existing store rows.",
+     "definition": "RAG as a retrieval‑augmentation strategy is the practice of retrieving relevant documents or data and feeding them into the LLM to improve answer accuracy and relevance.",
+     "application": "Use it to build systems that answer queries by first retrieving context from a knowledge base and then generating responses conditioned on that context."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The store already contains a row for 'Retrieval-augmented Generation Process' with a high cosine similarity of 0.75, indicating the core concept is already captured.",
+     "definition": "A technique that enhances LLM responses by retrieving relevant external documents to provide context before generation.",
+     "application": "Implement RAG pipelines to ground LLM answers in specific, up-to-date data sources rather than relying solely on pre-training knowledge."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The fragment discusses rephrasing queries for retrieval but does not introduce RAG as a distinct named principle, and the concept is already covered by the 'Retrieval-augmented Generation Process' store row.",
+     "definition": "RAG is a strategy that enhances LLM responses by retrieving external knowledge rather than relying solely on the model's training data.",
+     "application": "Use RAG to ground model answers in up-to-date or domain-specific sources, improving accuracy over pure generation."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Retrieval-augmented Generation Process",
+     "fb_id": "9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf",
+     "cos": 0.7476
+    },
+    {
+     "name": "Prompt Engineering for Contextual Retrieval",
+     "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+     "cos": 0.6241
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.5894
+    }
+   ],
+   "reading": "…r context. A fix is to rephrase the question into a clearer, more detailed form before passing it to the retrieval system.]{#chapter-8.html_p20} - [*Ineffective question for retrieval*---Using the original question for both retrieval and generation can fail, especially when the query is broad or abstract. Broad questions may not pinpoint relevant content, resulting in less accurate context. You can address this by …",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Fine-Tuning as a Customization Technique",
+   "concept_key": "4270ec0c20bdb6a7dc443269b5ffb782c96b3af3419420cd8159ba9ba94d890b",
+   "rationale": "Recognize fine-tuning as a targeted approach to adapt general-purpose LLMs to specific domains or tasks.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The source contrasts in-context learning with fine-tuning and notes that no fine-tuning is required; it does not teach fine-tuning as a customization technique, and existing rows cover customization/fine-tuning.",
+     "definition": "Fine-tuning is a customization technique that further trains a pretrained LLM on task- or domain-specific data.",
+     "application": "Apply it when prompt-based in-context learning is insufficient and labeled examples are available."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.78,
+     "reason": "The passage discusses in‑context learning rather than fine‑tuning; fine‑tuning is not explicitly presented as a technique in the source.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The concept is already covered by the existing store row 'Domain-specific Model Customization' and 'Supervised Fine-tuning for Instruction Following', which have high semantic overlap.",
+     "definition": "A machine learning technique where a pre-trained model is further trained on a specific dataset to adapt its behavior to a new domain or task.",
+     "application": "Use fine-tuning to specialize a general-purpose LLM for niche industries or specific output formats that prompt engineering alone cannot achieve."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The passage explicitly frames fine-tuning as a technique but immediately pivots to in-context learning as the common approach, and the store already covers domain-specific customization and supervised fine-tuning, so this candidate is redundant and not presented as a distinct standalone principle.",
+     "definition": "Fine-tuning is a technique for adapting general-purpose LLMs to specific domains or tasks by training them on tailored data.",
+     "application": "Use fine-tuning when you need persistent, model-level customization rather than prompt-level guidance via in-context examples."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Domain-specific Model Customization",
+     "fb_id": "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+     "cos": 0.6822
+    },
+    {
+     "name": "Supervised Fine-tuning for Instruction Following",
+     "fb_id": "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+     "cos": 0.676
+    },
+    {
+     "name": "Dimensionality Reduction Trade-offs",
+     "fb_id": "fb712f0fc9ac7a8d0d44a5ae67b05accabd9d99f554264ae343925baf4815a0c",
+     "cos": 0.6044
+    }
+   ],
+   "reading": "…designing these inputs so that the model understands the task and produces useful, accurate responses. Done well, it allows developers to guide the model's behavior, adapt it to domain-specific needs, and even handle problems the model wasn't explicitly trained on. A common technique here is *in-context learning*, where the model infers patterns from examples embedded directly in the prompt---no fine-tuning required",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LLM Selection Based on Use Case",
+   "concept_key": "c20d1ed051dc037f6aea0377499d028c7bbe2c438225f57a4fbba166d11166d8",
+   "rationale": "Understand that different LLMs are better suited for specific tasks like reasoning, summarization, or classification.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The cited passage discusses agentic workflows versus agents, not how to choose an LLM for a given use case, so the concept isn't actually taught here.",
+     "definition": "Selecting a specific large language model based on the requirements of a task such as reasoning, summarization, or classification.",
+     "application": "Match task requirements to model strengths before wiring a model into a workflow."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.92,
+     "reason": "The source discusses when to use agentic workflows, not how to choose an LLM for a specific use case.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided text discusses the criteria for adopting agentic workflows (complexity, multi-step nature) rather than providing a distinct principle for selecting specific LLM models based on task type.",
+     "definition": "A strategy for choosing specific Large Language Models based on their strengths in reasoning, summarization, or classification.",
+     "application": "Selecting GPT-4 for complex reasoning tasks and smaller models for simple classification to balance cost and performance."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The prose discusses LLM-based workflows and agents generally but does not teach a distinct named principle about selecting LLMs based on use case.",
+     "definition": "A principle for choosing the most appropriate LLM for specific tasks such as reasoning, summarization, or classification.",
+     "application": "Use this principle to match LLM capabilities to the requirements of a given task for optimal performance and efficiency."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Token-based Cost Optimization in Llm Usage",
+     "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+     "cos": 0.6053
+    },
+    {
+     "name": "Agent-centric Problem Solving",
+     "fb_id": "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+     "cos": 0.5831
+    },
+    {
+     "name": "Prompt Engineering for Contextual Retrieval",
+     "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+     "cos": 0.5782
+    }
+   ],
+   "reading": "The concepts of LLM-based workflows and agents are closely related and often overlap, with no sharp dividing line between them. Both approaches are most valuable when your application needs to break complex tasks into smaller steps, make decisions based on previous results, access external tools or data, or maintain context throughout extended interactions. It's best to adopt agentic workflows or agents when your us…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Programmatic Prompt Execution",
+   "concept_key": "f4b7477681588e66d86e56534e1a7f03f37a62d02bfc00c7b4e9921b0a1f25cf",
+   "rationale": "Learn how to execute prompts programmatically to automate and scale LLM interactions.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The reading covers agentic workflow structure, not programmatic execution of prompts as a distinct technique, and the idea is too generic to stand alone.",
+     "definition": "Running prompts via code rather than a chat UI so LLM calls can be automated and scaled.",
+     "application": "Wrap prompt calls in scripted pipelines to process many inputs automatically."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.88,
+     "reason": "The text explains executing prompts programmatically within agentic workflows, a distinct technique.",
+     "definition": "Executing prompts programmatically means automating prompt calls and handling responses within code, enabling scalable LLM interactions.",
+     "application": "Use it to build bots that run multi-step tasks, like data extraction or report generation, by scripting prompt calls."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The concept is too generic and overlaps significantly with existing store rows on prompt templates and agent execution, which already cover the mechanics of running prompts in code.",
+     "definition": "The practice of executing LLM prompts via code to automate interactions.",
+     "application": "Writing a Python script that calls an LLM API to process a list of documents."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The prose describes agentic workflows and multi-step orchestration rather than a distinct concept called 'Programmatic Prompt Execution,' and the store rows already cover prompt implementation and agent execution at high cosine similarity.",
+     "definition": "A proposed technique for executing prompts programmatically to automate and scale LLM interactions.",
+     "application": "Would be used to drive repeated or batched LLM calls in an application, though the source frames this as part of agentic workflows rather than a standalone technique."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Prompt Template Implementation",
+     "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+     "cos": 0.6897
+    },
+    {
+     "name": "Multi-step Agent Planning and Execution",
+     "fb_id": "f0a42b865a5ea7196210a54870f6bceff03adc51cdc870611441155de66ed9f8",
+     "cos": 0.6878
+    },
+    {
+     "name": "Tool-driven Agent Execution",
+     "fb_id": "44a4e528cb06a36aed19ed57c2a5f2d5954f563e4f16f2b908da03277e8a613c",
+     "cos": 0.6759
+    }
+   ],
+   "reading": "Large language models (LLMs) are driving a new generation of applications that require more than simple prompt--response exchanges. As applications become more complex, agentic workflows have become essential---a pattern where the LLM orchestrates a structured, multistep process using predefined components and explicit state management. Agentic workflows follow a well-defined and consistent sequence of steps. Instea…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Prompt Template Abstraction",
+   "concept_key": "17e13576456bd491a431af74785745d09de3e4035d284cb0f8938b1839021ae0",
+   "rationale": "Use prompt templates to encapsulate and reuse structured prompt designs across multiple LLM interactions.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "Already covered by the existing store row 'Prompt Template Implementation' (cosine 0.85), and the cited fragment is about LangChain RAG abstraction classes instead.",
+     "definition": "Encapsulating structured prompt designs in reusable templates that can be swapped across calls.",
+     "application": "Define parameterized templates once and reuse them across multiple LLM interactions."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "Similarity 0.8494 to 'Prompt Template Implementation' indicates the concept is already covered.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The cosine similarity of 0.8494 with 'Prompt Template Implementation' indicates this concept is already semantically covered by an existing store row.",
+     "definition": "Using abstract classes to encapsulate prompt structures for reuse.",
+     "application": "Defining a reusable prompt class that can be instantiated with different variables."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The fragment discusses component abstraction (loaders, vector stores, embedding models, LLMs) rather than reusable prompt templates, so the candidate concept is not genuinely present.",
+     "definition": "Prompt Template Abstraction is the practice of encapsulating structured prompt designs into reusable templates for repeated LLM interactions.",
+     "application": "Apply it when you need to standardize and reuse prompt formats across many LLM calls without rewriting them each time."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Prompt Template Implementation",
+     "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+     "cos": 0.8494
+    },
+    {
+     "name": "Prompt Engineering for Contextual Retrieval",
+     "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+     "cos": 0.6767
+    },
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.6474
+    }
+   ],
+   "reading": "- [LangChain provides abstraction classes for Retrieval-Augmented Generation (RAG) components. This enables swapping of vector stores (ChromaDB to Pinecone), embedding models (OpenAI to Cohere), or LLMs (GPT to Claude) with minimal code changes.]{#chapter-7.html_p221} - [LangChain's content ingestion phase uses these classes:]{#chapter-7.html_p222} - `BaseLoader`---Imports text sources (PDFs, web pages, databases) i…",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Prompt Types as Task Categories",
+   "concept_key": "aa106c45d6bb5a62ac57bbbc4caf6a54ad3bb364dfb9491f8f980c5cd24f84db",
+   "rationale": "Classify prompts into types like classification, sentiment analysis, and summarization to guide implementation.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.65,
+     "reason": "The source only says each task needs a well-designed prompt; it does not teach a distinct prompt-type taxonomy worth extracting as its own unit.",
+     "definition": "Grouping prompts by downstream task—classification, sentiment analysis, summarization, generation, QA.",
+     "application": "Pick a prompt design pattern according to the task category the application targets."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The source lists tasks but does not present a formal classification of prompt types as distinct categories.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The text lists task types as examples of where prompt design is crucial, but does not present 'Prompt Types' as a distinct, standalone mental model or principle separate from general prompt engineering.",
+     "definition": "Categorizing prompts by their specific task, such as classification or summarization.",
+     "application": "Using a different prompt structure for sentiment analysis versus text generation."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly frames prompt design as organized around distinct task categories (classification, sentiment analysis, summarization, text generation, question answering), which is a named conceptual grouping worth extracting.",
+     "definition": "Prompt Types as Task Categories refers to organizing prompt design around specific application tasks such as classification, sentiment analysis, summarization, text generation, and question answering.",
+     "application": "Use this grouping to select or design a prompt template matched to the particular task your LangChain application needs to perform."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Prompt Template Implementation",
+     "fb_id": "5a1f52512f7a7e6ccc3da2ba3afda96b1170d6bde98ebfe421462211af80b4f8",
+     "cos": 0.659
+    },
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.6152
+    },
+    {
+     "name": "Task-specific Dataset Creation",
+     "fb_id": "5492eb56da628eb1f8c8ef5f4de6a3ba7415f433d82bef5bfb6edc3ad8c1a528",
+     "cos": 0.6125
+    }
+   ],
+   "reading": "Creating effective prompts is crucial for getting the best results in LangChain applications. Whether your app is focused on text classification, sentiment analysis, summarization, text generation, or question answering, each task requires a carefully designed prompt. In the following sections, we'll dive into how to craft prompts tailored to these specific tasks, ensuring your application functions as intended.",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Reasoning in LLMs Through Examples",
+   "concept_key": "f300b8263b8cb901e11e0bc042aa48fadec8476bcf80d2238c22661e5936f0ec",
+   "rationale": "Understand how one-shot and two-shot learning enable LLMs to perform reasoning tasks with minimal instruction.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "Few-shot/one-shot prompting of reasoning tasks is a distinct prompt-engineering technique and no listed store row covers it (max cosine 0.67).",
+     "definition": "The technique of demonstrating a reasoning or classification task with one or two worked examples in the prompt so the LLM infers the pattern instead of relying on explicit instructions.",
+     "application": "When asking a model to classify, extract, or reason over new inputs, prepend one or two solved examples in the same output format to anchor the behaviour."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.92,
+     "reason": "The provided excerpt does not discuss one‑shot or two‑shot learning for reasoning, so the concept is not explicitly taught.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided text is a generic introduction to LLM use cases and does not contain specific content about one-shot or two-shot learning techniques.",
+     "definition": "A technique where LLMs learn to perform tasks by observing a few examples rather than explicit instructions.",
+     "application": "Using few-shot prompting to guide LLMs in classification or reasoning tasks without fine-tuning."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The prose explicitly frames zero-shot/one-shot/two-shot learning as a distinct use case of LLM reasoning, and no listed store row covers few-shot prompting specifically.",
+     "definition": "One-shot and two-shot learning let LLMs perform reasoning tasks by providing a single or double example of the desired input-output pattern.",
+     "application": "Use one-shot or two-shot examples in prompts to guide an LLM toward correct reasoning behavior without lengthy instructions."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.6695
+    },
+    {
+     "name": "Prompt Engineering for Llm Cognition",
+     "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+     "cos": 0.6229
+    },
+    {
+     "name": "Llm Api Request Patterns",
+     "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+     "cos": 0.6064
+    }
+   ],
+   "reading": "LLMs are applied across a wide range of tasks, from text classification to code generation and logical reasoning. Following are some of the most common use cases, along with real-world examples for further exploration:",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "Step-by-Step Instruction Design",
+   "concept_key": "86c48059917edcd2a66f1034021c0a9dfa0fb9affa8c01fc24e424081d79299e",
+   "rationale": "Structure prompts to guide LLMs through multi-step reasoning by explicitly providing steps.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.55,
+     "reason": "The supplied reading passage discusses LLM capability and tool use generally and does not teach explicit multi-step instruction design as a named technique.",
+     "definition": "Prompt design that spells out the intermediate steps an LLM should follow to reach an answer.",
+     "application": "Decompose a complex prompt into enumerated steps so the model's reasoning follows a predictable path."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.87,
+     "reason": "The text describes structuring prompts to guide LLMs through multi‑step reasoning, a distinct instructional design technique.",
+     "definition": "A prompt design method that explicitly breaks a task into sequential steps, guiding the LLM through each stage of reasoning.",
+     "application": "Use it to create step‑by‑step instructions for code generation, contract drafting, or any task that benefits from a clear, ordered workflow."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The provided text discusses general LLM capabilities and tool use, not the specific technique of structuring prompts for step-by-step reasoning.",
+     "definition": "A prompt engineering strategy that breaks down complex tasks into sequential steps to improve LLM reasoning accuracy.",
+     "application": "Designing prompts that explicitly list logical steps for the LLM to follow when solving multi-part problems."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The prose describes agents revising contracts and planning steps but does not teach a distinct, named principle for designing step-by-step instructions; the concept is vague and not substantively present.",
+     "definition": "A proposed technique for structuring prompts to guide LLMs through multi-step reasoning by explicitly providing steps.",
+     "application": "Would be used to improve multi-step LLM task execution, but no concrete method is detailed in the source."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Supervised Fine-tuning for Instruction Following",
+     "fb_id": "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+     "cos": 0.704
+    },
+    {
+     "name": "Ai-augmented Development Workflow",
+     "fb_id": "aa33fa09c235ae213f4840b5c3e4b57d54981e15f15e22cd6d42f0f3c8f98de5",
+     "cos": 0.6211
+    },
+    {
+     "name": "Multimodal Context Integration",
+     "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+     "cos": 0.6034
+    }
+   ],
+   "reading": "…eak human.\" They can revise a contract, turn logs into meaningful answers, draft code, and plan the next step---and then invoke the right tools and data to actually accomplish the task. Combined with retrieval and tool use, an application stops feeling like a rigid machine and begins to feel more like a collaborative partner. The potential is significant, but turning that potential into production systems isn't sim…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LangChain's Core Components",
+   "concept_key": "06e7d72bc45c7d22c2447d0fa775f136cf3ab6479d88e948c24be30aae1d29a2",
+   "rationale": "Identify the key LangChain components that form the foundation of LLM-based application development.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.6,
+     "reason": "The book explicitly enumerates LangChain's foundational building blocks (loaders, text splitters, Document, retrievers) as a coherent architectural unit, and no store row is semantically close (max cosine 0.57).",
+     "definition": "The standard set of LangChain building blocks — document loaders, text splitters, Document objects, embeddings, vector stores, retrievers, chains and agents — that are composed into an LLM application.",
+     "application": "Build a retrieval pipeline by chaining a loader into a splitter, embedding the chunks into a vector store, and retrieving relevant chunks into the prompt."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.85,
+     "reason": "The excerpt lists core LangChain components such as Document, Text Splitters, and Extractors, indicating a distinct architectural model.",
+     "definition": "The foundational building blocks of LangChain—Document containers, text splitters, and data extractors—that enable modular LLM application development.",
+     "application": "Employ these components to ingest, split, and index large documents before feeding them to an LLM for retrieval‑augmented generation."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.85,
+     "reason": "The text explicitly defines core LangChain components (loaders, splitters, Document) which is a distinct architectural concept not covered by the lower-similarity store rows.",
+     "definition": "The fundamental building blocks of the LangChain framework, including data loaders, text splitters, and document containers.",
+     "application": "Structuring LLM applications by utilizing LangChain's standard components for data ingestion and context management."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly names and describes LangChain's core components (content extraction, text splitters, Document objects) as foundational building blocks for LLM-based applications, and none of the listed store rows cover this structural overview.",
+     "definition": "LangChain's core components are the foundational building blocks of LLM-based applications, including content extraction, text splitters, and Document objects.",
+     "application": "Use these components to structure and build LLM-powered applications by extracting, chunking, and managing content as Documents."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.5658
+    },
+    {
+     "name": "Llm Api Request Patterns",
+     "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+     "cos": 0.5273
+    },
+    {
+     "name": "Multimodal Context Integration",
+     "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+     "cos": 0.5227
+    }
+   ],
+   "reading": "…s (1)*--- Extract content from sources (files, web pages, SaaS tools, and databases) and convert it into LangChain `Document` objects.]{#chapter-1.html_p73} - [*Text splitters (2)*--- Break large texts into smaller chunks/`Document` objects so they fit within context limits and can be embedded, indexed, and retrieved effectively.]{#chapter-1.html_p74} - [`Document`--- LangChain's core container for content + metada…",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LLM Adaptation Strategies",
+   "concept_key": "5c3453d7c8aa23d9894ddc3e1da51245556332c0327480b31929c4dc624956dc",
+   "rationale": "Distinguish between prompt engineering, RAG, and fine-tuning as methods to tailor LLMs to specific needs.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.5,
+     "reason": "The reading fragment covers ParentDocumentRetriever and embedding-based RAG optimisation rather than a taxonomy of prompt engineering vs RAG vs fine-tuning.",
+     "definition": "The three main ways of tailoring a general-purpose LLM to a task: prompt engineering, retrieval-augmented generation, and fine-tuning.",
+     "application": "Choose the cheapest sufficient adaptation: start with prompting, add RAG for missing knowledge, and fine-tune only for behaviour or format gaps."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.88,
+     "reason": "The passage mentions RAG and embeddings but does not explicitly differentiate prompt engineering, RAG, and fine‑tuning as distinct adaptation strategies.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided text focuses on a specific RAG retrieval technique (ParentDocumentRetriever) rather than providing a broad comparison of adaptation strategies like prompt engineering vs. fine-tuning.",
+     "definition": "A comparative framework for selecting between prompt engineering, RAG, and fine-tuning based on specific application requirements.",
+     "application": "Choosing the most cost-effective and accurate method to customize an LLM for a specific domain task."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The passage explicitly frames LLM adaptation as a distinct technique (embedding-based RAG optimization) and distinguishes it from prompt engineering and other methods, which the store rows do not fully cover.",
+     "definition": "LLM Adaptation Strategies refer to methods such as prompt engineering, RAG, and fine-tuning used to tailor large language models to specific requirements.",
+     "application": "Use these strategies to improve retrieval accuracy and model performance when integrating LLMs into domain-specific applications."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Llm Api Request Patterns",
+     "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+     "cos": 0.6123
+    },
+    {
+     "name": "Prompt Engineering for Llm Cognition",
+     "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+     "cos": 0.6088
+    },
+    {
+     "name": "Token-based Cost Optimization in Llm Usage",
+     "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+     "cos": 0.6087
+    }
+   ],
+   "reading": "The result we've obtained with the `ParentDocumentRetriever` is particularly useful when used as context for LLM synthesis, as it provides broader details around the specific information. Next, I'll introduce another technique that uses embedding strategies to further optimize RAG retrieval accuracy.",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LLM Use Case Mapping",
+   "concept_key": "3dc4a799568e7bce3d8eb5d186a0708eb5acd877d458fa5dcf3a24f8c12491b5",
+   "rationale": "Map real-world problems to specific LLM use cases like Q&A engines or chatbots for practical application.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The reading only shows a RAG use-case table entry; 'mapping problems to LLM use cases' is a generic framing rather than a distinct taught principle.",
+     "definition": "The practice of matching real-world business problems to specific LLM application patterns such as Q&A engines or chatbots.",
+     "application": "Use it to choose an appropriate LLM architecture for a given problem before beginning implementation."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.86,
+     "reason": "The source explicitly discusses mapping real‑world problems to specific LLM use cases (e.g., RAG, Q&A) and does not overlap with the listed store rows.",
+     "definition": "A systematic method for aligning real‑world problems with appropriate LLM application types such as Q&A engines, chatbots, or retrieval‑augmented generation.",
+     "application": "Use it to decide which LLM architecture and deployment strategy best fits a particular business need or user scenario."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided text defines Retrieval Augmented Generation (RAG) as a specific technique, not a general mapping methodology, and the concept is too broad to be a distinct unit separate from specific use cases like RAG.",
+     "definition": "A process of aligning business problems with specific Large Language Model capabilities.",
+     "application": "Identifying which LLM architecture best fits a specific business requirement."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source describes mapping real-world problems to specific named LLM use cases (e.g., RAG, Q&A), which is a distinct, extractable principle not covered by the listed cost/API/multimodal rows.",
+     "definition": "LLM Use Case Mapping is the practice of identifying a real-world problem and matching it to a specific, named LLM use case such as a Q&A engine, chatbot, or RAG system.",
+     "application": "Use it to translate business or user needs into concrete LLM solutions so you select the right architecture and retrieval strategy for each problem."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Token-based Cost Optimization in Llm Usage",
+     "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+     "cos": 0.6094
+    },
+    {
+     "name": "Llm Api Request Patterns",
+     "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+     "cos": 0.5966
+    },
+    {
+     "name": "Multimodal Context Integration",
+     "fb_id": "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+     "cos": 0.5905
+    }
+   ],
+   "reading": "…========+====================================================+ | Retrieval Augmented Generation (RAG)\\ | Use case involving the generation of text (typically an answer) augmented with information retrieved from a content store optimized for semantic searches, typically a vector store\\ | Q&A\\ | +---------------------------------------+----------------------------------------------------------------------------------…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f8f802e878304781",
+   "name": "LLM Prompt Optimization",
+   "concept_key": "4926d66cc3b4dc80b3c87cc1ad506cb6a8f054c22e2460f18f665d8401c39186",
+   "rationale": "Recognize that effective prompts require iterative refinement and testing to achieve desired outputs.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.78,
+     "reason": "The excerpt teaches query rewriting/optimization for retrieval, not iterative prompt refinement, and the concept is already close to the stored 'Prompt Engineering for Llm Cognition' row.",
+     "definition": "The iterative refinement and testing of prompts to reliably produce desired model outputs.",
+     "application": "Apply it by testing prompt variants against sample inputs and revising wording until outputs are consistently correct."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.78,
+     "reason": "The concept of prompt optimization is already covered by the store rows on prompt engineering and contextual retrieval, and the reading fragment focuses on query rewriting rather than a distinct optimization technique.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The text specifically discusses query rewriting for retrieval optimization, which is distinct from general prompt engineering, and the existing store row 'Prompt Engineering for Contextual Retrieval' (cos 0.68) likely covers this specific application of prompt optimization in the RAG context.",
+     "definition": "The iterative process of refining input queries to improve the accuracy of semantic search results.",
+     "application": "Rewriting vague user questions into precise search terms before querying a vector database."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source describes query optimization and query rewriting (Rewrite-Retrieve-Read) as a distinct named technique for improving retrieval, which is not already covered by the listed prompt-engineering rows.",
+     "definition": "Prompt/query optimization refines and rewrites vague queries into clearer, more specific forms so retrieval systems return better results.",
+     "application": "Use query rewriting to transform unclear user questions into precise search inputs before querying vector stores or search indexes."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Prompt Engineering for Llm Cognition",
+     "fb_id": "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+     "cos": 0.7483
+    },
+    {
+     "name": "Llm Text Generation with Structured Prompts",
+     "fb_id": "7885f863438a7caa124287eb5b0fb09524b90c10c7d91a7986d1c2232731b9f4",
+     "cos": 0.7277
+    },
+    {
+     "name": "Prompt Engineering for Contextual Retrieval",
+     "fb_id": "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+     "cos": 0.6847
+    }
+   ],
+   "reading": "…uce poor retrieval results because vector stores match semantic similarity, not logical precision. Query optimization transforms unclear queries into effective retrieval inputs.]{#chapter-9.html_p167} - [Query rewriting (Rewrite-Retrieve-Read) uses an LLM to reformulate the user's question into clearer, more specific versions before searching. \"Fix my code\" becomes \"How to resolve `ImportError: No module named pand…",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Proximate Objective",
+   "concept_key": "f396e21ab74b9206d53013b3c733cef5cf9921e1cf9b33a8c86099c997aebbc4",
+   "rationale": "A specific, actionable goal that serves as the immediate target for strategic implementation and resource allocation.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.88,
+     "reason": "Rumelt explicitly teaches the 'proximate goal/objective' as the immediate, achievable target that focuses effort and enables progress in chain-link systems, and no store row covers it.",
+     "definition": "A proximate objective is a specific, near-term, achievable goal that serves as the immediate target for coordinated action and resource allocation.",
+     "application": "Break a daunting long-term ambition into proximate objectives so teams can focus on achievable milestones and build momentum through incremental wins."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.92,
+     "reason": "The source does not present 'Proximate Objective' as a distinct, named principle; the term appears only in passing and is covered by the broader concept of 'Goal-oriented Agent Decomposition'.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The text uses 'proximate goal' as a descriptive example of a specific campaign target, not as a distinct, named strategic principle or mental model to be extracted.",
+     "definition": "A specific, immediate target within a larger strategic campaign.",
+     "application": "Used to define short-term milestones in operational planning."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source explicitly frames the proximate objective as a distinct strategic principle—focusing on change itself rather than incremental local measurements—so it is worth extracting on its own.",
+     "definition": "A proximate objective is the immediate, concrete target that guides strategic implementation and resource allocation, prioritizing actual change over incremental sub-goals.",
+     "application": "Use it to reorganize measurement and reward systems around real progress toward the true goal rather than local intermediate metrics that offer little payoff."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Equity Compensation Segmentation",
+     "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+     "cos": 0.6327
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.6264
+    },
+    {
+     "name": "Strategic-operational Decision Hierarchy",
+     "fb_id": "913cf686f7cdda2d937d3ecae06da441cdebc93731d68f1e6ceaeea18892c246",
+     "cos": 0.6146
+    }
+   ],
+   "reading": "…top nor did he operate a system that heaped blame on his department managers. Instead, he congratulated them for achieving the proximate goal of the first campaign and moved on to the second. There are little or no payoffs to incremental improvements in chain-link systems, but Marco avoided this problem by shutting down the normal system of local measurement and reward, refocusing on *change itself* as the objective",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Clarity Over Complexity",
+   "concept_key": "d7f7ce7b961949eb6245b89a75ea343fff6ac556bd8503cdbf1928eab8e4388f",
+   "rationale": "Effective strategy requires clear, focused direction rather than elaborate frameworks or abstract goals.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.62,
+     "reason": "The reading only laments the proliferation of shallow strategy content; 'Strategic Clarity Over Complexity' is a vague theme rather than a distinct named principle taught in the source.",
+     "definition": "The idea that effective strategy favors clear, focused direction over elaborate frameworks.",
+     "application": "When crafting strategy, strip away jargon and frameworks in favor of a few clear priorities."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.88,
+     "reason": "The source emphasizes clarity but does not label a separate principle called 'Strategic Clarity Over Complexity'; it is subsumed under the general idea of a focused guiding policy.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The provided prose is a preamble about the proliferation of strategy literature and does not explicitly define or teach the principle of 'clarity over complexity' as a distinct unit.",
+     "definition": "The preference for simple, clear strategic direction over complex frameworks.",
+     "application": "Guiding the simplification of strategic documents."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The prose only introduces a general discussion of strategy literature and does not define or teach a distinct named principle called 'Strategic Clarity Over Complexity'.",
+     "definition": "A general idea that good strategy should be clear and focused rather than overly complex, though it is not formally named or detailed in the source.",
+     "application": "Use as a loose guideline to keep strategy statements simple, but it lacks the specificity to warrant extraction as a standalone principle."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.5946
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.5718
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.5701
+    }
+   ],
+   "reading": "The gap between good strategy and the jumble of things people label \"strategy\" has grown over the years. In 1966, when I first began to study business strategy, there were only three books on the subject and no articles. Today, my personal library shelves are fat with books about strategy. Consulting firms specialize in strategy, PhDs are granted in strategy, and there are countless articles on the subject. But this…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategy as Action Plan",
+   "concept_key": "ec6ad7bedc323626b595229c11b4d5bdfea33e2f48f3ec6f29d1bdc2de6f8c06",
+   "rationale": "True strategy is not a document or set of objectives, but a structured plan of specific actions and decisions.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.6,
+     "reason": "The source genuinely emphasizes that strategy is the coherent set of actions to take and avoid rather than a document of aspirations, and no store row captures this.",
+     "definition": "Strategy as action plan holds that real strategy is a coherent set of specific actions and decisions to pursue (and avoid), not a list of goals or a glossy document.",
+     "application": "Evaluate a strategy by asking what concrete actions it commits the organization to and which actions it explicitly rules out."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.97,
+     "reason": "The source explicitly teaches that strategy is a structured plan of actions and decisions, a core principle in Rumelt’s framework.",
+     "definition": "Strategy is a coherent set of actions and decisions that guide an organization toward its objectives.",
+     "application": "Use it to design actionable plans that align with a clear guiding policy."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The provided text is a third-party endorsement/quote praising Rumelt, not the source book's own teaching of a distinct principle, and the concept is too generic to be a standalone unit.",
+     "definition": "The view that strategy is defined by specific actions rather than abstract goals.",
+     "application": "Focusing strategic planning on executable steps."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly frames strategy as a structured plan of specific actions to implement and avoid, a distinct principle worth extracting.",
+     "definition": "Strategy is defined as a structured plan of specific actions an organization should implement and avoid, rather than a document or set of objectives.",
+     "application": "Use this principle to build actionable, concrete plans that guide what to do and what to avoid when driving forward in a market."
+    }
+   },
+   "match": 3,
+   "none": 1,
+   "error": 0,
+   "agreement": "MAJORITY MATCH (3-1)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.594
+    },
+    {
+     "name": "Past Behavior Predicts Future Actions",
+     "fb_id": "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+     "cos": 0.5615
+    },
+    {
+     "name": "Subjective Reality Vs. Objective Representation",
+     "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+     "cos": 0.5442
+    }
+   ],
+   "reading": "[]{.calibre3}\"Richard Rumelt really 'gets it'! Too many strategy books delve into esoteric subjects and forget that a strategy is really about action. Rumelt reinforces that a strategy is the set of actions an organization or team should implement and, just as important, the actions an organization should avoid as they drive forward in their market. As General George S. Patton is oft quoted, 'A good plan violently e…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Trigger Point Strategy",
+   "concept_key": "4343ab99dc862af793f094dc646b377851d63569a9d221edb67405565ed74760",
+   "rationale": "Strategic action begins with identifying critical moments or conditions that signal the need for decisive intervention.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The reading discusses a clear, differentiated point of view, not 'trigger points'; the named concept 'Trigger Point Strategy' does not actually appear in the source passage.",
+     "definition": "A strategy that identifies critical moments or conditions signaling when decisive intervention is needed.",
+     "application": "Define trigger conditions in advance so the organization knows when to act decisively."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The source does not introduce a distinct principle named 'Trigger Point Strategy'; it discusses identifying critical moments but not as a separate named concept.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The term 'Trigger Point Strategy' is not present in the text, which discusses 'clear and differentiated point of view' and 'coherent action' instead, making the candidate a hallucination or misinterpretation.",
+     "definition": "A strategy based on identifying critical moments for intervention.",
+     "application": "Timing strategic moves based on market signals."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The prose discusses strategy in general terms and the dumbed-down nature of strategic advice but does not name or define a distinct 'Trigger Point Strategy' concept worth extracting on its own.",
+     "definition": "A strategy that begins with identifying critical moments or conditions signaling the need for decisive intervention.",
+     "application": "Use it to time strategic actions around pivotal conditions, though the source does not present this as a named, distinct principle."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.6384
+    },
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.626
+    },
+    {
+     "name": "Technology's Dual Nature",
+     "fb_id": "310734924aca8bd18add1df79a4df7ccfd56b60a7ad91988fadeb15cda4ed7a3",
+     "cos": 0.605
+    }
+   ],
+   "reading": "…xotic, muddled, and undifferentiated. This is hardly surprising, since in recent years the very idea of 'strategy' has been dumbed down by a deluge of naïve advice and simplistic frameworks. Rumelt cuts through the clutter and reminds managers that the essence of strategy is a clear and differentiated point of view that supports forceful and coherent action. Drawing on a wealth of examples, Rumelt identifies the cr…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "The Strategy Sin of Fluff",
+   "concept_key": "52a5db4f3cd27d3fdb1acdc2d1f9636b8b397dc184d55b5acce64faf4ec17e54",
+   "rationale": "Vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The source explicitly names 'fluff' as one of the four key hallmarks of bad strategy, a distinct teachable concept not covered by any store row.",
+     "definition": "Fluff is the bad-strategy hallmark of vague, abstract, or inflated language that masquerades as strategic insight but conveys no concrete direction.",
+     "application": "When writing or reviewing a strategy document, strip any statement that cannot be restated as a specific, testable claim about what will be done and why."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.78,
+     "reason": "The excerpt explicitly defines ‘fluff’ as a hallmark of bad strategy, presenting it as a distinct, named principle that the author teaches.",
+     "definition": "Fluff is the use of vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction.",
+     "application": "Identify and eliminate fluff in strategic plans to ensure clarity, focus, and measurable objectives."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.95,
+     "reason": "The source explicitly identifies 'fluff' as one of the four key hallmarks of bad strategy, making it a distinct, named concept worth extracting.",
+     "definition": "Fluff refers to vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction.",
+     "application": "Executives should audit their strategic plans to remove vague language and ensure every statement provides specific, actionable guidance."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly names 'fluff' as one of the four key hallmarks of bad strategy, teaching it as a distinct, named concept worth extracting on its own.",
+     "definition": "Fluff is a hallmark of bad strategy consisting of vague, generic, or overly ambitious strategic statements that lack specificity and actionable direction.",
+     "application": "Use this concept to identify and eliminate vague strategic language in plans so that objectives become concrete and actionable."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Subjective Reality Vs. Objective Representation",
+     "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+     "cos": 0.5373
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.5226
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.5218
+    }
+   ],
+   "reading": "In the several years since that seminar, I have had the opportunity to discuss the bad strategy concept with a number of senior executives. In the process, I have condensed my list of its key hallmarks to the four listed in the beginning of this chapter: fluff, the failure to face the challenge, mistaking goals for strategy, and bad strategic objectives.",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Alignment",
+   "concept_key": "2cf7896275e2c11d5407ff72aaab896fe22d51727f6a5750a6f3d59afaf9b1b7",
+   "rationale": "Ensuring that all strategic elements—diagnosis, objectives, and actions—are internally consistent and reinforce each other.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.72,
+     "reason": "The supplied reading discusses leverage and advantage rather than internal consistency, and 'strategic alignment' is not a distinctly named principle in the source.",
+     "definition": "Strategic alignment is the property of a strategy whose diagnosis, guiding policy, and actions are mutually consistent and reinforcing.",
+     "application": "Check that each proposed action traces back to the diagnosis and is licensed by the guiding policy before adopting it."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The prose discusses strategic advantage but does not present a distinct, named principle called ‘Strategic Alignment’; it is already covered by similar rows such as ‘Strategic Perspective Shift Advantage’.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The provided prose discusses the concept of 'strategic advantage' rather than the internal consistency of strategic elements, and the name 'Strategic Alignment' is not explicitly taught as a distinct principle in the text.",
+     "definition": "Strategic alignment is the principle that all strategic elements must be internally consistent and reinforce each other.",
+     "application": "Organizations should ensure that their diagnosis, objectives, and actions are logically connected to create a coherent strategy."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The prose focuses on strategic advantage as a concept rather than on 'strategic alignment' as a distinct named principle, and the candidate's emphasis on internal consistency is not the primary teaching here.",
+     "definition": "Strategic alignment refers to ensuring that diagnosis, objectives, and actions are internally consistent and mutually reinforcing.",
+     "application": "Use it to check that all parts of a strategy reinforce one another rather than contradicting each other."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.6761
+    },
+    {
+     "name": "Subjective Reality Vs. Objective Representation",
+     "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+     "cos": 0.6582
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.653
+    }
+   ],
+   "reading": "…g or drawing upon sources of *advantage*. Indeed, the heart of the matter in strategy is usually advantage. Just as a lever uses mechanical advantage to multiply force, strategic advantage multiplies the effectiveness of resources and/or actions. Importantly, not all advantage is competitive. In nonprofit and public policy situations, good strategy creates advantage by magnifying the effects of resources and actions",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Differentiation Through Strategy",
+   "concept_key": "1b6f1029d8bfcd79e3edb33fa95dcbc575ebbbccbbbd65298e2ef1e2811d640c",
+   "rationale": "A successful strategy must clearly define what makes an organization unique and how that uniqueness creates competitive advantage.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.78,
+     "reason": "The reading is a case example about restructuring objectives at Chen Brothers and does not teach differentiation as a named strategic principle; the rationale is generic.",
+     "definition": "Differentiation through strategy is the deliberate choice of a unique competitive position that creates advantage by being hard to imitate.",
+     "application": "Identify what the organization does differently from rivals and verify that the difference is the actual source of its advantage."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.82,
+     "reason": "The excerpt describes linking local producers under a brand but does not introduce a distinct principle named ‘Differentiation Through Strategy’; it is already reflected in related rows like ‘Strategic Perspective Shift Advantage’.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The prose describes a specific case study of a company changing its strategic objectives, but does not explicitly teach 'Differentiation Through Strategy' as a general, named principle or mental model.",
+     "definition": "Differentiation through strategy is the practice of defining what makes an organization unique to create competitive advantage.",
+     "application": "Companies should clearly articulate their unique value proposition to distinguish themselves from competitors."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.7,
+     "reason": "The passage describes a change in strategy but does not present 'Differentiation Through Strategy' as a distinct, named principle worth extracting on its own.",
+     "definition": "A strategy that defines what makes an organization unique to create competitive advantage.",
+     "application": "Use it to articulate an organization's unique selling points, though the source only illustrates a strategy change rather than teaching this as a named concept."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Surveillance Paradox of Power",
+     "fb_id": "48fe5422514a706f767b94a8e5448c453b773075845ccba2f88215a1724a3c46",
+     "cos": 0.628
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.6154
+    },
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.6135
+    }
+   ],
+   "reading": "…pecialty shops that had been Chen Brothers' target market. Accordingly, management was formulating a new strategy of linking together small local food producers under a common brand that could be sold through Whole Foods. This change in strategy had no impact on the company's overall goals, but clearly meant a radical restructuring of its current strategic objectives. Instead of penetration objectives for different…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Diagnosis",
+   "concept_key": "1167ed41c67f2587b54f318e460bfcc288f287bfe6eb8a4581e621b2c22f2f30",
+   "rationale": "The process of identifying the core problem or challenge that a strategy must address to be effective.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.88,
+     "reason": "The source directly teaches that a good strategic diagnosis explains a situation and defines a domain of action promising leverage over outcomes—a core, named element of strategy not covered by the store rows.",
+     "definition": "Strategic diagnosis is the analytical step that identifies and frames the critical challenge a strategy must overcome, defining a domain of action rather than merely predicting outcomes.",
+     "application": "Before setting objectives, write a one-paragraph diagnosis naming the central obstacle and why it is the leverage point."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.79,
+     "reason": "The passage defines strategic diagnosis as a process that identifies the core problem and defines a domain of action, presenting it as a distinct, named mental model.",
+     "definition": "Strategic diagnosis is the systematic identification of the core problem or challenge that a strategy must address to be effective.",
+     "application": "Use strategic diagnosis to focus resources on the most impactful issues and to design actions that leverage the organization’s strengths."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The source explicitly discusses 'strategic diagnosis' as a distinct component of good strategy, differentiating it from social scientific diagnosis by its focus on leverage.",
+     "definition": "Strategic diagnosis is the process of identifying the core problem or challenge that a strategy must address, focusing on leverage over outcomes.",
+     "application": "Strategists should define a domain of action by identifying the specific challenge that offers the greatest potential for strategic leverage."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source explicitly frames strategic diagnosis as a distinct concept that does more than explain a situation—it also defines a domain of action, distinguishing it from mere diagnosis and from outcome-predicting social science.",
+     "definition": "Strategic diagnosis is the process of identifying the core problem a strategy must address, going beyond explaining a situation to define a domain of action that promises leverage over outcomes.",
+     "application": "Use strategic diagnosis to focus strategy on the factors that offer the most actionable leverage rather than merely the factors that best predict outcomes."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.6633
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.63
+    },
+    {
+     "name": "Subjective Reality Vs. Objective Representation",
+     "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+     "cos": 0.6219
+    }
+   ],
+   "reading": "Furthermore, a good strategic diagnosis does more than explain a situation---it also defines a domain of action. Whereas a social scientist seeks a diagnosis that best predicts outcomes, good strategy tends to be based on the diagnosis promising leverage over outcomes. For instance, we know from research that K--12 student performance is better explained by social class and culture than by expenditures per student o…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Coherent Action Framework",
+   "concept_key": "69412abb4e6b0463edf84c8bc8657309b868368f30ea9b370c4dd47027ff7d16",
+   "rationale": "A strategy must provide a clear framework for what actions to take and what to avoid to achieve desired outcomes.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.78,
+     "reason": "The source presents coherent action as a core element of good strategy, distinct from vague goals or slogans.",
+     "definition": "The requirement that a strategy specify a set of mutually reinforcing actions that implement the guiding policy and avoid conflicting moves.",
+     "application": "Use it to check whether proposed initiatives reinforce one another and align with the strategy's guiding policy."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.92,
+     "reason": "The book discusses 'coherent action' as a principle, but does not present a distinct concept called 'Coherent Action Framework'.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.95,
+     "reason": "The source explicitly defines the essence of strategy as a clear point of view supporting forceful and coherent action, which is a distinct core principle not covered by the lower-similarity store rows.",
+     "definition": "A strategic framework that provides a clear, differentiated point of view to guide forceful and coherent action toward desired outcomes.",
+     "application": "Use this framework to ensure that all strategic components align to support decisive execution rather than vague intent."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The passage describes strategy in general terms (a differentiated point of view supporting coherent action) but does not present a distinct, named 'Coherent Action Framework' principle worth extracting on its own.",
+     "definition": "A general notion that a strategy should provide a clear framework guiding which actions to take and which to avoid to achieve desired outcomes.",
+     "application": "Use it as a checklist lens when evaluating whether a strategy is coherent, but it is not a distinct extractable principle."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Charismatic Leadership As Motivational Force",
+     "fb_id": "67ae083a6e81f19aba96cd8b517e07a4b38f8bd68922085215bbc7e525c399a5",
+     "cos": 0.585
+    },
+    {
+     "name": "New Thought Success Philosophy",
+     "fb_id": "5cd16fa1a16316233829bae8260ece9d32298988e0e464b03848bc3f7d156dbb",
+     "cos": 0.5778
+    },
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.5678
+    }
+   ],
+   "reading": "…gers that the essence of strategy is a clear and differentiated point of view that supports forceful and coherent action. Drawing on a wealth of examples, Rumelt identifies the critical features that distinguish powerful strategies from wimpy ones---and offers a cache of advice on how to build a strategy that is actually worthy of the name. If you're certain your company is already poised to outperform its rivals a…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Execution Force",
+   "concept_key": "99b2a000f3eed601bea72c4edcdd693ed5cc995ab845733a5961ab40f4feef54",
+   "rationale": "The commitment to forcefully implement a strategy despite obstacles, rather than waiting for perfect conditions.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.82,
+     "reason": "The reading discusses strategic advantage as a multiplier of resources and actions, not a distinct principle of forceful execution.",
+     "definition": "A supposed principle of forcefully executing a strategy despite obstacles and imperfect conditions.",
+     "application": "Not a standalone concept in this source; execution is handled through coherent action rather than 'execution force.'"
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.88,
+     "reason": "The book does not name a principle 'Strategic Execution Force'; it talks about execution but not as a separate named concept.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The provided prose discusses the concept of 'strategic advantage' as a multiplier of effectiveness, not the specific concept of 'execution force' or commitment to implementation despite obstacles.",
+     "definition": "The commitment to forcefully implement a strategy despite obstacles, rather than waiting for perfect conditions.",
+     "application": "Apply this mindset to drive implementation momentum even when external conditions are not ideal."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The passage discusses strategic advantage as a concept but does not describe a distinct principle or technique called 'Strategic Execution Force' involving forceful implementation despite obstacles.",
+     "definition": "A concept that is not actually present in the source text as a named principle or technique.",
+     "application": "Cannot be applied as a distinct technique since the source does not teach it."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.663
+    },
+    {
+     "name": "Strategic Design Through User-centric Innovation",
+     "fb_id": "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+     "cos": 0.6374
+    },
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.576
+    }
+   ],
+   "reading": "…g or drawing upon sources of *advantage*. Indeed, the heart of the matter in strategy is usually advantage. Just as a lever uses mechanical advantage to multiply force, strategic advantage multiplies the effectiveness of resources and/or actions. Importantly, not all advantage is competitive. In nonprofit and public policy situations, good strategy creates advantage by magnifying the effects of resources and actions",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Sin of Blue-Sky Objectives",
+   "concept_key": "3cb62852daabcdce28094aa4ebfe983a7563a5444b5cb359d083544d014a40f5",
+   "rationale": "Setting goals that are aspirational but disconnected from real-world constraints or actionable steps.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The source explicitly identifies 'blue sky' objectives as a form of bad strategic objectives.",
+     "definition": "A bad-strategy failure mode in which objectives are aspirational but disconnected from existing resources, constraints, and actionable proximate goals.",
+     "application": "Use it to test whether goals bridge desire and feasible action rather than merely stating aspirations."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.95,
+     "reason": "The book explicitly identifies 'blue‑sky objectives' as a common strategic sin, making it a distinct, teachable principle.",
+     "definition": "A strategic sin where goals are aspirational but disconnected from realistic constraints or actionable steps.",
+     "application": "Avoid setting objectives that are too lofty or unattainable by ensuring they align with available resources and realistic capabilities."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The source explicitly identifies 'blue sky' objectives as a specific form of bad strategic objective that fails to bridge the gap between challenge and immediate action.",
+     "definition": "A strategic error where goals are set aspirationally but are disconnected from real-world constraints, resources, or immediate actionable steps.",
+     "application": "Audit strategic goals to ensure they are proximate and achievable with current resources, avoiding vague long-term aspirations."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The source explicitly describes 'blue sky' objectives as a distinct named form of bad strategic objective, teaching it as a separable principle worth extracting on its own.",
+     "definition": "A strategic sin in which objectives are aspirational and disconnected from real-world constraints, resources, or actionable steps, making them unlikely to be accomplished.",
+     "application": "Use it to diagnose and correct strategy documents whose goals are too vague or ambitious to be achieved given available resources and competence."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Goal-oriented Agent Decomposition",
+     "fb_id": "69a2fdb4511b1d3772d61b6d728a63da1e888d6a721ce539b95edf9f4eff20f3",
+     "cos": 0.5695
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.5544
+    },
+    {
+     "name": "Strategic Design Through User-centric Innovation",
+     "fb_id": "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+     "cos": 0.5397
+    }
+   ],
+   "reading": "The second form of bad strategic objectives is one that is \"blue sky.\" A good strategy defines a critical challenge. What is more, it builds a bridge between that challenge and action, between desire and immediate objectives that lie within grasp. Thus, the objectives a good strategy sets should stand a good chance of being accomplished, given existing resources and competence. (See the discussion of proximate objec…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Simplicity",
+   "concept_key": "020d81c2c48adc63b0043d04e362a35042238ad3992d519bc220cf3ba1f5710c",
+   "rationale": "Effective strategies are often simple and focused, avoiding overcomplicated or convoluted approaches.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.7,
+     "reason": "The source uses the phrase 'strategic simplicity' to describe how a high-quality strategic resource and competitive advantage can simplify strategy.",
+     "definition": "A condition in which a powerful, protected strategic resource or advantage makes strategy simple and focused rather than complex.",
+     "application": "Identify or build protected resources that let the organization focus on exploiting a clear advantage instead of managing many complex initiatives."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.93,
+     "reason": "The book presents 'strategic simplicity' as a core principle, emphasizing that powerful strategies are simple and focused.",
+     "definition": "The principle that effective strategies are simple, focused, and avoid unnecessary complexity.",
+     "application": "Design strategies that concentrate on a few key actions and avoid convoluted plans, ensuring clarity and execution."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "MATCH",
+     "confidence": 0.85,
+     "reason": "The source explicitly names 'strategic simplicity' as a quality resulting from high-quality resources and clear advantage, distinguishing it from the more general 'perspective shift' in the store.",
+     "definition": "The quality of a strategy that is simple and focused, often enabled by a powerful, protected competitive advantage that reduces complexity.",
+     "application": "Leverage strong competitive advantages to simplify strategic execution and reduce operational complexity."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source explicitly frames 'strategic simplicity' as a distinct principle, using Xerox's low-cost, high-competitive-advantage patent as a concrete illustration of the concept.",
+     "definition": "Strategic simplicity is the principle that a high-quality strategic resource can yield a powerful competitive advantage while remaining simple and low-cost to produce.",
+     "application": "Apply this principle by seeking out simple, well-protected strategic assets that generate outsized returns relative to their manufacturing cost."
+    }
+   },
+   "match": 4,
+   "none": 0,
+   "error": 0,
+   "agreement": "UNANIMOUS MATCH",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.6199
+    },
+    {
+     "name": "Equity Compensation Segmentation",
+     "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+     "cos": 0.6008
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.5963
+    }
+   ],
+   "reading": "A high-quality strategic resource yielding a powerful competitive advantage makes for great strategic simplicity. Consider Xerox's patents on plain paper copying. By the mid-1950s these patents were rock solid, and it became clear that buyers would be willing to pay three thousand dollars or more for a Xerox machine---a device that cost about seven hundred dollars to manufacture. Given this large and protected compe…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Relevance",
+   "concept_key": "504b02d5f12065c3112c82d7fe5e7efcc413392dc60ba19f5dc24990cf707afb",
+   "rationale": "A strategy must be grounded in the actual conditions and challenges faced by the organization or situation.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.6,
+     "reason": "The passage explicitly teaches that real strategy requires identifying the critical obstacles to forward progress and building a coherent approach to overcome them, which is the principle the candidate names.",
+     "definition": "Strategic relevance is the requirement that a strategy be grounded in the actual, concrete obstacles and conditions blocking an organization's progress rather than in generic planning exercises.",
+     "application": "Before drafting strategy, list the specific critical obstacles to higher performance and test whether each proposed initiative directly removes one of them."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.78,
+     "reason": "The excerpt explicitly states that strategy must be grounded in real obstacles and conditions, a distinct principle not covered by the listed store rows.",
+     "definition": "Strategic Relevance is the principle that a strategy must be directly tied to the actual challenges and opportunities faced by an organization.",
+     "application": "Use it to evaluate whether a proposed strategy addresses real, critical obstacles rather than abstract goals."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The concept is a generic definition of strategy rather than a distinct, named mental model or technique, and the source text uses it to critique a process rather than teach a specific actionable principle.",
+     "definition": "The requirement that a strategy must be grounded in the actual conditions and critical obstacles faced by an organization.",
+     "application": "Leaders should identify critical obstacles to forward progress to develop a coherent approach to overcoming them."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source explicitly frames strategic planning as identifying critical obstacles and developing coherent approaches to overcome them, which is a distinct principle not covered by the listed store rows.",
+     "definition": "Strategic relevance requires grounding strategy in the actual conditions and challenges an organization faces so leaders can identify critical obstacles and develop coherent approaches to overcome them.",
+     "application": "Use it to distinguish genuine strategic thinking from superficial annual planning exercises by focusing on real obstacles to forward progress rather than generic planning rituals."
+    }
+   },
+   "match": 3,
+   "none": 1,
+   "error": 0,
+   "agreement": "MAJORITY MATCH (3-1)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Subjective Reality Vs. Objective Representation",
+     "fb_id": "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+     "cos": 0.5719
+    },
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.5586
+    },
+    {
+     "name": "Equity Compensation Segmentation",
+     "fb_id": "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+     "cos": 0.5553
+    }
+   ],
+   "reading": "You can call these annual exercises \"strategic planning\" if you like, but they are not strategy. They cannot deliver what senior managers want: a pathway to substantially higher performance. To obtain higher performance, leaders must identify the critical obstacles to forward progress and then develop a coherent approach to overcoming them. This may require product innovation, or new approaches to distribution, or a…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "b51204ce6c6a9950",
+   "name": "Strategic Leadership as Decision-Making",
+   "concept_key": "2e954f147f343d9fd6b41372a94e13cd7e5b2959f2f8d46dbcc3a3ed70fab544",
+   "rationale": "Leadership in strategy is fundamentally about making hard choices and committing to specific, high-impact actions.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The excerpt discusses Jack Welch's ambiguous writings and his dismissal of formal strategic planning, not leadership as a discipline of making hard strategic choices.",
+     "definition": "Strategic leadership as decision-making is the view that a leader's strategic role consists of making and committing to difficult, high-impact choices rather than delegating to planning processes.",
+     "application": "When leading strategy, force explicit choices among competing options and personally commit resources to the selected few."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The passage discusses decision-making and commitment but does not present a distinct named principle separate from existing concepts like the Strategy‑to‑Execution Gap.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The concept is too vague and generic, as 'leadership is decision-making' is a broad truism rather than a specific, extractable technique or named principle distinct from general management advice.",
+     "definition": "The idea that strategic leadership is fundamentally defined by the ability to make hard choices and commit to high-impact actions.",
+     "application": "Managers should focus on identifying the 'big aha' moments that drive sustainable competitive advantage."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.7,
+     "reason": "The passage discusses leadership and strategic planning in general terms but does not present a distinct, named principle or technique that warrants extraction as a standalone unit.",
+     "definition": "Strategic leadership as decision-making refers to the idea that leadership in strategy centers on making hard choices and committing to high-impact actions.",
+     "application": "It can be used to frame leadership discussions around decision-making but lacks a specific, extractable principle to apply independently."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Strategic Perspective Shift Advantage",
+     "fb_id": "77d382ecf64b6edaa72683e341592bb43830aa65f6911117b885510483581655",
+     "cos": 0.6081
+    },
+    {
+     "name": "Strategy-to-execution Gap",
+     "fb_id": "66b590c93935ac459edb6fea83f3ae22790dc24db9d54620e43558a066eb465b",
+     "cos": 0.5923
+    },
+    {
+     "name": "Ground Offensive Strategy for Kuwait Liberation",
+     "fb_id": "9d730e1080f88d9a5ab6463637536f23ca81221f053df2d463d8e65a2d8d7c99",
+     "cos": 0.5628
+    }
+   ],
+   "reading": "… of the most successful managers in history. He had written, spoken, and been interviewed extensively on leadership, strategy, and management. However, like dipping into the Bible, you could find whatever you wanted in his body of work. Yes, Welch thought formal strategic planning was a waste of time, but he also said, \"The first step of making strategy real is figuring out the big 'aha' to gain sustainable competi…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Creative Coding Pedagogy",
+   "concept_key": "6140448f50512e2f595cfcf76d6d6e086b370cb33a51b4d59454339d0cbc6a99",
+   "rationale": "Teaching programming through visual arts creates a more engaging and effective learning pathway than traditional computer science curricula.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.7,
+     "reason": "The source explicitly treats creative coding and its pedagogy (indexed entries, dedicated section 228, 237–250) as a substantive topic distinct from the unrelated store rows.",
+     "definition": "An approach to teaching programming through visual and artistic practice rather than conventional computer science instruction.",
+     "application": "Design a curriculum that introduces coding concepts via image- and interaction-based exercises to boost engagement and learning."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.92,
+     "reason": "The source explicitly discusses teaching programming through visual arts and refers to creative coding pedagogy as a distinct instructional approach.",
+     "definition": "A teaching framework that uses visual arts and creative coding to make programming concepts engaging and effective.",
+     "application": "Designing curriculum modules that integrate visual art projects to teach programming fundamentals."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided fragment is an index entry listing page numbers for 'Creative coding' and 'Computer science pedagogy', not a distinct, named principle or technique that the book teaches as a standalone unit.",
+     "definition": "A pedagogical approach that integrates programming with visual arts.",
+     "application": "Used to structure curricula that teach coding through artistic creation."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The fragment only lists 'Creative coding' as a cross-referenced term without defining it as a distinct teaching principle, and the rationale's claim about visual arts pedagogy is not substantiated in the source text.",
+     "definition": "Creative coding pedagogy is the practice of teaching programming through visual arts to create engaging learning pathways.",
+     "application": "Use it to justify replacing traditional computer science curricula with visual arts-based programming education."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5939
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.5579
+    },
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.547
+    }
+   ],
+   "reading": "… 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Creative coding, 3, 4, 196, 228, 237–250 - Critical design, 5, 94, 212 - Critical engineering, 5, 113 - Critique, 5, 6, 94, 110, 132, 196, 233–234 - Crowdsourcing, 82 - Curves, 152,…",
+   "reading_kind": "fragment/list"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Reactive Programming in Art",
+   "concept_key": "0b5531dfd1727f1c4d4af354d6568a1b4e274c515e9c30614496a7d39de0f049",
+   "rationale": "Visual experimentation with code can dramatically increase motivation and accelerate learning in creative coding contexts.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The prose discusses introductory image-processing exercises in Processing handbooks, not reactive programming or a motivation-accelerating art technique, so the named concept is not actually taught.",
+     "definition": "A paradigm where programs react to streams of changing data and events.",
+     "application": "Build interactive art that responds dynamically to sensor or user-event streams."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The source mentions Processing and visual experimentation but does not describe reactive programming concepts.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The text lists specific books by authors like Casey Reas and Ben Fry, which is a bibliographic reference rather than a distinct principle or technique named in the source.",
+     "definition": "The use of reactive programming paradigms in artistic contexts.",
+     "application": "Applied in interactive art installations that respond to user input."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The source text only lists names of books and authors related to Processing and visual design; it does not teach or define any principle called 'Reactive Programming in Art'.",
+     "definition": "A candidate concept name that is not actually presented as a principle or technique in the source text.",
+     "application": "Should not be extracted as a knowledge unit since the source merely references related books without explaining the concept."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Global Scale Data Perception",
+     "fb_id": "8b8d383216325ec60fd44956d944aa744e1ea02ca70180e8d5dc60095c04f901",
+     "cos": 0.6153
+    },
+    {
+     "name": "Media Semiotics and Representation",
+     "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+     "cos": 0.6124
+    },
+    {
+     "name": "Generative Landscape Design Principles",
+     "fb_id": "0660dd038b45e560a5f16ece713a1cb8d8e00efc65638d232628c24d0eb745e3",
+     "cos": 0.6065
+    }
+   ],
+   "reading": "…n introductory image processing. Exercises of this sort appear in Casey Reas and Ben Fry's Processing: A Programming Handbook for Visual Designers and Artists (2007);³⁴ in Ira Greenberg's Processing: Creative Coding and Computational Art (2007);³⁵ in Dan Shiffman's Learning Processing (2008);³⁶ in Andrew Glassner's Processing for Visual Artists: How to Create Expressive Images and Interactive Art (2010);³⁷ in Reas …",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Community-Curated Learning",
+   "concept_key": "226465de554600c26d91bc5c27c8663bc8ec92cc87243d9a4972be11c8e1853f",
+   "rationale": "Collective wisdom from educators and practitioners can be systematically documented and shared to improve creative coding instruction.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The fragment is a book-mission statement about capturing an evolving vernacular, not a taught principle of community-curated learning; the concept is too vague and unsupported.",
+     "definition": "Learning resources assembled and refined collectively by a community of practitioners.",
+     "application": "Gather and publish shared teaching notes from a community of creative-coding educators."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.88,
+     "reason": "The text describes a book that captures evolving vernacular and collective wisdom for creative coding instruction, indicating a community‑curated learning model.",
+     "definition": "An instructional model that aggregates and documents shared knowledge from educators and practitioners to improve creative coding teaching.",
+     "application": "Creating an online repository of best practices and tutorials compiled by a community of creative coders."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The text describes the book's intent to fill a gap in the market for creative coding resources, which is a statement of purpose rather than a distinct, extractable knowledge unit or technique.",
+     "definition": "A learning model where community members curate educational content.",
+     "application": "Used in open-source educational platforms to aggregate best practices."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The passage describes the book's purpose and audience but does not present 'Community-Curated Learning' as a distinct, named principle or technique worth extracting.",
+     "definition": "A concept whose existence as a named principle is not demonstrated in the source text.",
+     "application": "Cannot be applied as a distinct technique because the source does not define or teach it."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Bot Opt-in Requirement",
+     "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+     "cos": 0.5792
+    },
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.5588
+    },
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5577
+    }
+   ],
+   "reading": "… primers on our bookshelves, which dealt above all with how to write code, rather than what to make when learning to code and why. This book is our attempt to address this gap and capture an evolving vernacular. It is a book for artists, designers, and poets who are already working with code as a creative medium, or who are curious about doing so. It is for computer scientists, software developers, and engineers wh…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Design By Numbers Influence",
+   "concept_key": "f53853dc7e7d64aa42efe8600599689ab0060c55f0e6c8eab67e219168800970",
+   "rationale": "Early educational tools like Design By Numbers laid foundational groundwork for modern visual programming approaches.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The reading discusses audiovisual systems, sound visualization, and visual music, with no mention of Design By Numbers or its educational influence.",
+     "definition": "The foundational impact of Maeda's Design By Numbers visual programming environment on later tools.",
+     "application": "Trace how DBN's visual-first approach informed Processing and similar environments."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The passage discusses audiovisual systems and visual music but does not reference Design By Numbers or its influence on visual programming.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The provided text discusses sound visualization and visual music, which is semantically unrelated to the candidate concept of 'Design By Numbers' influence, indicating the concept is not present in the source fragment.",
+     "definition": "The historical impact of the Design By Numbers software on visual programming.",
+     "application": "Referenced when discussing the history of creative coding tools."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The prose discusses audiovisual typology and sonification generally but never mentions 'Design By Numbers' as a named principle or technique worth extracting.",
+     "definition": "A proposed early educational tool that supposedly laid foundational groundwork for modern visual programming approaches.",
+     "application": "Would be used to trace the origins of visual programming, but the source provides no such named concept to support this."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Global Scale Data Perception",
+     "fb_id": "8b8d383216325ec60fd44956d944aa744e1ea02ca70180e8d5dc60095c04f901",
+     "cos": 0.5615
+    },
+    {
+     "name": "Color Perception and Visual Task Alignment",
+     "fb_id": "4b4b10887b3dd6c85af94e2514f63e0668ed7bff7a93784b45c092da572c420e",
+     "cos": 0.5565
+    },
+    {
+     "name": "User-centered Design Priority",
+     "fb_id": "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+     "cos": 0.5389
+    }
+   ],
+   "reading": "It is helpful to consider the typology of audiovisual systems and the design strategies they use. Sound visualization, for example, is a common feature in desktop music players, VJ software, and phonology tools. Principles of image sonification underpin film scores, game music, and some tools for the visually impaired. The term “visual music,” used by creators of some color organs and abstract films, can even refer …",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Aesthetics + Computation Synthesis",
+   "concept_key": "281be8c39a4a308e01427dcc66590fbdc5590ece2f73e37b35c2bca4b8f678d9",
+   "rationale": "Interdisciplinary collaboration between artists, designers, and coders creates novel forms of computational expression.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source names the Aesthetics + Computation Group as a deliberate synthesis of artists, designers, and coders, a distinct interdisciplinary principle not covered by existing rows.",
+     "definition": "The principle that bringing artists, designers, and programmers into the same research context produces a novel synthesis of aesthetic and computational practice.",
+     "application": "Structure teams or curricula that deliberately mix visual-arts and coding expertise so that neither discipline dominates the exploration."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.78,
+     "reason": "The text explicitly describes a new synthesis between artists, designers, and coders, a distinct principle not covered by the high‑cosine store rows.",
+     "definition": "A collaborative process that blends aesthetic design, artistic expression, and computational techniques to create novel digital artifacts.",
+     "application": "Use interdisciplinary teams to prototype interactive installations that fuse visual art, user experience, and algorithmic logic."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The text describes a specific historical research group (ACG) rather than a generalizable, standalone principle or technique.",
+     "definition": "A specific interdisciplinary research group at MIT that collaborated on computational art.",
+     "application": "N/A"
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source describes Aesthetics + Computation Group (ACG) as a distinct named research group whose defining purpose was synthesizing artists, designers, and coders into a new form of computational expression, which is not covered by the listed store rows.",
+     "definition": "Aesthetics + Computation Synthesis refers to the interdisciplinary collaboration of artists, designers, and coders in the Aesthetics + Computation Group (ACG) at the MIT Media Lab to explore novel forms of computational expression.",
+     "application": "Use it as a conceptual framework for organizing interdisciplinary teams around shared creative-computational experiments rather than treating each domain in isolation."
+    }
+   },
+   "match": 3,
+   "none": 1,
+   "error": 0,
+   "agreement": "MAJORITY MATCH (3-1)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.6265
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.6249
+    },
+    {
+     "name": "Relational Creativity in Interactive Systems",
+     "fb_id": "93867ad699c43b18996c26b0b55f913f411e7157fc2fed49a02d81be8a4d77f2",
+     "cos": 0.6144
+    }
+   ],
+   "reading": "…ulting collection of cryptic experiments called Reactive 006 opened the door for me to join John Maeda's Aesthetics + Computation Group (ACG) at the MIT Media Lab in 1999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Processing 1.0 Origins",
+   "concept_key": "a4e1c2acf36ce33f0c6476cc567a77a7636d9939aaf5cb741cc19403a9d7813c",
+   "rationale": "Early visual programming tools emerged from experimental art projects and evolved into widely adopted educational platforms.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.72,
+     "reason": "Processing 1.0's release date and origin are historical facts about a tool, not a distinct named principle or technique.",
+     "definition": "The historical account of how early ACG experiments became the examples shipped with Processing 1.0 in 2001.",
+     "application": "Cite as background context when tracing the lineage of creative-coding tools rather than as a reusable principle."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.82,
+     "reason": "The passage credits early art‑project experiments as the seed for Processing 1.0, a specific historical origin that is not reflected in the store rows.",
+     "definition": "The historical lineage of Processing 1.0, tracing its roots to experimental art projects that evolved into an educational visual programming platform.",
+     "application": "Reference this origin when teaching the evolution of visual programming languages and their pedagogical impact."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The concept is a historical fact about the release of a specific software version, not a distinct, reusable knowledge unit or principle.",
+     "definition": "The historical release of Processing 1.0 in 2001 by Ben Fry and Casey Reas.",
+     "application": "N/A"
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The passage only mentions that early experiments evolved into the initial examples for Processing 1.0; it does not teach a distinct named principle or technique about Processing 1.0's origins.",
+     "definition": "Processing 1.0 originated from early experiments conducted by a research group of artists, designers, and coders that were later released as example set in 2001.",
+     "application": "This provides historical context about Processing's origins but offers no actionable principle to apply."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Design As Conversational Expression",
+     "fb_id": "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+     "cos": 0.4593
+    },
+    {
+     "name": "Bot Opt-in Requirement",
+     "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+     "cos": 0.4553
+    },
+    {
+     "name": "Ar Art Exhibition Design Pattern",
+     "fb_id": "239d50a7ea7156c52cf15a7b12ffad61b97ee8b6b95a33db79ea295248693dfe",
+     "cos": 0.4253
+    }
+   ],
+   "reading": "…999. The ACG was the place I had been looking for. As a small research group, it brought together a wide range of artists, designers, and coders to explore a new kind of synthesis between those domains. Some of those early experiments evolved into the initial set of examples for Processing 1.0, which Ben Fry and I released in 2001. My two years in ACG clarified my future and led to my first experiences teaching code",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Curriculum Evolution Through Experimentation",
+   "concept_key": "54a66aee9ca75501c45406590033b8d176afb49c83682f19629751b82bbec748",
+   "rationale": "Effective creative coding curricula develop through iterative testing, removal of ineffective elements, and gradual refinement.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.66,
+     "reason": "The supplied passage discusses a curated book on visual-arts education, not an iterative refine-and-remove curriculum-building principle.",
+     "definition": "The idea that creative-coding curricula improve through repeated testing and removal of ineffective elements.",
+     "application": "Revise a course each term by testing exercises and dropping those that fail to engage students."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.65,
+     "reason": "The prose discusses iterative curriculum refinement but does not present a named principle; similar ideas appear in the store rows.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The rationale describes a general pedagogical approach (iterative refinement) that is too vague and trivial to be a distinct named principle in this context.",
+     "definition": "The process of developing teaching materials through iterative testing and refinement.",
+     "application": "N/A"
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The prose describes Code as Creative Medium as a resource for visual arts education but does not teach a distinct principle or technique called 'Curriculum Evolution Through Experimentation.'",
+     "definition": "A proposed concept about developing creative coding curricula through iterative testing and refinement that is not substantively presented in the source.",
+     "application": "Not applicable, as the source does not provide a concrete, named method matching this candidate."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5481
+    },
+    {
+     "name": "Bot Opt-in Requirement",
+     "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+     "cos": 0.5314
+    },
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.5256
+    }
+   ],
+   "reading": "…he strange way of writing that is code? How can we engage “code people” with a sophisticated visual arts curriculum? Code as Creative Medium tackles these difficult questions by curating over 30 years of exploration in visual arts education. It not only offers guidance on new ways to involve students; instructors will find themselves challenged and inspired as well. I've taught visual arts students for two decades …",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Online Educational Material Fragility",
+   "concept_key": "05210054b910866998dd885cc7353cdb55fa3feb22a95c1816afd9582393371b",
+   "rationale": "Digital educational resources are ephemeral and at risk of being lost, making physical documentation essential for preserving knowledge.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.75,
+     "reason": "The passage describes Maeda's minimal paint-program exercise, not the claim that online educational materials are fragile and need physical documentation.",
+     "definition": "The observation that digital teaching resources decay or disappear, making printed documentation necessary for preservation.",
+     "application": "Archive course materials in durable print or mirrored repositories rather than relying on a single hosted site."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.6,
+     "reason": "The excerpt mentions fragile digital resources but does not articulate a distinct principle; the idea is too generic and overlaps with existing store concepts.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided prose excerpt discusses specific historical paint programs and Maeda's book, not the general principle of digital resource fragility.",
+     "definition": "The tendency for digital educational resources to be lost over time.",
+     "application": "N/A"
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The candidate phrase 'Online Educational Material Fragility' is a fabricated label not present in the source; the prose only describes a paint-program exercise from Design by Numbers, not a named principle about online educational material fragility.",
+     "definition": "A coined, non-existent concept suggesting online educational resources are fragile and require physical documentation to preserve knowledge.",
+     "application": "Not applicable, since the source does not teach or name this concept."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5479
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.5466
+    },
+    {
+     "name": "Shared Conceptual Model",
+     "fb_id": "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+     "cos": 0.5278
+    }
+   ],
+   "reading": "…nt, Time Paint, and A-Paint (or Alive-Paint).⁴¹ By 1999, Maeda had formalized this type of inquiry as an educational assignment. In his book Design by Numbers, he presents an exercise involving the construction of an ultra-minimal paint program: a loop that continually sets a canvas pixel to black, at the location of the cursor. In a section entitled “Special Brushes,” Maeda writes: “Perhaps the most entertaining e…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Code as Medium for Expression",
+   "concept_key": "00204b59ecf60add8de53b6cfedc349c3e05f51d091597f5af042d85788b0f7e",
+   "rationale": "Programming can function as a creative medium similar to traditional art forms, enabling new modes of artistic expression.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source frames coding as aesthetic/political expression and technological art, supporting code as a creative medium, though the excerpt is citation-heavy.",
+     "definition": "Code as Medium for Expression is the principle that programming languages and computational processes can serve as artistic materials for creative and expressive work.",
+     "application": "Use code as a material for artistic projects, emphasizing aesthetic, conceptual, and expressive outcomes rather than only functional software."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.85,
+     "reason": "The source explicitly discusses coding as an aesthetic and political medium, framing code as a creative expression akin to traditional art.",
+     "definition": "Treating computer code as a creative medium that can convey artistic ideas and emotions.",
+     "application": "Using code to produce visual, auditory, or interactive artworks that communicate personal or cultural narratives."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The provided text is a list of bibliographic citations and does not contain the substantive argument or definition required to extract a distinct principle.",
+     "definition": "Programming is utilized as a creative medium for artistic expression, analogous to traditional art forms.",
+     "application": "Artists and developers use code to create interactive installations and digital artworks that explore aesthetic and political themes."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The candidate names a distinct conceptual principle about programming as a creative medium, and the source references coding as aesthetic and political expression without any store row covering this specific framing.",
+     "definition": "Code functions as a creative medium for artistic expression, analogous to traditional art forms, allowing programming to convey aesthetic, political, and artistic meaning.",
+     "application": "Use this principle when analyzing or creating programs where the source code itself is intended to communicate artistic, political, or aesthetic content beyond its computational function."
+    }
+   },
+   "match": 3,
+   "none": 1,
+   "error": 0,
+   "agreement": "MAJORITY MATCH (3-1)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.564
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.5523
+    },
+    {
+     "name": "Creative Ai As Cultural Expansion",
+     "fb_id": "9b9ebf6d8ab77c49773039582d5740dba41f66f2e8380345160c9d5abab9f68c",
+     "cos": 0.5396
+    }
+   ],
+   "reading": "…le He's Technological Art,” Forbes, October 29, 2018. 4. Geoff Cox and Christopher Alex McLean, “Vocable Code,” in Speaking Code: Coding as Aesthetic and Political Expression (Cambridge, MA: MIT Press, 2013), 18–38. 5. Stephanie Dinkins, “Five Artificial Intelligence Insiders in Their Own Words,” New York Times, October 19, 2018. 6. Andrea L. Guzman, “Voices in and of the Machine: Source Orientation toward Mobile V…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Educational Community Building",
+   "concept_key": "82631bcea1481132121f11358d0e29db32d0cc2fc6f4ba5e510e67c476696f03",
+   "rationale": "In-person gatherings of creative coders and educators can catalyze the development and sharing of innovative teaching strategies.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.68,
+     "reason": "The excerpt only mentions a community of practitioners and educators; it does not articulate in-person community building as a distinct pedagogical technique.",
+     "definition": "Educational Community Building is the practice of fostering practitioner communities to develop and share teaching strategies.",
+     "application": "Convene educators to collaboratively refine curricula and share classroom practices."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.8,
+     "reason": "The text highlights a vibrant community of educators and practitioners collaborating to develop and share innovative teaching strategies.",
+     "definition": "Building and sustaining collaborative networks of educators to exchange practices, resources, and support.",
+     "application": "Organizing workshops, meetups, or online forums where creative coders co‑design curricula and share lessons learned."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The text describes the source material's composition (drawing on community accounts) rather than teaching a distinct, actionable principle of community building itself.",
+     "definition": "The practice of forming in-person groups of educators and practitioners to share teaching strategies and navigate interdisciplinary challenges.",
+     "application": "Educators organize workshops and peer networks to exchange resources for blending engineering and creative disciplines in the classroom."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.7,
+     "reason": "The prose mentions a 'community of practitioners and educators' only as a source of accounts and materials, not as a distinct named principle or technique for building educational communities.",
+     "definition": "A concept suggesting that in-person gatherings of creative coders and educators can help develop and share innovative teaching strategies.",
+     "application": "Would be applied by organizing community gatherings among creative coding educators, though the source does not frame this as a distinct extractable principle."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.4778
+    },
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.4696
+    },
+    {
+     "name": "Data Visualization Storytelling Through Decomposition",
+     "fb_id": "877430701e5f7bee5b81b781b4d530eed2cc5df8380cba4a8419010e6ea877b5",
+     "cos": 0.4511
+    }
+   ],
+   "reading": "…s—a companion to help plan a semester's journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Bauhaus Pedagogy Preservation",
+   "concept_key": "2564529bec16555d866c1a7d2b018a62a44d69c4abe7a87ec4813f2abbede8e6",
+   "rationale": "Like Bauhaus teaching methods, contemporary creative coding pedagogy benefits from systematic documentation and knowledge sharing.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "Bauhaus pedagogy appears only as a bibliographic citation, not as a taught principle about preserving or documenting teaching methods.",
+     "definition": "Bauhaus Pedagogy Preservation is the systematic documentation and continuation of Bauhaus-style design teaching methods.",
+     "application": "Archive and share foundational design exercises to sustain pedagogical traditions."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.75,
+     "reason": "The passage references Bauhaus pedagogy and stresses systematic documentation and knowledge sharing in contemporary creative coding.",
+     "definition": "Preserving and disseminating pedagogical methods from Bauhaus to inform modern creative coding instruction.",
+     "application": "Documenting lesson plans, teaching materials, and reflective practices to create a shared curriculum repository."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The text is a bibliography entry referencing a book on Bauhaus design, not a teaching of a specific pedagogical principle within the source text.",
+     "definition": "The systematic documentation and preservation of Bauhaus teaching methods for contemporary design education.",
+     "application": "Design faculty reference historical Bauhaus curricula to structure modern creative coding and design courses."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The candidate 'Bauhaus Pedagogy Preservation' is a fabricated term not present in the source; the prose merely lists book titles in a bibliography, including a reference to 'The Basic Course at the Bauhaus', with no actual teaching principle or technique described.",
+     "definition": "A non-existent concept that conflates the Bauhaus Basic Course with generic creative coding pedagogy.",
+     "application": "Not applicable, as no such principle or technique exists in the source material."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5446
+    },
+    {
+     "name": "Media Semiotics and Representation",
+     "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+     "cos": 0.5258
+    },
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.5195
+    }
+   ],
+   "reading": "…essor. Montreal: Drawn & Quarterly, 2014. 2. Davis, Meredith. Teaching Design: A Guide to Curriculum and Pedagogy for College Design Faculty and Teachers Who Use Design in Their Classrooms. New York: Simon and Schuster, 2017. 3. Itten, Johannes. Design and Form: The Basic Course at the Bauhaus and Later. New York: Van Nostrand Reinhold Company, 1975. 4. Jaffe, Nick, Becca Barniskis, and Barbara Hackett Cox. Teachin…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Visual Arts Programming Motivation",
+   "concept_key": "52d7914b8fc5f4b70b2c4be02699d1378bf8fcf9d2c39bb25ee1e155ee6f9d47",
+   "rationale": "Learning programming through visual arts applications increases student engagement and accelerates skill acquisition.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "MATCH",
+     "confidence": 0.74,
+     "reason": "The author's contrast between math/text exercises as a chore and the desire to make visual work supports visual arts as a motivating context for learning programming.",
+     "definition": "Visual Arts Programming Motivation is the pedagogical principle that teaching programming through visual-art projects increases engagement and persistence.",
+     "application": "Design coding assignments around generating images or interactive visuals to sustain student motivation."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.6,
+     "reason": "The excerpt notes a lack of resources for coding through visual arts but does not claim that visual arts programming increases engagement or skill acquisition.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The text is a personal anecdote about the lack of resources in 1997, which serves as background context rather than a distinct, generalizable principle or technique.",
+     "definition": "The use of visual arts applications as a primary motivator for learning programming to increase engagement and skill acquisition.",
+     "application": "Instructors design coding curricula around visual art projects to help students see the immediate creative utility of code."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The prose only describes the author's personal experience lacking visual arts coding resources and does not teach any principle, technique, or mental model worth extracting.",
+     "definition": "A candidate concept suggesting that learning programming through visual arts applications boosts engagement and skill acquisition.",
+     "application": "Not applicable as the source provides no such teaching or named principle to apply."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.5462
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.5306
+    },
+    {
+     "name": "Polar Interaction for Conceptual Clarity",
+     "fb_id": "795ea06b14c170280d8f4346a1a4da4008d4bacf0ee7435f76b36f8500b37757",
+     "cos": 0.5214
+    }
+   ],
+   "reading": "…my own and then through an evening extension class in 1997—and there were no resources I knew of at that time that were devoted to coding through the visual arts. My class only provided examples and exercises in the domains of math and text. (My final assignment was to make an accounting system for a fictional bank.) It was a challenge and a chore, but I knew I needed programming skills to make what I wanted to make",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Interdisciplinary Research in Creative Coding",
+   "concept_key": "f0a8e95fd048877a8e67b3afeae3ec893c18949b5b7f9fd4dfb409d12e98f873",
+   "rationale": "Cross-disciplinary collaboration between computer science and visual arts education creates unique pedagogical approaches.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.82,
+     "reason": "The passage mentions interdisciplinary creative coding education but does not teach a distinct named principle worth extracting separately.",
+     "definition": "Interdisciplinary research in creative coding would combine computer science and visual arts methods in creative-coding pedagogy.",
+     "application": "Use cross-disciplinary collaboration when designing creative-coding curricula or research projects."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.92,
+     "reason": "The excerpt explicitly discusses cross‑disciplinary collaboration between computer science and visual arts, framing it as a distinct pedagogical approach.",
+     "definition": "A research and teaching practice that integrates methods, theories, and perspectives from computer science and visual arts to create novel educational experiences.",
+     "application": "Design curricula that pair coding projects with artistic media, encouraging students to draw on both technical and aesthetic skills."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.9,
+     "reason": "The text describes a general pedagogical challenge and context rather than a distinct, named principle or technique that can be extracted as a standalone unit.",
+     "definition": "The integration of computer science and visual arts methodologies in educational settings.",
+     "application": "Designing curricula that balance technical rigor with creative collaboration."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "MATCH",
+     "confidence": 0.72,
+     "reason": "The source explicitly frames interdisciplinary research as a distinct pedagogical principle contrasting traditional solitary computer-science classrooms with collaborative creative-coding environments.",
+     "definition": "Interdisciplinary research in creative coding refers to blending computer science and visual arts education to produce pedagogically richer, collaborative learning approaches.",
+     "application": "Educators can use this principle to restructure classroom practices away from isolated, plagiarism-detector-driven work toward collaborative, morale-supportive creative coding."
+    }
+   },
+   "match": 2,
+   "none": 2,
+   "error": 0,
+   "agreement": "SPLIT (2-2)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.6591
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.6346
+    },
+    {
+     "name": "Color Perception and Cultural Context",
+     "fb_id": "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+     "cos": 0.6063
+    }
+   ],
+   "reading": "…ting technologies, in particular, are often discouragingly brittle and impersonal, making the hurdles of creative work even steeper. In an educational environment, methodologies from traditional computer science classrooms (such as emphasizing solitary work policed by plagiarism detectors) can exacerbate individual frustration and erode group morale.³⁴ The creative coding educator, in addition to explaining interdi…",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Educational Resource Sustainability",
+   "concept_key": "8d2cecbbbbd8ac2b769b6b8ed9463fc352cf3211ba96408a79408d04c548a2e5",
+   "rationale": "Physical publication of digital educational content ensures long-term accessibility and preservation of teaching methods.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.86,
+     "reason": "The passage describes drawing on research and educational materials for a book, not a standalone principle of educational resource sustainability.",
+     "definition": "Educational resource sustainability is the idea that educational content should remain accessible and preservable over time.",
+     "application": "Prefer durable publication formats and maintained repositories for long-term access to teaching materials."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "NONE",
+     "confidence": 0.88,
+     "reason": "The passage mentions using published materials for course planning but does not present a distinct principle of long‑term resource sustainability.",
+     "definition": "",
+     "application": ""
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The provided text describes the book's purpose and scope, not a specific principle or technique regarding the sustainability of educational resources.",
+     "definition": "The practice of preserving digital educational content through physical publication.",
+     "application": "Ensuring long-term access to teaching materials by creating physical companions to digital courses."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.85,
+     "reason": "The source text discusses educational materials and projects but never introduces or endorses the named principle of 'Educational Resource Sustainability' as a distinct concept; the rationale is a fabricated label not present in the prose.",
+     "definition": "A fabricated concept claiming that publishing digital educational content physically ensures long-term accessibility and preservation of teaching methods.",
+     "application": "Not applicable, as the source does not teach or name this principle."
+    }
+   },
+   "match": 0,
+   "none": 4,
+   "error": 0,
+   "agreement": "UNANIMOUS NONE",
+   "needs_review": false,
+   "store_best": [
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.5518
+    },
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.5426
+    },
+    {
+     "name": "Design As Conversational Expression",
+     "fb_id": "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+     "cos": 0.5403
+    }
+   ],
+   "reading": "…s—a companion to help plan a semester's journey, and a guide to bring students into a creative, thoughtful, and ultimately transformative engagement with computation. Our project draws on research, educational materials, and candid firsthand accounts from a vibrant community of practitioners and educators, all of whom are navigating the challenges of blending engineering and poetry in their courses and creative work",
+   "reading_kind": "prose"
+  },
+  {
+   "source_id": "f988150fe424aa75",
+   "name": "Creative Coding Community Networks",
+   "concept_key": "8b068fe2150c72f038f72f6c256d5238239d7bb58643ebe7ec1291a8ee173187",
+   "rationale": "Online networks of creative coders and educators can be formalized into structured communities that drive curriculum development.",
+   "votes": {
+    "deepseek-flash": {
+     "verdict": "NONE",
+     "confidence": 0.88,
+     "reason": "The fragment is an index listing that mentions community building, not an exposition of a named creative-coding community-network principle.",
+     "definition": "Creative coding community networks are structured groups of practitioners and educators who share resources and drive curriculum development.",
+     "application": "Build and participate in formal or informal communities to exchange creative-coding teaching practices and materials."
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+     "verdict": "MATCH",
+     "confidence": 0.9,
+     "reason": "The excerpt lists community building and network references, indicating a focus on formalizing creative coding communities for curriculum development.",
+     "definition": "A structured network of creative coders and educators that collaborates to develop, share, and evolve curriculum resources.",
+     "application": "Create online forums or guilds where educators co‑design lesson plans and share best practices for creative coding."
+    },
+    "Qwen3.8-27B-MLX-4bit": {
+     "verdict": "NONE",
+     "confidence": 0.95,
+     "reason": "The source text is an index entry listing page numbers, which does not constitute a distinct, named principle or technique worth extracting.",
+     "definition": "Structured online groups of creative coders and educators.",
+     "application": "Leveraging community networks to drive curriculum development and peer support."
+    },
+    "Ornith-1.5-35B-A3B-REAP-19B": {
+     "verdict": "NONE",
+     "confidence": 0.8,
+     "reason": "The source references community building and creative coding only as index entries, not as a distinct, named principle or technique that can be extracted on its own.",
+     "definition": "Online networks of creative coders and educators that can be formalized into structured communities driving curriculum development.",
+     "application": "Use as a conceptual framing for how creative coding communities may shape curriculum, but it is not a defined principle in the source."
+    }
+   },
+   "match": 1,
+   "none": 3,
+   "error": 0,
+   "agreement": "MAJORITY NONE (1-3)",
+   "needs_review": true,
+   "store_best": [
+    {
+     "name": "Visual Representation As Mediated Framework",
+     "fb_id": "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+     "cos": 0.62
+    },
+    {
+     "name": "Media Semiotics and Representation",
+     "fb_id": "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+     "cos": 0.6093
+    },
+    {
+     "name": "Semiotic Layered Meaning",
+     "fb_id": "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+     "cos": 0.6033
+    }
+   ],
+   "reading": "…ation, 9, 50, 81–85, 150, 194, 209, 228 - Color, 18, 24, 44, 96, 145, 153, 155–156, 170, 171, 173, 199 - Community building, 3, 4, 9, 193, 232 - Computational art, history, 150, 154, 159, 212, 238–250 - Computational literacy, 4, 187, 196 - Computer science, 187 - Computer science pedagogy, 2–3, 188 - Conditional design, 150 - Conditional testing, 157 - Connectivity, 10. See also Networks - Constructivism, 7 - Crea…",
+   "reading_kind": "fragment/list"
+  }
+ ]
+}

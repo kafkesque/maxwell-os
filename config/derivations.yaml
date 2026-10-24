@@ -108,13 +108,16 @@ derivations:
   column: classification_status
   kind: derived_regenerable
   home: scripts/reinject_bug198_singletons.py::_classify_s4
-  parity_rail: null
-  status: orphan_magic_threshold
+  parity_rail: scripts/repair_classification_status.py
+  status: homed
   note: >-
-    BUG-504 instance 2, MEASURED 2026-09-25: 7995/7995 stored rows carry one value (CLEAN) decided by an
-    UNDECLARED literal 10 in _classify_s4. A threshold that exists only as a literal has no home and no config
-    row. Declared now so the defect is DECLARED, not discovered twice; T2 moves it into config and re-proves the
-    7995 stored values against the new read.
+    T-122/D-2994 (2026-10-24): the undeclared literal 10 moved into config (stage4.failure_mode_min_length, read
+    via pipeline_paths.S4_FAILURE_MODE_MIN_LENGTH) and wired in BOTH _classify_s4 and stage4_merge.py (D2488 gate).
+    The store was re-proven by scripts/repair_classification_status.py: classification_status now mirrors the row's
+    own status (PASS->CLEAN 4513, QUARANTINE->FAILED 3135; D2184), and that script's --check is the parity rail
+    (fail-closed on canonical drift). Was orphan_magic_threshold (BUG-504 instance 2). RESIDUAL (BUG-992): the S4
+    producer's rule is fm-length (D2488), not status, so a long-fm row quarantined by NLI would be written CLEAN
+    again — the parity rail catches that; the writer-rule fix is owed (T-198).
 - name: fbs.borp_score
   table: fbs
   column: borp_score

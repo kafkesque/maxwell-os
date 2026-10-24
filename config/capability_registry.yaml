@@ -475,7 +475,11 @@ unrouted:
   #: [historical] BUG-977 was `owner_gate` — the ten DISPOSITION-labelled rows could not be re-labelled by any capability, because a
   #: content_type is a curation judgement and the next act is the OWNER'S WORD (D-2941/D-2898). Folding it into a
   #: route would hide a gate behind a script.
-  BUG-975: bug_is_a_finding
+  #: BUG-975 RETIRED FROM THIS BLOCK 2026-10-24 (D-3038: what we reject we REGISTER, not silently delete).
+  #: The entry read `BUG-975: bug_is_a_finding` and was correct while BUG-975 was OPEN (a row inserted without its
+  #: vec0 embedding: insert_single_concept.py wrote the FB but could not write its vector). BUG-975 is now FIXED
+  #: (2026-10-24: it fails-closed on an unloadable vec0 instead of landing an FTS-only row), so the reason outlived
+  #: the item — the same shape the route_graph fault (v) named for BUG-977.
   #: BUG-976 RETIRED FROM THIS BLOCK 2026-10-24 (D-3038: what we reject we REGISTER, not silently delete).
   #: The entry read `BUG-976: bug_is_a_finding` and was correct while BUG-976 was OPEN (the single-concept writer
   #: omitted evidence_passages). BUG-976 is now FIXED (T-197 re-insert landed PASS/entail), so the reason outlived
@@ -495,7 +499,11 @@ unrouted:
   #: it explained and the rail refused it at (v) - correctly. The key is removed because an override for a closed
   #: item is a declaration with no referent (D-3034); the reason it gave is preserved here so the decision is not lost.
   BUG-919: bug_is_a_finding   # an artefact's WHITESPACE DENSITY is a finding about pandoc's epub reader, not a file's route
-  BUG-920: bug_is_a_finding   # a missing RECEIPT is a finding about when the checkpoint is written, not a file's route
+  #: BUG-920 RETIRED FROM THIS BLOCK 2026-10-24 (D-3038: what we reject we REGISTER, not silently delete).
+  #: The entry read `BUG-920: bug_is_a_finding` (a missing RECEIPT is a finding about when the checkpoint is written,
+  #: not a file's route) and was correct while BUG-920 was OPEN. BUG-920 is now FIXED (2026-10-24: resume_has_work is
+  #: the ONE home the resume and audit both use; a checkpoint honour is now checked against bytes), so the reason
+  #: outlived the item and the rail refused it at (v) — correctly.
   BUG-921: bug_is_a_finding   # filename punctuation drift is a finding about the missing per-work identity, not a file's route
   BUG-948: bug_is_a_finding   # rule_digest whole-file sha256: the title names the script by dotted id, not a path; the fix task will name scripts/owner_marks.py, which routes to owner_marks
   #: BUG-950/951/952 appended 2026-10-20 by the act that diagnosed them (commit cb23258). Each reason is stated so the
@@ -527,7 +535,11 @@ unrouted:
   #: pipeline/acquisition/adapters.py (owned by acquisition_lane), BUG-956's is T-191 / D-3116 re-anchoring (owned by
   #: the owner gate). The override is not a route waiver for the work, only for the reading (D-3023 SHRINK-ONLY).
   BUG-909: bug_is_a_finding   # every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane)
-  BUG-956: bug_is_a_finding   # the store halved 14,574 -> 7,640 (a canonical-run consolidation, NOT data loss) and the anchor-bridge rail witnessed it: a FINDING, not a file's route; the work is T-191 / D-3116 re-anchoring (owner gate)
+  #: BUG-956 RETIRED FROM THIS BLOCK 2026-10-24 (D-3038: what we reject we REGISTER, not silently delete).
+  #: The entry read `BUG-956: bug_is_a_finding` (the store halved 14,574 -> 7,640 — a canonical-run consolidation,
+  #: NOT data loss — and the anchor-bridge rail witnessed it: a FINDING, not a file's route). BUG-956 is now CLOSED
+  #: (2026-10-23: the T-191 re-anchor landed, the bridge is GREEN, and the NONE-MUDDY recheck closed 40/40 with 0
+  #: verdict changes), so the reason outlived the item and the rail refused it at (v) — correctly.
   #: BUG-964/967/972 appended 2026-10-22/23. Each is stated so the override is a DECISION, not a shrug
   #: (D-3038). None of the three titles names an artifact owned by a declared capability, so they are the
   #: per-item escape the BUG-913 fix made real. Stated separately so the debt count SUBTRACTS them.

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 762,
-  "open_n": 254,
-  "closed_n": 508,
+  "open_n": 251,
+  "closed_n": 511,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -412,11 +412,6 @@
       "id": "BUG-389",
       "title": "MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a)",
       "events": 1
-    },
-    {
-      "id": "BUG-390",
-      "title": "(LOW, OPEN) - the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable",
-      "events": 3
     },
     {
       "id": "BUG-391",
@@ -1109,11 +1104,6 @@
       "events": 1
     },
     {
-      "id": "BUG-864",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a",
-      "events": 3
-    },
-    {
       "id": "BUG-867",
       "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders",
       "events": 1
@@ -1122,11 +1112,6 @@
       "id": "BUG-869",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and",
       "events": 1
-    },
-    {
-      "id": "BUG-873",
-      "title": "(MED, OPEN) \u2014 AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)",
-      "events": 3
     },
     {
       "id": "BUG-875",
@@ -1361,6 +1346,7 @@
     "BUG-386",
     "BUG-387",
     "BUG-388",
+    "BUG-390",
     "BUG-392",
     "BUG-393",
     "BUG-396",
@@ -1688,12 +1674,14 @@
     "BUG-860",
     "BUG-861",
     "BUG-863",
+    "BUG-864",
     "BUG-865",
     "BUG-866",
     "BUG-868",
     "BUG-870",
     "BUG-871",
     "BUG-872",
+    "BUG-873",
     "BUG-874",
     "BUG-878",
     "BUG-880",

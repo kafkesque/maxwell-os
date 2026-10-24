@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**254 open** / 508 closed of 762 ids.
+**251 open** / 511 closed of 762 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -88,7 +88,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-381 |  | 1 |
 | BUG-382 |  | 1 |
 | BUG-389 | MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) | 1 |
-| BUG-390 | (LOW, OPEN) - the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable | 3 |
 | BUG-391 | (HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force | 1 |
 | BUG-394 | (HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not | 2 |
 | BUG-395 | (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration | 2 |
@@ -227,10 +226,8 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-857 | (MED — OPEN 2026-10-16) — governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, | 1 |
 | BUG-858 | (MED — OPEN 2026-10-16) — governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 | 1 |
 | BUG-862 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml | 1 |
-| BUG-864 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a | 3 |
 | BUG-867 | (LOW — OPEN 2026-10-16) — scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders | 1 |
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and | 1 |
-| BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 3 |
 | BUG-875 | (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S | 1 |
 | BUG-876 | (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES | 1 |
 | BUG-877 | (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no | 1 |

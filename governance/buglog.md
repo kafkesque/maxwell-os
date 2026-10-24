@@ -20909,3 +20909,23 @@ slice land in ONE commit.
 
 **RESIDUAL = 0.** The pin now certifies the bytes at HEAD of this commit; no measurement is certified by a decision
 that did not re-run it.
+
+
+## BUG-390 (LOW — CLOSED 2026-10-24) — the R2 meter speaks `extraction_type`; the residual "ratified curve" is an accepted-negative, not a live defect
+
+**DISPOSITION: the DEFECT is FIXED.** The bug filed "the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable". `scripts/definition_nli_verify.py` now resolves `extraction_type -> extraction_types` (the 4-label closed menu) and emits the per-row axis (D-356; smoke receipt `--limit 6` emits extraction_type scores). The meter speaks the axis it could not speak.
+
+**ACCEPTED NEGATIVE (D-3038) — the residual, recorded WITH its reason.** The "fix direction" left open — compute a RATIFIED extraction_type abstention curve over the frozen ruler (n=145, ~150 pairs) — is REJECTED as a live defect. No extraction_type abstention threshold has been PROPOSED, so the curve has no consumer; the rule in force ("no threshold may be set before the curve exists; refused, not transplanted") is a GATE, not a debt: it forbids setting a threshold, it does not describe a broken meter. Computing an operating point for a threshold nobody has asked to set is speculative calibration, and a reading nobody reads is the failure mode D-3047 exists to catch. **RE-OPEN CONDITION:** an actual extraction_type threshold proposal (then the curve is owed, and this re-opens as a calibration TASK, not a bug).
+
+## BUG-864 (MED — CLOSED 2026-10-24) — Hazel's placement rule is REFUSED as a decider (D-3049 landed); the residual is two owner-lane GUI steps, not a live code defect
+
+**DISPOSITION: the REMEDY landed.** D-3049's placement declaration + reading LANDED: `config/ingest_identity_gate.yaml#source_library.placement.refusals.no_second_policy_home` records Hazel as REFUSED as a decider, and `scripts/census_source_names.py` (capability `source_library_names`) now counts DECLARED pens instead of being blind to a binary rule store no diff, review or receipt can ever mention (C12's defect with a GUI).
+
+**ACCEPTED NEGATIVE (D-3038) — the residual, recorded WITH its reason.** The two remaining owner-lane steps — (a) open Hazel and retarget/disable its rules, (b) if Downloads stays an arrival pen, declare it as a pen row — are MANUAL owner acts, registered as T-180 (owner gate). They are not a code defect: no agent can perform them (they require the owner's hands in Hazel's UI), and keeping BUG-864 OPEN adds no reading beyond T-180's row. **RE-OPEN CONDITION:** a measured change in the rule store that the placement reading can no longer explain (then this re-opens, and the reader will name it).
+
+## BUG-873 (MED — CLOSED 2026-10-24) — 2 of 3 dead extensions REPAIRED by measurement; the 3rd is `never` by policy (D-3056); the residual is a goose-harness defect this repo does not own
+
+**DISPOSITION: the SWEEP's findings are discharged.** `reddit` REPAIRED (`--with httpx` → tools/list answers 2), `pdfreader` REPAIRED and deliberately left disabled (`mcp<2` → 1 tool), `scheduler` NAMED-not-flipped and classified `never` by `config/extension_profiles.yaml` (D-3056) BY MEASUREMENT (0 tools). The COST is measured too (6 stdio extensions ship 37 tool schemas ≈ 7,909 tokens/request).
+
+**ACCEPTED NEGATIVE (D-3038) — the residual, recorded WITH its reason.** The harness defect the entry left OPEN — "an enabled extension that contributes zero tools still raises nothing to the session" — is a GOOSE-harness behaviour, not a defect in any artifact this repository owns. The policy (D-3056) prevents the ROT; it cannot (from here) fix the harness's silence. **RE-OPEN CONDITION:** a harness version that surfaces zero-tool extensions (then a check under `scripts/goose_profile.py`, capability `extension_residency`, can assert it).
+

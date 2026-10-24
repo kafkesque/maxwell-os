@@ -122,7 +122,7 @@ def _load_state() -> dict:
     """Load watchdog state (previous RSS for trend detection)."""
     if STATE_FILE.exists():
         try:
-            return json.loads(STATE_FILE.read_text())
+            return json.loads(STATE_FILE.read_text(encoding='utf-8'))
         except (json.JSONDecodeError, OSError):
             pass
     return {"last_rss_gb": 0.0, "restart_count": 0, "last_restart_at": None}

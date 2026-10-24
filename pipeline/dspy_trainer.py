@@ -42,7 +42,7 @@ GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.ya
 CONFIG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 
 # Load config for model settings
-with open(CONFIG_PATH) as f:
+with open(CONFIG_PATH, encoding='utf-8') as f:
     _cfg = yaml.safe_load(f)
 
 # Resolve model name: generator is a dict {model, provider, temperature, max_tokens}
@@ -172,7 +172,7 @@ def golden_to_examples(
     Returns:
         List of dspy.Example objects with .author, .is_positive, .fb_name metadata.
     """
-    with open(golden_path) as f:
+    with open(golden_path, encoding='utf-8') as f:
         data = yaml.safe_load(f)
 
     examples: list[dspy.Example] = []

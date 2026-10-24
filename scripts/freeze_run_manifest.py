@@ -86,7 +86,7 @@ def _load_manifest() -> dict:
     """Load pipeline_manifest from config (mirrors pipeline/stamp.py D2282)."""
     import yaml
     cfg_path = CONFIG_DIR / "pipeline_config.yaml"
-    with open(cfg_path) as f:
+    with open(cfg_path, encoding='utf-8') as f:
         cfg = yaml.safe_load(f) or {}
     return cfg.get("pipeline_manifest", {})
 

@@ -21,7 +21,7 @@ CONFIG_DIR = REPO_ROOT / "config"
 
 def _load_ontology() -> dict:
     import yaml
-    with open(CONFIG_DIR / "content_types.yaml") as f:
+    with open(CONFIG_DIR / "content_types.yaml", encoding='utf-8') as f:
         return yaml.safe_load(f) or {}
 
 

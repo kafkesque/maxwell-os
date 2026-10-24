@@ -554,7 +554,7 @@ def load_verified_fbs() -> list[dict]:
         sys.exit(1)
 
     fbs: list[dict] = []
-    with open(STAGE5_CHECKPOINT) as f:
+    with open(STAGE5_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:
@@ -579,7 +579,7 @@ def load_non_fb_content() -> dict[str, list[dict]]:
     for key, filename in mapping:
         path = stage4_dir / filename
         if path.exists():
-            with open(path) as f:
+            with open(path, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if line:

@@ -240,7 +240,7 @@ def run_comparison(
     """
 
     # Load golden set for few-shot examples
-    with open(GOLDEN_PATH) as f:
+    with open(GOLDEN_PATH, encoding='utf-8') as f:
         golden = yaml.safe_load(f)
 
     # A-002: author-disjoint few-shot (no author overlap with test set)
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     test = test[:args.n_examples]
 
     # A-002: report author overlap between test and few-shot pool
-    with open(GOLDEN_PATH) as f:
+    with open(GOLDEN_PATH, encoding='utf-8') as f:
         _golden = yaml.safe_load(f)
     _test_auth: set[str] = set()
     for _ex in test:

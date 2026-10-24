@@ -50,7 +50,7 @@ SIDECARS = {
 
 # type-specific body fields that S2 must emit (read from content_types.yaml, C12)
 def _s2_body_fields() -> dict[str, list[str]]:
-    with open(REPO / "config" / "content_types.yaml") as f:
+    with open(REPO / "config" / "content_types.yaml", encoding='utf-8') as f:
         cfg = yaml.safe_load(f)
     return cfg.get("s2_body_fields", {})
 

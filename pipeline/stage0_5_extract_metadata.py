@@ -87,7 +87,7 @@ def load_cache(cache_path: Path) -> dict[str, dict]:
     """
     cache: dict[str, dict] = {}
     if cache_path.exists():
-        with open(cache_path) as f:
+        with open(cache_path, encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -351,7 +351,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
 
         # LLM extraction for ambiguous filenames
         try:
-            with open(md_path) as f:
+            with open(md_path, encoding='utf-8') as f:
                 text: str = f.read(PREAMBLE_CHARS)
         except Exception as e:
             print(f"   ❌ Cannot read {filename}: {e}")

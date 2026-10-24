@@ -74,7 +74,7 @@ def _read_checkpoint(checkpoint: Path | None) -> tuple[int, float]:
     if checkpoint is None:
         return 0, 0.0
     try:
-        fbs = [json.loads(line) for line in checkpoint.read_text().splitlines() if line.strip()]
+        fbs = [json.loads(line) for line in checkpoint.read_text(encoding='utf-8').splitlines() if line.strip()]
     except (json.JSONDecodeError, OSError):
         return 0, 0.0
     c = Counter(fb.get("extraction_type", "?") for fb in fbs if not fb.get("_null"))
@@ -86,7 +86,7 @@ def _log_markers(log: Path | None) -> dict[str, int]:
     """Count outcome markers in the S2 log (rough but useful signals)."""
     if log is None:
         return {}
-    text = log.read_text(errors="replace")
+    text = log.read_text(errors="replace", encoding='utf-8')
     return {
         "added": text.count("→ "),
         "near_dup": text.count("near-duplicate"),

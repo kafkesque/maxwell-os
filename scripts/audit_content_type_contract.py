@@ -30,7 +30,7 @@ CONFIG_DIR = REPO_ROOT / "config"
 # ── Ontology load ───────────────────────────────────────────────────────────
 def _load_ontology() -> dict:
     import yaml
-    with open(CONFIG_DIR / "content_types.yaml") as f:
+    with open(CONFIG_DIR / "content_types.yaml", encoding='utf-8') as f:
         return yaml.safe_load(f) or {}
 
 
@@ -232,7 +232,7 @@ def _report(label: str, results: dict[str, list[str]]) -> bool:
 def audit_golden(onto: dict) -> tuple[dict[str, list[str]], bool]:
     """Audit the single-source golden set's expected_fb (S2 ground truth)."""
     import yaml
-    golden = yaml.safe_load(open(CONFIG_DIR / "golden" / "stage2_fewshot_single_source.yaml"))
+    golden = yaml.safe_load(open(CONFIG_DIR / "golden" / "stage2_fewshot_single_source.yaml", encoding='utf-8'))
     results: dict[str, list[str]] = {}
     for ex in golden["examples"]:
         if not ex.get("should_extract"):

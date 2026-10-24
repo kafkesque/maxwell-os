@@ -36,7 +36,7 @@ def main() -> None:
     if len(sys.argv) != 2:
         print(__doc__)
         sys.exit(1)
-    decisions = json.loads(Path(sys.argv[1]).read_text())
+    decisions = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
     ts = datetime.now(timezone.utc).isoformat()
 
     # 1. append to ledger
@@ -54,7 +54,7 @@ def main() -> None:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
     # 2. update backlog
-    bl = json.loads(BACKLOG.read_text())
+    bl = json.loads(BACKLOG.read_text(encoding='utf-8'))
     by_id = {r["example_id"]: r for r in bl["backlog"]}
     for eid, d in decisions.items():
         r = by_id.get(eid)

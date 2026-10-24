@@ -174,7 +174,7 @@ def main():
             sys.exit(1)
 
         chunks = []
-        with open(STAGE1_CHECKPOINT) as f:
+        with open(STAGE1_CHECKPOINT, encoding='utf-8') as f:
             for line in f:
                 try:
                     chunks.append(json.loads(line))

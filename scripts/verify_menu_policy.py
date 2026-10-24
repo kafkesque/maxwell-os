@@ -22,9 +22,9 @@ from pathlib import Path
 import yaml
 
 R = Path(__file__).resolve().parent.parent
-ROUTING = yaml.safe_load((R / 'config/menu_routing.yaml').read_text())
-ABSTENTION = yaml.safe_load((R / 'config/verify_abstention.yaml').read_text())
-MERGE = yaml.safe_load((R / 'config/menu_v6_merge_map.yaml').read_text())
+ROUTING = yaml.safe_load((R / 'config/menu_routing.yaml').read_text(encoding='utf-8'))
+ABSTENTION = yaml.safe_load((R / 'config/verify_abstention.yaml').read_text(encoding='utf-8'))
+MERGE = yaml.safe_load((R / 'config/menu_v6_merge_map.yaml').read_text(encoding='utf-8'))
 red, warn = [], []
 
 
@@ -38,9 +38,9 @@ for axis, spec in ROUTING['axes'].items():
         continue
     src = ROUTING['menu_sources'][axis]
     if src['path'].endswith('.json'):
-        labels = [d['value'] for d in json.loads((R / src['path']).read_text())[src['key']]]
+        labels = [d['value'] for d in json.loads((R / src['path']).read_text(encoding='utf-8'))[src['key']]]
     else:
-        doc = yaml.safe_load((R / src['path']).read_text())
+        doc = yaml.safe_load((R / src['path']).read_text(encoding='utf-8'))
         labels = [d['value'] for d in (doc.get(src['key']) or [])]
     if not labels:
         warn.append(f'{axis}: menu source {src["path"]} exposes no readable list -- closure unverified')
@@ -53,7 +53,7 @@ for axis, spec in ROUTING['axes'].items():
     else:
         print(f'OK  closure {axis}: {len(queued)} queued, constant {spec.get("constant_label")}, abstention {exempt}')
 
-evidence = json.loads((R / MERGE['evidence']).read_text())
+evidence = json.loads((R / MERGE['evidence']).read_text(encoding='utf-8'))
 by_tail = {canon(r['tail_label']): r for r in evidence['map']}
 # PINNED-BY-DESIGN (BUG-694 future-tax audit, 2026-10-09): this reads closed_menu_v5.json
 # deliberately, NOT live_menu_path(). The merge map (config/menu_v6_merge_map.yaml) is a FROZEN
@@ -61,7 +61,7 @@ by_tail = {canon(r['tail_label']): r for r in evidence['map']}
 # live v9 menu would time-travel-validate a historical artifact against a future menu (e.g. the
 # v9-demoted 'computational theory' is absent from v9, so a v6 parent that is now demoted would
 # RED spuriously). Do NOT "fix" this into live_menu_path() — see BUG-694 for the serving-path fix.
-axis_labels = {canon(d['value']) for d in json.loads((R / 'config/closed_menu_v5.json').read_text())['disciplines']}
+axis_labels = {canon(d['value']) for d in json.loads((R / 'config/closed_menu_v5.json').read_text(encoding='utf-8'))['disciplines']}
 rat = MERGE['ratification']
 tails = set(by_tail)
 for t in rat['ratified']:
@@ -92,7 +92,7 @@ else:
     digest = hashlib.sha256(cal_path.read_bytes()).hexdigest()
     if digest != pol['measured_curve_sha256']:
         red.append('abstention: calibration artifact digest does not match the policy (curve changed without a decision)')
-    cal = json.loads(cal_path.read_text())
+    cal = json.loads(cal_path.read_text(encoding='utf-8'))
     for axis, op in pol['operating_points'].items():
         if axis not in cal['curves']:
             red.append(f'abstention: {axis} has an operating point with NO measured curve (transplant refused)')

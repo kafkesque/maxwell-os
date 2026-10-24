@@ -49,7 +49,7 @@ def main() -> None:
 
     # Track probe position mapping (cluster id -> % through 2634 convergent)
     try:
-        with open(os.path.join(S15_DIR, "latest", "checkpoint.jsonl")) as f:
+        with open(os.path.join(S15_DIR, "latest", "checkpoint.jsonl"), encoding='utf-8') as f:
             clusters = [json.loads(l) for l in f if l.strip()]
         conv = [c for c in clusters if c.get("is_convergent")]
         order = [c.get("cluster_id", "") for c in conv]
@@ -64,7 +64,7 @@ def main() -> None:
             ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             # Read N2 log
             try:
-                with open(LOG) as f:
+                with open(LOG, encoding='utf-8') as f:
                     content = f.read()
                 splits = len(re.findall(r"✂️", content))
                 last = probe_position(content)
@@ -82,7 +82,7 @@ def main() -> None:
             cp_lines = 0
             if os.path.exists(CHECKPOINT):
                 try:
-                    with open(CHECKPOINT) as f:
+                    with open(CHECKPOINT, encoding='utf-8') as f:
                         cp_lines = sum(1 for line in f if line.strip())
                 except Exception as e:
                     # D2226: C16 compliance — log, don't silently swallow.

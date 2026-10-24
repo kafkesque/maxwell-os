@@ -66,7 +66,7 @@ PIPELINE_COMMIT = "v3.0-D2616-phase1"
 
 def _load():
     golden = []
-    g = yaml.safe_load(GOLDEN.open())
+    g = yaml.safe_load(GOLDEN.open(encoding='utf-8'))
     for e in g["examples"]:
         m = re.search(r"[0-9a-f]{64}", str(e.get("rationale", "")))
         golden.append({
@@ -80,7 +80,7 @@ def _load():
         })
 
     p5 = {}
-    for line in P5.open():
+    for line in P5.open(encoding='utf-8'):
         line = line.strip()
         if not line:
             continue
@@ -88,7 +88,7 @@ def _load():
         p5[r["example_id"]] = r
 
     adj = {}
-    for line in ADJ.open():
+    for line in ADJ.open(encoding='utf-8'):
         line = line.strip()
         if not line:
             continue
@@ -96,7 +96,7 @@ def _load():
         adj[r["fb_id"]] = r
 
     jv = {}
-    for line in JV.open():
+    for line in JV.open(encoding='utf-8'):
         line = line.strip()
         if not line:
             continue

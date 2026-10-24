@@ -37,7 +37,7 @@ def load_segments():
     if not STAGE1_CHECKPOINT.exists():
         print(f"ERROR: Stage 1 checkpoint missing: {STAGE1_CHECKPOINT}")
         sys.exit(1)
-    with open(STAGE1_CHECKPOINT) as f:
+    with open(STAGE1_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             if not line.strip():
                 continue
@@ -96,7 +96,7 @@ def main():
         print("No S2 checkpoint. Run stage2_extract.py first.")
         sys.exit(1)
 
-    fbs = [json.loads(line) for line in open(STAGE2_CHECKPOINT) if line.strip()]
+    fbs = [json.loads(line) for line in open(STAGE2_CHECKPOINT, encoding='utf-8') if line.strip()]
     print(f"Loaded {len(fbs)} FBs")
     segments = load_segments()
     print(f"Loaded {len(segments)} segments")

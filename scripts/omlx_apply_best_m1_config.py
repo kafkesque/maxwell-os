@@ -31,13 +31,13 @@ SETTINGS_PATH = Path.home() / ".omlx" / "model_settings.json"
 
 def load_spec() -> dict:
     """Load the intent spec (config-sourced, C12)."""
-    with open(SPEC_PATH) as f:
+    with open(SPEC_PATH, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
 def load_settings() -> dict:
     """Load the live oMLX per-model settings."""
-    with open(SETTINGS_PATH) as f:
+    with open(SETTINGS_PATH, encoding='utf-8') as f:
         return json.load(f)
 
 

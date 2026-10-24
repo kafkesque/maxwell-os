@@ -48,7 +48,7 @@ GPTOSS_MODEL = VERIFY_MODEL  # gpt-oss-20b-MXFP4-Q8
 def load_test_set() -> list[dict]:
     """Load all depth-labeled FBs from the golden set."""
     import yaml
-    with open(GOLDEN_PATH) as f:
+    with open(GOLDEN_PATH, encoding='utf-8') as f:
         d = yaml.safe_load(f)
     fbs = []
     for ex in d["examples"]:

@@ -56,7 +56,7 @@ def _nonempty(v) -> bool:
 
 def load_ontology(config: Path) -> dict:
     import yaml
-    with open(config) as f:
+    with open(config, encoding='utf-8') as f:
         return yaml.safe_load(f) or {}
 
 

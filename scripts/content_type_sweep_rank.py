@@ -39,7 +39,7 @@ OUT_MD = ROOT / "governance" / "content_type_verification_backlog.md"
 
 
 def load_golden_universe() -> Dict[str, Dict[str, Any]]:
-    d = yaml.safe_load(GOLDEN_MINE.read_text())
+    d = yaml.safe_load(GOLDEN_MINE.read_text(encoding='utf-8'))
     rows = d["examples"] if isinstance(d, dict) and "examples" in d else d
     out: Dict[str, Dict[str, Any]] = {}
     for r in rows:
@@ -55,9 +55,9 @@ def main() -> None:
     universe = load_golden_universe()
 
     # model verdicts (728)
-    oa = json.loads(OA_JOINED.read_text())
+    oa = json.loads(OA_JOINED.read_text(encoding='utf-8'))
     # re-triage flips (40)
-    rt = json.loads(RETRIAGE.read_text())
+    rt = json.loads(RETRIAGE.read_text(encoding='utf-8'))
     flag_flips: Dict[str, Dict[str, Any]] = rt.get("flag_flips", {})
     manifest_flips: Dict[str, Any] = rt.get("manifest_flips", {})
     retriaged: Dict[str, Dict[str, Any]] = {}
@@ -67,10 +67,10 @@ def main() -> None:
         if isinstance(v, list) and len(v) >= 2:
             retriaged[eid] = {"from": v[0], "to": v[1], "reason": "manifest flip"}
     # re-swept (31)
-    rs = json.loads(RESWEEP.read_text())
+    rs = json.loads(RESWEEP.read_text(encoding='utf-8'))
     reswept: Dict[str, Dict[str, Any]] = rs.get("verdicts", {})
     # human-confirmed (9 cases + 4 flips)
-    bc = yaml.safe_load(BOUNDARY.read_text())
+    bc = yaml.safe_load(BOUNDARY.read_text(encoding='utf-8'))
     human_cases: Dict[str, Dict[str, Any]] = {
         c["example_id"]: {"name": c.get("name", ""), "disposition": c.get("disposition") or c.get("content_type_derived")}
         for c in bc.get("cases", [])
@@ -82,7 +82,7 @@ def main() -> None:
 
     # canonical append-only human ledger (highest authority) overrides the seed cases
     if LEDGER.exists():
-        for line in LEDGER.read_text().splitlines():
+        for line in LEDGER.read_text(encoding='utf-8').splitlines():
             line = line.strip()
             if not line:
                 continue

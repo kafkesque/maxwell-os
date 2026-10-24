@@ -21,7 +21,7 @@ def main() -> int:
     examples=edc.load_depth_examples(str(EVAL))
     out={}
     for name,ck in CKPTS:
-        maps=json.loads((ck/'label_maps.json').read_text())
+        maps=json.loads((ck/'label_maps.json').read_text(encoding='utf-8'))
         dmap={k:int(v) for k,v in maps['depth_to_idx'].items()}; inv={v:k for k,v in dmap.items()}
         tok=AutoTokenizer.from_pretrained(edc.BASE_MODEL_NAME)
         model=edc.DepthClassifier(backbone=edc.AutoModel.from_pretrained(edc.BASE_MODEL_NAME))

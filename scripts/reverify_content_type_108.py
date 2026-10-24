@@ -69,7 +69,7 @@ Application: {application}
 
 
 def _load_queue() -> List[Dict[str, Any]]:
-    return [json.loads(l) for l in QUEUE.read_text().splitlines() if l.strip()]
+    return [json.loads(l) for l in QUEUE.read_text(encoding='utf-8').splitlines() if l.strip()]
 
 
 def _load_row(fb_id: str) -> Dict[str, Any]:
@@ -89,7 +89,7 @@ def _load_prior() -> Dict[str, Dict[str, Any]]:
     if not OUT.exists():
         return {}
     try:
-        d = json.loads(OUT.read_text())
+        d = json.loads(OUT.read_text(encoding='utf-8'))
     except Exception:
         return {}
     return {v["fb_id"]: v for v in d.get("verdicts", [])}

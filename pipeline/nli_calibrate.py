@@ -57,7 +57,7 @@ def load_fbs_from_stage4() -> list[dict]:
         print(f"❌ Stage 4 checkpoint not found at {STAGE4_CHECKPOINT}")
         sys.exit(1)
     fbs = []
-    with open(STAGE4_CHECKPOINT) as f:
+    with open(STAGE4_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:
@@ -124,7 +124,7 @@ def load_labeled_pairs(path: str) -> list[tuple[str, str, str]]:
     {"definition": "...", "evidence": "...", "label": "ENTAILMENT|NEUTRAL|CONTRADICTION"}
     """
     pairs = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):

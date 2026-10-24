@@ -24,10 +24,10 @@ def main() -> int:
     from pipeline.pipeline_paths import S2_GOLDEN_PATH
 
     golden = PROJECT_ROOT / S2_GOLDEN_PATH
-    vote = json.loads(VOTE_JSON.read_text())
+    vote = json.loads(VOTE_JSON.read_text(encoding='utf-8'))
     relabels = {r["id"]: r["recommend"] for r in vote if r.get("recommend")}
 
-    lines = golden.read_text().splitlines()
+    lines = golden.read_text(encoding='utf-8').splitlines()
     id_re = re.compile(r"^\s*- id: (\S+)\s*$")
     depth_re = re.compile(r"^(\s*)depth:\s*(domain|cross-domain|universal|specialized)\s*$")
 
@@ -49,7 +49,7 @@ def main() -> int:
 
     # verify parse + distribution (D2367: also count list-form expected_fb — the
     # old isinstance(dict) filter silently excluded CONV-037/039-style list entries)
-    d = yaml.safe_load(golden.read_text())
+    d = yaml.safe_load(golden.read_text(encoding='utf-8'))
     from collections import Counter
     dist = Counter()
     list_form = 0

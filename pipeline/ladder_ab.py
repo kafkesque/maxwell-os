@@ -78,9 +78,9 @@ def judge(prompt: str) -> str:
     return label if label in ("causal_mechanism","empirical_pattern","normative_heuristic","descriptive_model") else ""
 
 def main() -> None:
-    verdicts = [json.loads(l) for l in open(RW / "human_review_verdicts.jsonl") if l.strip()]
+    verdicts = [json.loads(l) for l in open(RW / "human_review_verdicts.jsonl", encoding='utf-8') if l.strip()]
     adjudicated = [v for v in verdicts if v["verdict"] != "NONE"]
-    sample = [json.loads(l) for l in open(RW / "disagreement_sample.jsonl") if l.strip()]
+    sample = [json.loads(l) for l in open(RW / "disagreement_sample.jsonl", encoding='utf-8') if l.strip()]
     by_id = {s["fb_id"]: s for s in sample}
     print(f"adjudicated records: {len(adjudicated)} (of {len(verdicts)})")
 

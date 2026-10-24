@@ -375,7 +375,7 @@ def run_stage4_5(
     if STAGE4_5_CHECKPOINT.exists() and os.path.exists(state_path):
         try:
             resume_fbs = load_jsonl(STAGE4_5_CHECKPOINT, context="S4.5 checkpoint")
-            with open(state_path) as sf:
+            with open(state_path, encoding='utf-8') as sf:
                 resume_state = json.load(sf)
             # Guard: a stale enriched checkpoint from a different S4 run must not
             # silently resume — require identical fb_id multisets.

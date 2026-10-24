@@ -62,7 +62,7 @@ def load_gold() -> list[dict[str, Any]]:
     if not GOLD.exists():
         print("FAIL gold anchor missing: " + str(GOLD))
         sys.exit(2)
-    return [json.loads(line) for line in GOLD.read_text().splitlines() if line.strip()]
+    return [json.loads(line) for line in GOLD.read_text(encoding='utf-8').splitlines() if line.strip()]
 
 
 def main() -> int:

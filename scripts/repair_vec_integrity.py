@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-backup", action="store_true", help="skip the internal pre-repair copy")
     args = ap.parse_args(argv)
 
-    cfg = yaml.safe_load(_CFG_PATH.read_text())
+    cfg = yaml.safe_load(_CFG_PATH.read_text(encoding='utf-8'))
     db = Path(args.db) if args.db else _ROOT / cfg["db_path"]
     fbs = cfg["fbs_table"]
     if not db.exists():

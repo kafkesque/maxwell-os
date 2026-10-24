@@ -156,7 +156,7 @@ def load_segments() -> list[dict]:
     if prefilter_flag.exists():
         # Verify it's a flag, not segments (flag has "completed" key)
         try:
-            flag_data = json.loads(prefilter_flag.read_text().strip())
+            flag_data = json.loads(prefilter_flag.read_text(encoding='utf-8').strip())
             if flag_data.get("completed"):
                 print(f"   ✅ Stage 1.3 prefilter completed ({flag_data.get('kept', '?')}/{flag_data.get('total', '?')} kept)")
         except (json.JSONDecodeError, KeyError) as e:
@@ -171,7 +171,7 @@ def load_segments() -> list[dict]:
         sys.exit(1)
 
     segments: list[dict] = []
-    with open(checkpoint) as f:
+    with open(checkpoint, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -341,7 +341,7 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> tuple[
 
         if state_path.exists():
             try:
-                state = json.loads(state_path.read_text())
+                state = json.loads(state_path.read_text(encoding='utf-8'))
             except Exception:
                 state = {}
             if (state.get("fingerprint") == fp and state.get("total") == total

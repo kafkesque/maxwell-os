@@ -38,9 +38,9 @@ def _check_config_integrity() -> bool:
     vy_path = Path("config/version.yaml")
     pc_path = Path("config/pipeline_config.yaml")
     if vy_path.exists() and pc_path.exists():
-        with open(vy_path) as f:
+        with open(vy_path, encoding='utf-8') as f:
             vy = yaml.safe_load(f) or {}
-        with open(pc_path) as f:
+        with open(pc_path, encoding='utf-8') as f:
             pcy = yaml.safe_load(f) or {}
         expected = str(vy.get("schema_version", "")).strip().strip("'\"")
         actual = str(pcy.get("pipeline", {}).get("schema_version", "")).strip().strip("'\"")
@@ -51,7 +51,7 @@ def _check_config_integrity() -> bool:
             print(f"   ✅ Version consistent: schema_version={expected}")
 
     # No hardcoded /Users/ paths in config
-    with open(pc_path) as f:
+    with open(pc_path, encoding='utf-8') as f:
         for i, line in enumerate(f, 1):
             if "/Users/" in line and not line.strip().startswith("#"):
                 print(f"   ⚠️  Hardcoded path at line {i}: {line.strip()[:80]}")

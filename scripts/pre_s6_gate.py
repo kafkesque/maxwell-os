@@ -33,7 +33,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
 
 def _load_jsonl(path: Path) -> list[dict]:
     recs: list[dict] = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for i, line in enumerate(f, 1):
             line = line.strip()
             if not line:
@@ -53,7 +53,7 @@ def _expected_count() -> int | None:
     for c in candidates:
         if c.exists():
             try:
-                d = json.loads(c.read_text())
+                d = json.loads(c.read_text(encoding='utf-8'))
                 n = d.get("expected_fb_count")
                 if n is not None:
                     return int(n)

@@ -49,7 +49,7 @@ def main() -> int:
     # golden example_id -> fb_id
     fbids: set[str] = set()
     if GOLDEN_LABELS.exists():
-        with GOLDEN_LABELS.open() as f:
+        with GOLDEN_LABELS.open(encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line:
@@ -60,7 +60,7 @@ def main() -> int:
 
     echoes: list[dict] = []
     scanned = 0
-    with EXPORT.open() as f:
+    with EXPORT.open(encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:

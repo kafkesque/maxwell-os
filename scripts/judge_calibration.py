@@ -81,7 +81,7 @@ def load_cfg() -> dict[str, Any]:
     """Load the calibration config (candidates + decision thresholds)."""
     import yaml
 
-    return (yaml.safe_load(CFG.read_text()) or {}).get("judge_calibration") or {}
+    return (yaml.safe_load(CFG.read_text(encoding='utf-8')) or {}).get("judge_calibration") or {}
 
 
 def norm(value: str) -> str:
@@ -243,8 +243,8 @@ def decide(report: dict[str, Any], cfg: dict[str, Any]) -> dict[str, str]:
 
 def _rescore(cfg: dict[str, Any], models: list[str], sheet: Path) -> None:
     """Re-score the stored raw answers against the sheet, applying the current rule (no calls)."""
-    prior = json.loads(OUT_JSON.read_text())
-    with sheet.open(newline="") as fh:
+    prior = json.loads(OUT_JSON.read_text(encoding='utf-8'))
+    with sheet.open(newline="", encoding='utf-8') as fh:
         rows = [r for r in csv.DictReader(fh)]
     report = score(rows, prior["raw_answers"], models)
     report["verdicts"] = decide(report, cfg)
@@ -327,14 +327,14 @@ def main() -> int:
     cfg = load_cfg()
     models = [m.strip() for m in args.models.split(",") if m.strip()] or list(cfg.get("candidates") or [])
     if args.rescore:
-        prior = json.loads(OUT_JSON.read_text())
+        prior = json.loads(OUT_JSON.read_text(encoding='utf-8'))
         rows_stored = [{"task": a["task"], "item_id": a["item_id"]} for a in prior["raw_answers"][models[0]].values()] if False else None
         _rescore(cfg, models, SHEET)
         return 0
     if not models:
         raise SystemExit("no candidate models in config/eval_integrity.yaml::judge_calibration")
 
-    with SHEET.open(newline="") as fh:
+    with SHEET.open(newline="", encoding='utf-8') as fh:
         rows = [r for r in csv.DictReader(fh)]
     pending = [r for r in rows if not (r.get("HUMAN_VERDICT") or "").strip()]
     if pending:

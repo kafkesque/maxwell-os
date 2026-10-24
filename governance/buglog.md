@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 761 bugs (254 open / 507 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1269 decisions (census stamp 331d6bf92bfbcfd2, 2026-10-24) · 762 bugs (254 open / 508 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1269 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1269, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 254 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 254 open.
 >
@@ -20884,3 +20884,28 @@ ceiling, no longer above), `unresolved_reference` unchanged at 64, `chronic_open
 code family where a fix's remedy lives: `archive/` is the C19 dead-code home (a citation to a file retired there
 is not "the thing that was fixed"), `backups/` are data snapshots, and `specs/`+`evals/` are design/eval artifacts.
 Broadening "trace" past "the remedy a later reader can open" would turn the reading into a weaker one (D-2644).
+
+## BUG-998 (LOW - CLOSED 2026-10-24) - the T-114 read slice moved a PINNED artifact's bytes, so robustness_meter owed a RE-MINT (never a sha overwrite)
+
+**DEFECT, MEASURED (not asserted).** `scripts/abstention_robustness.py` is PINNED as `robustness_meter` (D-352,
+sha256 `0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f`). The T-114 undeclared-encoding read slice
+(`scripts/declare_encoding.py --apply`) mechanically inserted `encoding='utf-8'` on its 5 READ sites (4 ×
+`read_text()`, 1 × `open(newline="")`). Staged bytes moved HEAD `0218845e...` → `c14b3ea3...` (5 changed lines,
+`git diff --cached --numstat` = `5 5`).
+
+**CONSEQUENCE (the rail working, not failing).** `scripts/verify_recalibration_pins.py --staged` REFUSED the 147-path
+read-slice commit: a pin certifies that the bytes at HEAD reproduce a measurement, so ANY byte move invalidates that
+certificate. The tempting shortcut — writing the new sha256 under D-352 — is the BUG-391/BUG-526/BUG-535 class: it
+turns the scan green while an old decision certifies a measurement nobody re-ran (the exact refusal the re-mint rule
+exists to force).
+
+**FIX (deterministic re-measurement + re-mint, the D-2963/BUG-740 precedent).** The 5 changed lines only make the UTF-8
+codec EXPLICIT on reads that already default to it, so the change is score-neutral by construction; but the
+certification is empirical, not assumed (D-3036): running the STAGED script re-derives
+`governance/ABSTENTION_ROBUSTNESS_20260923.json` and `.md` BYTE-IDENTICALLY (json `d1bf79c4...`, md `03667fbe...`;
+`git diff` empty; exit 2 = the declared "reproduction mismatch reported LOUD, run continues" behaviour, not an error).
+The pin is re-minted under D-3143 (new decision id, new sha256 `c14b3ea3...`) — the pin, its certificate and the read
+slice land in ONE commit.
+
+**RESIDUAL = 0.** The pin now certifies the bytes at HEAD of this commit; no measurement is certified by a decision
+that did not re-run it.

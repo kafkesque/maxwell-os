@@ -32,7 +32,7 @@ def strip_fb(fb_dict: dict) -> int:
 
 def main() -> None:
     gs_path = Path("config/golden/stage2_fewshot_convergent.yaml")
-    with open(gs_path) as f:
+    with open(gs_path, encoding='utf-8') as f:
         gs = yaml.safe_load(f)
 
     stripped_count = 0

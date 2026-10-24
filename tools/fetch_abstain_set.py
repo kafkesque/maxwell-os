@@ -45,7 +45,7 @@ def _fb_text(row: sqlite3.Row) -> str:
 
 def main() -> int:
     """Materialise the frozen abstain eval set."""
-    verdicts = json.loads(VERDICTS.read_text())['verdicts']
+    verdicts = json.loads(VERDICTS.read_text(encoding='utf-8'))['verdicts']
     db = sqlite3.connect(DB)
     db.row_factory = sqlite3.Row
     ids = [v['fb_id'] for v in verdicts]

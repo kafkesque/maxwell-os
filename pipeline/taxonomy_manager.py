@@ -72,7 +72,7 @@ def _get_next_taxonomy_path() -> Path:
 def _load_canonical_set(kind: str) -> set[str]:
     """Return lowercase canonical label set for `kind` ('domain' | 'discipline')."""
     key = "domains" if kind == "domain" else "disciplines"
-    with open(_get_taxonomy_path()) as f:
+    with open(_get_taxonomy_path(), encoding='utf-8') as f:
         taxa = yaml.safe_load(f)
     return {
         normalize_label(entry["canonical"])
@@ -174,7 +174,7 @@ def reconcile_canonical_status(conn: sqlite3.Connection) -> int:
     if not taxonomy_path.exists():
         return 0
 
-    with open(taxonomy_path) as f:
+    with open(taxonomy_path, encoding='utf-8') as f:
         tax = yaml.safe_load(f)
 
     now = datetime.now(UTC).isoformat()
@@ -232,7 +232,7 @@ def seed_from_taxonomy_yaml(conn: sqlite3.Connection) -> int:
     if not taxonomy_path.exists():
         return 0
 
-    with open(taxonomy_path) as f:
+    with open(taxonomy_path, encoding='utf-8') as f:
         tax = yaml.safe_load(f)
 
     now = datetime.now(UTC).isoformat()
@@ -565,7 +565,7 @@ def generate_taxonomy_yaml(conn: sqlite3.Connection, output_path: Path | None = 
         output_path = _get_next_taxonomy_path()
 
     current_path = _get_taxonomy_path()
-    with open(current_path) as f:
+    with open(current_path, encoding='utf-8') as f:
         current_tax = yaml.safe_load(f)
 
     # ── Canonical entries from DB ──
@@ -797,7 +797,7 @@ if __name__ == "__main__":
             print("   Review it (C8-G2), then update pipeline_config.yaml taxonomy_version if approved.")
 
         elif args.command == "apply":
-            with open(args.review_file) as f:
+            with open(args.review_file, encoding='utf-8') as f:
                 review = json.load(f)
             approved = [c for c in review.get("candidates", []) if c.get("approved")]
             if not approved:

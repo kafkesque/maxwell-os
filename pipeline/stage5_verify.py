@@ -854,7 +854,7 @@ def _load_stored_fingerprint() -> dict:
     if not S5_INPUT_FINGERPRINT_PATH.exists():
         return {}
     try:
-        return (json.loads(S5_INPUT_FINGERPRINT_PATH.read_text()) or {}).get("input") or {}
+        return (json.loads(S5_INPUT_FINGERPRINT_PATH.read_text(encoding='utf-8')) or {}).get("input") or {}
     except Exception as e:
         print(f"   ⚠️  stored S5 fingerprint unreadable ({type(e).__name__}: {e}) — treated as absent")
         return {}
@@ -874,7 +874,7 @@ def _acquire_single_writer_lock() -> None:
         return
     if S5_LOCK_PATH.exists():
         try:
-            held = int(S5_LOCK_PATH.read_text().split()[0])
+            held = int(S5_LOCK_PATH.read_text(encoding='utf-8').split()[0])
         except Exception:
             held = -1
         alive = False
@@ -967,7 +967,7 @@ def _load_stored_fingerprint_id() -> str | None:
     if not S5_INPUT_FINGERPRINT_PATH.exists():
         return None
     try:
-        data = json.loads(S5_INPUT_FINGERPRINT_PATH.read_text())
+        data = json.loads(S5_INPUT_FINGERPRINT_PATH.read_text(encoding='utf-8'))
         return data.get("fingerprint_id")
     except Exception:
         return None

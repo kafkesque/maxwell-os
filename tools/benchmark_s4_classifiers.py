@@ -27,7 +27,7 @@ from pipeline.stage4_merged_call import merged_cribs_classify, batch_cribs_class
 def load_fbs(checkpoint_path: str) -> list[dict]:
     """Load classified FBs from S4 checkpoint."""
     fbs = []
-    with open(checkpoint_path) as f:
+    with open(checkpoint_path, encoding='utf-8') as f:
         for line in f:
             if line.strip():
                 fbs.append(json.loads(line))

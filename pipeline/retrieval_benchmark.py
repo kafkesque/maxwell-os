@@ -68,7 +68,7 @@ GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
 
 _CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 _CFG_HOME = str(_CFG_PATH.relative_to(_CFG_PATH.parent.parent))  # D-2982: derived, not a second copy
-with open(_CFG_PATH) as _f:
+with open(_CFG_PATH, encoding='utf-8') as _f:
     _CFG = yaml.safe_load(_f) or {}
 # D-2982 (C16/D-2644): both blocks are DECLARED. `candidate_pool: 0` means "derive the pool from
 # serving.pool", so an absent block silently changed the harness's own pool policy, and an absent
@@ -87,7 +87,7 @@ _REQUIRE_RESOLVABLE: bool = bool(required(_SERVING, "require_resolvable_goldens"
 
 
 def _load_golden(path: Path) -> list[dict]:
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         data = yaml.safe_load(f)
     return data.get("queries", [])
 

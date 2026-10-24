@@ -222,21 +222,21 @@ def main() -> int:
     total = 0
 
     # 1. taxonomy.yaml
-    with open(TAX_PATH) as f:
+    with open(TAX_PATH, encoding='utf-8') as f:
         tax = yaml.safe_load(f)
     tax, n = migrate_taxonomy(tax)
     total += n
     _safe_write(TAX_PATH, _dump(tax), args.dry_run)
 
     # 2. alias_map.yaml
-    with open(ALIAS_PATH) as f:
+    with open(ALIAS_PATH, encoding='utf-8') as f:
         alias = yaml.safe_load(f)
     alias, n = migrate_alias_map(alias)
     total += n
     _safe_write(ALIAS_PATH, _dump(alias), args.dry_run)
 
     # 3. pipeline_config.yaml
-    with open(CFG_PATH) as f:
+    with open(CFG_PATH, encoding='utf-8') as f:
         cfg = yaml.safe_load(f)
     cfg, n = migrate_config(cfg)
     total += n

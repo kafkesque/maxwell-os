@@ -163,7 +163,7 @@ def load_stage0_md_files() -> list[dict]:
         sys.exit(1)
 
     md_files = []
-    with open(STAGE0_CHECKPOINT) as f:
+    with open(STAGE0_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

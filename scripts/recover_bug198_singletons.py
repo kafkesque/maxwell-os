@@ -45,7 +45,7 @@ def main() -> None:
     for path in (T11 / "singleton_fbs.jsonl", T11 / "checkpoint.jsonl"):
         if not path.exists():
             continue
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line:

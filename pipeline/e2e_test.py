@@ -127,7 +127,7 @@ def _get_stage_timeout(stage_script: str) -> float | None:
     try:
         import yaml as _yaml_timeout
         _cfg_path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
-        with open(_cfg_path) as _f:
+        with open(_cfg_path, encoding='utf-8') as _f:
             _cfg = _yaml_timeout.safe_load(_f) or {}
         _timeouts = _cfg.get("stages", {}).get("timeouts", {})
         return _timeouts.get(stage_id, 3600.0)
@@ -376,7 +376,7 @@ def validate_results() -> dict:
 def _load_jsonl(path: Path) -> list[dict]:
     """Load JSONL file, return list of dicts."""
     items = []
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

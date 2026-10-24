@@ -21,7 +21,7 @@ import numpy as np
 import yaml
 
 _ROOT = Path(__file__).resolve().parent.parent
-_CFG = yaml.safe_load((_ROOT / "config" / "menu_merge_map.yaml").read_text())
+_CFG = yaml.safe_load((_ROOT / "config" / "menu_merge_map.yaml").read_text(encoding='utf-8'))
 _NON_ALNUM = re.compile(r"[^a-z0-9]+")
 
 
@@ -75,12 +75,12 @@ def write_atomic(path: Path, text: str) -> None:
 
 def main() -> int:
     """Measure the map, write evidence + proposal config."""
-    routing = yaml.safe_load((_ROOT / _CFG["routing_config"]).read_text())
+    routing = yaml.safe_load((_ROOT / _CFG["routing_config"]).read_text(encoding='utf-8'))
     axis_cfg = routing["axes"][_CFG["axis"]]
     tails = [q["label"] for q in axis_cfg.get("queue", [])]
     if not tails:
         raise SystemExit("routing config names no tail labels - refusing (C16)")
-    menu = json.loads((_ROOT / _CFG["closed_menu"]).read_text())
+    menu = json.loads((_ROOT / _CFG["closed_menu"]).read_text(encoding='utf-8'))
     candidates = [d["value"] for d in menu["disciplines"]
                   if canon(d["value"]) not in {canon(t) for t in tails}
                   and d["value"] not in _CFG["excluded_candidates"]]

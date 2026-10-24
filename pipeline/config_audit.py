@@ -151,7 +151,7 @@ def load_config() -> dict:
     """Load pipeline_config.yaml."""
     import yaml
     cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-    with open(cfg_path) as f:
+    with open(cfg_path, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
@@ -171,7 +171,7 @@ def other_home(name: str) -> dict:
             raise SystemExit(f"FATAL: the audit registry names config home {name!r}, which does not exist "
                              f"at {path} - a registry entry that cannot be checked is worse than none")
         import yaml
-        _OTHER_HOMES[name] = yaml.safe_load(path.read_text()) or {}
+        _OTHER_HOMES[name] = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
     return _OTHER_HOMES[name]
 
 
@@ -273,7 +273,7 @@ def check_hardcoded_elsewhere() -> list[dict]:
     known_attrs |= ACKNOWLEDGED_HARDCODED  # Tier 1+ pending migrations
 
     for fp in py_files:
-        with open(fp) as f:
+        with open(fp, encoding='utf-8') as f:
             lines = f.readlines()
         for i, line in enumerate(lines, 1):
             m = re.match(

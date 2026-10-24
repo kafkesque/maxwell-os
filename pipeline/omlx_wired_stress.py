@@ -57,7 +57,7 @@ _PAGE_SIZE_DEFAULT = 16384  # macOS page size fallback (overridden by vm_stat ou
 def _load_config() -> dict:
     """Load the omlx_wired_stress section from pipeline_config.yaml (C12)."""
     import yaml
-    with open(_CFG_PATH) as f:
+    with open(_CFG_PATH, encoding='utf-8') as f:
         cfg = yaml.safe_load(f) or {}
     return cfg.get("omlx_wired_stress", {}) or {}
 

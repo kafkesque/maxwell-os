@@ -298,7 +298,7 @@ def selftest() -> int:
             raise AssertionError("selftest: placeholder ruling was not refused")
         except SystemExit as e:
             assert "placeholder" in str(e), f"selftest: placeholder guard missing: {e}"
-        lines = [json.loads(l) for l in (td / "rulings.jsonl").read_text().splitlines() if l.strip()]
+        lines = [json.loads(l) for l in (td / "rulings.jsonl").read_text(encoding='utf-8').splitlines() if l.strip()]
         assert lines == [{"source_id": "abc123", "name": "Concept One", "owner_ruling_note": "MATCH"}], lines
     print("selftest OK: count / MATCH / duplicate-refusal / placeholder-refusal / atomic append")
     return 0

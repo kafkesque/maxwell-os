@@ -10,7 +10,7 @@ from pathlib import Path
 GOLDEN_PATH = Path("config/golden/stage2_fewshot_convergent.yaml")
 
 def load():
-    with open(GOLDEN_PATH, "r") as f:
+    with open(GOLDEN_PATH, "r", encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 def save(data):

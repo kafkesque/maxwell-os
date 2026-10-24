@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 # ── Config (C12: from YAML, never hardcoded) ──────────────────────────
 _CFG_PATH: Path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-with open(_CFG_PATH) as _f:
+with open(_CFG_PATH, encoding='utf-8') as _f:
     _CFG: dict = yaml.safe_load(_f)
 
 _EVAL_CFG: dict = _CFG.get("retrieval_eval", {})
@@ -454,7 +454,7 @@ def main() -> None:
         if not args.fb_file.exists():
             print(f"❌ FB file not found: {args.fb_file}", file=sys.stderr)
             sys.exit(1)
-        with open(args.fb_file) as f:
+        with open(args.fb_file, encoding='utf-8') as f:
             fbs: list[dict] = json.load(f)
         result = evaluate_retrieval(args.query, fbs, model=args.model)
     else:

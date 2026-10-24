@@ -134,7 +134,7 @@ def main() -> None:
         sys.exit(1)
 
     all_fbs: list[dict] = []
-    with open(checkpoint_path) as f:
+    with open(checkpoint_path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

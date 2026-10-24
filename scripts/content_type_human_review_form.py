@@ -42,7 +42,7 @@ CHOICES = [
 
 
 def load_definitions() -> Dict[str, Dict[str, str]]:
-    d = yaml.safe_load(GOLDEN_MINE.read_text())
+    d = yaml.safe_load(GOLDEN_MINE.read_text(encoding='utf-8'))
     rows = d["examples"] if isinstance(d, dict) and "examples" in d else d
     out: Dict[str, Dict[str, str]] = {}
     for r in rows:
@@ -68,7 +68,7 @@ def main() -> None:
     args = ap.parse_args()
 
     defs = load_definitions()
-    backlog = json.loads(BACKLOG.read_text())["backlog"]
+    backlog = json.loads(BACKLOG.read_text(encoding='utf-8'))["backlog"]
     rows = [r for r in backlog if r["status"] == args.band][: args.limit]
 
     lines: List[str] = []

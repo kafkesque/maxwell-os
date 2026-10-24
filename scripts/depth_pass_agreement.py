@@ -66,7 +66,7 @@ def _load(path: Path) -> dict[str, Any]:
     """Load a YAML document, failing closed when it is missing."""
     if not path.exists():
         raise AgreementError(f"declared input missing: {path.relative_to(REPO)}")
-    return yaml.safe_load(path.read_text()) or {}
+    return yaml.safe_load(path.read_text(encoding='utf-8')) or {}
 
 
 def krippendorff_alpha(
@@ -155,7 +155,7 @@ def check_cohort(panel: dict[str, Any], verbose: bool = True) -> dict[str, Any]:
     """Verify the declared denominator against the manifest and the workbook (BUG-466)."""
     cohort_cfg = _load(COHORT)
     cohort = (cohort_cfg.get("cohorts") or {}).get(PANEL_KEY_COHORT, {})
-    manifest = json.loads((REPO / cohort["declared_by"].split("#")[0]).read_text())
+    manifest = json.loads((REPO / cohort["declared_by"].split("#")[0]).read_text(encoding='utf-8'))
     declared_rows = int(manifest["sheet"]["rows"])
     if declared_rows != int(cohort["declared_rows"]):
         raise AgreementError(

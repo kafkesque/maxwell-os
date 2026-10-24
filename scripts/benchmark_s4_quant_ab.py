@@ -52,7 +52,7 @@ Answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No rea
 def load_test_set() -> list[dict]:
     """Load depth-labelled FBs from the convergent golden set (same source as D2245)."""
     import yaml
-    with open(PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml") as f:
+    with open(PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml", encoding='utf-8') as f:
         d = yaml.safe_load(f)
     fbs = []
     for ex in d["examples"]:

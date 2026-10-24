@@ -83,7 +83,7 @@ def _now() -> str:
 
 
 def _load_jsonl(p: Path) -> List[Dict[str, Any]]:
-    return [json.loads(l) for l in p.read_text().splitlines() if l.strip()]
+    return [json.loads(l) for l in p.read_text(encoding='utf-8').splitlines() if l.strip()]
 
 
 def _fb_text(fb_id: str) -> Dict[str, Any]:

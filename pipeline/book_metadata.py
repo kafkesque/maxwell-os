@@ -67,7 +67,7 @@ def _load_noise_markers() -> list[str]:
 
         from pipeline.pipeline_paths import PROJECT_ROOT
         cfg_path = PROJECT_ROOT / "config" / "filtering.yaml"
-        with open(cfg_path) as _f:
+        with open(cfg_path, encoding='utf-8') as _f:
             _cfg = yaml.safe_load(_f) or {}
         markers = (_cfg.get("source_noise") or {}).get("markers") or []
         return [str(m).strip() for m in markers if str(m).strip()]
@@ -151,7 +151,7 @@ def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
     cache: dict[str, dict[str, str]] = {}
     norm_index: dict[str, str] = {}
     if METADATA_PATH.exists():
-        with open(METADATA_PATH) as f:
+        with open(METADATA_PATH, encoding='utf-8') as f:
             for line in f:
                 try:
                     d = json.loads(line)

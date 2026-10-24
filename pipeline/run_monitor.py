@@ -111,7 +111,7 @@ def analyze_stage_output(stage_name: str, run_id: str) -> dict:
 
         try:
             items = []
-            with open(checkpoint_file) as f:
+            with open(checkpoint_file, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if line:

@@ -402,7 +402,7 @@ def _get_pipeline_version() -> str:
     """Read pipeline version from config/version.yaml (D2169: single source of truth)."""
     try:
         import yaml
-        vcfg = yaml.safe_load(Path("config/version.yaml").read_text())
+        vcfg = yaml.safe_load(Path("config/version.yaml").read_text(encoding='utf-8'))
         return str(vcfg.get("pipeline_version", "3.0"))
     except Exception as e:
         print(f"   ⚠️  stage6: version.yaml unreadable ({type(e).__name__}: {e}) — fallback '3.0' (C16)", file=sys.stderr)
@@ -615,7 +615,7 @@ def audit_stale_store_labels(conn: sqlite3.Connection, run_id: str) -> tuple[int
     """
     import yaml as _yaml  # noqa: PLC0415
 
-    taxonomy = _yaml.safe_load((Path(__file__).resolve().parent.parent / "config" / "taxonomy.yaml").read_text())
+    taxonomy = _yaml.safe_load((Path(__file__).resolve().parent.parent / "config" / "taxonomy.yaml").read_text(encoding='utf-8'))
     retired = set(taxonomy.get("meta", {}).get("displaced_canonicals", []))
     affected = 0
     tally: dict[str, int] = {}
@@ -1050,7 +1050,7 @@ def load_stage5_fbs() -> list[dict]:
         sys.exit(1)
 
     fbs = []
-    with open(STAGE5_CHECKPOINT) as f:
+    with open(STAGE5_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

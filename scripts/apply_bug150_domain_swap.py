@@ -112,7 +112,7 @@ def _to_list(v) -> list:
 
 
 def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
-    data = yaml.safe_load(TAXONOMY_PATH.read_text())
+    data = yaml.safe_load(TAXONOMY_PATH.read_text(encoding='utf-8'))
     doms = data["domains"]
     # group raw labels by canonical, with a TitleCase variant per label
     added: dict[str, list[str]] = {}

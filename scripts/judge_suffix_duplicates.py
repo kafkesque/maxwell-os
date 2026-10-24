@@ -40,7 +40,7 @@ MAX_TOKENS = 2048
 
 
 def _load_plan() -> List[Dict[str, Any]]:
-    return json.loads(PLAN.read_text()).get("high_confidence_suffix_candidates", [])
+    return json.loads(PLAN.read_text(encoding='utf-8')).get("high_confidence_suffix_candidates", [])
 
 
 def _load_row(fb_id: str) -> Dict[str, Any]:
@@ -83,7 +83,7 @@ def _load_prior() -> Dict[str, Dict[str, Any]]:
     if not OUT.exists():
         return {}
     try:
-        d = json.loads(OUT.read_text())
+        d = json.loads(OUT.read_text(encoding='utf-8'))
     except Exception:
         return {}
     return {v["dup_fb_id"]: v for v in d.get("verdicts", [])}

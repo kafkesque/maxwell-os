@@ -271,7 +271,7 @@ def _checkpoint_is_valid(stage_id: str) -> bool:
     if not mp.exists():
         return False
     try:
-        manifest = json.loads(mp.read_text())
+        manifest = json.loads(mp.read_text(encoding='utf-8'))
     except Exception:
         return False
     if manifest.get("status") != "COMPLETE":
@@ -321,7 +321,7 @@ def _get_stage_timeout(stage_id: str) -> float | None:
     import yaml as _yaml_timeout
     _config_path = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
     try:
-        with open(_config_path) as _f:
+        with open(_config_path, encoding='utf-8') as _f:
             _cfg = _yaml_timeout.safe_load(_f) or {}
         _timeouts = _cfg.get("stages", {}).get("timeouts", {})
         # Direct key lookup — config keys match STAGES dict keys (C12: no hardcoded mapping)
@@ -527,7 +527,7 @@ def _check_version_consistency() -> None:
     # Read version.yaml
     try:
         import yaml
-        with open(version_yaml_path) as f:
+        with open(version_yaml_path, encoding='utf-8') as f:
             vy = yaml.safe_load(f) or {}
     except Exception as e:
         print(f"⚠️  Cannot parse version.yaml ({e}) — skipping version gate")
@@ -548,7 +548,7 @@ def _check_version_consistency() -> None:
     violations: list[str] = []
     if pipeline_config_path.exists():
         try:
-            with open(pipeline_config_path) as f:
+            with open(pipeline_config_path, encoding='utf-8') as f:
                 pcy = yaml.safe_load(f) or {}
         except Exception as e:
             print(f"⚠️  Cannot parse pipeline_config.yaml ({e}) — skipping version gate")
@@ -809,7 +809,7 @@ Examples:
     # ── D2136: Auto-resume from marker if no explicit resume-from ──────
     if not args.resume_from and _RESUME_MARKER.exists():
         import json as _json
-        state = _json.loads(_RESUME_MARKER.read_text())
+        state = _json.loads(_RESUME_MARKER.read_text(encoding='utf-8'))
         if state.get("paused"):
             resume_stage = state.get("last_stage", "")
             if resume_stage in STAGES:

@@ -132,7 +132,7 @@ def _acquire_lock(checkpoint_path: str) -> Path:
     lock_path = Path(checkpoint_path).with_suffix(".relabel_lock")
     if lock_path.exists():
         try:
-            owner = int(lock_path.read_text().strip())
+            owner = int(lock_path.read_text(encoding='utf-8').strip())
             os.kill(owner, 0)  # raises OSError if not alive
             print(f"❌ another relabel run is active (PID {owner}) — refusing to start", file=sys.stderr)
             sys.exit(3)
@@ -280,7 +280,7 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
     start_pos: int = 0
     if resume and progress_path.exists():
         try:
-            start_pos = int(progress_path.read_text().strip())
+            start_pos = int(progress_path.read_text(encoding='utf-8').strip())
             print(f"   ⏩ resuming from candidate #{start_pos}")
         except ValueError:
             start_pos = 0

@@ -46,7 +46,7 @@ PROMPTS = [
 
 
 def _load() -> dict:
-    with open(SETTINGS_PATH) as f:
+    with open(SETTINGS_PATH, encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -121,7 +121,7 @@ def measure(model: str, label: str, n_prompts: int, max_tokens: int, timeout: in
 
 def compare(a: str, b: str) -> None:
     """Ratio + WIN/LOSS/NEUTRAL verdict (D-332)."""
-    rows = [json.loads(l) for l in open(RESULTS) if l.strip()]
+    rows = [json.loads(l) for l in open(RESULTS, encoding='utf-8') if l.strip()]
     d = {r["label"]: r for r in rows}
     if a not in d or b not in d:
         raise SystemExit(f"need both labels {a!r},{b!r} in {RESULTS}")

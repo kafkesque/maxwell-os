@@ -51,7 +51,7 @@ DEFAULT_MODELS = [
 def load_probe_targets() -> list[dict]:
     """Load convergent probe targets (cluster_id -> segment_ids)."""
     p = ROOT / "knowledge pipeline" / "stage2_extract" / "canary" / "probe_targets.jsonl"
-    with open(p) as f:
+    with open(p, encoding='utf-8') as f:
         data = json.load(f)
     return data.get("targets", [])
 
@@ -60,7 +60,7 @@ def load_segments() -> dict[str, dict]:
     """Load segments indexed by segment_id (Stage 1 checkpoint)."""
     p = ROOT / "knowledge pipeline" / "stage1_chunk" / "canary" / "checkpoint.jsonl"
     segs: dict[str, dict] = {}
-    with open(p) as f:
+    with open(p, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -75,7 +75,7 @@ def load_clusters() -> dict[str, dict]:
     """Load convergent clusters from Stage 1.5 checkpoint, keyed by cluster_id."""
     p = ROOT / "knowledge pipeline" / "stage1_5_embed_cluster" / "canary" / "checkpoint.jsonl"
     clusters: dict[str, dict] = {}
-    with open(p) as f:
+    with open(p, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:

@@ -3,7 +3,7 @@
 import yaml, tempfile, os, subprocess
 from collections import Counter
 
-with open('config/golden/stage2_fewshot_convergent.yaml', 'r') as f:
+with open('config/golden/stage2_fewshot_convergent.yaml', 'r', encoding='utf-8') as f:
     data = yaml.safe_load(f)
 
 examples = data['examples']

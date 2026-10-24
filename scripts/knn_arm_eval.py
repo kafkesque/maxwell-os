@@ -27,7 +27,7 @@ CFG_PATH = ROOT / "config" / "knn_arm.yaml"
 
 def load_cfg() -> dict:
     """Load the arm configuration (C12: no path, k, axis or threshold is hardcoded)."""
-    return yaml.safe_load(CFG_PATH.read_text())
+    return yaml.safe_load(CFG_PATH.read_text(encoding='utf-8'))
 
 
 def load_vectors(cfg: dict) -> tuple[list[int], np.ndarray]:
@@ -86,7 +86,7 @@ def evaluate(cfg: dict, rowids: list[int], mat: np.ndarray, meta: dict[int, dict
     """Compute k-NN agreement per axis on the ruler rows, with the constant baseline."""
     index = {rid: i for i, rid in enumerate(rowids)}
     by_name = {norm(m["name"]): rid for rid, m in meta.items() if m["name"]}
-    ruler = list(csv.DictReader((ROOT / cfg["ruler"]).open()))
+    ruler = list(csv.DictReader((ROOT / cfg["ruler"]).open(encoding='utf-8')))
     k = cfg["k"]
     out: dict = {"n_ruler": len(ruler), "axes": {}, "qualifier": cfg["qualifier"]}
     for axis in cfg["axes"]:

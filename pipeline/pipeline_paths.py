@@ -16,7 +16,7 @@ import yaml
 
 # D2182: Use with-statement to close file handle (was unclosed — Maxwell R2 finding)
 _CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-with open(_CFG_PATH) as _f:
+with open(_CFG_PATH, encoding='utf-8') as _f:
     _CFG = yaml.safe_load(_f)
 # D-2982: the `where=` provenance of a loud read is DERIVED from the path constant - a hand-written
 # second copy of a path is one more value with two homes (C12/C20).
@@ -108,7 +108,7 @@ def _canonical_run() -> str:
         return env
     try:
         _anchor = PROJECT_ROOT / "config" / "anchor_family.yaml"
-        with open(_anchor) as _af:
+        with open(_anchor, encoding='utf-8') as _af:
             _val = (yaml.safe_load(_af) or {}).get("store_bridge", {}).get("canonical_run")
         if _val:
             return str(_val)
@@ -823,7 +823,7 @@ def check_pipeline_state() -> str:
             continue
         checkpoints = list(stage_dir.glob("checkpoint*.jsonl"))
         if checkpoints:
-            count = sum(1 for _ in open(checkpoints[0]))
+            count = sum(1 for _ in open(checkpoints[0], encoding='utf-8'))
             lines.append(f"  ✅ {name}: {count} {unit}")
             any_done = True
         else:

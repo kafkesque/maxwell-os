@@ -115,7 +115,7 @@ def _load_manifest() -> dict:
     import yaml as _yaml
     _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
     try:
-        with open(_cfg_path) as _f:
+        with open(_cfg_path, encoding='utf-8') as _f:
             _cfg = _yaml.safe_load(_f) or {}
         manifest = _cfg.get("pipeline_manifest", {}) or {}
         # D-318/D-325: a pin is a control only if it is byte-compared IN THE RUN PATH. Folding the

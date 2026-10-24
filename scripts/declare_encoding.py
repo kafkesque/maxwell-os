@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""declare_encoding.py — T-114: add `encoding='utf-8'` to UNDECLARED text WRITE sites (D-2644).
+"""declare_encoding.py — T-114: add `encoding='utf-8'` to UNDECLARED text read and write sites (D-2644).
 
-WHY WRITES FIRST (C3/C26/R14): a write without a named codec emits bytes the ENVIRONMENT decides
-(locale.getpreferredencoding). Under LC_ALL=C a non-ASCII byte raises a UnicodeEncodeError that names no
-artifact, and on Windows cp1252 a 0xD1 em dash is written as two different bytes per machine — so a
-sha256 pin does not pin the same bytes. The 310 READ sites are lower risk (they fail CLOSED on decode,
-not silently) and are the next slice.
+WHY A NAMED CODEC (C3/C26/R14): a text read or write that does not name its codec uses the platform
+default (locale.getpreferredencoding). A WRITE is the sharper case — the bytes an artifact gets depend on
+the machine that wrote it, so a sha256 pin pins different bytes per platform (the BUG-511 class). A READ
+fails CLOSED on decode rather than silently, so it was the second slice; both are now declared.
 
 REUSES THE RAIL'S DETECTOR: this rewriter imports check_undeclared_encoding.py's own walk so the thing
-that decides "this is an undeclared WRITE site" is the SAME code the rail runs. The two can never disagree
-about what is a write site (D-2646: never re-implement a reader).
+that decides "this is an undeclared site" is the SAME code the rail runs. The two can never disagree
+about what is a site (D-2646: never re-implement a reader).
 
 SAFETY: reads as BYTES (ast col_offset is a UTF-8 byte offset), replaces ONLY the call span, preserves all
 comments and formatting (a multi-line call gets the keyword on its content line, not the closing-paren line),
@@ -36,8 +35,8 @@ import yaml  # noqa: E402
 REGISTER = ROOT / "config" / "undeclared_encoding.yaml"
 
 
-def _write_calls(source: str, non_text_open: tuple[str, ...]) -> list[ast.Call]:
-    """Every undeclared WRITE call in one module, as the AST node (same walk as the rail, node-returning)."""
+def _undeclared_calls(source: str, non_text_open: tuple[str, ...]) -> list[ast.Call]:
+    """Every undeclared text READ or WRITE call in one module, as the AST node (same walk as the rail, node-returning)."""
     out: list[ast.Call] = []
     for node in ast.walk(ast.parse(source)):
         if not isinstance(node, ast.Call):
@@ -52,16 +51,14 @@ def _write_calls(source: str, non_text_open: tuple[str, ...]) -> list[ast.Call]:
         if cue._names_encoding(node, name):
             continue
         if name in cue.TEXT_CALLS:
-            if name == "write_text":
-                out.append(node)
+            out.append(node)  # read_text and write_text both need a named codec
             continue
         literal, mode = cue._literal_mode(node, name)
         if not literal:
             continue  # unresolvable: a non-literal mode is not proof of text, never auto-repaired
         if "b" in mode:
             continue  # binary: no codec
-        if any(c in mode for c in cue.WRITE_MODES):
-            out.append(node)
+        out.append(node)  # text mode (read or write) needs a named codec
     return out
 
 
@@ -82,13 +79,13 @@ def _insert_encoding(call_span: bytes, has_args: bool) -> bytes:
 
 
 def rewrite(source: str, non_text_open: tuple[str, ...]) -> tuple[str, int]:
-    """Rewrite the module, replacing each undeclared write call with its utf-8-declared form.
+    """Rewrite the module, replacing each undeclared text call with its utf-8-declared form.
 
     Returns (new_source, changed_count). Byte spans are computed from the AST col offsets (UTF-8 byte
     offsets), so multi-byte characters do not shift the edits; a multi-line call is handled by walking
     back over its trailing whitespace in `_insert_encoding` (no call is skipped).
     """
-    calls = _write_calls(source, non_text_open)
+    calls = _undeclared_calls(source, non_text_open)
     if not calls:
         return source, 0
     lines = source.splitlines(keepends=True)
@@ -135,14 +132,14 @@ def _crash_safe_write(path: Path, data: bytes) -> None:
 
 
 def run(apply: bool) -> int:
-    """Scan, rewrite, and (with --apply) write back each module with at least one write site."""
+    """Scan, rewrite, and (with --apply) write back each module with at least one undeclared text site."""
     reg = yaml.safe_load(REGISTER.read_text(encoding="utf-8")) or {}
     non_text_open = tuple(str(x) for x in cue.declared(reg, "non_text_open"))
     found, _ = cue.scan(reg, ROOT)
     total = 0
     changed_files = 0
     for rel, sites in found.items():
-        if not any(k == "write" for _, k in sites):
+        if not any(k in ("read", "write") for _, k in sites):
             continue
         path = ROOT / rel
         source = path.read_text(encoding="utf-8")
@@ -151,10 +148,10 @@ def run(apply: bool) -> int:
             continue
         total += n
         changed_files += 1
-        print(f"  {'APPLY' if apply else 'dry  '} {rel}: {n} write site(s)")
+        print(f"  {'APPLY' if apply else 'dry  '} {rel}: {n} text site(s)")
         if apply:
             _crash_safe_write(path, new.encode("utf-8"))
-    print(f"declare-encoding: {total} write site(s) across {changed_files} file(s)"
+    print(f"declare-encoding: {total} text site(s) across {changed_files} file(s)"
           + (" (DRY RUN — no file changed)" if not apply else " (written, crash-safe C6)"))
     return 0
 
@@ -171,12 +168,18 @@ def selftest() -> int:
          r("open(p, 'w')\n") == "open(p, 'w', encoding='utf-8')\n"),
         ("Path.open('a') gets encoding",
          r("p.open('a')\n") == "p.open('a', encoding='utf-8')\n"),
-        ("read is untouched",
-         r("p.read_text()\n") == "p.read_text()\n"),
+        ("read_text gets encoding",
+         r("p.read_text()\n") == "p.read_text(encoding='utf-8')\n"),
+        ("builtin open() bare (read) gets encoding",
+         r("open(p)\n") == "open(p, encoding='utf-8')\n"),
+        ("Path.open('r') gets encoding",
+         r("p.open('r')\n") == "p.open('r', encoding='utf-8')\n"),
         ("binary is untouched",
          r("open(p, 'rb')\n") == "open(p, 'rb')\n"),
-        ("already-declared is untouched",
+        ("already-declared write is untouched",
          r("p.write_text('x', encoding='utf-8')\n") == "p.write_text('x', encoding='utf-8')\n"),
+        ("already-declared read is untouched",
+         r("p.read_text(encoding='utf-8')\n") == "p.read_text(encoding='utf-8')\n"),
         ("idempotent",
          r(r('p.write_text("x")\n')) == 'p.write_text("x", encoding=\'utf-8\')\n'),
         ("trailing comment is preserved",
@@ -207,7 +210,7 @@ def selftest() -> int:
 
 
 def main(argv: list[str]) -> int:
-    ap = argparse.ArgumentParser(description="T-114: declare utf-8 on undeclared text WRITE sites (D-2644)")
+    ap = argparse.ArgumentParser(description="T-114: declare utf-8 on undeclared text read and write sites (D-2644)")
     group = ap.add_mutually_exclusive_group()
     group.add_argument("--apply", action="store_true", help="write the changes (default is dry-run)")
     group.add_argument("--selftest", action="store_true", help="known-answer controls on the rewriter")

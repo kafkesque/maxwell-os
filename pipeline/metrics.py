@@ -63,7 +63,7 @@ def read_metrics(run_id: str | None = None) -> list[dict]:
     if not METRICS_PATH.exists():
         return []
     records = []
-    with open(METRICS_PATH) as f:
+    with open(METRICS_PATH, encoding='utf-8') as f:
         for line in f:
             try:
                 r = json.loads(line)

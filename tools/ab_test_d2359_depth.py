@@ -44,7 +44,7 @@ DEPTH_ORDER = ["specialized", "domain", "cross-domain", "universal"]
 
 def load_golden() -> list[dict]:
     import yaml
-    with open(GOLDEN_PATH) as f:
+    with open(GOLDEN_PATH, encoding='utf-8') as f:
         d = yaml.safe_load(f)
     fbs = []
     for ex in d["examples"]:

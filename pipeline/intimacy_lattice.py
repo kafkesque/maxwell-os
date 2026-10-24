@@ -63,7 +63,7 @@ def _load_policy() -> dict[str, Any]:
         return _POLICY_CACHE
     if POLICY_FILE.exists():
         try:
-            _POLICY_CACHE = yaml.safe_load(POLICY_FILE.read_text()) or {}
+            _POLICY_CACHE = yaml.safe_load(POLICY_FILE.read_text(encoding='utf-8')) or {}
         except Exception as e:
             _record_config_error("intimacy_policy.yaml", e)
             _POLICY_CACHE = {}
@@ -80,7 +80,7 @@ def _load_anchors() -> dict[str, Any]:
         return _ANCHOR_CACHE
     if ANCHORS_FILE.exists():
         try:
-            _ANCHOR_CACHE = yaml.safe_load(ANCHORS_FILE.read_text()) or {}
+            _ANCHOR_CACHE = yaml.safe_load(ANCHORS_FILE.read_text(encoding='utf-8')) or {}
         except Exception as e:
             _record_config_error("domain_anchors.yaml", e)
             _ANCHOR_CACHE = {}

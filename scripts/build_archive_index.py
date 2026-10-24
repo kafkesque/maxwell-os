@@ -54,7 +54,7 @@ def write_atomic(path: Path, text: str) -> None:
 
 def load_cfg() -> dict[str, Any]:
     """Load and minimally validate the index contract. Raises on a malformed declaration (C16)."""
-    cfg = yaml.safe_load(_CFG_PATH.read_text())
+    cfg = yaml.safe_load(_CFG_PATH.read_text(encoding='utf-8'))
     if not isinstance(cfg, dict) or "rules" not in cfg or "local_archive" not in cfg:
         raise ValueError(f"{_CFG_PATH}: must be a mapping carrying 'local_archive' and 'rules'")
     for rule in cfg["rules"]:

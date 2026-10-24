@@ -99,7 +99,7 @@ def snapshot() -> dict:
         if not fpath.exists():
             snap["files"][fname] = {"exists": False}
             continue
-        content = fpath.read_text()
+        content = fpath.read_text(encoding='utf-8')
         snap["files"][fname] = {
             "exists": True,
             "lines": len(content.split('\n')),
@@ -122,7 +122,7 @@ def postflight() -> list[str]:
     if not SNAPSHOT_FILE.exists():
         return ["ERROR: No preflight snapshot found. Run preflight() first."]
 
-    before = json.loads(SNAPSHOT_FILE.read_text())
+    before = json.loads(SNAPSHOT_FILE.read_text(encoding='utf-8'))
     violations = []
 
     for fname, policy in PROTECTED_FILES.items():
@@ -134,7 +134,7 @@ def postflight() -> list[str]:
                 violations.append(f"D824: {fname} DELETED (was {before_state.get('lines')} lines)")
             continue
 
-        current = fpath.read_text()
+        current = fpath.read_text(encoding='utf-8')
         current_lines = len(current.split('\n'))
         current_sha = hashlib.sha256(current.encode()).hexdigest()
         min_lines = policy["min_lines"]

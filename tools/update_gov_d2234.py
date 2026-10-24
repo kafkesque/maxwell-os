@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Update DECISION-LOG.md
 log_path = Path("DECISION-LOG.md")
-log_text = log_path.read_text()
+log_text = log_path.read_text(encoding='utf-8')
 
 d2234 = """
 ### D2234 — Author Concentration Cap & Extraction Type Expansion (2026-08-10)
@@ -65,7 +65,7 @@ print("✅ Updated DECISION-LOG.md with D2234")
 
 # Update aggregated_remaining_tasks.md
 tasks_path = Path("governance/aggregated_remaining_tasks.md")
-tasks_text = tasks_path.read_text()
+tasks_text = tasks_path.read_text(encoding='utf-8')
 
 # Update T-009 and T-015 status
 tasks_text = tasks_text.replace("T-009 (P1): ❌", "T-009 (P1): ✅ DONE D2234")

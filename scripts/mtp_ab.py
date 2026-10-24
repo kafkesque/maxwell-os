@@ -74,7 +74,7 @@ _FROZEN_PROMPTS = [
 
 def read_model_settings(path: Path) -> dict:
     """Load the oMLX model_settings.json file as a dict."""
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -222,7 +222,7 @@ def measure_batch(model: str, label: str, max_tokens: int, n_prompts: int, timeo
     # Crash-safe append (C6): read, extend, rewrite via tempfile+replace.
     existing = []
     if results_path.exists():
-        with open(results_path) as f:
+        with open(results_path, encoding='utf-8') as f:
             existing = [json.loads(l) for l in f if l.strip()]
     existing.extend(rows)
     tmp = results_path.with_suffix(results_path.suffix + ".tmp")
@@ -241,7 +241,7 @@ def compare(label_a: str, label_b: str) -> None:
     if not results_path.exists():
         print(f"[compare] no results at {results_path}")
         return
-    with open(results_path) as f:
+    with open(results_path, encoding='utf-8') as f:
         rows = [json.loads(l) for l in f if l.strip()]
     for label in (label_a, label_b):
         decodes = [r["decode_tok_s"] for r in rows if r.get("label") == label and r.get("decode_tok_s")]

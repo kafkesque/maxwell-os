@@ -70,7 +70,7 @@ def load_label_model() -> dict[str, dict]:
     out: dict[str, dict] = {}
     if not LABEL_MODEL.exists():
         return out
-    with LABEL_MODEL.open() as f:
+    with LABEL_MODEL.open(encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:

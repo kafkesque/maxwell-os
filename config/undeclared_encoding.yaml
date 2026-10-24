@@ -37,8 +37,8 @@ non_text_open: [os, fitz]   # `.open()` receivers that are NOT text file opens -
 measured_by: scripts/check_undeclared_encoding.py
 allowed: []
 ceiling:
-  files: 144
-  sites: 310
+  files: 0
+  sites: 0
   writes: 0
   unresolvable: 0
   direction: shrink_only

@@ -75,7 +75,7 @@ def _load_extra_drop_patterns():
     import yaml as _yaml
     _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
     try:
-        with open(_cfg_path) as _f:
+        with open(_cfg_path, encoding='utf-8') as _f:
             _cfg = _yaml.safe_load(_f)
         pats = (_cfg.get("stage1_3", {}) or {}).get("drop_patterns_extra", []) or []
         # ".*" prefix gives search semantics (re.match is anchored at pos 0)
@@ -178,7 +178,7 @@ def run_prefilter(in_place: bool = False, min_len: int = None,
         sys.exit(1)
 
     segments = []
-    with open(STAGE1_CHECKPOINT) as f:
+    with open(STAGE1_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

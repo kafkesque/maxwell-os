@@ -515,7 +515,7 @@ def load_clusters() -> list[dict]:
         checkpoint = STAGE1_5_CHECKPOINT
 
     clusters: list[dict] = []
-    with open(checkpoint) as f:
+    with open(checkpoint, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:
@@ -530,7 +530,7 @@ def load_segments() -> dict[str, dict]:
         sys.exit(1)
 
     segments: dict[str, dict] = {}
-    with open(STAGE1_CHECKPOINT) as f:
+    with open(STAGE1_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -1266,7 +1266,7 @@ def load_golden_parity(
         )
     try:
         import yaml
-        with open(str(golden_path)) as f:
+        with open(str(golden_path), encoding='utf-8') as f:
             golden = yaml.safe_load(f)
     except Exception as e:
         raise RuntimeError(
@@ -1326,7 +1326,7 @@ def load_golden_single_source(
         )
     try:
         import yaml
-        with open(str(golden_path)) as f:
+        with open(str(golden_path), encoding='utf-8') as f:
             golden = yaml.safe_load(f)
     except Exception as e:
         raise RuntimeError(
@@ -1935,7 +1935,7 @@ def _load_probe_cache(
     if not STAGE2_PROBE_CACHE.exists():
         return None
     try:
-        with open(STAGE2_PROBE_CACHE) as f:
+        with open(STAGE2_PROBE_CACHE, encoding='utf-8') as f:
             pc: dict = json.load(f)
         # D2215: Always accept cache when corpus counts match, even if mode flag differs.
         # If cache was built without --only-convergent but we're now running with it,
@@ -2266,12 +2266,12 @@ def run_stage2(
             # D2332: fail-closed JSONL read — a pretty-printed/multi-line checkpoint
             # must raise (caught below → fresh start), never silently subset-parse.
             all_fbs.extend(load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint"))
-            with open(segids_file) as f:
+            with open(segids_file, encoding='utf-8') as f:
                 processed_ids = set(json.load(f))
             # D2421: load gated cluster IDs (is_summary-gated) for optional re-processing.
             if os.path.exists(gated_ids_file):
                 try:
-                    with open(gated_ids_file) as f:
+                    with open(gated_ids_file, encoding='utf-8') as f:
                         gated_ids = set(json.load(f))
                 except Exception:
                     gated_ids = set()
@@ -2953,7 +2953,7 @@ def process_singletons(
 
     # Load singletons
     singletons: list[dict] = []
-    with open(STAGE1_5_SINGLETONS) as f:
+    with open(STAGE1_5_SINGLETONS, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

@@ -61,7 +61,7 @@ def _active_log() -> Path | None:
 
 def _log_tail(log: Path, n: int = 400) -> str:
     try:
-        with open(log, errors="replace") as f:
+        with open(log, errors="replace", encoding='utf-8') as f:
             return "".join(f.readlines()[-n:])
     except OSError:
         return ""
@@ -134,7 +134,7 @@ def run_chain(advance: bool) -> dict:
         return report
 
     n = 0
-    with open(STAGE4_CHECKPOINT) as f:
+    with open(STAGE4_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             if line.strip():
                 try:

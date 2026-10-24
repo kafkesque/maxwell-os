@@ -21,12 +21,12 @@ WORKBOOK = "governance/calibration_D2293_workbook.json"
 PROGRESS = "governance/calibration_D2293_progress.json"
 
 def load_workbook():
-    with open(WORKBOOK) as f:
+    with open(WORKBOOK, encoding='utf-8') as f:
         return json.load(f)
 
 def load_progress():
     if os.path.exists(PROGRESS):
-        with open(PROGRESS) as f:
+        with open(PROGRESS, encoding='utf-8') as f:
             return json.load(f)
     return {}
 

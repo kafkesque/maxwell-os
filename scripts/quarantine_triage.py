@@ -59,7 +59,7 @@ def _nli_score(verification_results: list[dict]) -> float | None:
 
 def load_buckets() -> dict[tuple[str, str], list[dict]]:
     buckets: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    with CHECKPOINT.open() as f:
+    with CHECKPOINT.open(encoding='utf-8') as f:
         for line in f:
             if not line.strip():
                 continue

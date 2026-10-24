@@ -104,7 +104,7 @@ def find_passage_in_segments(passage_raw, segments: list[dict]) -> dict | None:
 
 def main() -> None:
     gs_path = Path("config/golden/stage2_fewshot_convergent.yaml")
-    with open(gs_path) as f:
+    with open(gs_path, encoding='utf-8') as f:
         gs = yaml.safe_load(f)
 
     results: list[dict] = []

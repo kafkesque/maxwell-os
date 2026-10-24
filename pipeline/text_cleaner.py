@@ -407,7 +407,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.quality:
-        with open(args.quality) as f:
+        with open(args.quality, encoding='utf-8') as f:
             text = f.read()
         result = check_conversion_quality(text, args.quality)
         import json as _json

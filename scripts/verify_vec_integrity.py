@@ -70,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="D-354/D-357 vec store referential integrity")
     ap.add_argument("--db", default=None, help="override the configured db path (e.g. a repaired copy)")
     args = ap.parse_args(argv)
-    cfg = yaml.safe_load(_CFG_PATH.read_text())
+    cfg = yaml.safe_load(_CFG_PATH.read_text(encoding='utf-8'))
     db = Path(args.db) if args.db else _ROOT / cfg["db_path"]
     fbs = cfg["fbs_table"]
     suffix = cfg.get("shadow_rowids_suffix", "_rowids")

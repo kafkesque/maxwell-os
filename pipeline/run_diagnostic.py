@@ -42,7 +42,7 @@ from pipeline.io_guard import safe_write, safe_write_jsonl  # D2487: atomic writ
 import yaml as _yaml
 
 _CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
-with open(_CFG_PATH) as _f:
+with open(_CFG_PATH, encoding='utf-8') as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
 _DIAG_CFG = _PIPELINE_CFG.get("e2e", {}).get("diagnostic", {})
 _DEFAULT_BOOKS = _DIAG_CFG.get("default_books", 100)
@@ -106,7 +106,7 @@ def _acquire_process_lock() -> bool:
     import os as _ospid
     if _PID_FILE.exists():
         try:
-            old_pid = int(_PID_FILE.read_text().strip())
+            old_pid = int(_PID_FILE.read_text(encoding='utf-8').strip())
             # Check if old process is still alive
             try:
                 _ospid.kill(old_pid, 0)  # Signal 0 = check existence
@@ -130,7 +130,7 @@ def _release_process_lock() -> None:
     import os as _ospid2
     try:
         if _PID_FILE.exists():
-            stored = int(_PID_FILE.read_text().strip())
+            stored = int(_PID_FILE.read_text(encoding='utf-8').strip())
             if stored == _ospid2.getpid():
                 _PID_FILE.unlink(missing_ok=True)
     except Exception as e:  # C16: log cleanup failure, don't silently swallow
@@ -198,7 +198,7 @@ def _stop_caffeinate() -> None:
     import os as _ospid5
     try:
         if _CAFFEINATE_PID_FILE.exists():
-            pid = int(_CAFFEINATE_PID_FILE.read_text().strip())
+            pid = int(_CAFFEINATE_PID_FILE.read_text(encoding='utf-8').strip())
             _ospid5.kill(pid, 9)
             _CAFFEINATE_PID_FILE.unlink(missing_ok=True)
             print("☕ Caffeinate stopped — laptop may sleep normally")
@@ -235,7 +235,7 @@ def _load_diag_state() -> dict:
     import json as _json
     _path = _get_diag_state_path()
     if _path.exists():
-        with open(_path) as f:
+        with open(_path, encoding='utf-8') as f:
             return _json.load(f)
     return {}
 
@@ -282,7 +282,7 @@ def _load_real_clusters() -> list[dict]:
         print(f"❌ Real S1.5 checkpoint not found: {real_path}")
         sys.exit(1)
     clusters: list[dict] = []
-    with open(real_path) as f:
+    with open(real_path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:
@@ -384,7 +384,7 @@ def run_diagnostic() -> dict:
     # ═══ S2: Convergent Extraction ══════════════════════════════════════
     if _s2_ckpt.exists():
         s2_fbs = []
-        with open(_s2_ckpt) as f:
+        with open(_s2_ckpt, encoding='utf-8') as f:
             for line in f:
                 if line.strip():
                     s2_fbs.append(json.loads(line))
@@ -408,7 +408,7 @@ def run_diagnostic() -> dict:
             results["s2_elapsed_s"] = round(s2_elapsed, 1)
             s2_fbs = []
             if s2.STAGE2_CHECKPOINT.exists():
-                with open(s2.STAGE2_CHECKPOINT) as f:
+                with open(s2.STAGE2_CHECKPOINT, encoding='utf-8') as f:
                     for line in f:
                         if line.strip():
                             s2_fbs.append(json.loads(line))
@@ -431,7 +431,7 @@ def run_diagnostic() -> dict:
 
     # ═══ S4: Merge + Classify + Depth ════════════════════════════════════
     if _s4_ckpt.exists():
-        s4_fbs = [json.loads(l) for l in open(_s4_ckpt) if l.strip()]
+        s4_fbs = [json.loads(l) for l in open(_s4_ckpt, encoding='utf-8') if l.strip()]
         print(f"\n{'='*60}\n🧩 STAGE 4: RESUMED — {len(s4_fbs)} FBs from checkpoint\n{'='*60}")
         results["s4_fb_count"] = len(s4_fbs)
         results["s4_elapsed_s"] = 0
@@ -453,7 +453,7 @@ def run_diagnostic() -> dict:
                 _limited = s4.STAGE2_CHECKPOINT.parent / "checkpoint_limited.jsonl"
                 _n = 0
                 _buf: list[str] = []
-                with open(s4.STAGE2_CHECKPOINT) as fin:
+                with open(s4.STAGE2_CHECKPOINT, encoding='utf-8') as fin:
                     for _n, line in enumerate(fin):
                         if _n >= args.s4_limit:
                             break
@@ -470,7 +470,7 @@ def run_diagnostic() -> dict:
             results["s4_elapsed_s"] = round(s4_elapsed, 1)
             s4_fbs = []
             if s4.STAGE4_CHECKPOINT.exists():
-                with open(s4.STAGE4_CHECKPOINT) as f:
+                with open(s4.STAGE4_CHECKPOINT, encoding='utf-8') as f:
                     for line in f:
                         if line.strip():
                             s4_fbs.append(json.loads(line))
@@ -490,7 +490,7 @@ def run_diagnostic() -> dict:
 
     # ═══ S5: Verify ══════════════════════════════════════════════════════
     if _s5_ckpt.exists():
-        s5_fbs = [json.loads(l) for l in open(_s5_ckpt) if l.strip()]
+        s5_fbs = [json.loads(l) for l in open(_s5_ckpt, encoding='utf-8') if l.strip()]
         s5_pass = sum(1 for fb in s5_fbs if fb.get("status", fb.get("verification_status")) == "PASS")
         s5_quarantine = sum(1 for fb in s5_fbs if fb.get("status", fb.get("verification_status")) == "QUARANTINE")
         s5_fail = len(s5_fbs) - s5_pass - s5_quarantine
@@ -521,7 +521,7 @@ def run_diagnostic() -> dict:
             results["s5_elapsed_s"] = round(s5_elapsed, 1)
             s5_fbs = []; s5_pass = s5_fail = s5_quarantine = 0
             if s5.STAGE5_CHECKPOINT.exists():
-                with open(s5.STAGE5_CHECKPOINT) as f:
+                with open(s5.STAGE5_CHECKPOINT, encoding='utf-8') as f:
                     for line in f:
                         if line.strip():
                             fb = json.loads(line)
@@ -901,7 +901,7 @@ def main() -> None:
     s5_fbs: list[dict] = []
     s5_checkpoint = CHECKPOINT_DIR / "stage5_verify" / RUN_ID / "checkpoint.jsonl"
     if s5_checkpoint.exists():
-        with open(s5_checkpoint) as f:
+        with open(s5_checkpoint, encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -911,7 +911,7 @@ def main() -> None:
         s4_checkpoint = CHECKPOINT_DIR / "stage4_merge" / RUN_ID / "checkpoint.jsonl"
         if s4_checkpoint.exists():
             print("⚠️  S5 produced no output — using S4 FBs for report")
-            with open(s4_checkpoint) as f:
+            with open(s4_checkpoint, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if line:
@@ -920,7 +920,7 @@ def main() -> None:
         s2_checkpoint = CHECKPOINT_DIR / "stage2_extract" / RUN_ID / "checkpoint.jsonl"
         if s2_checkpoint.exists():
             print("⚠️  S4/S5 produced no output — using S2 FBs for report")
-            with open(s2_checkpoint) as f:
+            with open(s2_checkpoint, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if line:

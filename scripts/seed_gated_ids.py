@@ -40,7 +40,7 @@ def _load_cfg() -> dict:
     import yaml
 
     cfg_path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
-    with open(cfg_path) as f:
+    with open(cfg_path, encoding='utf-8') as f:
         cfg = yaml.safe_load(f)
     return cfg.get("stage2", {})
 

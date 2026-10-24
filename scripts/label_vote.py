@@ -71,7 +71,7 @@ from pipeline.model_lazyload import PINNED_MODELS, unload_model  # noqa: E402
 from pipeline.schemas import CANONICAL_DISCIPLINES, CANONICAL_DOMAINS  # noqa: E402
 
 # ── Config (C12: no hardcoding — all from pipeline_config.yaml) ──────────
-_CFG = yaml.safe_load((_ROOT / "config" / "pipeline_config.yaml").read_text())
+_CFG = yaml.safe_load((_ROOT / "config" / "pipeline_config.yaml").read_text(encoding='utf-8'))
 _VOTE = _CFG.get("label_vote", {})
 
 VOTERS: list[dict[str, str]] = _VOTE.get("models", [])
@@ -342,7 +342,7 @@ def load_target_fbs_from_golden(golden_path: Path, limit: int | None) -> list[di
     in the output are therefore the gpt-oss TEACHER silver labels the vote
     exists to verify.
     """
-    doc = yaml.safe_load(golden_path.read_text()) or {}
+    doc = yaml.safe_load(golden_path.read_text(encoding='utf-8')) or {}
     examples = doc.get("examples", []) if isinstance(doc, dict) else []
     rows: list[dict[str, Any]] = []
     for ex in examples:
@@ -371,7 +371,7 @@ def load_checkpoint(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        return {r["fb_id"]: r for r in json.loads(path.read_text())}
+        return {r["fb_id"]: r for r in json.loads(path.read_text(encoding='utf-8'))}
     except (json.JSONDecodeError, KeyError):
         print(f"⚠️  checkpoint {path} unreadable — starting fresh", file=sys.stderr)
         return {}

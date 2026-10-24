@@ -174,7 +174,7 @@ def main() -> int:
 
     # 4. Update expected count.
     if EXPECTED.exists():
-        with open(EXPECTED) as f:
+        with open(EXPECTED, encoding='utf-8') as f:
             ec = json.load(f)
         ec["expected_fb_count"] = len(checkpoint_recs)
         ec["s4_expected_fb_count"] = len(checkpoint_recs)

@@ -27,7 +27,7 @@ _CANON = re.compile(r"[^a-z0-9]+")
 
 def load_cfg() -> dict:
     """Load the scoring configuration (C12)."""
-    return yaml.safe_load(CFG_PATH.read_text())
+    return yaml.safe_load(CFG_PATH.read_text(encoding='utf-8'))
 
 
 def canon(text: str) -> str:

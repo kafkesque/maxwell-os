@@ -58,7 +58,7 @@ def validate(path: str) -> int:
 
     # --- Load ---
     try:
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             text = f.read()
     except FileNotFoundError:
         print(f"FAIL: File not found: {path}", file=sys.stderr)

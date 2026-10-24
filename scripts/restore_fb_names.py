@@ -49,7 +49,7 @@ def _quiet_normalize(raw: str, max_words: int, normalize) -> str:
 def build_name_map(s2_path: Path, normalize, max_words: int) -> dict[str, tuple[str, str]]:
     """Build {source_cluster: (old_n5, new_n8)} from the S2 checkpoint."""
     name_map: dict[str, tuple[str, str]] = {}
-    with open(s2_path) as f:
+    with open(s2_path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -89,7 +89,7 @@ def _atomic_patch(path: Path, name_map: dict[str, tuple[str, str]]) -> tuple[int
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), suffix=".restore.tmp")
     try:
         with os.fdopen(fd, "w") as out:
-            with open(path) as f:
+            with open(path, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line:
@@ -155,7 +155,7 @@ def main() -> int:
             continue
         if args.dry_run:
             changed = total = 0
-            with open(path) as f:
+            with open(path, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line:

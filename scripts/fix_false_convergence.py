@@ -99,7 +99,7 @@ def build_fix_plan() -> list[dict]:
     """Load the 96 echoes + their export metadata → ordered fix plan."""
     echoes = json.loads(ECHOES.read_text(encoding="utf-8"))["echoes"]
     export_by_id: dict[str, dict] = {}
-    with EXPORT.open() as f:
+    with EXPORT.open(encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:

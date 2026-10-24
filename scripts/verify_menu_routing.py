@@ -74,9 +74,9 @@ def menu_labels(src: dict) -> set[str]:
 
 def main() -> int:
     """CLI entry point: returns 1 (RED) or 0 (clean)."""
-    routing = yaml.safe_load((ROOT / ROUTING_CFG).read_text())
-    sweep_cfg = yaml.safe_load((ROOT / routing["sweep_config"]).read_text())
-    artifact = json.loads((ROOT / routing["sweep_artifact"]).read_text())
+    routing = yaml.safe_load((ROOT / ROUTING_CFG).read_text(encoding='utf-8'))
+    sweep_cfg = yaml.safe_load((ROOT / routing["sweep_config"]).read_text(encoding='utf-8'))
+    artifact = json.loads((ROOT / routing["sweep_artifact"]).read_text(encoding='utf-8'))
     floor = float(sweep_cfg["separable_min_pp"])
     vocab = set(routing["actions_vocabulary"])
     art = {a["axis"]: a for a in artifact["axes"]}

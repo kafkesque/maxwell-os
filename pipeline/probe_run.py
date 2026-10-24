@@ -95,7 +95,7 @@ def load_clusters(max_convergent: int = 200) -> list[dict]:
     single: list[dict] = []
     
     print(f"📂 Loading clusters from {S15_CHECKPOINT}...")
-    with open(S15_CHECKPOINT) as f:
+    with open(S15_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             c = json.loads(line)
             if c.get("is_convergent"):
@@ -250,7 +250,7 @@ print(f'   📋 Copy: {{probe_s2}}')
     s2_checkpoint = output_dir / "stage2_checkpoint.jsonl"
     fbs = []
     if s2_checkpoint.exists():
-        with open(s2_checkpoint) as f:
+        with open(s2_checkpoint, encoding='utf-8') as f:
             for line in f:
                 if line.strip():
                     fbs.append(json.loads(line))
@@ -292,7 +292,7 @@ _run_s4()
     from pipeline.pipeline_paths import STAGE4_CHECKPOINT
     fbs_out = []
     if STAGE4_CHECKPOINT.exists():
-        with open(STAGE4_CHECKPOINT) as f:
+        with open(STAGE4_CHECKPOINT, encoding='utf-8') as f:
             for line in f:
                 if line.strip():
                     fbs_out.append(json.loads(line))
@@ -334,7 +334,7 @@ run_stage5(strict=False)
     from pipeline.pipeline_paths import STAGE5_CHECKPOINT
     fbs_out = []
     if STAGE5_CHECKPOINT.exists():
-        with open(STAGE5_CHECKPOINT) as f:
+        with open(STAGE5_CHECKPOINT, encoding='utf-8') as f:
             for line in f:
                 if line.strip():
                     fbs_out.append(json.loads(line))
@@ -401,7 +401,7 @@ def main() -> None:
         print(f"   S5 FBs verified: {len(fbs_s5)}")
         print(f"   Checkpoints: {output_dir}/")
         for f in sorted(output_dir.glob("*.jsonl")):
-            lines = sum(1 for _ in open(f))
+            lines = sum(1 for _ in open(f, encoding='utf-8'))
             size_kb = f.stat().st_size / 1024
             print(f"     {f.name}: {lines} lines, {size_kb:.0f}KB")
         print(f"{'='*60}")

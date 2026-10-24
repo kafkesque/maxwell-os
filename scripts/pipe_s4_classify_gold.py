@@ -64,7 +64,7 @@ def canon(x: object) -> str:
 def load_gold() -> dict[str, dict]:
     """Return {fb_id: gold_row} for rows carrying both discipline and domains."""
     gold: dict[str, dict] = {}
-    for line in GOLD.read_text().splitlines():
+    for line in GOLD.read_text(encoding='utf-8').splitlines():
         if not line.strip():
             continue
         r = json.loads(line)
@@ -163,7 +163,7 @@ def done_keys() -> set[tuple[str, str]]:
     done: set[tuple[str, str]] = set()
     if not CKPT.exists():
         return done
-    for line in CKPT.read_text().splitlines():
+    for line in CKPT.read_text(encoding='utf-8').splitlines():
         if not line.strip():
             continue
         d = json.loads(line)
@@ -211,7 +211,7 @@ def report(models: list[str], gold: dict[str, dict]) -> None:
     if not CKPT.exists():
         print('no checkpoint yet')
         return
-    rows = [json.loads(l) for l in CKPT.read_text().splitlines() if l.strip()]
+    rows = [json.loads(l) for l in CKPT.read_text(encoding='utf-8').splitlines() if l.strip()]
     print()
     print('PRODUCTION PATH — merged_cribs_classify() vs gold_4axis')
     print('  disc/domF1 = after the production raw->canonical mapping (D2138)  '

@@ -101,7 +101,7 @@ def _integrity_gate(db_path: Path) -> None:
 
 
 def _edit_taxonomy_yaml(dry_run: bool) -> None:
-    data = yaml.safe_load(TAXONOMY_PATH.read_text())
+    data = yaml.safe_load(TAXONOMY_PATH.read_text(encoding='utf-8'))
     disc = data["disciplines"]
     for sw in SWAPS:
         demote = sw["demote"]

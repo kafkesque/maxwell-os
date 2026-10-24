@@ -41,7 +41,7 @@ def _load_gate_config() -> dict[str, Any]:
     try:
         import yaml as _yaml
         _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-        with open(_cfg_path) as _f:
+        with open(_cfg_path, encoding='utf-8') as _f:
             _cfg = _yaml.safe_load(_f) or {}
         return _cfg.get("s2", {}).get("gate", {})
     except Exception as e:

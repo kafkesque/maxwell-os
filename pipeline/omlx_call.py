@@ -541,7 +541,7 @@ def assert_omlx_no_cache() -> None:
         print(f"⚠️  OMLX cache gate: {settings_path} not found — cannot verify --no-cache; proceeding")
         return
     try:
-        with open(settings_path) as f:
+        with open(settings_path, encoding='utf-8') as f:
             gui_settings = json.load(f)
     except Exception as e:
         raise RuntimeError(f"OMLX cache gate: cannot parse {settings_path}: {e}") from e

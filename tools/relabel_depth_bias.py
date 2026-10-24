@@ -34,10 +34,10 @@ def load_disputed() -> list[dict]:
     import yaml
     from pipeline.pipeline_paths import S2_GOLDEN_PATH
 
-    verify = json.loads(VERIFY_JSON.read_text())
+    verify = json.loads(VERIFY_JSON.read_text(encoding='utf-8'))
     disputed_names = {r["name"] for r in verify["rows"] if r["pred"] != r["gold"]}
 
-    with open(PROJECT_ROOT / S2_GOLDEN_PATH) as f:
+    with open(PROJECT_ROOT / S2_GOLDEN_PATH, encoding='utf-8') as f:
         d = yaml.safe_load(f)
 
     out = []

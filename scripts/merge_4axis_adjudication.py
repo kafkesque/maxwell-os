@@ -82,11 +82,11 @@ def _now() -> str:
 
 
 def _load_jsonl(p: Path) -> List[Dict[str, Any]]:
-    return [json.loads(l) for l in p.read_text().splitlines() if l.strip()]
+    return [json.loads(l) for l in p.read_text(encoding='utf-8').splitlines() if l.strip()]
 
 
 def _load_json(p: Path) -> Any:
-    return json.loads(p.read_text())
+    return json.loads(p.read_text(encoding='utf-8'))
 
 
 def _atomic_write(path: Path, content: str) -> None:

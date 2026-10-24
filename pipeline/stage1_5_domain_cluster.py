@@ -33,7 +33,7 @@ from pipeline.pipeline_paths import S1_DIR, get_run_id  # BUG-597: import BEFORE
 import numpy as np
 import yaml
 
-_CFG = yaml.safe_load(open(ROOT / "config" / "pipeline_config.yaml"))
+_CFG = yaml.safe_load(open(ROOT / "config" / "pipeline_config.yaml", encoding='utf-8'))
 S15 = _CFG.get("stage1_5", {})
 THRESHOLD = float(S15.get("faiss_threshold", 0.75))
 MIN_DISTINCT = int(S15.get("min_source_diversity", 2))
@@ -131,7 +131,7 @@ def domain_of(seg: dict) -> str:
 
 def load_segments(domain: str | None, limit: int) -> list[dict]:
     segs = []
-    with open(SEGS_PATH) as f:
+    with open(SEGS_PATH, encoding='utf-8') as f:
         for line in f:
             seg = json.loads(line)
             if domain and domain_of(seg) != domain:

@@ -60,7 +60,7 @@ def _cfg() -> dict[str, Any]:
     """Load the integrity config (C12: every floor and path is config-driven)."""
     import yaml
 
-    return yaml.safe_load(CFG.read_text())
+    return yaml.safe_load(CFG.read_text(encoding='utf-8'))
 
 
 def _norm(text: str) -> str:
@@ -118,13 +118,13 @@ def check_disjoint(anchor: dict[str, Any], pool: Path) -> tuple[int, str]:
     anchor_path = REPO / str(anchor["file"])
     if not anchor_path.exists():
         return 1, "anchor file missing: " + str(anchor_path) + " (cannot verify disjointness)"
-    gold = [json.loads(line) for line in anchor_path.read_text().splitlines() if line.strip()]
+    gold = [json.loads(line) for line in anchor_path.read_text(encoding='utf-8').splitlines() if line.strip()]
     if not pool.exists():
         # Fail closed: an absent train pool means disjointness was NOT verified. Reporting OK here
         # is the exact silent-pass class this project keeps paying for (R5 round 4, 2026-09-17).
         return 1, "train pool absent (" + pool.name + ") — disjointness NOT verified"
     try:
-        data = yaml.safe_load(pool.read_text())
+        data = yaml.safe_load(pool.read_text(encoding='utf-8'))
     except Exception as exc:
         return 1, "cannot read train pool: " + type(exc).__name__
     examples = data.get("examples", data) if isinstance(data, dict) else data
@@ -169,7 +169,7 @@ def check_floors(floors: dict[str, float]) -> tuple[int, str]:
     anchor_path = REPO / "governance" / "gold_4axis.jsonl"
     if not anchor_path.exists():
         return 1, "anchor file missing: " + str(anchor_path)
-    gold = [json.loads(line) for line in anchor_path.read_text().splitlines() if line.strip()]
+    gold = [json.loads(line) for line in anchor_path.read_text(encoding='utf-8').splitlines() if line.strip()]
     if not gold:
         return 1, "anchor file is empty: " + str(anchor_path)
     target = len(gold)

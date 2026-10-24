@@ -73,7 +73,7 @@ def load_alias_map() -> dict[str, dict[str, str] | dict[str, list[str]]]:
     import yaml
     if not ALIAS_MAP_PATH.exists():
         return {"discipline": {}, "domain": {}}
-    with open(ALIAS_MAP_PATH) as f:
+    with open(ALIAS_MAP_PATH, encoding='utf-8') as f:
         data = yaml.safe_load(f) or {}
     disc_aliases = data.get("discipline_aliases", {}) or {}
     dom_aliases = data.get("domain_aliases", {}) or {}

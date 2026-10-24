@@ -41,7 +41,7 @@ CONFIRMED_STEMS = frozenset({
 
 
 def _load_candidates() -> List[Dict[str, Any]]:
-    return [json.loads(l) for l in CAND.read_text().splitlines() if l.strip()]
+    return [json.loads(l) for l in CAND.read_text(encoding='utf-8').splitlines() if l.strip()]
 
 
 def _stem_of(name: str) -> str:

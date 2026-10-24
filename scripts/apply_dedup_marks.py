@@ -38,7 +38,7 @@ DB = ROOT / "knowledge pipeline" / "maxwell.db"
 
 
 def _load_duplicate_of() -> Dict[str, str]:
-    d = json.loads(PLAN.read_text())
+    d = json.loads(PLAN.read_text(encoding='utf-8'))
     return d.get("duplicate_of", {})
 
 

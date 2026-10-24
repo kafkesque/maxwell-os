@@ -26,7 +26,7 @@ def load_test_set() -> list[dict]:
     """Load depth-labelled FBs from the golden set (same source as prior benchmarks)."""
     import yaml
     from pipeline.pipeline_paths import S2_GOLDEN_PATH
-    with open(PROJECT_ROOT / S2_GOLDEN_PATH) as f:
+    with open(PROJECT_ROOT / S2_GOLDEN_PATH, encoding='utf-8') as f:
         d = yaml.safe_load(f)
     fbs = []
     for ex in d["examples"]:

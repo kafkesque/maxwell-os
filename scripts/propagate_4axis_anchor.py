@@ -154,7 +154,7 @@ def main() -> int:
     ap.add_argument("--db", default=str(DB))
     args = ap.parse_args()
 
-    gold_rows = [json.loads(line) for line in Path(args.gold).read_text().splitlines() if line.strip()]
+    gold_rows = [json.loads(line) for line in Path(args.gold).read_text(encoding='utf-8').splitlines() if line.strip()]
     con = sqlite3.connect(args.db)
     updates, report = plan_updates(gold_rows, con)
     if report["problems"]:

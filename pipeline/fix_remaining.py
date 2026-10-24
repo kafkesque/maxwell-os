@@ -232,7 +232,7 @@ def task2_llm_stubborn(dry_run: bool = True, max_books: int = 0):
     candidates = []
     for md_path in MD_BASE.rglob("*.md"):
         try:
-            text = md_path.read_text(errors='replace')
+            text = md_path.read_text(errors='replace', encoding='utf-8')
         except Exception as e:
             print(f"    ⚠️  Cannot read {md_path.name}: {e}")
             continue
@@ -260,7 +260,7 @@ def task2_llm_stubborn(dry_run: bool = True, max_books: int = 0):
         tag = "🟠" if is_orphan else "🟡"
 
         if not dry_run:
-            text = md_path.read_text(errors='replace')
+            text = md_path.read_text(errors='replace', encoding='utf-8')
             enhanced_text = llm_insert_headers(text)
             if enhanced_text:
                 from pipeline.enhance_md_headers import analyze_headers

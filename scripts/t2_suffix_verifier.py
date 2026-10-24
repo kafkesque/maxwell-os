@@ -54,7 +54,7 @@ def _cfg() -> dict:
     """Load the suffix policy (C12: markers and thresholds come from config)."""
     import yaml
 
-    return (yaml.safe_load(CFG.read_text()) or {}).get("suffix_dedup") or {}
+    return (yaml.safe_load(CFG.read_text(encoding='utf-8')) or {}).get("suffix_dedup") or {}
 
 
 def norm(name: str) -> str:
@@ -159,7 +159,7 @@ def main() -> int:
     # The pairs a model flagged are reported separately so the two populations can be compared.
     flagged = []
     if PLAN.exists():
-        plan = json.loads(PLAN.read_text())
+        plan = json.loads(PLAN.read_text(encoding='utf-8'))
         for pair in plan.get("high_confidence_suffix_candidates") or []:
             b = next((n for f, n in rows if f == pair.get("base_fb_id")), "")
             d = next((n for f, n in rows if f == pair.get("dup_fb_id")), "")
@@ -215,7 +215,7 @@ def _validate(cfg: dict, markers: list[str], max_marker: int, by_rec: dict) -> i
         print("  validate: no calibration sheet found")
         return 0
     pairs = []
-    for row in csv.DictReader(sheet.open()):
+    for row in csv.DictReader(sheet.open(encoding='utf-8')):
         if row["task"] != "T2_suffix_merge" or not (row.get("HUMAN_VERDICT") or "").strip():
             continue
         human = row["HUMAN_VERDICT"].strip().lower()

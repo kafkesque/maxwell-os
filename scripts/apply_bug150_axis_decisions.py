@@ -101,7 +101,7 @@ def _norm(s: str) -> str:
 
 
 def _edit_taxonomy(dry_run: bool) -> None:
-    data = yaml.safe_load(TAXONOMY_PATH.read_text())
+    data = yaml.safe_load(TAXONOMY_PATH.read_text(encoding='utf-8'))
     added = []
     for section, mapping in (("domains", DOMAIN_ALIASES), ("disciplines", DISCIPLINE_ALIASES)):
         entries = data[section]

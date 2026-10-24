@@ -33,7 +33,7 @@ DRAFTS_PATH = PROJECT_ROOT / "config" / "golden" / "_depth_mined_drafts.json"
 
 def load_seeds() -> dict:
     import yaml
-    with open(SEEDS_PATH) as f:
+    with open(SEEDS_PATH, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
@@ -86,7 +86,7 @@ def discover(seeds: dict, corpus_path: Path) -> dict:
             for term in seed["terms"]:
                 term_index[term.lower()] = (seed["name"], depth_key)
 
-    with open(corpus_path) as f:
+    with open(corpus_path, encoding='utf-8') as f:
         for line in f:
             try:
                 d = json.loads(line)
@@ -192,7 +192,7 @@ def main() -> int:
         return 0
 
     if args.generate:
-        candidates = json.loads(CANDIDATES_PATH.read_text())
+        candidates = json.loads(CANDIDATES_PATH.read_text(encoding='utf-8'))
         drafts = generate(candidates, args.model)
         DRAFTS_PATH.write_text(json.dumps(drafts, indent=2, ensure_ascii=False), encoding='utf-8')
         print(f"✅ {len(drafts)} drafts -> {DRAFTS_PATH.name}")

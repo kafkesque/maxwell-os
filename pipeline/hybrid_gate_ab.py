@@ -54,7 +54,7 @@ def _expected_route(example: dict) -> str:
 
 def run_ab(limit: int | None = None, verbose: bool = False) -> dict:
     """Run the hybrid gate against the golden set and return a structured report."""
-    with open(GOLDEN_PATH) as f:
+    with open(GOLDEN_PATH, encoding='utf-8') as f:
         golden = yaml.safe_load(f) or {}
     examples: list[dict] = golden.get("examples", [])
     if limit:

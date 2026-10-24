@@ -26,7 +26,7 @@ def main() -> int:
     from pipeline.pipeline_paths import S2_GOLDEN_PATH
 
     golden_path = PROJECT_ROOT / S2_GOLDEN_PATH
-    meta = json.loads(META_PATH.read_text())
+    meta = json.loads(META_PATH.read_text(encoding='utf-8'))
 
     expected = meta.get("golden_sha256", "")
     actual = hashlib.sha256(golden_path.read_bytes()).hexdigest()

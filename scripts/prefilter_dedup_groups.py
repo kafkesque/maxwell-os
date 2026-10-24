@@ -49,7 +49,7 @@ def _jaccard(a: frozenset, b: frozenset) -> float:
 
 
 def prefilter(threshold: float) -> None:
-    groups: List[Dict[str, Any]] = [json.loads(l) for l in CAND.read_text().splitlines() if l.strip()]
+    groups: List[Dict[str, Any]] = [json.loads(l) for l in CAND.read_text(encoding='utf-8').splitlines() if l.strip()]
     subset: List[Dict[str, Any]] = []
     for g in groups:
         members = g["members"]

@@ -102,7 +102,7 @@ def _norm(s: str) -> str:
 
 def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
     """Append alias raw labels to the 6 canonical entries. Returns what was added."""
-    data = yaml.safe_load(TAXONOMY_PATH.read_text())
+    data = yaml.safe_load(TAXONOMY_PATH.read_text(encoding='utf-8'))
     disc = data["disciplines"]
     added: dict[str, list[str]] = {}
     for canonical, variants in ALIASES:

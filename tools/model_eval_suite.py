@@ -1100,7 +1100,7 @@ def main() -> int:
 
     models = list(args.models or [])
     if args.models_file:
-        models += [l.strip() for l in Path(args.models_file).read_text().splitlines()
+        models += [l.strip() for l in Path(args.models_file).read_text(encoding='utf-8').splitlines()
                    if l.strip() and not l.strip().startswith("#")]
     if not models:
         print("no models given")

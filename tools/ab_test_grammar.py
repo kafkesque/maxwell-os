@@ -45,7 +45,7 @@ def _resolve_checkpoint() -> Path:
 def sample_fbs(n: int) -> list[dict]:
     """Return n FBs sampled evenly across the S2 checkpoint."""
     checkpoint = _resolve_checkpoint()
-    fbs = [json.loads(line) for line in checkpoint.read_text().splitlines() if line.strip()]
+    fbs = [json.loads(line) for line in checkpoint.read_text(encoding='utf-8').splitlines() if line.strip()]
     step = max(1, len(fbs) // n)
     return fbs[::step][:n]
 

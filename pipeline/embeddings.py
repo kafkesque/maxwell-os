@@ -32,7 +32,7 @@ import yaml
 from pipeline.pipeline_paths import OLLAMA_URL, S15_EMBED_NATIVE_MRL
 
 _CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-with open(_CFG_PATH) as f:
+with open(_CFG_PATH, encoding='utf-8') as f:
     _CFG = yaml.safe_load(f)
 
 EMBED_MODEL: str = _CFG["models"]["embeddings"]["model"]

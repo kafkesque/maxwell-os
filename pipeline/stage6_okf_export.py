@@ -394,7 +394,7 @@ def main() -> None:
 
         print(f"  📖 Loading FBs from: {ckpt_path}")
         bad_lines = 0
-        with open(ckpt_path) as f:
+        with open(ckpt_path, encoding='utf-8') as f:
             for line_no, line in enumerate(f, 1):
                 line = line.strip()
                 if line:

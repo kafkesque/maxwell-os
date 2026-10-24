@@ -38,7 +38,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_GOLDEN = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 
 # D2307: name-match threshold — config-driven default; overridable via CLI (C12).
-with open(PROJECT_ROOT / "config" / "pipeline_config.yaml") as _rcf:
+with open(PROJECT_ROOT / "config" / "pipeline_config.yaml", encoding='utf-8') as _rcf:
     _RECALL_CFG = yaml.safe_load(_rcf) or {}
 DEFAULT_MATCH_THRESHOLD: float = float(_RECALL_CFG.get("recall", {}).get("match_threshold", 0.55))
 
@@ -72,7 +72,7 @@ def load_golden(golden_path: Path) -> list[dict]:
         List of dicts: {id, tier, should_extract, names: [str, ...]}.
         For 1:N examples, `names` holds multiple expected FB names.
     """
-    with open(golden_path) as f:
+    with open(golden_path, encoding='utf-8') as f:
         data = yaml.safe_load(f)
 
     out: list[dict] = []
@@ -99,7 +99,7 @@ def load_pipeline_output(output_path: Path) -> list[dict]:
 
     if output_path.suffix == ".jsonl":
         records: list[dict] = []
-        with open(output_path) as f:
+        with open(output_path, encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line:
@@ -110,7 +110,7 @@ def load_pipeline_output(output_path: Path) -> list[dict]:
                     continue
         return records
 
-    with open(output_path) as f:
+    with open(output_path, encoding='utf-8') as f:
         data = json.load(f)
     if isinstance(data, list):
         return data

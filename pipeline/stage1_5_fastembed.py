@@ -27,7 +27,7 @@ import yaml
 
 # Load config
 CONFIG_PATH: Path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-with open(CONFIG_PATH) as f:
+with open(CONFIG_PATH, encoding='utf-8') as f:
     _CFG = yaml.safe_load(f)
 
 S15 = _CFG.get("stage1_5", {})
@@ -53,7 +53,7 @@ def load_segments() -> list[dict]:
         print(f"❌ Stage 1 checkpoint not found: {STAGE1_CHECKPOINT}")
         sys.exit(1)
     segments: list[dict] = []
-    with open(STAGE1_CHECKPOINT) as f:
+    with open(STAGE1_CHECKPOINT, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if line:

@@ -74,7 +74,7 @@ def check_yaml_parse() -> tuple[bool, str]:
         if f.name.endswith(".bak"):
             continue
         try:
-            with open(f) as fh:
+            with open(f, encoding='utf-8') as fh:
                 yaml.safe_load(fh)
         except yaml.YAMLError as e:
             errors.append(f"  {f.name}: {e}")
@@ -92,7 +92,7 @@ def check_referenced_files() -> tuple[bool, str]:
     missing = []
 
     # Check pipeline stage scripts
-    with open(CONFIG_DIR / "pipeline_config.yaml") as f:
+    with open(CONFIG_DIR / "pipeline_config.yaml", encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
     stages = config.get("stages", {})
@@ -109,7 +109,7 @@ def check_referenced_files() -> tuple[bool, str]:
             missing.append(f"  Stage {stage_name}: script {script_name} not found in pipeline/")
 
     # Check protected files from session_seed
-    with open(REPO_ROOT / "agent" / "session_seed.yaml") as f:
+    with open(REPO_ROOT / "agent" / "session_seed.yaml", encoding='utf-8') as f:
         seed = yaml.safe_load(f)
 
     EXPECTED_MISSING = {".env"}  # Gitignored, intentionally missing
@@ -146,7 +146,7 @@ def check_models_known() -> tuple[bool, str]:
     for mf in model_files:
         if not mf.exists():
             continue
-        with open(mf) as f:
+        with open(mf, encoding='utf-8') as f:
             lines = f.readlines()
         for i, line in enumerate(lines):
             # Skip commented-out lines
@@ -243,7 +243,7 @@ def check_import_dependencies() -> tuple[bool, str]:
         if pyf.name.startswith("__") or pyf.name.startswith("."):
             continue
         try:
-            with open(pyf) as f:
+            with open(pyf, encoding='utf-8') as f:
                 tree = ast.parse(f.read())
         except SyntaxError:
             continue
@@ -302,7 +302,7 @@ def check_stage_contracts() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 def check_stage_order() -> tuple[bool, str]:
     """Verify CONSTITUTION.md stage order matches pipeline_config.yaml."""
-    with open(REPO_ROOT / "CONSTITUTION.md") as f:
+    with open(REPO_ROOT / "CONSTITUTION.md", encoding='utf-8') as f:
         constitution = f.read()
 
     # Extract stage order from CONSTITUTION
@@ -312,7 +312,7 @@ def check_stage_order() -> tuple[bool, str]:
             pipeline_line = line
             break
 
-    with open(CONFIG_DIR / "pipeline_config.yaml") as f:
+    with open(CONFIG_DIR / "pipeline_config.yaml", encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
     config_stages = list(config.get("stages", {}).keys())
@@ -360,7 +360,7 @@ def check_schema_sqlite_match() -> tuple[bool, str]:
     conn.close()
 
     # Extract Pydantic fields from schemas.py
-    with open(PIPELINE_DIR / "schemas.py") as f:
+    with open(PIPELINE_DIR / "schemas.py", encoding='utf-8') as f:
         schemas_code = f.read()
 
     # Find all Pydantic model fields (collect across all model classes)
@@ -413,13 +413,13 @@ def check_schema_sqlite_match() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 def check_vector_dimensions() -> tuple[bool, str]:
     """Verify embed_dim in config matches pipeline_paths and actual stored vectors."""
-    with open(CONFIG_DIR / "pipeline_config.yaml") as f:
+    with open(CONFIG_DIR / "pipeline_config.yaml", encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
     embed_dim = config.get("stage1_5", {}).get("embed_dim", None)
 
     # Check session_seed agrees
-    with open(REPO_ROOT / "agent" / "session_seed.yaml") as f:
+    with open(REPO_ROOT / "agent" / "session_seed.yaml", encoding='utf-8') as f:
         seed = yaml.safe_load(f)
 
     seed_dim = seed.get("models", {}).get("embeddings", {}).get("dims", None)
@@ -437,13 +437,13 @@ def check_vector_dimensions() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 def check_version_consistency() -> tuple[bool, str]:
     """Verify version stamps in version.yaml, CONSTITUTION.md, session_seed agree."""
-    with open(CONFIG_DIR / "version.yaml") as f:
+    with open(CONFIG_DIR / "version.yaml", encoding='utf-8') as f:
         version_cfg = yaml.safe_load(f)
 
     schema_v = version_cfg.get("schema_version", "")
     const_v = version_cfg.get("constitution_version", "")
 
-    with open(REPO_ROOT / "agent" / "session_seed.yaml") as f:
+    with open(REPO_ROOT / "agent" / "session_seed.yaml", encoding='utf-8') as f:
         seed = yaml.safe_load(f)
 
     seed_schema = seed.get("session", {}).get("schema_version", "")
@@ -475,7 +475,7 @@ def check_deprecated_config() -> tuple[bool, str]:
     for cf in config_files:
         if not cf.exists():
             continue
-        with open(cf) as f:
+        with open(cf, encoding='utf-8') as f:
             for i, line in enumerate(f, 1):
                 for dk in DEPRECATED_KEYS:
                     if dk in line and not line.strip().startswith("#") and "REMOVED" not in line:
@@ -572,7 +572,7 @@ def check_silent_exceptions() -> tuple[bool, str]:
     py_files = list(PIPELINE_DIR.glob("*.py"))
 
     for pyf in sorted(py_files):
-        with open(pyf) as f:
+        with open(pyf, encoding='utf-8') as f:
             lines = f.readlines()
 
         # Determine if we're in a graceful-degradation function
@@ -621,7 +621,7 @@ def check_zero_vector() -> tuple[bool, str]:
     if not embed_file.exists():
         return "skip", "ollama_embed.py not found"
 
-    with open(embed_file) as f:
+    with open(embed_file, encoding='utf-8') as f:
         content = f.read()
 
     # Check EmbeddingQuarantineError is defined
@@ -649,7 +649,7 @@ def check_monotonic_trust() -> tuple[bool, str]:
     if not verify_file.exists():
         return "skip", "stage5_verify.py not found"
 
-    with open(verify_file) as f:
+    with open(verify_file, encoding='utf-8') as f:
         content = f.read()
 
     # Check for fail-closed pattern
@@ -687,7 +687,7 @@ def check_sqlite_insert_placeholders() -> tuple[bool, str]:
     col_count = len(cursor.fetchall())
     conn.close()
 
-    with open(commit_file) as f:
+    with open(commit_file, encoding='utf-8') as f:
         commit_code = f.read()
 
     # Count ? placeholders in the `INSERT OR REPLACE INTO fbs` VALUES clause.
@@ -726,7 +726,7 @@ def check_prompt_ids() -> tuple[bool, str]:
     py_files = list(PIPELINE_DIR.glob("*.py"))
     refs_found = 0
     for pyf in py_files:
-        with open(pyf) as f:
+        with open(pyf, encoding='utf-8') as f:
             content = f.read()
         for pf in prompt_files:
             if pf in content:
@@ -747,7 +747,7 @@ def check_model_registry_runtime() -> tuple[bool, str]:
     an encoder — no family string. R5 (Generator ≠ Verifier) therefore reduces
     to: generator family must differ from the classifier/probe family.
     """
-    with open(CONFIG_DIR / "pipeline_config.yaml") as f:
+    with open(CONFIG_DIR / "pipeline_config.yaml", encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
     models = config.get("models", {})

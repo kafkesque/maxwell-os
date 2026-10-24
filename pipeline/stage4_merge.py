@@ -42,7 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import yaml as _yaml
 
 _CFG_PATH_S4 = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-with open(_CFG_PATH_S4) as _f:
+with open(_CFG_PATH_S4, encoding='utf-8') as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
 
 from pipeline.io_guard import load_jsonl, safe_write, safe_write_jsonl  # D2332 fail-closed + BUG-188 streaming/fail-loud writer
@@ -1545,7 +1545,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         try:
             fbs.extend(load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint"))
             if os.path.exists(_segids_file):
-                with open(_segids_file) as _sf:
+                with open(_segids_file, encoding='utf-8') as _sf:
                     processed_ids = set(json.load(_sf))
             else:
                 # D2424: a completed run deletes .segids (below). Reconstruct the
@@ -1558,7 +1558,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                     if sc
                 }
             if os.path.exists(_state_file):
-                with open(_state_file) as _stf:
+                with open(_state_file, encoding='utf-8') as _stf:
                     _scalar_state = json.load(_stf)
             # BUG-183: stale-resume guard — discard a checkpoint whose S2 input
             # fingerprint differs from the current S2 corpus (relabeled/regenerated
@@ -1677,7 +1677,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # classified clusters instead of re-running the whole pre-pass.
         if os.path.exists(_cribs_file):
             try:
-                with open(_cribs_file) as _cf:
+                with open(_cribs_file, encoding='utf-8') as _cf:
                     _loaded_cribs = json.load(_cf)
                 if isinstance(_loaded_cribs, dict):
                     _pre_classified.update(_loaded_cribs)
@@ -1749,7 +1749,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # classified clusters instead of re-running the whole ~1-2h pre-pass.
         if os.path.exists(_depth_file):
             try:
-                with open(_depth_file) as _df:
+                with open(_depth_file, encoding='utf-8') as _df:
                     _loaded_depth = json.load(_df)
                 if isinstance(_loaded_depth, dict):
                     _pre_depth.update(_loaded_depth)

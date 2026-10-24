@@ -299,7 +299,7 @@ class PrincipleJournal:
         """Yield all records in order."""
         if not self.path.exists():
             return
-        with open(self.path) as f:
+        with open(self.path, encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if line:

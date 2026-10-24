@@ -28,7 +28,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
-with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml", encoding='utf-8') as _f:
     _CFG = yaml.safe_load(_f) or {}
 _RERANK = _CFG.get("rerank", {})
 

@@ -35,9 +35,9 @@ def norm_name(text: str) -> str:
 
 def load_rows(cfg: dict) -> tuple[list[dict], dict]:
     """Join the R2 artifact to the ruler by canonical name; fail closed below the floor."""
-    r2 = json.loads((_ROOT / cfg["r2_artifact"]).read_text())
+    r2 = json.loads((_ROOT / cfg["r2_artifact"]).read_text(encoding='utf-8'))
     index = {norm_name(r["name"]): r for r in r2["results"]}
-    with (_ROOT / cfg["ruler_artifact"]).open(newline="") as fh:
+    with (_ROOT / cfg["ruler_artifact"]).open(newline="", encoding='utf-8') as fh:
         ruler = list(csv.DictReader(fh))
     joined, unmatched = [], []
     for row in ruler:
@@ -133,7 +133,7 @@ def write_atomic(path: Path, text: str) -> None:
 
 def main() -> int:
     """Run the measurement and write the artifact pair."""
-    cfg = yaml.safe_load(_CFG_PATH.read_text())
+    cfg = yaml.safe_load(_CFG_PATH.read_text(encoding='utf-8'))
     rows, r2 = load_rows(cfg)
     result = {"schema_version": "1.0", "decision": cfg["decision"],
               "r2_artifact": cfg["r2_artifact"], "ruler_artifact": cfg["ruler_artifact"],

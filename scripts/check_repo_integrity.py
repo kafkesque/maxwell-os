@@ -498,7 +498,7 @@ def checks(cfg: dict[str, Any], git_dir: Path | None, rows: list[dict[str, Any]]
                      "'git reflog' will silently serve a stale branch reflog (P0-A, measured 2026-09-25: "
                      "reflog said HEAD@{0}=a1061cd while HEAD was 96b1e9c)")
     elif reflog_rel and gcfg.get("reflog_must_agree_with_head"):
-        last = [ln for ln in reflog.read_text(errors="replace").splitlines() if ln.strip()]
+        last = [ln for ln in reflog.read_text(errors="replace", encoding='utf-8').splitlines() if ln.strip()]
         last_sha = last[-1].split()[1] if last and len(last[-1].split()) > 1 else ""
         if head and last_sha and last_sha != head:
             fails.append(f"{git_dir}/{reflog_rel} records HEAD as {last_sha[:7]} while HEAD is {head[:7]} - "

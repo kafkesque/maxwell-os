@@ -66,7 +66,7 @@ def load_rows() -> list[dict[str, str]]:
     """Read the calibration sheet, raising if it is missing or has no rows."""
     if not SHEET.exists():
         raise SystemExit("sheet not found: " + str(SHEET))
-    with SHEET.open(newline="") as fh:
+    with SHEET.open(newline="", encoding='utf-8') as fh:
         rows = list(csv.DictReader(fh))
     if not rows:
         raise SystemExit("sheet is empty: " + str(SHEET))

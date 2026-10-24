@@ -567,7 +567,7 @@ def load_taxonomy():
     import yaml
 
     config_path = Path(__file__).resolve().parent.parent / "config" / "taxonomy.yaml"
-    with open(config_path) as f:
+    with open(config_path, encoding='utf-8') as f:
         taxa = yaml.safe_load(f)
 
     domains = [d["canonical"] for d in taxa.get("domains", [])]
@@ -609,7 +609,7 @@ def _axis_contract() -> dict:
             import yaml
 
             path = Path(__file__).resolve().parent.parent / "config" / "eval_integrity.yaml"
-            _AXIS_CONTRACT_CACHE = (yaml.safe_load(path.read_text()) or {}).get("label_axes") or {}
+            _AXIS_CONTRACT_CACHE = (yaml.safe_load(path.read_text(encoding='utf-8')) or {}).get("label_axes") or {}
         except Exception:  # noqa: BLE001 — a missing/!parsable contract must not become a pass
             _AXIS_CONTRACT_CACHE = {}
     return _AXIS_CONTRACT_CACHE
@@ -927,7 +927,7 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     # 1. Taxonomy raw aliases (both domains and disciplines)
     tax_path = config_root / "taxonomy.yaml"
     if tax_path.exists():
-        with open(tax_path) as f:
+        with open(tax_path, encoding='utf-8') as f:
             taxa = yaml.safe_load(f)
         for entry in taxa.get("domains", []) + taxa.get("disciplines", []):
             canonical = entry["canonical"].strip()
@@ -942,7 +942,7 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     # 2. Synonym_map.yaml (domain synonyms, keywords, patterns)
     syn_path = config_root / "synonym_map.yaml"
     if syn_path.exists():
-        with open(syn_path) as f:
+        with open(syn_path, encoding='utf-8') as f:
             syn_map = yaml.safe_load(f)
         for _key, entry in syn_map.get("synonyms", {}).items():
             canonical = entry.get("canonical", "").strip()
@@ -1170,7 +1170,7 @@ def validate_golden_set(path: str) -> list[str]:
 
     import yaml
 
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         doc = yaml.safe_load(f)
 
     violations: list[str] = []

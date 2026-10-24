@@ -33,7 +33,7 @@ from pipeline.pipeline_paths import S1_DIR, S15_DIR, get_run_id  # BUG-597: no h
 def load_clusters(checkpoint: Path) -> list[dict]:
     """Load cluster records from S1.5 checkpoint."""
     clusters: list[dict] = []
-    with open(checkpoint) as f:
+    with open(checkpoint, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -45,7 +45,7 @@ def load_clusters(checkpoint: Path) -> list[dict]:
 def load_segments(checkpoint: Path) -> dict[str, dict]:
     """Load segment texts from Stage 1 checkpoint, indexed by segment_id."""
     segments: dict[str, dict] = {}
-    with open(checkpoint) as f:
+    with open(checkpoint, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:

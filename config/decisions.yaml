@@ -32083,3 +32083,35 @@ decisions:
   - BUG-993
   files:
   - tests/test_governance_faces_spec.py
+- id: D-3143
+  state: RESOLVED
+  category: GOVERNANCE / PINS / ROBUSTNESS METER
+  date: '2026-10-24'
+  title: the T-114 read slice moved a PINNED artifact's bytes, and robustness_meter is RE-MINTED under a NEW decision
+    id (never a sha overwrite) because its score-neutrality is certified DETERMINISTICALLY (byte-identical re-derivation)
+  decision: 'BUG-998 (filed and closed in the same commit): the T-114 undeclared-encoding read slice ran scripts/declare_encoding.py
+    --apply, which mechanically inserted encoding=''utf-8'' on the 5 READ sites of scripts/abstention_robustness.py,
+    and that file is PINNED as robustness_meter (D-352, sha256 0218845e82...). verify_recalibration_pins.py --staged
+    then REFUSED the 147-path read-slice commit, CORRECTLY: a pin certifies that the BYTES at HEAD reproduce a measurement,
+    so ANY byte move invalidates the certificate. (1) NO OVERWRITE UNDER THE OLD ID: writing the new sha256 under
+    D-352 is exactly BUG-391/BUG-526/BUG-535 - it turns the scan GREEN while an old decision certifies a measurement
+    nobody re-ran. The sha256 moves ONLY in the commit that moves its decision to an id minted for the new state
+    of the artifact. (2) THE PROOF IS DETERMINISTIC, NOT AN A/B: the 5 changed lines only make the UTF-8 codec EXPLICIT
+    on reads that already default to it, so every score is provably unmoved - and it is PROVED, not assumed, by
+    running the STAGED script and byte-comparing its outputs to HEAD (git diff EMPTY) - 0 LLM calls, 0 model tokens
+    (BUG-269: never ask an LLM what a machine can decide). (3) THE PIN, ITS CERTIFICATE AND THE READ SLICE LAND
+    IN ONE COMMIT. (4) THE CLASS OUTLIVES THIS BUG: a pinned artifact is pinned by BYTES, so every future mechanical
+    rewrite inside one (doc, comment, or an encoding declaration) is a re-mint by construction - the cost of the
+    rule, paid in one place instead of a green scan that lies.'
+  measured: 'HEAD bytes sha256 0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f (= the D-352 pin,
+    verified) -> staged c14b3ea3165c2b7841ba1ebcb23a5d13958c3d913f58381914462a8b597e7023. Diff: 5 changed lines
+    (5 + / 5 -), all inserting encoding=''utf-8'' on READ sites (4 x read_text(), 1 x open(newline="")). Deterministic
+    re-run of the STAGED script: exit 2 (the declared reproduction-mismatch ''report LOUD and continue'' behaviour,
+    not an error), outputs byte-identical to HEAD - json d1bf79c40615a5597aa21c18c6f1ed9c64e0b533b4f03c57539fcdd08acc6b60,
+    md 03667fbe047bbafbe652f2e22e264acdfd342352ca81df14873527479727a8e4; git diff EMPTY.'
+  bugs:
+  - BUG-998
+  files:
+  - scripts/abstention_robustness.py
+  - config/recalibration_pins.yaml
+  - governance/buglog.md

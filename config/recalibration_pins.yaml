@@ -32,8 +32,8 @@ pins:
     decision: D-362
   robustness_meter:
     path: scripts/abstention_robustness.py
-    sha256: 0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f
-    decision: D-352
+    sha256: c14b3ea3165c2b7841ba1ebcb23a5d13958c3d913f58381914462a8b597e7023
+    decision: D-3143
 # BUG-687 (CLOSED 2026-10-08): the nli_calibration pin (D-2863) is RETIRED, not re-scoped. It pinned
 # `knowledge pipeline/metrics/nli_calibration.json` — a 16 MB regenerable calibration-run OUTPUT under the
 # gitignored `knowledge pipeline/` directory (.gitignore:73), so it could never hold in `git archive HEAD`

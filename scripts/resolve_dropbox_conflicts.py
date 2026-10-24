@@ -244,7 +244,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.apply and a.check:
         raise SystemExit("FAIL-CLOSED (dropbox-conflicts): --apply and --check contradict (one moves bytes, one "
                          "must not) - refusing rather than picking one")
-    policy = yaml.safe_load(POLICY.read_text())
+    policy = yaml.safe_load(POLICY.read_text(encoding='utf-8'))
     rows = resolve(policy, a.apply)
     if not a.check:
         write_register(rows, a.apply, ROOT / policy["register"])

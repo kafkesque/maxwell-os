@@ -138,7 +138,7 @@ def _get_query_version() -> str:
     """Read banner version from config/version.yaml (D2169: single source of truth)."""
     try:
         import yaml
-        vcfg = yaml.safe_load(Path("config/version.yaml").read_text())
+        vcfg = yaml.safe_load(Path("config/version.yaml").read_text(encoding='utf-8'))
         return str(vcfg.get("query_banner_version", "3.0"))
     except Exception:
         return "3.0"

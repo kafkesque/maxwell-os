@@ -180,7 +180,7 @@ def analyze_headers(text: str) -> dict:
 def enhance_book(md_path: Path, dry_run: bool = False, force_llm: bool = False) -> dict | None:
     """Enhance a single book's headers. Returns stats dict or None if skipped."""
     try:
-        text = md_path.read_text(errors='replace')
+        text = md_path.read_text(errors='replace', encoding='utf-8')
     except Exception as e:
         return {'path': str(md_path), 'error': str(e), 'enhanced': False}
 
@@ -246,7 +246,7 @@ def main():
         if args.domain and args.domain not in str(md_path):
             continue
 
-        text = md_path.read_text(errors='replace')
+        text = md_path.read_text(errors='replace', encoding='utf-8')
         stats = analyze_headers(text)
 
         has_epub = md_path.name.lower() in epub_names

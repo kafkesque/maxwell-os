@@ -40,7 +40,7 @@ def write_atomic(path: Path, text: str) -> None:
 
 def load_cfg() -> dict:
     """Load the config and fail closed if a declared input is missing (C16)."""
-    cfg = yaml.safe_load(_CFG_PATH.read_text())
+    cfg = yaml.safe_load(_CFG_PATH.read_text(encoding='utf-8'))
     paths = [cfg[k] for k in ("calibration_artifact", "r2_artifact", "bakeoff_artifact")]
     paths += [v["path"] for v in cfg["references"].values()]
     for rel in paths:
@@ -51,7 +51,7 @@ def load_cfg() -> dict:
 
 def read_table(rel: str) -> list[dict]:
     """Read a CSV artifact as a list of dict rows."""
-    with (_ROOT / rel).open(newline="") as fh:
+    with (_ROOT / rel).open(newline="", encoding='utf-8') as fh:
         return list(csv.DictReader(fh))
 
 
@@ -61,9 +61,9 @@ def build_rows(cfg: dict) -> dict:
     cons = {rgm.norm_name(r["name"]): r for r in read_table(cfg["references"]["ruler_in_force"]["path"])}
     if not sheet or not cons:
         raise SystemExit("a declared reference table is empty - refusing (C16)")
-    r2 = json.loads((_ROOT / cfg["r2_artifact"]).read_text())
+    r2 = json.loads((_ROOT / cfg["r2_artifact"]).read_text(encoding='utf-8'))
     idx = {r["fb_id"]: r for r in r2["results"]}
-    preds = json.loads((_ROOT / cfg["bakeoff_artifact"]).read_text())["arms"][cfg["bakeoff_arm"]]["predictions"]
+    preds = json.loads((_ROOT / cfg["bakeoff_artifact"]).read_text(encoding='utf-8'))["arms"][cfg["bakeoff_arm"]]["predictions"]
     sheet_col = cfg["references"]["ruler_sheet_raw"]["discipline_column"]
     disc_col = cfg["references"]["ruler_in_force"]["discipline_column"]
     ct_col = cfg["references"]["ruler_in_force"]["content_type_column"]
@@ -161,7 +161,7 @@ def curve(rows: list[dict], cfg: dict, grid_in: list[float]) -> dict:
 def main() -> int:
     """Run the robustness + drift check and write the artifact pair."""
     cfg = load_cfg()
-    cal = json.loads((_ROOT / cfg["calibration_artifact"]).read_text())
+    cal = json.loads((_ROOT / cfg["calibration_artifact"]).read_text(encoding='utf-8'))
     rows = build_rows(cfg)
     result = {"schema_version": "1.0", "decision": cfg["decision"],
               "calibration_artifact": cfg["calibration_artifact"], "bakeoff_artifact": cfg["bakeoff_artifact"],

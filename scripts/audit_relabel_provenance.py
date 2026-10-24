@@ -51,7 +51,7 @@ def main() -> int:
     if path is None:
         print("FAIL no relabel report found in " + args.dir + " (a relabel run must emit one)")
         return 1
-    report = json.loads(path.read_text())
+    report = json.loads(path.read_text(encoding='utf-8'))
     print("newest relabel report: " + path.name)
     for key in REQUIRED:
         print("    " + key.ljust(30) + str(report.get(key)))

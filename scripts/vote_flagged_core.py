@@ -42,7 +42,7 @@ def _load_targets() -> list[str]:
     """The 25 flagged 149-core source fb_ids missing from the checkpoint."""
     if not VOTE_SET.exists():
         raise SystemExit(f"❌ vote set not found: {VOTE_SET}")
-    return [json.loads(l)["fb_id"] for l in VOTE_SET.open() if l.strip()]
+    return [json.loads(l)["fb_id"] for l in VOTE_SET.open(encoding='utf-8') if l.strip()]
 
 
 def _load_fb_data(fb_ids: list[str]) -> list[dict]:

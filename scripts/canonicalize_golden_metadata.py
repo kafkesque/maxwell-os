@@ -50,7 +50,7 @@ def main() -> int:
     # Backup original (crash-safe, C6)
     shutil.copy2(GOLDEN, BACKUP)
 
-    lines = GOLDEN.read_text().splitlines(keepends=True)
+    lines = GOLDEN.read_text(encoding='utf-8').splitlines(keepends=True)
     changed: list[tuple[str, str, str, str]] = []
     left: list[tuple[str, str, str, str]] = []
     for i, line in enumerate(lines):
@@ -68,7 +68,7 @@ def main() -> int:
 
     GOLDEN.write_text("".join(lines), encoding='utf-8')
 
-    meta = json.loads(META.read_text())
+    meta = json.loads(META.read_text(encoding='utf-8'))
     meta["golden_sha256"] = hashlib.sha256(GOLDEN.read_bytes()).hexdigest()
     meta["pipeline_commit"] = _git_head()
     meta["restamped_note"] = (

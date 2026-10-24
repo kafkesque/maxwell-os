@@ -75,6 +75,7 @@ CONTROL_LABELS: tuple[str, ...] = (
     "a_reference_cited_by_more_findings_than_the_declared_ceiling_is_EXCLUDED_and_COUNTED",
     "a_finding_related_ONLY_by_a_sibling_citation_is_not_a_neighbour",
     "a_neighbour_sharing_fewer_references_than_the_declared_minimum_is_not_a_relation",
+    "a_decision_citation_resolves_regardless_of_the_hyphen_the_register_wrote",
 )
 
 class RecallError(SystemExit):
@@ -162,6 +163,17 @@ def spans(bugs: dict[str, dict], n_lines: int) -> dict[str, tuple[int, int]]:
     return out
 
 
+def canonical_id(token: str) -> str:
+    """The DECISION id's canonical form: the hyphen is FORMATTING, never identity.
+
+    The declared trace pattern `D-?\\d{3,4}` already treats the optional hyphen as ONE reference class,
+    so a citation written `D-3047` and a ruling id written `D3047` are the SAME ruling (D-3034: the
+    number IS the reference). The register and the ruling home drifted to two conventions, so comparison
+    must fold the hyphen out on BOTH sides or the rail reports a ruling it actually carries as unresolved.
+    """
+    return token.replace("-", "").upper()
+
+
 def extract(text: str, traces: list[tuple[str, bool, re.Pattern[str]]],
             resolvers: dict[str, Any]) -> tuple[dict[str, set[str]], list[tuple[str, str]]]:
     """The references a span NAMES, split into the ones that RESOLVE and the ones that do not.
@@ -173,10 +185,11 @@ def extract(text: str, traces: list[tuple[str, bool, re.Pattern[str]]],
     for name, must_resolve, pattern in traces:
         for hit in pattern.findall(text):
             token = str(hit).strip()
-            if must_resolve and name in resolvers and not resolvers[name](token):
+            key = canonical_id(token) if name == "decision" else token
+            if must_resolve and name in resolvers and not resolvers[name](key):
                 unresolved.append((name, token))
                 continue
-            found[name].add(token)
+            found[name].add(key)
     return found, unresolved
 
 
@@ -240,6 +253,7 @@ def measure(doc: dict[str, Any], *, register_lines: list[str] | None = None, rep
         raise RecallError("FATAL: the declared register folded to ZERO findings — an empty register is "
                           "not a green one (D-795)")
     rulings = rulings if rulings is not None else cited_rulings(doc, repo)
+    rulings = {canonical_id(k): v for k, v in rulings.items()}
     traces = compile_traces(doc)
     decision_pattern = next((p for n, _, p in traces if n == "decision"), None)
     if decision_pattern is None:
@@ -500,6 +514,13 @@ def selftest() -> int:
     check(CONTROL_LABELS[14], "BUG-010" in mentions_only, False)
     thin_only = "\n".join(recall_lines("BUG-006", m, fixture_doc))
     check(CONTROL_LABELS[15], "BUG-001" in thin_only and "BUG-011" not in thin_only, True)
+    #: The DECISION id's hyphen is FORMATTING, not identity (the declared trace pattern is `D-?`, so both
+    #: forms are ONE reference): a no-hyphen citation must resolve against a hyphenated ruling id.
+    check(CONTROL_LABELS[16], canonical_id("D-3047"), canonical_id("D3047"))
+    norm = measure(fixture_doc, register_lines=["## BUG-050 (MED - FIXED 2026-01-01) - cites D3047 and D-9999"],
+                   rulings=fixture_rulings, caps=fixture_caps)
+    check(CONTROL_LABELS[16] + "_and_the_resolver_folds_the_hyphen",
+          "decision:D3047" in norm["counts"]["cited_references_that_do_not_resolve"], False)
 
     failed = 0
     for label, ok, _total in results:

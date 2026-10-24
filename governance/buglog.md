@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 759 bugs (256 open / 503 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 760 bugs (256 open / 504 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
@@ -20767,3 +20767,22 @@ still open), not this bug.
 (UPDATE #4) re-adjudicated the 40-row high-cosine tail with a DIFFERENT family pair (Qwen3.8-27B + gpt-oss-20b):
 cross-family agreement 40/40, the one dissent (R111) is gpt-oss against itself and fail-closes to NONE (D-2658).
 Receipt `governance/ANCHOR_208_RECHECK_NONEMUDDY_RESULTS_20261022.json` (R14-stamped, 80-line JSONL).
+
+
+## BUG-996 (MED — FIXED 2026-10-24) — the recall rail's decision resolver exact-matched a drifted id namespace and reported 52 rulings it actually carries as unresolved
+
+**CLOSURE.** `scripts/check_bug_recall.py` (D-3047) resolved a decision citation by exact string match against
+`config/decisions.yaml` ids, but the id namespace drifted to TWO hyphen conventions (measured: 577 `D-xxxx` /
+691 `Dxxx`; zero collisions after stripping the hyphen). The rail's own declared trace pattern `D-?\d{3,4}`
+already treats the hyphen as optional, so `D-3047` and `D3047` are ONE reference (D-3034: the number IS the
+reference) — the exact match contradicted its own declaration and inflated the debt.
+
+**FIX.** Added `canonical_id()` (fold the hyphen out, both sides: `cited_rulings` keys AND each decision token in
+`extract`), plus a new selftest control `a_decision_citation_resolves_regardless_of_the_hyphen_the_register_wrote`
+(a no-hyphen citation must resolve against a hyphenated ruling id). Selftest 22/22.
+
+**MEASURED (live, after the fix).** `unresolved_reference` 116 → 64 (WITHIN ceiling 112, was 4 over);
+`untraced_closed` 31 → 29 (two closed findings whose only decision trace was a mismatched citation now RESOLVE);
+`chronic_open` 16 unchanged (unrelated class). The 21 remaining unresolved decision refs are GENUINELY absent ids
+(D-271, D-795, D-1074, D-1075, D-2648, D-2650, D-2651, D-2653, D-2904, D-3055, D-2537, D150, D2534, D274,
+D3251, D410, D824, plus sentinels D-0000/D-999/D-9002) — the missing-D-record drafting work, not this defect.

@@ -440,6 +440,9 @@ def main() -> int:
         "gen_model": gen_model,
         "is_summary": 0,
         "is_convergent": 0,
+        # BUG-989: source_diversity is a DERIVED value (== |source_ids|, D-2309/D-2993) and this path
+        # inserts exactly one canonical work, so it is 1 — never NULL (the rail re-derives it and fails).
+        "source_diversity": 1,
     }
 
     # BUG-990: the identity gate runs on the DICT, before verify and before any write, and names EVERY gap at

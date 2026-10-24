@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 757 bugs (260 open / 497 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1268 decisions (census stamp 0d50869da65d9a8e, 2026-10-24) · 758 bugs (260 open / 498 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1268 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 355 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1268, D-2987/BUG-765)
 >
@@ -20683,3 +20683,44 @@ was also removed this session.
 
 Receipt: `python3 scripts/check_store_columns.py --check` → `OWED store-columns: debt 7 of ceiling 7 | 49 declared
 column(s) | census moves 0` — ZERO drift lines remaining (only the two DECLARED OUTSIDE-COVERAGE notes).
+
+
+## BUG-989 (LOW — FIXED 2026-10-24) — source_diversity NULL on 14 single-concept PASS rows
+
+The 14 PASS single-concept rows (D-3130) carried `source_diversity = NULL` while `derivations.yaml#fbs.source_diversity` declares the value DERIVED (`== |source_ids|`, D-2309/D-2993, parity rail `check_corroboration_bit.py`). The rail went RED: "stored source_diversity=0 but the evidence set holds 1 distinct canonical work(s)" on 14 rows. Root cause: `insert_single_concept.py` wrote `source_ids` + `is_convergent: 0` but never wrote `source_diversity` (it never passes S1.5 embed_cluster). The store_columns `sparse` declaration was therefore a drift against the derivation registry.
+
+FIX (deterministic, LLM-free): `scripts/repair_single_concept_diversity.py` re-derived `source_diversity = |source_ids| = 1` on the 14 PASS rows (PASS-scoped, so the QUARANTINE BUG-990 evidence row was untouched), with C13 backup + in-transaction post-state check. The producer now writes `source_diversity: 1`. store_columns.yaml `source_diversity` re-declared: non-blank 7,648/7,649, the single blank is the BUG-990 evidence row (reverts to `value` on its withdrawal, BUG-994).
+
+Receipt: `check_corroboration_bit.py` → `ok 7648/7648 re-derive exactly`; `check_store_columns.py --check` → `OWED debt 7 of ceiling 7 | census moves 0`.
+
+
+## 2026-10-24 — two remaining authority/citation reds discharged (no new bug; drift on dead/superseded artifacts)
+
+**verify_artifact_authority (was 2 RED).** `stage4_merge/t11/checkpoint_enriched_kindsafe.jsonl` (95 MB, declared
+`non_authoritative`, disposition "archive candidate; never a citation surface") drifted **29 bytes** at 11:16 today
+with NO MUTATION_JOURNAL entry — a mutation with no trace on a file no live stage reads (only two historical
+post-hoc repair scripts reference it, one with a fallback). It was structurally valid JSONL. FIX: performed the
+already-declared archive — moved to `knowledge pipeline/archive/checkpoint_enriched_kindsafe.jsonl.archived_20261024`
+— and recorded it in `ARTIFACT_AUTHORITY.json` (note field; the non_authoritative entry was kept as the disposition
+record, which the rail treats as an absent-file report, not RED). Receipt: `verify_artifact_authority.py` → `0 RED`.
+
+**verify_declared_inputs (was 1 RED).** `stage5_verify/rechunk-v4-20260929` fingerprint declared its S4 checkpoint at
+`ef77e346…`, but the checkpoint grew (hash `8ba362…`) because single-concept records (D-3130, e.g. "Planck's
+Constant Derivation" `c0d5b9b8…`) were appended and individually verified/committed (PASS/entail in the store).
+The store is CURRENT; the fingerprint is stale only because the checkpoint grew. FIX: recorded a C-3 acknowledgment
+in `config/verify_declared_inputs.yaml` (same declared-exception pattern as BUG-376), with owner gate = re-cite the
+fingerprint against the grown checkpoint or keep the declared exception. Receipt: `verify_declared_inputs.py` → `0 RED, 2 acknowledged move(s)`.
+
+**Remaining red: `check_undeclared_encoding` (T-114) — files 151/150, sites 385/384.** Pre-existing, tracked, and
+actively SHRINKING (was 161/156 on 2026-10-14). Shrink-only ceiling (D-2642) — `--record` refuses a raise, so the
+only path is declaring the 1 remaining undeclared text site's `encoding=` in code.
+
+## T-114 (CLOSED 2026-10-24) — undeclared-encoding debt is AT ceiling (files 150/150, sites 384/384)
+
+The over-ceiling site the prior entry named (files 151/150, sites 385/384) was the single undeclared text read in
+the boot sequence: `pipeline/status.py:57` (`count_jsonl` opened `path` with no `encoding=`). Declared
+`encoding="utf-8"` — the ONE route the shrink-only ceiling allows (declaring the encoding in code; `--record`
+refuses a raise, D-2642). Receipt: `python3 scripts/check_undeclared_encoding.py --check` → `OWED
+undeclared-encoding: files 150 of ceiling 150 | sites 384 of ceiling 384 | writes 74 of ceiling 74 |
+unresolvable 0 of ceiling 0` (EXIT 2 — at ceiling, not over). The 150 files / 384 sites that remain are OWED debt
+INSIDE the shrink-only ceiling, not a drift; further shrinkage is a low-priority future task, not a correctness gate.

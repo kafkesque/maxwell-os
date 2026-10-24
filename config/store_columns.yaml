@@ -67,7 +67,7 @@ columns:
   citation: {role: sparse, why: "non-blank 7,648/7,649 (720 distinct) - the single blank is the BUG-990 evidence row f523504e (QUARANTINE, vacuous), kept as evidence; `sparse` names it and it reverts to default `value` once that row is repaired (BUG-994)."}
   primary_source: {role: sparse, why: "non-blank 7,648/7,649 (968 distinct) - the single blank is the BUG-990 evidence row f523504e; `sparse` names it and it reverts to `value` on repair (BUG-994)."}
   source_authors: {role: sparse, why: "non-blank 7,634/7,649 (1,505 distinct) - the 15 single-concept rows (D-3130) are blank because source_provenance reads book identity but not the author list; `sparse` keeps that 15-row gap visible."}
-  source_diversity: {role: sparse, why: "non-blank 7,634/7,649 (94 distinct) - the 15 single-concept rows (D-3130) never pass S1.5 embed_cluster, so their cluster diversity is genuinely absent; `sparse` keeps that 15-row gap visible."}
+  source_diversity: {role: sparse, why: "MEASURED 2026-10-24 (BUG-989): non-blank 7,648/7,649 (94 distinct) - the value is DERIVED (== |source_ids|, D-2309/D-2993) and the 14 single-concept PASS rows were re-derived to 1 by scripts/repair_single_concept_diversity.py; the producer now writes it. The SINGLE remaining blank is the BUG-990 evidence row f523504e (QUARANTINE, vacuous), deliberately kept as evidence; `sparse` names it and it reverts to default `value` once that row is withdrawn (BUG-994)."}
   verifier_model: {role: state, population: s5_verified, outside: absent, why: "MEASURED 2026-10-12: ONE value inside the S5 tier (6,591/6,591 rows, distinct 1) - the pinned DeBERTa-v3-large NLI + threshold that judged those rows. RESHAPED 2026-10-12 (BUG-737, scripts/normalize_absent_shape.py): the 1,049 sidecar rows now carry a TRUE NULL, so count(verifier_model) reads 6,591 and can no longer claim a value on a row no verifier judged (D-2957). The manufacturing point is closed too: pipeline/stage6_commit.py now writes _safe_str(...) or None, so a new run cannot reintroduce the blank."}
   # ---- state: one value that IS this run's fact (a stamp or a genuinely single-state flag) ----
   provenance: {role: state, why: "constant 'llm_extracted_from_source' - the store is entirely LLM-extracted, which is a fact about this run and not a label"}
@@ -318,7 +318,7 @@ measured:
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 157
+      mentions: 158
       nonblank: 7649
       nonnull: 7649
       rows: 7649
@@ -360,7 +360,7 @@ measured:
     fb_id:
       distinct: 7649
       hollow: 0
-      mentions: 221
+      mentions: 222
       nonblank: 7649
       nonnull: 7649
       rows: 7649
@@ -402,7 +402,7 @@ measured:
     is_convergent:
       distinct: 2
       hollow: 0
-      mentions: 53
+      mentions: 54
       nonblank: 7649
       nonnull: 7649
       rows: 7649
@@ -570,14 +570,14 @@ measured:
     source_diversity:
       distinct: 94
       hollow: 0
-      mentions: 34
-      nonblank: 7634
-      nonnull: 7634
+      mentions: 36
+      nonblank: 7648
+      nonnull: 7648
       rows: 7649
     source_ids:
       distinct: 1477
       hollow: 0
-      mentions: 39
+      mentions: 40
       nonblank: 7649
       nonnull: 7649
       rows: 7649
@@ -605,7 +605,7 @@ measured:
     status:
       distinct: 2
       hollow: 0
-      mentions: 149
+      mentions: 150
       nonblank: 7649
       nonnull: 7649
       rows: 7649

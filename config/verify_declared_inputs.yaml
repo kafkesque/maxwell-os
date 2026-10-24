@@ -15,3 +15,12 @@ acknowledged_moves:
       S5 run completed, so the run's declared input no longer resolves and the verified image is gone
       from disk. Not a new defect; owner gate = re-verify (~1.3 h) or freeze the pair and cite it.
     ref: C-3
+  - fingerprint: "knowledge pipeline/stage5_verify/rechunk-v4-20260929/checkpoint.jsonl.input_fingerprint.json"
+    declared_input_sha256: "ef77e346c812ccf707b2457675a82d94cfdeaadb4ac8dc4b88df2018c8a2cb9f"
+    reason: >-
+      C-3 (2026-10-24): the stage4_merge rechunk-v4 checkpoint was EXTENDED (not destructively rewritten)
+      after the 2026-10-11 S5 run — single-concept records (D-3130, e.g. 'Planck's Constant Derivation'
+      fb_id c0d5b9b8..., PASS/entail) were appended and committed to the store, so the store is CURRENT
+      and the fingerprint's declared hash is stale only because the checkpoint grew. Not a data defect;
+      owner gate = re-cite the fingerprint against the grown checkpoint or keep this declared exception.
+    ref: C-3

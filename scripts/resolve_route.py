@@ -34,6 +34,7 @@ import hashlib
 import json
 import pathlib
 import re
+import shlex
 import sys
 from typing import Callable
 
@@ -258,6 +259,25 @@ def capability_faults(cap: dict, w: World) -> list[str]:
     return faults
 
 
+def _without_comments(body: list[str] | str) -> str:
+    """The recipe body with its `#` COMMENTS removed, so a MENTION can never be read as a RUN.
+
+    MEASURED 2026-10-25 (BUG-1014): a justfile comment that merely NAMED `pipeline/model_loadability_probe.py` made
+    lane_faults report that the lane's command "is ALSO run by the governed ladder recipe 'health'". The comment was
+    an explanation of WHY the rail was cheaper than a recollection, and it became a declaration that the lane was a
+    ladder rail — the BUG-838 limb-3 shape one register over ("the reader's own vocabulary may not declare a byte").
+    A FALSE RED is worse than an UNKNOWN (D-3150), and nothing may go quiet about a real overlap either, so a line
+    that cannot be tokenised is kept VERBATIM: the conservative direction for a rail is to still see it.
+    """
+    kept: list[str] = []
+    for line in (body if isinstance(body, list) else str(body).splitlines()):
+        try:
+            kept.append(" ".join(shlex.split(str(line), comments=True)))
+        except ValueError:
+            kept.append(str(line))
+    return "\n".join(kept)
+
+
 def lane_faults(lane: dict, w: World) -> list[str]:
     """ONE operator lane -> its two-sided claim: the command is STILL THERE, and it is NOT a ladder rail."""
     rid = str(lane.get("recipe") or "<no recipe>")
@@ -276,7 +296,7 @@ def lane_faults(lane: dict, w: World) -> list[str]:
         faults.append(f"lane {rid}: the recipe no longer carries {cmd!r} - the declaration outlived its subject")
     if cmd:
         for name in w.governed:
-            if name in w.recipes and cmd in w.recipes[name]:
+            if name in w.recipes and cmd in _without_comments(w.recipes[name]):
                 faults.append(f"lane {rid}: {cmd!r} is ALSO run by the governed ladder recipe {name!r} - its guard "
                               f"class belongs in config/rail_registry.yaml#guards, not in a lane (T-164)")
     faults.extend(_bare_form_faults(f"lane {rid}", cmd, w))
@@ -580,6 +600,22 @@ def selftest() -> int:
     f, _ = check_world(w)
     control("interpreter_form_needs_no_exec_bit", f, 0, "the OTHER direction: 562 tracked .py files carry a "
             "shebang and are not executable, so the declared 'python3 X' form must NOT require the bit")
+
+    lane = {"recipe": "lane_a", "cmd": "scripts/check_a.py --selftest", "produces": "reading", "why": "fixture"}
+    w = dataclasses.replace(synthetic(), recipes={
+        "lane_a": "    python3 scripts/check_a.py --selftest",
+        "health": "    echo ok   # scripts/check_a.py --selftest is run by a lane, never by this recipe"})
+    control("a_MENTION_in_a_COMMENT_is_not_a_RUN", lane_faults(lane, w), 0,
+            "MEASURED 2026-10-25/BUG-1014: a comment that merely NAMED a lane's command made this rail report that "
+            "the lane was a ladder rail - the mention acted as a declaration (BUG-838 limb 3, one register over), "
+            "and a FALSE RED is worse than an UNKNOWN (D-3150)")
+
+    w = dataclasses.replace(synthetic(), recipes={
+        "lane_a": "    python3 scripts/check_a.py --selftest",
+        "health": "    scripts/check_a.py --selftest"})
+    control("a_REAL_line_in_a_governed_recipe_IS_a_RUN", lane_faults(lane, w), 1,
+            "the other direction, unchanged: stripping comments must NOT hide a genuine ladder rail - a lane whose "
+            "command really runs in a governed recipe still has to move to rail_registry#guards (T-164)")
 
     w = synthetic()
     w.cfg["capabilities"][0]["cost_tier"] = "T9"

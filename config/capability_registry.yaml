@@ -374,10 +374,10 @@ lanes:
     capability: research_run
     why: 'what the detached runs are doing RIGHT NOW - a run outlives the session that started it (D-3020)'
   - recipe: model-loadability
-    cmd: pipeline/model_loadability_probe.py
+    cmd: python3 pipeline/model_loadability_probe.py
     produces: reading
     capability: model_fetch
-    why: 'whether the engine can actually serve a candidate; 2 = the engine refused it (owner-owed, loud)'
+    why: 'whether the engine can actually serve a candidate; 2 = the engine refused it (owner-owed, loud). BUG-842/T-146: declared in the INTERPRETER form because the file carries a shebang and is not executable - a bare path would need the exec bit, and a route that needs a mode is a route that breaks by accident'
   - recipe: engine-guard
     cmd: pipeline/omlx_engine_guard.sh
     produces: state

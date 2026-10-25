@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1277 decisions (census stamp 1c039bb1a211cf31, 2026-10-25) · 777 bugs (244 open / 533 closed; highest OPEN = BUG-1010) · 57 open tasks (MUST 9 / SHOULD 42 / WORTH 6; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1277 decisions (census stamp 1c039bb1a211cf31, 2026-10-25) · 779 bugs (245 open / 534 closed; highest OPEN = BUG-1015) · 57 open tasks (MUST 9 / SHOULD 42 / WORTH 6; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1277 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 657 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1277, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 244 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21664,3 +21664,85 @@ declared form still prints).
 **NOT a bug in the ladder itself.** `just health` never took this path; the whole-set measurement is unaffected.
 Recorded because the SAME reading surfaced it as surfaced BUG-1011: running the instrument by hand instead of
 describing what it would say.
+
+## BUG-1014 (MED - FIXED 2026-10-25) - `resolve_route.py` read a COMMENT as a RUN: a justfile comment that merely NAMED a lane's command turned the ladder RED
+
+**MEASURED.** The whole-set scan that measured this session's landing came back `worst rc=1 over 194 line(s)` with
+three faults. One of them:
+```
+FAIL route graph: 2 fault(s):
+  - lane model-loadability: 'pipeline/model_loadability_probe.py' is ALSO run by the governed ladder recipe 'health' - its guard class belongs in config/rail_registry.yaml#guards, not in a lane (T-164)
+```
+**It is not run by `health`.** `pipeline/model_loadability_probe.py` appears on exactly ONE ladder line —
+`justfile:602`, inside its own recipe `model-loadability` — and in the HEALTH recipe only inside a **comment** I had
+just written, explaining why the 2-second loadability read was cheaper than my recollection of a research row.
+
+**THE CAUSE.** `lane_faults` tested `cmd in w.recipes[name]` against the recipe body **as text**, so a mention and a
+command were indistinguishable. A comment acted as a declaration — the **BUG-838 limb-3** shape one register over
+("the reader's own vocabulary may not declare a byte"), and a **FALSE RED**, which **D-3150** says is worse than an
+UNKNOWN: rc=1 reads as "measured, and the tree is broken" and may not go quiet (C16/D-2983).
+
+**FIX.** `_without_comments()` tokenises each line with `shlex.split(..., comments=True)` before the overlap test, and
+a line it cannot tokenise is kept **VERBATIM** — a stripping step may never make a rail stop looking. Two controls,
+proved two-sided, 19 → **21**: `a_MENTION_in_a_COMMENT_is_not_a_RUN` (0 faults) and
+`a_REAL_line_in_a_governed_recipe_IS_a_RUN` (1 fault), so removing comments cannot hide a genuine ladder rail.
+
+**THE SAME READING FOUND A REAL DEFECT, AND THERE THE RAIL WAS RIGHT.** With the false positive gone, one fault
+remained: `lane model-loadability: it is written as a BARE path … but the file is not executable`. That is
+**BUG-842/T-146** exactly — 562 tracked `.py` files carry a shebang and are not executable, so a declaration written
+in the bare form demands a mode bit nobody set. Fixed in `config/capability_registry.yaml` by declaring the
+INTERPRETER form, `python3 pipeline/model_loadability_probe.py`, which is the form every other capability uses.
+**Two faults, two different kinds: one where the instrument was wrong, one where the instrument was right.** Both
+had to be read before either could be classified — which is D-3149 clause 5 applied to a rail's own output.
+
+**ALSO FROM THE SAME SCAN (recorded so the numbers do not look like drift).** `check_config_defaults` reported
+`counts.modules: recorded 646 -> measured 647` and `tests/test_config_defaults_census_spec.py::test_the_receipt_equals
+_the_measurement` failed on `assert 646 == 647`: **one new module** (`scripts/check_model_claims.py`) is a new
+module. Re-recorded with the rail's own declared writer (`python3 scripts/check_config_defaults.py --record`), never
+hand-edited (D-2642). Not a bug — a consequence, and the rail named its own remedy, which is why it was a 2-second fix
+rather than a re-classification debate.
+
+**AND ONE SELF-INFLICTED FAULT WORTH KEEPING.** `check_silent_repair` refused this session's own new rail:
+`scripts/check_model_claims.py:180 repairs silently (replace) with no entry`. The rail read receipts with
+`errors="replace"` — a silent repair of bytes, C16/BUG-511 — and a substituted character could make a missing repo id
+look present, which would have turned an evidence check into a rubber stamp. Now strict, with
+`UnicodeDecodeError` reported as `UNREADABLE-EVIDENCE` rather than raised. **The rail caught the rail.** That is the
+whole argument for the ladder in one line.
+
+## BUG-1015 (MED - OPEN 2026-10-25) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and 428 ruff errors read as "✅ Audit complete"
+
+**MEASURED.**
+```
+$ /bin/sh -cu 'false | tail -5 >/dev/null'; echo $?
+0
+$ /bin/sh -cu 'set -o pipefail; false | tail -5 >/dev/null'; echo $?
+1
+$ python3 -m ruff check pipeline/ | tail -3
+Found 428 errors. [*] 179 fixable with --fix
+```
+`justfile:493` is `@python3 -m ruff check pipeline/ 2>&1 | tail -5`, inside recipe **`audit`** (line 489). A pipeline's
+status is its LAST command's, so that line reports `tail`'s 0 no matter what ruff found. `justfile:494`
+(`tools/delegate_safe.py`) then sets the recipe's own exit code, so there are **two** masking layers between a
+428-error lint result and the `✅ Audit complete` printed at `justfile:495`.
+
+**WHAT THIS IS NOT.** It is **not** on the health ladder — `audit` is a separate recipe, so no whole-set receipt is
+corrupted by it, and the 1048-second measurement is unaffected. It is a **false assurance in a recipe whose name is
+"audit"**: a human or an agent running `just audit` as a gate gets a green light from a check that cannot go red.
+
+**WHY IT IS NOT FIXED IN THIS LANDING.** Turning it into a gate today would make `just audit` red on 428 pre-existing
+findings, which is the TRUTH but not a fix — and this repository already has the right shape for exactly that
+situation: a **declared ceiling with shrink-only semantics**, which is how `check_silent_repair` reports
+`debt 13 of ceiling 13` rather than failing outright (C16/BUG-511), and how `check_config_defaults` reports
+`shadowed_declared: 300`. A gate that appears without its ceiling either blocks the owner or gets switched off — and
+a rail switched off is worse than one that is honest about being informational.
+
+**THE DECLARED FIX SHAPE (for whoever lands it).** (1) A receipt carrying the measured count and a declared ceiling,
+in the same form as `check_config_defaults`; (2) the ceiling may only SHRINK (a widened ceiling must be a named
+decision, not an edit); (3) the line stops being piped — the count is captured, printed, and compared, so no `tail`
+can absorb a status again; (4) two-sided controls: 1 finding above the ceiling is a FAULT, at-or-below is OWED/ok.
+**Nothing about this needs the owner's word to MEASURE** — the count is already known (428).
+
+**THE SAME READING FOUND A SECOND, SMALLER HOLE.** The lint rail covers `pipeline/` only; **`scripts/` is linted
+nowhere by the ladder**. `scripts/resolve_route.py` alone carries 6 findings (UP035, 3× UP037, B007, 2× E741, 2×
+F541), invisible because no ladder line looks there — the BUG-580 shape ("a directory no rail reads"). Reported, not
+fixed: it is the same decision as the ceiling above and belongs in the same landing.

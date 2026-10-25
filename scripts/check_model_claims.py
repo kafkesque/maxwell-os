@@ -164,7 +164,7 @@ def check_entry(entry: object, verdicts: list[str], decisions: set[str], researc
                 elif not held(path, repo):
                     faults.append("EVIDENCE-SILENT: " + str(evidence) + " does not name " + repo + " — a receipt"
                                   " that does not carry the subject it is cited for proves nothing about it")
-            except OSError as exc:
+            except (OSError, UnicodeDecodeError) as exc:
                 # An evidence file this rail cannot READ is a fault it must REPORT, never a traceback: a crash
                 # exits 1 with a stack, which reads as a broken rail rather than as a bad receipt (C16/D-3150).
                 faults.append("UNREADABLE-EVIDENCE: " + repo + " cites " + str(evidence) + " and the read failed ("
@@ -177,8 +177,14 @@ def check_entry(entry: object, verdicts: list[str], decisions: set[str], researc
 
 def scan(config: dict, decisions: set[str], research: set[str], root: Path = ROOT,
          exists: Callable[[Path], bool] = Path.exists,
-         held: Callable[[Path, str], bool] = lambda p, r: r in p.read_text(encoding="utf-8", errors="replace")) -> tuple[list[str], list[str]]:
-    """Return (faults, owner_owed_repo_ids) for the whole declared register."""
+         held: Callable[[Path, str], bool] = lambda p, r: r in p.read_text(encoding="utf-8")) -> tuple[list[str], list[str]]:
+    """Return (faults, owner_owed_repo_ids) for the whole declared register.
+
+    The receipt is read with STRICT decoding on purpose: `errors="replace"` is a SILENT REPAIR of bytes, and
+    `scripts/check_silent_repair.py --check` refused the first draft of this rail for exactly that
+    (`check_model_claims.py:180 repairs silently (replace) with no entry`, C16/BUG-511) - a receipt whose bytes
+    cannot be decoded must be REPORTED, and a substituted character could make a missing repo id look present.
+    """
     block = refused_block(config)
     served = served_now(config)
     faults: list[str] = []

@@ -5,6 +5,12 @@ run:
   singleton_lock_path: ".pipeline_runner.lock"  # BUG-602: pid lock, relative to pipeline_root (C12)
   preflight_timeout_sec: 90            # BUG-606: must exceed watchdog restart cycle (kill 10s + sleep 3s + RESTART_WAIT 30s ≈ 43s)
   python_bin: /Users/barn/miniforge3/bin/python3  # BUG-607: canonical stage interpreter. Bare "python3" drifted between shells (login zsh→conda base, non-login→framework 3.12) so S2 lost datasketch. Pin the full-dep-chain env (C12).
+  # BUG-1000 (2026-10-25): the modules a bare `python3` MUST be able to import before any NON-PYTHON surface
+  # (justfile ladder, git pre-commit hook) is allowed to run under it. The values are not a preference: they are
+  # the two measured failure modes of this exact bug — `yaml` refused `git commit` at RAIL 0, and `mcp` refused
+  # `just health` at line 20. scripts/resolve_python.sh reads this list and PROVES the pin against it, so a pin
+  # that points at an interpreter missing a dep is refused with a diagnostic instead of failing 40 rails later.
+  python_required_modules: [yaml, mcp]
 serving:
   # D-2936 (2026-10-11): SERVING INDEX SCOPE — scope must be enforced by the INDEX, not
   # only by a WHERE clause. The store holds every run ever committed (t11: 7855 rows,

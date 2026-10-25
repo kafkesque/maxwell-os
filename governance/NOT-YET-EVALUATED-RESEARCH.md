@@ -38,6 +38,7 @@
 | **R-12** | Prompt caching | Cache system prompts across calls | S4 | ~500 tokens saved per FB | ✅ **ANSWERED 2026-10-16 (BUG-872): the cache is LIVE and was never disproven** — byte-identical 2,616-token prefix, gemma-4-E4B cold 6.90 s → warm 0.16–0.39 s, `cached 2613/2616`, **25.01x** against a declared 5.0x bar, confirmed independently by `agent_context_probe --prefill-ab`. Two corrections the measurement forced: the cache is **PER-MODEL** (`cached = 0` on both Orniths), and the binding constraint is **PREFIX STABILITY**, not prefill throughput — one byte changed at the head converts a 0.16 s turn back into a 6.90 s one. The `2,000-token comparable floor` this row's stage relied on is **DISPROVEN** (gpt-oss-20b-Q8: 71.3 tok/s @ 2,677 vs 210 tok/s @ 50,082). |
 | **R-13** | Token-efficient prompt patterns | Systematic prompt optimization | All stages | 10-30% across pipeline | Requires per-stage analysis. |
 | **R-14** | Recursive Flint (40B-A2.5B MoE coding model) | Coding-agent MoE; 39.8B total / ~2.5B active, 256 experts (6+1 shared), 262K ctx, sliding-window 513 | Pipeline generator / agent loop | **Both target runtimes EXIST and are measured fast** (Ollama 87–115 tok/s on M5 Pro 64GB 4-bit; MLX conversion in `mlx-community/flint-mixed-3-4bit`) | ❌ **NOT ADOPTED 2026-10-25** — four blockers, each measured: (1) operating point is **temp 1.0 / top-p 0.95 / top-k 20**, a direct conflict with R7 (temp=0.0 on all generation scripts); (2) **tool calls fail without a constrained-decoding grammar** (41/85 failed in OpenCode with a community MLX build; 0/50 after adding a grammar — mlx-lm/OMLX has no grammar path); (3) Recursive's own fast engine `rec` (1.4–2.6× llama.cpp) **requires an M4 Pro/M5 Pro/M5 Max + ≥48 GB — this box is an M1 Max**; (4) community quality is **behind Qwen3.6-35B-A3B** and it **overthinks** (20K+ reasoning tokens). Full receipt below. |
+| **R-15** | Underdog Saluki 27B 1.0 (ConwayResearch) | 2-bit **IQ2-mix** requant of **Qwen3.8-27B** (base `ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF`), Apache-2.0, weight file **7.89 GB**, thinking switchable per request, optional vision add-on (`mmproj`, 0.6–0.9 GB) | Tool-calling / agent-loop **only** — never pipeline generation, classification or verification | **Ollama: YES, MLX: NO.** Ollama is supported through the card's own `ollama create` recipe and is stated as tested ("Ollama 0.40.4 on Apple silicon: chat, thinking and tool calling work"). MLX has **no** build: 9 hub repos match `saluki` and **none** is MLX; the bf16 dequant (`rty813/…-bf16`) exists but re-quantising it to MLX 4-bit returns the base model already served at 4-bit, because Saluki's whole contribution **is** the GGUF IQ2 recipe | ⏸️ **REFUSED TO DOWNLOAD 2026-10-25 — LANE LEFT OPEN, NOT CLOSED.** Five measured reasons: (1) **engine-ROLE-bound** (CORRECTED 2026-10-25 — see the correction block at the end of this section): Ollama **is** installed and running on this box (v0.40.11); its declared role is the **embedder**, while the generation pool is OMLX-only, so a generation role for it is a new role on a stack whose lifecycle is not governed as a generation engine; (2) **2-bit costs the axis Maxwell is most exposed on** (card's own: MuSR 67.5 vs 79.6, AIME 2025 79.2 vs 96.7, MBPP+ 78.0 vs 83.9); (3) the headline **88-vs-84 is the VENDOR's own 120-task set**, and the card concedes "120 tasks is a modest test", "a few tasks of any gap is run-to-run variation" and "about a fifth of parallel-call replies have small formatting slips"; (4) it **duplicates a served model** (`Qwen3.8-27B-MLX-4bit`, 15 GB measured) at LOWER precision, so D-3009's pool rule would demand a RETIREMENT to seat it; (5) **the instrument cannot see the claimed effect** — T-187's two-step fixture DOES grade argument values and name-drift, but on ONE fixture, and a 1-task instrument cannot resolve a 3-point gap on 120 tasks. **Its one genuine merit, recorded so it is not lost: it is temp-0-native** (card: thinking off, temperature 0 for tool calls), so unlike Flint (R-14) it does **NOT** conflict with R7. Full receipt below. |
 
 ---
 
@@ -421,3 +422,132 @@ reading on Maxwell's OWN eval set beats the incumbent for the specific role prop
 to be one that does not require R7 determinism. (c) If the hardware moves to an M4/M5 Pro/Max with ≥48 GB, `rec`
 becomes a candidate engine in its own right and should be evaluated separately from Flint. **Nothing is downloaded or
 promoted before (a) and (b) both speak (D-3058/D-3036).**
+
+---
+
+## 2026-10-25 — EVALUATION: Underdog Saluki 27B 1.0 (R-15) — Ollama/MLX availability, and whether it beats the local tool-calling roster
+
+**The question asked.** "Can Underdog Saluki be found in Ollama or MLX, and is it worth using for tool calling if it is
+better than any current local tool-calling LLM?"
+
+### 1. WHAT IT ACTUALLY IS (read off the hub, not recalled)
+
+`ConwayResearch/Underdog-Saluki-27B-1.0` — `library_name: gguf`, `pipeline_tag: text-generation`, `license:
+apache-2.0`, created 2026-10-08, last modified 2026-10-15, **549,535 downloads / 622 likes**. Three weight-adjacent
+files only: `Underdog-Saluki-27B-1.0-IQ2-mix.gguf` (7.89 GB), and two optional `mmproj-…-{F16,Q8_0}.gguf` vision
+projectors. Its tags are the claim under test: `tool-calling`, `function-calling`, `agents`, `2-bit`, `qwen3.8`.
+Base models declared: `Qwen/Qwen3.8-27B` and `ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF` — i.e. a **quantized derivative
+of the model this box already serves**, not a new model family.
+
+### 2. THE AVAILABILITY ANSWER — two different answers, and the difference is decisive
+
+| Runtime | Available? | Evidence |
+|---|---|---|
+| **Ollama** | **YES** | The card ships an `ollama create` recipe and states the test: *"Tested with Ollama 0.40.4 on Apple silicon: chat, thinking and tool calling work."* |
+| **MLX / OMLX** | **NO** | `GET /api/models?search=saluki` returns **9** repos; every one is `gguf`, `transformers`, or `ninfer`. **Zero MLX.** The one `transformers` hit (`rty813/…-bf16`, 160 downloads) is a dequant, not a runtime |
+
+**Why the MLX route is not merely "missing" but VALUE-DESTROYING.** Saluki's entire contribution is the **IQ2-mix
+quantization recipe** — its reason for existing is that a 27B at ~2 bits keeps tool calling. To reach MLX you would
+dequantise to bf16 and re-quantise to MLX 4-bit, which discards the recipe and reproduces **the base model this box
+already serves at 4-bit (`Qwen3.8-27B-MLX-4bit`, 15 GB measured)**. So: in OMLX it is either impossible or pointless.
+This is the opposite of Flint's shape (R-14), where MLX support existed and Ollama merely existed too.
+
+### 3. THE TOOL-CALLING ANSWER — better than the local roster? **UNPROVEN, and the instrument is why**
+
+Saluki's published numbers (vendor's own "Underdog Bench", 120 frozen BFCL-v4 tasks, thinking off, temperature 0):
+
+| Model | Size | Passed / 120 |
+|---|---|---|
+| Underdog Saluki 27B 1.0 | 7.89 GB | **88** (73.3 %) |
+| Qwen3.8-27B, full size | 54 GB | 84 (70.0 %) |
+| Bonsai 2 | 5.95 GB | 70 |
+
+A +4-task margin over its own full-size base. The card's own caveats are the strongest evidence against buying it:
+*"120 tasks is a modest test, and a few tasks of any gap is run-to-run variation"*, *"about a fifth of parallel-call
+replies have small formatting slips"*, *"clumsy"* is the shape community reviewers report. **A small formatting slip
+in a tool call is precisely the failure class this OS refuses** — a malformed call is a governed write that
+half-succeeds.
+
+**Against the local roster, no comparison is possible today, and that is the finding.** Maxwell has never measured
+tool-call **accuracy** for ANY served model. `scripts/measure_subagent_loop.py` (T-187) is the only instrument, and
+it is honest but narrow: it grades that step 2's argument equals the seed-derived key (`grade_two_step`: *"lookup_token
+keys … never used the seed-derived key"*), so it **does** catch wrong argument VALUES and therefore name-drift (the
+Flint failure, `path` vs `filePath`). But it is **one fixture**. A one-task instrument cannot resolve a 3-point
+difference on 120 tasks — the claimed effect size is below the instrument's resolution. So the honest sentence is:
+**Saluki is not measurably better than the served roster, because nothing here measures tool-call accuracy at a
+resolution that could say so.**
+
+### 4. THE HIDDEN CONFLICT — what adopting it would actually cost (the future tax)
+
+1. **A SECOND INFERENCE ENGINE.** Ollama is not installed on this machine (`command not found`); the declared engine
+   is OMLX (`config/engine.yaml#name: omlx`, port 11435). Adopting Saluki means installing and living with a second
+   engine. `pipeline/memory_guard.py` measures **host-wide** `psutil.virtual_memory().available`, so a second resident
+   model is *not* invisible to the memory guard — that one cascade is genuinely contained. But the **lifecycle** is
+   not: `pipeline/omlx_engine_guard.sh` manages OMLX only, so a second engine would have no boot guard, no
+   adaptive eviction, and no retirement discipline (BUG-808: *"a name that lies"*).
+2. **PROVENANCE LOSES ITS SUBJECT.** R14 stamps `gen_model` + `pipeline_commit`. The SAME model name served by TWO
+   engines can produce different outputs (different quant, different sampler defaults, different template). The stamp
+   would still resolve — but no longer re-produce. Under D-3034 (a declaration must RESOLVE) that is a degraded
+   receipt, not a broken one — which is exactly the kind of quiet drift this OS exists to refuse.
+3. **THE POOL RULE BITES.** D-3009: *"a DOWNLOAD is paired with a RETIREMENT when the pool is full."* Seating a
+   2-bit copy of a model already resident at 4-bit means retiring the **better** copy for the **worse** one, to gain
+   a tool-calling margin that is not measurable here.
+4. **NO R7 CONFLICT — recorded because it is real.** The card's fast-tool-call setting is *thinking off, temperature 0*,
+   which is **compatible** with the temp=0.0 iron rule. This is the one axis on which Saluki is strictly better
+   positioned than Flint, and it is why the lane is left OPEN rather than closed.
+
+### 5. VERDICT — DO NOT DOWNLOAD. Registered as R-15, §lane OPEN, model REFUSED.
+
+- **Ollama**: works, and is the only route. **MLX/OMLX**: does not exist, and converting the bf16 dequant would
+  reproduce a model already served — so there is nothing to gain on this engine.
+- **Worth it for tool calling?** Not on today's evidence: the margin is a vendor self-measurement inside run-to-run
+  noise, purchased with a 2-bit accuracy cut on the reasoning axis (MuSR −12.1, AIME −17.5), paid for with a second
+  engine and a retirement of the 4-bit incumbent.
+- **What would actually change the answer is an INSTRUMENT, not a download:** widen T-187 from one fixture to a
+  task-family battery (distractor, parallel-call formatting, argument-NAME trap, enum-arg trap). That instrument is
+  engine-agnostic and settles Saluki, Flint and every future candidate at **zero GB**.
+
+**RE-OPEN CONDITIONS (all must be re-measured, never assumed).** (a) An MLX build of the **IQ2 recipe** (not a 4-bit
+re-quant) appears, **or** OMLX gains a GGUF/llama.cpp route so the engine stays single. (b) T-187 widens to a
+task-family battery **and** Saluki beats the best served model on it at temp=0. (c) A tool-calling role is declared
+that does not sit in the governed-write path, so a "small formatting slip" cannot corrupt a store write. **Nothing is
+downloaded or promoted before (a) and (b) both speak (D-3058/D-3036).** D-3009's earlier "REFUSE (no model_type: not
+an MLX repack)" is hereby **confirmed and superseded in scope**: the observation stands, the refusal was scoped to the
+resident pool, and this row is the wider question the owner asked (D-3038: what we reject we register, with reason).
+
+### 6. CORRECTION (2026-10-25, measured after the first write-up) — the §4/§5 engine objection was WRONG, and it was wrong by the very bug this session fixed
+
+**What I claimed and what is true.** The first write-up of §4/§5 said *"Ollama is not even installed here —
+`command not found`"* and priced adoption as *"installing a second engine"*. That was **FALSE**, and it was produced by
+exactly the defect BUG-1000 names: I probed with a bare `ollama` name, which is resolved by PATH ORDER, and this
+shell's PATH did not contain `/usr/local/bin`. Measured properly:
+
+- `curl -s http://127.0.0.1:11434/api/version` → `{"version":"0.40.11"}`
+- `/usr/local/bin/ollama -> /Applications/Ollama.app/Contents/Resources/ollama` (installed, 71.9 MB binary)
+- `python3 pipeline/status.py` → `Services: OMLX ✅ | Ollama ✅`, `Versions: OMLX 0.7.2 | Ollama 0.40.11`
+- `python3 scripts/guard_stacks_single_source.py` → `✅ Single-source invariant holds for all stacks: ollama, omlx`
+
+So Ollama is not a hypothetical second engine: it is an **already-installed, already-running, already-declared stack**
+whose single-source invariant the repository already guards. A bare-name probe answered a question about a SERVICE
+using a fact about a shell — the identical shape as `python3` answering a question about an interpreter. **The lesson
+is general and is the reason this correction is recorded rather than quietly edited: on this box, "not found" is a
+claim about PATH, not about existence, and it must never be written down as the latter.**
+
+**What the correction does to the verdict — one blocker weakens, none fall.** The objection is no longer "a new
+engine must be installed"; it is **"a new ROLE on an existing engine whose lifecycle is not governed for it"**:
+
+- The engine POOL is OMLX's: `/health` reports `engine_pool {model_count: 8, loaded_count: 2, final_ceiling:
+  46822972304, current_model_memory: 16959830621}`. A model resident **in Ollama** is invisible to that pool's
+  accounting and its adaptive eviction — the *host* memory guard (`psutil.available`) would see the bytes, but the
+  thing that decides WHICH model to evict would not. That is the cascade, and it is sharper than the original claim,
+  not softer.
+- Ollama's declared role is the **embedder** (`bge-m3`, 512d — D2190/D2196/D2202). Promoting it to a generation role
+  is a role change on a shared stack, which needs its own decision, not a download.
+- Blockers (2) 2-bit accuracy, (3) vendor self-benchmark inside run-to-run noise, (4) duplicate-of-a-served-model at
+  lower precision, and (5) instrument resolution are **untouched** by this correction.
+
+**Verdict unchanged: DO NOT DOWNLOAD.** R-15 stays §lane-OPEN, model-REFUSED, and re-open condition (a) is now
+narrower and more honest: it is not "get an MLX build" alone, it is **"declare a governed generation role for the
+Ollama stack (its own pool accounting and eviction), AND widen T-187 past one fixture, AND beat the served roster on
+it at temp=0"**. Until all three speak, a 7.89 GB 2-bit duplicate of a model already served at 4-bit buys a margin
+this machine cannot measure.

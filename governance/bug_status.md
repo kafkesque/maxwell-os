@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**253 open** / 511 closed of 764 ids.
+**253 open** / 512 closed of 765 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -259,4 +259,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-992 | (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row | 1 |
 | BUG-993 | (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the | 1 |
 | BUG-999 | (MED — OPEN 2026-10-24) — the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the | 1 |
-| BUG-1000 | (MED — OPEN 2026-10-25) — the justfile ladder and the git pre-commit hook still call bare `python3`, so a fresh shell fails on the WRONG | 1 |
+| BUG-1001 | (LOW, OPEN 2026-10-25) — `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a | 1 |

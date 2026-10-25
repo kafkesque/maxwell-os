@@ -1,6 +1,19 @@
 # Maxwell OS v3.0 — justfile
 # Authority: CONSTITUTION.md §6
 
+# ── Interpreter (BUG-1000) ──────────────────────────────────
+# EVERY line in the ladder below shells a bare `python3`, and a bare NAME is resolved by PATH ORDER — which
+# differs between shells on one machine (login zsh → conda base, non-login → framework 3.12). MEASURED
+# 2026-10-25: under /opt/homebrew/bin/python3 the ladder died at line 20 with `No module named 'mcp'`; under
+# /usr/bin/python3 `git commit` died at RAIL 0 with `No module named 'yaml'`. Both refusals were for the WRONG
+# reason — the rails were fine, the interpreter was not (BUG-607's class, on the surface D-2745 never covered).
+#
+# THE FIX IS ONE EXPORT, NOT 193 EDITS. Prepend the directory of the interpreter this repository ALREADY pinned
+# (config/pipeline_config.yaml#run.python_bin — the same key pipeline/runner.py reads, so there is still ONE
+# home for it). scripts/resolve_python.sh PROVES the pin can import what the rails need before naming it; if it
+# cannot, the backtick fails and `just` aborts the WHOLE file with the diagnostic — never a silent fallback (C16).
+export PATH := `sh scripts/resolve_python.sh --dir` + ":" + env_var_or_default("PATH", "")
+
 # ── Health ───────────────────────────────────────────────────
 health:
     @echo "=== Maxwell OS v3.0 Health Check ==="

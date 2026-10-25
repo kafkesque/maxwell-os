@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1270 decisions (census stamp db5e208e69b6a38e, 2026-10-25) · 764 bugs (253 open / 511 closed; highest OPEN = BUG-1000) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1271 decisions (census stamp 8914497b2201aef5, 2026-10-25) · 765 bugs (253 open / 512 closed; highest OPEN = BUG-1001) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1270 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 650 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1270, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1271 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 651 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1271, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 253 open.
+> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 253 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20981,3 +20981,79 @@ DECLARED once and read by both surfaces, exactly as D-2745 did for the runner: a
 failing closed with a diagnostic that NAMES the interpreter when a rail's module is missing, rather than surfacing the
 raw `ModuleNotFoundError`. **RE-OPEN/CLOSE CONDITION:** a fresh shell with `PATH=/usr/bin:/bin:…` runs `git commit` and
 `just health` green. **RED LOOP (D-3036):** `env -i PATH=/usr/bin:/bin HOME="$HOME" bash -lc 'cd <repo> && python3 scripts/check_repo_integrity.py'` must go RED now and GREEN after the pin.
+
+## BUG-1000 (MED, FIXED 2026-10-25) — ONE pin, PROVEN, no fallback: the justfile ladder and the git hook now resolve the interpreter through `run.python_bin` and refuse a pin that cannot import what the rails need
+
+**What was broken (measured 2026-10-25, unchanged from the OPEN report).** `justfile` (193 declaring lines) and
+`.git`'s pre-commit hook (5 rails) shelled a bare `python3`, so the interpreter was decided by PATH ORDER:
+`PATH=/usr/bin:/bin` → `git commit` died at RAIL 0 with `ModuleNotFoundError: No module named 'yaml'`;
+`PATH=/opt/homebrew/bin:/usr/bin` → `just health` died at line 20 with `No module named 'mcp'`. Both were refusals
+for the WRONG reason. D-2745 had pinned `run.python_bin` **inside `pipeline/runner.py` only**; the two surfaces
+outside the runner were never covered.
+
+**The remedy — three parts, one home (C12), no fallback (C16).**
+1. **`scripts/resolve_python.sh`** (new, POSIX sh — a Python resolver would need a correct interpreter first, which is
+   the chicken-and-egg that produced the bug). It reads `run.python_bin` from `config/pipeline_config.yaml` — the SAME
+   key `pipeline/runner.py` and `scripts/phase0_idempotency.py` read, so there is still ONE home — and then **PROVES**
+   the pin: (a) the key exists and names an executable file, (b) that interpreter can import every module named in
+   `run.python_required_modules`. It prints the binary (`--dir` for the directory to prepend to PATH) or exits 2 with
+   a diagnostic naming the key, the value, the modules, the interpreter's own error and the remedy.
+2. **`config/pipeline_config.yaml#run.python_required_modules: [yaml, mcp]`** — the two modules are not a preference,
+   they are the two measured failure modes of this exact bug, so they are declared rather than assumed (C12c).
+3. **Two one-line preludes instead of 198 edits:** `justfile` gained `export PATH := \`sh scripts/resolve_python.sh
+   --dir\` + ":" + env_var_or_default("PATH", "")`, and `scripts/install_git_hooks.sh#render_hook` gained
+   `PYDIR="$(sh scripts/resolve_python.sh --dir)" || exit 1` + `export PATH="$PYDIR:$PATH"`. **The hook's four
+   declared lines were left BYTE-IDENTICAL on purpose:** `config/rail_registry.yaml#commit_boundary.must_contain`
+   names them literally (`'python3 scripts/check_repo_integrity.py'` …), so rewriting them to `"$PY"` would have
+   turned that rail RED — a fix that breaks a checker is not a fix. The redirect-through-PATH form keeps both true.
+
+**TWO-SIDED RECEIPT (measured this turn, each line re-runnable).**
+- **The resolver's four controls, in an isolated copy so the live config was untouched:** pin lacks `mcp`
+  (`/opt/homebrew/bin/python3`) → **REFUSED**, `it said: ModuleNotFoundError: No module named 'mcp'`; pin names an
+  absent file → **REFUSED** `NOT executable`; pin ABSENT → **REFUSED** `refusing to guess an interpreter`; a good pin
+  written as a bare scalar instead of a list → **RESOLVED**. It also caught a real defect in itself while being
+  written: `[yaml, mcp]` parsed to `", yaml, mcp, "` and failed on a SyntaxError of its OWN making — a prover that
+  fails for its own reason is worse than no prover, so the list is now collapsed and trimmed.
+- **The hook loop, RED then GREEN on the SAME command** (`env -i PATH=/usr/bin:/bin HOME="$HOME" bash
+  <git-path hooks/pre-commit>`): OLD hook → `rc=1`, `ModuleNotFoundError: No module named 'yaml'`; NEW hook →
+  **`rc=0`**, `ok repo-integrity …`, `0 staged path(s), 0 RED`, `ok declaration consumers: 11 declared home(s), 14
+  consumer edge(s) all resolve`, `ok session plan`. `install_git_hooks.sh --check` → `ok git-hooks: the installed
+  pre-commit hook equals its re-derivation`.
+- **The ladder side, hostile PATH with no `/usr/local` and no conda:** `just --evaluate` now reports
+  `PATH := "/Users/barn/miniforge3/bin:/opt/homebrew/bin:/usr/bin:/bin"`, and the measured failure lines pass:
+  `check_repo_integrity.py` rc=0, `measure_extension_cost.py --selftest` rc=0 (6/6), `run_ladder.py --receipt-check`
+  rc=0.
+- **The pin was already there and is capable:** `/Users/barn/miniforge3/bin/python3` imports `yaml`, `mcp` AND
+  `mlx_lm` (measured) — so this fix does not create a third interpreter, it unifies the two stray surfaces onto the
+  one the repository had already declared.
+
+**SHADOWING CHECK (the cascade the one-line export could have introduced).** Prepending a conda `bin` to PATH can
+shadow system tools. Measured against `git curl sqlite3 openssl node npx sh bash awk sed grep rg tree docker deno
+ffmpeg`: **exactly one** is shadowed, `openssl` (conda's). No rail, script, justfile line or YAML invokes the
+`openssl` **CLI** — the only matches in the tree are SPDX licence identifiers inside `.venv_laya/lib/…/packaging/`.
+So the export is safe against the surfaces it governs.
+
+**WHAT THIS DOES NOT CLAIM.** It does not make a *wrong* pin right: if `run.python_bin` ever points at an interpreter
+missing a module, the ladder and the hook will now FAIL LOUDLY AT LOAD rather than 40 rails later — which is the
+correct behaviour and the point of the proof step. Re-open if a `python3`-shelling surface is added outside these two
+(launchd jobs, cron entries) **without** routing through the resolver; that surface would be the same bug in a new
+coat.
+
+## BUG-1001 (LOW, OPEN 2026-10-25) — `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a FALSE RED into the ladder receipt
+
+MEASURED 2026-10-25, two runs of the SAME tree on the same machine: `just health-full` (gate run, coverage
+b5e72575886da0d6) reported `FAULT rc=1 after 0.1s: python3 scripts/guard_stacks_single_source.py || exit 1`, and the
+line just above it read `- [omlx] port 11435: no listener (server down)`. **Re-run 90 s later, unchanged tree:
+`✅ Single-source invariant holds for all stacks: ollama, omlx`, rc=0.** OMLX was healthy both times it was asked
+directly (`curl 127.0.0.1:11435/health` → `{"status":"healthy", "engine_pool":{…"loaded_count":2…}}`), so the fault
+was a transient no-listener window — a model load/eviction or watchdog restart colliding with the probe.
+
+WHY THIS IS A BUG AND NOT NOISE. The receipt records "worst rc=1 over 193 line(s)" for that coverage fingerprint, so
+the NEXT `just health` reads a RED that the tree cannot reproduce — and `run_ladder.py --receipt-check` treats a
+recorded red as load-bearing. That is the BUG-375 shape in the other direction: a verdict derived from a check that
+could not resolve what it was checking. A rail whose subject is a LIVE PROCESS must either retry within a declared
+window or report UNKNOWN (owner-owed, rc 2), never FAULT on a single sample.
+
+NOT YET DIAGNOSED (deliberately): whether the blip was eviction, a watchdog restart, or the pool loading a model
+during the run. The remedy and any retry budget belong in one declared home (C12). Until then the observed rate is
+**1 in 3 full-ladder runs today** — a rate, not a repro, which is the honest label (D-3036).

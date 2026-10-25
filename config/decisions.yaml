@@ -32143,3 +32143,36 @@ decisions:
   - scripts/repair_single_concept_provenance.py
   - scripts/reverify_one_row.py
   - governance/MUTATION_JOURNAL.jsonl
+- id: D-3145
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: ENGINE / INTERPRETER PIN
+  title: a surface that shells a bare `python3` must resolve it through the ONE pin AND prove the pin — a path that
+    is named is not an interpreter that works
+  decision: 'BUG-1000. MEASURED 2026-10-25: the justfile ladder (193 declaring lines) and the git pre-commit hook
+    (5 rails) shelled a bare `python3`, so the interpreter was decided by PATH ORDER; PATH=/usr/bin:/bin refused
+    `git commit` at RAIL 0 (`No module named yaml`) and PATH=/opt/homebrew/bin:/usr/bin refused `just health` at
+    line 20 (`No module named mcp`). D-2745 had pinned run.python_bin inside pipeline/runner.py ONLY, so the pin
+    covered the STAGES and left every surface outside the runner uncovered. FOUR CLAUSES. (1) THE ONE-HOME CLAUSE:
+    there is ONE interpreter pin (config/pipeline_config.yaml#run.python_bin) and every surface reads THAT key —
+    a second copy of the path is the D-3136 shape (one rule, two homes, two truths). (2) THE PROVE-THE-PIN CLAUSE:
+    naming a file is not proving it. A pin is only satisfied when the named interpreter is EXECUTABLE and can import
+    the modules declared in run.python_required_modules; the two modules ([yaml, mcp]) are the two measured failure
+    modes of this bug, declared rather than assumed (C12c). (3) THE NO-FALLBACK CLAUSE: a pin that fails the proof
+    is REFUSED at LOAD with a diagnostic naming the key, the value, the modules and the remedy — never a silent
+    fallback to sys.executable or to PATH order, because a fallback is exactly how the ladder ran on the wrong interpreter
+    unnoticed (C16). (4) THE REDIRECT-NOT-REWRITE CLAUSE: the fix is applied by prepending the pinned DIRECTORY
+    to PATH once per surface (one `export` in justfile, one prelude in the installed hook), NOT by rewriting the
+    declaring lines — config/rail_registry.yaml#commit_boundary.must_contain names those lines literally, so a rewrite
+    turns that rail RED, and a fix that breaks a checker is not a fix. THE RESOLVER IS SHELL, NOT PYTHON: a Python
+    resolver needs a correct interpreter first, which is the chicken-and-egg that produced the bug. NOT DECIDED
+    HERE: what a FUTURE surface (launchd job, cron entry) must import; that surface routes through the same resolver
+    or it is this bug in a new coat.'
+  bugs:
+  - BUG-1000
+  files:
+  - scripts/resolve_python.sh
+  - config/pipeline_config.yaml
+  - justfile
+  - scripts/install_git_hooks.sh

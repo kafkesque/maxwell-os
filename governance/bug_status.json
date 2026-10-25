@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 764,
+  "total_ids": 765,
   "open_n": 253,
-  "closed_n": 511,
+  "closed_n": 512,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1269,8 +1269,8 @@
       "events": 1
     },
     {
-      "id": "BUG-1000",
-      "title": "(MED \u2014 OPEN 2026-10-25) \u2014 the justfile ladder and the git pre-commit hook still call bare `python3`, so a fresh shell fails on the WRONG",
+      "id": "BUG-1001",
+      "title": "(LOW, OPEN 2026-10-25) \u2014 `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a",
       "events": 1
     }
   ],
@@ -1785,6 +1785,7 @@
     "BUG-995",
     "BUG-996",
     "BUG-997",
-    "BUG-998"
+    "BUG-998",
+    "BUG-1000"
   ]
 }

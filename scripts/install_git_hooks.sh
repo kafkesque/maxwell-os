@@ -23,6 +23,15 @@ mkdir -p "$(dirname "$hook")"
 render_hook() {
 cat <<'HOOK'
 #!/usr/bin/env bash
+# BUG-1000 - the four rails below shell a bare `python3`, so the interpreter they get is decided by PATH ORDER.
+# MEASURED 2026-10-25: with PATH=/usr/bin:/bin the FIRST rail died on `No module named 'yaml'` and the commit
+# was refused for the WRONG reason. This prelude prepends the directory of the interpreter the repository already
+# PINNED (config/pipeline_config.yaml#run.python_bin) and PROVES it can import what the rails need; if it cannot,
+# the diagnostic names the key, the value and the remedy. THE FOUR DECLARED LINES STAY BYTE-IDENTICAL on purpose:
+# config/rail_registry.yaml#commit_boundary.must_contain names them literally, and rewriting them to "$PY" would
+# turn that rail RED - a fix that breaks a checker is not a fix, so this prelude keeps both true at once.
+PYDIR="$(sh scripts/resolve_python.sh --dir)" || exit 1
+export PATH="$PYDIR:$PATH"
 # RAIL 0 - refuse to commit THROUGH a repository whose git metadata a sync client has renamed (P0-A, BUG-400),
 # or whose git dir still sits inside a sync domain (BUG-500). Strict on purpose: exit 2 (owner-owed conflict
 # copies) also blocks, because a commit is the one act that makes a conflicted tree permanent.

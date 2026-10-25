@@ -156,7 +156,12 @@ services:
     # naming a version nothing runs is the BUG-623 stale-pin class. Rollback: /Applications/oMLX-0.7.0.app.
     # NOTE (D-3034): pinned_version has no runtime consumer (monitor_stacks gates on min_version) — this line
     # is documentation truth, not a gate. min_version 0.4.0 is unchanged.
-    pinned_version: 0.7.1rc1
+    # BUG-1006 (2026-10-25): the pin said 0.7.1rc1 while the INSTALLED AND SERVING bundle is 0.7.2 — bundle
+    # Info.plist 0.7.2, mtime 2026-10-21 10:41, server pid on 127.0.0.1:11435 started 2026-10-25 14:16. D-3120
+    # had DEFERRED 0.7.2, so the engine moved to a version no decision adopted (an app update, not a choice).
+    # A pin naming a version nothing runs is the BUG-623 stale-pin class its own comment names — so the pin is
+    # synced to what SERVES. The missing half is the ROLLBACK, not this line: see BUG-1006 and T-200.
+    pinned_version: 0.7.2
     # D-293: Lightning MTP drafter for Qwen3 adapters (+34-58% decode, lossless at
     # temp=0.0). Enabled per-model in ~/.omlx/model_settings.json; flag records intent.
     mtp_enabled: false

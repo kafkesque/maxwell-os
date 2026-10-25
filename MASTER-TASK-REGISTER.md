@@ -11,16 +11,17 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 769 bugs (245 open / 524 closed; highest OPEN = BUG-1002) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 770 bugs (245 open / 525 closed; highest OPEN = BUG-1002) · 56 open tasks (MUST 9 / SHOULD 42 / WORTH 5; OWNER-moved 1, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1275 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 655 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1275, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-200 | 🟡 WORTH | A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point | Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path |
 >
 > **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >

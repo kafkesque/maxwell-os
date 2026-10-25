@@ -2571,3 +2571,34 @@ tasks:
     closed set. The instrument must NAME which model each fixture fails, and a promotion into AGENT_LOOP_FAST /
     AGENT_LOOP_WORKHORSE stays refused until a candidate beats the incumbent across the WHOLE battery at
     temperature 0 (R7). No model is downloaded to run it: the served roster is the first population (0 GB).'
+- id: T-200
+  priority: WORTH
+  state: open
+  mover: owner
+  title: 'A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point does not yet exist'
+  source: 'governance/OWNER_STEPS_T200_20261025.md'
+  why: 'BUG-1006/D-3120. MEASURED 2026-10-25 by reading the vendor repo and this machine, not by assuming. D-3120 DEFERRED
+    the 0.7.2 upgrade with a declared trigger: "a commit touching base MLX decode/prefill or the chat-completions API
+    for Maxwell model families". The range v0.7.2...v0.7.3.dev2 is 58 commits and the trigger now FIRES: perf(m1)
+    speculative verify and long-context attention routes for applegpu_g13 (#4496) is the M1 generation this box runs,
+    plus a base mlx-lm bump, a thinking-path fix on the exact surface that spent 897 of 900 tokens on gpt-oss-20b, a
+    prefix-cache reporting fix on the cached_tokens accounting this repo already calls unreliable, and two engine-pool
+    memory fixes. So the deferral no longer holds BY ITS OWN TERMS and must be re-measured, not renewed. It is NOT
+    worth adopting blind: three quarters of the 58 commits are cluster/RDMA, MiniMax M3.1, DeepSeek v4, GLM5, VLM and
+    web UI, the build is a .dev, and a base-runtime bump can regress as easily as it gains. What makes it legitimate to
+    try is that the instrument already exists (the T-199 battery, 0 GB downloaded) and the decision rule is fixed
+    BEFORE the measurement. What does NOT exist is the return point: D-3120 preserved rollback as
+    /Applications/oMLX-0.7.0.app, that path is ABSENT on disk and names a version two behind the one serving, so
+    step 1 below creates it before anything is installed (BUG-1006). No new model is downloaded for any outcome: the
+    0.7.3.dev2 Flint serving does not move R-14 s decisive blocker, which is the absence of a grammar path.'
+  evidence: 'MEASURED 2026-10-25: installed and serving = 0.7.2 (bundle Info.plist 0.7.2, mtime 2026-10-21 10:41;
+    server pid 64933 listening 127.0.0.1:11435, started 2026-10-25 14:16). The declared pin said 0.7.1rc1 and is now
+    synced to 0.7.2 (BUG-1006). The T-199 battery baseline (governance/evidence/LOOP_BATTERY_20261025.json) was
+    measured WITH 0.7.2 serving, so it is the baseline for this A/B and cannot judge the upgrade itself. The 58-commit
+    range and the trigger candidates were read from the vendor tags via the GitHub compare API, not from memory.'
+  gate: 'Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path) - pipeline act; step 2 record the
+    baseline (the battery, today s receipt will do); step 3 install 0.7.3.dev2 and re-run the battery. THE DECISION
+    RULE IS FIXED IN ADVANCE: >10 percent better warm time on Qwen3-Coder or Qwen3.8-27B with no fixture lost =
+    adopt and record; flat within 10 percent = DO NOT adopt; any 4/4 model dropping to 3/4 = REVERT to the dated
+    0.7.2 bundle and register the regression. Exact commands, expected output and the "if it differs" branch for
+    every step are in governance/OWNER_STEPS_T200_20261025.md (D-3100).'

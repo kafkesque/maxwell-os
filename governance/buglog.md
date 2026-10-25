@@ -8,16 +8,17 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 769 bugs (245 open / 524 closed; highest OPEN = BUG-1002) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 770 bugs (245 open / 525 closed; highest OPEN = BUG-1002) · 56 open tasks (MUST 9 / SHOULD 42 / WORTH 5; OWNER-moved 1, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1275 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 655 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1275, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-200 | 🟡 WORTH | A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point | Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path |
 >
 > **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -21359,3 +21360,46 @@ this fix** - see the two-line receipt below, taken while the bug was live: `7478
 duplicate `76106 01:56 1:55.10 98.5`, both inside the same search. A rail that returns fast makes an orphan far
 less likely, but nothing yet NAMES the rail's own pid in a record, so a future hang is still only visible to
 `ps`. That half stays open as a separate, smaller act.
+
+## BUG-1006 (MED - OPEN 2026-10-25) - the engine's declared state has three homes that disagree, and the declared ROLLBACK does not resolve on disk
+
+**WHAT DISAGREES, each read directly today.** (1) **INSTALLED AND SERVING: 0.7.2** —
+`/Applications/oMLX.app/Contents/Info.plist` `CFBundleShortVersionString` = 0.7.2, plist mtime **2026-10-21 10:41**;
+the server is pid 64933 started **2026-10-25 14:16** listening on **127.0.0.1:11435** (`lsof -nP -a -p 64933 -iTCP
+-sTCP:LISTEN`). (2) **DECLARED PIN: 0.7.1rc1** (`config/pipeline_config.yaml#engine.pinned_version`). (3)
+**DECISION D-3120: `state: DEFERRED`** — the decision that said do NOT upgrade to 0.7.2, while 0.7.2 is what
+serves. (4) **DECLARED ROLLBACK: `/Applications/oMLX-0.7.0.app` — ABSENT on disk.**
+
+**WHY IT MATTERS (the future tax, not a tidiness complaint).** D-3120's whole safety argument is "rollback
+preserved". The rollback path it names does not exist, **and it names 0.7.0 — two versions behind the one that
+runs**. So a future A/B of any later version has **no declared return point at all**: the one act that makes an
+engine experiment reversible would first have to invent one. Second tax: the pin named a version nothing ran, which
+is exactly the **BUG-623 stale-pin class the pin's own comment names** — the comment predicted this failure and did
+not prevent it, because nothing reads the value.
+
+**FIXED HALF (this entry).** `pinned_version` is synced to **0.7.2** (what serves) with the reading above recorded
+beside it; the value still has NO runtime consumer, and that is stated rather than implied. The pin was
+documentation truth and now it is true documentation.
+
+**OPEN HALF.** A rollback that RESOLVES has to exist before any engine experiment is legitimate. Cheap and exact:
+copy the 0.7.2 bundle aside under a dated name and record THAT path (mover: pipeline, no owner word needed for a
+copy). Until then **no upgrade may be adopted**, only measured — which is what T-200 is for.
+
+**NOT A CLAIM.** Nothing here says 0.7.2 is worse or better than 0.7.1rc1 on this box; no A/B of 0.7.2 vs 0.7.1rc1
+exists, and the T-199 battery baseline (`governance/evidence/LOOP_BATTERY_20261025.json`, 2026-10-25) was measured
+with 0.7.2 already serving, so that baseline belongs to the CURRENT engine and cannot be used to judge the upgrade.
+
+## BUG-1006 (MED - FIXED 2026-10-25) - the engine's declared state has three homes that disagree, and the declared ROLLBACK does not resolve on disk
+
+**BOTH HALVES CLOSED THE SAME DAY.** (1) The **pin** now names what serves (0.7.2) with the reading beside it
+(`config/pipeline_config.yaml#engine.pinned_version`). (2) The **rollback** now RESOLVES:
+`cp -R /Applications/oMLX.app /Applications/oMLX-0.7.2-20261025.app`, verified — the path exists, `du -sh` 1.7 GB,
+and `plutil -extract CFBundleShortVersionString` on the COPY prints **0.7.2**, so the return point is the bundle
+that actually serves rather than a version two behind it. A rollback is only a rollback if it RESOLVES (D-3034);
+before this act the decision's whole safety argument rested on a path that was absent from disk.
+
+**WHAT REMAINS TRUE AND IS NOT A DEFECT.** D-3120 keeps `state: DEFERRED` and its *intent* still holds — nothing was
+adopted. What had drifted was its PREMISE (that 0.7.1rc1 runs), and the premise is now true again in the pin.
+The **supersession of the 0.7.2 question by 0.7.3.dev2 is registered, not assumed**: T-200 (mover: owner, WORTH)
+carries the 58-commit reading, the four commits that make D-3120's own trigger FIRE, and the decision rule fixed
+BEFORE any measurement. `pinned_version` still has no runtime consumer, and that is stated rather than implied.

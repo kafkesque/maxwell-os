@@ -21057,3 +21057,35 @@ window or report UNKNOWN (owner-owed, rc 2), never FAULT on a single sample.
 NOT YET DIAGNOSED (deliberately): whether the blip was eviction, a watchdog restart, or the pool loading a model
 during the run. The remedy and any retry budget belong in one declared home (C12). Until then the observed rate is
 **1 in 3 full-ladder runs today** — a rate, not a repro, which is the honest label (D-3036).
+
+## BUG-1001 (LOW, OPEN 2026-10-25, DIAGNOSIS CORRECTED the same hour) — the guard reports "server down" when its own PROBE is absent; it is NOT a transient engine blip and the earlier "1 in 3 runs" label was WRONG
+
+**CORRECTION, and it is the point of the entry.** The block above attributed the fault to a transient OMLX
+no-listener window and labelled it "1 in 3 full-ladder runs today". **Both claims are withdrawn.** The rail had
+already printed the answer on the line I read past:
+
+```
+- [ollama] lsof failed on port 11434: [Errno 2] No such file or directory: 'lsof'
+- [ollama] port 11434: no listener (server down)
+```
+
+`guard_stacks_single_source.py` probes with the **`lsof` CLI**, which lives at `/usr/sbin/lsof`. Two runs in a row
+faulted because the PATH used to exercise the ladder was `/opt/homebrew/bin:/usr/bin:/bin` — **without `/usr/sbin`**.
+Measured directly: same PATH → `lsof failed … no listener` for BOTH stacks; PATH with `/usr/sbin` appended →
+`✅ Single-source invariant holds for all stacks: ollama, omlx`, rc=0. OMLX and Ollama were answering `/health` and
+`/api/version` throughout, so nothing was down at any point.
+
+**The real defect, which is worth keeping open.** The rail turns TWO different facts — *"my probe could not run"* and
+*"the service is not listening"* — into ONE verdict line and ONE exit code. A missing probe is reported as a **dead
+service**. That is the BUG-375 shape exactly: a verdict derived from a check that could not resolve what it was
+checking. It is dangerous in the specific direction that matters here — a machine that loses `lsof` (or a
+container/minimal image, C26) would be told its engines are DOWN and act on that, when the truth is that the
+INSTRUMENT is missing. **Remedy (not applied, one declared home, C12):** a probe that cannot be executed must exit
+with a diagnostic naming the binary and searching PATH, and must NOT emit the "no listener" sentence; a retry budget
+is a separate question and is now NOT needed to explain this observation.
+
+**The second lesson (the one that made this a bug at all).** I read a fault line, inferred a cause from the subject
+(OMLX's health) instead of from the evidence printed underneath it, and wrote the inference down as a measurement.
+The correct act — reading the two `lsof failed` lines that were already in the log — would have cost one second.
+Recorded because it is the same class as the `which ollama` error in R-15: **a probe's absence is not a fact about
+the subject.**

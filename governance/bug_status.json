@@ -1271,7 +1271,7 @@
     {
       "id": "BUG-1001",
       "title": "(LOW, OPEN 2026-10-25) \u2014 `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a",
-      "events": 1
+      "events": 2
     }
   ],
   "closed": [

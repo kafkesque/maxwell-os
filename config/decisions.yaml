@@ -32413,3 +32413,50 @@ decisions:
   files:
   - scripts/run_ladder.py
   - justfile
+- id: D-3151
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: RAILS / INSTRUMENTS
+  title: a research claim about a model RESOLVES to an engine reading, never to a recollection - four propositions
+    are never one sentence, and what we refuse we register as a repo id plus a verdict that resolves
+  bugs:
+  - BUG-1011
+  decision: 'BUG-1011. MEASURED 2026-10-25: the agent told the owner "Flint is not available in oMLX" while R-14
+    in the research register already said both target runtimes EXIST and named the MLX conversion; the owner answered
+    with flint-OptiQ-4bit and flint-mixed-3-4bit, both real upstream (dl 138 and 1166). The drift was in the SUMMARY,
+    not in the record, so no amount of better record-keeping would have prevented it. Seven clauses. (1) FOUR PROPOSITIONS,
+    NEVER ONE SENTENCE: exists_upstream, bytes_local, servable-by-THIS-engine, and adoptable are four different
+    questions with four different readings; P1/P2 are existence claims, P3 is a byte claim, P4 is a statement about
+    ONE ENGINE BUILD, and the defect is collapsing them (BUG-808 was the same collapse inside the store: an entry
+    that reads as on disk is not on disk). (2) THE CHEAPEST HONEST READ WINS, AND THAT IS THE WHOLE ENFORCEMENT.
+    A discipline that costs more than its shortcut will not be kept; pipeline/model_loadability_probe.py answers
+    the availability question TIER-A with no download in ~2 s, so the truthful read is CHEAPER than the recollection.
+    The fix for research drift is therefore not a promise to be careful - it is making the true read the cheapest
+    action and making a verdict without it REFUSE. (3) A REFUSAL RESOLVES, AND WHAT IS REJECTED IS REGISTERED WITH
+    ITS REASON (D-3038 applied to models). config/engine.yaml#candidates.refused is the ONE home: a repo id (org/name
+    quoted exactly, never a sentence - D-3034), a refused_by that resolves to D-nnnn or R-nn, and a probe verdict
+    whose receipt EXISTS and NAMES that repo (D-405: a citation whose subject is absent is an assertion). (4) THE
+    VOCABULARY IS READ FROM THE INSTRUMENT, NEVER MEMORISED. The first declared verdict list omitted UNDETERMINED
+    and REPO_ABSENT; the very next probe returned UNDETERMINED for Saluki (GGUF-only, no model_type). The list was
+    then read from model_loadability_probe.py:174-187, and the instrument''s own docstring - which omitted both
+    words while emitting them - was corrected in the same landing. (5) NEVER IS OWNER-OWED, NOT A PASS. A refusal
+    made on judgement with no reading on file exits 2 and names itself. MEASURED the same day: two such entries
+    existed and each was settled by ONE probe rather than left owed. (6) A REFUSAL IS ABOUT A VERSION, NOT ETERNITY.
+    ARCH_UNSUPPORTED is a statement about the engine''s mlx_lm at a version: upstream mlx-lm gained mlx_lm/models/flint.py
+    on 2026-10-21 and this bundle ships 0.31.4.dev132, so an engine upgrade is the entire distance between ARCH_UNSUPPORTED
+    and LOADABLE_CANDIDATE. T-201 carries the re-open condition. (7) A WEAK REVIEWER''S FINDING IS ADJUDICATED,
+    NEVER APPLIED (R5 read one level down). The R5 review of this rail by gemma-4-E4B returned two findings; BOTH
+    were checked against the code and neither held (exists/held are if/elif, so both fault; the repo derivation
+    IS isinstance-guarded). The three real defects - a probe given as a bare string crashing on .get, an unreadable
+    receipt raising a traceback instead of a fault, and a register whose entries/verdicts were of the wrong CONTAINER
+    shape - were found by auditing the code the reviewer had already read. Delegation produces OPINIONS; only an
+    adjudicated reading produces a defect.'
+  files:
+  - config/engine.yaml
+  - scripts/check_model_claims.py
+  - governance/NOT-YET-EVALUATED-RESEARCH.md
+  - governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json
+  - governance/evidence/MODEL_AVAILABILITY_REFUSED_20261025.json
+  - pipeline/model_loadability_probe.py
+  - justfile

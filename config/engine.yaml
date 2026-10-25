@@ -331,3 +331,66 @@ candidates:
     # gemma-4-12B-it-qat-OptiQ-4bit RETIRED 2026-10-15 (T-139, D-3013): the worst measured non-27B
     # decode (13.4 tok/s) and its only live declarations were a REJECTED swap (D-2788) plus one R5
     # candidate slot. Entry and bytes are gone, so the name must not appear here.
+
+  # ── THE REFUSAL REGISTER (D-3038 applied to MODELS; D-3151) ────────────────────────────────────────────────
+  # WHAT WE REJECT WE REGISTER. A model Maxwell OS has considered and refused used to live ONLY in the prose of
+  # governance/NOT-YET-EVALUATED-RESEARCH.md, so nothing could check it and its verdict could drift freely in a
+  # summary - which is exactly what happened on 2026-10-25: the agent said "Flint is not available in oMLX" while
+  # R-14 itself said both runtimes EXIST and named the MLX conversion. The owner answered with two real repo names.
+  # MEASURED that day (governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json): both exist upstream, NEITHER's
+  # bytes are here, and NEITHER can be served by this engine (`ARCH_UNSUPPORTED`, model_type=flint absent from the
+  # bundle's 134-architecture mlx_lm). FOUR propositions were fused into one sentence; this block keeps them apart.
+  #
+  # THE RULE THIS BLOCK EXISTS TO MAKE CHECKABLE: a refusal is a REPO ID plus a VERDICT that RESOLVES to an engine
+  # reading, never a sentence (D-3034). `scripts/check_model_claims.py` refuses:
+  #   - a repo that is a bare name or a sentence (a model id is `org/name`, quoted exactly)
+  #   - a `refused_by` that does not resolve to a decision in config/decisions.yaml or a row in the research file
+  #   - a `probe.evidence` PATH that does not exist or does not hold that repo id (a citation whose subject is
+  #     absent is an assertion, D-405)
+  #   - a repo refused AND served_now at once (a contradiction is a fault, not a preference)
+  # and reports OWNER-OWED (loud, rc=2) for a verdict of NEVER: refused on judgement with no engine reading on
+  # file is a RECOLLECTION, and the honest cost of fixing it is one 2-second command:
+  #     python3 pipeline/model_loadability_probe.py <org/name>
+  # The vocabulary is DECLARED here so the rail holds no literal (C12).
+  refused:
+    # THE COMPLETE EMITTED VOCABULARY, read from the instrument (pipeline/model_loadability_probe.py:174-187), not
+    # from memory: a vocabulary that omits a verdict the instrument can emit is a blind spot wearing a rule's
+    # clothes (the first draft of this list omitted UNDETERMINED and REPO_ABSENT, and the very next probe run
+    # returned UNDETERMINED for Saluki — a GGUF-only repo whose config.json declares no model_type).
+    # NEVER is the register's own word for "refused on judgement, no engine reading on file": always OWNER-OWED.
+    verdicts: [LOADABLE_CANDIDATE, ARCH_UNSUPPORTED, NEEDS_FORK_RUNTIME, NO_MLX_WEIGHTS, EMPTY_REPO,
+               UNDETERMINED, REPO_ABSENT, NEVER]
+    entries:
+      # R-14. The four blockers are OPERATING-POINT / GRAMMAR / HARDWARE / QUALITY - none of them an existence
+      # claim. Its verdict here is about THIS ENGINE VERSION: upstream mlx-lm gained mlx_lm/models/flint.py on
+      # 2026-10-21 and this bundle ships 0.31.4.dev132, so an engine upgrade is the whole distance to loadable.
+      - repo: mlx-community/flint-mixed-3-4bit
+        refused_by: R-14
+        refused_because: 'four measured blockers: temp-1.0 operating point vs R7, no grammar-constrained decoding path, rec needs an M4/M5 Pro + >=48 GB, and quality behind Qwen3.6-35B-A3B'
+        exists_upstream: true          # dl 1166, 17.84 GB, model_type=flint, created 2026-10-22
+        bytes_local: false             # MEASURED: 12 K hub entry holding only README.md + refs/main
+        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json, date: '2026-10-25'}
+      # The owner's name, measured the day after it was published (created 2026-10-24, dl 138, 27.48 GB).
+      - repo: mlx-community/flint-OptiQ-4bit
+        refused_by: R-14
+        refused_because: 'same architecture and same four blockers as the mixed quant; a different quantisation of one refused model, not a new candidate'
+        exists_upstream: true
+        bytes_local: false             # not present in any of the seven locations searched
+        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json, date: '2026-10-25'}
+      # R-15. Refused to DOWNLOAD, lane left OPEN: the refusal is about serving it from THIS stack, and it is
+      # temp-0-native (card: thinking off, temperature 0), so unlike Flint it does NOT conflict with R7.
+      - repo: ConwayResearch/Underdog-Saluki-27B-1.0
+        refused_by: R-15
+        refused_because: 'engine-role-bound (Ollama is the declared embedder, the generation pool is OMLX-only), 2-bit costs the axis Maxwell is most exposed on, vendor-set headline, duplicates a served 27B at lower precision, and the 1-task instrument cannot resolve a 3-point gap'
+        exists_upstream: true
+        bytes_local: false
+        probe: {verdict: UNDETERMINED, evidence: governance/evidence/MODEL_AVAILABILITY_REFUSED_20261025.json, date: '2026-10-25'}
+      # T-139 / D-3013 / D-2788. The LOCAL entry and bytes are gone; the UPSTREAM repo still resolves (9.0 GB,
+      # 5536 downloads, fetch=OK) — which is the same three-axis distinction this register exists to keep. Its
+      # architecture is absent from the engine too, so the retirement removed a model this engine could not serve.
+      - repo: mlx-community/gemma-4-12B-it-qat-OptiQ-4bit
+        refused_by: D-3013
+        refused_because: 'RETIRED 2026-10-15: worst measured non-27B decode (13.4 tok/s); its only live declarations were a rejected swap (D-2788) and one R5 slot. Local entry and bytes removed; upstream repo remains fetchable.'
+        exists_upstream: true
+        bytes_local: false
+        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_REFUSED_20261025.json, date: '2026-10-25'}

@@ -474,7 +474,18 @@ def narrowing(recipe: str) -> str:
 
 
 def banner(recipe: str, full: str) -> int:
-    """Declare the ladder's own shape, in the ladder's own units, before any rail can abort the recipe."""
+    """Declare the ladder's own shape, in the ladder's own units, before any rail can abort the recipe.
+
+    `full` is the recipe that measures the WHOLE set, so it is not decoration: without it the banner can only say
+    "a red line hides the rest" and cannot say what to run instead. MEASURED 2026-10-25: `--banner health` with no
+    `--full` raised `TypeError: can only concatenate str (not "NoneType") to str` AFTER printing the first line, so
+    a hand-run of a declared mode produced a traceback - a crash reports nothing about the tree and reads as a
+    broken rail (C16/D-3150). It now REFUSES with the exact argument that fixes it.
+    """
+    if not full:
+        raise SystemExit("FAIL-CLOSED (ladder): --banner <recipe> also needs --full <whole-set recipe> - the banner"
+                         " names the run that measures EVERY fault, and a banner that cannot name it is decoration."
+                         " Try: python3 scripts/run_ladder.py --banner health --full health-full")
     lines = body(recipe)
     hard = [ln for ln in lines if "exit 1" in ln]
     print("ladder scan: `just " + recipe + "` reports a PREFIX - it stops at the FIRST non-zero line, and "
@@ -580,6 +591,14 @@ def selftest() -> int:
           all(TEMPLATE.search(ln) for ln in uncollectable("health")) and len(uncollectable("health")) >= 1,
           "MEASURED on the LIVE ladder: every line the census excludes really carries just-template syntax, so "
           "the exclusion is a fact about the interpreter and not a filter that hides work")
+    try:
+        banner("health", "")
+        banner_refused = False
+    except SystemExit:
+        banner_refused = True
+    check("a_banner_with_no_WHOLE_SET_recipe_REFUSES_instead_of_crashing", banner_refused,
+          "MEASURED 2026-10-25: `--banner health` with no --full raised TypeError AFTER printing its first line, "
+          "so a declared mode produced a traceback - a crash reports nothing about the tree (C16/D-3150)")
     try:
         body("__no_such_recipe__")
         refused = False

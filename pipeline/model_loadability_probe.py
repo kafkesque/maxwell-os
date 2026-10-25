@@ -20,6 +20,8 @@ TIERS
           NEEDS_FORK_RUNTIME   the checkpoint requires a runtime the engine does not ship
           NO_MLX_WEIGHTS       GGUF-only, or no MLX metadata in the shards
           EMPTY_REPO           declared weights are absent (the BUG-808 failure mode)
+          UNDETERMINED         config.json declares no model_type, so no architecture question can be asked
+          REPO_ABSENT          the hub answers 404/403: a name that resolves to nothing (BUG-808's class)
     TIER-B (after a download, --tier-b): ask the running engine itself - /v1/models/status
         must list the model and /v1/models/{id}/load must succeed. TIER-A is a prediction;
         TIER-B is the fact.

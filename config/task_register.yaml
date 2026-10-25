@@ -2602,3 +2602,30 @@ tasks:
     adopt and record; flat within 10 percent = DO NOT adopt; any 4/4 model dropping to 3/4 = REVERT to the dated
     0.7.2 bundle and register the regression. Exact commands, expected output and the "if it differs" branch for
     every step are in governance/OWNER_STEPS_T200_20261025.md (D-3100).'
+- id: T-201
+  priority: WORTH
+  state: open
+  mover: pipeline
+  title: >-
+    RE-PROBE the two flint repos the moment the engine's mlx_lm reaches >=0.32.x - ARCH_UNSUPPORTED is a
+    statement about a VERSION, never eternity
+  source: 'BUG-1011 (D-3151)'
+  why: >-
+    BUG-1011/D-3151. MEASURED 2026-10-25 by the engine's own oracle, not by reading a card:
+    python3 pipeline/model_loadability_probe.py mlx-community/flint-mixed-3-4bit mlx-community/flint-OptiQ-4bit
+    -> ARCH_UNSUPPORTED for BOTH, "model_type=flint has no module in the engine's mlx_lm build", at mlx_lm
+    0.31.4.dev132 / 134 architectures. Upstream mlx-lm gained mlx_lm/models/flint.py on 2026-10-21, and the 58
+    commits of v0.7.2...v0.7.3.dev2 include `feat(flint): add native Flint serving` - both facts were ALREADY
+    recorded in governance/OWNER_STEPS_T200_20261025.md. So the trigger is not hypothetical and the distance to
+    LOADABLE_CANDIDATE is ONE engine upgrade, which is exactly the upgrade T-200 is A/B-ing. This task is
+    therefore not independent work: it is the re-probe that runs BEFORE and AFTER T-200's swap. A
+    LOADABLE_CANDIDATE verdict re-opens R-14 on its remaining THREE blockers (the temp-1.0 operating point vs R7,
+    the absent grammar-constrained decoding path, and rec needing an M4/M5 Pro) - it adopts nothing. No model is
+    downloaded by any outcome: TIER-A answers without weights.
+  evidence: 'governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json 2026-10-25'
+  gate: >-
+    RUN the probe on both repos before and after T-200's engine swap and record BOTH verdicts with their dates.
+    A flint repo becoming LOADABLE_CANDIDATE re-opens R-14 on blockers 1, 2 and 3, so a fresh recording decision
+    is required; a verdict still ARCH_UNSUPPORTED changes nothing and the dated register entry stands. Until this
+    runs, the register says ARCH_UNSUPPORTED AT 0.31.4.dev132 and nothing more. A verdict recorded without its
+    date is a recollection, and scripts/check_model_claims.py refuses it.

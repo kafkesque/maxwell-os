@@ -553,3 +553,55 @@ it at temp=0"**. Until all three speak, a 7.89 GB 2-bit duplicate of a model alr
 this machine cannot measure.
 | 2026-10-25 | **"gated on T-187" — the gate in five rows above now resolves to NOTHING, and this row says what replaced it** (found while re-deriving the declared next steps) | ⬜ **CORRECTED, NOTHING IN THE ROWS ABOVE IS RETRACTED. T-187 is CLOSED (state done, 2026-10-19)** — `scripts/measure_subagent_loop.py#run_two_step_model` landed, the full served-set run was recorded (`temp/subagent_loop_two_step_full_20261019.json`), and the promotion it gated was made by **D-3104** (AGENT_LOOP_SHORT = gpt-oss-20b-MXFP4-Q8). So every sentence above that says a candidate is "gated on T-187" is naming a referent that no longer exists (D-3034: a declaration must RESOLVE). What those rows were actually waiting for is the thing T-187 deliberately did not build: **one fixture ADMITS a model to a role, a BATTERY RANKS one.** R-15's own recorded limit is the proof — a 1-task instrument cannot resolve a 3-point gap on 120 tasks — and it is why `AGENT_LOOP_FAST` / `AGENT_LOOP_WORKHORSE` are still undeclared. **REPLACEMENT GATE: `config/task_register.yaml#T-199` (registered 2026-10-25, mover pipeline)** — four fixtures beyond the two-step one (distractor, parallel-call formatting, argument-NAME trap, enum-argument trap), each with a derived expected answer and a known-answer control, and promotion refused until a candidate beats the incumbent across the whole battery at temperature 0. **Nothing is downloaded to run it:** the served roster is the first population, 0 GB. The verdicts in the rows above are unchanged — R-14 (Flint) stays REFUSED for its temp-conflict with R7, R-15 (Saluki) stays §lane-OPEN / model-REFUSED on five measured reasons of which the instrument is only the fifth, and D-3061's "download nothing this cycle" stands on its own argument. | `config/task_register.yaml#T-199`; `config/task_register.yaml#T-187`; D-3058; D-3104 |
 | 2026-10-25 | **R-15 (Saluki): its re-open condition (b) now RESOLVES — the BATTERY exists and four served models pass it 4/4 — so the "instrument cannot see the claim" objection is retired; what it must now beat is measured** | ⏸️ **STILL REFUSED, on the two conditions that did not move.** The gate this row was waiting on was T-199, and T-199 is CLOSED the same day (D-3148): `scripts/measure_subagent_loop.py --battery` ran the whole served roster at temperature 0.0 — 8 models × 4 fixtures, 32 rows, `governance/evidence/LOOP_BATTERY_20261025.json`, **0 GB downloaded**. Four models passed 4/4 with WARM turns of **1.5 s (MiniCPM5-2B), 7.3 s (Ornith-35B), 14.7 s (Ornith-9B) and 15.8 s (Qwen3.8-27B)**; nothing on this roster failed a fixture except Phi-4-mini (0/4, the BUG-053 shape again) and gemma (distractor only). So the honest sentence is no longer "the effect is below the instrument's resolution" — it is "**Saluki would have to beat a 4/4 roster at 1.5–15.8 s warm, on this exact battery, at 2 bits, and its vendor margin (+4 tasks of 120 over its own base) does not survive that comparison being made at all**". Unchanged and still decisive: (a) **no MLX build of the IQ2 recipe** exists (9 hub repos, zero MLX) and dequantising to MLX 4-bit reproduces the 4-bit base already served; (c) **Ollama has no governed GENERATION role** — its declared role is the embedder, and a model resident there is invisible to the OMLX pool's accounting and adaptive eviction. The lane stays OPEN, the model stays REFUSED, and re-measuring it is now cheap instead of impossible: download nothing, run the battery. | `config/task_register.yaml#T-199`; D-3148; `governance/evidence/LOOP_BATTERY_20261025.json` |
+
+---
+
+## 2026-10-25 — CORRECTION TO R-14 (Flint): the row was RIGHT and the agent's SUMMARY of it was WRONG. Four propositions, four readings, never again one sentence.
+
+**What was said, and what is true.** The agent told the owner *"Flint is not available in oMLX."* The owner answered with
+two names — **`flint-Optiq-4bit`** and **`flint mixed 3 4bit`** — and asked how future market research would be enforced.
+**Both names are real upstream.** The R-14 row above already said so verbatim ("Both target runtimes **EXIST** and are
+measured fast", "a validated MLX conversion exists: `mlx-community/flint-mixed-3-4bit`"). The agent therefore **contradicted
+its own register from recollection** — the drift was in the summary, not in the record. That distinction is the whole point
+of this correction: a register that is right cannot defend itself against a reader who does not read it.
+
+**THE FOUR PROPOSITIONS.** One sentence fused them; each has its own reading, and only P4 is false. Durable receipt:
+`governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json`.
+
+| # | proposition | verdict | the reading that decides it |
+|---|---|---|---|
+| **P1** | `mlx-community/flint-mixed-3-4bit` **exists upstream** | ✅ **TRUE** | `curl -sS 'https://huggingface.co/api/models?search=flint&limit=100'` → repo present, **dl 1166**; probe → `fetch=OK`, **17.84 GB**, `model_type=flint`, created 2026-10-22, apache-2.0 |
+| **P2** | `mlx-community/flint-OptiQ-4bit` **exists upstream** (the owner's name) | ✅ **TRUE** | same read → repo present, **dl 138**, **27.48 GB**, created **2026-10-24** (one day old when the owner named it) |
+| **P3** | the **bytes** are on THIS machine | ❌ **FALSE — a name without bytes** | `du -sh ~/.cache/huggingface/hub/models--mlx-community--flint-mixed-3-4bit` → **12 K**, and `find` over it returns exactly two files: `blobs/cf7c7f09…` (the README) and `refs/main`. **No weights.** For scale, same command: `clef-4bit` 8.2 G, `MiniCPM5-2B-MLX` 1.3 G. `flint-OptiQ-4bit` is present in **none** of `~/.omlx/models`, `~/.cache/huggingface/hub`, `~/.lmstudio/models`, `~/models`, `~/Downloads`, `~/Documents`, `/Volumes` |
+| **P4** | oMLX can **serve** either today | ❌ **FALSE — measured twice** | (a) the engine's own oracle: **`ARCH_UNSUPPORTED` for BOTH**, *"model_type=flint has no module in the engine's mlx_lm build"* (`mlx_lm 0.31.4.dev132`, **134 architectures**); (b) the bundle itself: 135 files under `mlx_lm/models/`, **no `flint.py`**. `~/.omlx/models` holds 8 served models, flint not among them |
+
+**P3 and P4 are NOT existence claims, and P1/P2 are NOT servability claims.** R-14's four blockers are all P4-class
+(operating point, grammar path, `rec` hardware, quality) plus one adoption cost — none of them ever said the models do not
+exist. The project already owned the correct vocabulary and the agent did not use it: `MARKET_RESEARCH_20261015.md:88`
+distinguishes *"Already on disk (bytes), NOT yet served"*, and **BUG-808** records the **inverse** failure ("an entry that
+reads as on disk is not on disk"). BUG-808 and this event are **one defect**: collapsing a multi-state availability
+ontology into a binary.
+
+**TWO SECONDARY CORRECTIONS TO R-14 (both from live reads, neither changing the verdict).**
+1. R-14 says *"`flint` is **NOT** in its **118** model modules"*. Live oracle: **134** architectures. The number is stale;
+   a row carrying a count the instrument contradicts had not been re-measured, which is exactly the condition in which a
+   verdict silently outlives its evidence.
+2. R-14 presents the runtime absence as final. The distance is now **one upgrade**: upstream `mlx-lm` gained
+   `mlx_lm/models/flint.py` on **2026-10-21**, so the engine at `0.31.4.dev132` is **below** the `>=0.32.x` that would
+   resolve `flint`. P4 is therefore false **at this engine version**, not false in principle — and it becomes
+   `LOADABLE_CANDIDATE` the moment the engine's mlx_lm moves, which is precisely what **T-200** (the oMLX A/B) is holding.
+
+**WHY AN INSTRUMENT ALREADY ANSWERED THIS, AND WHY THAT IS THE ENFORCEMENT.**
+`python3 pipeline/model_loadability_probe.py <repo>` is **TIER-A, needs no download, runs in ~2 s**, and answers in the
+engine's own runtime with the vocabulary this question needs: `LOADABLE_CANDIDATE / ARCH_UNSUPPORTED /
+NEEDS_FORK_RUNTIME / NO_MLX_WEIGHTS / EMPTY_REPO`, with TIER-B for the post-download fact. **The honest read was cheaper
+than the recollection.** That is the principle earned here and registered as **D-3151**: *a discipline that costs more
+than its shortcut will not be kept — so the fix for research drift is not a promise to be careful, it is making the
+truthful read the cheapest action available, and making a verdict without it REFUSE.*
+
+**The rail that follows from it (one home, no fourth instrument).** `config/engine.yaml#candidates.refused` is now the
+**machine-readable refusal register** (D-3038, *what we reject we register*, applied to models), and
+`python3 scripts/check_model_claims.py` refuses any refusal whose verdict does not RESOLVE to an engine reading. A
+refusal recorded only as a sentence is a recollection; a refusal recorded as a repo id plus a resolvable probe verdict is
+evidence (D-3034). Nothing is downloaded and no candidate is re-opened by this correction: **R-14's refusal stands
+unchanged** — it is its *reason* that is now stated exactly.

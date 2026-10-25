@@ -1,0 +1,64 @@
+{
+  "schema_version": "1",
+  "subject": "the Flint claim - four propositions that ONE sentence 'Flint is not available in oMLX' fused into one",
+  "why_this_file_exists": "On 2026-10-25 the agent told the owner 'Flint is not available in oMLX'. The owner answered with two names, flint-Optiq-4bit and flint mixed 3 4 bit, and asked how future market research would be enforced. BOTH names are real upstream (readings below). The sentence was ambiguous and its most natural reading - an EXISTENCE claim - is FALSE. The record (R-14) had in fact said the opposite ('Both target runtimes EXIST', 'a validated MLX conversion exists'); the agent contradicted its own register from recollection. This file is the durable receipt so the four propositions can never be fused again, and so the honest read is CHEAPER than the recollection.",
+  "measured_at": "2026-10-25T17:5x+01:00",
+  "measured_from": "this machine, M1 Max, oMLX 0.7.2 (bundle /Applications/oMLX.app)",
+  "oracle": {
+    "engine": "oMLX",
+    "bundle_mlx_lm": "0.31.4.dev132+g94cdcae13",
+    "mlx": "0.32.4",
+    "architectures_implemented": 134,
+    "reading": "python3 pipeline/model_loadability_probe.py <repo> --json-out ... -> printed 'oracle: mlx_lm 0.31.4.dev132+g94cdcae13 / mlx 0.32.4 / 134 architectures (measured)'",
+    "note": "R-14 as written says '118 model modules'; the live oracle says 134. The count in the research row is STALE. The verdict it supported (flint absent) still holds, but a row carrying a number the live instrument contradicts had not been re-measured."
+  },
+  "propositions": [
+    {
+      "id": "P1",
+      "proposition": "mlx-community/flint-mixed-3-4bit EXISTS upstream as an MLX conversion",
+      "verdict": "TRUE",
+      "reading": "curl -sS https://huggingface.co/api/models?search=flint&limit=100 -> repo present, downloads 1166; probe: fetch=OK, 17.84 GB, model_type=flint, created 2026-10-22, licence apache-2.0",
+      "would_be_falsified_by": "the HF search returning no such repo id"
+    },
+    {
+      "id": "P2",
+      "proposition": "mlx-community/flint-OptiQ-4bit EXISTS upstream (the owner's name)",
+      "verdict": "TRUE",
+      "reading": "same HF search -> repo present, downloads 138, likes 2, created 2026-10-24; probe: fetch=OK, 27.48 GB, model_type=flint, licence apache-2.0",
+      "would_be_falsified_by": "the HF search returning no such repo id"
+    },
+    {
+      "id": "P3",
+      "proposition": "the BYTES of either are on THIS machine",
+      "verdict": "FALSE - name without bytes for flint-mixed; no entry at all for flint-OptiQ",
+      "reading": "du -sh ~/.cache/huggingface/hub/models--mlx-community--flint-mixed-3-4bit -> 12K, and find over it returns exactly two files: blobs/cf7c7f09... (the README.md) and refs/main. No weights. For scale on the same command: clef-4bit 8.2G, MiniCPM5-2B-MLX 1.3G. flint-OptiQ-4bit is present in NONE of ~/.omlx/models, ~/.cache/huggingface/hub, ~/.lmstudio/models, ~/models, ~/Downloads, ~/Documents, /Volumes (maxdepth 3).",
+      "what_this_does_NOT_say": "absence from those seven locations is NOT absence from the machine and NOT non-existence. It is a statement about where I looked.",
+      "would_be_falsified_by": "a weight file (.safetensors) resolving under either entry, or an eighth location holding one"
+    },
+    {
+      "id": "P4",
+      "proposition": "oMLX can SERVE either of them today",
+      "verdict": "FALSE - measured twice, by two independent readings",
+      "reading": "(a) the engine's own oracle: ARCH_UNSUPPORTED for BOTH repos, 'model_type=flint has no module in the engine's mlx_lm build' (mlx_lm 0.31.4.dev132, 134 architectures, measured 2026-10-25). (b) the bundle itself: ls /Applications/oMLX.app/Contents/Resources/Python/framework-mlx-base/lib/python3.11/site-packages/mlx_lm/models/ -> 135 files, NO flint.py. Also ~/.omlx/models holds 8 served models and flint is not among them.",
+      "what_this_does_NOT_say": "it does NOT say the models are fictitious, unavailable in principle, or unavailable on other engines. R-14 records Ollama 87-115 tok/s on an M5 Pro; upstream mlx-lm gained a flint.py on 2026-10-21, so an mlx-lm upgrade (>=0.32.x) is the whole distance between ARCH_UNSUPPORTED and LOADABLE_CANDIDATE.",
+      "would_be_falsified_by": "the probe returning LOADABLE_CANDIDATE for a flint repo, or flint.py appearing under the bundle's mlx_lm/models/"
+    }
+  ],
+  "the_drift_event": {
+    "what_was_said": "'Flint is not available in oMLX.'",
+    "what_was_true": "P4 is false. P1 and P2 are TRUE and were named by the owner; P3 is false.",
+    "mechanism": "A narrow measured proposition (P4, from R-14 blocker 2: no grammar-constrained decoding path) was spoken as a BROAD availability claim, and it was asserted from recollection of the research row rather than from a live read. The register itself was correct and already contained the correct vocabulary - MARKET_RESEARCH_20261015.md:88 uses 'Already on disk (bytes), NOT yet served', and BUG-808 records the INVERSE failure ('an entry that reads as on disk is not on disk'). Both failures are one defect: collapsing a multi-state availability ontology into a binary.",
+    "the_instrument_that_already_answered_it": "python3 pipeline/model_loadability_probe.py <repo> - TIER-A, no download, ~2 s, verdict vocabulary LOADABLE_CANDIDATE / ARCH_UNSUPPORTED / NEEDS_FORK_RUNTIME / NO_MLX_WEIGHTS / EMPTY_REPO, with TIER-B for the post-download fact. The honest read was CHEAPER than the recollection. That is the enforcement principle: a discipline more expensive than its shortcut will not be kept.",
+    "enforcement": "config/engine.yaml#candidates.refused is the machine-readable refusal register (D-3038 applied to models); scripts/check_model_claims.py refuses a refusal that carries no resolvable engine verdict."
+  },
+  "provenance": {
+    "probe_receipt": "temp/flint_probe.json (gitignored) - superseded by this file as the durable record",
+    "repair_commands_used": [
+      "python3 pipeline/model_loadability_probe.py mlx-community/flint-mixed-3-4bit mlx-community/flint-OptiQ-4bit --json-out temp/flint_probe.json",
+      "curl -sS 'https://huggingface.co/api/models?search=flint&limit=100'",
+      "du -sh ~/.cache/huggingface/hub/models--mlx-community--flint-mixed-3-4bit",
+      "ls -1 ~/.omlx/models",
+      "ls /Applications/oMLX.app/Contents/Resources/Python/framework-mlx-base/lib/python3.11/site-packages/mlx_lm/models/ | grep -i flint"
+    ]
+  }
+}

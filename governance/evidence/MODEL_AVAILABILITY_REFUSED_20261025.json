@@ -1,0 +1,43 @@
+{
+  "schema_version": "1",
+  "subject": "the refusal register's two judgement-only refusals, put to the engine's own oracle",
+  "why": "config/engine.yaml#candidates.refused requires every refusal to RESOLVE to an engine reading (D-3034). Two entries were registered with verdict NEVER because their refusals had been reasoned in prose only. TIER-A needs no download and takes ~2 s, so both were measured rather than left owed. The rail went from rc=2 (2 owed) to rc=0 after this receipt.",
+  "measured_at": "2026-10-25T18:0x+01:00",
+  "measured_from": "this machine, M1 Max, oMLX 0.7.2",
+  "command": "python3 pipeline/model_loadability_probe.py ConwayResearch/Underdog-Saluki-27B-1.0 mlx-community/gemma-4-12B-it-qat-OptiQ-4bit --json-out temp/refused_probe.json",
+  "oracle": {
+    "bundle_mlx_lm": "0.31.4.dev132+g94cdcae13",
+    "mlx": "0.32.4",
+    "architectures_implemented": 134
+  },
+  "rows": [
+    {
+      "repo": "ConwayResearch/Underdog-Saluki-27B-1.0",
+      "verdict": "UNDETERMINED",
+      "why": "config.json declares no model_type",
+      "gb": 9.46,
+      "downloads": 549535,
+      "likes": 628,
+      "licence": "apache-2.0",
+      "fetch": "OK",
+      "reading": "the repo is GGUF-only, so there is no MLX architecture to ask the engine about. This is R-15's 'MLX: NO' confirmed BY THE INSTRUMENT rather than by prose: the probe cannot reach LOADABLE_CANDIDATE because there is no MLX graph to implement. My first declared verdict vocabulary OMITTED UNDETERMINED, so the register could not have recorded this reading even if it had been taken.",
+      "does_not_say": "it does NOT say the model is bad, or that Ollama cannot run it - R-15 records that Ollama is its supported runtime (ollama create), which is why the lane was left OPEN."
+    },
+    {
+      "repo": "mlx-community/gemma-4-12B-it-qat-OptiQ-4bit",
+      "verdict": "ARCH_UNSUPPORTED",
+      "why": "model_type=gemma4_unified has no module in the engine's mlx_lm build",
+      "gb": 9.0,
+      "downloads": 5536,
+      "likes": 21,
+      "licence": "apache-2.0",
+      "fetch": "OK",
+      "reading": "the UPSTREAM repo still exists and is fetchable (9.0 GB, 5536 downloads) while the LOCAL entry and bytes were retired on 2026-10-15 (T-139/D-3013). Both statements are true at once and they are the SAME distinction this receipt exists to preserve: exists_upstream is not bytes_local is not servable. Its architecture, gemma4_unified, is ALSO absent from this engine's 134 architecture list - so the retirement removed a model this engine could not have served at its current version anyway.",
+      "does_not_say": "it does NOT reopen T-139. The retirement stands on measured decode (13.4 tok/s, the worst non-27B measured). This row only makes the refusal resolvable."
+    }
+  ],
+  "the_two_findings_this_sweep_produced": [
+    "The declared verdict vocabulary was INCOMPLETE: the instrument emits UNDETERMINED and REPO_ABSENT, and neither was declared. Fixed in config/engine.yaml#candidates.refused.verdicts, read from the instrument's own source (model_loadability_probe.py:174-187) rather than from memory.",
+    "The instrument's own DOCSTRING omitted UNDETERMINED and REPO_ABSENT while the code emitted them. Fixed in the same landing: a verdict a reader cannot learn from the header is a verdict that gets mis-transcribed."
+  ]
+}

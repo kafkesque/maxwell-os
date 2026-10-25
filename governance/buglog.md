@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1276 decisions (census stamp b782021f10ce7946, 2026-10-25) · 774 bugs (244 open / 530 closed; highest OPEN = BUG-1010) · 56 open tasks (MUST 9 / SHOULD 42 / WORTH 5; OWNER-moved 1, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1277 decisions (census stamp 1c039bb1a211cf31, 2026-10-25) · 777 bugs (244 open / 533 closed; highest OPEN = BUG-1010) · 57 open tasks (MUST 9 / SHOULD 42 / WORTH 6; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1276 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 656 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1276, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1277 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 657 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1277, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 244 open.
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-200 | 🟡 WORTH | A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point | Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path |
 >
-> **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 55 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -21549,3 +21549,118 @@ ok ladder scan: 192 line(s) RUN, 0 fault(s), 1048.0s
 **EPISTEMICS.** As with BUG-993: the FIX is not attributed here and is not claimed - the MEASUREMENT is. A recurrence reopens it with its receipt.
 
 **NOT RETIRED BY THIS.** The real lesson in this bug's history is BUG-573's prefix pathology (a red line hides every line after it), which is a property of the ladder and is untouched; and the "3 red contract tests are DECLARED and SHRINK-ONLY" debt is a declared red, not a fault, and still stands in `check_tests.py`'s own declaration.
+
+## BUG-1011 (MED - FIXED 2026-10-25) - the agent said "Flint is not available in oMLX" while R-14 itself said the MLX conversion EXISTS: four propositions, one sentence
+
+**WHAT WAS SAID, TO WHOM.** The agent reported "Flint is not available in oMLX." The owner answered with two repo
+names — `flint-OptiQ-4bit` and `flint mixed 3 4 bit` — and asked *"how should I trust in your future market research,
+how you enforce it to do it properly?"* **Both names are real.**
+
+**THE ROW WAS RIGHT; THE SUMMARY WAS WRONG.** R-14 in `governance/NOT-YET-EVALUATED-RESEARCH.md` already said, in
+its own words, *"Both target runtimes EXIST and are measured fast"* and *"a validated MLX conversion exists:
+`mlx-community/flint-mixed-3-4bit`"*. The drift was therefore not a research error at all — it was a reader
+contradicting the register it was citing. That distinction matters: **a register that is right cannot defend itself
+against a reader who does not read it**, which is why the remedy is a RAIL and not a promise.
+
+**MEASURED (all four readings in `governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json`).**
+
+| # | proposition | verdict | reading |
+|---|---|---|---|
+| P1 | `mlx-community/flint-mixed-3-4bit` exists upstream | ✅ TRUE | `curl -sS 'https://huggingface.co/api/models?search=flint&limit=100'` → present, dl 1166; probe `fetch=OK`, 17.84 GB, `model_type=flint`, created 2026-10-22 |
+| P2 | `mlx-community/flint-OptiQ-4bit` exists upstream | ✅ TRUE | same read → present, dl 138, 27.48 GB, created **2026-10-24** (one day old when the owner named it) |
+| P3 | their BYTES are on this machine | ❌ FALSE | `du -sh` the hub entry → **12 K**, holding only `blobs/cf7c7f09…` (the README) and `refs/main`. `flint-OptiQ-4bit` in **none** of `~/.omlx/models`, the HF hub, `~/.lmstudio/models`, `~/models`, `~/Downloads`, `~/Documents`, `/Volumes` |
+| P4 | this engine can SERVE them | ❌ FALSE, measured twice | probe → **`ARCH_UNSUPPORTED` for BOTH**, *"model_type=flint has no module in the engine's mlx_lm build"* (`mlx_lm 0.31.4.dev132`, 134 architectures); bundle read → 135 files under `mlx_lm/models/`, **no `flint.py`** |
+
+**THE MECHANISM.** A narrow measured proposition (R-14 blocker 2, the absent constrained-decoding grammar path) was
+spoken as a broad AVAILABILITY claim, and it was asserted from recollection of the row rather than from a live read.
+The project already owned the correct vocabulary and the agent did not use it: `MARKET_RESEARCH_20261015.md:88`
+distinguishes *"Already on disk (bytes), NOT yet served"*, and **BUG-808** records the INVERSE failure ("an entry that
+reads as on disk is not on disk"). BUG-808 and this bug are **one defect**: collapsing a multi-state availability
+ontology into a binary.
+
+**TWO SECONDARY DRIFTS INSIDE R-14 ITSELF, both found by live read.** (1) R-14 says `flint` is not in the engine's
+**118** model modules; the live oracle says **134** — a count the instrument contradicts is a row that has not been
+re-measured, which is exactly the condition in which a verdict outlives its evidence. (2) R-14 reads as if the runtime
+were absent in principle; upstream `mlx-lm` gained `mlx_lm/models/flint.py` on **2026-10-21**, so the engine at
+`0.31.4.dev132` is **below** the `>=0.32.x` that would resolve `flint`. **P4 is false at this engine VERSION** — an
+engine upgrade is the whole distance, which is precisely what T-200 is holding.
+
+**THE FIX — A RAIL, NOT A RESOLUTION TO BE CAREFUL (D-3151).**
+`python3 pipeline/model_loadability_probe.py <org/name>` is TIER-A, needs no download and runs in ~2 s. **The honest
+read was cheaper than the recollection**, so what is now enforced is the RESOLUTION:
+`config/engine.yaml#candidates.refused` is the machine-readable refusal register (D-3038 applied to models), and
+`scripts/check_model_claims.py` (23/23 controls) refuses a bare name, a `refused_by` that resolves to nothing, a
+measured verdict with no receipt, a receipt that does not NAME its subject, a receipt PATH that does not exist, a
+verdict outside the instrument's own vocabulary, a repo both refused and served, and a verdict with no date. It
+reports OWNER-OWED (rc=2) — never a pass — for a refusal made on judgement with no reading on file. MEASURED the same
+day: two such refusals existed (Saluki, gemma-4-12B OptiQ) and both were settled by one probe each rather than left
+owed. The rail was wired into the ladder selftest and check.
+
+**THE HONEST LIMIT.** The rail enforces the REGISTER. It cannot enforce a spoken summary — no script can. What it
+changes is that any sentence claiming a model's availability now has a **2-second checkable referent**, and the
+register that answers it is the engine's own oracle rather than my memory. **R-14's refusal stands unchanged**: it is
+the REASON that is now stated exactly. Nothing was downloaded and no candidate was re-opened.
+
+**RE-OPEN CONDITION.** T-201: if the engine's `mlx_lm` reaches `>=0.32.x` (T-200 is the upgrade being A/B'd), re-probe
+both flint repos. A `LOADABLE_CANDIDATE` verdict re-opens R-14 on its remaining three blockers, not on availability.
+
+## BUG-1012 (LOW - FIXED 2026-10-25) - the manual instruction was UNPASTEABLE: it carried prompt characters and a placeholder inside the block, so the owner's zsh produced six errors and the task LOOKED like a user mistake
+
+**WHAT THE OWNER SAW, verbatim.**
+```
+zsh: command not found: $
+zsh: unknown file attribute: 1
+error: No justfile found
+zsh: no matches found: line(s)
+zsh: command not found: $
+zsh: command not found: 0
+```
+**WHAT WAS WRONG (all four are the INSTRUCTION's defects, not the owner's).** (1) I printed `$ ` prompt characters
+inside a fenced block, so `$ /opt/homebrew/bin/just health` was executed WITH the dollar sign. (2) I included the
+placeholder `... (192 rails) ...` inside the same block, so zsh tried to glob `line(s)`. (3) `echo $?` and the
+expected receipt text were part of the paste, so the shell ran the expected OUTPUT as commands. (4) The owner's
+`CD` (uppercase) did not change directory — zsh is case-sensitive — so `just` ran in `~` and reported
+`error: No justfile found`.
+
+**WHY THIS IS A BUG AND NOT A NEW RULE.** **D-3100** already says a manual task is handed over NOOB-PROOF: the exact
+command, the exact file, the expected output, and the "if it differs, do this" branch. The instruction violated a
+decision that already existed, which is the exact class the owner named on 2026-10-18. The rule needed no minting;
+the VIOLATION needed recording.
+
+**THE FIX (the formation, not just this one instance).** A manual instruction is **ONE paste-safe command**: no prompt
+character, no placeholder, no ellipsis, no expected output inside the block. The expected output is stated SEPARATELY
+and marked **do not paste**. The directory is set inside the same command (`cd "…" && …`) so a not-taken `cd` cannot
+silently relocate the run. Re-issued in that form for this task, and applied to every manual step in this report.
+
+**THE GENERALISATION (earned, and it is D-3100's own logic one level out).** A handover that FAILS SILENTLY is worse
+than a handover that is obviously incomplete: the owner's paste produced an error message about `$` and about
+`line(s)`, none of which named the real fault, and the run appeared to fail for reasons the owner could not see. The
+face of a manual step is an INTERFACE, and an interface whose misuse produces irrelevant errors is a defect of the
+interface.
+
+## BUG-1013 (LOW - FIXED 2026-10-25) - `run_ladder.py --banner health` CRASHED on its own default: a declared CLI mode printed half a banner, then raised TypeError
+
+**MEASURED.** `python3 scripts/run_ladder.py --banner health` printed its first line and then died:
+```
+TypeError: can only concatenate str (not "NoneType") to str
+  File "scripts/run_ladder.py", line 483, in banner
+    print("ladder scan: for EVERY fault of this ladder in ONE run use `just " + full + "` (D-2680).")
+```
+`banner(recipe, full)` concatenates `full` unconditionally, and `full` is `None` unless `--full` is passed.
+
+**WHY IT SURVIVED.** The ladder itself always passes it — `justfile:20` calls
+`--banner health --full health-full` — so every automated path was green and the defect was reachable only by a
+human or an agent running the mode BY HAND. Found exactly that way, while verifying the census after a justfile
+edit. **A mode that only works with an argument its own help describes as optional is a trap for the next reader**,
+and the failure mode is the one D-3150 names: a crash prints a traceback, which reads as a broken rail rather than
+as an unmeasured tree.
+
+**FIX.** `banner()` now REFUSES with the exact argument that fixes it (C16 fail-closed) instead of raising:
+`FAIL-CLOSED (ladder): --banner <recipe> also needs --full <whole-set recipe> … Try: python3 scripts/run_ladder.py
+--banner health --full health-full`. Control added — **29/29** (was 28/28):
+`a_banner_with_no_WHOLE_SET_recipe_REFUSES_instead_of_crashing`, proved two-sided (the bare form refuses, the
+declared form still prints).
+
+**NOT a bug in the ladder itself.** `just health` never took this path; the whole-set measurement is unaffected.
+Recorded because the SAME reading surfaced it as surfaced BUG-1011: running the instrument by hand instead of
+describing what it would say.

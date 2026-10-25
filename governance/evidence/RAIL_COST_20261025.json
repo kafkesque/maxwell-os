@@ -1,0 +1,113 @@
+{
+ "schema_version": "1",
+ "measured_at": "2026-10-25T17:24:30+01:00",
+ "what": "per-declaring-line cost of `just health-full` (run_ladder --collect health) - the FIRST whole-set scan to record a green",
+ "coverage_fingerprint": "de045511f4523bf8",
+ "declaring_lines": 192,
+ "excluded_template_lines": 1,
+ "worst_rc": 0,
+ "wall_seconds": 1048.0,
+ "timed_lines": 158,
+ "sum_of_timed_seconds": 1031.0,
+ "top_costs": [
+  {
+   "seconds": 491.5,
+   "command": "scripts/lib/yaml_guard.py"
+  },
+  {
+   "seconds": 192.6,
+   "command": "scripts/check_tests.py"
+  },
+  {
+   "seconds": 66.6,
+   "command": "scripts/check_rail_mutations.py"
+  },
+  {
+   "seconds": 27.2,
+   "command": "scripts/check_boundary_rehearsal.py"
+  },
+  {
+   "seconds": 26.2,
+   "command": "pipeline/model_store_census.py"
+  },
+  {
+   "seconds": 24.6,
+   "command": "pipeline/model_store_sweep.py"
+  },
+  {
+   "seconds": 23.5,
+   "command": "scripts/check_store_columns.py"
+  },
+  {
+   "seconds": 17.7,
+   "command": "scripts/normalise_corpus_names.py"
+  },
+  {
+   "seconds": 17.3,
+   "command": "pipeline/model_store_census.py"
+  },
+  {
+   "seconds": 14.4,
+   "command": "scripts/reconcile.py"
+  },
+  {
+   "seconds": 13.7,
+   "command": "scripts/check_derivation_homes.py"
+  },
+  {
+   "seconds": 9.3,
+   "command": "scripts/check_agent_surface.py"
+  },
+  {
+   "seconds": 8.9,
+   "command": "scripts/check_agent_surface.py"
+  },
+  {
+   "seconds": 7.1,
+   "command": "scripts/check_bug_recall.py"
+  },
+  {
+   "seconds": 5.7,
+   "command": "scripts/check_revoked_references.py"
+  },
+  {
+   "seconds": 5.7,
+   "command": "pipeline/model_store_sweep.py"
+  },
+  {
+   "seconds": 5.6,
+   "command": "scripts/check_config_defaults.py"
+  },
+  {
+   "seconds": 5.1,
+   "command": "scripts/check_config_duplicate_keys.py"
+  },
+  {
+   "seconds": 4.8,
+   "command": "scripts/gov_sync.py"
+  },
+  {
+   "seconds": 3.7,
+   "command": "scripts/check_retired_names.py"
+  }
+ ],
+ "yaml_guard_breakdown": {
+  "standalone_real_seconds": 484.51,
+  "artifacts_scanned": 522,
+  "bytes_scanned": 316981567,
+  "backups_files": 348,
+  "backups_bytes": 312722202,
+  "backups_share_of_bytes_pct": 98.7,
+  "per_snapshot": {
+   "bytes": 1730000,
+   "safe_load_s": 1.29,
+   "duplicate_keys_s": 1.29,
+   "total_s": 2.58
+  },
+  "parses_per_artifact_per_run": 2,
+  "new_yaml_preimages_last_7d": 39,
+  "last_24h": 10,
+  "producer_dominant": "decisions.PRE_recompute_decision_summary (286 of 348)"
+ },
+ "source_file": "temp/health_full_20261025b.txt (gitignored; the numbers are restated here so the claim RESOLVES, D-3034)"
+}

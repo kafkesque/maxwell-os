@@ -32376,3 +32376,40 @@ decisions:
     two patterns were examined, only against this subject class.'
   files:
   - scripts/check_governance_faces.py
+- id: D-3150
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: RAILS / INSTRUMENTS
+  title: a declared line has ONE interpreter - a line the collector cannot run is EXCLUDED AND COUNTED, never reported
+    as a fault, because a FALSE RED is worse than an UNKNOWN
+  bugs:
+  - BUG-1008
+  - BUG-1007
+  decision: 'BUG-1008. MEASURED 2026-10-25: the first end-to-end `--collect health` recorded 1 fault and turned
+    the ladder from OWNER-OWED (rc=2) into FATAL (rc=1), because `run_lines` hands a declaring line to /bin/sh RAW
+    while `just` interpolates `{{...}}` first - `/bin/sh -cu ''{{just_executable()}} --list ...''` -> "syntax error
+    near `}}''", rc=2. Seven clauses. (1) ONE-LINE-ONE-INTERPRETER: a declaring line has as many execution semantics
+    as it has readers, and the census belongs to the READER THAT RUNS IT. (2) THE EXCLUSION IS COUNTED: what that
+    reader cannot run is excluded from the census AND REPORTED on every run, by both the banner and the collect
+    modes - a narrowed census that is reported is neither a blind spot nor a fault. (3) NO SECOND HOME FOR THE INTERPRETER:
+    re-implementing the ladder''s `{{...}}` expansion inside the collector is REFUSED (D-2642/C12); exclusion-plus-count
+    is the answer, and the coverage it loses is nil in substance because a justfile that does not parse cannot start
+    a recipe at all. (4) A FALSE RED IS WORSE THAN AN UNKNOWN: rc=1 asserts "measured, and the tree is broken" and
+    may not go quiet (C16/D-2983), so an INSTRUMENT''s own semantics gap must never be expressed as a fault of the
+    tree; rc=2 UNKNOWN is the honest state of "not measured". (5) EVERY FIX IS CHECKED AGAINST EVERY READER OF THE
+    LINE IT REWRITES: BUG-1003''s fix was correct for `just` and fatal for `--collect` on the same day, because
+    nothing asked who else reads the line. (6) A CHANGED CENSUS IS A NEW COVERAGE: the fingerprint moved 6cfdc8d9835ce2e6
+    (193) -> de045511f4523bf8 (192), so the old record is SUPERSEDED as evidence (D-2660), never deleted and never
+    read as a verdict about the new census. (7) MEASURE BEFORE CLASSIFYING - the BUG-1007 clause, learned against
+    my own title: "unbounded" was a hypothesis drawn from a 6:51 CPU snapshot, and a direct timing killed it with
+    `real 484.51 s, rc=0`; "unbounded" and "unbudgeted" have DIFFERENT remedies (a wall bound makes a slow rail
+    legible; a cost fix makes it short), so the class must be measured before the remedy is chosen. RECEIPTS: `run_ladder.py
+    --selftest` 28/28 controls fire (was 24); `--banner health` reports "192 declaring line(s) ... | 1 line(s) carry
+    just-TEMPLATE syntax ... excluded BY DECLARATION (BUG-1008)"; `--collect health` -> "RECORDED 192 declaring
+    line(s), worst rc=0 (coverage de045511f4523bf8)", "192 line(s) RUN, 0 fault(s), 1048.0s"; `--receipt-check`
+    -> MEASURED GREEN, rc=0. UNMEASURED SURFACES, stated: the exclusion is COUNTED but not PREVENTED - nothing forbids
+    a second template line, and nothing should; what is enforced is that its exclusion is reported.'
+  files:
+  - scripts/run_ladder.py
+  - justfile

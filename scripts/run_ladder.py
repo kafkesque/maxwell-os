@@ -73,6 +73,11 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 CFG = REPO / "config/rail_registry.yaml"
 SELF = pathlib.Path(__file__).name
 RECIPE = re.compile(r"^([A-Za-z0-9_-]+):")
+# BUG-1008 (MEASURED 2026-10-25): ONE line may carry `{{just_executable()}}` - a function the LADDER expands
+# BEFORE any shell exists. `--collect` hands every line to /bin/sh RAW, so that line was a SYNTAX ERROR
+# ("near unexpected token `}}'", rc=2) and the whole-set receipt recorded it as a FAULT - which turned
+# `just health` from OWNER-OWED (2) to FATAL (1) the moment the ladder was first measured end to end.
+TEMPLATE = re.compile(r"\{\{[^{}]*\}\}")
 EXIT_CLEAN, EXIT_FATAL, EXIT_OWED = 0, 1, 2
 Fault = tuple[str, int, float]
 RECEIPT_SCHEMA = "1"
@@ -92,13 +97,53 @@ def declared() -> tuple[str, list[str]]:
     return str(ladder), [str(r) for r in recipes]
 
 
+def shell_split(lines: list[str]) -> tuple[list[str], list[str]]:
+    """Split a recipe's lines by WHO CAN RUN THEM: (a shell can run it, only the LADDER can).
+
+    MEASURED 2026-10-25 (BUG-1008). The collector hands a declaring line to /bin/sh as WRITTEN, while `just`
+    interpolates `{{...}}` first, so ONE declared line has TWO execution semantics. `{{just_executable()}}`
+    reached the shell literally and died on "syntax error near unexpected token `}}'" (rc=2), and the first
+    end-to-end `--collect` recorded that as a fault of the LADDER - a false verdict about the tree produced by a
+    fact about the COLLECTOR (BUG-375/BUG-1001 class, one instrument over).
+
+    The census is therefore the set of lines a SHELL can run: a line only the ladder interpreter can run is
+    EXCLUDED from it and COUNTED. A narrowed census that is REPORTED is neither a blind spot nor a fault - and
+    the property such a line tests is entailed anyway, because a justfile that does not parse cannot start a
+    recipe at all. Re-implementing just's expansion here would be a SECOND home for just's semantics (D-2642),
+    so the exclusion is the answer and the count is its receipt.
+    """
+    return ([ln for ln in lines if not TEMPLATE.search(ln)], [ln for ln in lines if TEMPLATE.search(ln)])
+
+
+def parse_report(text: str, recipe: str) -> tuple[list[str], list[str]]:
+    """The declaring lines of ONE recipe, SPLIT BY WHO CAN RUN THEM - the ONE home of that split.
+
+    PURE, and read by BOTH the census the scan RUNS (`parse`) and the count the scan REPORTS (`uncollectable`),
+    so the reported narrowing cannot drift from the executed set (D-2642). The self-exclusion (a ladder that
+    collects itself would recurse) is applied FIRST, so a template line that invokes the collector stays dropped
+    for the older reason rather than being counted twice.
+    """
+    return shell_split([line for name, lines in recipes_of(text) for line in lines
+                        if name == recipe and SELF not in line])
+
+
 def parse(text: str, recipe: str) -> list[str]:
-    """The declaring lines of ONE recipe in a ladder's TEXT, in order, with only the call syntax removed.
+    """The SHELL-RUNNABLE declaring lines of ONE recipe, in order, with only the call syntax removed.
 
     PURE on purpose: the known-answer controls drive it on synthetic ladders, so the rule that decides WHICH
     lines are collected is testable without running the live ladder (and without writing a fixture).
     """
-    return [line for name, lines in recipes_of(text) for line in lines if name == recipe and SELF not in line]
+    return parse_report(text, recipe)[0]
+
+
+def uncollectable(recipe: str) -> list[str]:
+    """The lines of a DECLARED recipe that only the LADDER can run - consulted only to REPORT the narrowing.
+
+    Steps through `body`'s rejection first, so a recipe no declaration governs is refused here with the same
+    named refusal instead of quietly reporting zero exclusions (an empty answer is not a clean answer, D-405).
+    """
+    body(recipe)
+    return parse_report((REPO / declared()[0]).read_text(encoding="utf-8"), recipe)[1]
 
 
 def recipes_of(text: str) -> list[tuple[str, list[str]]]:
@@ -415,13 +460,26 @@ def receipt_lines(*, strict: bool) -> tuple[int, list[str]]:
     return rc, ["ladder receipt: " + message]
 
 
+def narrowing(recipe: str) -> str:
+    """The ONE sentence that reports how the shell census narrows a recipe - empty when nothing is excluded.
+
+    BUG-1008: an exclusion that is not reported is a blind spot; this sentence is its receipt. It is emitted by
+    BOTH modes (the banner and the scan) so the count a reader sees before the run is the count the run honoured.
+    """
+    excluded = uncollectable(recipe)
+    if not excluded:
+        return ""
+    return (" | " + str(len(excluded)) + " line(s) carry just-TEMPLATE syntax, so the LADDER runs them and the "
+            "shell census excludes them BY DECLARATION (BUG-1008)")
+
+
 def banner(recipe: str, full: str) -> int:
     """Declare the ladder's own shape, in the ladder's own units, before any rail can abort the recipe."""
     lines = body(recipe)
     hard = [ln for ln in lines if "exit 1" in ln]
     print("ladder scan: `just " + recipe + "` reports a PREFIX - it stops at the FIRST non-zero line, and "
           + str(len(lines)) + " declaring line(s) stand in it (" + str(len(hard)) + " declared a HARD gate), so a "
-          "red line HIDES every line after it (BUG-573).")
+          "red line HIDES every line after it (BUG-573)." + narrowing(recipe))
     print("ladder scan: for EVERY fault of this ladder in ONE run use `just " + full + "` (D-2680).")
     # D-2983: the record is printed HERE, before any rail can abort - and it may never abort the recipe itself.
     _recorded_rc, messages = receipt_lines(strict=False)
@@ -434,7 +492,7 @@ def scan(recipe: str) -> int:
     """Collect every fault of one declared recipe and exit with the WORST code, never the first."""
     lines = body(recipe)
     print("=== ladder scan (" + recipe + ", " + str(len(lines)) + " declaring line(s)): every line runs, "
-          "nothing is hidden (D-2680) ===", flush=True)
+          "nothing is hidden (D-2680) ===" + narrowing(recipe), flush=True)
     t0 = time.monotonic()
     worst, faults = run_lines(lines)
     elapsed = time.monotonic() - t0
@@ -506,6 +564,22 @@ def selftest() -> int:
     selfline = parse(ladder(["echo KEEP", "python3 scripts/" + SELF + " --banner probe"]), "probe")
     check("self_invocation_is_skipped", selfline == ["echo KEEP"],
           "a line that invokes the collector itself is dropped (a ladder that collects itself would recurse)")
+    # BUG-1008 - the known instance is the LIVE line that produced the false red, not an invented one.
+    tmpl = "{{just_executable()}} --list >/dev/null || { echo \"died\"; exit 1; }"
+    kept, dropped = shell_split(["echo KEEP", tmpl])
+    check("a_just_TEMPLATE_line_is_NOT_handed_to_the_shell", kept == ["echo KEEP"] and dropped == [tmpl],
+          "BUG-1008: /bin/sh read `{{just_executable()}}` as `syntax error near unexpected token '}}'` (rc=2) "
+          "and the whole-set receipt recorded a FAULT that turned `just health` from OWNER-OWED to FATAL")
+    check("the_excluded_line_is_COUNTED_not_silently_dropped", len(parse_report(ladder([tmpl]), "probe")[1]) == 1,
+          "a narrowed census that is REPORTED is not a blind spot: the exclusion count is the receipt of the "
+          "narrowing (both directions of the BUG-1008 rule)")
+    check("a_plain_line_is_untouched_by_that_rule", shell_split(["python3 x.py || exit 1"])[0] == ["python3 x.py || exit 1"],
+          "the exclusion narrows ONLY template lines - a rule that drops every line would report a clean scan of "
+          "nothing (negative control, BUG-492)")
+    check("the_live_ladder_reports_its_own_TEMPLATE_exclusion",
+          all(TEMPLATE.search(ln) for ln in uncollectable("health")) and len(uncollectable("health")) >= 1,
+          "MEASURED on the LIVE ladder: every line the census excludes really carries just-template syntax, so "
+          "the exclusion is a fact about the interpreter and not a filter that hides work")
     try:
         body("__no_such_recipe__")
         refused = False

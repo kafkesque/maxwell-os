@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 783,
-  "open_n": 245,
+  "total_ids": 784,
+  "open_n": 246,
   "closed_n": 538,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1233,6 +1233,11 @@
     {
       "id": "BUG-1015",
       "title": "(MED - OPEN 2026-10-25) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and",
+      "events": 1
+    },
+    {
+      "id": "BUG-1020",
+      "title": "(MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal",
       "events": 1
     }
   ],

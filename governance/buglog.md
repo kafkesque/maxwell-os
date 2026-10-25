@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 783 bugs (245 open / 538 closed; highest OPEN = BUG-1015) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 784 bugs (246 open / 538 closed; highest OPEN = BUG-1020) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 82 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 246 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21893,3 +21893,38 @@ that must not). The rule being enforced is the one this repo already applies to 
 D-2692): **a count a register owns has ONE home, and prose cites it.** The reason it must be a rule and not a
 resolution is exactly the reason it recurred: a number in prose is the one claim in this tree that no verdict can
 be derived from.
+
+## BUG-1020 (MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal knew a run had happened
+The R5 verifier for a 66-line diff could not be obtained through delegation, and the failure modes were opaque.
+MEASURED, all three recorded in `scripts/delegate_journal.py` BEFORE the claim (the row is written before the
+call, so a call that hangs is visible):
+
+| run | model | outcome | wall | what was reported |
+|---|---|---|---|---|
+| 20261025_2 | gemma-4-E4B-it-MLX-4bit | failed | 153.0 s | "Unable to load content from the provided diff file ... persistent `unsupported image format` errors from the read_image tool" — a TEXT diff reached an IMAGE decoder, and the child's birth record shows its only extension was `developer` |
+| 20261025_3 | gemma-4-E4B-it-MLX-4bit | failed | **2962.8 s** | `Other` — no cause, and 9.9x its declared 300 s budget; the journal's `status` (rc 2) was the only thing that named the overrun |
+| 20261025_4 | Ornith-1.5-9B-MLX-8bit | failed | 158.5 s | `Other` — no cause, with `extensions: []` so no tool could be blamed |
+
+**THE SAME MODEL, THE SAME PROMPT, A DIRECT CALL: 8.18 s.** `POST /v1/chat/completions` to the engine with
+`temperature: 0.0` (R7-compliant, and the delegate path's own temperature is not declared anywhere) returned
+`finish_reason=stop`, 812 characters, and a usable verdict (`APPROVE_WITH_NOTES`) with five findings. Receipt:
+`temp/r5_review_20261025.json`. **So the model can do the task and the harness could not deliver it** — which is
+the distinction that matters, because "the local model is too weak to review code" would be the wrong lesson and
+would quietly retire the R5 pairing this OS depends on.
+
+**TWO THINGS THIS COSTS, both real.** (1) 55 minutes of budget across three attempts, on a task that takes eight
+seconds. (2) A verifier obtained outside the delegation path is a verifier nobody provisions: the tool surface, the
+temperature, the model and the prompt all travel with the caller instead of a recipe, so the next session cannot
+re-take this reading from a declaration.
+
+**WHAT IS *NOT* THE FAULT.** Not the model, not the queue, not memory (68.7 GB total / 35.7 GB available at the
+time). The three failures share exactly one property — they went through the delegate harness — and the fourth,
+which did not, succeeded on the first try.
+
+**CLOSURE CONDITION.** Three consecutive delegate runs complete a KNOWN-ANSWER task (a three-line review whose
+expected verdict is fixed in advance) before this path is trusted to satisfy R5; `Other` must name a cause rather
+than a word; and a delegate's provisioned surface must include a TEXT reader that is not an image decoder. Until
+then the recorded fallback is the direct engine call at temperature 0.0 with its receipt, which is what this
+session used and what `governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json#verified_by.r5_review` records —
+including the AUDIT of that review's five findings, two of which were false positives that repeated a risk instead
+of resolving it (a delegated answer is not self-certifying either).

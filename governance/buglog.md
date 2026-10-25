@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1274 decisions (census stamp de36276a72846c0e, 2026-10-25) · 768 bugs (246 open / 522 closed; highest OPEN = BUG-1004) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 769 bugs (245 open / 524 closed; highest OPEN = BUG-1002) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1274 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 654 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1274, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1275 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 655 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1275, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 80 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 246 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21298,3 +21298,64 @@ outlives a session is visible in the next session's first reading instead of bei
 then, an optimisation of whichever stage the longer profile names.
 NOT DECIDED HERE: whether the ladder keeps a 19-minute-plus rail at all, or moves the face walk behind an explicit
 `--deep` recipe. That is an owner call about what `just health` promises.
+
+## BUG-1005 (HIGH - FIXED 2026-10-25) - a counted repeat inside a star made one regex exponential, and a buglog SEPARATOR LINE stopped `just health` from ever returning
+
+**THE BUG.** `scripts/check_governance_faces.py#LIVE_LABEL_RE` wrote its decoration prefix as
+`(?:#{1,6}\s*)?(?:>\s*)*(?:[*_`]{0,2}\s*)*(?:[^\w\s]{1,3}\s*)*`. The last group puts a COUNTED repeat `{1,3}`
+inside a STAR. On a run of punctuation that is NOT followed by the label, the matcher may partition the run 1, 2
+or 3 characters at a time, so the number of ways grows as a tribonacci series, and the final alternation fails
+every one of them. `heading_faults` carried the identical shape on its own `head` pattern.
+
+**THE TRIGGER WAS A COSMETIC LINE.** `governance/buglog.md` separates entries with lines of ~110 `═` box-drawing
+characters. `═` is not `\w` and not `\s`, so it matches `[^\w\s]`. Every separator line inside the history region
+was an exponential-time search.
+
+**MEASURED (the red loop, D-3036).** Growth on a run of `═`, current pattern: 16 chars -> 3.257 ms, 20 -> 37.362 ms,
+24 -> 428.399 ms, 26 -> 1455.197 ms (**x3.4 per 2 characters**). The real 110-character separator did not finish in
+300 s. The fix (`^[\s\W]*`) does 110 chars in **4.4 us**. Whole rail, end to end: **>31 min and never returned
+(four attempts) -> 1.80 s, rc=0, green.**
+
+**HOW IT WAS NAMED, AND THE HYPOTHESES THAT DIED ON THE WAY (each refuted by a measurement, not an argument).**
+(1) `/usr/bin/sample` on the live pid: **2465 of 2465 samples** in one `_sre_SRE_Pattern_search`, no other frame
+executing - so the cost was a regex, but a C stack cannot name the Python line. (2) REFUTED: that the citation
+`LIVE_PATH_RE` over the 2 MB buglog was the cost - 0.11 s. (3) REFUTED: that `entry_date`/`section_date` were
+quadratic backward scans - only **17** `open_assert` and **170** `dec_row` hits exist, and the scan breaks on the
+first dated line: predicted cost **0.0 s**. (4) A `re.compile`-wrapping probe produced NO OUTPUT while the worker
+thread held the GIL for minutes - which is itself the signature of a single catastrophic match, because `re` does
+not yield to the interpreter during matching. (5) `faulthandler.dump_traceback_later` dumps from a C watchdog
+thread and cannot be blocked that way; it named `history_faults:623` three times in 75 s. (6) A per-line probe
+first pointed at line 1111 (1.4 s) - a real hotspot but not the blocker; an unbuffered `os.write` of the CURRENT
+subject before every search left the actual line on disk after SIGKILL: `len=112 '<!-- ═══…'`.
+
+**A DETECTOR THAT FIRED ON THE WRONG THING IS AS BAD AS ONE THAT NEVER FIRES (BUG-492, one layer in).** The first
+static lint I wrote for "counted repeat under a star" reported **0** hits while a proven instance sat in the file,
+and when tested against the known pattern it matched the BENIGN group `(?:[*_`]{0,2}\s*)*` and missed the
+pathological one. The depth-aware rewrite found **4** instances (2 patterns x 2 groups).
+
+**THE FIX, AND WHY IT IS NOT A REWRITE.** The three older decoration groups (`#{1,6}`, `>`, `[*_`]{0,2}`) are all
+SUBSETS of `[^\w\s]`, and `[^\w\s]` + `\s` is exactly `[\s\W]`. So the prefix is the same language written once:
+`^[\s\W]*`. Nothing else in either rule moved. `#{1,6}` is kept where it is the heading MARKER rather than
+decoration (`heading_faults`).
+
+**CONTROLS (the cost is now a known answer too):** 46 -> **49** controls, all firing. New: a run of 110 `═` costs
+the matcher nothing; the same run with the label BEHIND it must still fire (or the fix bought speed by blindness);
+a 400-character `|` table rule costs nothing. Ruff clean.
+
+**WHAT THIS DOES NOT CLAIM.** No pattern in this repository is proved linear; the lint that would prove it is
+described above and is wrong in its first form. Only these two patterns were examined, and only against this
+subject class. Files: `scripts/check_governance_faces.py#LIVE_LABEL_RE`, `#heading_faults`.
+
+## BUG-1004 (MED - FIXED 2026-10-25) - the face rail has no wall bound, and TWO copies of it outlived the session that started them
+
+**UPDATE 2026-10-25 (CLOSE): the unnamed ~29 minutes are NAMED, and the rail now returns.** The open entry above
+withheld any fix direction until the gap was measured. It is measured: the cost was **one regex**,
+`LIVE_LABEL_RE`, backtracking exponentially on the `═` separator lines of `governance/buglog.md` - registered as
+**BUG-1005**, where the growth series, the four refuted hypotheses and the fix live. End to end the rail is
+**1.80 s** (was >31 min, never returned). The four fix directions listed in the open entry were NOT applied
+because they were aimed at the wrong thing: a wall bound, progress lines and a pid-in-record would all have made
+a 30-minute rail legible instead of making it 1.8 seconds. **The orphan hazard remains real and is NOT closed by
+this fix** - see the two-line receipt below, taken while the bug was live: `74789 27:22 27:15.05 96.4` and its
+duplicate `76106 01:56 1:55.10 98.5`, both inside the same search. A rail that returns fast makes an orphan far
+less likely, but nothing yet NAMES the rail's own pid in a record, so a future hang is still only visible to
+`ps`. That half stays open as a separate, smaller act.

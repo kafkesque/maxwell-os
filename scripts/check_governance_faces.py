@@ -43,6 +43,7 @@ import json
 import re
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 import yaml
@@ -73,9 +74,18 @@ HEADING_RE = re.compile(r"^#{1,6}\s")
 #: is not a claim about a moment, it is a claim about WHERE THE CURRENT STATE IS. The label must LEAD the
 #: line: MEASURED 2026-10-13, the phrase also occurs in prose that DISCUSSES the face (buglog.md:9241, the
 #: BUG-669 entry), and a rule that fires on a discussion of a pointer is not a rule about pointers.
+#: BUG-1005 (2026-10-25) - THE PREFIX IS ONE CHARACTER CLASS, NOT FOUR QUANTIFIED GROUPS. The previous
+#: pattern wrote the decoration as `(?:#{1,6}\s*)?(?:>\s*)*(?:[*_`]{0,2}\s*)*(?:[^\w\s]{1,3}\s*)*`, whose
+#: LAST group puts a COUNTED repeat ({1,3}) inside a STAR. On a run of punctuation that is not followed by
+#: the label, the matcher may partition the run 1/2/3 characters at a time, so the work grows as a tribonacci
+#: series: MEASURED on a run of '=' box characters, 16 chars -> 3.3 ms, 20 -> 37 ms, 24 -> 428 ms, 26 -> 1455 ms
+#: (x3.4 per 2 chars), and the 110-character separator lines in governance/buglog.md did not finish in 300 s.
+#: That single line is why `just health` never returned: MEASURED 2026-10-25 by faulthandler, 2465/2465 native
+#: samples inside one `_sre_SRE_Pattern_search`, stack at this function's call site (BUG-1004).
+#: The three older groups are all SUBSETS of `[^\w\s]`, and `[^\w\s]`+`\s` is exactly `[\s\W]`, so the prefix
+#: is the same language written once: 110 chars now cost 4.4 us. Nothing else in the rule moved.
 LIVE_LABEL_RE = re.compile(
-    r"^\s*(?:#{1,6}\s*)?(?:>\s*)*(?:[*_`]{0,2}\s*)*(?:[^\w\s]{1,3}\s*)*"
-    r"(?:CURRENT\s+OPEN\s*(?:/\s*PENDING)?\s*INDEX|the\s+live\s+face)\b",
+    r"^[\s\W]*(?:CURRENT\s+OPEN\s*(?:/\s*PENDING)?\s*INDEX|the\s+live\s+face)\b",
     re.IGNORECASE,
 )
 #: MEASURED 2026-10-13 (D-2985), the day AFTER this rule first landed: the pattern above was blind to a label
@@ -208,7 +218,10 @@ def heading_faults(path: Path, lines: list[str], cfg_d: dict) -> list[str]:
     tokens = [str(t) for t in cfg_d["face_index_head_tokens"]]
     token = str(cfg_d["face_hand_index_token"])
     declare = re.compile(str(cfg_d["face_head_declaration_re"]), re.IGNORECASE)
-    head = re.compile(r"^\s*#{1,6}\s*(?:[^\w\s]{1,3}\s*)*(?:[*_`]{0,2}\s*)*"
+    # BUG-1005: the same nested counted repeat BUG-1005 removed from LIVE_LABEL_RE stood here too - the
+    # decoration between the heading marker and the token is one class, so a run of '=' or '|' cannot be
+    # partitioned 1/2/3 characters at a time. `#{1,6}` stays: it is the heading marker, not decoration.
+    head = re.compile(r"^\s*#{1,6}\s*[\s\W]*"
                       r"(?:" + "|".join(re.escape(t) for t in tokens) + r")\b", re.IGNORECASE)
     problems: list[str] = []
     for i in range(start, len(lines)):
@@ -658,6 +671,21 @@ def history_faults(path: Path, lines: list[str], states: dict[str, str],
     return problems
 
 
+def _costs_nothing(subject: str, budget_ms: float = 50.0) -> bool:
+    """BUG-1005: a PATTERN'S COST IS A KNOWN ANSWER TOO. `history_faults` is only a rule if it RETURNS; a
+    prefix that can partition a run of punctuation returns after a tribonacci number of steps. Returns True
+    when one search over the subject finishes inside the budget."""
+    t = time.perf_counter()
+    LIVE_LABEL_RE.search(subject)
+    return (time.perf_counter() - t) * 1000.0 < budget_ms
+
+
+def _label_behind_decoration_fires() -> bool:
+    """The fixed prefix must still SEE a label behind decoration, or the fix bought speed by blindness."""
+    decorated = "═" * 110 + " the live face"
+    return LIVE_LABEL_RE.search(decorated) is not None and LIVE_LABEL_RE.search("═" * 110) is None
+
+
 def _selftest_history_faults() -> list[tuple[str, bool]]:
     """Known-answer controls for D-2984, in BOTH directions: every limb fires on a claim that contradicts the
     register and stays quiet on the same claim once it declares its moment (BUG-492: a detector nobody has
@@ -706,6 +734,17 @@ def _selftest_history_faults() -> list[tuple[str, bool]]:
          len(faults(["Registry unchanged: highest OPEN BUG-750."])) == 1),
         ("the highest-OPEN field carrying its moment is history",
          len(faults(["The register then stood at 460 bugs (163 open, highest OPEN then BUG-695)."])) == 0),
+        # BUG-1005: the COST is part of the rule. A decoration prefix that can partition a run of punctuation
+        # is exponential, so these controls measure the subject that actually stopped `just health` - the
+        # 110-character '=' separator lines in governance/buglog.md - and the same subject with the label
+        # behind it (which must still fire). A generous 50 ms bound is not a timing test in disguise: the
+        # broken pattern needs longer than the age of the universe on this input, and the fixed one 4.4 us.
+        ("a run of 110 '=' box characters costs the matcher nothing (BUG-1005: this line stopped the ladder)",
+         _costs_nothing("[" + "=" * 110)),
+        ("a run of 110 '=' box characters does not hide a label that follows it",
+         _label_behind_decoration_fires()),
+        ("a 400-character '|' table rule costs the matcher nothing",
+         _costs_nothing("|" * 400)),
     ]
 
 

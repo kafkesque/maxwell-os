@@ -98,7 +98,7 @@ tasks:
     class).'
   source:
   - BUG-757
-  evidence: 'bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13)'
+  evidence: 'bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERED 101 -> 99 by the BUG-481 reconciliation batch, which took eight reconciled ids out of the open set (253 -> 245 open). The census prints CRITICAL 0 / HIGH 35 / MED 80 / LOW 31 / UNLABELLED 99 = 245, so the ceiling now has ZERO headroom: limb (a) is no longer a claim, it is the ceiling, because a new heading without a severity takes the count over it and scripts/gov_sync.py --check NAMES the id.'
   gate: none
 - id: T-105
   priority: SHOULD
@@ -2519,3 +2519,36 @@ tasks:
   - BUG-992
   evidence: 'MEASURED 2026-10-24 (sqlite census on "knowledge pipeline/maxwell.db"#fbs, pipeline_run_id=rechunk-v4-20260929): PASS|CLEAN|long 4513; QUARANTINE|FAILED|long 2860 (the conflict - failure_mode>=10 yet status=QUARANTINE); QUARANTINE|FAILED|short 275 (correct by BOTH rules); +1 non-canonical QUARANTINE|CLEAN (failure_mode length 141, pipeline_run_id empty, never written). The writer rule is classification_status = CLEAN if len(failure_mode)>=S4_FAILURE_MODE_MIN_LENGTH else FAILED, so the 2860 long-fm QUARANTINE rows flip FAILED->CLEAN on re-injection.'
   gate: 'RED LOOP FIRST (D-3036) plus a DESIGN choice (each candidate gets its own record; none adopted here). The named command that must go RED now and GREEN when this closes is a fixture that invokes _classify_s4 (or the D2488 gate) on a long-fm QUARANTINE row and observes it emit CLEAN - today scripts/repair_classification_status.py --check is GREEN because the STORE is correct; the red condition is the WRITER. Candidates: (1) derive classification_status from status at S5 time (serving_gate.derive_status is already the sole status writer, so the column becomes a status mirror and S4 stops writing it); (2) have S4 leave the column NULL for a status-derived step to fill; (3) make the writer status-aware. MUST land before any S4 re-injection (re-inject_bug198_singletons or a future rechunk), because the parity rail will otherwise stop just health.'
+- id: T-199
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE LOOP BATTERY — widen the T-187 instrument from ONE fixture to a task FAMILY, so a candidate can be
+    RANKED instead of merely ADMITTED'
+  why: 'A gate that names a CLOSED task is not a gate. MEASURED 2026-10-25 by reading config/task_register.yaml:
+    T-187 is state done (closed 2026-10-19, the two-step/two-tool fixture landed as
+    scripts/measure_subagent_loop.py#run_two_step_model, first served-set receipt
+    temp/subagent_loop_two_step_full_20261019.json, promotion made by D-3104). Five rows in
+    governance/NOT-YET-EVALUATED-RESEARCH.md still say a candidate is "gated on T-187", so the condition they
+    name no longer RESOLVES (D-3034). What they actually need is what T-187 deliberately did not build: one
+    fixture admits a model to a role, and only a BATTERY ranks one. R-15 (Saluki) recorded the limit in its own
+    words — a 1-task instrument cannot resolve a 3-point gap on a 120-task vendor set — and
+    AGENT_LOOP_FAST / AGENT_LOOP_WORKHORSE remain UNDECLARED for exactly that reason (D-3058).'
+  source:
+  - D-3058
+  - D-3061
+  - scripts/measure_subagent_loop.py
+  - governance/NOT-YET-EVALUATED-RESEARCH.md
+  - config/task_register.yaml
+  evidence: 'MEASURED 2026-10-19 (the T-187 close receipt): the single two-step/two-tool/distractor fixture ran the
+    served set and reported 6/8 PASS, with the failures named — it DISCRIMINATES but cannot RANK, because one task
+    yields one bit per model. MEASURED 2026-10-25: config/task_register.yaml#T-187 is done, and five research rows
+    cite it as the live gate.'
+  gate: 'FOUR fixtures beyond the two-step one, each with a DERIVED expected answer (never typed, C12) and its own
+    known-answer control in --selftest: (a) a DISTRACTOR that is a valid answer to the wrong question; (b) a
+    PARALLEL-CALL formatting case, because the R-15 card itself concedes about a fifth of parallel replies slip;
+    (c) an argument-NAME trap, which is the drift shape a rename produces (the same class the existing
+    grade_two_step already catches for values); (d) an ENUM-argument trap, where the correct choice is one of a
+    closed set. The instrument must NAME which model each fixture fails, and a promotion into AGENT_LOOP_FAST /
+    AGENT_LOOP_WORKHORSE stays refused until a candidate beats the incumbent across the WHOLE battery at
+    temperature 0 (R7). No model is downloaded to run it: the served roster is the first population (0 GB).'

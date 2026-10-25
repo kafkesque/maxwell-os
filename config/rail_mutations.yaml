@@ -61,7 +61,7 @@ fixture:
   timeout_seconds: 600
 
 coverage:
-  min_mutations: 48            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (48 = 47 prior + the D-2991 anchor-SET multiplicity guard; the prior 47 = 43 + the advertised-field rail's UNDECLARED guard and its owner-WORD guard, the feedback aggregate's ABSENCE guard, and the census receipt's MODULE-count re-record guard)
+  min_mutations: 49            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (48 = 47 prior + the D-2991 anchor-SET multiplicity guard; the prior 47 = 43 + the advertised-field rail's UNDECLARED guard and its owner-WORD guard, the feedback aggregate's ABSENCE guard, and the census receipt's MODULE-count re-record guard)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -1258,3 +1258,23 @@ mutations:
       more amortisable prefix than exists, which is the BUG-589 shape (an under-declared fixture turning a rail's
       baseline green). With the floor inert, a label enters the stable set and the control reds.
 
+
+  - id: the_divergence_ceiling_may_stop_binding
+    subject: scripts/gov_sync.py
+    op: replace
+    find: '    if n <= div_ceil:'
+    replace: '    if True:  # MUTATION (D-3146/BUG-481): the divergence ceiling stops binding'
+    runner: scripts/gov_sync.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a body-only closure OVER the ceiling is a NAMED fault (BUG-481)'
+    why: >-
+      BUG-481's remedy is a shrink-only ceiling over the open ids whose own last paragraph claims a closure that
+      no header event records. A ceiling is worth nothing while the count sits exactly ON it, so the LIVE oracle
+      cannot see this rule at all (0 divergent, ceiling 0): the only oracle that CAN see it is the two-sided
+      known-answer control in `gov_sync --selftest`, which asserts that one id over the ceiling is a NAMED fault.
+      With the ceiling inert that control reds, which is the whole claim: the rule separates "within the ceiling"
+      from "over it", and a rule that cannot be made to fail is a comment (BUG-492). Recorded because the drift
+      this guards is exactly what let BUG-481 stay open for 30 days while its own eight instances were quietly
+      reconciled and seven new ones accumulated - a guard nobody had to prove could fail.

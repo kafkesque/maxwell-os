@@ -197,6 +197,7 @@ def derive(d: dict) -> dict:
         "decisions_total": dec.get("total_decisions", 0), "states": states, "need_action": need_action,
         "stamp": stamp8, "date": today,
         "bugs_total": bugs.get("total_ids", 0), "bugs_open": bugs.get("open_n", 0), "bugs_closed": bugs.get("closed_n", 0),
+        "bugs_divergent": bugs.get("divergent_n", 0), "divergent": bugs.get("divergent") or [],
         "sev": sev, "unlabelled": len(unlab), "open_bugs": open_bugs, "headed_ids": len(open_ids),
         "tasks": live, "rules": rules, "all_tasks": all_tasks, "pri": pri,
         "owner_moved": owner_moved, "pipeline_moved": pipeline_moved,
@@ -457,6 +458,33 @@ def severity_gap(d: dict, open_ids: set[str]) -> list:
     return severity_census(d, open_ids)[1]
 
 
+def divergence_ceiling_faults(d: dict, x: dict) -> list[str]:
+    """BUG-481: a body paragraph that claims a closure, over the declared shrink-only ceiling. PURE.
+
+    The ids are NOT removed from the open set by this rule and this rule cannot close anything: the header is the
+    event (D-2642). Removing them would release freeze obligations (config/freeze_window.yaml reads this register)
+    and break the agreement join in scripts/check_bug_recall.py, so the divergence is a QUALIFIER - an accepted
+    negative, recorded rather than silently chosen (D-3038).
+    """
+    div_ceil = int(d.get("bug_divergence_grandfathered") or 0)
+    n = int(x.get("bugs_divergent") or 0)
+    listed = len(x.get("divergent") or [])
+    if n > listed:   # R5 FINDING-4: the count and the list must not be able to disagree silently
+        return [f"buglog: the census says {n} divergent id(s) but lists {listed} - the fault cannot name what the "
+                f"register did not record (C16), so this is a FAULT of the census, not of the log"]
+    if n <= div_ceil:
+        return []
+    # R5 FINDING-4: a COUNT cannot say WHICH ids are new, so the fault must not claim to. It names every id over
+    # the ceiling when that set is small, and says plainly how many it withheld - the earlier "New: [...]" sliced
+    # by id order and would have labelled already-accepted ids as new, which is an unfalsifiable fault.
+    over = [str(e.get("id")) for e in (x.get("divergent") or [])]
+    shown, hidden = over[:6], max(len(over) - 6, 0)
+    return [f"buglog: {n} OPEN id(s) whose own last paragraph claims a closure that no header event records, "
+            f"over the shrink-only ceiling {div_ceil} (BUG-481). Ids: {shown}"
+            + (f" (+{hidden} more)" if hidden else "")
+            + " - append the status EVENT, never edit the body"]
+
+
 def _write(path: pathlib.Path, text: str) -> str:
     # D-401/I1: EVERY governed write declares its writer and what it owns. OWNED_ANY is the declared marker
     # for "this writer owns the whole artifact" (the faces are DERIVED in full). D-2982: the guard is imported
@@ -493,6 +521,11 @@ def check(d: dict, x: dict) -> int:
     if len(bad) > ceil:
         faults.append(f"buglog: {len(bad)} of the register's OPEN ids carry no severity token, over the "
                       f"shrink-only ceiling {ceil} (BUG-757). New: {bad[ceil:][:6]}")
+    # BUG-481: a closure written as a BODY paragraph is invisible to a parser whose status event is a HEADER, so
+    # the register over-reports OPEN. The ids are NOT moved out of the open set (that would release freeze
+    # obligations and break BUG-467's agreement join); the DIVERGENCE is a qualifier with its own shrink-only
+    # ceiling, so the count may only fall and a future body-only resolution is LOUD on the next rail run.
+    faults.extend(divergence_ceiling_faults(d, x))
     for f in faults:
         print("  !! " + f)
     if faults:
@@ -687,6 +720,16 @@ def selftest() -> int:
     base = {"priority": "MUST", "evidence": "e (2026-01-02)", "gate": "none"}
     one_lane = lambda n: [{"id": "T-%d" % i, "priority": "MUST", "state": "open", "mover": "pipeline",
                            "title": "t", "evidence": "e (2026-01-02)"} for i in range(n)]
+    # BUG-481 / R5 FINDING-4: the ceiling's own controls are computed here so each stays two-sided and readable.
+    div_over = divergence_ceiling_faults(
+        {**d, "bug_divergence_grandfathered": 0},
+        {**x, "bugs_divergent": 1,
+         "divergent": [{"id": "BUG-777", "line": 1, "statement": "RESOLVED 2026-01-01:"}]})
+    div_desync = divergence_ceiling_faults({**d, "bug_divergence_grandfathered": 0},
+                                           {**x, "bugs_divergent": 2, "divergent": []})
+    div_within = divergence_ceiling_faults(
+        {**d, "bug_divergence_grandfathered": 1},
+        {**x, "bugs_divergent": 1, "divergent": [{"id": "BUG-777", "line": 1, "statement": "x"}]})
     rows = [
         ("no key in this fixture is absent from the live config - a second home for a RENAMED fact would"
          " drift here in silence (a key the fixture LACKS is caught by the renderer call below, which raises)",
@@ -723,6 +766,13 @@ def selftest() -> int:
         ("the census re-cut owns the LIVE region and leaves the history region BYTE-IDENTICAL",
          n3 >= 1 and "7 decisions (census stamp deadbeefdeadbeef, 2026-01-02)" in scoped
          and "SNAPSHOT: 99 decisions (census stamp 27, 1999-01-01)" in scoped),
+        # BUG-481: the divergence ceiling is a CONTROL only if it is seen to fire. Two-sided: at the ceiling it
+        # is silent, and ONE id over it is a named fault - so the guard cannot pass by being unreachable.
+        ("a register WITHIN the divergence ceiling is not a fault", div_within == []),
+        ("a body-only closure OVER the ceiling is a NAMED fault (BUG-481)",
+         len(div_over) == 1 and "BUG-777" in div_over[0] and "ceiling 0" in div_over[0]),
+        ("a census whose count exceeds its own list is a FAULT, not a fault that invents ids (R5 FINDING-4)",
+         len(div_desync) == 1 and "cannot name what the register did not record" in div_desync[0]),
     ]
     for name, okk in rows:
         print(("  ok  " if okk else "  !!  ") + name)

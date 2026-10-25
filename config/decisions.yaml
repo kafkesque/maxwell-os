@@ -32176,3 +32176,64 @@ decisions:
   - config/pipeline_config.yaml
   - justfile
   - scripts/install_git_hooks.sh
+- id: D-3146
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: GOVERNANCE / BUG REGISTER
+  title: a closure recorded in a body is not a status event — the register must REPORT the divergence and hold a
+    SHRINK-ONLY ceiling over it, because a register that over-reports cannot order its own work
+  decision: 'BUG-481. MEASURED 2026-10-25: the register''s severity axis — the one T-104/D-2985 exists to make ORDERABLE,
+    and the axis this session used to answer "what is the highest-leverage bug" — ranked THREE ids CRITICAL (BUG-297,
+    299, 305). Two of the three (299, 305) had provably landed remedies recorded in their own bodies (299: `pipeline/serving_gate.derive_status`
+    consumed by verify_record:267 and stage6_commit, with the four illegal writers measured at ZERO status writes;
+    305: D-284 arm C and `_r5_hash()` present, BUG-307 RESOLVED), and the third (297) was a pointer stub whose entire
+    substance was 299''s. THE TOP OF THE QUEUE WAS PHANTOM. The class was not unknown: BUG-481 registered it on
+    2026-09-25 with eight instances (254/276/283/284/285/286/379/380); those eight were reconciled by later headers
+    and SEVEN NEW ones silently accumulated in their place, so it had been noticed, fixed BY EXAMPLE, and never
+    GUARDED. FIVE CLAUSES. (1) THE EVENT CLAUSE: the header is the status EVENT and a paragraph never moves a bug''s
+    state (reaffirms D-2642 — one fact, one home). Nothing here makes prose authoritative. (2) THE NO-SILENCE CLAUSE:
+    an OPEN bug whose own last paragraph CLAIMS a closure (a line that LEADS with the verdict AND carries its evidence
+    — a date, a decision parenthetical, or a terminator — or an explicit `Status:` field) is DIVERGENT and is REPORTED,
+    with its id, body line and claim, in `governance/bug_status.json#divergent` and on the register face. A reader
+    that can SEE the disagreement may not print only one side of it (BUG-481''s own fix direction: make it loud,
+    never silent). (3) THE QUALIFIER-NOT-STATE CLAUSE: a divergent id STAYS in the open set. REFUSED: a third state
+    that removes it. MEASURED why — `config/freeze_window.yaml` reads this register for its held set, so removal
+    would silently RELEASE a frozen bug, and `scripts/check_bug_recall.py` agrees its own fold against `open_n`,
+    so removal would red a rail on a disagreement the census itself manufactured. A third state that quietly frees
+    a parked bug is worse than the defect it fixes; recorded as an accepted negative with its reason (D-3038). (4)
+    THE SHRINK-ONLY CEILING CLAUSE: the population is declared in `config/gov_sync.yaml#bug_divergence_grandfathered`
+    and may only FALL (D-2644), enforced by `scripts/gov_sync.py --check` through a PURE two-sided control (at the
+    ceiling: silent; one over: a named fault) with a mutation that REDs that control (D-2676(iv)). Zero headroom
+    is the POINT, exactly as on the severity ceiling: the only way the population can grow is a new body-only closure,
+    which is the thing the rule forbids. (5) THE NO-INVENTION CLAUSE: the reader reports, it never adjudicates.
+    Settling a divergence is an ACT in the log that must name the reading which settles it (file:line, a command,
+    a receipt) — and a bug whose own words say its evidence is PENDING remains OPEN after the reading (BUG-263:
+    code verified at `config/pipeline_config.yaml:484`, the 200-record cross-family pass still owed, so the header
+    was CONFIRMED, not overruled). HONEST LIMITS, stated because a detector that claims completeness is the defect
+    it removes. (a) A shape vocabulary is not a language: four verdict forms are accepted and lowercase prose ("Resolved
+    in commit abc") is REFUSED, because the loose probe is the measured 19-vs-8 regression. (b) A NEW header re-frames
+    "the last paragraph", so a vacuous event body could silence a divergence — mitigated only by clause (5) and
+    by the log being append-only and visible; not prevented. (c) The fence rule is COPIED from scan(), not refined:
+    a quoted verdict and a quoted header must not disagree about what counts as code. (d) A body beginning inside
+    a fence opened before the last header would be read as prose; unobserved in the live log and recorded rather
+    than guessed at. WHAT THIS IS NOT: it is not a claim that the 244 open ids are all real work — it is the instrument
+    that lets that question be asked without lying at the top of the answer.'
+  bugs:
+  - BUG-481
+  - BUG-297
+  - BUG-299
+  - BUG-300
+  - BUG-301
+  - BUG-302
+  - BUG-305
+  - BUG-394
+  - BUG-628
+  - BUG-263
+  files:
+  - scripts/bug_status.py
+  - scripts/gov_sync.py
+  - config/gov_sync.yaml
+  - config/rail_mutations.yaml
+  - config/task_register.yaml
+  - governance/buglog.md

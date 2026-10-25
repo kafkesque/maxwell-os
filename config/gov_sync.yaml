@@ -168,6 +168,26 @@ face_head_declaration_re: '(?:HAND\s+INDEX|DERIVED\s+(?:block|index))'
 # 101. The retired 125 counted 88 bugs the register calls CLOSED and was blind to 18 open ids; the
 # retired severity_grandfathered_titles (108) was a SECOND number for the same question and is gone -
 # one question, one home. LOWERED 125 -> 101 (D-2644: a ceiling may only be LOWERED).
-severity_grandfathered: 101
+# LOWERED AGAIN 101 -> 99 on 2026-10-25 by the BUG-481 reconciliation batch: the eight ids that left the open
+# set were measured, and the census now prints CRITICAL 0 · HIGH 35 · MED 80 · LOW 31 · UNLABELLED 99 = 245.
+# ZERO HEADROOM IS THE POINT (T-104 limb (a)): an unlabelled token costs nothing to write and everything to
+# lose, so the next `## BUG-n` heading filed WITHOUT a severity takes the count to 100, `--check` goes RED and
+# the fault NAMES the id. That is the rail T-104 said exists - the ceiling IS the enforcement, because a new
+# id is the only way the population can grow while every closure lowers it.
+severity_grandfathered: 99
+# BUG-481, DECLARED 2026-10-25. A status EVENT is a header (D-2642), so a closure written as a BODY paragraph is
+# invisible to the parser and the register counts the bug OPEN for ever. BUG-481 measured 8 such ids on
+# 2026-09-25; those 8 were reconciled by later headers and SEVEN NEW ones had silently accumulated in their
+# place (299/300/301/302/305/394/628), so the class was never closed - only its examples were. It was not
+# cosmetic: the severity axis above ranked three ids CRITICAL and two of the three had provably landed remedies
+# in their own bodies, i.e. the TOP of the queue was phantom.
+# THE POPULATION is the census's `divergent_n` - the open ids whose own LAST paragraph leads with a verdict and
+# its evidence (a date, a decision parenthetical, or a colon, measured in scripts/bug_status.py). The ids STAY
+# in the open set on purpose: removing them would release freeze obligations (config/freeze_window.yaml reads
+# this register) and break the agreement join in scripts/check_bug_recall.py, so the divergence is a QUALIFIER,
+# never a third state - an accepted negative, recorded rather than silently chosen.
+# SHRINK-ONLY (D-2644): the number may only fall. It is 0 because the batch that landed this ceiling reconciled
+# all seven against the tree; a future body-only resolution makes `--check` RED and names the id.
+bug_divergence_grandfathered: 0
 # How many rows the faces print per list (the FULL set stays in the registers; the face is a view).
 face_list_limit: 12

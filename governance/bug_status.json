@@ -1,12 +1,14 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 765,
-  "open_n": 253,
-  "closed_n": 512,
+  "total_ids": 766,
+  "open_n": 245,
+  "closed_n": 521,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
+  "divergent_n": 0,
+  "divergent": [],
   "open": [
     {
       "id": "BUG-099",
@@ -111,7 +113,7 @@
     {
       "id": "BUG-263",
       "title": "the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record)",
-      "events": 2
+      "events": 3
     },
     {
       "id": "BUG-264",
@@ -224,33 +226,8 @@
       "events": 1
     },
     {
-      "id": "BUG-297",
-      "title": "\"ROLE is decorative\" is INVERTED: ROLE is the only serving gate (CRITICAL, my instrument)",
-      "events": 1
-    },
-    {
       "id": "BUG-298",
       "title": "No label carries human provenance; the floor gate is unsatisfiable (MEDIUM)",
-      "events": 1
-    },
-    {
-      "id": "BUG-299",
-      "title": "The serving gate is a LABEL, not a verification verdict (CRITICAL, 2026-09-19)",
-      "events": 1
-    },
-    {
-      "id": "BUG-300",
-      "title": "The RRF keyword leg is query-blind, insertion-ordered and weighted equally (HIGH)",
-      "events": 1
-    },
-    {
-      "id": "BUG-301",
-      "title": "Stage 5 computes a verification tier that Stage 6 has no column for (HIGH)",
-      "events": 1
-    },
-    {
-      "id": "BUG-302",
-      "title": "Two further status writers remain outside the serving gate (MEDIUM, 2026-09-19)",
       "events": 1
     },
     {
@@ -261,11 +238,6 @@
     {
       "id": "BUG-304",
       "title": "Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20)",
-      "events": 1
-    },
-    {
-      "id": "BUG-305",
-      "title": "R2 definition-anchored NLI emits ~100% CONTRA on the principle class \u2014 the meter is broken (CRITICAL, 2026-09-20)",
       "events": 1
     },
     {
@@ -417,11 +389,6 @@
       "id": "BUG-391",
       "title": "(HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force",
       "events": 1
-    },
-    {
-      "id": "BUG-394",
-      "title": "(HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not",
-      "events": 2
     },
     {
       "id": "BUG-395",
@@ -599,11 +566,6 @@
       "events": 1
     },
     {
-      "id": "BUG-481",
-      "title": "OPEN (severity MED) - the machine register over-reports: 8 bugs carrying an explicit status field in the body are still counted OPEN",
-      "events": 1
-    },
-    {
       "id": "BUG-482",
       "title": "OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report",
       "events": 1
@@ -716,11 +678,6 @@
     {
       "id": "BUG-604",
       "title": "(OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split book",
-      "events": 1
-    },
-    {
-      "id": "BUG-628",
-      "title": "(OPEN, 2026-10-03) \u2014 ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed",
       "events": 1
     },
     {
@@ -1272,6 +1229,11 @@
       "id": "BUG-1001",
       "title": "(LOW, OPEN 2026-10-25) \u2014 `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a",
       "events": 2
+    },
+    {
+      "id": "BUG-1002",
+      "title": "(LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and",
+      "events": 1
     }
   ],
   "closed": [
@@ -1301,6 +1263,12 @@
     "BUG-285",
     "BUG-286",
     "BUG-291",
+    "BUG-297",
+    "BUG-299",
+    "BUG-300",
+    "BUG-301",
+    "BUG-302",
+    "BUG-305",
     "BUG-307",
     "BUG-308",
     "BUG-309",
@@ -1359,6 +1327,7 @@
     "BUG-390",
     "BUG-392",
     "BUG-393",
+    "BUG-394",
     "BUG-396",
     "BUG-397",
     "BUG-402",
@@ -1408,6 +1377,7 @@
     "BUG-474",
     "BUG-476",
     "BUG-479",
+    "BUG-481",
     "BUG-483",
     "BUG-485",
     "BUG-486",
@@ -1525,6 +1495,7 @@
     "BUG-625",
     "BUG-626",
     "BUG-627",
+    "BUG-628",
     "BUG-631",
     "BUG-633",
     "BUG-634",

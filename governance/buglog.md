@@ -8,23 +8,23 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1271 decisions (census stamp 8914497b2201aef5, 2026-10-25) · 765 bugs (253 open / 512 closed; highest OPEN = BUG-1001) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1272 decisions (census stamp 8e0fbe1179a53972, 2026-10-25) · 766 bugs (245 open / 521 closed; highest OPEN = BUG-1002) · 56 open tasks (MUST 9 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1271 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 651 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1271, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1272 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 652 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1272, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 253 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-101 | 🔴 MUST | 🔴 open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candida |
-> | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
+> | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERE |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938  |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
@@ -36,7 +36,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 55 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -63,7 +63,7 @@
 >
 > _the face is a VIEW: 12 of 81 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
-> **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341 · 🟧 BUG-391.
+> **Open bugs, most severe first:** 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341 · 🟧 BUG-391 · 🟧 BUG-400 · 🟧 BUG-406 · 🟧 BUG-417 · 🟧 BUG-426 · 🟧 BUG-433.
 <!-- GOV-INDEX:END -->
 
 <!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
@@ -21089,3 +21089,155 @@ is a separate question and is now NOT needed to explain this observation.
 The correct act — reading the two `lsof failed` lines that were already in the log — would have cost one second.
 Recorded because it is the same class as the `which ollama` error in R-15: **a probe's absence is not a fact about
 the subject.**
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════════════════════════
+     BUG-481 RECONCILIATION BATCH - 2026-10-25. EIGHT STATUS EVENTS, NO NEW FIXES.
+     WHY THIS BLOCK EXISTS. A status event is a HEADER (D-2642), so a closure written as a body paragraph is
+     invisible to `scripts/bug_status.py` and the register counts the bug OPEN for ever. BUG-481 registered that
+     class on 2026-09-25 with EIGHT instances (254/276/283/284/285/286/379/380); those eight were reconciled by
+     later headers, and SEVEN NEW instances had silently accumulated in their place, so the class was never
+     closed - only its examples were. MEASURED 2026-10-25: the register's severity axis - the one T-104/D-2985
+     exists to make ORDERABLE - ranked three ids CRITICAL, and two of the three (299, 305) had provably landed
+     remedies recorded in their own bodies. The top of the queue was phantom, which is the one thing a register
+     may never be.
+     WHAT THESE ENTRIES CLAIM: only that a resolution ALREADY DECLARED IN THE BODY is also recorded as the event
+     the register reads, after RE-VERIFYING the claim against the tree on 2026-10-25. Every entry names its own
+     reading. Nothing here asserts a new repair, and no body text above was altered (R-D410).
+     THE CLASS IS NOW GUARDED, not remembered: `scripts/bug_status.py` reports every open id whose last
+     paragraph claims a closure (`divergent_n`), and `config/gov_sync.yaml#bug_divergence_grandfathered` holds a
+     shrink-only ceiling (7 -> 0 by this batch) that `scripts/gov_sync.py --check` enforces, so a future
+     body-only resolution is LOUD on the next rail run instead of silent for a month.
+     ═══════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+
+## BUG-297 (CRITICAL - RESOLVED 2026-10-25, RECONCILED) - its whole substance was BUG-299's, and 299 is settled by a rail
+
+RECONCILIATION, not a new fix. This entry carries no measurement of its own: its entire body is the sentence
+"BUG-280 / D6 / D272g all assert that content_type influences nothing. The opposite is true - see BUG-299", so
+its claim ("ROLE is the only serving gate") is BUG-299's claim and is settled by BUG-299's remedy, which is
+RE-VERIFIED below and carried by a rail. A bug whose subject is another bug's cannot outlive that bug's
+settlement. Reading: `python3 scripts/bug_status.py` (this batch) + `pipeline/serving_gate.py` (derive_status,
+the ONE rule) + `tests/test_serving_gate.py` (14 controls).
+
+## BUG-299 (CRITICAL - RESOLVED 2026-10-25, RECONCILED) - the serving gate IS derived from the verdict; the body declared it on 2026-09-19
+
+RECONCILIATION of `**RESOLVED 2026-09-19 (0a / G17):**`, invisible to the register for 36 days (BUG-481).
+RE-VERIFIED 2026-10-25 three ways: (1) `pipeline/serving_gate.derive_status` is consumed as the ONE status rule
+by `pipeline/verify_record.py:267` and `pipeline/stage6_commit.py`; (2) the four illegal writers the bug named -
+apply_phase1_finalize / apply_phase1_adjudication / apply_phase0_relabels / repass_pair_agreed - now contain
+ZERO status writes (measured: `grep -cE "UPDATE fbs SET[^;]*status"` = 0 on each); (3) the declared homes
+resolve: config/serving_gate.yaml 10,872 B, pipeline/serving_gate.py 17,597 B, scripts/apply_serving_gate.py
+8,458 B, tests/test_serving_gate.py 10,528 B.
+
+## BUG-300 (HIGH - RESOLVED 2026-10-25, RECONCILED) - `search_keyword` IS query-aware; the body declared it on 2026-09-19
+
+RECONCILIATION of `**RESOLVED 2026-09-19 (0b/G12):**`, invisible to the register (BUG-481). RE-VERIFIED
+2026-10-25: `pipeline/retrieve.py:257` declares `def search_keyword(conn, query: str = None, ...)` and matches
+the query - the parameter the bug said was missing is IN THE SIGNATURE and used by the query it builds.
+
+## BUG-301 (HIGH - RESOLVED 2026-10-25, RECONCILED) - stage6 DOES persist the S5 tier fields; the body declared it on 2026-09-19
+
+RECONCILIATION of `**RESOLVED 2026-09-19 (G19):**`, invisible to the register (BUG-481). RE-VERIFIED
+2026-10-25: `pipeline/stage6_commit.py:183` declares the `s5_reason TEXT` column, `:339-340` is the migration
+that adds it, and `:794` carries it in the INSERT - the field the bug said stage6 dropped is persisted.
+
+## BUG-302 (RESOLVED 2026-10-25, RECONCILED) - all three callers DO use `derive_status`; the body declared it on 2026-09-19
+
+RECONCILIATION of `**RESOLVED 2026-09-19:**`, invisible to the register (BUG-481). RE-VERIFIED 2026-10-25:
+`scripts/apply_dedup_marks.py:34` imports `derive_status` with the D274h note and `:125` calls
+`derive_status(None, duplicate_of=canon)` - a dedup mark is derived from the rule, never typed.
+
+## BUG-305 (CRITICAL - RESOLVED 2026-10-25, RECONCILED) - the R2 NLI meter was repaired on 2026-09-20, and the repair's own follow-up landed too
+
+RECONCILIATION of `**RESOLVED (2026-09-20, D-283 + D-284):**`, invisible to the register (BUG-481).
+RE-VERIFIED 2026-10-25: the remedy was TWO acts - D-283 (repaired r5 definition) and D-284 (arm C, the
+paraphrase content-claim hypothesis for content_type) - and the adoption step it named ("rewrite
+definition_nli_verify.py hypothesis construction + stamp an r5 hash") is IN THE TREE:
+`scripts/definition_nli_verify.py` documents arm C at its head and declares `_r5_hash()` at :75, and the
+follow-up it pointed at (BUG-307, the r5 provenance stamp) is RESOLVED 2026-09-20. Nothing of this bug is owed.
+
+## BUG-394 (RESOLVED 2026-10-25, RECONCILED) - vec_integrity IS a per-table contract with an invoked rail; the body declared it (D-357)
+
+RECONCILIATION of `FIXED (D-357 + code):`, invisible to the register (BUG-481). RE-VERIFIED 2026-10-25:
+`config/vec_integrity.yaml` (2,477 B) declares per-table entries with `required: true` for `vec_fbs` and
+`required: false` for the dormant `vec_fbs_ctx`, plus an orphans/missing/live-count contract; its rail
+`scripts/verify_vec_integrity.py` (6,393 B) is INVOKED by the ladder at `justfile:200`, and the clean-receipt
+full-ladder run of 2026-10-25 (193 lines, 0 faults) passed through it - a rail that runs and is green is a
+control, not a comment (BUG-492).
+
+## BUG-628 (RESOLVED 2026-10-25, RECONCILED) - the anchor-axis authority and its rail are in the tree; the body declared it on 2026-10-03
+
+RECONCILIATION of `RESOLVED 2026-10-03 (D-2811, rail + declared debt):`, invisible to the register (BUG-481).
+RE-VERIFIED 2026-10-25: `config/anchor_axis_authority.yaml` (5,661 B) exists as the ONE authority,
+`scripts/apply_anchor_axis_authority.py` propagates it and its `--selftest` is invoked at `justfile:113`
+(D-2812: an authority propagator must be SEEN to fire before it rewrites an artifact), and
+`scripts/check_anchor_axis_consistency.py` (14,420 B) is invoked twice in the ladder. The "declared debt" the
+entry names is carried by its own register row, which is what makes it declared rather than open here.
+
+## BUG-481 (MED - RESOLVED 2026-10-25) - the register's over-reporting is now REPORTED, and the class is guarded by a shrink-only ceiling
+
+CLOSED, and the closure is the fix direction this entry named on 2026-09-25 ("make the divergence RED rather than
+silent ... emit a `divergent` state and fail closed"), with ONE amendment that the measurement forced.
+WHAT WAS BUILT. (1) `scripts/bug_status.py#divergent_statement` reads a bug's own LAST paragraph and reports a
+closure claim only when the line LEADS with the verdict AND carries its evidence (a date, a decision parenthetical,
+or a colon). The narrow shape is the point: a looser probe matched 19 ids on 2026-09-25 where the honest figure was
+8, and the two live false positives are now KNOWN-ANSWER CONTROLS in the parser (`CLOSED, so any consumer ...` =
+BUG-314's prose; `CLOSED probe vocabulary (...) ` = BUG-773's catalogue), so the rule is only accepted while it
+still refuses them. Fenced regions are skipped, as they are for headers (BUG-634). The register face prints
+`divergent_n` with the id, the body line and the claim, so a false positive is VISIBLE and adjudicable rather than
+buried. (2) `config/gov_sync.yaml#bug_divergence_grandfathered` holds a SHRINK-ONLY ceiling (D-2644) that
+`scripts/gov_sync.py --check` enforces through a PURE, two-sided control: at the ceiling it is silent, one id over
+it is a NAMED fault that says "append the status EVENT, never edit the body".
+THE AMENDMENT (an accepted negative, D-3038). This entry asked for a `divergent` STATE; what landed is a
+QUALIFIER on the open set. REFUSED: moving a divergent id out of `open`. MEASURED why: `config/freeze_window.yaml`
+reads this register for its held set, so removing an id would silently RELEASE a freeze obligation, and
+`scripts/check_bug_recall.py` agrees its own fold against `open_n`, so it would go RED on a disagreement the census
+had manufactured. A third state that quietly frees a parked bug is a worse defect than the one being fixed.
+THE INSTANCES, ALL RECONCILED THE SAME DAY. The eight ids this entry named were already closed by later headers,
+and SEVEN NEW ones had accumulated in their place - 299/300/301/302/305/394/628 - plus BUG-297, whose entire
+substance was BUG-299's. Each was re-verified against the tree on 2026-10-25 and given the status EVENT its body
+had declared (see the reconciliation batch above, which names its own reading for each). The census moved
+253 open -> 245, and the severity axis the register is ORDERED by moved from "CRITICAL 3" (two of them phantom) to
+"CRITICAL 0 · HIGH 35 · MED 80 · LOW 31 · UNLABELLED 99 = 245".
+WHAT REMAINS TRUE, stated so this closure is not read as more than it is: the header is still the event, and the
+parser still cannot decide a bug's state from a paragraph - it now REFUSES to be silent about the disagreement
+instead, which is the whole of what was owed. `divergent_n` is 0 today and the ceiling is 0, so any future
+body-only resolution is louder than this bug ever was: it REDs `gov_sync --check` on the next rail run.
+
+## BUG-263 (MED - OPEN 2026-10-25, DIVERGENCE ADJUDICATED) - the body's closure claim is CODE-ONLY and the entry itself names the evidence as PENDING, so OPEN is the correct state
+
+NOT closed. This entry is the one case the new divergence probe reported on its first run (buglog line 454,
+`**Status: FIXED** (code)`) and the adjudication CONFIRMS the header rather than overruling it: the entry's own
+final sentence reads "**Run artifact pending** - the 200-record cross-family pass is the outstanding evidence", so
+by the parser's declared rule (PARTIALLY FIXED is OPEN) this bug is open on its own terms.
+THE CODE HALF IS VERIFIED LANDED, 2026-10-25: the budget the entry names is in the tree -
+`config/pipeline_config.yaml:484` declares `relabel_judge_max_tokens: 1024` under `stage2` - which is exactly what
+the entry says was required (64 -> 1024, config-first, C12). What is owed is not code: it is the 200-record
+cross-family PASS, and until that receipt exists "zero disagreements" is still unreadable as a result.
+WHY THIS IS A STATUS EVENT AND NOT A NOTE: it re-frames the bug (the claim is now "evidence owed", not "code
+unfixed"), which is what a later header is FOR. It also settles the divergence in the only way the rule accepts -
+by answering it - so the register's `divergent_n` returns to 0 without the log losing the reason it was 1.
+THE PROBE WAS WRONG FIRST, and that is recorded because it is the more useful fact: the detector's first version
+required a body line to LEAD with the verdict, so it reported 0 while this line sat in the log. A grep for an
+explicit `Status:` field found it, the rule gained that shape in BOTH directions (a `Status: OPEN` is not a
+closure), and the 4 new known-answer controls are what keep it. A detector that cannot be shown to have missed
+something has not been tested.
+
+## BUG-1002 (LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and `--may-write none` is a declared claim that there is none
+
+MEASURED 2026-10-25 while closing `DJ-20261025T133204Z-b846` (an R5 review that writes no repository path).
+`config/agent_surface.yaml#journal` declares BOTH halves of the vocabulary and they do not meet:
+`read_only_token: none` is a legal `--may-write` claim at START (consumed at `scripts/delegate_journal.py:434-436`),
+`artifact_required_states: [done]` is enforced at END (`:342-344`), and `verified_artifacts_required: true` then
+refuses `--artifact none` because the disk contradicts it (`:346-349`). So a read-only run has exactly two closes,
+both false: `--state failed` says a run that succeeded failed, and leaving it open makes `status` name a run that is
+over. The measured refusals, in order: `end --artifact none` → "the disk CONTRADICTS the claim: none absent";
+`end` with no artifact → "state 'done' requires at least one --artifact".
+WHY IT MATTERS (the class, not the instance): D-3036 says an act that leaves no trace did not happen, and the
+journal is the ONE place that trace lives - but a READ-ONLY act's trace is its FINDINGS, not a file it wrote, and
+the vocabulary has no word for that. The workaround used here was to make the findings a real artifact
+(`governance/evidence/R5_REVIEW_20261025_BUG481.md`), which is the right home anyway; it is recorded because the
+next read-only delegate should not have to discover the gap again.
+FIX DIRECTION (not applied, one declared home, C12): the END reader must accept the same `read_only_token` the
+START accepted - if a run's own start row claims the token, `done` with that token is a COMPLETE record (the trace
+is the review, and the journal row is the receipt of it), and any OTHER artifact word stays subject to the
+present-on-disk proof. The token already exists as a declaration; the defect is that only half the reader reads it.

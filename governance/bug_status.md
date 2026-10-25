@@ -2,8 +2,12 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**253 open** / 512 closed of 765 ids.
+**245 open** / 521 closed of 766 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
+
+**DIVERGENT 0** open id(s) whose OWN last paragraph claims a
+closure that no header event records (BUG-481). They stay counted OPEN - the header is the event
+(D-2642) - so nothing is closed by a paragraph and nothing is hidden by one either.
 
 | id | title (last header) | events |
 |---|---|---|
@@ -27,7 +31,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-259 | report tables quoted PRUNED models as if they were candidates | 1 |
 | BUG-260 | pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured) | 1 |
 | BUG-261 | safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK | 1 |
-| BUG-263 | the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record) | 2 |
+| BUG-263 | the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record) | 3 |
 | BUG-264 | poisoned rows survive every re-run (found by drift_monitor, 2026-09-17) | 1 |
 | BUG-265 | toolcalling scored the HARNESS, not the model: native tool_calls ignored | 2 |
 | BUG-266 | gpt-oss toolcalling is truncated, not incapable | 1 |
@@ -50,15 +54,9 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-294 | the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19) | 1 |
 | BUG-295 | The ruler compares stored-label ACCURACY to a human-provenance SHARE (MEDIUM, my instrument) | 1 |
 | BUG-296 | F-14 pocket retarget is statistically null; the claim is withdrawn (MEDIUM, my instrument) | 1 |
-| BUG-297 | "ROLE is decorative" is INVERTED: ROLE is the only serving gate (CRITICAL, my instrument) | 1 |
 | BUG-298 | No label carries human provenance; the floor gate is unsatisfiable (MEDIUM) | 1 |
-| BUG-299 | The serving gate is a LABEL, not a verification verdict (CRITICAL, 2026-09-19) | 1 |
-| BUG-300 | The RRF keyword leg is query-blind, insertion-ordered and weighted equally (HIGH) | 1 |
-| BUG-301 | Stage 5 computes a verification tier that Stage 6 has no column for (HIGH) | 1 |
-| BUG-302 | Two further status writers remain outside the serving gate (MEDIUM, 2026-09-19) | 1 |
 | BUG-303 | Stored extraction_type over-claims causal_mechanism; normative_heuristic 50% mislabeled (HIGH, 2026-09-19) | 1 |
 | BUG-304 | Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20) | 1 |
-| BUG-305 | R2 definition-anchored NLI emits ~100% CONTRA on the principle class — the meter is broken (CRITICAL, 2026-09-20) | 1 |
 | BUG-306 | Single-coder ceiling κ is contaminated: same-person + ruleset mismatch (HIGH, 2026-09-20) | 3 |
 | BUG-312 | NEW: three divergent label snapshots (HIGH, provenance drift, 2026-09-20) | 1 |
 | BUG-314 | Frozen ruler csv_sha256 provenance mismatch (MED, 2026-09-21) | 1 |
@@ -89,7 +87,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-382 |  | 1 |
 | BUG-389 | MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) | 1 |
 | BUG-391 | (HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force | 1 |
-| BUG-394 | (HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not | 2 |
 | BUG-395 | (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration | 2 |
 | BUG-398 | (MED, OPEN) - a receipt claimed a dated artifact that does not exist | 2 |
 | BUG-399 | (MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere | 2 |
@@ -125,7 +122,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-477 | OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty | 1 |
 | BUG-478 | OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells | 1 |
 | BUG-480 | OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable | 1 |
-| BUG-481 | OPEN (severity MED) - the machine register over-reports: 8 bugs carrying an explicit status field in the body are still counted OPEN | 1 |
 | BUG-482 | OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report | 1 |
 | BUG-484 | OPEN | 1 |
 | BUG-487 | OPEN (owner gate) | 3 |
@@ -149,7 +145,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-594 | (OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings) | 1 |
 | BUG-595 | (OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies | 1 |
 | BUG-604 | (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book | 1 |
-| BUG-628 | (OPEN, 2026-10-03) — ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed | 1 |
 | BUG-629 | (OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from | 1 |
 | BUG-630 | (OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead | 1 |
 | BUG-632 | (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and | 1 |
@@ -260,3 +255,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-993 | (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the | 1 |
 | BUG-999 | (MED — OPEN 2026-10-24) — the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the | 1 |
 | BUG-1001 | (LOW, OPEN 2026-10-25) — `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a | 2 |
+| BUG-1002 | (LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and | 1 |

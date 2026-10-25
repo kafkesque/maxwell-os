@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 784 bugs (245 open / 539 closed; highest OPEN = BUG-1020) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 785 bugs (246 open / 539 closed; highest OPEN = BUG-1021) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 246 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -22003,3 +22003,58 @@ column.
   with one whose coverage is a 2-line recipe, and the reader answers UNKNOWN (coverage mismatch, D-2982) rather
   than green. The failure mode is a re-scan, never a wrong verdict - which is why this is a named limit and not a
   new bug (D-3038: what we reject, we register; what we have measured to fail closed, we do not re-file).
+
+### ADDENDUM (2026-10-25) to BUG-1020 — the harness failed three times tonight and the DIRECT path answered the same class of task in 44.0 s, so the bug is the harness and it is still OPEN
+
+The R5 review of the BUG-1010 landing was delegated a fourth time and taken by a DIRECT `/v1/chat/completions`
+call to `gemma-4-E4B-it-MLX-4bit` at `temperature 0.0` (R7 replayable), key read from the ambient `OMLX_API_KEY` and never printed, endpoint
+`127.0.0.1:11435`:
+**44.02 s, finish_reason=stop, 4380 content characters, 0 reasoning characters**, six questions answered about
+`scripts/run_ladder.py`'s new attribution code. Journalled before the call and closed after it
+(`DJ-20261025T212727Z-6694`, state `done`, artifact `temp/r5_review_1010.json`, 5332 B,
+sha256_16 `17602dd55b92e034`), so the run is a record and not a retelling (BUG-844).
+
+**The review was then AUDITED, and one of its six answers was WRONG IN ITS REASONING.** On question C ("can a
+`state: running` record ever read green?") it concluded NO, correctly, but gave the mechanism as *"the receipt
+lacks the necessary timing information to pass the aging check"*. Measured: the running record carries a usable
+`measured_at`, and it is refused by the **state field**, which is tested BEFORE the fingerprint and the age - so
+the record is refused for the right reason and by the right branch, and the reviewer invented a plausible
+mechanism that would not have worked. This is BUG-1020-adjacent and worth naming: a verifier that reaches the
+RIGHT verdict by a mechanism that does not exist is only safe because a CONTROL, not the reviewer, is the
+arbiter (`selftest/an_UNFINISHED_scan_is_OWNER_OWED_and_never_green` asserts the message says `BEGAN`, and that
+assertion is what the mutation gate disables to prove the branch is load-bearing).
+The other five answers were correct on audit. **No finding required a code change.**
+
+**What this does NOT close.** The closure condition stands unchanged: three consecutive DELEGATE-HARNESS runs on
+a known-answer task, `Other` naming a CAUSE rather than a word, and a delegate surface with a TEXT reader (the
+first failure tonight was a text diff handed to an IMAGE decoder). Tonight's evidence is that the MODEL side is
+sound and cheap while the HARNESS side has failed 4/4 attempts across two sessions - so the R5 pairing can be
+kept by hand in the meantime, and BUG-1020 stays OPEN until the harness is measured working, not routed around.
+
+## BUG-1021 (LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict, and the loss is reported only to the NEXT reader
+
+**MEASURED, and not by breaking anything.** `record_open()` and `record_scan()` both write `receipt_path()`
+(`scripts/run_ladder.py:499` and `:547`), which `config/rail_registry.yaml#ladder_receipt` declares as ONE path,
+and the recipe written into the record is whatever `--collect` was asked for. So `python3 scripts/run_ladder.py
+--collect health-deep` (2 declaring lines) OVERWRITES the whole-set record of `just health` (194). Put a deep
+record through the whole-set reader and it answers **rc=2** and names the mismatch exactly - *"the ladder CHANGED
+since the recorded scan (2 -> 194 declaring line(s), e12b6b796630a68a -> 18d1b2d71f73dc70)"* - so the verdict is
+never wrong, and this is filed as LOW for that reason alone.
+
+**Why it is filed anyway (D-3038: what we reject, we register).** The loss is reported to the NEXT reader and
+never at WRITE time: the deep scan says nothing while it destroys a green whole-set verdict, and the owner
+discovers it later as an OWNER-OWED line that costs a 17-minute rescan. The shape is "one home, two writers",
+which is the same shape the task register was cured of (a count a register owns has ONE home, BUG-588/D-2692)
+applied to a FILE. A second, smaller face: a KILLED deep scan leaves `state: running` with `recipe: health-deep`,
+and the whole-set reader then reports *"a scan BEGAN at T and never recorded a finish"* - a true statement about
+the file and a misleading one about what was being scanned, because the `state` test precedes the recipe test.
+
+**Closure condition (either limb, both cheap, neither needs a model).** (a) the record path is DERIVED per
+declared recipe (a declared pattern, never a literal, C12), so two recipes can never share one home; or (b) the
+writer REFUSES to replace a record whose `recipe` differs from the one it is about to write, naming both. Either
+limb must carry a two-sided control: a same-recipe rewrite is ALLOWED (the ledger is meant to be replaced) and a
+cross-recipe rewrite is REFUSED - a rule that refuses both is not a rule (BUG-492).
+
+**Not filed as a duplicate of BUG-1010.** BUG-1010 was that a record could not say WHICH BYTES it measured and is
+CLOSED by measurement tonight; this is that two subjects can occupy one name. Different referent, different fix,
+and the attribution work is what made it visible (the `recipe` field is now compared rather than assumed).

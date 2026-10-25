@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 784,
-  "open_n": 245,
+  "total_ids": 785,
+  "open_n": 246,
   "closed_n": 539,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1233,6 +1233,11 @@
     {
       "id": "BUG-1020",
       "title": "(MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal",
+      "events": 1
+    },
+    {
+      "id": "BUG-1021",
+      "title": "(LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict,",
       "events": 1
     }
   ],

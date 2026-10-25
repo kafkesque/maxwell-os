@@ -2703,3 +2703,31 @@ tasks:
     governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json instead of repeating a number, and the limb only
     counts what refuses to cite. It is never a network read: a rail that needs HF to pass is a rail that fails
     offline, which is the opposite of what this OS wants.
+- id: T-204
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    the recorded verdict names the head it MEASURED and, when they differ, the head the tree NOW stands at - as a
+    NOTE in the message, never as a gate
+  source: BUG-1010 (CLOSED 2026-10-25) / D-3152 clause 4 / commit 24d2c01
+  why: >-
+    MEASURED 2026-10-25, and it is the residual shape BUG-1010's own closure block NAMES rather than hides: after
+    the landing scan recorded `head_at_end = 24d2c01`, two DOCUMENTATION-ONLY commits moved the tree to f3f534f
+    while `--receipt-check` still answered rc=0 CLEAN naming 24d2c01. That statement is TRUE - 24d2c01 is the byte
+    set that was measured - but a reader cannot tell from the message whether "head 24d2c01" means "this was
+    measured at 24d2c01 and nothing has changed since" or "the tree has moved and the record speaks for the bytes
+    it ran". The addendum that closed BUG-1010 recorded the same confusion from the other side: a CLEAN rc=0
+    naming a sha the worktree had already LEFT. The fix is one clause in the message and costs no scan, because it
+    reads a value the reader already computes.
+  evidence: >-
+    temp/ladder_receipt.json 2026-10-25 (head_at_start == head_at_end == 24d2c01, all four worktree readings
+    empty) | governance/buglog.md#BUG-1010 (MED - CLOSED 2026-10-25), the NAMED LIMIT "a commit made AFTER the
+    scan" | git log: 24d2c01 (the measured code) then 6d5b4ee, f3f534f (documentation only)
+  gate: >-
+    receipt_verdict() appends a clause to the GREEN message when the current head differs from head_at_end, naming
+    BOTH ("measured at ..., the tree now stands at ..."), and it changes NOTHING about the rc. Two-sided control:
+    equal heads produce NO clause (a message that always adds one is noise the eye learns to skip) and unequal
+    heads produce it with both shas. The wrong fix is GATING on it: that would force a 17-minute whole-set rescan
+    after every commit - including every documentation commit - which is the discipline D-3151 says will not be
+    kept, and it is why this is a SHOULD task and not a bug. The message is not a verdict; the fields are.

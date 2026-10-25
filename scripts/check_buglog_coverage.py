@@ -27,7 +27,13 @@ HEADING_RE = re.compile(r"^#{1,6}\s+.*?BUG-\d+")
 # event. MEASURED (pre-existing, proved against the pre-session commit): 7 such blocks, all 2026-10-11, failed
 # this guard while the bugs they name were fully parsed everywhere else. The bug's OWN "## BUG-<id>" heading
 # still carries its status and is still required - the two controls in --selftest hold BOTH directions.
-ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|NOTE|APPENDIX|ERRATUM|STATUS)\b")
+# ADDENDUM (2026-10-25) BELONGS TO THE SAME CLASS, and leaving it out turned `just health` RED on TWO blocks
+# written the same day - one appended to BUG-1010 and one to BUG-811. Both legitimately ANNOTATE a bug that
+# already has its own status heading, which is exactly what this list is for. MEASURED: the ladder stopped at
+# `just health` line 91 with "FAIL buglog coverage: 2 heading(s) name a bug but are not parsed" AFTER a commit
+# that had been declared green by running only the three rails that happen to read the buglog - the lesson is
+# that the vocabulary was one word short, and that a green claim from a partial rail set is not a green claim.
+ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|NOTE|APPENDIX|ERRATUM|ADDENDUM|STATUS)\b")
 
 
 BLOCK_START_RE = re.compile(r"^(?:#{2,3}\s.*?BUG-\d+|\*\*BUG-\d+)")
@@ -121,6 +127,13 @@ def selftest() -> int:
         # D-2946 controls. Forward: a session STATUS summary that names bugs is apparatus, not a fault.
         ("a '## STATUS <date> (...)' summary naming several bugs is NOT a fault (D-2946)",
          not unparsed_heading_problems(["## STATUS 2026-10-11 20:08 (BUG-712 PRODUCER FIX APPLIED · BUG-715 NEW)\n"])),
+        # ADDENDUM controls, both directions: an addendum ANNOTATES a bug that has its own status heading, so it is
+        # apparatus rather than a status event (the 2026-10-25 pair that turned the ladder RED), while a heading that
+        # merely names a bug and says nothing about what kind of block it is stays a fault.
+        ("an ADDENDUM heading naming a bug is NOT a fault - it annotates a block that has its own status heading",
+         not unparsed_heading_problems(["### ADDENDUM (2026-10-25) to BUG-811 \u2014 lie 6 was PUBLISHED as a measured cell\n"])),
+        ("but an ADDENDUM that names NO bug is not even seen by the guard - it can never be mistaken for a status event",
+         not unparsed_heading_problems(["### ADDENDUM (2026-10-25) \u2014 no id at all\n"])),
         # Backward: the DETECTION class must still fire, or the exemption would have swallowed it.
         ("a heading that names a bug with NO annotation word is STILL a fault (the guard is not disarmed)",
          bool(unparsed_heading_problems(["## Weekly notes about BUG-9001 and its children\n"]))),

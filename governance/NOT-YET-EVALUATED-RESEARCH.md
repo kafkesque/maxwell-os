@@ -37,6 +37,7 @@
 | **R-11** | SiliconScope | Apple Silicon native monitor | System diagnostics | ⭐802. ANE/Memory-bandwidth tracking. Diagnostic only. |
 | **R-12** | Prompt caching | Cache system prompts across calls | S4 | ~500 tokens saved per FB | ✅ **ANSWERED 2026-10-16 (BUG-872): the cache is LIVE and was never disproven** — byte-identical 2,616-token prefix, gemma-4-E4B cold 6.90 s → warm 0.16–0.39 s, `cached 2613/2616`, **25.01x** against a declared 5.0x bar, confirmed independently by `agent_context_probe --prefill-ab`. Two corrections the measurement forced: the cache is **PER-MODEL** (`cached = 0` on both Orniths), and the binding constraint is **PREFIX STABILITY**, not prefill throughput — one byte changed at the head converts a 0.16 s turn back into a 6.90 s one. The `2,000-token comparable floor` this row's stage relied on is **DISPROVEN** (gpt-oss-20b-Q8: 71.3 tok/s @ 2,677 vs 210 tok/s @ 50,082). |
 | **R-13** | Token-efficient prompt patterns | Systematic prompt optimization | All stages | 10-30% across pipeline | Requires per-stage analysis. |
+| **R-14** | Recursive Flint (40B-A2.5B MoE coding model) | Coding-agent MoE; 39.8B total / ~2.5B active, 256 experts (6+1 shared), 262K ctx, sliding-window 513 | Pipeline generator / agent loop | **Both target runtimes EXIST and are measured fast** (Ollama 87–115 tok/s on M5 Pro 64GB 4-bit; MLX conversion in `mlx-community/flint-mixed-3-4bit`) | ❌ **NOT ADOPTED 2026-10-25** — four blockers, each measured: (1) operating point is **temp 1.0 / top-p 0.95 / top-k 20**, a direct conflict with R7 (temp=0.0 on all generation scripts); (2) **tool calls fail without a constrained-decoding grammar** (41/85 failed in OpenCode with a community MLX build; 0/50 after adding a grammar — mlx-lm/OMLX has no grammar path); (3) Recursive's own fast engine `rec` (1.4–2.6× llama.cpp) **requires an M4 Pro/M5 Pro/M5 Max + ≥48 GB — this box is an M1 Max**; (4) community quality is **behind Qwen3.6-35B-A3B** and it **overthinks** (20K+ reasoning tokens). Full receipt below. |
 
 ---
 
@@ -328,3 +329,95 @@ that were NOT yet reflected in this register's P1/P2/P3 rows are (a) the **ontol
 receipts; neither is promoted to a numbered row because their adoption gates are decisions (SHACL is the only one
 already 60% built — `config/taxonomy_shacl.ttl`), not research. No new dependency is implied by this index; it is a
 recall map, not a purchase order.
+
+
+---
+
+## 2026-10-25 — EVALUATION: Recursive Flint (R-14) — MLX/OMLX vs Ollama availability, and the verdict
+
+**The question asked:** is `RecursiveSI/flint` available for the MLX / OMLX inference engine, or can it be as fast in
+Ollama? Every line below is a reading taken 2026-10-25; nothing is from memory (D-3109).
+
+### 1. What the model IS (from the repository, not the tag metadata)
+
+`config.json` → `architectures: ["FlintForCausalLM"]`, **`model_type: "flint"`** — a CUSTOM architecture, not a
+Llama/Qwen shape. 49 layers (2 dense + 47 MoE), 256 routed experts (6 selected + 1 always-active shared), sliding
+window **513**, 14 full-attention layers with **no positional encoding** (`no_rope_layer_indices`), per-head QK
+RMSNorm + **learned per-head attention sinks**, `router_score_function: sigmoid`, `softmax_type: learnable`,
+vocab 150,144, ctx 262,144. BF16 = 39,785,287,456 params / 79.6 GB in 15 shards. License Apache-2.0.
+
+The model card says, verbatim: *"Flint runs on one B300 or H200 GPU per replica with the SGLang kit in `sglang/`.
+**Transformers modeling code is not included yet.**"* and *"Quantized variants are prepared separately for NVIDIA
+and Apple Silicon runtimes."* Note the trap: the HF repo metadata says `library_name: transformers` /
+`AutoModelForCausalLM`, but **no `modeling_flint.py` is in the repo** — the tag is an autoloader alias, not shipped
+code. Claiming "it has Transformers support" from the tag alone would be a false reading.
+
+### 2. MLX / OMLX — available, but NOT through the engine installed here
+
+- **`mlx-lm` has first-class Flint support**: `mlx_lm/models/flint.py` exists at HEAD; the PR *"Recursive Flint model
+  support"* merged **2026-10-21**; a further perf PR (*"Skip fully masked key tiles in Flint sliding-window prefill"*)
+  is **still OPEN (2026-10-24)** — i.e. the support is real but still stabilising.
+- **A validated MLX conversion exists**: `mlx-community/flint-mixed-3-4bit` (lastModified 2026-10-22, 768 downloads) —
+  mixed 3/4-bit (3-bit on the expert `switch_mlp` matrices, 8-bit embed), 4 shards, ships `eval_kl.py` (a KL-divergence
+  quality check, not just a convert-and-hope). Plus community MLX builds (`pgmharikrishnan/Flint-MLX-Serve-*`,
+  `dima6312/...-MLX-4bit`).
+- **BUT the engine in this repo cannot load it today.** MEASURED: `/usr/local/bin/python3` carries **mlx-lm 0.31.3**,
+  and `flint` is **NOT** in its 118 model modules (`import mlx_lm.models; 'flint' in …` → False). PyPI latest is
+  **0.32.2**. So OMLX would need an mlx-lm upgrade (0.31.3 → ≥0.32.x) before `flint` resolves at all.
+- **The fast MLX path is Recursive's own engine `rec`**, and it is hardware-gated: `rec` claims **1.4–2.6× llama.cpp
+  throughput on M4 Pro**, but its stated requirements are *"Apple Silicon Mac with an **M4 Pro, M5 Pro, or M5 Max**"*
+  and *"At least **48 GB** unified memory"*, and it is *"optimized for **single-session** usage"*. **This machine is an
+  Apple M1 Max, 64 GB** — the M1 Max is not in `rec`'s supported list, and single-session-only excludes a multi-model
+  pipeline anyway.
+
+### 3. Ollama — YES, measured, and it is already the fastest *simple* path
+
+Official GGUF ships from Recursive (`RecursiveSI/flint-int4-gguf`, `flint-nvfp4-gguf`) and upstream support exists
+(`ggml-org/Flint-GGUF`). Community numbers, quoted with their source:
+
+| Reading | Hardware / runtime | Number | Source |
+|---|---|---|---|
+| Short prompt | M5 Pro Mac mini 64 GB, **Ollama 4-bit** | **115 tok/s** | HF discussion #15 (@pratikgx) |
+| 20K-token codebase | same | read in 11 s, then **87 tok/s** writing | #15 / #8 (@pratikgx) |
+| Full ctx, NVFP4 GGUF | RTX Pro 5000 48 GB, llama.cpp | ~26 GB VRAM, **~115 t/s** | #17 (@curiousily) |
+| Memory fit | 4-bit | int4 MLX 22.6 GB → ~24 GB total; Q4_K_XL 25.1 → ~27 GB; Q3 fits 24 GB | #8 (@localllmrig) |
+
+So **"as fast in Ollama?" → yes; 87–115 tok/s**, entirely local, on exactly this machine class (64 GB Apple Silicon).
+MLX/`rec` would be *faster*, but not on an M1 Max and not multi-session.
+
+### 4. The blockers that decide it (this is the part that matters)
+
+1. **R7 conflict — the decisive one.** Recommended generation is **temperature 1.0, top-p 0.95, top-k 20**; the card
+   even says the server applies these when a request omits them. Maxwell's IRON RULE **R7 = temp 0.0 on all
+   generation scripts**. The pipeline's determinism/reproducibility rests on R7 (D-3143 re-mints a pin precisely
+   because a *byte* move invalidates a certificate). Running Flint at 0.0 is off its trained operating point; running
+   it at 1.0 breaks R7. Either way it cannot hold a pipeline generator/classifier role.
+2. **Tool calling is the model's known weak spot and needs grammar constraints.** Measured in HF #11 (@Nav8ha):
+   with `--grammar none`, Flint called a `read` tool with `path` instead of `filePath` on 2 of 3 seeds; in OpenCode
+   with a 3-bit MLX build **41 of 85 tool calls failed**; adding a schema grammar + all four EOS stop tokens took it
+   to **0 of 50 failures with no decode slowdown** (mlx-vlm PR #2571). HF #19: *"speed is impressive, but tool call is
+   disaster."* HF #12: it re-plans repeatedly and inspects unrelated files instead of calling an already-supplied
+   tool; rec's MLX server accepts `grammar:"flint"` + `max_tokens` but **not** `reasoning_effort` /
+   `thinking_token_budget`, so the only lever is a hard output cap.
+3. **Quality is below the incumbent it would replace.** HF #5/#18/@curiousily: *"still behind Qwen"*, *"Not even close
+   to the Qwen 3.8 27B, it is alternative for Qwen 3.6 35B A3B"*, *"clumsy, uses a lot of tools … but it is fast"*,
+   *"it feels more is needed"*. Harness-reported: Terminal-Bench 2.1 **54.9%**, SWE-bench Pro v2 **89.7%**, SWE-bench
+   Verified **74.2%** (temp 1.0; web-retrieved solutions counted as failures).
+4. **Overthinking.** HF #15: *"some runs used 20K+ reasoning tokens before writing any code"*; the only mitigation is
+   `max_tokens`, which truncates rather than reduces thinking.
+
+### 5. VERDICT — DO NOT DOWNLOAD. Registered as R-14 (P3 monitor), not adopted.
+
+- **MLX/OMLX**: available in principle (mlx-lm `flint.py`, `mlx-community/flint-mixed-3-4bit`), **but not with today's
+  engine** — it needs an mlx-lm upgrade **and** a grammar-constrained tool path that plain mlx-lm/OMLX does not have.
+- **Ollama**: available and fast (87–115 tok/s), **but** Ollama's GGUF path has the same tool-call grammar dependency
+  and cannot honour R7.
+- **Not worth the ~23–25 GB** while it (a) violates R7 for any pipeline role, (b) is weaker than the models already
+  serving, and (c) cannot run on the fastest engine (`rec`) on an M1 Max.
+
+**RE-OPEN CONDITIONS (all must be re-measured, not assumed).** (a) A grammar-constrained tool-call path exists in
+OMLX (or mlx-vlm PR #2571-equivalent lands in mlx-lm), AND the sliding-window-prefill PR closes. (b) A **temp=0.0**
+reading on Maxwell's OWN eval set beats the incumbent for the specific role proposed — otherwise the role would need
+to be one that does not require R7 determinism. (c) If the hardware moves to an M4/M5 Pro/Max with ≥48 GB, `rec`
+becomes a candidate engine in its own right and should be evaluated separately from Flint. **Nothing is downloaded or
+promoted before (a) and (b) both speak (D-3058/D-3036).**

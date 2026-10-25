@@ -2059,7 +2059,12 @@ tasks:
     patterns loaded from its ONE home): `--recall BUG-850` names 13 neighbours ranked by strength, the 3 rulings it cites
     that resolve, and the capability that owns each artifact it names; the live reading prints untraced_closed 26 (ceiling
     27), chronic_open 10 (ceiling 11) and unresolved_reference 111 (ceiling 112), each ceiling a measurement plus one
-    declared slot, never raised. The exclusions are readings too: 79 references cited by more than twenty findings are
+    declared slot, never raised. RE-MEASURED 2026-10-25 while closing BUG-481: chronic_open 12 (ceiling 11), i.e. the
+    debt grew by TWO since this reading and the class is now ABOVE its ceiling - the twelfth is BUG-263, whose third
+    heading event is the D-3146 adjudication that keeps it OPEN (its own words name the 200-record run as pending), and
+    the eleventh arrived after this evidence was written. The relief is to DISCHARGE a chronic finding and LOWER the
+    ceiling behind it, never to raise the ceiling (D-2644); the rail reports this as rc 2, loud and NOT fatal (BUG-457),
+    so the ladder keeps running while the debt is visible. The exclusions are readings too: 79 references cited by more than twenty findings are
     excluded as common substrate and COUNTED, and 23 findings sharing fewer than the declared minimum are dropped as
     coincidence and COUNTED.'
   gate: 'pipeline: the recall is run at each finding''s intake, and the two worklist classes are DISCHARGED - each of

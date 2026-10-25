@@ -2,7 +2,7 @@
 
 spec_version: 1
 governed: scripts/run_ladder.py (the ladder's whole-set collector: --collect records, --banner and --receipt-check read) · config/rail_registry.yaml#ladder_receipt (the record's declared home, recipe and age budget) · config/rail_mutations.yaml (the rule's mutation lock) · justfile#health (where the readers stand and in which ORDER)
-authority: D-2680 (the whole-set rule) · D-2982 (a measurement states its coverage; a fingerprint makes two measurements comparable) · D-2660 (a citation is a claim at the moment of mint) · D-404 (a number travels with its ruler) · D-2676 (no rule without one home, a seen control, a named oracle and a mutation) · BUG-573 (a prefix read as a verdict) · BUG-759 (the ladder stood RED on seven lines and nobody knew) · BUG-457 (tri-state) · C12/C16
+authority: D-2680 (the whole-set rule) · D-2982 (a measurement states its coverage; a fingerprint makes two measurements comparable) · D-2660 (a citation is a claim at the moment of mint) · D-404 (a number travels with its ruler) · D-2676 (no rule without one home, a seen control, a named oracle and a mutation) · BUG-573 (a prefix read as a verdict) · BUG-759 (the ladder stood RED on seven lines and nobody knew) · BUG-457 (tri-state) · BUG-1010 (a verdict names the bytes it ran, not the commit it was filed under) · D-3151 (a discipline that costs more than its shortcut will not be kept) · D-3152 (a receipt names its subject) · C12/C16
 stamp: 2026-10-13 · deterministic authoring (no LLM gen)
 status: each invariant is live-verified by tests/test_ladder_receipt_spec.py
 
@@ -68,11 +68,22 @@ never a new file per change. History lives in git plus the D-number that changed
 
 ### INV-7 — The record equals the measurement it took
 - **Correct:** `--collect` records the line count, the coverage, the worst code, each fault with its own rc and
-  cost, the elapsed time, the moment and HEAD, written crash-safely (tempfile -> fsync -> os.replace, C6) — and
-  it records a RED ladder too.
-- **Wrong:** a record that can drift from the run it describes, a write that can leave a partial file, or a
-  record written only on success.
+  cost, the elapsed time, the moment it began (`started_at`), the moment it was written (`measured_at`), HEAD at
+  BOTH ends, the worktree's tracked readings at both ends and the files that appeared during the run, written
+  crash-safely (tempfile -> fsync -> os.replace, C6) — and it records a RED ladder too.
+- **Wrong:** a record that can drift from the run it describes, a write that can leave a partial file, a record
+  written only on success, or one timestamp doing the work of two (the age budget applies to the WRITE).
 - **Test:** `test_the_record_equals_the_measurement`.
+
+### INV-10 — A record is a verdict about the BYTES it names, or it is UNKNOWN (BUG-1010)
+- **Correct:** the opening (moment, HEAD, worktree) is read and RECORDED before the first rail; a record whose
+  `state` is not `finished`, whose HEAD moved between the two ends, whose worktree carried a TRACKED difference at
+  either end, or that names no commit at all, is rc=2 OWNER-OWED and SAYS WHICH of those it is. An inherited
+  GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE is never obeyed when the worktree is read.
+- **Wrong:** reading HEAD when the receipt is WRITTEN (so a commit landed mid-scan is recorded as though its
+  bytes had run), reporting a green record for a scan of a MODIFIED tree, treating "git could not answer" as
+  "clean", or making a record's own OUTPUTS unattributable (a rule that costs that much gets bypassed, D-3151).
+- **Test:** `test_the_record_is_a_verdict_about_the_bytes_it_ran`.
 
 ### INV-8 — ORDER is load-bearing at both ends of the recipe
 - **Correct:** the banner (which prints the record) stands FIRST so no rail can abort before the record is read,

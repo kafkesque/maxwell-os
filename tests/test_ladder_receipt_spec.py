@@ -10,8 +10,10 @@ through its pure functions, and the crash-safe write is driven against a temp pa
 from __future__ import annotations
 
 import importlib.util
+import os
 import re
 import subprocess
+import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -39,16 +41,34 @@ def _recipe_body(rail, name: str) -> list[str]:
     return dict(rail.recipes_of(JUSTFILE.read_text(encoding="utf-8")))[name]
 
 
-def _record(rail, lines: list[str], *, recipe: str = "health", faults: list | None = None, age_hours: float = 2.0):
-    """A synthetic record measured over exactly `lines` - the shape the collector writes, built by hand."""
+def _record(rail, lines: list[str], *, recipe: str = "health", faults: list | None = None, age_hours: float = 2.0,
+            head_at_start: str = "abc1234", head_at_end: str = "abc1234", state: str = "finished",
+            worktree: dict | None = None):
+    """A synthetic record measured over exactly `lines` - the shape the collector writes, built by hand.
+
+    BUG-1010: the shape now carries WHICH BYTES it is about (`state`, both ends' HEAD, the worktree readings), so a
+    control that leaves them out would be driving a record the collector can no longer produce.
+    """
     return {
+        "schema_version": rail.RECEIPT_SCHEMA,
+        "state": state,
         "line_count": len(lines),
         "line_set_fingerprint": rail.line_set_fingerprint(recipe, lines),
         "worst_rc": rail.EXIT_FATAL if faults else rail.EXIT_CLEAN,
         "faults": faults or [],
+        "started_at": (MOMENT - timedelta(hours=age_hours, minutes=9)).isoformat(timespec="seconds"),
         "measured_at": (MOMENT - timedelta(hours=age_hours)).isoformat(timespec="seconds"),
-        "head": "abc1234",
+        "head_at_start": head_at_start,
+        "head_at_end": head_at_end,
+        "worktree": worktree if worktree is not None else {
+            "modified_at_start": [], "modified_at_end": [], "untracked_at_start": [], "minted_during_scan": []},
     }
+
+
+def _opening(head: str = "abc1234", modified: list | None = None, untracked: list | None = None) -> dict:
+    """The state a scan is a measurement OF, as `snapshot()` reads it at the opening."""
+    return {"started_at": (MOMENT - timedelta(minutes=9)).isoformat(timespec="seconds"), "head": head,
+            "worktree": {"modified": modified or [], "untracked": untracked or []}}
 
 
 def test_the_spec_is_paired_1to1_with_its_contract():
@@ -160,21 +180,74 @@ def test_the_record_equals_the_measurement(tmp_path, monkeypatch):
     rail = _rail()
     lines = ["echo A", "echo B"]
     payload = rail.scan_payload("health", lines, rail.EXIT_FATAL, [(lines[1], 1, 0.44)], 2.26, ladder="justfile",
-                               head="deadbee", now=MOMENT)
+                               opening=_opening(), head_at_end="deadbee",
+                               worktree={"modified": [], "untracked": []}, now=MOMENT, state="finished")
     assert payload["line_count"] == len(lines)
     assert payload["line_set_fingerprint"] == rail.line_set_fingerprint("health", lines)
     assert payload["worst_rc"] == rail.EXIT_FATAL and payload["elapsed_seconds"] == 2.3
     assert payload["faults"] == [{"line": lines[1], "rc": 1, "seconds": 0.4}]
     assert payload["measured_at"] == MOMENT.isoformat(timespec="seconds")
+    assert payload["started_at"] == _opening()["started_at"], "the opening is its OWN field, not the write time"
     assert payload["schema_version"] == rail.RECEIPT_SCHEMA and payload["rail"] == "run_ladder.py"
     target = tmp_path / "receipt.json"
     monkeypatch.setattr(rail, "receipt_path", lambda: target)
-    written = rail.record_scan("health", lines, rail.EXIT_CLEAN, [], 0.5)
+    written = rail.record_scan("health", lines, rail.EXIT_CLEAN, [], 0.5, opening=_opening(), environ={})
     assert written == target and target.is_file(), "a green scan is recorded too: the record is not a failure log"
     back, absent = rail.recorded_scan()
     assert absent == "" and back["line_set_fingerprint"] == rail.line_set_fingerprint("health", lines)
+    assert back["state"] == "finished", "a record that cannot say it FINISHED is not a verdict (BUG-1010)"
     assert [p.name for p in tmp_path.iterdir() if p.name.startswith(".")] == [], (
         "the crash-safe write must leave no temp file behind (C6)")
+
+
+def test_the_record_is_a_verdict_about_the_bytes_it_ran():
+    """INV-10: a commit NAMES the bytes only while the worktree equals it; every other shape is OWNER-OWED."""
+    rail = _rail()
+    lines = ["echo A", "echo B"]
+    coverage = rail.line_set_fingerprint("health", lines)
+    clean = {"modified_at_start": [], "modified_at_end": [], "untracked_at_start": [], "minted_during_scan": []}
+    rc, message = rail.receipt_verdict(_record(rail, lines), coverage, len(lines), recipe="health", now=MOMENT,
+                                       max_age_hours=72)
+    assert rc == rail.EXIT_CLEAN and "abc1234" in message, "a clean scan at an unmoved HEAD is the one green state"
+    cases = {
+        "a commit landed MID-SCAN": _record(rail, lines, head_at_end="def5678"),
+        "the scan BEGAN on a modified tracked file": _record(rail, lines, worktree=dict(
+            clean, modified_at_start=["scripts/run_ladder.py"])),
+        "the scan ENDED on a modified tracked file": _record(rail, lines, worktree=dict(
+            clean, modified_at_end=["config/x.yaml"])),
+        "the record names NO commit": _record(rail, lines, head_at_start="", head_at_end=""),
+        "the scan never FINISHED": _record(rail, lines, state="running"),
+    }
+    for why, record in cases.items():
+        rc, message = rail.receipt_verdict(record, coverage, len(lines), recipe="health", now=MOMENT,
+                                          max_age_hours=72)
+        assert rc == rail.EXIT_OWED, f"{why}: must be OWNER-OWED, not green and not fatal (got rc={rc})"
+        assert "UNKNOWN" in message or "no fault" in message, f"{why}: the message must say the record is unusable"
+    # a recorded RED outranks unattributability: a fault that WAS measured may not be softened into "unknown"
+    red = _record(rail, lines, faults=[{"line": lines[1], "rc": 1, "seconds": 0.2}], head_at_end="def5678")
+    rc, message = rail.receipt_verdict(red, coverage, len(lines), recipe="health", now=MOMENT, max_age_hours=72)
+    assert rc == rail.EXIT_FATAL and "1 fault" in message, "C16: a measured red may not be quieted by a provenance defect"
+    # the shape it deliberately does NOT gate: the scan's own OUTPUTS
+    minted = _record(rail, lines, worktree=dict(clean, minted_during_scan=["governance/evidence/NEW.json"]))
+    rc, message = rail.receipt_verdict(minted, coverage, len(lines), recipe="health", now=MOMENT, max_age_hours=72)
+    assert rc == rail.EXIT_CLEAN and "minted during the scan" in message, (
+        "D-3151: a rule that reds a scan for leaving an artefact is a rule that gets bypassed - so it is REPORTED")
+
+
+def test_git_overrides_are_cleared_before_the_worktree_is_read():
+    """INV-10: an inherited GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE is never obeyed (BUG-527's class, one level up)."""
+    rail = _rail()
+    armed = {"GIT_DIR": "/decoy/.git", "GIT_WORK_TREE": "/decoy", "GIT_INDEX_FILE": "/decoy/index", "PATH": "/bin"}
+    scrubbed = rail.cleared(armed)
+    assert scrubbed == {"PATH": "/bin"}, "git's own overrides must be dropped and everything else KEPT"
+    live = rail.worktree_state()
+    # the ARMED reading is this process's real environment with the three overrides added, so the only variable
+    # between the two readings is the thing under test
+    armed_live = dict(os.environ, GIT_DIR="/decoy/.git", GIT_WORK_TREE="/decoy",
+                      GIT_INDEX_FILE=str(Path(tempfile.gettempdir()) / ".no_such_index_for_a_control"))
+    assert rail.worktree_state(armed_live) == live, (
+        "MEASURED on this clone: an inherited empty GIT_INDEX_FILE made `git status --porcelain -uall` answer 3973 "
+        "lines against 0 - an unscrubbed reading would mark every scan un-attributable")
 
 
 def test_the_order_is_load_bearing():

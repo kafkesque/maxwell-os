@@ -36,9 +36,10 @@ THE RECEIPT (D-2983, BUG-759). A prefix report is a verdict about the lines it R
 lines it never reached. MEASURED 2026-10-13, that cost a whole-session blindness: the full ladder stood RED on
 SEVEN lines and nobody knew, because a session that mints a decision cannot get past the commit-frontier rail
 and a session that never runs the whole set never sees the rest. So the whole set is now a MEASUREMENT that
-outlives the run. --collect records {coverage fingerprint, line count, worst rc, every fault, cost, age, HEAD}
-to the path declared in config/rail_registry.yaml#ladder_receipt (C12: no path in code), and both readers of
-that record derive the whole-set entry point from the ladder's own bytes:
+outlives the run. --collect records {coverage fingerprint, line count, worst rc, every fault, cost, the OPENING
+state, HEAD at START and at END, and the worktree's tracked readings at both ends} to the path declared in
+config/rail_registry.yaml#ladder_receipt (C12: no path in code), and both readers of that record derive the
+whole-set entry point from the ladder's own bytes:
   --banner         prints the recorded verdict FIRST, before any rail can abort the recipe (a declaration
                    printed after the abort is read by nobody) and NEVER aborts on it itself;
   --receipt-check  exits with the same tri-state: 0 the whole ladder was MEASURED GREEN under exactly this
@@ -49,6 +50,21 @@ that record derive the whole-set entry point from the ladder's own bytes:
                    it speaks for.
 The record is held OUT of version control (gitignored, declared in the registry): it is THIS clone's
 observation, so committing it would dress a machine-local measurement as durable evidence.
+
+WHICH BYTES (BUG-1010; D-3152 clause 2 - a receipt NAMES the subject it measured). The record's claim is not
+"the ladder is green" in the abstract: it is "the ladder was green over THIS SET OF BYTES", and a commit names
+that set only while the worktree EQUALS it. Two readings were missing and both were MEASURED to be missing:
+HEAD was read when the record was WRITTEN, i.e. after every rail (so a commit landed mid-scan was recorded as
+though its bytes had run, and `--receipt-check` returned rc=0 CLEAN naming a commit the tree had already left),
+and nothing recorded whether the tree was clean (so a scan of a MODIFIED tree named a commit whose bytes it never
+ran, and a clean run and a dirty run produced BYTE-IDENTICAL records). The record now carries `state`,
+`started_at`, `head_at_start`, `head_at_end` and
+`worktree:{modified_at_start, modified_at_end, untracked_at_start, minted_during_scan}`, and a record that cannot
+be ATTRIBUTED to its bytes is OWNER-OWED (rc=2) naming why - never green and never fatal, because only a clean
+tree measured again can clear it. `state: "running"` is written BEFORE the first rail, so a scan that is KILLED
+leaves a record that says so instead of leaving a tree indistinguishable from one never scanned (MEASURED
+2026-10-25: a detached whole-set scan ran 6+ minutes, reached rail ~180 of 194 and vanished - no traceback, no
+crash report, receipt untouched).
 """
 from __future__ import annotations
 
@@ -80,7 +96,15 @@ RECIPE = re.compile(r"^([A-Za-z0-9_-]+):")
 TEMPLATE = re.compile(r"\{\{[^{}]*\}\}")
 EXIT_CLEAN, EXIT_FATAL, EXIT_OWED = 0, 1, 2
 Fault = tuple[str, int, float]
-RECEIPT_SCHEMA = "1"
+RECEIPT_SCHEMA = "2"
+# git's OWN override variables: they are INHERITED by every child process, and this file now reads the worktree to
+# decide WHICH BYTES a verdict is about. MEASURED on this clone 2026-10-25: with an inherited EMPTY GIT_INDEX_FILE,
+# `git status --porcelain -uall` answered 3973 lines (every tracked path as deleted) against 0 on the real index -
+# so an unscrubbed reading would mark EVERY scan un-attributable and turn a green ladder permanently owner-owed
+# from a variable nobody in this file set (BUG-527/BUG-568's class, one level up).
+GIT_OVERRIDES = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+# How many dirty paths a MESSAGE names before it reports the remainder as a count: the record carries them ALL.
+PATHS_NAMED = 3
 
 
 def declared() -> tuple[str, list[str]]:
@@ -322,39 +346,156 @@ def age_hours(measured_at: Any, now: datetime) -> float | None:
     return (now - measured).total_seconds() / 3600.0
 
 
-def scan_payload(recipe: str, lines: list[str], worst: int, faults: list[Fault], elapsed: float, *,
-                 ladder: str, head: str, now: datetime) -> dict:
-    """What ONE full scan measured, as a record: the verdict, its coverage, its cost and its moment.
+def scan_payload(recipe: str, lines: list[str], worst: int | None, faults: list[Fault], elapsed: float | None, *,
+                 ladder: str, opening: dict, head_at_end: str, worktree: dict, now: datetime, state: str) -> dict:
+    """What ONE scan measured, as a record: the verdict, its coverage, ITS BYTES, its cost and its moments.
 
     PURE, so a control can drive it without running a ladder. The record IS the measurement - a receipt that can
     drift from the run it describes would be read as evidence, which is worse than no receipt at all.
+
+    TWO MOMENTS, TWO ROLES (BUG-1010). `started_at` is when the scan BEGAN; `measured_at` is when this record was
+    WRITTEN, and it is the one the declared age budget is applied to (INV-1), so the opening is named in a field
+    of its own rather than by overloading one timestamp. `head_at_start` comes from `opening` and `head_at_end`
+    from the close, and `state` says whether the run FINISHED: a record that cannot say it finished is not a
+    verdict, whatever else it carries.
     """
+    opened = opening.get("worktree") or {}
+    untracked_at_start = [str(p) for p in (opened.get("untracked") or [])]
+    untracked_at_end = [str(p) for p in (worktree.get("untracked") or [])]
     return {
         "schema_version": RECEIPT_SCHEMA,
         "rail": SELF,
         "ladder": ladder,
         "recipe": recipe,
+        "state": state,
         "line_count": len(lines),
         "line_set_fingerprint": line_set_fingerprint(recipe, lines),
         "worst_rc": worst,
         "faults": [{"line": line, "rc": rc, "seconds": round(seconds, 1)} for line, rc, seconds in faults],
-        "elapsed_seconds": round(elapsed, 1),
+        "elapsed_seconds": None if elapsed is None else round(elapsed, 1),
+        "started_at": opening.get("started_at"),
         "measured_at": now.isoformat(timespec="seconds"),
-        "head": head,
+        "head_at_start": str(opening.get("head") or ""),
+        "head_at_end": head_at_end,
+        "worktree": {
+            "modified_at_start": [str(p) for p in (opened.get("modified") or [])],
+            "modified_at_end": [str(p) for p in (worktree.get("modified") or [])],
+            "untracked_at_start": untracked_at_start,
+            # UNTRACKED AT END minus UNTRACKED AT START: these are the scan's own OUTPUTS (a rail mints an
+            # evidence file), and they are kept apart from the opening reading on purpose - see attribution().
+            "minted_during_scan": [p for p in untracked_at_end if p not in untracked_at_start],
+        },
     }
 
 
-def head_sha() -> str:
-    """git's own short answer for HEAD - enough to place a scan in history, never an input to a verdict."""
-    done = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(REPO), capture_output=True, text=True)
+def cleared(environ: dict[str, str] | None = None) -> dict[str, str]:
+    """The environment git is run with: this process's, minus git's OWN overrides (GIT_OVERRIDES).
+
+    BUG-527/BUG-568's class, and here it feeds a VERDICT. An inherited index or git dir is somebody else's
+    repository: MEASURED on this clone 2026-10-25, an empty inherited GIT_INDEX_FILE made `git status --porcelain
+    -uall` answer 3973 lines against 0, and `GIT_DIR` pointed at a decoy made git refuse to answer at all. Both
+    readings now decide whether a green record may be believed, so both are taken through THIS worktree only.
+    """
+    source = dict(os.environ if environ is None else environ)
+    for name in GIT_OVERRIDES:
+        source.pop(name, None)
+    return source
+
+
+def head_sha(environ: dict[str, str] | None = None) -> str:
+    """git's own short answer for HEAD at the moment it is ASKED, or "" when git cannot answer (never a guess).
+
+    An EMPTY answer is not a clean answer: attribution() REFUSES on it, because a verdict that names no bytes is
+    a verdict about nothing (D-405/BUG-1018's class).
+    """
+    done = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(REPO), capture_output=True, text=True,
+                          env=cleared(environ))
     return done.stdout.strip() if done.returncode == 0 else ""
 
 
-def record_scan(recipe: str, lines: list[str], worst: int, faults: list[Fault], elapsed: float) -> pathlib.Path:
-    """Record what this run measured. Crash-safe (C6), and written for a RED ladder too: a red is a measurement."""
-    ladder, _recipes = declared()
-    payload = scan_payload(recipe, lines, worst, faults, elapsed, ladder=ladder, head=head_sha(),
-                           now=datetime.now(UTC))
+def worktree_state(environ: dict[str, str] | None = None) -> dict[str, list[str]]:
+    """The worktree as git sees it, with TRACKED changes and UNTRACKED files kept APART because they mean apart.
+
+    `git status --porcelain` answers in two letters: `??` is a path git does not know, everything else is a
+    TRACKED path that differs from the commit. attribution() turns on the distinction - a tracked difference means
+    the bytes that ran are NOT the commit's, while an untracked path is a candidate input whose reach a status
+    line cannot decide. An unanswerable read returns empty lists and is therefore NOT a clean reading; the caller
+    asks head_sha() separately, and attribution() refuses when either reading is missing.
+    """
+    done = subprocess.run(["git", "status", "--porcelain", "-uall"], cwd=str(REPO), capture_output=True,
+                          text=True, env=cleared(environ))
+    if done.returncode != 0:
+        return {"modified": [], "untracked": []}
+    modified: list[str] = []
+    untracked: list[str] = []
+    for line in done.stdout.splitlines():
+        if not line.strip():
+            continue
+        path = line[3:].strip() if len(line) > 3 else line.strip()
+        (untracked if line.startswith("??") else modified).append(path)
+    return {"modified": modified, "untracked": untracked}
+
+
+def snapshot(now: datetime | None = None, environ: dict[str, str] | None = None) -> dict:
+    """The state a scan is a measurement OF, read ONCE at its OPENING: the moment, the commit, the worktree."""
+    return {"started_at": (now or datetime.now(UTC)).isoformat(timespec="seconds"),
+            "head": head_sha(environ),
+            "worktree": worktree_state(environ)}
+
+
+def attribution(payload: dict) -> str:
+    """WHY this record may not be read as a verdict about the bytes it names - "" when it may (BUG-1010).
+
+    The claim is about a SET OF BYTES, and a commit names that set only while the worktree equals it. Three shapes
+    break the equality, and each is NAMED rather than averaged into one boolean:
+      * HEAD MOVED between the opening and the close - the bytes measured are neither commit's;
+      * a TRACKED file differed from HEAD when the scan BEGAN - the scan ran code no commit contains;
+      * a TRACKED file differed when it ENDED - something the scan ran rewrote the tree it was measuring;
+      * no commit at all was named at one end - a verdict whose subject is missing (D-405).
+
+    THE SHAPE IT DOES NOT GATE, named so it cannot be mistaken for coverage (D-3152 clause 4): a path that was
+    UNTRACKED when the scan began. A status line cannot decide whether a rail imported it, and the alternative -
+    gating on the record's own outputs - would mark every scan that mints an evidence file un-attributable, so the
+    rule would be bypassed (D-3151). Both readings therefore TRAVEL in the record and are reported by
+    uncommitted_note(); neither turns the verdict.
+    """
+    start = str(payload.get("head_at_start") or "")
+    end = str(payload.get("head_at_end") or "")
+    if not start or not end:
+        return ("it names no commit (" + ("start" if not start else "end")
+                + " reading empty), and a verdict that cannot name its bytes is a verdict about nothing")
+    if start != end:
+        return ("HEAD MOVED while the rails ran (" + start + " -> " + end + "), so the bytes measured are neither "
+                "commit's - the scan spans a commit and no single byte set")
+    worktree = payload.get("worktree") or {}
+    for field, when in (("modified_at_start", "when the scan BEGAN"), ("modified_at_end", "when it ENDED")):
+        dirty = [str(p) for p in (worktree.get(field) or [])]
+        if dirty:
+            named = ", ".join(dirty[:PATHS_NAMED])
+            if len(dirty) > PATHS_NAMED:
+                named += ", +" + str(len(dirty) - PATHS_NAMED) + " more"
+            return (str(len(dirty)) + " TRACKED file(s) differed from " + end + " " + when + " (" + named
+                    + "), so the scan ran code that commit does not contain")
+    return ""
+
+
+def uncommitted_note(payload: dict) -> str:
+    """What the record saw that git did not know, as a NOTE: reported, never gating (D-3151, see attribution()).
+
+    `minted_during_scan` is the scan's own output and `untracked_at_start` is state the run inherited; both are
+    counted here so a reader can see that a green verdict was taken on an impure tree WITHOUT the rule turning
+    every artefact-producing scan un-attributable.
+    """
+    worktree = payload.get("worktree") or {}
+    before = len(worktree.get("untracked_at_start") or [])
+    minted = len(worktree.get("minted_during_scan") or [])
+    parts = ([] if not before else [str(before) + " file(s) untracked at start"]) \
+        + ([] if not minted else [str(minted) + " minted during the scan"])
+    return ("; " + ", ".join(parts)) if parts else ""
+
+
+def write_record(payload: dict) -> pathlib.Path:
+    """Write the record crash-safely (C6): tempfile -> fsync -> os.replace, or REFUSE loudly (never a silent loss)."""
     path = receipt_path()
     try:
         handle, tmp = tempfile.mkstemp(dir=str(path.parent), prefix="." + path.name + ".", suffix=".tmp")
@@ -368,6 +509,33 @@ def record_scan(recipe: str, lines: list[str], worst: int, faults: list[Fault], 
                          + str(err) + ") - a whole-set verdict nobody records is a verdict reasoned about from "
                          "memory, which is how BUG-759 went unnoticed (D-2983)") from err
     return path
+
+
+def record_open(recipe: str, lines: list[str], opening: dict) -> pathlib.Path:
+    """Record that a scan has BEGUN, BEFORE the first rail, so a killed scan is a NAMED state (BUG-1010).
+
+    MEASURED 2026-10-25: a detached whole-set scan reached rail ~180 of 194 and vanished - no traceback, no crash
+    report, the receipt untouched - leaving a tree indistinguishable from one never scanned. `worst_rc` is None
+    and never 0 here, so even a reader that ignored `state` cannot read a half-run as green.
+    """
+    ladder, _recipes = declared()
+    payload = scan_payload(recipe, lines, None, [], None, ladder=ladder, opening=opening, head_at_end="",
+                           worktree={}, now=datetime.now(UTC), state="running")
+    return write_record(payload)
+
+
+def record_scan(recipe: str, lines: list[str], worst: int, faults: list[Fault], elapsed: float, *,
+                opening: dict, environ: dict[str, str] | None = None) -> pathlib.Path:
+    """Record what this run measured. Crash-safe (C6), and written for a RED ladder too: a red is a measurement.
+
+    `opening` is REQUIRED, not defaulted: a record whose opening was invented at the close would name a moment
+    and a commit it never read, which is the defect this parameter exists to end (D-3152 clause 2).
+    """
+    ladder, _recipes = declared()
+    payload = scan_payload(recipe, lines, worst, faults, elapsed, ladder=ladder, opening=opening,
+                           head_at_end=head_sha(environ), worktree=worktree_state(environ),
+                           now=datetime.now(UTC), state="finished")
+    return write_record(payload)
 
 
 def recorded_scan() -> tuple[dict | None, str]:
@@ -404,6 +572,20 @@ def receipt_verdict(payload: Any, fingerprint: str, line_count: int, *, recipe: 
         return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: "
                            + (absent or "no full scan is recorded on this machine")
                            + " - a prefix report is not a verdict (BUG-573)" + tail)
+    # WHICH BYTES, before WHICH LADDER (BUG-1010): a record that cannot say it FINISHED is not a verdict about
+    # anything, and both shapes are NAMED - a scan still running or killed, and a record written by a collector
+    # younger than this rule, which had no field in which to say it.
+    state = str(payload.get("state") or "")
+    if state == "running":
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: a scan BEGAN at "
+                           + str(payload.get("started_at") or "an unrecorded moment") + " and never recorded a "
+                           "finish, so it was killed or is still running - a half-run is not a verdict (BUG-1010)"
+                           + tail)
+    if state != "finished":
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: the recorded scan cannot "
+                           "say it FINISHED (schema " + str(payload.get("schema_version") or "?")
+                           + " carries no state) - a record that cannot say it finished is not a verdict "
+                           "(BUG-1010)" + tail)
     recorded = str(payload.get("line_set_fingerprint") or "")
     if recorded != fingerprint:
         return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: the ladder CHANGED "
@@ -424,9 +606,17 @@ def receipt_verdict(payload: Any, fingerprint: str, line_count: int, *, recipe: 
         return EXIT_FATAL, ("a red is RECORDED for `just " + recipe + "` under exactly this coverage: "
                             + str(len(recorded_faults)) + " fault(s) measured " + f"{age:.1f}" + "h ago ("
                             + named + ") - a measured fault may not go quiet (C16)" + tail)
+    # A RECORDED RED OUTRANKS UNATTRIBUTABILITY, and the order is the point: an unattributable scan that measured
+    # a fault still MEASURED it, so reporting provenance first would soften a red into "unknown" - C16 inverted.
+    why = attribution(payload)
+    if why:
+        return EXIT_OWED, ("the whole ladder `just " + recipe + "` recorded no fault, but the record may not be "
+                           "read as a verdict about a commit: " + why + " - re-measure on a clean tree"
+                           + tail)
     return EXIT_CLEAN, ("the whole ladder `just " + recipe + "` was MEASURED GREEN under exactly this "
                         + str(line_count) + " declaring line(s) " + f"{age:.1f}" + "h ago (fingerprint "
-                        + fingerprint + ", head " + str(payload.get("head") or "?") + ")")
+                        + fingerprint + ", head " + str(payload.get("head_at_end") or "?")
+                        + uncommitted_note(payload) + ")")
 
 
 def receipt_lines(*, strict: bool) -> tuple[int, list[str]]:
@@ -504,10 +694,19 @@ def scan(recipe: str) -> int:
     lines = body(recipe)
     print("=== ladder scan (" + recipe + ", " + str(len(lines)) + " declaring line(s)): every line runs, "
           "nothing is hidden (D-2680) ===" + narrowing(recipe), flush=True)
+    # BUG-1010: the opening is read and RECORDED before the first rail, so the verdict can name the bytes it ran
+    # and a killed scan leaves a record that says so. Recorded, not merely remembered: a detached scan that dies
+    # leaves this row and nothing else.
+    opening = snapshot()
+    record_open(recipe, lines, opening)
+    print("ladder scan: opened at head " + (str(opening.get("head")) or "?") + " with "
+          + str(len((opening.get("worktree") or {}).get("modified") or [])) + " tracked change(s) and "
+          + str(len((opening.get("worktree") or {}).get("untracked") or [])) + " untracked file(s); the receipt "
+          "records BOTH ends (BUG-1010)", flush=True)
     t0 = time.monotonic()
     worst, faults = run_lines(lines)
     elapsed = time.monotonic() - t0
-    recorded = record_scan(recipe, lines, worst, faults, elapsed)
+    recorded = record_scan(recipe, lines, worst, faults, elapsed, opening=opening)
     print("ladder receipt: RECORDED " + str(len(lines)) + " declaring line(s), worst rc=" + str(worst) + " -> "
           + str(recorded.relative_to(REPO)) + " (coverage " + line_set_fingerprint(recipe, lines) + ")")
     if not faults:
@@ -640,8 +839,10 @@ def selftest() -> int:
     # ---- the RECEIPT (D-2983/BUG-759): one rule, five answers, every input synthetic (no live tree)
     moment = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
     coverage = line_set_fingerprint("probe", got)
-    fresh = {"line_count": len(got), "line_set_fingerprint": coverage, "worst_rc": EXIT_CLEAN, "faults": [],
-             "measured_at": (moment - timedelta(hours=1)).isoformat(timespec="seconds"), "head": "abc1234"}
+    clean_tree = {"modified_at_start": [], "modified_at_end": [], "untracked_at_start": [], "minted_during_scan": []}
+    fresh = {"state": "finished", "line_count": len(got), "line_set_fingerprint": coverage, "worst_rc": EXIT_CLEAN,
+             "faults": [], "measured_at": (moment - timedelta(hours=1)).isoformat(timespec="seconds"),
+             "head_at_start": "abc1234", "head_at_end": "abc1234", "worktree": dict(clean_tree)}
     rc, message = receipt_verdict(fresh, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
     check("a_recorded_green_scan_is_green", rc == EXIT_CLEAN and "MEASURED GREEN" in message,
           "D-2983: a whole-set verdict recorded over EXACTLY this coverage, inside its age budget, is the one "
@@ -683,13 +884,101 @@ def selftest() -> int:
           "produce a remedy the ladder does not declare, and a whole-set mode nothing invokes is a control "
           "nothing runs")
     payload = scan_payload("probe", got, EXIT_FATAL, [("sh -c 'exit 1'", 1, 0.25)], 1.5, ladder="justfile",
-                           head="abc1234", now=moment)
+                           opening={"started_at": (moment - timedelta(minutes=9)).isoformat(timespec="seconds"),
+                                    "head": "abc1234", "worktree": {"modified": [], "untracked": []}},
+                           head_at_end="abc1234", worktree={"modified": [], "untracked": []}, now=moment,
+                           state="finished")
     check("the_record_equals_the_measurement_it_took",
           payload["line_count"] == len(got) and payload["line_set_fingerprint"] == coverage
           and payload["worst_rc"] == EXIT_FATAL and len(payload["faults"]) == 1
           and payload["faults"][0]["rc"] == 1 and str(payload["measured_at"]).startswith("2026-10-13"),
           "D-2983: the record IS the measurement - a receipt that can drift from the run it describes would be "
           "read as evidence, which is worse than no receipt at all")
+    # ---- WHICH BYTES (BUG-1010/D-3152 clause 2): an attribution rule with BOTH ends driven
+    def record(**overrides: Any) -> dict:
+        """A finished record over `got` with the opening/close readings a control wants to drive."""
+        opening = {"started_at": (moment - timedelta(minutes=9)).isoformat(timespec="seconds"), "head": "abc1234",
+                   "worktree": {"modified": [], "untracked": []}}
+        worktree = {"modified": [], "untracked": []}
+        opening = overrides.pop("opening", opening)
+        worktree = overrides.pop("worktree", worktree)
+        built = scan_payload("probe", got, EXIT_CLEAN, [], 540.0, ladder="justfile", opening=opening,
+                             head_at_end="abc1234", worktree=worktree, now=moment, state="finished")
+        built.update(overrides)
+        return built
+
+    rc, message = receipt_verdict(record(), coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_clean_scan_names_the_bytes_it_ran", rc == EXIT_CLEAN and "abc1234" in message,
+          "BUG-1010: a record read on a clean tree at an unmoved HEAD is a verdict about that commit - the one "
+          "state in which the commit sha is a NAME for the bytes that ran")
+    rc, message = receipt_verdict(record(head_at_end="def5678"), coverage, len(got), recipe="probe", now=moment,
+                                  max_age_hours=72)
+    check("a_scan_whose_HEAD_MOVED_is_not_a_verdict_about_either_commit",
+          rc == EXIT_OWED and "abc1234" in message and "def5678" in message,
+          "BUG-1010 (b): a commit landed MID-SCAN, so the bytes measured belong to no commit - both shas are "
+          "named, because the reader has to see WHICH two agreed no verdict covers")
+    rc, message = receipt_verdict(record(opening={"started_at": "2026-10-13T11:51:00+00:00", "head": "abc1234",
+                                                 "worktree": {"modified": ["scripts/run_ladder.py"],
+                                                              "untracked": []}}),
+                                  coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_scan_that_BEGAN_on_a_MODIFIED_tracked_file_is_OWNER_OWED",
+          rc == EXIT_OWED and "run_ladder.py" in message and "does not contain" in message,
+          "BUG-1010's OBSERVED case: a green receipt naming e239b52 for a run whose run_ladder.py was NOT "
+          "e239b52 - the scan ran code no commit contains, and the path is NAMED so it can be fixed")
+    rc, message = receipt_verdict(record(worktree={"modified": ["scripts/check_x.py"], "untracked": []}),
+                                  coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_scan_that_ENDED_on_a_MODIFIED_tracked_file_is_OWNER_OWED",
+          rc == EXIT_OWED and "check_x.py" in message,
+          "the same defect at the close: something the scan RAN rewrote the tree it was measuring, so the later "
+          "rails did not see the bytes the earlier ones did")
+    rc, message = receipt_verdict(record(head_at_end=""), coverage, len(got), recipe="probe", now=moment,
+                                  max_age_hours=72)
+    check("a_record_that_names_NO_commit_is_OWNER_OWED_never_green",
+          rc == EXIT_OWED and "names no commit" in message,
+          "D-405/BUG-1018's class: git refusing to answer is not a clean answer - a verdict whose subject is "
+          "absent may not be reported as a verdict (fail-closed)")
+    rc, message = receipt_verdict(record(state="running", worst_rc=None, head_at_end=""),
+                                  coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("an_UNFINISHED_scan_is_OWNER_OWED_and_never_green",
+          rc == EXIT_OWED and "BEGAN" in message and "half-run" in message,
+          "BUG-1010 (a): a scan that was KILLED leaves `state: running` - MEASURED 2026-10-25 a detached scan "
+          "vanished at rail 180/194 and left the tree indistinguishable from one never scanned")
+    unschema = record()
+    unschema.pop("state")
+    rc, message = receipt_verdict(unschema, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_record_that_cannot_say_it_FINISHED_is_UNKNOWN_not_green",
+          rc == EXIT_OWED and "FINISHED" in message,
+          "the schema-1 shape is NAMED rather than assumed: a record written by a collector younger than this "
+          "rule had no field in which to say it finished, so no old green survives the change by silence")
+    minted = record(worktree={"modified": [], "untracked": ["governance/evidence/NEW.json"]})
+    rc, message = receipt_verdict(minted, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("an_artefact_the_scan_MINTED_does_not_make_it_un_attributable",
+          rc == EXIT_CLEAN and "1 minted during the scan" in message,
+          "D-3151: gating on the record's OWN OUTPUTS would mark every scan that mints an evidence file "
+          "un-attributable, and a rule that costs that much is a rule that gets bypassed - so it is REPORTED")
+    inherited = record(opening={"started_at": "2026-10-13T11:51:00+00:00", "head": "abc1234",
+                                "worktree": {"modified": [], "untracked": ["notes.py"]}},
+                       worktree={"modified": [], "untracked": ["notes.py", "art.json"]})
+    rc, message = receipt_verdict(inherited, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("what_was_UNTRACKED_BEFORE_and_what_APPEARED_are_counted_APART",
+          rc == EXIT_CLEAN and "1 file(s) untracked at start" in message and "1 minted" in message,
+          "the one distinction the record has to keep: an inherited uncommitted file is state the run did not "
+          "create, an appearing one is the run's own output - counting them as one number would make the note "
+          "unreadable and its absence in the verdict unfalsifiable")
+    check("git_OWN_overrides_are_CLEARED_before_the_worktree_is_read",
+          all(name not in cleared({"GIT_DIR": "d", "GIT_WORK_TREE": "w", "GIT_INDEX_FILE": "i", "PATH": "/bin"})
+              for name in GIT_OVERRIDES)
+          and cleared({"PATH": "/bin"})["PATH"] == "/bin",
+          "BUG-527/BUG-568's class: GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE are inherited by every child, and this "
+          "reading now decides a verdict - everything else is kept, so the scrub is a filter and not a wipe")
+    live = worktree_state()
+    armed = worktree_state({"GIT_INDEX_FILE": os.path.join(tempfile.gettempdir(), ".no_such_index_for_a_control"),
+                            "PATH": os.environ.get("PATH", "")})
+    check("an_INHERITED_index_cannot_change_what_the_worktree_reads",
+          not head_sha() or (armed == live),
+          "MEASURED on this clone: an inherited empty GIT_INDEX_FILE made the same command answer 3973 lines "
+          "against 0, which would have marked EVERY scan un-attributable - the reading is taken through THIS "
+          "repository or not at all (the live leg is vacuous only where git cannot answer, which head_sha() names)")
     print("ladder controls: " + str(ok) + "/" + str(ok + fail) + " known-answer control(s) fire")
     return EXIT_FATAL if fail else EXIT_CLEAN
 

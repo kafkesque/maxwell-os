@@ -1278,3 +1278,29 @@ mutations:
       from "over it", and a rule that cannot be made to fail is a comment (BUG-492). Recorded because the drift
       this guards is exactly what let BUG-481 stay open for 30 days while its own eight instances were quietly
       reconciled and seven new ones accumulated - a guard nobody had to prove could fail.
+  # BUG-1010 / D-3152 clause 2 - a receipt NAMES the subject it measured. The rule under mutation is the one that
+  # decides whether a green record may be believed at all, so the oracle is the control that drives a commit
+  # landing MID-SCAN: with the attribution branch inert, that record reads MEASURED GREEN naming a sha whose bytes
+  # never ran - which is the exact lie BUG-1010 was filed for (MEASURED 2026-10-25: a green receipt named e239b52
+  # for a run whose scripts/run_ladder.py was not e239b52). Declared here because a rule whose teeth are only in a
+  # docstring is a comment (D-2676).
+  - id: a_scan_names_the_bytes_it_ran
+    subject: scripts/run_ladder.py
+    op: replace
+    find: '    if why:'
+    replace: '    if False:  # MUTATION (D-2676): an unattributable record reads as a verdict'
+    runner: scripts/run_ladder.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_scan_whose_HEAD_MOVED_is_not_a_verdict_about_either_commit'
+    why: >-
+      BUG-1010: the receipt's claim is "the ladder was green over THIS SET OF BYTES", and HEAD was read when the
+      record was WRITTEN, so a commit landed mid-scan was filed as though its bytes had run - while
+      `--receipt-check` returned rc=0 CLEAN naming a commit the worktree had already left. With the attribution
+      branch inert, four controls red at once (the moved HEAD, both worktree ends, and the record that names no
+      commit) and the declared marker is the one that names the class: a scan spanning a commit has no single byte
+      set, so no verdict either. The worktree reading also carries its own hygiene (GIT_DIR/GIT_WORK_TREE/
+      GIT_INDEX_FILE are cleared), because an inherited empty index made the same command answer 3973 lines
+      against 0 in this clone - which would have marked EVERY scan un-attributable and turned a green ladder
+      permanently owner-owed from a variable nobody in that file set.

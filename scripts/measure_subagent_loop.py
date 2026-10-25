@@ -38,6 +38,33 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 CONFIG = ROOT / "config/agent_context.yaml"
+ENGINE = ROOT / "config/engine.yaml"
+
+
+def engine_block() -> dict[str, Any]:
+    """WHICH ENGINE this receipt measured: the referent any A/B rule compares (BUG-1018).
+
+    MEASURED 2026-10-25: the pre-swap baseline (15:22) and the post-swap battery (19:12) BOTH
+    carried no engine identity, so T-200's pre-declared rule had to INFER the baseline's engine
+    from the install timeline. A receipt that does not name its engine cannot support a
+    comparison, and a version written into a task description is not a reading (D-3034, D-3150).
+    The mlx_lm dist-info name is the strongest cheap identifier: it carries the exact build
+    (0.32.3.dev8+g0d4d3d04f) that every fixture verdict below is a statement ABOUT.
+    """
+    import plistlib
+
+    conf = _yaml(ENGINE)["engine"]
+    bundle = pathlib.Path(conf["bundle"])
+    block: dict[str, Any] = {"bundle": str(bundle), "app_version": None, "mlx_lm": None}
+    plist = bundle / "Info.plist"
+    if plist.exists():
+        try:
+            block["app_version"] = plistlib.loads(plist.read_bytes()).get("CFBundleShortVersionString")
+        except (OSError, ValueError, plistlib.InvalidFileException):
+            block["app_version"] = "unreadable"      # reported, never guessed (C16)
+    dist = sorted((bundle / conf["oracle_site"]).glob("mlx_lm-*.dist-info"))
+    block["mlx_lm"] = dist[0].name if dist else None
+    return block
 
 def _yaml(path: pathlib.Path) -> dict[str, Any]:
     """Read one declared YAML file (the repository's own idiom: a local import, no helper invented)."""
@@ -822,13 +849,14 @@ def main() -> int:
             out.write_text(json.dumps(
                 {"measured_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "fixture": "T-199 loop battery",
                  "state": reason, "per_turn_budget_s": budget, "served": served,
+                 "engine": engine_block(),
                  "fixtures": [{"name": f["name"], "why": f["why"]} for f in BATTERY_FIXTURES],
                  "rows": rows, "ranking": rank(rows)}, indent=2) + "\n", encoding="utf-8")
 
         print(f"T-199 battery | per-turn budget {budget:g}s | served {len(served)} | "
-              f"measured {len(models)} model(s) x {len(BATTERY_FIXTURES)} fixtures")
+              f"measured {len(models)} model(s) x {len(BATTERY_FIXTURES)} fixtures", flush=True)
         for fixture in BATTERY_FIXTURES:
-            print(f"  fixture {fixture['name']:11} {fixture['why']}")
+            print(f"  fixture {fixture['name']:11} {fixture['why']}", flush=True)
         for model in models:
             for fixture in BATTERY_FIXTURES:
                 rows.append(run_battery_fixture(decl, model, budget, fixture,
@@ -836,14 +864,14 @@ def main() -> int:
             mine = [row for row in rows if row["model"] == model]
             passed = sum(1 for row in mine if row["verdict"] == "PASS")
             print(f"  {model:38} {passed}/{len(mine)}  "
-                  + " ".join(f"{row['fixture']}={row['verdict']}" for row in mine))
+                  + " ".join(f"{row['fixture']}={row['verdict']}" for row in mine), flush=True)
             for row in mine:
                 if row["verdict"] != "PASS":
-                    print(f"      {row['fixture']:11} {row['detail']}")
+                    print(f"      {row['fixture']:11} {row['detail']}", flush=True)
             flush("running")
         flush("complete")
         print("RANKED (a battery RANKS a model; one fixture only ADMITS one) - fixtures passed, then "
-              "slowest turn:")
+              "slowest turn:", flush=True)
         for position, item in enumerate(rank(rows), 1):
             failed = f" failed={item['failed']}" if item["failed"] else ""
             unmeasured = f" UNMEASURED={item['unmeasured']}" if item["unmeasured"] else ""
@@ -861,7 +889,8 @@ def main() -> int:
         passed = sum(1 for r in rows if r["verdict"] == "PASS")
         out = pathlib.Path(args.out or f"temp/subagent_loop_two_step_receipt_{time.strftime('%Y%m%d')}.json")
         out.write_text(json.dumps({"measured_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "fixture": "T-187 two-step",
-                                   "per_turn_budget_s": budget, "served": served, "rows": rows}, indent=2) + "\n",
+                                   "engine": engine_block(), "per_turn_budget_s": budget, "served": served,
+                                   "rows": rows}, indent=2) + "\n",
                        encoding="utf-8")
         print(f"{passed}/{len(rows)} PASS | receipt {out}")
         return 0 if passed == len(rows) else 2
@@ -872,7 +901,8 @@ def main() -> int:
     passed = sum(1 for r in rows if r["verdict"] == "PASS")
     out = pathlib.Path(args.out or f"temp/subagent_loop_receipt_{time.strftime('%Y%m%d')}.json")
     out.write_text(json.dumps({"measured_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                               "per_turn_budget_s": budget, "served": served, "rows": rows}, indent=2) + "\n",
+                               "engine": engine_block(), "per_turn_budget_s": budget, "served": served,
+                               "rows": rows}, indent=2) + "\n",
                    encoding="utf-8")
     print(f"{passed}/{len(rows)} PASS | receipt {out}")
     return 0 if passed == len(rows) else 2

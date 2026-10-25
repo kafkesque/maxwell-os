@@ -1,0 +1,92 @@
+{
+  "schema_version": "1",
+  "subject": "the POST-swap flint reading: T-201's trigger FIRED and the answer is still no - for a newly exact reason",
+  "measured_at": "2026-10-25T19:16:00",
+  "supersedes": {
+    "path": "governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json",
+    "what_changed": "the ENGINE, not the answer: that receipt was taken at mlx_lm 0.31.4.dev132 / 134 architectures. This one is taken at mlx_lm 0.32.3.dev8+g0d4d3d04f / 136 architectures, after oMLX 0.7.2 -> 0.7.3.dev2. Both readings say ARCH_UNSUPPORTED; the second names a build two days too old to have the capability.",
+    "why_a_new_file": "a receipt is a record of ONE measurement event (D-3150 clause 6); editing the old one would make its date a lie"
+  },
+  "engine": {
+    "app_version": "0.7.3.dev2",
+    "bundle": "/Applications/oMLX.app/Contents",
+    "mlx_lm_dist_info": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info",
+    "mlx": "0.32.4",
+    "module_files_under_mlx_lm_models": 137,
+    "architectures_iterated_by_pkgutil": 136,
+    "app_process_born": "Sun Oct 25 19:05:40 2026",
+    "omlx_server_born": "Sun Oct 25 19:05:47 2026",
+    "reading": "ps -Ao pid,lstart,command | grep -i omlx  (the swap is live at the SERVING layer, not merely on disk)"
+  },
+  "oracle_provenance": {
+    "problem_this_receipt_had_to_survive": "the first post-swap probe printed 0.31.4.dev132 / 134 architectures, labelled only '(cache)' - it was reading a cache written at 17:54, before the install (BUG-1016)",
+    "fix_in_force": "pipeline/model_loadability_probe.py now keys the cache on the engine's identity and re-measured by itself, printing 'oracle cache NOT used (the ENGINE CHANGED since the cache was written ...)' with NO flag passed",
+    "cache_now_carries": {
+      "bundle": "/Applications/oMLX.app/Contents",
+      "app_version": "0.7.3.dev2",
+      "dist_info": ["mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"],
+      "modules": 137,
+      "digest": "4d69937e4b74e5bd"
+    }
+  },
+  "the_build_resolution": {
+    "question": "why does a 0.32.3 build lack a module upstream added two days earlier?",
+    "answer": "the bundle ships a PRE-BUILT WHEEL pinned to one upstream commit, and that commit predates flint",
+    "bundle_build_commit": {"sha": "0d4d3d04f", "date": "2026-10-22T09:47:59Z", "message": "Mistral3 medium (#1986)"},
+    "upstream_flint_commit": {"date": "2026-10-24T00:10:47Z", "message": "Recursive Flint model support (#1998)", "path": "mlx_lm/models/flint.py", "size": 11642},
+    "distance": "1 day 14 h 22 min of upstream history: the wheel is 2 days too old to contain the module",
+    "wheel_origin": "mlx_lm-0.32.3.dev8+g0d4d3d04f-py3-none-any.whl, recorded in the dist-info's direct_url.json (a file:// URL from the packaging step)",
+    "reading": "curl -sS https://api.github.com/repos/ml-explore/mlx-lm/commits/0d4d3d04f  AND  .../contents/mlx_lm/models/flint.py  AND  .../commits?path=mlx_lm/models/flint.py",
+    "would_be_falsified_by": "the file existing under the bundle's mlx_lm/models/ (it does not: 137 files, grep -ril flint over the whole shipped mlx_lm tree returns nothing, and the dist-info RECORD does not mention it)"
+  },
+  "propositions": [
+    {
+      "id": "P1",
+      "proposition": "mlx-community/flint-mixed-3-4bit EXISTS upstream",
+      "verdict": "TRUE",
+      "reading": "probe fetch=OK, 17.84 GB, model_type=flint, dl=1166, likes=3, licence apache-2.0",
+      "unchanged_by_the_swap": true
+    },
+    {
+      "id": "P2",
+      "proposition": "mlx-community/flint-OptiQ-4bit EXISTS upstream (the name the owner used)",
+      "verdict": "TRUE",
+      "reading": "probe fetch=OK, 27.48 GB, model_type=flint, dl=138, likes=2, licence apache-2.0",
+      "unchanged_by_the_swap": true
+    },
+    {
+      "id": "P3",
+      "proposition": "the BYTES of either are on this machine",
+      "verdict": "FALSE (unchanged, and not re-downloaded by any step of T-200)",
+      "reading": "~/.omlx/models holds the same 8 served entries as before the swap; neither flint repo appears in any of the eight locations already searched"
+    },
+    {
+      "id": "P4",
+      "proposition": "oMLX 0.7.3.dev2 can SERVE either of them today",
+      "verdict": "FALSE - and now for an EXACTLY NAMED reason, which is the only thing the swap changed",
+      "reading": "probe returns ARCH_UNSUPPORTED for both: 'model_type=flint has no module in the engine's mlx_lm build', at 0.32.3.dev8 / 136 architectures"
+    }
+  ],
+  "the_trigger_that_fired": {
+    "t201_as_written": "RE-PROBE the two flint repos the moment the engine's mlx_lm reaches >=0.32.x",
+    "status": "FIRED - the installed build is 0.32.3.dev8",
+    "defect": "a VERSION comparison fired on a build that lacks the capability, because the wheel is pinned to a commit older than the feature (BUG-1019)",
+    "corrected_gate": "re-probe when the bundle's mlx_lm/models/ CONTAINS flint (a capability the oracle already reports) - never when a version string crosses a threshold",
+    "next_re_open_condition": "the first oMLX build whose mlx_lm wheel is built from a commit at or after 2026-10-24T00:10:47Z",
+    "what_a_LOADABLE_CANDIDATE_would_still_have_to_pass": "R-14's remaining three blockers: temp-1.0 operating point vs R7, no grammar-constrained decoding path, and hardware/quality (a LOADABLE verdict re-opens the row; it adopts nothing)"
+  },
+  "what_this_does_NOT_say": [
+    "It does NOT say flint is bad, unavailable, or refused upstream. Both repos exist, are downloadable, and upstream mlx-lm now serves the architecture.",
+    "It does NOT say the swap failed. 0.7.3.dev2 installed and is serving; its bundled runtime is simply pinned one commit-range behind the feature.",
+    "It does NOT authorise any download. Every step of T-200/T-201 is TIER-A: bytes stay the owner's decision.",
+    "It does NOT make R-14 wrong. R-14 said both runtimes EXIST and listed four blockers; P4 is a statement about THIS build, and it was already false when R-14 was written."
+  ],
+  "provenance_commands": [
+    "python3 pipeline/model_loadability_probe.py mlx-community/flint-mixed-3-4bit mlx-community/flint-OptiQ-4bit",
+    "python3 pipeline/model_loadability_probe.py --selftest",
+    "/usr/bin/plutil -extract CFBundleShortVersionString raw /Applications/oMLX.app/Contents/Info.plist",
+    "ls /Applications/oMLX.app/Contents/Resources/Python/framework-mlx-base/lib/python3.11/site-packages | grep mlx_lm",
+    "grep -ril flint /Applications/oMLX.app/Contents/Resources/Python/framework-mlx-base/lib/python3.11/site-packages/mlx_lm",
+    "curl -sS https://api.github.com/repos/ml-explore/mlx-lm/commits/0d4d3d04f"
+  ]
+}

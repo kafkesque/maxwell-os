@@ -1,0 +1,84 @@
+{
+  "schema_version": "1",
+  "subject": "oMLX 0.7.2 vs 0.7.3.dev2 - the A/B T-200 declared in advance, measured with the instrument that already existed (T-199 battery, 0 GB downloaded)",
+  "measured_at": "2026-10-25T19:20:00",
+  "engines": {
+    "post_swap": {
+      "recorded": true,
+      "app_version": "0.7.3.dev2",
+      "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f",
+      "module_files": 137,
+      "app_process_born": "Sun Oct 25 19:05:40 2026",
+      "omlx_server_born": "Sun Oct 25 19:05:47 2026",
+      "receipt_runs": "19:12:59 (32 rows) and the three enum re-runs 19:14-19:18"
+    },
+    "pre_swap_baseline": {
+      "recorded": false,
+      "labelled": "INFERRED - two readings, not a recorded field (BUG-1018)",
+      "reading_1": "/Applications/oMLX-0.7.2-20261025.app/Contents/Info.plist -> 0.7.2, directory copied 2026-10-25 16:18",
+      "reading_2": "~/Library/Application Support/oMLX/update-prefs.json -> {\"channel\":\"dev\",\"deferredPromptVersion\":\"0.7.3.dev2\"}, i.e. the candidate was OFFERED and DEFERRED, not installed",
+      "why_it_matters": "the baseline receipt (governance/evidence/LOOP_BATTERY_20261025.json, 15:22:08) carries no engine identity, so the comparison's left-hand referent is an inference; the right-hand one is recorded. The A/B is usable, and it is not symmmetrical - stated, not smoothed."
+    }
+  },
+  "the_column_that_is_NOT_the_A_B": {
+    "column": "slowest_turn_s",
+    "measured": "MiniCPM5-2B 33.5 s (pre) -> 4.0 s (post); Ornith-35B 88.7 -> 8.3",
+    "why_it_lies": "the pre run paid COLD model loads inside its slowest turn; the post run found four models already loaded (engine /v1/models/status: loaded_count=4). A load is not a speed-up.",
+    "the_honest_column": "warm_turn_s, which the battery's own ranking separates out alongside load_paid_s (T-199 decision D-3148)"
+  },
+  "warm_vs_warm": [
+    {"model": "MiniCPM5-2B-MLX", "pre_warm_s": 1.5, "post_warm_s": 1.5, "delta_pct": 0, "fixtures": "4/4 -> 4/4"},
+    {"model": "Ornith-1.5-35B-A3B-REAP-19B", "pre_warm_s": 7.3, "post_warm_s": 5.9, "delta_pct": -19, "fixtures": "4/4 -> 4/4"},
+    {"model": "gemma-4-E4B-it-MLX-4bit", "pre_warm_s": 2.1, "post_warm_s": 1.7, "delta_pct": -19, "fixtures": "3/4 -> 3/4"},
+    {"model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "pre_warm_s": 1.8, "post_warm_s": 1.6, "delta_pct": -11, "fixtures": "3/4 -> 3/4"},
+    {"model": "Ornith-1.5-9B-MLX-8bit", "pre_warm_s": 14.7, "post_warm_s": 13.6, "delta_pct": -7, "fixtures": "4/4 -> 4/4"},
+    {"model": "Qwen3.8-27B-MLX-4bit", "pre_warm_s": 15.8, "post_warm_s": 15.6, "delta_pct": -1, "fixtures": "4/4 -> 4/4"},
+    {"model": "Phi-4-mini-instruct-8bit", "pre_warm_s": 8.1, "post_warm_s": 8.0, "delta_pct": -1, "fixtures": "0/4 -> 0/4 (the BUG-053 shape, unchanged by the swap)"},
+    {"model": "gpt-oss-20b-MXFP4-Q8", "pre_warm_s": 25.9, "post_warm_s": 26.5, "delta_pct": 2, "fixtures": "3/4 -> 2/4 LOST enum"}
+  ],
+  "the_one_regression": {
+    "model": "gpt-oss-20b-MXFP4-Q8",
+    "fixture": "enum",
+    "what_the_fixture_asks": "the mode argument must be one of the declared enum values ['count','distinct'], exact and case-sensitive, and 'count' returns a TRUE wrong answer (a decoy)",
+    "pre_swap": "PASS - 1 of 1 attempt: tools=['summarize_column'], turns=2, mode 'distinct', answer carries 4 distinct",
+    "post_swap": "FAIL - 3 of 3 attempts, IDENTICAL detail in each: 'mode values attempted [] never the declared distinct' - no tool call at all, the full 26.5 s allowance spent (finish_reason=length)",
+    "determinism": "temperature 0.0 on every call (R7); three identical failures is a reproduced behaviour, not a flake",
+    "the_runs": ["temp/subagent_loop_battery_receipt_20261025.json", "temp/ab_gptoss_run1.json", "temp/ab_gptoss_run2.json"]
+  },
+  "why_the_regression_is_confined": {
+    "claim": "the loss cannot reach the S4 classifier, by CONSTRUCTION rather than by luck",
+    "reading_1": "the fixture is a TOOL-argument trap: it can only fail on a request that carries a tools array",
+    "reading_2": "pipeline/omlx_call.py builds the payload with model, messages, response_format, chat_template_kwargs and thinking_budget - it never sets a 'tools' key; grep for 'tools' in omlx_call.py, stage4_merge.py and student_classifier.py returns nothing",
+    "reading_3": "config/agent_context.yaml already declares gpt-oss-20b-MXFP4-Q8 '26214 / 210 = 125 s - a usable PROBE, an unusable loop'",
+    "what_would_falsify_it": "any path that sends a tools payload to this model - registered as T-202, whose gate is 'the enum fixture must pass again first'"
+  },
+  "the_pre_declared_rule_and_its_gap": {
+    "rule_as_fixed_before_measuring": "greater than 10 percent better warm time on Qwen3-Coder or Qwen3.8-27B with no fixture lost = adopt; flat within 10 percent = do not adopt; any 4/4 model dropping to 3/4 = REVERT",
+    "what_fired": "Qwen3-Coder improved 11 percent (>10) and lost no fixture of its own; no 4/4 model dropped to 3/4",
+    "the_gap": "a 3/4 -> 2/4 loss on a model that was never 4/4 falls BETWEEN the adopt clause ('no fixture lost') and the revert clause ('4/4 -> 3/4'). The rule did not anticipate the shape its own instrument produced.",
+    "how_it_is_handled": "named, not smoothed: the recommendation states its reasoning, the falsifier is a task (T-202), and the revert path stays one paste-safe command away. An under-specified rule is a register entry, not a licence to choose quietly."
+  },
+  "recommendation": {
+    "verdict": "ADOPT 0.7.3.dev2, do not revert",
+    "grounds": [
+      "every 4/4 model kept 4/4",
+      "warm wins of 19, 19 and 11 percent on the slowest loop drivers",
+      "the single loss is a tool-argument fixture, on a model whose own home declares it unusable in loops, on a payload shape the S4 classifier never sends",
+      "a revert costs a second swap cycle and carries its own risk against a loss with no identified consumer"
+    ],
+    "owner_action": "one word - keep or revert - and revert is the single command already written in governance/OWNER_STEPS_T200_20261025.md"
+  },
+  "what_this_does_NOT_say": [
+    "It does NOT say the swap is strictly faster: two models moved within noise (+2, -1) and one fixture was lost.",
+    "It does NOT say the baseline's engine was 0.7.2 as a RECORDED fact - it was inferred from two readings (BUG-1018).",
+    "It does NOT claim the enum regression is a property of flint/gpt-oss support in general: it is measured on ONE model, ONE fixture, at ONE build pair.",
+    "It does NOT adopt, download, or re-open any model; R-14's refusal stands."
+  ],
+  "provenance_commands": [
+    "python3 scripts/measure_subagent_loop.py --battery            # post-swap, 32 rows",
+    "python3 scripts/measure_subagent_loop.py --battery --only gpt-oss-20b-MXFP4-Q8   # x2, the regression re-runs",
+    "/usr/bin/plutil -extract CFBundleShortVersionString raw /Applications/oMLX.app/Contents/Info.plist",
+    "ps -Ao pid,lstart,command | grep -i omlx",
+    "grep -rn tools pipeline/omlx_call.py pipeline/stage4_merge.py pipeline/student_classifier.py"
+  ]
+}

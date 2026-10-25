@@ -32460,3 +32460,47 @@ decisions:
   - governance/evidence/MODEL_AVAILABILITY_REFUSED_20261025.json
   - pipeline/model_loadability_probe.py
   - justfile
+- id: D-3152
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: RAILS / INSTRUMENTS
+  title: a CACHE and a TRIGGER both name the IDENTITY of their referent - never its age, never its version string
+    - and a receipt names the engine it measured
+  bugs:
+  - BUG-1016
+  - BUG-1017
+  - BUG-1018
+  - BUG-1019
+  decision: 'Six clauses, each paid for by a measurement on 2026-10-25. (1) A CACHE OF A MEASUREMENT CARRIES THE
+    REFERENT''S IDENTITY IN ITS KEY, AND IDENTITY IS TESTED BEFORE AGE. The architecture oracle compared only the
+    cache''s age (7 days) and answered for a build that had been replaced 70 minutes earlier: it printed mlx_lm
+    0.31.4.dev132 / 134 architectures while the installed bundle was 0.32.3.dev8 / 137 modules, marked only "(cache)"
+    (BUG-1016). The key is now bundle + app version + mlx_lm dist-info + a digest over the model module names, and
+    a cache that names no engine is REFUSED. A stale clock is a warning; a stale REFERENT is a wrong answer wearing
+    a fresh timestamp. (2) A RECEIPT OF A MEASUREMENT NAMES THE ENGINE IT MEASURED. Two battery receipts nine hours
+    apart carried no engine identity, so a pre-declared A/B rule had to INFER its own baseline from an install timeline
+    - two readings, and still an inference (BUG-1018). A receipt that does not name its referent cannot support
+    a comparison (D-3034 applied to evidence). (3) A TRIGGER TESTS A CAPABILITY, NEVER A VERSION STRING. T-201 said
+    "re-probe when mlx_lm reaches >=0.32.x"; that fired, and flint was still absent, because the bundle pins a wheel
+    cut from upstream commit 0d4d3d04f (2026-10-22) while the module landed on 2026-10-24. A version string declares
+    no bytes (D-3034); the gate is now "the models directory CONTAINS flint", which the oracle already reports.
+    (4) A PRE-DECLARED RULE MUST COVER THE SHAPES ITS INSTRUMENT CAN EMIT, AND A SHAPE IT DOES NOT COVER IS NAMED.
+    T-200''s rule fixed adopt ("no fixture lost") and revert ("4/4 -> 3/4") and the instrument produced 3/4 -> 2/4,
+    which falls between them: the gap is written into the record with its falsifier, not resolved quietly by preference.
+    (5) A REGRESSION CONFINED BY STRUCTURE IS STILL A MEASURED REGRESSION, AND THE STRUCTURE THAT CONTAINS IT IS
+    STATED WHERE IT CAN BE FALSIFIED. The gpt-oss-20b enum loss cannot reach the S4 classifier because pipeline/omlx_call.py
+    never sends a tools array - so the argument is written down as a falsifier with a task (T-202) whose gate is
+    "the fixture must pass again before any tools payload is sent to that model". (6) AN INSTRUCTION THAT CAN RUN
+    FOR MINUTES STATES ITS DURATION AND A WAY TO READ PROGRESS. A battery ran for six silent minutes behind a pipe
+    while the owner reasonably read silence as a hang (BUG-1017); progress now flushes, and a handover names its
+    own channel (D-3100''s noob-proof rule applied to time, not only to commands).'
+  files:
+  - pipeline/model_loadability_probe.py
+  - scripts/measure_subagent_loop.py
+  - config/engine.yaml
+  - config/task_register.yaml
+  - governance/evidence/MODEL_AVAILABILITY_FLINT_POSTSWAP_20261025.json
+  - governance/evidence/ENGINE_AB_20261025.json
+  - governance/OWNER_STEPS_T200_20261025.md
+  - governance/buglog.md

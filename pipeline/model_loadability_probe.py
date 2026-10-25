@@ -12,6 +12,11 @@ WHAT IT READS (all declared in config/engine.yaml - nothing hardcoded here - C12
     engine.oracle_python   : that interpreter (the authoritative mlx_lm build)
     engine.oracle_ttl_days : how long a cached architecture list stays valid
 
+THE CACHE CANNOT OUTLIVE THE ENGINE (BUG-1016, measured 2026-10-25)
+    A cached architecture list answers ONLY for the engine that is installed now: the bundle's app
+    version, its mlx_lm dist-info and a digest over its model modules are part of the cache key. An
+    app install therefore invalidates the cache by itself, and nobody has to remember a flag.
+
 TIERS
     TIER-A (this script, no weights downloaded): fetch config.json + the file tree, ask the
         engine's mlx_lm which architectures it implements, and classify:
@@ -32,10 +37,13 @@ EXIT: 0 every candidate is LOADABLE_CANDIDATE; 2 at least one is REFUSED (owner-
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import pathlib
+import plistlib
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -106,14 +114,137 @@ def http_text(url: str, timeout: int = 25) -> tuple[int, str]:
     return fetch(url, timeout)
 
 
+def engine_identity(conf: dict) -> dict:
+    """The identity of the ENGINE an oracle describes: the bundle, its app version, its mlx_lm build.
+
+    MEASURED 2026-10-25 (BUG-1016): the cache in temp/ was written at 17:54 against mlx_lm
+    0.31.4.dev132 / 134 architectures. The owner then installed oMLX 0.7.3.dev2 (the app process
+    restarted 19:05:40) and this probe still printed 0.31.4.dev132 / 134 arches, labelled only
+    "(cache)". Every verdict here is a statement about a BUILD, so a cached oracle whose engine is
+    never re-read is a verdict outliving its referent - the exact defect D-3151 exists to stop,
+    reproduced inside the instrument built to stop it.
+
+    The read is deliberately CHEAP (one directory listing, ~1 ms) because a discipline that costs
+    more than its shortcut will not be kept (D-3151 clause 2).
+    """
+    bundle = pathlib.Path(conf["bundle"])
+    site = bundle / conf["oracle_site"]
+    ident = {"bundle": str(bundle), "app_version": None, "dist_info": [], "modules": 0, "digest": ""}
+    plist = bundle / "Info.plist"
+    if plist.exists():
+        try:
+            ident["app_version"] = plistlib.loads(plist.read_bytes()).get("CFBundleShortVersionString")
+        except (OSError, ValueError, plistlib.InvalidFileException):
+            ident["app_version"] = "unreadable"      # reported, never guessed (C16)
+    try:
+        ident["dist_info"] = sorted(p.name for p in site.glob("mlx_lm-*.dist-info"))
+    except OSError:
+        ident["dist_info"] = []
+    models = site / "mlx_lm" / "models"
+    try:
+        names = sorted(p.name for p in models.iterdir() if p.suffix == ".py")
+    except OSError:
+        names = []
+    ident["modules"] = len(names)
+    ident["digest"] = hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest()[:16]
+    return ident
+
+
+def cache_is_current(cached: dict, ident: dict, age_s: float, ttl_s: float) -> tuple[bool, str]:
+    """Whether a CACHED oracle may answer for the engine installed NOW, and the reason either way.
+
+    The ENGINE'S IDENTITY is tested BEFORE the clock: a five-second-old cache of a build that has
+    been REPLACED is wrong, while a six-day-old cache of the same build is merely aging. A cache
+    written before this rule existed names no engine, so it can never be trusted (fail-closed).
+    """
+    if not isinstance(cached, dict) or not cached.get("ok"):
+        return False, "the cached oracle is not a successful reading"
+    old = cached.get("engine")
+    if not isinstance(old, dict) or not old.get("digest"):
+        return False, "the cached oracle names NO engine: it cannot be trusted for THIS one"
+    if old.get("digest") != ident.get("digest") or old.get("dist_info") != ident.get("dist_info"):
+        return False, (f"the ENGINE CHANGED since the cache was written: "
+                       f"{old.get('dist_info') or '?'} -> {ident.get('dist_info') or '?'}")
+    if age_s >= ttl_s:
+        return False, f"the cache is {age_s / 86400:.1f} day(s) old, past the {ttl_s / 86400:g}-day TTL"
+    return True, f"same engine, {age_s / 60:.0f} min old"
+
+
+def selftest() -> int:
+    """Known-answer controls for the TWO decisions this file makes about a cache (BUG-1016)."""
+    total = 0
+    bad: list[str] = []
+
+    def control(name: str, got, want) -> None:
+        nonlocal total
+        total += 1
+        if got != want:
+            bad.append(f"{name}: got {got!r}, want {want!r}")
+
+    now_engine = {"digest": "aaa", "dist_info": ["mlx_lm-0.32.3.dev8.dist-info"]}
+    old_engine = {"digest": "bbb", "dist_info": ["mlx_lm-0.31.4.dev132.dist-info"]}
+    fresh_same = {"ok": True, "engine": dict(now_engine)}
+    week = 604800.0
+
+    control("the_2026_10_25_defect_a_FRESH_cache_of_a_REPLACED_engine_is_REFUSED",
+            cache_is_current({"ok": True, "engine": dict(old_engine)}, now_engine, 5.0, week)[0], False)
+    control("the_other_direction_the_SAME_engine_fresh_cache_IS_used",
+            cache_is_current(fresh_same, now_engine, 5.0, week)[0], True)
+    control("the_SAME_engine_PAST_TTL_is_REFUSED",
+            cache_is_current(fresh_same, now_engine, 8 * 86400.0, week)[0], False)
+    control("a_cache_that_names_NO_engine_is_REFUSED",
+            cache_is_current({"ok": True, "arches": ["llama"]}, now_engine, 1.0, week)[0], False)
+    control("a_FAILED_reading_is_not_a_cache",
+            cache_is_current({"ok": False, "engine": dict(now_engine)}, now_engine, 1.0, week)[0], False)
+    control("a_NON_MAPPING_cache_is_REFUSED_not_a_crash",
+            cache_is_current({}, now_engine, 1.0, week)[0], False)
+    control("the_refusal_NAMES_the_engine_change",
+            "ENGINE CHANGED" in cache_is_current({"ok": True, "engine": dict(old_engine)},
+                                                 now_engine, 5.0, week)[1], True)
+
+    with tempfile.TemporaryDirectory() as td:
+        base = pathlib.Path(td)
+        site = base / "site-packages"
+        (site / "mlx_lm" / "models").mkdir(parents=True)
+        (site / "mlx_lm-0.1.dist-info").mkdir()
+        (site / "mlx_lm" / "models" / "llama.py").write_text("", encoding="utf-8")
+        conf = {"bundle": str(base), "oracle_site": "site-packages"}
+        first = engine_identity(conf)
+        control("engine_identity_is_DETERMINISTIC", engine_identity(conf) == first, True)
+        control("engine_identity_counts_the_modules", first["modules"], 1)
+        control("engine_identity_reads_the_dist_info", first["dist_info"], ["mlx_lm-0.1.dist-info"])
+        control("a_bundle_with_NO_plist_reports_NULL_not_a_guess", first["app_version"], None)
+        (site / "mlx_lm" / "models" / "flint.py").write_text("", encoding="utf-8")
+        second = engine_identity(conf)
+        control("a_NEW_module_changes_the_identity_digest", second["digest"] != first["digest"], True)
+        control("the_new_module_is_COUNTED", second["modules"], 2)
+
+    for problem in bad:
+        print(f"  FAIL control: {problem}")
+    print(f"{'OK' if not bad else 'FAILED'} model-loadability controls: {total - len(bad)}/{total} known-answer")
+    return 0 if not bad else 1
+
+
 def oracle(force: bool = False) -> dict:
-    """Ask the ENGINE's own interpreter which architectures its mlx_lm implements."""
+    """Ask the ENGINE's own interpreter which architectures its mlx_lm implements.
+
+    A cache answers ONLY for the engine that is installed now (BUG-1016): the identity is read
+    first, so an app install invalidates the cache by itself and no one has to remember a flag.
+    """
     conf = cfg()["engine"]
     ttl_s = float(conf["oracle_ttl_days"]) * 86400
-    if CACHE.exists() and not force and time.time() - CACHE.stat().st_mtime < ttl_s:
-        cached = json.loads(CACHE.read_text(encoding='utf-8'))
-        cached["source"] = "cache"
-        return cached
+    ident = engine_identity(conf)
+    if CACHE.exists() and not force:
+        age_s = time.time() - CACHE.stat().st_mtime
+        try:
+            cached = json.loads(CACHE.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            cached = {}
+        usable, why = cache_is_current(cached, ident, age_s, ttl_s)
+        if usable:
+            cached["source"] = f"cache: {why}, engine {ident.get('app_version')}"
+            return cached
+        print(f"oracle cache NOT used ({why}) - re-measuring from the bundle")
     py = pathlib.Path(conf["bundle"]) / conf["oracle_python"]
     site = pathlib.Path(conf["bundle"]) / conf["oracle_site"]
     if not py.exists():
@@ -127,8 +258,9 @@ def oracle(force: bool = False) -> dict:
         print(f"FATAL: the oracle produced no JSON. stderr tail: {proc.stderr[-300:]}")
         return {"ok": False}
     if got.get("ok"):
+        got["engine"] = ident
         CACHE.write_text(json.dumps(got, indent=1), encoding='utf-8')
-        got["source"] = "measured"
+        got["source"] = f"measured, engine {ident.get('app_version')}"
     return got
 
 
@@ -225,9 +357,13 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("repos", nargs="*")
     ap.add_argument("--refresh-oracle", action="store_true")
+    ap.add_argument("--selftest", action="store_true",
+                    help="BUG-1016: known-answer controls for the cache-vs-engine decision (no network)")
     ap.add_argument("--tier-b", action="store_true")
     ap.add_argument("--json-out")
     args = ap.parse_args(argv)
+    if args.selftest:
+        return selftest()
 
     conf = cfg()["engine"]
     cand = cfg()["candidates"]

@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 779,
+  "total_ids": 783,
   "open_n": 245,
-  "closed_n": 534,
+  "closed_n": 538,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1770,6 +1770,10 @@
     "BUG-1011",
     "BUG-1012",
     "BUG-1013",
-    "BUG-1014"
+    "BUG-1014",
+    "BUG-1016",
+    "BUG-1017",
+    "BUG-1018",
+    "BUG-1019"
   ]
 }

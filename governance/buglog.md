@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1277 decisions (census stamp 1c039bb1a211cf31, 2026-10-25) · 779 bugs (245 open / 534 closed; highest OPEN = BUG-1015) · 57 open tasks (MUST 9 / SHOULD 42 / WORTH 6; OWNER-moved 1, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 783 bugs (245 open / 538 closed; highest OPEN = BUG-1015) · 58 open tasks (MUST 9 / SHOULD 43 / WORTH 6; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1277 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 657 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1277, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
 >
@@ -18,9 +18,9 @@
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-200 | 🟡 WORTH | A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point | Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path |
+> | T-200 | 🟡 WORTH | DECIDE the oMLX 0.7.2 -> 0.7.3.dev2 A/B - MEASURED 2026-10-25: warm turns improve 11-19 percent on the slowest | OWNER DECISION. The data-grounded recommendation is ADOPT WITHOUT REVE |
 >
-> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -21746,3 +21746,76 @@ can absorb a status again; (4) two-sided controls: 1 finding above the ceiling i
 nowhere by the ladder**. `scripts/resolve_route.py` alone carries 6 findings (UP035, 3× UP037, B007, 2× E741, 2×
 F541), invisible because no ladder line looks there — the BUG-580 shape ("a directory no rail reads"). Reported, not
 fixed: it is the same decision as the ceiling above and belongs in the same landing.
+
+## BUG-1016 (MED - FIXED 2026-10-25) - the architecture ORACLE outlived its ENGINE: a cache keyed on nothing but TIME answered for a build that had already been replaced
+
+MEASURED, both sides, on this machine:
+
+- `temp/engine_arch_oracle.json` was written **17:54** and read `mlx_lm 0.31.4.dev132+g94cdcae13 / 134 architectures`.
+- At **19:05:40** the owner installed oMLX **0.7.3.dev2** through the app's own updater (STEP 3 of
+  `governance/OWNER_STEPS_T200_20261025.md`). `ps -Ao pid,lstart` shows the app process born `Sun Oct 25 19:05:40 2026`
+  and `omlx-server` at `19:05:47` - so the swap is live at the serving layer, not merely on disk.
+- At ~19:10 the owner ran the probe and it printed **0.31.4.dev132 / 134 architectures**, marked only `(cache)`.
+- The bundle at that moment was **`mlx_lm-0.32.3.dev8+g0d4d3d04f`**, **137** module files, and **no flint**.
+
+So the probe answered a question about the NEW engine with the OLD engine's reading, and one word hinted at it. Every
+verdict this file emits is a statement about a **build** (D-3151 P4), which makes this the exact defect the rail exists
+to stop - reproduced **inside** the rail.
+
+THE DEFECT: `oracle()` compared the cache's **AGE** (`engine.oracle_ttl_days: 7`) and never the engine's **IDENTITY**.
+`config/engine.yaml` even carried the comment "a change here invalidates the cached architecture oracle" - a
+declaration with no mechanism behind it (D-3034).
+
+FIX: `engine_identity()` = bundle path + app version (`Info.plist`) + `mlx_lm-*.dist-info` names + a sha256 digest over
+the `models/*.py` names; `cache_is_current()` tests **IDENTITY BEFORE AGE**, and a cache that names no engine is
+refused (fail-closed). The cache now carries an `engine` block and the probe prints
+`cache: same engine, N min old, engine 0.7.3.dev2`. **13/13** known-answer controls
+(`--selftest`), including the 2026-10-25 defect itself and its two-sided twin.
+
+EVIDENCE the fix bites: the SAME command that printed the stale oracle printed
+`oracle cache NOT used (the ENGINE CHANGED since the cache was written ...) - re-measuring from the bundle`, then read
+`0.32.3.dev8+g0d4d3d04f / 136 architectures`. No flag was passed.
+
+## BUG-1017 (LOW - FIXED 2026-10-25) - the battery ran for six minutes in TOTAL SILENCE, and its own instruction promised nothing about duration
+
+MEASURED: the owner's `... --battery 2>&1 | tail -20` was **alive and at 28 of 32 rows** when I read
+`temp/subagent_loop_battery_receipt_20261025.json` (`state=running`, written `19:11:36`); `lsof -p` showed fd 1 and fd 2
+both `PIPE` and one `ESTABLISHED` socket to `127.0.0.1:11435`. Python block-buffers stdout on a pipe, so `tail` can
+emit nothing until the process exits. The receipt on disk was the ONLY progress channel and the owner was never told
+it existed.
+
+TWO HALVES, and one is mine. (a) The instrument: five progress prints now carry `flush=True`. (b) The instruction: a
+manual step that can run for minutes must state its expected duration and give the command that reads progress.
+D-3100 demands a noob-proof handover, and a command that cannot be distinguished from a hang is not a handover.
+
+It was never hung: `state=complete`, 32/32 rows, `19:12:59`.
+
+## BUG-1018 (MED - FIXED 2026-10-25) - a battery RECEIPT never named the ENGINE it measured, so T-200's pre-declared rule had to INFER its own baseline
+
+MEASURED: `governance/evidence/LOOP_BATTERY_20261025.json` (15:22:08) and
+`temp/subagent_loop_battery_receipt_20261025.json` (19:12:59) share the key set
+`{measured_at, fixture, state, per_turn_budget_s, served, fixtures, rows, ranking, ranking_note}` - and **no engine**.
+T-200's rule compares warm turn time across the swap, so the pre-swap side's engine had to be inferred from
+`/Applications/oMLX-0.7.2-20261025.app` (`plutil` 0.7.2, copied 16:18) plus `update-prefs.json` naming
+`0.7.3.dev2` as *deferred*: two readings, and still an **inference** (D-3034 - a value that merely MENTIONS a thing
+declares nothing).
+
+FIX: `engine_block()` in `scripts/measure_subagent_loop.py` (bundle + `app_version` + `mlx_lm` dist-info) is written
+into all **three** receipt writers; `--selftest` still reports **39/39**. The A/B record must now label the 15:22
+baseline *"engine INFERRED from two readings, not recorded"* rather than silent.
+
+## BUG-1019 (LOW - FIXED 2026-10-25) - a RE-OPEN TRIGGER written as a VERSION COMPARISON fired on a build that lacked the capability, and the version was never the thing that declares the module
+
+`config/task_register.yaml#T-201` said: *"RE-PROBE the two flint repos the moment the engine's mlx_lm reaches
+>=0.32.x"*. That trigger **fired** - the installed build is `0.32.3.dev8` - and flint is still absent, because the
+bundle pins a wheel built from upstream commit `0d4d3d04f` dated **2026-10-22T09:47:59Z** ("Mistral3 medium (#1986)")
+while upstream created `mlx_lm/models/flint.py` in commit **2026-10-24T00:10:47Z** ("Recursive Flint model support
+(#1998)"). A version string declared no bytes: `0.32.3 >= 0.32` and still no `flint.py`, `grep -ril flint` over the
+whole shipped `mlx_lm` returns nothing, and the dist-info `RECORD` does not mention it.
+
+FIX: T-201's gate is now a **capability** test - re-probe when the bundle's `mlx_lm/models/` CONTAINS `flint`, which the
+probe's own oracle already reports, so no one has to compare version strings by eye.
+
+ALSO CORRECTED IN THE SAME READ (my own prose, not the register): `governance/NOT-YET-EVALUATED-RESEARCH.md` says
+upstream gained `flint.py` on **2026-10-21**. GitHub says the file's creating commit is **2026-10-24T00:10:47Z**. The
+date in the correction section is superseded by this line.

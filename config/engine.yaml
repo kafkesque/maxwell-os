@@ -1,7 +1,13 @@
 schema_version: "1.0"
 # THE ENGINE'S OWN FACTS, in one home (C12). Nothing that reads this file may restate a value.
-# Measured 2026-10-15 from the live install; a change here invalidates the cached architecture
-# oracle in pipeline/model_loadability_probe.py (oracle_ttl_days governs that).
+# A CHANGE HERE INVALIDATES THE CACHED ARCHITECTURE ORACLE, and that is now a MECHANISM rather than a hope
+# (BUG-1016, measured 2026-10-25): pipeline/model_loadability_probe.py keys its cache on the ENGINE'S IDENTITY -
+# the bundle, the app version from its Info.plist, the mlx_lm dist-info and a sha256 over its model module names -
+# and tests that identity BEFORE the clock. An app install therefore invalidates the cache by itself, with no flag.
+# MEASURED 2026-10-25: oMLX 0.7.2 -> 0.7.3.dev2 moved the bundled runtime from mlx_lm 0.31.4.dev132 (134
+# architectures) to 0.32.3.dev8+g0d4d3d04f (137 module files), and the same probe command re-measured by itself.
+# A verdict here is a statement about THAT BUILD, never about a version number: 0.32.3 was newer than the upstream
+# commit that added flint.py and still had no flint module (BUG-1019).
 engine:
   name: omlx
   bundle: /Applications/oMLX.app/Contents   # the installed app's Contents; Resources/omlx is the engine source
@@ -362,21 +368,24 @@ candidates:
                UNDETERMINED, REPO_ABSENT, NEVER]
     entries:
       # R-14. The four blockers are OPERATING-POINT / GRAMMAR / HARDWARE / QUALITY - none of them an existence
-      # claim. Its verdict here is about THIS ENGINE VERSION: upstream mlx-lm gained mlx_lm/models/flint.py on
-      # 2026-10-21 and this bundle ships 0.31.4.dev132, so an engine upgrade is the whole distance to loadable.
+      # claim. Its verdict here is about THIS BUILD: upstream CREATED mlx_lm/models/flint.py on 2026-10-24T00:10:47Z
+      # ("Recursive Flint model support (#1998)"), while this bundle pins a wheel built from commit 0d4d3d04f dated
+      # 2026-10-22T09:47:59Z - 1 day 14 h too old. MEASURED POST-SWAP 2026-10-25 at oMLX 0.7.3.dev2 / mlx_lm
+      # 0.32.3.dev8 / 137 modules: STILL ARCH_UNSUPPORTED. The distance is therefore not an app refresh but the first
+      # build whose wheel is cut at or after that commit - T-201's corrected gate, which tests the CAPABILITY.
       - repo: mlx-community/flint-mixed-3-4bit
         refused_by: R-14
         refused_because: 'four measured blockers: temp-1.0 operating point vs R7, no grammar-constrained decoding path, rec needs an M4/M5 Pro + >=48 GB, and quality behind Qwen3.6-35B-A3B'
         exists_upstream: true          # dl 1166, 17.84 GB, model_type=flint, created 2026-10-22
         bytes_local: false             # MEASURED: 12 K hub entry holding only README.md + refs/main
-        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json, date: '2026-10-25'}
+        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_POSTSWAP_20261025.json, date: '2026-10-25'}
       # The owner's name, measured the day after it was published (created 2026-10-24, dl 138, 27.48 GB).
       - repo: mlx-community/flint-OptiQ-4bit
         refused_by: R-14
         refused_because: 'same architecture and same four blockers as the mixed quant; a different quantisation of one refused model, not a new candidate'
         exists_upstream: true
         bytes_local: false             # not present in any of the seven locations searched
-        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json, date: '2026-10-25'}
+        probe: {verdict: ARCH_UNSUPPORTED, evidence: governance/evidence/MODEL_AVAILABILITY_FLINT_POSTSWAP_20261025.json, date: '2026-10-25'}
       # R-15. Refused to DOWNLOAD, lane left OPEN: the refusal is about serving it from THIS stack, and it is
       # temp-0-native (card: thinking off, temperature 0), so unlike Flint it does NOT conflict with R7.
       - repo: ConwayResearch/Underdog-Saluki-27B-1.0

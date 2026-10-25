@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-22'
+updated: '2026-10-25'
 tasks:
 - id: T-101
   priority: MUST
@@ -2575,57 +2575,93 @@ tasks:
   priority: WORTH
   state: open
   mover: owner
-  title: 'A/B the oMLX engine 0.7.2 vs 0.7.3.dev2 — the FIRST upgrade whose declared trigger fires, and the return point does not yet exist'
+  title: >-
+    DECIDE the oMLX 0.7.2 -> 0.7.3.dev2 A/B - MEASURED 2026-10-25: warm turns improve 11-19 percent on the
+    slowest loop drivers, and one TOOL-ARGUMENT fixture was lost on gpt-oss-20b, in the one role its home
+    already declares unusable
   source: 'governance/OWNER_STEPS_T200_20261025.md'
-  why: 'BUG-1006/D-3120. MEASURED 2026-10-25 by reading the vendor repo and this machine, not by assuming. D-3120 DEFERRED
-    the 0.7.2 upgrade with a declared trigger: "a commit touching base MLX decode/prefill or the chat-completions API
-    for Maxwell model families". The range v0.7.2...v0.7.3.dev2 is 58 commits and the trigger now FIRES: perf(m1)
-    speculative verify and long-context attention routes for applegpu_g13 (#4496) is the M1 generation this box runs,
-    plus a base mlx-lm bump, a thinking-path fix on the exact surface that spent 897 of 900 tokens on gpt-oss-20b, a
-    prefix-cache reporting fix on the cached_tokens accounting this repo already calls unreliable, and two engine-pool
-    memory fixes. So the deferral no longer holds BY ITS OWN TERMS and must be re-measured, not renewed. It is NOT
-    worth adopting blind: three quarters of the 58 commits are cluster/RDMA, MiniMax M3.1, DeepSeek v4, GLM5, VLM and
-    web UI, the build is a .dev, and a base-runtime bump can regress as easily as it gains. What makes it legitimate to
-    try is that the instrument already exists (the T-199 battery, 0 GB downloaded) and the decision rule is fixed
-    BEFORE the measurement. What does NOT exist is the return point: D-3120 preserved rollback as
-    /Applications/oMLX-0.7.0.app, that path is ABSENT on disk and names a version two behind the one serving, so
-    step 1 below creates it before anything is installed (BUG-1006). No new model is downloaded for any outcome: the
-    0.7.3.dev2 Flint serving does not move R-14 s decisive blocker, which is the absence of a grammar path.'
-  evidence: 'MEASURED 2026-10-25: installed and serving = 0.7.2 (bundle Info.plist 0.7.2, mtime 2026-10-21 10:41;
-    server pid 64933 listening 127.0.0.1:11435, started 2026-10-25 14:16). The declared pin said 0.7.1rc1 and is now
-    synced to 0.7.2 (BUG-1006). The T-199 battery baseline (governance/evidence/LOOP_BATTERY_20261025.json) was
-    measured WITH 0.7.2 serving, so it is the baseline for this A/B and cannot judge the upgrade itself. The 58-commit
-    range and the trigger candidates were read from the vendor tags via the GitHub compare API, not from memory.'
-  gate: 'Step 1 create the return point (cp -R the 0.7.2 bundle to a dated path) - pipeline act; step 2 record the
-    baseline (the battery, today s receipt will do); step 3 install 0.7.3.dev2 and re-run the battery. THE DECISION
-    RULE IS FIXED IN ADVANCE: >10 percent better warm time on Qwen3-Coder or Qwen3.8-27B with no fixture lost =
-    adopt and record; flat within 10 percent = DO NOT adopt; any 4/4 model dropping to 3/4 = REVERT to the dated
-    0.7.2 bundle and register the regression. Exact commands, expected output and the "if it differs" branch for
-    every step are in governance/OWNER_STEPS_T200_20261025.md (D-3100).'
+  why: >-
+    BUG-1006/D-3120. D-3120 DEFERRED the 0.7.2 upgrade with a declared trigger; the 58-commit range
+    v0.7.2...v0.7.3.dev2 fired it by its own terms (perf(m1) speculative verify and long-context attention
+    routes for applegpu_g13, a base mlx-lm bump, a thinking-path fix on the surface that spent 897 of 900
+    tokens on gpt-oss-20b, a prefix-cache recording fix, two engine-pool memory fixes). THE EXPERIMENT IS NOW
+    DONE and this task is the DECISION. MEASURED 2026-10-25, warm_turn_s (the load-independent column the
+    battery's own ranking separates out), 0.7.2 15:22 -> 0.7.3.dev2 19:12: Ornith-1.5-35B-REAP-19B 7.3 -> 5.9
+    (-19 percent), gemma-4-E4B 2.1 -> 1.7 (-19 percent), Qwen3-Coder 1.8 -> 1.6 (-11 percent), Ornith-1.5-9B
+    14.7 -> 13.6 (-7 percent), Qwen3.8-27B 15.8 -> 15.6 (-1 percent), Phi-4-mini 8.1 -> 8.0 (-1 percent),
+    MiniCPM5-2B 1.5 -> 1.5 (0 percent), gpt-oss-20b 25.9 -> 26.5 (+2 percent). FIXTURES: no 4/4 model lost one;
+    gpt-oss-20b went 3/4 -> 2/4, losing the ENUM tool-argument fixture (pre: PASS via summarize_column; post:
+    THREE of three attempts emitted NO tool call and burned the whole 26.5 s allowance). That loss is confined
+    by STRUCTURE, not by hope: the fixture is a TOOL-argument trap, and pipeline/omlx_call.py builds payloads
+    with model/messages/response_format/chat_template_kwargs/thinking_budget and never a tools key - zero
+    'tools' references in omlx_call.py, stage4_merge.py or student_classifier.py - so the S4 classifier path
+    cannot send tools at all, and config/agent_context.yaml already declares gpt-oss 'a usable PROBE, an
+    unusable loop'. WHAT THE PRE-DECLARED RULE DOES NOT COVER, named rather than smoothed: it fixes REVERT at
+    'any 4/4 model dropping to 3/4' and ADOPT at 'no fixture lost', so a 3/4 -> 2/4 loss on a model that was
+    never 4/4 falls between the two clauses.
+  evidence: >-
+    governance/evidence/ENGINE_AB_20261025.json 2026-10-25 (both batteries warm-vs-warm, the enum re-runs, the
+    structural resolution) | governance/evidence/LOOP_BATTERY_20261025.json 2026-10-25 (pre-swap baseline) |
+    temp/subagent_loop_battery_receipt_20261025.json 2026-10-25 (post-swap, now carrying its engine block).
+    THE BASELINE'S ENGINE IS INFERRED, NOT RECORDED (BUG-1018): the 15:22 receipt carries no engine identity;
+    two readings support 0.7.2 - /Applications/oMLX-0.7.2-20261025.app has Info.plist 0.7.2 and was copied at
+    16:18, and update-prefs.json named 0.7.3.dev2 as DEFERRED. The post side IS recorded: the app process was
+    born 19:05:40 and the receipt names engine 0.7.3.dev2 / mlx_lm 0.32.3.dev8+g0d4d3d04f.
+  gate: >-
+    OWNER DECISION. The data-grounded recommendation is ADOPT WITHOUT REVERTING: (a) every 4/4 model kept 4/4,
+    (b) warm wins are 11-19 percent on the three slowest loop drivers, (c) the single loss is a tool-argument
+    fixture in a role the model's own home declares unusable AND on a path the S4 classifier cannot reach by
+    construction, (d) reverting buys a second swap cycle and its own risk against a loss with no identified
+    consumer. WHAT WOULD FALSIFY IT: any path that sends a tools payload to gpt-oss-20b-MXFP4-Q8 - before that
+    happens the enum fixture must pass again, and that condition is T-202. If the owner prefers the letter of
+    the pre-declared rule, REVERT instead: the dated 0.7.2 bundle is intact at
+    /Applications/oMLX-0.7.2-20261025.app and the rollback is one paste-safe command in the OWNER_STEPS file.
 - id: T-201
   priority: WORTH
   state: open
   mover: pipeline
   title: >-
-    RE-PROBE the two flint repos the moment the engine's mlx_lm reaches >=0.32.x - ARCH_UNSUPPORTED is a
-    statement about a VERSION, never eternity
-  source: 'BUG-1011 (D-3151)'
+    RE-PROBE the two flint repos when the BUNDLE'S mlx_lm CONTAINS the flint module - never when a version
+    string crosses a threshold, because 0.32.3 passed the threshold and still had no flint
+  source: 'BUG-1011 (D-3151) / BUG-1019'
   why: >-
-    BUG-1011/D-3151. MEASURED 2026-10-25 by the engine's own oracle, not by reading a card:
-    python3 pipeline/model_loadability_probe.py mlx-community/flint-mixed-3-4bit mlx-community/flint-OptiQ-4bit
-    -> ARCH_UNSUPPORTED for BOTH, "model_type=flint has no module in the engine's mlx_lm build", at mlx_lm
-    0.31.4.dev132 / 134 architectures. Upstream mlx-lm gained mlx_lm/models/flint.py on 2026-10-21, and the 58
-    commits of v0.7.2...v0.7.3.dev2 include `feat(flint): add native Flint serving` - both facts were ALREADY
-    recorded in governance/OWNER_STEPS_T200_20261025.md. So the trigger is not hypothetical and the distance to
-    LOADABLE_CANDIDATE is ONE engine upgrade, which is exactly the upgrade T-200 is A/B-ing. This task is
-    therefore not independent work: it is the re-probe that runs BEFORE and AFTER T-200's swap. A
-    LOADABLE_CANDIDATE verdict re-opens R-14 on its remaining THREE blockers (the temp-1.0 operating point vs R7,
-    the absent grammar-constrained decoding path, and rec needing an M4/M5 Pro) - it adopts nothing. No model is
-    downloaded by any outcome: TIER-A answers without weights.
-  evidence: 'governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json 2026-10-25'
+    MEASURED TWICE by the engine's own oracle, and the second reading killed the original trigger. PRE-SWAP
+    (2026-10-25, mlx_lm 0.31.4.dev132 / 134 architectures): ARCH_UNSUPPORTED for BOTH repos. POST-SWAP (same
+    day, oMLX 0.7.3.dev2, mlx_lm 0.32.3.dev8+g0d4d3d04f / 137 module files): STILL ARCH_UNSUPPORTED. That is
+    why the trigger was rewritten: it used to read 'the moment the engine's mlx_lm reaches >=0.32.x', and that
+    condition FIRED while the capability did not arrive, because the bundle pins a pre-built wheel cut from
+    upstream commit 0d4d3d04f dated 2026-10-22T09:47:59Z while upstream CREATED mlx_lm/models/flint.py in
+    commit 2026-10-24T00:10:47Z - 1 day 14 h of history the wheel does not have. Reading: grep -ril flint over
+    the whole shipped mlx_lm tree returns nothing and the dist-info RECORD does not mention it. ALSO CORRECTED:
+    this task previously said upstream gained flint.py on 2026-10-21; the GitHub reading says
+    2026-10-24T00:10:47Z. A LOADABLE_CANDIDATE verdict re-opens R-14 on its remaining THREE blockers (the
+    temp-1.0 operating point vs R7, the absent grammar-constrained decoding path, rec needing an M4/M5 Pro +
+    48 GB) - it adopts nothing, and no model is downloaded by any outcome: TIER-A answers without weights.
+  evidence: >-
+    governance/evidence/MODEL_AVAILABILITY_FLINT_POSTSWAP_20261025.json 2026-10-25 |
+    governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json 2026-10-25
   gate: >-
-    RUN the probe on both repos before and after T-200's engine swap and record BOTH verdicts with their dates.
-    A flint repo becoming LOADABLE_CANDIDATE re-opens R-14 on blockers 1, 2 and 3, so a fresh recording decision
-    is required; a verdict still ARCH_UNSUPPORTED changes nothing and the dated register entry stands. Until this
-    runs, the register says ARCH_UNSUPPORTED AT 0.31.4.dev132 and nothing more. A verdict recorded without its
-    date is a recollection, and scripts/check_model_claims.py refuses it.
+    RE-PROBE when the bundle's mlx_lm/models/ CONTAINS flint - a capability the probe's oracle already reports
+    in its architecture list - so nobody compares version strings by eye. Two readings with their dates are on
+    file; until a later one differs, the register says ARCH_UNSUPPORTED AT THIS BUILD and nothing more. Verify
+    the ORACLE before believing a verdict: the probe prints the engine it measured, and since BUG-1016 a cache
+    from a replaced engine is refused rather than quoted.
+- id: T-202
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    BEFORE any path sends a tools payload to gpt-oss-20b-MXFP4-Q8, its ENUM tool-argument fixture must pass
+    again - the one condition that would turn T-200's confined regression into a real one
+  source: 'T-200 / BUG-1018'
+  why: >-
+    MEASURED 2026-10-25: after the 0.7.3.dev2 swap, gpt-oss-20b failed the ENUM tool-argument fixture in 3 of 3
+    attempts (no tool call at all; the full 26.5 s allowance spent), where it passed once on 0.7.2. The
+    regression is confined today by STRUCTURE: pipeline/omlx_call.py never sets a tools key, so the S4
+    classifier path cannot reach it. A guard that depends on a structure nobody checks is a comfort, not a
+    control (the BUG-1016 shape), so the falsifier is written down as a task instead of a memory.
+  evidence: 'governance/evidence/ENGINE_AB_20261025.json 2026-10-25'
+  gate: >-
+    Any proposal that adds tool-calling to a gpt-oss-20b path cites this task, runs the enum fixture first
+    (python3 scripts/measure_subagent_loop.py --battery --only gpt-oss-20b-MXFP4-Q8), and records the verdict.
+    A PASS lifts the condition; a FAIL means that path needs a different model, not a retry.

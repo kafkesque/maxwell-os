@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1270 decisions (census stamp db5e208e69b6a38e, 2026-10-25) · 763 bugs (252 open / 511 closed; highest OPEN = BUG-999) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1270 decisions (census stamp db5e208e69b6a38e, 2026-10-25) · 764 bugs (253 open / 511 closed; highest OPEN = BUG-1000) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1270 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 650 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1270, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 252 open.
+> Open BUGS by severity (population = the census's 253 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 253 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20939,3 +20939,45 @@ that did not re-run it.
 **WHY MED, NOT HIGH.** No bytes were LOST: the mutation is fully explained and recovered (the buglog prose in BUG-994/BUG-995/BUG-976/T-197 names the exact withdrawal and re-insert, and `check_store_columns` re-measured the 7,649-row census). The defect is a provenance INTEGRITY gap, not a data-loss event — but the class is the same one the journal exists to catch, so it is owed a mechanical fix, not a shrug.
 
 **REMEDY — D-3144.** The single-concept store-write path (writer + repair scripts) must append a `kind: data` MUTATION_JOURNAL record (pre/post sha16, stamp, writer, rows-touched) for every store mutation it performs — reusing the existing journal slot, no new table, no over-engineering.
+
+## BUG-1000 (MED — OPEN 2026-10-25) — the justfile ladder and the git pre-commit hook still call bare `python3`, so a fresh shell fails on the WRONG thing (BUG-607's class, on the surface D-2745 did not cover)
+
+**MEASURED 2026-10-25 (two independent failures in one session, both frozen).** A Goose-tool shell inherited
+`PATH=/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Goose.app/Contents/Resources/bin`. There `python3` is
+**`/usr/bin/python3`**, which carries neither PyYAML nor MCP. Consequences:
+
+1. **The commit was BLOCKED.** `git commit` → the `pre-commit` hook's RAIL 0 (`python3 scripts/check_repo_integrity.py`)
+   died with `ModuleNotFoundError: No module named 'yaml'` at `check_repo_integrity.py:67`. Nothing was wrong with the
+   tree; the hook was executed by the wrong interpreter.
+2. **The ladder was BLOCKED at rail 20 of 193.** `just health` → `python3 scripts/measure_extension_cost.py --selftest`
+   died with `ModuleNotFoundError: No module named 'mcp'` at `measure_extension_cost.py:138`, reported as
+   `error: Recipe 'health' failed on line 20`. Every rail before it had passed.
+
+The interpreters actually present, measured on this machine (all three have PyYAML; only two have the rest):
+
+| interpreter | version | yaml | mcp | mlx_lm |
+|---|---|---|---|---|
+| `/usr/bin/python3` | system | **no** | **no** | no |
+| `/opt/homebrew/bin/python3` | 3.14.6 | yes | **no** | no |
+| `/usr/local/bin/python3` | 3.12.1 (python.org) | yes | **yes** | **yes** |
+
+Prefacing the shell with `PATH=/usr/local/bin:/opt/homebrew/bin:$PATH` made BOTH surfaces pass unchanged: the commit
+landed, and `just health-full` measured **193 lines RUN, 0 fault(s)**. So the defect is interpreter SELECTION, not code.
+
+**WHY THIS IS A NEW FILE, NOT A RE-OPEN OF BUG-607.** BUG-607 (CLOSED 2026-09-30, D-2745) fixed exactly this class —
+but only inside `pipeline/runner.py`: it added `run.python_bin` to `config/pipeline_config.yaml` and `_get_python_bin()`
+for the stage subprocess and the preflight. That pin is real and still holds. `justfile` (193 declaring lines) and
+`.git/hooks/pre-commit` (5 rails) were never covered, so the same class recurs on the two surfaces every commit and
+every health run depend on. D-2745's own FOLLOW-UP item ("consolidate the 4-Python drift") anticipated this; it was
+never discharged.
+
+**ASYMMETRY THAT MAKES IT WORSE (measured).** The failure is reported as a MISSING MODULE deep inside a rail that had
+already passed 19 others, so the first reading is "a code defect in measure_extension_cost.py" — which is false. It is
+the same shape as BUG-375: a verdict derived from a check that could not resolve what it was checking.
+
+**REMEDY (one home, C12 — not yet applied; this entry only records the reading).** The ladder's interpreter must be
+DECLARED once and read by both surfaces, exactly as D-2745 did for the runner: a `ladder.python_bin` (or reuse
+`run.python_bin`) in a config home, with the justfile and the pre-commit hook resolving through it — and the ladder
+failing closed with a diagnostic that NAMES the interpreter when a rail's module is missing, rather than surfacing the
+raw `ModuleNotFoundError`. **RE-OPEN/CLOSE CONDITION:** a fresh shell with `PATH=/usr/bin:/bin:…` runs `git commit` and
+`just health` green. **RED LOOP (D-3036):** `env -i PATH=/usr/bin:/bin HOME="$HOME" bash -lc 'cd <repo> && python3 scripts/check_repo_integrity.py'` must go RED now and GREEN after the pin.

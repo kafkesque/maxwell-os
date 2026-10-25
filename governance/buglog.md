@@ -21819,3 +21819,31 @@ probe's own oracle already reports, so no one has to compare version strings by 
 ALSO CORRECTED IN THE SAME READ (my own prose, not the register): `governance/NOT-YET-EVALUATED-RESEARCH.md` says
 upstream gained `flint.py` on **2026-10-21**. GitHub says the file's creating commit is **2026-10-24T00:10:47Z**. The
 date in the correction section is superseded by this line.
+
+### ADDENDUM (2026-10-25) to BUG-1010 — a scan can die unrecorded, and the head is read at the END
+
+Two measured facts, both found while trying to close today's landing with a whole-set scan. Filed here rather than
+as a new bug id because `head_sha()`'s own docstring declares the position (*"enough to place a scan in history,
+never an input to a verdict"*), so the check not gating on head is a **declared trade-off, not an oversight** — and
+minting a duplicate defect for a declared position is the bug-bloat this register refuses (D-3038 read the other way:
+what we REJECT, we register too, but we do not re-file it under a new number).
+
+1. **A DETACHED WHOLE-SET SCAN WAS KILLED AND LEFT NO TRACE.** `nohup /opt/homebrew/bin/just health-full &` ran
+   6+ minutes, reached rail ~180 of 194, then vanished: no traceback in the log, no crash report under
+   `~/Library/Logs/DiagnosticReports/`, `temp/ladder_receipt.json` untouched (18:44). The tree afterwards is
+   **indistinguishable from a tree that was never scanned** — which is BUG-1010's own shape applied to the RAIL rather
+   than to the artefact. The re-run was made in the FOREGROUND (`timeout_secs` 1800) and completed:
+   `ok ladder scan: 194 line(s) RUN, 0 fault(s), 1038.7s`, receipt `head 62f4fcd`. **Harness fact to carry forward:
+   a long scan runs in the foreground, because a detached one can be reaped silently.**
+2. **THE HEAD IS READ WHEN THE RECEIPT IS WRITTEN, i.e. AFTER THE RAILS.** `record_scan()` calls `head_sha()` at write
+   time, so a commit made MID-scan is recorded as though those bytes had been measured. Conversely
+   `--receipt-check` returned **rc=0 CLEAN naming `head 5d1a888` while the worktree stood at `62f4fcd`** — measured
+   today. The head is PRINTED, not GATED, and that position is only sound while the worktree is clean — and nothing
+   records cleanliness.
+   What would close it (unchanged proposal, now with the two fields it needs): the receipt carries
+   `head_at_start`, `head_at_end` and `worktree: {clean, dirty_paths}`; `head_at_end != head_at_start` ⇒ OWNER-OWED
+   rc=2 naming both shas (the scan's bytes are undefined); a receipt measured on a dirty worktree ⇒ OWNER-OWED-green
+   rc=2. The fix touches `scripts/run_ladder.py`, so it must land **with** its own whole-set scan — editing the
+   scanner while a scan is running turns that scan into a verdict about mixed bytes.
+> **What this addendum does NOT change:** today's receipt is a verdict about **62f4fcd** with a clean worktree at scan
+> time (`git status --porcelain` empty before the run), so the green stands on its own terms.

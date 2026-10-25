@@ -32115,3 +32115,31 @@ decisions:
   - scripts/abstention_robustness.py
   - config/recalibration_pins.yaml
   - governance/buglog.md
+- id: D-3144
+  state: ACTIVE
+  date: '2026-10-24'
+  by: assistant
+  category: GOVERNANCE / PROVENANCE
+  title: the single-concept store-write path must journal its store mutations — the Oct 24 19:07 untraced mutation
+    is closed by a kind:data receipt, not a new table
+  decision: 'BUG-999. MEASURED 2026-10-24: knowledge pipeline/maxwell.db mutated at 19:07:30 (the T-197 evidence-row
+    withdrawal f523504e -> re-insert 164e4761) with ZERO MUTATION_JOURNAL entries at the 20261024T19 stamp — the
+    journal names maxwell.db exactly ONCE (the Oct 11 provenance_update, kind: data, mode: provenance_update), and
+    the store has NO mutation/provenance table. Root cause: pipeline/insert_single_concept.py (the D-3130 route)
+    writes the store via a bare sqlite3.connect + conn.commit with no journal append, and scripts/repair_single_concept_provenance.py
+    + scripts/reverify_one_row.py are the same shape. THREE CLAUSES. (1) THE ONE-HOME CLAUSE: MUTATION_JOURNAL already
+    owns the kind: data slot (the Oct 11 provenance_update used it); the store does NOT need a new mutation table
+    — a second provenance home is the D-3136 shape (one rule, two homes, two truths). (2) THE JOURNAL-OR-REFUSE
+    CLAUSE: the single-concept writer and its repair scripts must append a kind: data record (pre/post sha16, stamp,
+    writer, rows-touched) on every store mutation, or refuse to write — an unjournaled store write is the C16 silent-mutation
+    shape and is REFUSED, not absorbed. (3) THE SCOPE CLAUSE: stage6_commit.py (the bulk commit path) is OUT of
+    scope here — it leaves its trace via per-row R14 stamps + the Parquet export; folding it in would over-engineer
+    a path that already carries a per-object receipt. NOT DECIDED HERE: whether a check_* rail should assert the
+    journal covers every store mutation — that is a future instrument, not this decision''s act.'
+  bugs:
+  - BUG-999
+  files:
+  - pipeline/insert_single_concept.py
+  - scripts/repair_single_concept_provenance.py
+  - scripts/reverify_one_row.py
+  - governance/MUTATION_JOURNAL.jsonl

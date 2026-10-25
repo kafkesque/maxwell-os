@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 762,
-  "open_n": 251,
+  "total_ids": 763,
+  "open_n": 252,
   "closed_n": 511,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1261,6 +1261,11 @@
     {
       "id": "BUG-993",
       "title": "(HIGH \u2014 OPEN 2026-10-24) \u2014 the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the",
+      "events": 1
+    },
+    {
+      "id": "BUG-999",
+      "title": "(MED \u2014 OPEN 2026-10-24) \u2014 the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the",
       "events": 1
     }
   ],

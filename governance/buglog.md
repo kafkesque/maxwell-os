@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1269 decisions (census stamp 331d6bf92bfbcfd2, 2026-10-24) · 762 bugs (254 open / 508 closed; highest OPEN = BUG-993) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1270 decisions (census stamp db5e208e69b6a38e, 2026-10-24) · 763 bugs (252 open / 511 closed; highest OPEN = BUG-999) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1269 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 649 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1269, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1270 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 650 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1270, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 254 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 81 · 🟩 LOW 31 · UNLABELLED 101 (BUG-757) of 254 open.
+> Open BUGS by severity (population = the census's 252 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 3 · 🟧 HIGH 38 · 🟨 MED 80 · 🟩 LOW 30 · UNLABELLED 101 (BUG-757) of 252 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20929,3 +20929,13 @@ that did not re-run it.
 
 **ACCEPTED NEGATIVE (D-3038) — the residual, recorded WITH its reason.** The harness defect the entry left OPEN — "an enabled extension that contributes zero tools still raises nothing to the session" — is a GOOSE-harness behaviour, not a defect in any artifact this repository owns. The policy (D-3056) prevents the ROT; it cannot (from here) fix the harness's silence. **RE-OPEN CONDITION:** a harness version that surfaces zero-tool extensions (then a check under `scripts/goose_profile.py`, capability `extension_residency`, can assert it).
 
+
+## BUG-999 (MED — OPEN 2026-10-24) — the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the provenance trail (C13/C16)
+
+**WHAT WAS MEASURED (D-3109).** `knowledge pipeline/maxwell.db` mtime is `Oct 24 19:07:30 2026`. `governance/MUTATION_JOURNAL.jsonl` carries exactly **1** entry naming `maxwell.db` — the Oct 11 19:19:04 `provenance_update` (`kind: data`, `mode: provenance_update`, writer `agent/session_20261011_ruleV`). Zero entries carry the `20261024T19` stamp. So the 19:07:30 mutation — the T-197 closure (BUG-990 evidence row `f523504e…` withdrawn, then re-inserted as PASS `fb_id 164e4761…` / rowid 23647 with corrected Rumelt provenance) — is a store mutation the journal cannot name. The store itself has **no** mutation/provenance table (`sqlite3 .tables` → `fbs`, `fbs_fts*`, `vec_fbs*`, `taxonomy_counts` only): the ONLY per-object trace is the R14 per-row stamp (`pipeline_run_id`/`gen_model`/`pipeline_commit`), which the single-concept path wrote BLANK on this row in the first place (the BUG-990 defect).
+
+**ROOT CAUSE.** `pipeline/insert_single_concept.py` (the D-3130 single-concept route) writes the store with a bare `sqlite3.connect(db)` + `conn.commit()` (lines 37, 542–546) — no `write_guard`, no `mutation_journal` append. The repair scripts (`scripts/repair_single_concept_provenance.py`, `scripts/reverify_one_row.py`) are the same shape. The Oct 11 `provenance_update` proves the journal already HAS a `kind: data` slot for exactly this; the single-concept path simply never uses it. This is a C13/C16 class defect: a batch/row write with no backup-or-journal receipt (C13), and a mutation that is silent to every forensic reader except the human prose (C16).
+
+**WHY MED, NOT HIGH.** No bytes were LOST: the mutation is fully explained and recovered (the buglog prose in BUG-994/BUG-995/BUG-976/T-197 names the exact withdrawal and re-insert, and `check_store_columns` re-measured the 7,649-row census). The defect is a provenance INTEGRITY gap, not a data-loss event — but the class is the same one the journal exists to catch, so it is owed a mechanical fix, not a shrug.
+
+**REMEDY — D-3144.** The single-concept store-write path (writer + repair scripts) must append a `kind: data` MUTATION_JOURNAL record (pre/post sha16, stamp, writer, rows-touched) for every store mutation it performs — reusing the existing journal slot, no new table, no over-engineering.

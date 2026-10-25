@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 784 bugs (246 open / 538 closed; highest OPEN = BUG-1020) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 784 bugs (245 open / 539 closed; highest OPEN = BUG-1020) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 82 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 246 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21928,3 +21928,78 @@ then the recorded fallback is the direct engine call at temperature 0.0 with its
 session used and what `governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json#verified_by.r5_review` records —
 including the AUDIT of that review's five findings, two of which were false positives that repeated a risk instead
 of resolving it (a delegated answer is not self-certifying either).
+
+## BUG-1010 (MED - CLOSED 2026-10-25) - CLOSED BY MEASUREMENT: the receipt now NAMES the bytes it ran (HEAD at BOTH ends, the worktree at both ends), and a scan that is killed leaves a NAMED state instead of a tree indistinguishable from one never scanned
+
+**The landing: `24d2c01`, and it is the entry's own declared fix, not a redesign of it.** The record goes from
+schema 1 to schema 2 and gains `state` (`running|finished`), `started_at`, `measured_at`, `head_at_start`,
+`head_at_end` and `worktree{modified_at_start, modified_at_end, untracked_at_start, minted_during_scan}`. The
+claim it can now make is the one it was always making implicitly and could never support: *this ladder was green
+over THIS SET OF BYTES*.
+
+**THREE DECISIONS INSIDE IT, each one a refusal of a simpler shape.**
+
+1. **`state: "running"` is WRITTEN BEFORE THE FIRST RAIL**, with `worst_rc: None` and never `0`. This is the
+   addendum's item 1 landed: a detached scan that dies leaves a record that says a scan BEGAN and never
+   finished, so the next reader is told "half-run", not "never measured" and not "clean". `worst_rc` is deliberately
+   not 0, so even a reader that ignored `state` cannot read a half-run as green.
+2. **An unattributable record is OWNER-OWED (rc=2) NAMING WHICH of four shapes it is** - HEAD moved mid-scan;
+   a TRACKED file differed when the scan BEGAN; a TRACKED file differed when it ENDED; no commit named at all
+   ("git could not answer" is not "clean", D-405/BUG-1018's class). Never green, never fatal: only a clean tree
+   measured again can clear it, and the fast ladder's line already tolerates 2 (`|| [ $? -eq 2 ]`), so no cascade
+   into FATAL.
+3. **A RECORDED RED OUTRANKS UNATTRIBUTABILITY, and the order is the point.** An unattributable scan that
+   MEASURED a fault still measured the fault; reporting provenance first would soften a red into "unknown" -
+   C16 inverted. This is asserted as a control, not left to reading order.
+
+**THE HIDDEN CONFLICT IT FOUND, MEASURED BEFORE IT COULD BITE.** `GIT_DIR` / `GIT_WORK_TREE` / `GIT_INDEX_FILE`
+are inherited by every child process, and this reading now decides a VERDICT. Measured on this clone:
+`GIT_INDEX_FILE=/tmp/decoy_index_absent git status --porcelain -uall` answered **3973 lines against 0** on the
+real index (every tracked path reported as deleted), and `GIT_DIR=<decoy>` made git refuse to answer at all.
+Unscrubbed, EVERY scan would have been un-attributable - a green ladder turned permanently owner-owed by a
+variable nobody in that file set (BUG-527/BUG-568's class, one level up). `cleared()` drops git's own three
+overrides and keeps everything else, and it is driven both ways: a synthetic mapping (what is dropped and what is
+kept) and a LIVE armed reading compared to the clean one.
+
+**THE RECEIPT OF THIS LANDING** (`python3 scripts/run_ladder.py --collect health`, foreground, D-3036):
+`2026-10-25T21:08:48Z -> 21:26:23Z`, **194 declaring line(s), 0 fault(s), 1054.5 s, worst rc=0**, schema 2,
+`state: finished`, `head_at_start == head_at_end == 24d2c01`, and **all four worktree readings EMPTY**
+(`modified_at_start`, `modified_at_end`, `untracked_at_start`, `minted_during_scan`), fingerprint
+`18d1b2d71f73dc70`. `--receipt-check` rc=0: *"MEASURED GREEN under exactly this 194 declaring line(s) 0.0h ago
+(fingerprint 18d1b2d71f73dc70, head 24d2c01)"*.
+
+**What those four EMPTY readings MEASURE, and it is the answer to the obvious objection.** The new rule could
+have been the thing that made every scan un-attributable - if any of the 194 rails rewrote a tracked file or
+minted an uncommitted one, the whole ladder would have been owner-owed on every run and the rule would have been
+bypassed within a day (D-3151). Measured: **none of the 194 rails dirties the tree it runs in.** The rule
+therefore costs nothing in normal operation, which is the only reason it can be kept.
+
+**The old green did not survive by silence.** The schema-1 record on disk was put through the new reader BEFORE
+the landing scan: *"the recorded scan cannot say it FINISHED (schema 1 carries no state) ... rc=2"*. A record
+written by a collector younger than the rule has no field in which to say it finished, and that shape is NAMED
+rather than assumed - otherwise every pre-change green would have been inherited unmeasured.
+
+**CONTRACT UPDATED ON BOTH FACES (D-2978), and the teeth are seen.** `specs/ladder_receipt.spec.md` INV-7
+rewritten and **INV-10 added** (*"a record is a verdict about the BYTES it names, or it is UNKNOWN"*);
+`tests/test_ladder_receipt_spec.py` drives every shape, **12/12**; collector controls **29 -> 40**, all
+known-answer; new mutation `a_scan_names_the_bytes_it_ran` and the gate sees it red its own named control -
+**65 declared rule(s) SEEN, 1 negative control green**.
+
+**NO NEW DECISION IS MINTED, and the reason is not economy.** D-2660 already declares that *a verdict is a claim
+about the ladder at the MOMENT OF MEASUREMENT* and D-3152 clause 2 that *a receipt NAMES the subject it
+measured*; this landing makes the moment and the bytes FIELDS instead of prose. A new D-number would restate a
+rule that already has a home (D-2646: one fact, one home) - what was missing was never the principle, it was the
+column.
+
+**WHAT THIS DOES NOT COVER, named so it cannot be read as coverage (D-3152 clause 4).**
+- **A commit made AFTER the scan.** `head_at_end` is the referent and the declared age budget is the mitigation;
+  `--receipt-check` does not compare the record's head to the CURRENT head, deliberately: gating that would force
+  a 17-minute whole-set rescan after every commit and the rule would be bypassed (D-3151). The honest reading of
+  a green record is therefore *"green at `head_at_end`, within its age budget"* - and a documentation commit
+  (this block) is not distinguished from a code commit by the record alone.
+- **An untracked file that a rail IMPORTED.** The reading travels (`untracked_at_start`) and the verdict does not
+  turn on it - see decision 3 above. The record is falsifiable on this point; the rule is not.
+- **`--collect health-deep` writes the same declared home.** A deep scan therefore REPLACES the whole-set record
+  with one whose coverage is a 2-line recipe, and the reader answers UNKNOWN (coverage mismatch, D-2982) rather
+  than green. The failure mode is a re-scan, never a wrong verdict - which is why this is a named limit and not a
+  new bug (D-3038: what we reject, we register; what we have measured to fail closed, we do not re-file).

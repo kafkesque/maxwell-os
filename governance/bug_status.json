@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 784,
-  "open_n": 246,
-  "closed_n": 538,
+  "open_n": 245,
+  "closed_n": 539,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1226,11 +1226,6 @@
       "events": 1
     },
     {
-      "id": "BUG-1010",
-      "title": "(MED - OPEN 2026-10-25) - the ladder receipt records `head` and NOT the worktree state, so a scan of a MODIFIED tree writes a verdict",
-      "events": 1
-    },
-    {
       "id": "BUG-1015",
       "title": "(MED - OPEN 2026-10-25) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and",
       "events": 1
@@ -1772,6 +1767,7 @@
     "BUG-1007",
     "BUG-1008",
     "BUG-1009",
+    "BUG-1010",
     "BUG-1011",
     "BUG-1012",
     "BUG-1013",

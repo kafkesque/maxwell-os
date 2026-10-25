@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 774,
-  "open_n": 247,
-  "closed_n": 527,
+  "open_n": 244,
+  "closed_n": 530,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -751,11 +751,6 @@
       "events": 2
     },
     {
-      "id": "BUG-681",
-      "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails)",
-      "events": 2
-    },
-    {
       "id": "BUG-698",
       "title": "(OPEN, 2026-10-10) \u2014 v8\u2192v9 discipline-anchor off-menu rows are 22 in THREE categories, not the \"7 delta rows\" assumed in GATE-2; abstained",
       "events": 1
@@ -1193,7 +1188,7 @@
     {
       "id": "BUG-954",
       "title": "(MED, OPEN 2026-10-20) \u2014 `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG",
-      "events": 1
+      "events": 2
     },
     {
       "id": "BUG-964",
@@ -1216,11 +1211,6 @@
       "events": 1
     },
     {
-      "id": "BUG-993",
-      "title": "(HIGH \u2014 OPEN 2026-10-24) \u2014 the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the",
-      "events": 1
-    },
-    {
       "id": "BUG-999",
       "title": "(MED \u2014 OPEN 2026-10-24) \u2014 the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the",
       "events": 1
@@ -1233,11 +1223,6 @@
     {
       "id": "BUG-1002",
       "title": "(LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and",
-      "events": 1
-    },
-    {
-      "id": "BUG-1009",
-      "title": "(MED - OPEN 2026-10-25) - 47 % of `just health` is ONE rail re-parsing 312.7 MB of FROZEN pre-images, twice, and the cost grows by ~14 s a",
       "events": 1
     },
     {
@@ -1544,6 +1529,7 @@
     "BUG-676",
     "BUG-678",
     "BUG-679",
+    "BUG-681",
     "BUG-682",
     "BUG-683",
     "BUG-684",
@@ -1762,6 +1748,7 @@
     "BUG-989",
     "BUG-990",
     "BUG-991",
+    "BUG-993",
     "BUG-994",
     "BUG-995",
     "BUG-996",
@@ -1773,6 +1760,7 @@
     "BUG-1005",
     "BUG-1006",
     "BUG-1007",
-    "BUG-1008"
+    "BUG-1008",
+    "BUG-1009"
   ]
 }

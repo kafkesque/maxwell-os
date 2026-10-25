@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**247 open** / 527 closed of 774 ids.
+**244 open** / 530 closed of 774 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -159,7 +159,6 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
 | BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
-| BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) | 2 |
 | BUG-698 | (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained | 1 |
 | BUG-700 | (HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store) | 1 |
 | BUG-701 | (HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation | 1 |
@@ -247,14 +246,12 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-949 | (HIGH, OPEN 2026-10-20) — pipeline cloud spend is UNMETERED while the routing table still declares cloud routes | 1 |
 | BUG-950 | (HIGH, OPEN 2026-10-20) — THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS "Failed to read response body: error | 2 |
 | BUG-951 | (HIGH, OPEN 2026-10-20) — gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS | 1 |
-| BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 1 |
+| BUG-954 | (MED, OPEN 2026-10-20) — `yaml_guard.py --check` TAKES **442.9 s** BECAUSE IT PARSES **282 MB** OF YAML TWICE, SO `just health` LOOKS HUNG | 2 |
 | BUG-964 | (LOW, OPEN 2026-10-22) — gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified) | 2 |
 | BUG-967 | (LOW, OPEN 2026-10-23) — the Phase 0 receipt reports S0.5 as "identical" over two EMPTY sets | 1 |
 | BUG-972 | (LOW, OPEN 2026-10-23) — `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback | 1 |
 | BUG-992 | (HIGH — OPEN 2026-10-24) — the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row | 1 |
-| BUG-993 | (HIGH — OPEN 2026-10-24) — the whole-set receipt re-collection revealed the ladder is THIRTEEN-red, not two: six regressions from the | 1 |
 | BUG-999 | (MED — OPEN 2026-10-24) — the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the | 1 |
 | BUG-1001 | (LOW, OPEN 2026-10-25) — `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a | 2 |
 | BUG-1002 | (LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and | 1 |
-| BUG-1009 | (MED - OPEN 2026-10-25) - 47 % of `just health` is ONE rail re-parsing 312.7 MB of FROZEN pre-images, twice, and the cost grows by ~14 s a | 1 |
 | BUG-1010 | (MED - OPEN 2026-10-25) - the ladder receipt records `head` and NOT the worktree state, so a scan of a MODIFIED tree writes a verdict | 1 |

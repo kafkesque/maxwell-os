@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 770 bugs (245 open / 525 closed; highest OPEN = BUG-1002) · 56 open tasks (MUST 9 / SHOULD 42 / WORTH 5; OWNER-moved 1, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1275 decisions (census stamp b169a1a15552b88a, 2026-10-25) · 771 bugs (246 open / 525 closed; highest OPEN = BUG-1007) · 56 open tasks (MUST 9 / SHOULD 42 / WORTH 5; OWNER-moved 1, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1275 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 655 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1275, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 80 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 246 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21403,3 +21403,28 @@ adopted. What had drifted was its PREMISE (that 0.7.1rc1 runs), and the premise 
 The **supersession of the 0.7.2 question by 0.7.3.dev2 is registered, not assumed**: T-200 (mover: owner, WORTH)
 carries the 58-commit reading, the four commits that make D-3120's own trigger FIRE, and the decision rule fixed
 BEFORE any measurement. `pinned_version` still has no runtime consumer, and that is stated rather than implied.
+
+## BUG-1007 (MED - OPEN 2026-10-25) - fixing the face rail REVEALED a second unbounded rail: `yaml_guard.py --check` ran 6+ minutes at 100 % CPU inside `just health`
+
+**HOW IT SURFACED.** With BUG-1005 fixed the face rail went from >31 min to **1.80 s**, and `just health` — for the
+first time — ran PAST declaring line 86 and reached **line 1552 of its output (~declaring line 150 of 193)** in about
+four minutes. It then stopped growing and sat inside `scripts/lib/yaml_guard.py --check`
+(`77480 06:20 6:18.28 100.0`) with the ladder's own pid `76998` still alive. Nothing is printed while it works and
+there is no budget on it.
+
+**IT IS A DIFFERENT SHAPE FROM BUG-1005, AND THE MEASUREMENT SAYS SO.** `sample` on the live pid put only **7 of 1761**
+samples in `_sre_SRE_Pattern_search`; the rest are spread across the C YAML parser (`_yaml.cpython-313-darwin.so`),
+`insertdict`, `unicodekeys_lookup_unicode`, `object_isinstance` — i.e. **ordinary work, done a lot of it**, not
+backtracking. `main()` calls `scan(register, REGISTER.parent.parent)`, so it walks the whole repository root for
+declared artifacts. The cost question is *how many files, how many times, and what is the budget*, and none of the
+three is answered here.
+
+**WHY IT IS THE HIGHEST-VALUE THING TO FIX NEXT even though nothing is wrong with its answer.** The health ladder is
+a PREFIX (BUG-573): it stops at the first non-zero line and a slow line HIDES every line after it. So one unbounded
+rail does not merely cost minutes — it removes the coverage of the remaining 40-plus declaring lines, and the owner's
+only verification loop still cannot be watched to completion. This is the SECOND time in one day that the same
+symptom ("`just health` never returns") had a different cause.
+
+**NOT CLAIMED.** That 6 minutes is wrong, or that any optimisation is safe. `yaml_guard --selftest` (12/12 controls)
+passes in well under a second, so the cost is entirely in `--check`'s repository walk and must be measured before it
+is touched (the BUG-1004 lesson, applied in advance this time). Files: `scripts/lib/yaml_guard.py#main`, `#scan`.

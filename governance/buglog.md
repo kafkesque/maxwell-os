@@ -8,19 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 783 bugs (245 open / 538 closed; highest OPEN = BUG-1015) · 58 open tasks (MUST 9 / SHOULD 43 / WORTH 6; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 783 bugs (245 open / 538 closed; highest OPEN = BUG-1015) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 32 · UNLABELLED 98 (BUG-757) of 245 open.
 >
-> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-200 | 🟡 WORTH | DECIDE the oMLX 0.7.2 -> 0.7.3.dev2 A/B - MEASURED 2026-10-25: warm turns improve 11-19 percent on the slowest | OWNER DECISION. The data-grounded recommendation is ADOPT WITHOUT REVE |
 >
-> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +36,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -21847,3 +21846,50 @@ what we REJECT, we register too, but we do not re-file it under a new number).
    scanner while a scan is running turns that scan into a verdict about mixed bytes.
 > **What this addendum does NOT change:** today's receipt is a verdict about **62f4fcd** with a clean worktree at scan
 > time (`git status --porcelain` empty before the run), so the green stands on its own terms.
+
+### ADDENDUM (2026-10-25) to BUG-811 — lie 6 escaped the runner and was PUBLISHED as a measured cell, with a companion cell a monotonic counter REFUTES
+
+**What was found, and it was found by accident.** Re-probing the whole declared candidate register at the new
+engine (`governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json`) produced 11 rows and, as a side effect, a
+collision with this bug's lie 6. That lie records that the prior-test census called **`dl=57485` "near the model
+name"** a MEASUREMENT. `governance/MARKET_RESEARCH_20261015.md` — written the SAME DAY — carries that number as a
+column value: *"`Edge0/Edge0-35B-A3B-preview` — 19,738 MB of weights, 57,485 downloads, **3,582 likes** in three
+weeks"*, and `governance/DELETE_PROPOSAL_20261015.md` cites **3,582 likes** as the corroboration for its HOLD.
+
+**The companion cell is REFUTED by a monotonic counter, and that is the one test here that cannot be explained
+away by a metric definition.** Two different HF fields are involved and only one of them is a proof:
+
+- `downloads` is a **rolling 30-day** count, so a DECREASE over ten days is expected and proves nothing: four of
+  eight candidates decreased (MiniCPM5-2B 554,313 -> 530,812; Qwen3.8-35B-A3B-Distill 7,813 -> 3,933;
+  Ternary-Bonsai 83,733 -> 35,220; Edge0 57,485 -> 4,894).
+- `likes` is **MONOTONIC** — it never decreases. Edge0 reads **1,083** today against the published **3,582**, a
+  fall of 2,499. That is IMPOSSIBLE for the same repo id, so the older cell did not come from this repo. Both
+  endpoints were read to close the obvious objection: `GET /api/models/Edge0/Edge0-35B-A3B-preview` and
+  `GET /api/models?search=Edge0-35B-A3B` both answer **4,894 / 1,083**. This is not an endpoint mismatch.
+
+**What is retracted, and what is NOT.** The corroboration and the superlative — *"the strongest community signal
+of any candidate found"* — are WITHDRAWN: at the real reading Edge0 has 1,083 likes and is not the strongest
+(`google/embeddinggemma-2` reads 2,918). The **HOLD is NOT retracted**, because it never rested on the number: it
+rests on architecture (`qwen3_5_moe`, re-measured `LOADABLE_CANDIDATE` today) and on pool scarcity (a 55 GB guard
+with adaptive eviction). A decision that survives the withdrawal of a cited number was resting on the right thing;
+the number was decoration that happened to be false.
+
+**The shape worth keeping, and it is worse than one bad cell.** The same document DID catch its sibling defect:
+`empero-ai/Qwen3.8-35B-A3B-Distill`'s "998k downloads" is corrected in a later adversarial pass *in the same
+file* (*"the popularity figure was not reproducible"*). So the correction pass was real, was written down, and was
+**partial** — it fixed the cell that its author happened to re-read and left the twin standing three sections
+earlier. A correction pass by eye cannot be complete, because **a table cell has no referent to RESOLVE**
+(D-3034): there is nothing for a reader to check it against.
+
+**Why lie 6's fix did not reach it.** The fix landed in the READING PATTERN of `pipeline/research_run.py` — it
+made the instrument stop calling a scraped number a measurement. The TABLE is not the instrument: it is prose
+written afterwards, in a different file, by the same person. A fix at the producer does not constrain the
+consumer's prose, and nothing in the tree could see a number re-entered as text.
+
+**CLOSURE CONDITION FOR THIS LIMB (not the whole bug).** BUG-811 stays OPEN. This limb closes when a doc that
+carries a hub count either CITES the engine-stamped receipt that owns it, or a deterministic network-free limb
+reports it (registered as `config/task_register.yaml#T-203`, seeded with one cell that must be reported and one
+that must not). The rule being enforced is the one this repo already applies to the task register (BUG-588 /
+D-2692): **a count a register owns has ONE home, and prose cites it.** The reason it must be a rule and not a
+resolution is exactly the reason it recurred: a number in prose is the one claim in this tree that no verdict can
+be derived from.

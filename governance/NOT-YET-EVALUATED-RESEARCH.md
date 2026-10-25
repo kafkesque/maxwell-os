@@ -605,3 +605,50 @@ truthful read the cheapest action available, and making a verdict without it REF
 refusal recorded only as a sentence is a recollection; a refusal recorded as a repo id plus a resolvable probe verdict is
 evidence (D-3034). Nothing is downloaded and no candidate is re-opened by this correction: **R-14's refusal stands
 unchanged** — it is its *reason* that is now stated exactly.
+
+---
+
+## 2026-10-25 — THE WHOLE DECLARED REGISTER RE-PROBED AT THE INSTALLED ENGINE: 0 of 11 verdicts moved, and a published cell was REFUTED by a monotonic counter
+
+**Why this pass exists.** D-3152 clause 1 (BUG-1016) says a cache may not outlive its **referent**. The same
+question applies one level up, and nothing had asked it: every verdict in this file and in
+`governance/MARKET_RESEARCH_20261015.md` was recorded against the engine that was installed THEN
+(`mlx_lm 0.31.4.dev132`, 134 architectures). The engine was replaced on 2026-10-25 (oMLX 0.7.3.dev2,
+`mlx_lm-0.32.3.dev8+g0d4d3d04f`, 137 module files). So after the swap every stored research verdict was a verdict
+whose referent had changed — the exact shape that produced a wrong answer one layer down.
+
+**The pass, in one command, with no downloads.** `python3 pipeline/model_loadability_probe.py <every repo in
+config/engine.yaml#candidates>` — 8 declared candidates plus 4 refused repos, TIER-A, **7.1 s wall, 0 GB
+downloaded, 0 model adopted**. Receipt: `governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json`. The receipt now
+carries the **engine identity it measured** (bundle, app version, `mlx_lm` dist-info, module count, sha256 digest
+over the model module names) — BUG-1018's fix reached the battery and the probe's own `--json-out` was still
+writing only version strings, so the engine block was added there and controlled (17/17 known-answer).
+
+**THE ANSWER: no verdict moved.** `openbmb/MiniCPM5-2B-MLX`, `Edge0/Edge0-35B-A3B-preview`,
+`LiquidAI/LFM2.5-24B-A2B` and `ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit` are `LOADABLE_CANDIDATE`;
+`mlx-community/flint-mixed-3-4bit`, `mlx-community/flint-OptiQ-4bit` and
+`mlx-community/gemma-4-12B-it-qat-OptiQ-4bit` are `ARCH_UNSUPPORTED`; `prism-ml/Ternary-Bonsai-2-27B-mlx-2bit` is
+`NEEDS_FORK_RUNTIME`; `google/embeddinggemma-2` is `ARCH_UNSUPPORTED`; `ConwayResearch/Underdog-Saluki-27B-1.0` is
+`UNDETERMINED`; `empero-ai/Qwen3.8-35B-A3B-Distill` is `LOADABLE_CANDIDATE` (its refusal is size, not
+architecture). **The app install is arch-neutral for this register**, so nothing recorded here is invalidated by
+it — that is now a measurement rather than a hope, and it is the reading that retires the suspicion.
+
+**A `LOADABLE_CANDIDATE` VERDICT IS P4 ONLY, and the distinction is the whole R-14 lesson.** P4 says the engine can
+SERVE the architecture. It says nothing about size, licence or quality, and three of the four loadable rows are
+refused or deferred on exactly those grounds (71.9 GB for the Distill, a non-OSI licence for LFM2.5, no declared
+licence for Ornith-35B). Reading the word "LOADABLE" as "approved" is the four-proposition fusion this file was
+corrected for, one row up.
+
+**And a published social-signal cell was REFUTED.** The sweep also re-read the numbers, and one of them cannot
+have come from the repo it is attached to: `Edge0/Edge0-35B-A3B-preview` was published on 2026-10-15 as
+"57,485 downloads, **3,582 likes**", and reads **4,894 downloads / 1,083 likes** today. **A likes count is
+MONOTONIC** — it never decreases — so a fall of 2,499 proves the older cell was not a reading of this repo id;
+both the model endpoint and the search endpoint answer 1,083, which closes the endpoint-mismatch objection. The
+download figure is NOT refuted by the same test (that field is a rolling 30-day count, so four of eight candidates
+legitimately decreased), which is exactly why the monotonic field is the one that decides. **Withdrawn: the
+corroboration and the superlative "the strongest community signal of any candidate found" (embeddinggemma-2 reads
+2,918 likes). NOT withdrawn: the HOLD**, which rests on architecture (`qwen3_5_moe`, re-measured loadable) and on
+pool scarcity. The number was never load-bearing, and the record should not make it look as though it were.
+Filed as an **addendum to BUG-811** (lie 6 named this very number as not-a-measurement the same day it was
+published as one) with the closure condition registered as **T-203** — a doc cites the receipt that owns a count,
+or a network-free limb reports the doc.

@@ -47,6 +47,7 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+from datetime import UTC, datetime
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "config" / "engine.yaml"
@@ -219,6 +220,21 @@ def selftest() -> int:
         control("a_NEW_module_changes_the_identity_digest", second["digest"] != first["digest"], True)
         control("the_new_module_is_COUNTED", second["modules"], 2)
 
+        # BUG-1018 / D-3152 clause 2: the SWEEP RECEIPT names the engine it measured, in both directions.
+        ok_orc = {"mlx_lm": "0.1.dev", "mlx": "0.1", "arches": ["llama", "mamba"]}
+        rec = receipt(conf, ok_orc, [{"repo": "org/name", "verdict": "LOADABLE_CANDIDATE"}])
+        control("the_sweep_receipt_NAMES_the_engine_it_measured", bool(rec["engine"].get("digest")), True)
+        control("the_sweep_receipt_counts_the_architectures_the_ORACLE_saw", rec["oracle_architectures"], 2)
+        control("the_sweep_receipt_carries_the_oracle_SOURCE_so_measured_and_cached_are_distinguishable",
+                receipt(conf, {**ok_orc, "source": "measured, engine 0.1"}, [])["oracle_source"],
+                "measured, engine 0.1")
+        control("a_receipt_over_an_oracle_that_declares_no_source_carries_NULL_not_a_guess",
+                receipt(conf, ok_orc, [])["oracle_source"], None)
+        control("the_sweep_receipt_carries_the_rows_UNCHANGED", rec["rows"],
+                [{"repo": "org/name", "verdict": "LOADABLE_CANDIDATE"}])
+        control("a_receipt_of_a_FAILED_oracle_does_not_crash",
+                receipt(conf, {"ok": False}, [])["oracle_architectures"], 0)
+
     for problem in bad:
         print(f"  FAIL control: {problem}")
     print(f"{'OK' if not bad else 'FAILED'} model-loadability controls: {total - len(bad)}/{total} known-answer")
@@ -352,6 +368,32 @@ def tier_b(repo: str, conf: dict) -> dict:
             "loaded_count": data.get("loaded_count"), "model_count": data.get("model_count")}
 
 
+def receipt(conf: dict, orc: dict, rows: list[dict]) -> dict:
+    """The JSON receipt for a sweep: WHICH engine answered, what it reported, and one row per repo.
+
+    WHY THE ENGINE TRAVELS WITH THE ROWS (BUG-1018, D-3152 clause 2): the oracle strings name a BUILD of mlx_lm,
+    never the app that shipped it - two bundles can print the same version from different wheel commits, and a
+    wheel is pinned to one commit (BUG-1019). `measured_at` is the instant this receipt was WRITTEN, which in this
+    file is AFTER every row was produced: the rows are the measurement and the stamp is the filing. A receipt that
+    names no engine therefore cannot support a
+    comparison across an install, and its baseline has to be INFERRED from what happened to be installed at the
+    time - which is exactly what T-200 had to do for the pre-swap battery. The identity lives inside the
+    artifact instead, so a later reader needs no memory of the session that wrote it.
+    """
+    # R5 REVIEW FINDING B (accepted 2026-10-25): the field was called `architectures`, which reads as a count of
+    # the LIVE engine while it is a count of what the ORACLE reported - and the oracle may answer from a cache. The
+    # name now says whose number it is, and the `source` string travels with it so a reader can see `measured`
+    # against `cache:` without reading this file (BUG-1016's lesson applied to a FIELD name, not only to a key).
+    return {
+        "engine": engine_identity(conf),
+        "oracle": {k: orc[k] for k in ("mlx_lm", "mlx") if k in orc},
+        "oracle_architectures": len(orc.get("arches") or []),
+        "oracle_source": orc.get("source"),
+        "measured_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "rows": rows,
+    }
+
+
 def main(argv: list[str]) -> int:
     """Probe every declared candidate and print the table the download decision reads."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -393,8 +435,8 @@ def main(argv: list[str]) -> int:
         print(f"  {v:<20} {row['gb']:>7} GB  {repo:<52} mt={row['model_type'] or '?':<18} dl={row['dl']} likes={row['likes']} lic={row['license']} fetch={facts['fetch_state']}")
         print(f"    {'':<20} {why}")
     if args.json_out:
-        pathlib.Path(args.json_out).write_text(json.dumps({"oracle": {k: orc[k] for k in ("mlx_lm", "mlx") if k in orc},
-                                                          "rows": rows}, indent=1), encoding='utf-8')
+        pathlib.Path(args.json_out).write_text(json.dumps(receipt(conf, orc, rows), indent=1),
+                                               encoding='utf-8')
     if fatal:
         print(f"FATAL: {fatal} repo(s) could not be read - the probe refuses to guess (C16)")
         return FATAL

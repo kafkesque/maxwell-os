@@ -1,0 +1,222 @@
+{
+ "schema_version": "1",
+ "what_this_is": "TIER-A whole-register re-probe at the engine installed after the 2026-10-25 oMLX swap: every DECLARED candidate and every REFUSED repo in config/engine.yaml#candidates, one command, no downloads.",
+ "engine": {
+  "bundle": "/Applications/oMLX.app/Contents",
+  "app_version": "0.7.3.dev2",
+  "dist_info": [
+   "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  ],
+  "modules": 137,
+  "digest": "4d69937e4b74e5bd"
+ },
+ "oracle": {
+  "mlx_lm": "0.32.3.dev8+g0d4d3d04f",
+  "mlx": "0.32.4"
+ },
+ "measured_at": "2026-10-25T19:53:45+00:00",
+ "command": "python3 pipeline/model_loadability_probe.py $(every declared candidate + refused repo) --json-out <this file>",
+ "why_it_was_run": {
+  "the_defect_it_generalises": "BUG-1016 (D-3152 clause 1): a cache may not outlive its REFERENT. The oracle entry was keyed on nothing but time and answered for an engine that had already been replaced. The same question applies one level up: every market-research VERDICT in the register was recorded against the OLD engine's mlx_lm (0.31.4.dev132 / 134 architectures), so after the swap they are all verdicts whose referent changed.",
+  "the_answer_in_one_line": "0 of 11 declared verdicts moved. The swap is ARCH-NEUTRAL for every declared candidate and every refused repo.",
+  "cost": "7.1 s wall, 0 bytes downloaded, 0 model adopted. The honest read is still cheaper than the recollection (D-3151)."
+ },
+ "verdicts_that_changed": [],
+ "no_verdict_changed": true,
+ "per_repo": [
+  {
+   "repo": "openbmb/MiniCPM5-2B-MLX",
+   "verdict_20261015": "LOADABLE_CANDIDATE",
+   "verdict_20261025": "LOADABLE_CANDIDATE",
+   "verdict_changed": false,
+   "model_type_now": "llama",
+   "gb_now": 1.42,
+   "dl_20261015": 554313,
+   "dl_20261025": 530812,
+   "likes_20261015": 55,
+   "likes_20261025": 57,
+   "likes_delta": 2,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "Edge0/Edge0-35B-A3B-preview",
+   "verdict_20261015": "LOADABLE_CANDIDATE",
+   "verdict_20261025": "LOADABLE_CANDIDATE",
+   "verdict_changed": false,
+   "model_type_now": "qwen3_5_moe",
+   "gb_now": 19.69,
+   "dl_20261015": 57485,
+   "dl_20261025": 4894,
+   "likes_20261015": 3582,
+   "likes_20261025": 1083,
+   "likes_delta": -2499,
+   "likes_never_decreases": "IMPOSSIBLE - a likes count is MONOTONIC, so this older cell did not come from this repo id"
+  },
+  {
+   "repo": "LiquidAI/LFM2.5-24B-A2B",
+   "verdict_20261015": "LOADABLE_CANDIDATE",
+   "verdict_20261025": "LOADABLE_CANDIDATE",
+   "verdict_changed": false,
+   "model_type_now": "lfm2_moe",
+   "gb_now": 47.94,
+   "dl_20261015": 6286,
+   "dl_20261025": 20480,
+   "likes_20261015": 353,
+   "likes_20261025": 579,
+   "likes_delta": 226,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit",
+   "verdict_20261015": "LOADABLE_CANDIDATE",
+   "verdict_20261025": "LOADABLE_CANDIDATE",
+   "verdict_changed": false,
+   "model_type_now": "qwen3_5_moe",
+   "gb_now": 19.51,
+   "dl_20261015": 164329,
+   "dl_20261025": 173733,
+   "likes_20261015": 39,
+   "likes_20261025": 42,
+   "likes_delta": 3,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "empero-ai/Qwen3.8-35B-A3B-Distill",
+   "verdict_20261015": "LOADABLE_CANDIDATE",
+   "verdict_20261025": "LOADABLE_CANDIDATE",
+   "verdict_changed": false,
+   "model_type_now": "qwen3_5_moe",
+   "gb_now": 71.9,
+   "dl_20261015": 7813,
+   "dl_20261025": 3933,
+   "likes_20261015": 76,
+   "likes_20261025": 80,
+   "likes_delta": 4,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "prism-ml/Ternary-Bonsai-2-27B-mlx-2bit",
+   "verdict_20261015": "NEEDS_FORK_RUNTIME",
+   "verdict_20261025": "NEEDS_FORK_RUNTIME",
+   "verdict_changed": false,
+   "model_type_now": "prism_hadamard_qwen35",
+   "gb_now": 8.6,
+   "dl_20261015": 83733,
+   "dl_20261025": 35220,
+   "likes_20261015": 454,
+   "likes_20261025": 476,
+   "likes_delta": 22,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "google/embeddinggemma-2",
+   "verdict_20261015": "ARCH_UNSUPPORTED",
+   "verdict_20261025": "ARCH_UNSUPPORTED",
+   "verdict_changed": false,
+   "model_type_now": "embedding_gemma2",
+   "gb_now": 1.49,
+   "dl_20261015": 144280,
+   "dl_20261025": 212769,
+   "likes_20261015": 2337,
+   "likes_20261025": 2918,
+   "likes_delta": 581,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "ConwayResearch/Underdog-Saluki-27B-1.0",
+   "verdict_20261015": "UNDETERMINED",
+   "verdict_20261025": "UNDETERMINED",
+   "verdict_changed": false,
+   "model_type_now": "",
+   "gb_now": 9.46,
+   "dl_20261015": 344177,
+   "dl_20261025": 549535,
+   "likes_20261015": 477,
+   "likes_20261025": 630,
+   "likes_delta": 153,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "mlx-community/flint-mixed-3-4bit",
+   "verdict_20261015": "ARCH_UNSUPPORTED",
+   "verdict_20261025": "ARCH_UNSUPPORTED",
+   "verdict_changed": false,
+   "model_type_now": "flint",
+   "gb_now": 17.84,
+   "dl_20261015": 1166,
+   "dl_20261025": 1166,
+   "likes_20261015": 3,
+   "likes_20261025": 3,
+   "likes_delta": 0,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "mlx-community/flint-OptiQ-4bit",
+   "verdict_20261015": "ARCH_UNSUPPORTED",
+   "verdict_20261025": "ARCH_UNSUPPORTED",
+   "verdict_changed": false,
+   "model_type_now": "flint",
+   "gb_now": 27.48,
+   "dl_20261015": 138,
+   "dl_20261025": 138,
+   "likes_20261015": 2,
+   "likes_20261025": 2,
+   "likes_delta": 0,
+   "likes_never_decreases": "consistent"
+  },
+  {
+   "repo": "mlx-community/gemma-4-12B-it-qat-OptiQ-4bit",
+   "verdict_20261015": "ARCH_UNSUPPORTED",
+   "verdict_20261025": "ARCH_UNSUPPORTED",
+   "verdict_changed": false,
+   "model_type_now": "gemma4_unified",
+   "gb_now": 9.0,
+   "dl_20261015": null,
+   "dl_20261025": 5536,
+   "likes_20261015": null,
+   "likes_20261025": 21
+  }
+ ],
+ "the_numeric_columns_ARE_not_reproducible_and_one_is_REFUTED": {
+  "why_this_is_recorded_at_all": "The verdict column is load-bearing and it survived. The SOCIAL-SIGNAL columns also travelled into decisions (governance/DELETE_PROPOSAL_20261015.md's Edge0 HOLD cites '3,582 likes'), so they are checked here rather than assumed.",
+  "downloads_is_a_ROLLING_30_DAY_COUNT_not_an_all_time_total": "so a DECREASE over 10 days is expected and is NOT evidence of a bad cell: four of eight did decrease (MiniCPM5-2B 554,313 -> 530,812; Qwen3.8-35B-A3B-Distill 7,813 -> 3,933; Ternary-Bonsai 83,733 -> 35,220; Edge0 57,485 -> 4,894).",
+  "likes_is_MONOTONIC": "a likes count never decreases, so a decrease PROVES the older cell was not read from this repo id - this is the one test here that cannot be explained away by a metric definition.",
+  "the_REFUTED_cell": {
+   "repo": "Edge0/Edge0-35B-A3B-preview",
+   "likes_20261015": 3582,
+   "likes_20261025": 1083,
+   "delta": -2499,
+   "read_from": "GET https://huggingface.co/api/models/Edge0/Edge0-35B-A3B-preview -> likes 1083, downloads 4894, createdAt 2026-09-08T13:56:18Z, lastModified 2026-10-01T09:43:11Z; the SEARCH endpoint returns the same 1083/4894, so this is not an endpoint mismatch",
+   "the_verdict": "the 3,582-likes cell did not come from this repo, and neither did the 57,485-downloads cell beside it"
+  },
+  "and_it_was_ALREADY_NAMED": "BUG-811 lie #6 (OPEN, 2026-10-15) records that the prior-test census called \"dl=57485 near the model name\" a MEASUREMENT. The same number was published, that same day, as a measured column value in governance/MARKET_RESEARCH_20261015.md, with a companion likes cell invented beside it. BUG-811's fix repaired the RESEARCH RUNNER's reading pattern; it never reached the table that carried the number (see the addendum appended to BUG-811).",
+  "what_it_DOES_not_change": "the Edge0 HOLD rests on architecture (qwen3_5_moe, LOADABLE) and pool scarcity (a 55 GB guard with adaptive eviction), both re-measured TRUE today. The corroboration and the superlative ('the strongest community signal of any candidate found') are withdrawn; the HOLD stands, now with 1,083 likes rather than a number that never existed.",
+  "the_Same_day_partial_correction": "the same document DID catch its sibling defect - empero-ai/Qwen3.8-35B-A3B-Distill's '998k downloads' is corrected in its own adversarial pass ('the popularity figure was not reproducible'). So the correction pass was real but partial: it fixed one contaminated cell and left its twin standing."
+ },
+ "what_this_does_NOT_say": [
+  "It does NOT say any candidate is adopted, downloadable, or quality-approved: a LOADABLE_CANDIDATE verdict is P4 only (the engine can SERVE the architecture). Size, licence and quality refusals (Qwen3.8-35B-A3B-Distill at 71.9 GB, LFM2.5 under a non-OSI licence, Ornith-1.5-35B with no declared licence) are untouched.",
+  "It does NOT say the register was wrong about flint: both flint repos are ARCH_UNSUPPORTED here for the same reason as before the swap (no flint module in the shipped wheel, BUG-1019), and that is the third independent reading of the same fact.",
+  "It does NOT prove the other numeric cells: it REFUTES one cell (likes cannot decrease) and records that the rest are consistent with a rolling-window metric. A cell that is merely consistent is not verified.",
+  "It does NOT check any repo that is not declared: the population is exactly config/engine.yaml#candidates (8 probe + 4 refused, one of which is a served model not re-probed)."
+ ],
+ "verified_by": {
+  "selftest": "python3 pipeline/model_loadability_probe.py --selftest -> 19/19 known-answer controls (13 pre-existing + 6 for the sweep receipt: engine block, oracle count, rows unchanged, a failed oracle not crashing, and the oracle SOURCE carried both ways)",
+  "rail": "python3 scripts/check_model_claims.py --check -> rc=0 (4 declared refusals, every verdict resolves to an engine reading)",
+  "r5_review": {
+   "verifier": "gemma-4-E4B-it-MLX-4bit via a direct engine call (temperature 0.0 per R7), 8.18 s, finish_reason=stop",
+   "why_not_a_goose_delegate": "three delegate runs over the same 66-line diff FAILED before answering (20261025_2: its only reader was an image tool, 'unsupported image format' on a text diff; 20261025_3: 'Other' after 2962.8 s against a 300 s declared budget; 20261025_4: 'Other' after 158.5 s). Each run was opened and closed in scripts/delegate_journal.py BEFORE the claim was made, so the failures are recorded rather than retold.",
+   "findings_5_audited": {
+    "A_no_raise": "ACCEPTED but INCOMPLETE, and the incompleteness was MINE: the prompt I gave the verifier said engine_identity 'never raises', which is true for a missing Info.plist but FALSE for a missing mlx_lm/models directory (iterdir raises FileNotFoundError). No live path reaches it: oracle() returns {'ok': False} when the interpreter is absent, and main() then returns FATAL before the receipt is written.",
+    "B_architectures_name": "ACCEPTED and APPLIED: renamed to oracle_architectures and oracle_source added, so a reader can tell 'measured' from 'cache:' inside the artifact.",
+    "C_measured_at": "ACCEPTED as a documentation fix: measured_at is the WRITE instant and the rows precede it by the whole sweep; stated in the docstring.",
+    "D_vacuous_control": "REJECTED - a false positive. The verifier called the fourth control vacuous; it fails if the `or []` idiom is removed (a failed-oracle orc has no 'arches' key, so len(orc['arches']) raises KeyError), which is exactly the regression it exists to catch.",
+    "E_rows_from_older_oracle": "REJECTED - a false positive, and it is the shape worth remembering: the verifier repeated the RISK instead of resolving it. cache_is_current() tests the engine DIGEST and dist_info before age, so a cache from a replaced engine cannot answer; and there is no fail-open fallback (a failed measurement returns {'ok': False} and main() refuses). The only remaining ambiguity was that the artifact did not SAY which it was - which is what finding B now fixes."
+   },
+   "verdict_given": "APPROVE_WITH_NOTES",
+   "verdict_after_audit": "APPROVE_WITH_NOTES, one finding applied (B), one documented (C), two rejected with reasons, one of my own supplied facts corrected (A)"
+  }
+ },
+ "oracle_architectures": 136,
+ "oracle_source": "cache: same engine, 101 min old, engine 0.7.3.dev2",
+ "the_architecture_list_was_a_CACHE_reading_and_that_is_now_VISIBLE": "oracle_source in this receipt reads 'cache: same engine, 101 min old, engine 0.7.3.dev2'. That is not a defect and it is the point of carrying the field: the cache is tested against the installed engine's DIGEST and dist-info BEFORE its age (BUG-1016), so the list it returned belongs to the engine that is installed now. Before the R5 finding was applied, a reader could not tell a cached list from a measured one inside the artifact; now the artifact says which, and the next sweep can be read without asking which it was."
+}

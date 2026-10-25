@@ -2573,10 +2573,17 @@ tasks:
     temperature 0 (R7). No model is downloaded to run it: the served roster is the first population (0 GB).'
 - id: T-200
   priority: WORTH
-  state: open
-  mover: owner
+  state: done
+  mover: pipeline
+  closed: '2026-10-25'
+  owner_word_20261025: >-
+    OWNER WORD 2026-10-25: "Ok accept your recommendation: KEEP". The DECISION is LANDED and this row is CLOSED:
+    oMLX 0.7.3.dev2 STAYS (the state that was already installed), the dated 0.7.2 bundle stays on disk as a
+    RETURN POINT at /Applications/oMLX-0.7.2-20261025.app, and the confined gpt-oss enum loss is carried by T-202
+    as a falsifier rather than by a revert. This field is the record and the register is its home (D-3035: an
+    approval recorded on the FACE changes nothing - it is recorded IN the register and the face is DERIVED).
   title: >-
-    DECIDE the oMLX 0.7.2 -> 0.7.3.dev2 A/B - MEASURED 2026-10-25: warm turns improve 11-19 percent on the
+    DECIDED 2026-10-25 (owner word: KEEP) - the oMLX 0.7.2 -> 0.7.3.dev2 A/B - MEASURED 2026-10-25: warm turns improve 11-19 percent on the
     slowest loop drivers, and one TOOL-ARGUMENT fixture was lost on gpt-oss-20b, in the one role its home
     already declares unusable
   source: 'governance/OWNER_STEPS_T200_20261025.md'
@@ -2608,14 +2615,14 @@ tasks:
     16:18, and update-prefs.json named 0.7.3.dev2 as DEFERRED. The post side IS recorded: the app process was
     born 19:05:40 and the receipt names engine 0.7.3.dev2 / mlx_lm 0.32.3.dev8+g0d4d3d04f.
   gate: >-
-    OWNER DECISION. The data-grounded recommendation is ADOPT WITHOUT REVERTING: (a) every 4/4 model kept 4/4,
-    (b) warm wins are 11-19 percent on the three slowest loop drivers, (c) the single loss is a tool-argument
-    fixture in a role the model's own home declares unusable AND on a path the S4 classifier cannot reach by
-    construction, (d) reverting buys a second swap cycle and its own risk against a loss with no identified
-    consumer. WHAT WOULD FALSIFY IT: any path that sends a tools payload to gpt-oss-20b-MXFP4-Q8 - before that
-    happens the enum fixture must pass again, and that condition is T-202. If the owner prefers the letter of
-    the pre-declared rule, REVERT instead: the dated 0.7.2 bundle is intact at
-    /Applications/oMLX-0.7.2-20261025.app and the rollback is one paste-safe command in the OWNER_STEPS file.
+    none - CLOSED 2026-10-25 by the recorded word (the field directly above this block), so there is nothing left to
+    decide. The three things that must survive the closure are each held by a field, not by this paragraph:
+    the FALSIFIER is T-202 (any path that sends a tools payload to gpt-oss-20b-MXFP4-Q8 runs the enum fixture
+    first and a FAIL means that path needs a different model), the RETURN POINT is the dated 0.7.2 bundle at
+    /Applications/oMLX-0.7.2-20261025.app with its one paste-safe rollback command in the dated steps file, and
+    the measured table is governance/evidence/ENGINE_AB_20261025.json. A reopen would need a NEW measurement,
+    never a re-reading of this row (D-3152 clause 4: a rule states the shapes it covers; the 3/4 -> 2/4 shape
+    was NAMED as uncovered rather than smoothed into ADOPT).
 - id: T-201
   priority: WORTH
   state: open
@@ -2665,3 +2672,34 @@ tasks:
     Any proposal that adds tool-calling to a gpt-oss-20b path cites this task, runs the enum fixture first
     (python3 scripts/measure_subagent_loop.py --battery --only gpt-oss-20b-MXFP4-Q8), and records the verdict.
     A PASS lifts the condition; a FAIL means that path needs a different model, not a retry.
+- id: T-203
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    a prose table may not RESTATE a hub count - the number's one home is the engine-stamped receipt, and a
+    deterministic limb reports every doc that repeats one
+  source: BUG-811 (lie 6) / governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json
+  why: >-
+    MEASURED 2026-10-25 while re-probing the whole declared register at the installed engine. BUG-811 lie 6
+    records that the prior-test census called "dl=57485 near the model name" a MEASUREMENT; that same number was
+    published, the same day, as a column value in governance/MARKET_RESEARCH_20261015.md with a companion likes
+    cell that the monotonicity test REFUTES (the same repo id reads 1,083 likes today, and a likes count never
+    decreases), and the cell was then cited by governance/DELETE_PROPOSAL_20261015.md as the corroboration for a
+    HOLD. BUG-811's fix repaired the research runner's reading pattern and never reached the table that carried
+    the number, so the defect survived in a SECOND HOME with nothing able to see it. The same document DID catch
+    its sibling defect (empero-ai/Qwen3.8-35B-A3B-Distill's download figure, corrected in its own adversarial
+    pass), which is the shape to remember: a correction pass fixed one contaminated cell and left its twin
+    standing, because the pass was by eye and a table cell has no referent to resolve.
+  evidence: >-
+    governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json 2026-10-25 (the 11 per-repo rows with both columns,
+    the monotonicity argument, and the two-sided reading of both HF endpoints) | governance/buglog.md#BUG-811
+    addendum 2026-10-25 | governance/MARKET_RESEARCH_20261015.md 2026-10-15 (the contaminated cells, in place)
+  gate: >-
+    Deterministic and network-free: scan the dated market-research and delete-proposal documents for a numeric
+    hub-cell pattern, report a count against a SHRINK-ONLY ceiling (the check_config_defaults idiom that BUG-1015
+    is about), and seed its known-answer controls with the two condemned cells - one that must be REPORTED and one
+    that must NOT (a receipt path or a date is not a count). Prefer the smaller fix if it holds: a doc CITES
+    governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json instead of repeating a number, and the limb only
+    counts what refuses to cite. It is never a network read: a rail that needs HF to pass is a rail that fails
+    offline, which is the opposite of what this OS wants.

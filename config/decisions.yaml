@@ -32237,3 +32237,99 @@ decisions:
   - config/rail_mutations.yaml
   - config/task_register.yaml
   - governance/buglog.md
+- id: D-3147
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: GOVERNANCE / SELF-CHECK
+  title: a surface that checks ITSELF must run the binary that is already running it — a probe that could not run
+    is a claim about PATH, never a verdict about the file it was asked to read
+  decision: 'BUG-1003. MEASURED 2026-10-25 on the owner''s own step-3 check (`cd <repo> && just health`). From a
+    shell whose PATH is /usr/bin:/bin:/usr/sbin:/sbin — no homebrew, therefore no `just` — line 24 of the health
+    recipe printed `sh: just: command not found` and then `FAIL justfile does not parse - the health rail cannot
+    verify itself`, rc 1: the ladder aborted at its THIRD line having measured nothing, while the justfile parsed
+    perfectly the whole time. The class is known and this is its FOURTH instance: BUG-375 (a missing `lsof` read
+    as "the service is down"), BUG-1001 (the same shape, corrected the same day), and BUG-873''s lesson that a dead
+    extension reports to the terminal and never to the session. On this box "not found" is a claim about PATH; it
+    must never be written down as a claim about existence. It is also the ONE bare tool name D-3145''s pin did not
+    cover: the same file that prepends the pinned interpreter directory still resolved `just` by PATH ORDER, so
+    the fix that made the ladder interpreter-independent left it tool-dependent. FOUR CLAUSES. (1) THE SELF-REFERENCE
+    CLAUSE: a surface that checks ITSELF invokes the binary that is ALREADY RUNNING it — `just_executable()` for
+    a justfile recipe — never a bare name resolved by PATH. Self-reference cannot drift, because there is no second
+    value to disagree with. (2) THE NO-SECOND-HOME CLAUSE: REFUSED (D-3038) are both remedies that would have been
+    faster — typing the absolute path of `just` into the recipe (a second home for a path, C12/D-3136) and prepending
+    homebrew to the ladder''s PATH export (it would make the repository depend on one machine''s layout AND would
+    mask the class the next time a different tool name is added). A `just` that lives nowhere on PATH is `just`''s
+    own contract, not the repository''s: the ladder must not depend on where the entry point lives. (3) THE PROBE-ABSENCE
+    CLAUSE: when a probe cannot be RUN, the message must name the probe and must NOT emit the sentence about the
+    subject. After this fix the line''s sentence ("the justfile does not parse") is reachable only when `--list`
+    genuinely fails on a file that exists — which is what the line was written for. (4) THE SCOPE CLAUSE: every
+    surface that checks its own file is in scope (a justfile recipe, a git hook, a shell script, a Python entry
+    point). The FOUR other bare `just` invocations in the same file (`preflight` -> `just integrity-quick` / `just
+    stress`; `smoke-mlx` -> `MAXWELL_INFERENCE_BACKEND=mlx just smoke-fast` / `just e2e-test`) were given the same
+    form in the same act, because a rule with four standing exceptions is not a rule. HONEST LIMITS, stated so a
+    later reader does not read this as more than it is. (a) `just_executable()` is provided by the running binary;
+    only 1.50.0 was measured here, so NO version bound is claimed — an older `just` would fail to COMPILE the recipe,
+    which is loud and not silent. (b) This does not make `just` available to an owner who has none; it removes the
+    LADDER''s dependency on where it lives. (c) The fix makes the self-check PATH-independent and does not make
+    any OTHER bare name in the file independent, and NO RAIL watches for a newly added bare tool name — `scripts/resolve_route.py
+    --check` governs the FORM of declared commands (BUG-842), not the provenance of a tool name. That gap is NAMED
+    here and not closed; closing it is a rail over the justfile''s own tokens, which is a separate act with its
+    own red loop.'
+  bugs:
+  - BUG-1003
+  files:
+  - justfile
+  - config/pipeline_config.yaml
+  - scripts/resolve_python.sh
+- id: D-3148
+  state: ACTIVE
+  date: '2026-10-25'
+  by: assistant
+  category: MODELS / LOOP ROLES
+  title: a battery RANKS and one fixture only ADMITS — the loop roles are declared from a measured matrix, and a
+    role no fixture can discriminate stays UNDECLARED on purpose
+  decision: 'T-199. MEASURED 2026-10-25 by running the new battery over the served roster at temperature 0.0 (8
+    models x 4 fixtures = 32 rows, receipt governance/evidence/LOOP_BATTERY_20261025.json, 90s per-turn budget,
+    ZERO GB downloaded — the population is what was already served). FOUR fixtures beyond T-187s two-step one, each
+    deriving its expected answer (C12) and carrying known-answer controls (39 in --selftest, no model is called):
+    a DISTRACTOR whose stale summary states a number TRUE of the files the manifest does not name; a PARALLEL-CALL
+    case requiring two tool calls in ONE assistant message with distinct ids; an ARGUMENT-NAME trap (record_id declared,
+    `id` accepted by a decoy tool — the R-14 Flint shape); and an ENUM-ARGUMENT trap where `count` returns a TRUE
+    wrong number for a `distinct` question. FIVE CLAUSES. (1) THE INSTRUMENT-BEFORE-DOWNLOAD CLAUSE: a model question
+    is settled by the battery that already exists at 0 GB, never by a download. R-15 (Saluki) re-open condition
+    (b) now RESOLVES — the battery exists and four served models pass it 4/4 — so any future candidate must beat
+    those, not a vendor claim. Conditions (a) (no MLX build of the IQ2 recipe) and (c) (no governed generation role
+    for the Ollama stack) are UNCHANGED, so the model stays REFUSED; this makes the refusal cheaper to re-measure
+    and no easier to overturn. (2) THE RANK-ON-WARM CLAUSE: a model load is a property of the ENGINE POOL, not of
+    the model s loop, so the ranking uses WARM turns and reports the load separately. MEASURED why this clause exists:
+    the first version ranked on the raw slowest turn, and the load paid by a model s first fixture (MiniCPM5-2B
+    33.5s vs 1.0-1.5s after) put a model 10x slower in FIRST place. A ranking metric that measures the pool is not
+    a ranking. (3) THE UNMEASURED CLAUSE: an engine refusal, a transport failure, or a turn that spent its whole
+    allowance returning no content is UNMEASURED and is NEVER graded as a FAIL — that would be BUG-375s shape one
+    layer in (a limit of the probe read as a fact about the subject). Two of the 32 rows landed there and are reported
+    as UNMEASURED: Qwen3-Coder got one fixture refused by the engine (HTTP 500) and gpt-oss-20b spent a whole turn
+    inside reasoning_content (897 of 900 tokens in the delta probe, the same shape at the battery allowance). (4)
+    THE PROMOTION CLAUSE: AGENT_LOOP_FAST is DECLARED as MiniCPM5-2B-MLX — 4/4 fixtures, warm 1.5s against the next
+    4/4 model at 7.3s (a 4.9x margin on the same battery, same temperature, same fixtures). AGENT_LOOP_WORKHORSE
+    stays UNDECLARED and the reason is recorded rather than filled in (D-3038): all four fixtures measure failure
+    CLASSES, not how many DEPENDENT steps a model sustains, so the battery can tell a safe loop from an unsafe one
+    and cannot yet rank depth. Declaring a workhorse here would be a size heuristic wearing a receipt. The next
+    fixture answers it (a long dependent chain), not a download. (5) THE SELF-DOUBT CLAUSE: the instrument was WRONG
+    THREE TIMES before this receipt was acceptable, and each fault is kept in the record with the control that now
+    holds it: it counted tool ATTEMPTS as measurements (a model could call a wrong path three times, get three error
+    payloads, guess and PASS); its whole-token check refused a sentence-final "14." and graded Qwen3-Coder s CORRECT
+    answer as a formatting failure; and its ranking measured the pool (clause 2). A measurement instrument whose
+    own defects are not in its receipt is indistinguishable from one that has none. BOUNDARY OF THIS DECISION: it
+    declares ONE role from ONE battery on ONE roster at one temperature. It does not re-point the pipeline (no stage
+    uses AGENT_LOOP_FAST), it does not touch the classifier or verifier roles (R5 is unchanged), and it does not
+    retire any model. Phi-4-mini s 0/4 is consistent with BUG-053 and adds one more measured instance, nothing more
+    — it was never a loop candidate.'
+  bugs:
+  - BUG-1004
+  - BUG-053
+  files:
+  - scripts/measure_subagent_loop.py
+  - governance/evidence/LOOP_BATTERY_20261025.json
+  - config/task_register.yaml
+  - governance/NOT-YET-EVALUATED-RESEARCH.md

@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 766,
-  "open_n": 245,
-  "closed_n": 521,
+  "total_ids": 768,
+  "open_n": 246,
+  "closed_n": 522,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1234,6 +1234,11 @@
       "id": "BUG-1002",
       "title": "(LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and",
       "events": 1
+    },
+    {
+      "id": "BUG-1004",
+      "title": "(MED - OPEN 2026-10-25) - the face rail has no wall bound, and TWO copies of it outlived the session that started them: the ladder cannot",
+      "events": 1
     }
   ],
   "closed": [
@@ -1757,6 +1762,7 @@
     "BUG-996",
     "BUG-997",
     "BUG-998",
-    "BUG-1000"
+    "BUG-1000",
+    "BUG-1003"
   ]
 }

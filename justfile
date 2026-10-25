@@ -21,7 +21,7 @@ health:
     python3 scripts/check_repo_integrity.py || [ $? -eq 2 ]   # RAIL 0: 0 git metadata intact | 1 repository defect (P0-A/P0-B, BUG-400) | 2 owner-owed
     python3 scripts/check_repo_integrity.py --worktree || exit 1   # BUG-563: every DIRTY path must be GRANTED by the plan's may_touch or DECLARED-EXCLUDED (joined to git's own ignore verdict); neither = FATAL
     python3 scripts/check_commit_frontier.py || exit 1   # D-2860: anti-circle - refuse to proceed with uncommitted ratified governance state (commit first)
-    @just --list >/dev/null || { echo "FAIL justfile does not parse - the health rail cannot verify itself"; exit 1; }
+    @{{just_executable()}} --list >/dev/null || { echo "FAIL the justfile does not parse - the health rail cannot verify itself"; exit 1; }   # BUG-1003 (2026-10-25): the self-check shells the RUNNING binary, never a bare `just` resolved by PATH. MEASURED: from a shell whose PATH lacks homebrew (`PATH=/usr/bin:/bin:/usr/sbin:/sbin`) this line printed "FAIL justfile does not parse" while the justfile parsed perfectly - a false verdict about the FILE produced by a fact about the SHELL (BUG-375/BUG-1001 class), and the one bare tool name D-3145's python3 pin did not cover. `just_executable()` names the binary already running, so there is no second home for the path (C12/D-3136)
     python3 scripts/guard_stacks_single_source.py || exit 1
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
@@ -264,8 +264,8 @@ preflight:
     @pip3 list --outdated --format=columns 2>/dev/null | wc -l | xargs -I{} echo "      {} total (run 'pip3 list --outdated' for details)"
     @echo "  🖥️  Hardware-model fit..."
     @llmfit 2>&1 | head -5 || echo "    ⚠️  llmfit unavailable"
-    just integrity-quick
-    just stress
+    {{just_executable()}} integrity-quick
+    {{just_executable()}} stress
 
 # ── Stress-test OMLX chat (catches the 'health endpoint lies' bug) ──
 stress:
@@ -355,10 +355,10 @@ eval: e2e-test
 
 # ── MLX direct inference (2-3× faster, needs OMLX stopped) ─────
 mlx-smoke:
-    MAXWELL_INFERENCE_BACKEND=mlx just smoke-fast
+    MAXWELL_INFERENCE_BACKEND=mlx {{just_executable()}} smoke-fast
 
 mlx-e2e:
-    MAXWELL_INFERENCE_BACKEND=mlx just e2e-test
+    MAXWELL_INFERENCE_BACKEND=mlx {{just_executable()}} e2e-test
 
 # ── Individual stages ─────────────────────────────────────────
 stage0:

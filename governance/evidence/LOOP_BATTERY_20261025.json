@@ -1,0 +1,596 @@
+{
+  "measured_at": "2026-10-25T15:22:08",
+  "fixture": "T-199 loop battery",
+  "state": "complete",
+  "per_turn_budget_s": 90.0,
+  "served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "fixtures": [
+    {
+      "name": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)"
+    },
+    {
+      "name": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message"
+    },
+    {
+      "name": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)"
+    },
+    {
+      "name": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer"
+    }
+  ],
+  "rows": [
+    {
+      "model": "MiniCPM5-2B-MLX",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 33.5s",
+      "tools_called": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 3,
+      "turns": 4,
+      "slowest_turn_s": 33.5,
+      "answer": "The files listed in `temp/_subagent_loop_battery/distractor/manifest.txt` are `m0.txt`, `m1.txt`, and `m2.txt`. Their line counts are:\n\n- m0.txt: 2 lines\n- m1.txt: 3 lines\n- m2.txt: 4 lines\n\nTotal: **"
+    },
+    {
+      "model": "MiniCPM5-2B-MLX",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 1.0s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 1.0,
+      "answer": "The total is **14** lines (6 from left.txt + 8 from right.txt)."
+    },
+    {
+      "model": "MiniCPM5-2B-MLX",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 1.5s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 1.5,
+      "answer": "rec-4"
+    },
+    {
+      "model": "MiniCPM5-2B-MLX",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 0.8s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 0.8,
+      "answer": "4"
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 88.7s",
+      "tools_called": [
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 3,
+      "turns": 3,
+      "slowest_turn_s": 88.7,
+      "answer": "9"
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 3.2s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 3.2,
+      "answer": "The total is **14** (6 + 8)."
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 2.6s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 2.6,
+      "answer": "rec-4"
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 7.3s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 7.3,
+      "answer": "4"
+    },
+    {
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 28.6s",
+      "tools_called": [
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 3,
+      "turns": 3,
+      "slowest_turn_s": 28.6,
+      "answer": "9"
+    },
+    {
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 7.6s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 7.6,
+      "answer": "14"
+    },
+    {
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 4.8s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 4.8,
+      "answer": "rec-4"
+    },
+    {
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 14.7s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 14.7,
+      "answer": "4"
+    },
+    {
+      "model": "Phi-4-mini-instruct-8bit",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "FAIL",
+      "detail": "count_lines SUCCEEDED 0x of the 3 file(s) manifest.txt names (an error payload is not a measurement)",
+      "tools_called": [],
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 3.1,
+      "answer": "To provide an accurate answer, I would need to access the file `temp/_subagent_loop_battery/distractor/manifest.txt` and count the lines of the files listed in it. However, as an AI, I don't have the "
+    },
+    {
+      "model": "Phi-4-mini-instruct-8bit",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "FAIL",
+      "detail": "no assistant message carried two tool calls (max 0 in one message) - the fixture asks for ONE parallel reply, not two turns",
+      "tools_called": [],
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 0.6,
+      "answer": "The total number of lines in both files is 123."
+    },
+    {
+      "model": "Phi-4-mini-instruct-8bit",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "FAIL",
+      "detail": "never called fetch_field (called []) - the decoy tool is a valid shape and the wrong address",
+      "tools_called": [],
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 8.1,
+      "answer": "To accomplish the task, I will first call the `ls` command on the file `temp/_subagent_loop_battery/argname/seed.txt` to get the number of lines in the file, which will serve as the record id. Then, I"
+    },
+    {
+      "model": "Phi-4-mini-instruct-8bit",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "FAIL",
+      "detail": "mode values attempted [] never the declared 'distinct' (enum ['count', 'distinct'], exact and case-sensitive)",
+      "tools_called": [],
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 0.4,
+      "answer": "The column holds 5 DISTINCT values."
+    },
+    {
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 4 manifest file(s), answer carries 9, slowest turn 22.9s",
+      "tools_called": [
+        "count_lines",
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 3,
+      "turns": 4,
+      "slowest_turn_s": 22.9,
+      "answer": "9"
+    },
+    {
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 1.7s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 1.7,
+      "answer": "The total number of lines in both files is 14."
+    },
+    {
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 1.8s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 1.8,
+      "answer": "rec-4"
+    },
+    {
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "UNMEASURED",
+      "detail": "the ENGINE refused the turn (HTTPError: HTTP Error 500: Internal Server Error) - a transport failure is not a fact about the model, so this row is not a verdict",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 1,
+      "slowest_turn_s": 1.4,
+      "answer": ""
+    },
+    {
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 35.0s",
+      "tools_called": [
+        "read_file",
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 3,
+      "turns": 3,
+      "slowest_turn_s": 35.0,
+      "answer": "The manifest lists m0.txt, m1.txt, and m2.txt. Their line counts are 2, 3, and 4 respectively.\n\n2 + 3 + 4 = 9\n\n9"
+    },
+    {
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 15.8s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 15.8,
+      "answer": "14"
+    },
+    {
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 15.4s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 15.4,
+      "answer": "rec-4"
+    },
+    {
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 14.2s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 14.2,
+      "answer": "4"
+    },
+    {
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "FAIL",
+      "detail": "count_lines SUCCEEDED 1x of the 3 file(s) manifest.txt names (an error payload is not a measurement)",
+      "tools_called": [
+        "count_lines"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 13.1,
+      "answer": "The total number of lines in the files listed in `temp/_subagent_loop_battery/distractor/manifest.txt` is 3."
+    },
+    {
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "PASS",
+      "detail": "2 calls in ONE message, 2 distinct id(s), answer carries 14, slowest turn 2.1s",
+      "tools_called": [
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 2,
+      "turns": 2,
+      "slowest_turn_s": 2.1,
+      "answer": "The total number of lines is 14."
+    },
+    {
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 1.6s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 1.6,
+      "answer": "rec-4"
+    },
+    {
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 1.5s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 1.5,
+      "answer": "4"
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 13.8s",
+      "tools_called": [
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "turn_calls": 1,
+      "turns": 5,
+      "slowest_turn_s": 13.8,
+      "answer": "9"
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "UNMEASURED",
+      "detail": "the turn spent its whole token allowance (finish_reason=length) and returned no content - the instrument cannot see this model at this allowance, so this is UNMEASURED, not a FAIL",
+      "tools_called": [],
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 25.9,
+      "answer": ""
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 3.3s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 3.3,
+      "answer": "rec-4"
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 11.9s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 11.9,
+      "answer": "4"
+    }
+  ],
+  "ranking": [
+    {
+      "model": "MiniCPM5-2B-MLX",
+      "passed": 4,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [],
+      "warm_turn_s": 1.5,
+      "load_paid_s": 33.5
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "passed": 4,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [],
+      "warm_turn_s": 7.3,
+      "load_paid_s": 88.7
+    },
+    {
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "passed": 4,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [],
+      "warm_turn_s": 14.7,
+      "load_paid_s": 28.6
+    },
+    {
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "passed": 4,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [],
+      "warm_turn_s": 15.8,
+      "load_paid_s": 35.0
+    },
+    {
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "passed": 3,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [
+        "enum"
+      ],
+      "warm_turn_s": 1.8,
+      "load_paid_s": 22.9
+    },
+    {
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "passed": 3,
+      "of": 4,
+      "failed": [
+        "distractor"
+      ],
+      "unmeasured": [],
+      "warm_turn_s": 2.1,
+      "load_paid_s": 13.1
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "passed": 3,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [
+        "parallel"
+      ],
+      "warm_turn_s": 25.9,
+      "load_paid_s": 13.8
+    },
+    {
+      "model": "Phi-4-mini-instruct-8bit",
+      "passed": 0,
+      "of": 4,
+      "failed": [
+        "distractor",
+        "parallel",
+        "argname",
+        "enum"
+      ],
+      "unmeasured": [],
+      "warm_turn_s": 8.1,
+      "load_paid_s": 3.1
+    }
+  ],
+  "ranking_note": "RE-RANKED 2026-10-25 from the same 32 rows without calling a model: the first version sorted on the raw slowest turn, which includes the engine LOAD paid by the model's first fixture (MiniCPM5-2B 33.5s on fixture 1 vs 1.0-1.5s on the rest) and inverted the order. Warm turns are ranked; the load is reported separately as load_paid_s."
+}

@@ -2526,7 +2526,7 @@ tasks:
   gate: 'RED LOOP FIRST (D-3036) plus a DESIGN choice (each candidate gets its own record; none adopted here). The named command that must go RED now and GREEN when this closes is a fixture that invokes _classify_s4 (or the D2488 gate) on a long-fm QUARANTINE row and observes it emit CLEAN - today scripts/repair_classification_status.py --check is GREEN because the STORE is correct; the red condition is the WRITER. Candidates: (1) derive classification_status from status at S5 time (serving_gate.derive_status is already the sole status writer, so the column becomes a status mirror and S4 stops writing it); (2) have S4 leave the column NULL for a status-derived step to fill; (3) make the writer status-aware. MUST land before any S4 re-injection (re-inject_bug198_singletons or a future rechunk), because the parity rail will otherwise stop just health.'
 - id: T-199
   priority: SHOULD
-  state: open
+  state: done
   mover: pipeline
   title: 'THE LOOP BATTERY — widen the T-187 instrument from ONE fixture to a task FAMILY, so a candidate can be
     RANKED instead of merely ADMITTED'
@@ -2548,7 +2548,21 @@ tasks:
   evidence: 'MEASURED 2026-10-19 (the T-187 close receipt): the single two-step/two-tool/distractor fixture ran the
     served set and reported 6/8 PASS, with the failures named — it DISCRIMINATES but cannot RANK, because one task
     yields one bit per model. MEASURED 2026-10-25: config/task_register.yaml#T-187 is done, and five research rows
-    cite it as the live gate.'
+    cite it as the live gate. MEASURED 2026-10-25 (CLOSE RECEIPT, D-3148): the battery landed as
+    scripts/measure_subagent_loop.py --battery with FOUR fixtures, four PURE graders, 39 known-answer controls
+    (--selftest calls no model) and one shared driver, and the served roster ran it at temperature 0.0 against a
+    90s per-turn budget — 8 models x 4 fixtures = 32 rows, receipt governance/evidence/LOOP_BATTERY_20261025.json.
+    RESULT: four models 4/4 (MiniCPM5-2B warm 1.5s, Ornith-35B 7.3s, Ornith-9B 14.7s, Qwen3.8-27B 15.8s), three
+    3/4 (gemma failed the distractor by counting ONE of three files, with two error payloads; Qwen3-Coder and
+    gpt-oss each had ONE fixture UNMEASURED — an engine HTTP 500 and a reply whose whole allowance went to
+    reasoning tokens), and Phi-4-mini 0/4 (zero tool calls at all, the BUG-053 shape measured on a battery).
+    THE INSTRUMENT WAS WRONG THREE TIMES BEFORE IT WAS RIGHT, and each fault is recorded rather than tidied: the
+    distractor counted tool ATTEMPTS (an error payload is not a measurement); carries() refused a sentence-final
+    "14." and graded a CORRECT answer as a formatting failure; and rank() sorted on the raw slowest turn, which
+    includes the engine LOAD paid by a model s first fixture and inverted the FAST order (MiniCPM5 33.5s on
+    fixture 1 vs 1.0-1.5s after). Rows are re-ranked on WARM turns with the load reported separately. OWED (not
+    done here, an owner act): the 1024-token battery allowance is a module constant, not a ratified knob, and a
+    reasoning model can still consume it — the receipt reports that as UNMEASURED rather than as a FAIL.'
   gate: 'FOUR fixtures beyond the two-step one, each with a DERIVED expected answer (never typed, C12) and its own
     known-answer control in --selftest: (a) a DISTRACTOR that is a valid answer to the wrong question; (b) a
     PARALLEL-CALL formatting case, because the R-15 card itself concedes about a fifth of parallel replies slip;

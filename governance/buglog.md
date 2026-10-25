@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1272 decisions (census stamp 8e0fbe1179a53972, 2026-10-25) · 766 bugs (245 open / 521 closed; highest OPEN = BUG-1002) · 56 open tasks (MUST 9 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 56; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1274 decisions (census stamp de36276a72846c0e, 2026-10-25) · 768 bugs (246 open / 522 closed; highest OPEN = BUG-1004) · 55 open tasks (MUST 9 / SHOULD 42 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1272 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 652 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1272, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1274 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 654 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1274, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 79 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 35 · 🟨 MED 80 · 🟩 LOW 32 · UNLABELLED 99 (BUG-757) of 246 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (56) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 56 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 55 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -21241,3 +21241,60 @@ FIX DIRECTION (not applied, one declared home, C12): the END reader must accept 
 START accepted - if a run's own start row claims the token, `done` with that token is a COMPLETE record (the trace
 is the review, and the journal row is the receipt of it), and any OTHER artifact word stays subject to the
 present-on-disk proof. The token already exists as a declaration; the defect is that only half the reader reads it.
+
+## BUG-1003 (LOW - FIXED 2026-10-25) - the health ladder's self-check shelled a bare `just`, so a shell whose PATH lacks homebrew reported "the justfile does not parse" about a justfile that parses
+
+MEASURED 2026-10-25 on the owner's own step-3 check (`cd <repo> && just health`). From a shell whose PATH is
+`/usr/bin:/bin:/usr/sbin:/sbin` — no homebrew, therefore no `just` — line 24 of the health recipe printed
+`sh: just: command not found` and then `FAIL justfile does not parse - the health rail cannot verify itself`,
+rc 1: the ladder aborted at its THIRD line having measured nothing, while the justfile parsed perfectly the whole
+time. THE CLASS: a probe that could not RUN is not a fact about its SUBJECT — BUG-375's shape (a missing `lsof`
+became "the service is down", corrected as BUG-1001), here applied to the ladder's own self-check. It is also the
+ONE bare tool name D-3145's python3 pin did not cover: the same file that prepends the pinned interpreter
+directory still resolved `just` by PATH ORDER, so the fix that made the ladder interpreter-independent left it
+tool-dependent.
+FIX APPLIED (D-3147, two clauses, no new home for any path): the self-check now runs
+`{{just_executable()}} --list` — the binary ALREADY RUNNING the recipe — so nothing is resolved through PATH and no
+path is typed (C12/D-3136); and the FOUR remaining bare `just` invocations on three lines (`preflight` ->
+`integrity-quick`, `stress`; `smoke-mlx` -> `MAXWELL_INFERENCE_BACKEND=mlx smoke-fast`, `e2e-test`) were given the
+same form in the same act, because one instance fixed and four left standing is a rule that does not hold.
+RECEIPT: `env PATH=/usr/bin:/bin /opt/homebrew/bin/just --list` rc=0 (was rc=127); the ladder from that SAME
+stripped PATH then ran PAST line 24 and reached declaring line 85 of 193 with 0 faults printed, where it stopped on
+a different defect (BUG-1004: the face rail's own 30-minute cost, NOT this bug); `scripts/check_rail_registry.py`
+rc=0 unchanged; `scripts/run_ladder.py --selftest` 24/24.
+WHAT THIS DOES NOT DO: it does not make `just` resolve for an owner who has none, and it does not make any OTHER
+bare name in the file PATH-independent — `scripts/resolve_route.py --check` governs the FORM of declared commands
+(BUG-842), not the provenance of a tool name, so a NEWLY added bare tool name is caught by nothing. That gap is
+named in D-3147 and not closed.
+
+## BUG-1004 (MED - OPEN 2026-10-25) - the face rail has no wall bound, and TWO copies of it outlived the session that started them: the ladder cannot verify itself inside a session, and "slow" is indistinguishable from "hung"
+
+MEASURED 2026-10-25, on the same step-3 check. `just health` started at 14:52:25; at 15:22 it had reached declaring
+line **85 of 193** and had spent the WHOLE interval inside ONE line, `scripts/check_governance_faces.py` —
+**29 min 36 s of CPU in 30 min 26 s elapsed at 99.3%**, killed by hand to release the machine. Two more copies of
+the SAME rail, started by the PREVIOUS session, were still running when this one began: pid 65676 (37:46 elapsed,
+99.5% CPU) and pid 68788 (31:01 elapsed, **30:19 CPU**). Neither could ever have had its verdict read — the session
+that would have read it had ended — and BOTH were killed by hand at ~15:05. The ladder's own recorded receipt from
+11:29 the SAME DAY claims `193 declaring line(s) … 989.4 s`, so the rail's cost is now far past what that receipt
+describes and a later run cannot honestly re-make the same claim.
+WHAT WAS MEASURED AND **REFUTED** AS THE CAUSE, so the next reader does not re-hypothesise it: the citation regex
+is not slow — `LIVE_PATH_RE` over 21,244 `governance/buglog.md` lines = **0.11 s**; resolving all **807 unique**
+cited paths on disk = **0.03 s**. `cProfile` (60 s cap) puts **152,249 `re.Pattern.search` calls = 54.6 s of the
+first 60 s** inside `history_faults` (`scripts/check_governance_faces.py:601`), with `yaml.safe_load` at 5.3 s.
+THE REMAINING ~29 MINUTES IS NOT NAMED HERE — stated as a limit of this entry, not a guess (D-3036): the first 60 s
+of the profile are accounted for, the rest is not, and it is the next measurement this bug owes.
+WHY IT MATTERS, three distinct taxes: (1) A MANUAL VERIFICATION STEP CANNOT COMPLETE — the owner's step 3 is "run
+`just health`, expect 193 RUN / 0 faults", and the ladder cannot reach line 86 inside a session that also has to do
+work; (2) AN ORPHAN AT 100% CPU SILENTLY DISTORTS ANY MEASUREMENT BESIDE IT — this session's FIRST T-199 battery
+run (temp/subagent_loop_battery_receipt_20261025.json, superseded) executed next to one, and a latency axis
+measured under an unnamed load is not a measurement; the battery was re-run in full once the orphans were gone;
+(3) NO PROGRESS OUTPUT — the rail prints nothing while it works, so "slow" and "hung" are ONE observation, which is
+BUG-375's shape applied to the rail's own runtime.
+FIX DIRECTION (not applied: each clause needs its own red loop, D-3036; and none can be justified until the
+unnamed 29 minutes are measured). (a) A declared WALL BUDGET in config (C12, never a literal) whose breach is a
+LOUD statement about the RAIL, not a verdict about the faces (BUG-457: loud, not fatal). (b) One progress line per
+face on stderr, with its elapsed time. (c) The record names the rail's own pid and wall time, so an orphan that
+outlives a session is visible in the next session's first reading instead of being discovered by `ps`. (d) Only
+then, an optimisation of whichever stage the longer profile names.
+NOT DECIDED HERE: whether the ladder keeps a 19-minute-plus rail at all, or moves the face walk behind an explicit
+`--deep` recipe. That is an owner call about what `just health` promises.

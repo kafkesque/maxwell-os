@@ -3,8 +3,8 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-10-10T11:24:00Z</dateModified>
-    <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
+    <dateModified>2026-10-26T19:40:00Z</dateModified>
+    <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds; 2026-10-26 (D-3161) with the reference-class rule: a topic feed is mined EXHAUSTIVELY (every relevant repo in the topic, not the first screen) and a vendor throughput claim is a HYPOTHESIS until a device-matched receipt exists.</description>
   </head>
   <body>
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -74,6 +74,19 @@
                description="On-device inference engines and models (M1/M-series desktop vs mobile/embedded). Sweep 2026-09-22: none out-serves OMLX on M1 Max."/>
       <outline type="rss" text="On-Device LLM" xmlUrl="https://github.com/topics/on-device-llm"
                description="On-device LLM runtimes and quantized models. Community-benchmark-first (D-332)."/>
+      <!-- 2026-10-26 (D-3161): a topic feed is a STANDING feed and is mined EXHAUSTIVELY - every relevant repo in
+           the topic, not the first screen. The five below were added because a measured gap named them, not
+           because a page listed them. -->
+      <outline type="rss" text="Search Engine" xmlUrl="https://github.com/topics/search-engine"
+               description="D-3161/research lane: self-hostable search (searxng) and local-first search-with-MCP (xerj) - the sovereign substitute for a cloud web-search API (C3). Mined 2026-10-26: server DBs (elastic/qdrant/weaviate) are SKIP - Maxwell's SQLite+sqlite-vec+FTS5 is the correct shape."/>
+      <outline type="rss" text="Local LLM" xmlUrl="https://github.com/topics/local-llm"
+               description="D-3161: on-machine LLM serving. rafska/awesome-local-llm maps 1:1 onto Maxwell's own concerns (memory management, context engineering, eval/observability, sandboxing, MCP, RAG) - REFERENCE, never truth."/>
+      <outline type="rss" text="LLM Inference" xmlUrl="https://github.com/topics/llm-inference"
+               description="D-3161/BUG-1033: the RUNTIME is a measured variable - llama.cpp/Metal vs MLX decode is the whole distance between this stack's rate and the reference rate. The A/B lever."/>
+      <outline type="rss" text="Quantization" xmlUrl="https://github.com/topics/quantization"
+               description="D-3161: quant FORMAT is a fit decision per model and per device (affine q4 g64/q32, mxfp4 g32, mixed 4/6 via quant_predicate, GGUF Q4_K_M/Q4_K_S/IQ4_XS). Bytes/weight sets the decode ceiling; the runtime sets how much of it you get."/>
+      <outline type="rss" text="Model Context Protocol" xmlUrl="https://github.com/topics/model-context-protocol"
+               description="C25 agent-agnostic surface: MCP servers/clients worth adapting (xerj exposes mcp; a local search server is a gap-5 candidate)."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->

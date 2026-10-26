@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1286 decisions (census stamp 0815ab568f6428e2, 2026-10-26) · 796 bugs (243 open / 553 closed; highest OPEN = BUG-1030) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1287 decisions (census stamp a6a5cbddfa07a274, 2026-10-26) · 799 bugs (246 open / 553 closed; highest OPEN = BUG-1035) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1286 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 150 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1286, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1287 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1287, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 243 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 57 · 🟨 MED 117 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 243 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 119 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 246 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -22735,6 +22735,36 @@ regression" now reads OPEN (it never was a reopened event). Known-answer self-te
 reopened. Blast radius measured BEFORE the edit: only BUG-341 and BUG-448 carried "regression" in slot
 position, both OPEN and both fold to open either way - ZERO live bug changes status (245/551/796 unchanged).
 
+**SCOPE RECONCILIATION DISCHARGED (MEASURED 2026-10-26 at head a0ea050 - not estimated).** The "~125 rails vs 71
+registry entries" gap is not a contradiction: the two numbers count DIFFERENT THINGS, and each is now read from its
+own source.
+
+* the LADDER's census (D-404/D-405, `scripts/run_ladder.py::body('health')`) = **198** shell-runnable declaring
+  lines (+2 in `health-deep`, +1 that only the ladder interpreter can run), i.e. **202** distinct invocation keys
+  under `check_rail_registry.ladder_invocations`;
+* distinct SUBJECTS across those 198 lines = **123** (122 rails + the banner). **This is the number "~125" was
+  reaching for** - the working figure counted EXECUTED SUBJECTS, not registry declarations;
+* `config/rail_registry.yaml` = **71** declarations (58 guard forms + 11 writer identities + 2 dormant) naming
+  **47** distinct scripts (34 guard + 11 writer + 2 dormant);
+* **141** ladder invocations carry NO registry declaration, and that is BY DESIGN: the registry's rule is
+  ONE-DIRECTIONAL (every `check_*.py`/`verify_*.py` is invoked by a declared ladder recipe, or declared dormant
+  with a subject that EXISTS). **So the registry is NOT a census of the ladder** - and a ~12-family map must be
+  grounded in the 198 DECLARING LINES, with the registry supplying only the machine-checkable facts per command
+  form (exit-code contract, writer-ness, dormancy). An earlier plan that read "~12 rails" off the registry was
+  reading a partial view.
+* A **13-family DRAFT** partition (F1 commit-unit integrity / F2 declaration resolution and one-home / F3
+  register<->face<->decision graph / F4 ingest identity and naming / F5 store truth and served claims / F6
+  extraction and verification recall / F7 retrieval goldens, eval leakage and menu axes / F8 write boundary and
+  owner gate / F9 machine surface / F10 session admission and plan / F11 pins, freeze window and archive / F12 the
+  bytes / F13 the rail system itself) covers the 198 lines **198/198, each exactly once, zero double-assignment** -
+  verified by script (`temp/t207_families.py`), not by prose.
+* **AN LLM IS REFUSED AS THE R5 VERIFIER OF THE TAXONOMY, on a MEASURED control.** gemma-4-E4B-it-MLX-4bit was
+  given the map and then a deliberately CORRUPTED copy (a byte-codec rail filed under the register<->face family);
+  it answered SUPPORTED on **both**. Zero discriminating power at a 13-way classification over ~20 KB of context -
+  a verifier that cannot be SEEN to fire is a comment (BUG-492's shape, one instrument over). The acceptance test
+  for the rearrange is therefore **PARTITION + PRESERVATION** (deterministic), never a model's approval of a
+  taxonomy.
+
 ## BUG-1031 (MED, RESOLVED 2026-10-26) - CLOSE_WORDS covers TOMBSTONED; LANDED ruled non-terminal; the DONE/COMPLETED/MERGED sweep is CLEAN
 
 RESOLVED 2026-10-26 (all three limbs): (a) TOMBSTONED added to CLOSE_WORDS with a known-answer self-test
@@ -22743,3 +22773,84 @@ control. (b) LANDED ruled non-terminal by BUG-773/731; BUG-516 CLOSED and BUG-52
 REMOVED/RETIRED/SHIPPED) over every OPEN bug's status slot is CLEAN: zero hits. The only terminal-looking
 slot word is "LANDED" on BUG-749, whose own slot also marks OPEN — and LANDED is ruled non-terminal, so no
 further CLOSE_WORDS addition is warranted.
+
+## BUG-1033 (MED, OPEN 2026-10-26) - market research had NO reference-class obligation, so a 2x throughput gap to a rival RUNTIME sat undetected across several research rounds
+
+**The measured instance.** A public aggregator page for THIS device (`llmrun.dev/device/macbook-pro-16-m1-max-64gb`)
+lists gpt-oss-20b at **71.2 t/s** (Q4_K_M, 13.1 GB) and Qwen3.8-27B at **16.1 t/s** (Q4_K_M, 17.9 GB). This stack's
+own measured rates are **42 t/s** decode (gpt-oss-20b-MXFP4-Q8) and **8.2 t/s** decode / 39 t/s prefill
+(Qwen3.8-27B-MLX-4bit, BUG-793). Same chip, same model family, ~half the rate - and the owner, not the research,
+found it.
+
+**Why it was structurally invisible (four reasons, each measured).**
+1. There was no REFERENCE-CLASS obligation: every pass measured what is INSTALLED, so a faster implementation of
+   the same capability could not be discovered by construction.
+2. The compared numbers are not comparable measurements: GGUF Q4_K_M k-quants under llama.cpp/Metal vs MXFP4-Q8 and
+   MLX affine q4-g64 under oMLX, at unstated context length, best-case cold load. A page number is a HYPOTHESIS
+   (D-3036) until a device-matched receipt exists.
+3. No instrument could even EXPRESS the comparison: the probes report OUR decode and prefill; there is no row keyed
+   by (model, runtime, quant, context, residency) that a rival runtime could be entered into.
+4. `llmfit` and oMLX are not research agents and never claimed to be: llmfit is a FIT oracle over a model DB
+   (`scope: FIT ONLY`, `gates_promotion: false`, tps estimated at an 8192-token context cap, engine-blind), and oMLX
+   reports what IT serves. Expecting either to name a competitor's runtime is a category error.
+
+**Remedy (RATIFIED as D-3161, owner word 2026-10-26).** Best-in-class-by-default: a capability claim names the best
+MEASURED implementation on comparable hardware with its runtime and quant, and states this stack's own measured
+rate against it; a vendor/aggregator number stays a hypothesis until a device-matched receipt exists. The
+instrument is the solo-load A/B (llama.cpp Q4_K_M vs MLX affine q4-g64 vs mxfp4 g32, one model, short context,
+residency recorded), which ALSO decides whether the fix is routing or the MLX decode path. Filed rather than fixed
+so the absence of a reference comparison is a NAMED defect (D-3038), not a silence.
+
+## BUG-1034 (HIGH, OPEN 2026-10-26) - the execute_javascript bridge ran each tools.call TWICE, so one append landed TWO identical blocks in AGENTS.md
+
+**Measured, not suspected.** A single `docguard__safe_append` call issued through the JS tool bridge returned its
+result TWICE (the duplicate result lines were visible in the output) and appended the SAME 23-line block twice:
+`AGENTS.md` went 241 -> 287 lines (+46 = 2 x 23), with `BEST-IN-CLASS-BY-DEFAULT` present in two blocks. The
+duplicate was removed by an atomic rewrite that first asserted the two blocks are byte-identical. The double result
+lines were also seen on `docguard__check_protected` (five paths, ten result lines), so the duplication is the
+BRIDGE's, not one tool's.
+
+**Why HIGH.** A read-only call run twice is harmless; a WRITE run twice is a silent double-write to a protected or
+append-only artifact, and nothing in the call's own contract says "this may run twice". The class is C16's: a fault
+that neither the caller nor the callee can see.
+
+**Standing remedy (until the bridge is fixed).** Do NOT perform writes through the JS bridge: use `shell`, `edit`,
+`write` or the docguard tools DIRECTLY, and after any write read the artifact back and count the occurrence. A
+write that was issued through the JS bridge is presumed DOUBLED until the count says otherwise. The bridge itself
+needs either an idempotency token per call or a single-invocation guarantee before it may carry a writer.
+
+## BUG-1035 (MED, OPEN 2026-10-26) - the decision register has NO governed append route, so every hand append leaves its bytes attributable to no journal row - and only the WHOLE-SET ladder catches it
+
+**Measured instance (this is the THIRD occurrence, so it is a design gap, not a slip).** D-3158's append was
+unjournaled at mint time (the journal already carries its repair row, `session-20261026_D3158 (attribution
+repair: D-3158 append left unjournaled at mint time)`). D-3160 and D-3161 were then appended by a crash-safe
+`tempfile -> fsync -> os.replace` write that is NOT `write_guard`, so `governance/MUTATION_JOURNAL.jsonl` held NO
+row whose `post_sha16` equalled the register's live bytes.
+
+**What that cost, measured.** `just health-full` at head a0ea050 returned worst **rc=1** with TWO faults sharing
+ONE root:
+  * `scripts/lib/handoff.py --selftest` - "a governed write that IS the current bytes is attributed, and the join
+    is by CONTENT (its recorded post-image equals the live digest 4ade968317ae25f5) - the probe did not answer as
+    declared";
+  * `tests/test_handoff_obligation.py::test_the_attribution_is_joined_by_CONTENT_and_never_by_recency` - the
+    suite's only NEW failure (580 collected, 567 passed, 1 failed, declared red = 0).
+The PREFIX ladder (`just health`) had shown NEITHER: it stops at the first non-zero line (BUG-573), which is why
+the commit at a0ea050 looked green. This is BUG-573's class paying out again: a prefix read as a verdict.
+
+**Why it recurs (the structural reason, not the excuse).** `config/decisions.yaml` is append-only in practice but
+has no WRITER in the ladder. `write_guard --audit` sees it as owned by `scripts/recompute_decision_summary.py`
+(mode `regenerate`, i.e. a whole-file rewrite from that script's own model), so a session that wants to ADD one
+record has no declared route, and reaches for the obvious atomic write - which is precisely the one that does not
+journal. C6 (crash-safe write) and D-403 (attribution by CONTENT against the journal) pull in different directions
+for this file, and nothing names the join between them.
+
+**Repair APPLIED 2026-10-26 (this sitting).** A governed no-op `write_guard.write_document` over the UNCHANGED
+bytes: writer `session-20261026_D3161 (...)`; `pre_sha16 9e80ecf7ed9ee19d -> post_sha16 9e80ecf7ed9ee19d`; the
+bytes were asserted unchanged after the write. Both rails went GREEN in the same sitting: `handoff --selftest`
+answers on all four declared subjects, and `tests/test_handoff_obligation.py` is 6 passed.
+
+**REMEDY OWED (deliberately not built here - one act per sitting).** ONE declared append route for the register:
+either `scripts/append_decision.py --record <file>` (parse-before, parse-after, and `write_guard.append_lines`
+semantics - the pre-image must be a PREFIX of the post-image, which IS an append-only register's invariant), or an
+`--append` mode on `recompute_decision_summary.py`. Until it exists the STANDING RULE is: a register append ends
+with the governed no-op write above, and the WHOLE-SET ladder - never the prefix - is what proves it.

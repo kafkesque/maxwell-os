@@ -32955,3 +32955,54 @@ decisions:
     - pipeline/stage5_verify.py
     - config/extraction_recall.yaml
     - governance/EXTRACTION_RECALL_REPORT.json
+
+- id: D-3161
+  state: RATIFIED
+  category: RESEARCH / MARKET INTELLIGENCE
+  title: Market research is BEST-IN-CLASS-BY-DEFAULT and mines its standing topic feeds exhaustively; a vendor
+    throughput claim is a HYPOTHESIS until a device-matched receipt exists (BUG-1033)
+  decision: |
+    Owner word 2026-10-26, recorded so it does not live only in session prose (an act that leaves no trace did not
+    happen). TWO CLAUSES, both about research DEFAULTs - the owner had to point out both, which is the defect.
+
+    (1) REFERENCE-CLASS OBLIGATION. Every research pass that asks "is this good / how fast is this / should we use
+    this" must name the BEST MEASURED implementation of that capability on comparable hardware WITH its runtime and
+    its quant, and must state what THIS stack measures against it. The answer carries this row:
+    (capability | reference implementation | its runtime+quant | its claimed rate | OUR rate | our runtime+quant |
+    delta | what would close it), each cell labelled MEASURED or CLAIMED. A number read off a vendor or aggregator
+    page (llmrun.dev, a model card, a "tokens/s" line in a README) is a HYPOTHESIS (D-3036) until a device-matched
+    receipt exists on THIS machine with the runtime, the quant, the context length and the model residency
+    recorded. "We benchmarked what we have" answers a different question and is not research.
+
+    (2) TOPIC FEEDS ARE STANDING FEEDS, MINED EXHAUSTIVELY. feed.opml declares the topics; whenever research is
+    asked for - general market research or a specific capability evaluation - those topics are mined FOR THAT
+    SUBJECT, to their RELEVANT SET, not to their first screen: the top page is a RANKING, not a CENSUS. Each
+    candidate is classified into exactly ONE of ADOPT / ADAPT / REFERENCE / WATCH / SKIP with its reason recorded
+    (D-3038), so a rejected project cannot be re-proposed from memory; a topic that keeps returning nothing usable
+    is recorded as a declared negative, never silently dropped.
+
+    MEASURED MOTIVATION (the instance that forced the rule - filed as BUG-1033). The public aggregator page for
+    THIS device (llmrun.dev/device/macbook-pro-16-m1-max-64gb) lists gpt-oss-20b at 71.2 t/s (Q4_K_M, 13.1 GB) and
+    Qwen3.8-27B at 16.1 t/s (Q4_K_M, 17.9 GB), against this stack's MEASURED 42 t/s decode (gpt-oss-20b-MXFP4-Q8)
+    and 8.2 t/s decode / 39 t/s prefill (Qwen3.8-27B-MLX-4bit, BUG-793). Same chip, ~half the rate, and the OWNER
+    found it, not the research. Four structural reasons, each measured: (a) no reference-class obligation, so only
+    INSTALLED things were ever measured; (b) the two readings are not comparable measurements (GGUF Q4_K_M
+    k-quant under llama.cpp/Metal vs MXFP4-Q8 and MLX affine q4-group64 under oMLX, at unstated context length and
+    best-case cold load); (c) no instrument could even EXPRESS the comparison - there is no row keyed by (model,
+    runtime, quant, context, residency) into which a rival runtime could be entered; (d) llmfit is a FIT oracle
+    (scope FIT ONLY, gates_promotion false, tps estimated at an 8192-token context cap, engine-blind) and oMLX
+    reports what IT serves - neither is a research agent, and expecting either to name a competitor's runtime is a
+    category error.
+
+    SCOPE OF THIS ACT. It ratifies a RESEARCH OBLIGATION and a FEED-MINING RULE. It changes no pipeline behaviour, no
+    rail and no register semantics: it appends the two rules to the operating loader (AGENTS.md, append_only per
+    D824) and adds five topic feeds to feed.opml (search-engine, local-llm, llm-inference, quantization,
+    model-context-protocol), each added because a MEASURED gap named it, not because a page listed it. The
+    instrument that would make clause (1) MACHINE-CHECKABLE - a solo-load A/B row per (model, runtime, quant) on
+    this machine - is NOT built by this decision and remains the open remediation under BUG-1033.
+  bugs:
+  - BUG-1033
+  files:
+  - feed.opml
+  - AGENTS.md
+  - governance/buglog.md

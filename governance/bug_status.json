@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 796,
-  "open_n": 243,
+  "total_ids": 799,
+  "open_n": 246,
   "closed_n": 553,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1223,6 +1223,21 @@
     {
       "id": "BUG-1030",
       "title": "(MED, OPEN 2026-10-26) \u2014 the governance rail surface accreted five hidden couplings, so any consolidation is a non-atomic cascade (future",
+      "events": 1
+    },
+    {
+      "id": "BUG-1033",
+      "title": "(MED, OPEN 2026-10-26) - market research had NO reference-class obligation, so a 2x throughput gap to a rival RUNTIME sat undetected across",
+      "events": 1
+    },
+    {
+      "id": "BUG-1034",
+      "title": "(HIGH, OPEN 2026-10-26) - the execute_javascript bridge ran each tools.call TWICE, so one append landed TWO identical blocks in AGENTS.md",
+      "events": 1
+    },
+    {
+      "id": "BUG-1035",
+      "title": "(MED, OPEN 2026-10-26) - the decision register has NO governed append route, so every hand append leaves its bytes attributable to no",
       "events": 1
     }
   ],

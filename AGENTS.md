@@ -239,3 +239,26 @@ protected file; the correction itself is already made here.
   run the query, name the receipt. A claim whose only support is "likely"/"generally" is a hypothesis and
   must be labelled as such (D-3036). This applies to every decision, bug, and task, and is enforced on every
   turn.
+
+<!-- ════════════════════════════════════════════════════════════════════════════════════════════
+     WORKING RULES ADDED 2026-10-26 (D-3161): BEST-IN-CLASS-BY-DEFAULT RESEARCH + EXHAUSTIVE TOPIC FEEDS.
+     Appended (AGENTS.md is append_only per D824) — same mechanism as the blocks above.
+     ════════════════════════════════════════════════════════════════════════════════════════════ -->
+
+- MARKET RESEARCH IS BEST-IN-CLASS-BY-DEFAULT (D-3161). Every research pass that asks "is this good / how fast is
+  this / should we use this" must name the BEST MEASURED implementation of that capability on comparable hardware,
+  WITH its runtime and its quant, and must state what THIS stack measures against it. "We benchmarked what we have"
+  answers a different question and is not research. The owner must never have to point out that a faster or
+  better-fit option exists: the obligation is DEFAULT, and its absence is a named defect (BUG-1033). A number read
+  off a vendor or aggregator page (llmrun.dev, a model card, a "tokens/s" line in a README) is a HYPOTHESIS, never
+  evidence (D-3036) — evidence is a device-matched receipt on THIS machine with the runtime, the quant, the context
+  length and the model residency recorded. Every such answer therefore carries a row of this shape:
+  (capability | reference implementation | its runtime+quant | its claimed rate | OUR rate | our runtime+quant |
+  delta | what would close it) — and names which cell is measured and which is claimed.
+- A GITHUB TOPIC FEED IS A STANDING FEED, MINED EXHAUSTIVELY (D-3161). feed.opml's topic list is not decoration:
+  whenever research is asked for — general market research or a specific capability evaluation — the topics
+  declared there are mined for that subject, and a topic is mined to its RELEVANT SET, not to its first screen:
+  the top page is a RANKING, not a CENSUS. Each candidate is classified into exactly one of
+  ADOPT / ADAPT / REFERENCE / WATCH / SKIP **with its reason recorded**, so a rejected project cannot be
+  re-proposed from memory (D-3038). A topic that keeps returning nothing usable is recorded as such
+  (a declared negative), never silently dropped.

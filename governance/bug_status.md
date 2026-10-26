@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**246 open** / 553 closed of 799 ids.
+**247 open** / 553 closed of 800 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -257,3 +257,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1033 | (MED, OPEN 2026-10-26) - market research had NO reference-class obligation, so a 2x throughput gap to a rival RUNTIME sat undetected across | 1 |
 | BUG-1034 | (HIGH, OPEN 2026-10-26) - the execute_javascript bridge ran each tools.call TWICE, so one append landed TWO identical blocks in AGENTS.md | 1 |
 | BUG-1035 | (MED, OPEN 2026-10-26) - the decision register has NO governed append route, so every hand append leaves its bytes attributable to no | 1 |
+| BUG-1036 | (MED, OPEN 2026-10-26) - DECISION-LOG's tier tables lag the register by 22 records and NO rail can tell that from curation: the face | 1 |

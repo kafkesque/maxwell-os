@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1287 decisions (census stamp a6a5cbddfa07a274, 2026-10-26) · 799 bugs (246 open / 553 closed; highest OPEN = BUG-1035) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1287 decisions (census stamp a6a5cbddfa07a274, 2026-10-26) · 800 bugs (247 open / 553 closed; highest OPEN = BUG-1036) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1287 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1287, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 119 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 246 open.
+> Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 120 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 247 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -22854,3 +22854,29 @@ either `scripts/append_decision.py --record <file>` (parse-before, parse-after, 
 semantics - the pre-image must be a PREFIX of the post-image, which IS an append-only register's invariant), or an
 `--append` mode on `recompute_decision_summary.py`. Until it exists the STANDING RULE is: a register append ends
 with the governed no-op write above, and the WHOLE-SET ladder - never the prefix - is what proves it.
+
+## BUG-1036 (MED, OPEN 2026-10-26) - DECISION-LOG's tier tables lag the register by 22 records and NO rail can tell that from curation: the face declares no rule for WHEN a narrative entry is due
+
+**Measured 2026-10-26 at head 784d3d3** (`config/decisions.yaml` vs `DECISION-LOG.md`, read not recalled):
+* register **1287** decisions; the narrative is named for **347** of them (**27%**);
+* **249** recorded decisions are never named anywhere in the narrative;
+* of the **22** ids at or above D-3140, exactly **1** (D-3140) is named - D-3141..D-3161 have no narrative entry;
+* the face's own header still says `**Updated:** 2026-10-07` while the DERIVED index inside it was re-cut today
+  (census stamp a6a5cbddfa270274, 2026-10-26).
+
+**Why it is a defect and not just a lag.** It is indistinguishable from drift. `scripts/gov_sync.py` (D-2981) owns
+the face's DERIVED index and the census lines, and it re-cuts them correctly - all four faces equal their
+re-derivation, measured today. But the tier tables BELOW the sentinels are declared append-only HISTORY, and
+nothing declares WHEN an entry is owed: not `config/gov_sync.yaml`, not the face's own convention block. So a
+reader browsing the tiers cannot see the last 22 decisions, and no rail can separate "deliberately curated" from
+"nobody wrote it". BUG-588's class is the count restated in prose; this is the ENTRY-level analogue - a face whose
+coverage criterion is unstated.
+
+**REMEDY OWED (a scope decision, so it needs the owner's word - not taken here).** One of two, declared in
+`config/gov_sync.yaml`:
+  (a) **MINT-COMPLETE**: a narrative entry is written at mint for every RATIFIED decision. Then a rail COUNTS
+      coverage and a lag is a FAULT, with the same shrink-only discipline as every other ceiling; or
+  (b) **DECLARED CURATED**: the narrative is a curated subset and the criterion is named (e.g. "every decision
+      that changes a rail, a face or a register layout"), in which case the header states it and a rail asserts
+      only that the declared class is covered - and the 22-record tail is then correct by declaration.
+Until one is chosen, the honest reading of the face is: the INDEX is current, the NARRATIVE is dated 2026-10-07.

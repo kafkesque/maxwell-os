@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 799,
-  "open_n": 246,
+  "total_ids": 800,
+  "open_n": 247,
   "closed_n": 553,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1238,6 +1238,11 @@
     {
       "id": "BUG-1035",
       "title": "(MED, OPEN 2026-10-26) - the decision register has NO governed append route, so every hand append leaves its bytes attributable to no",
+      "events": 1
+    },
+    {
+      "id": "BUG-1036",
+      "title": "(MED, OPEN 2026-10-26) - DECISION-LOG's tier tables lag the register by 22 records and NO rail can tell that from curation: the face",
       "events": 1
     }
   ],

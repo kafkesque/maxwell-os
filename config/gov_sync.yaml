@@ -174,7 +174,10 @@ face_head_declaration_re: '(?:HAND\s+INDEX|DERIVED\s+(?:block|index))'
 # lose, so the next `## BUG-n` heading filed WITHOUT a severity takes the count to 100, `--check` goes RED and
 # the fault NAMES the id. That is the rail T-104 said exists - the ceiling IS the enforcement, because a new
 # id is the only way the population can grow while every closure lowers it.
-severity_grandfathered: 99
+# LOWERED AGAIN 99 -> 98 on 2026-10-26 (D-2644, a ceiling may only be lowered): the live census reads
+# UNLABELLED 98 of 244 open (one id gained a severity since 2026-10-25), so zero headroom is restored and the
+# NEXT unlabelled heading fires --check RED and names the id.
+severity_grandfathered: 98
 # BUG-481, DECLARED 2026-10-25. A status EVENT is a header (D-2642), so a closure written as a BODY paragraph is
 # invisible to the parser and the register counts the bug OPEN for ever. BUG-481 measured 8 such ids on
 # 2026-09-25; those 8 were reconciled by later headers and SEVEN NEW ones had silently accumulated in their

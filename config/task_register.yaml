@@ -98,7 +98,7 @@ tasks:
     class).'
   source:
   - BUG-757
-  evidence: 'bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERED 101 -> 99 by the BUG-481 reconciliation batch, which took eight reconciled ids out of the open set (253 -> 245 open). The census prints CRITICAL 0 / HIGH 35 / MED 80 / LOW 31 / UNLABELLED 99 = 245, so the ceiling now has ZERO headroom: limb (a) is no longer a claim, it is the ceiling, because a new heading without a severity takes the count over it and scripts/gov_sync.py --check NAMES the id.'
+  evidence: 'bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERED 101 -> 99 by the BUG-481 reconciliation batch, which took eight reconciled ids out of the open set (253 -> 245 open). The census prints CRITICAL 0 / HIGH 35 / MED 80 / LOW 31 / UNLABELLED 99 = 245, so the ceiling now has ZERO headroom: limb (a) is no longer a claim, it is the ceiling, because a new heading without a severity takes the count over it and scripts/gov_sync.py --check NAMES the id. LOWERED AGAIN 99 -> 98 on 2026-10-26 (live census UNLABELLED 98 of 244 open; zero headroom restored).'
   gate: none
 - id: T-105
   priority: SHOULD

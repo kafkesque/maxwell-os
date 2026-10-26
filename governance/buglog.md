@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1282 decisions (census stamp fea65bda08364e09, 2026-10-26) · 792 bugs (246 open / 546 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1283 decisions (census stamp 53b27463fb8e6d2c, 2026-10-26) · 793 bugs (246 open / 547 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1282 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 662 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1282, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1283 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1283, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 246 open.
 >
@@ -22496,3 +22496,67 @@ only that it failed, how long it took, and what it claimed to leave.
 tool-missing / model-error / context-overflow), or the harness is documented as naming none and `delegate_journal`
 carries a mandatory `--cause` slot instead - with a two-sided control proving that a TIMEOUT and a MISSING TOOL report
 DIFFERENT causes (a single "failed" bucket is a bucket that declares nothing).
+## BUG-1029 (HIGH - FIXED 2026-10-26) - the LIVE conversation ran on the CLOUD escalation provider while every rail read the CONFIG and answered BOUND: the provider was recorded per session all along, and the reader that already parsed that table did not project the column
+
+**MEASURED 2026-10-26, read-only, one query against the harness's own store**
+(`~/.local/share/goose/sessions/sessions.db#sessions`, `select id, created_at, session_type, provider_name,
+accumulated_total_tokens`):
+
+| session | born | type | `provider_name` | accumulated tokens |
+|---|---|---|---|---|
+| `20261026_1` | 10:52:57 | **user** | **`custom_deepseek`** | **20,515,807** |
+| `20261026_2` .. `20261026_7` | 11:07:44 - 11:15:20 | sub_agent | `maxwell_omlx` | 7,339 - 43,118 each |
+
+**In the same minutes:** `python3 scripts/check_harness_homes.py` printed **5 BOUND / 0 conflicting**, and
+`config/engine.yaml#harnesses` declares `goose_provider_id: maxwell_omlx`,
+`escalation_provider_id: custom_deepseek`, `escalation_rule: allowed, never the active provider, never silent
+(D-3023)`. Both readings were TRUE. **The config was sovereign and the conversation was not**, and no rail in the
+repository could tell them apart because every one of them read the config.
+
+**WHY THIS IS NOT BUG-1022 (HIGH, CLOSED) OVER AGAIN.** BUG-1022 was a PASTE that flipped `active_provider` in the
+harness config, and its fix made the config COMPARABLE (T-205/T-157: `config/agent_context.yaml#home_facts` against
+`engine.yaml`, read by `check_harness_homes`). This bug needs the config to be PERFECT: a session born before the
+fix, a RESUMED session, or a session started with a provider flag is off-route while every config byte is right -
+which is BUG-1022's own named limit (a config write is not live inside a running session, the BUG-873 harness fact).
+BUG-1022's note "**NOT RECORDED**: `sessions.db` holds no row for 2026-10-26" was true at 10:52 and FALSE by 11:07:
+the row exists, and it carries the provider.
+
+**THE COST, measured rather than argued.** 20.5 M accumulated tokens of a conversation billed upstream, on a machine
+whose first iron rule is $0 marginal cost (C1), while DELEGATE-001 bans `custom_deepseek` for delegation over a
+`reasoning_content` passthrough defect: the one provider this OS refuses to DELEGATE to was running the session that
+does the delegating.
+
+**WHAT WAS ALREADY THERE (D-3153 clause 1 applied, and it is the point of the fix).**
+`scripts/goose_profile.py#born_sessions` already READ this exact table, resolved from its ONE declared pointer
+(`config/agent_context.yaml#homes.cache_ledger`), and `scripts/goose_profile.py --check` was ALREADY a declaring line
+in `just health` (justfile:32) and inside `just preflight`. Its SELECT projected `id, created_at, name, session_type,
+extension_data` - **every column except the one that decides sovereignty**. So the fix is one column and one
+comparison; a second reader would have been drift wearing the costume of diligence.
+
+**FIXED 2026-10-26.** (1) `born_sessions` projects `provider_name`; `--born` now prints the provider each session is
+BILLED on beside the surface it was GIVEN. (2) `engine_providers()` reads the two ids from
+`config/engine.yaml#harnesses` and REFUSES when either is absent - a sovereignty rule with no referent is a comment
+(D-3034). (3) `session_provider_drift(rows, active, escalation)` is PURE and returns the reasons the conversation is
+off-route. (4) `--check` prints the reading and returns OWNER-OWED (rc 2), or `ok provider:` naming the active id.
+
+**THE TRAP, and it is a CONTROL rather than a comment: THE NEWEST ROW IS A SUB-AGENT.** Six sub-agent rows sat above
+the cloud user session, every one of them born on `maxwell_omlx` - so a rail that read the NEWEST row would have
+answered "local" and stayed green for ever. The subject is therefore the newest `session_type == "user"` row.
+
+**SIX KNOWN-ANSWER CONTROLS, `--selftest` 47/47 rc 0.** A local user session is not drift | an escalation user
+session IS drift and names D-3023 | a newer LOCAL sub-agent does NOT hide a cloud user session | a missing provider
+is drift, never read as local (D-2957: absent is not local) | no user row at all is drift | a provider that is
+neither declared route is drift, not a third answer.
+
+**MEASURED LIVE, the night it landed.** `python3 scripts/goose_profile.py --check` ->
+`OWNER-OWED provider (D-3023): 1 reading(s) say this conversation is NOT on the declared active provider
+maxwell_omlx` / `USER session 20261026_1 was born on the ESCALATION provider custom_deepseek ... this conversation is
+billed upstream, and DELEGATE-001's reasoning_content defect applies to it`, **rc 2** - loud, and NOT fatal
+(`justfile:32` tolerates 2, the BUG-457 tri-state convention), so it cannot cascade into a FATAL that hides the
+rails after it.
+
+**WHAT THIS DOES NOT DO, named so it is not mistaken for the whole of the class.** It reports the CONVERSATION's
+provider; it does not report a DELEGATE's, does not bill anything, and cannot retroactively unspend a token. The
+choice escalation makes is the owner's (D-3023 says ALLOWED, never silent), and the second owed item is still
+BUG-957's: `~/.config/goose/custom_providers/` carries no `custom_deepseek.json`, so the harness has no
+`context_limit` to compute a compaction trigger from on the provider this conversation is actually using.

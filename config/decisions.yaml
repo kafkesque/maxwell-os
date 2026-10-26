@@ -32756,3 +32756,87 @@ decisions:
     D-2644 (the shrink-only ceiling idiom) - it applies it. NAMED REJECTION (D-3038): folding these ten into ACKNOWLEDGED_HARDCODED,
     refused because a set that can absorb its findings cannot shrink; and making a binary-format offset configurable,
     refused because it would let a config edit falsify what a file format is.'
+- id: D-3157
+  state: ACTIVE
+  date: '2026-10-26'
+  by: assistant
+  category: SOVEREIGNTY / HARNESS READING / RAILS
+  title: a CONFIG declaration is not a SESSION fact - sovereignty is read from the session's OWN ROW, and the subject
+    is the newest USER session because the newest row is a delegate
+  bugs:
+  - BUG-1029
+  decision: 'Three clauses, each bought by a read-only measurement on 2026-10-26 while closing BUG-1029. (1) A DECLARATION
+    ABOUT WHAT THE SYSTEM IS
+
+    MUST ALSO BE READ WHERE THE SYSTEM RECORDS WHAT IT DID. config/engine.yaml declares goose_provider_id
+
+    maxwell_omlx; the harness records the provider each session was BORN with in sessions.provider_name; and a rail
+
+    that reads only the config reports BOUND while the conversation is billed upstream. MEASURED: session 20261026_1
+
+    held provider_name custom_deepseek and 20,515,807 accumulated tokens in the same minutes that
+
+    scripts/check_harness_homes.py printed 5 BOUND / 0 conflicting. Both readings were true, and only one of them
+    was
+
+    about the machine''s actual spend (C1). (2) THE SUBJECT OF A SESSION-SCOPED READING IS CHOSEN BY TYPE, NEVER
+    BY
+
+    RECENCY. The newest row is a SUB-AGENT, born on the provider its delegate call names - six of them sat above
+    the
+
+    cloud user session - so a reading that took the newest row would have answered "maxwell_omlx" and stayed green
+    for
+
+    ever. The subject is the newest session_type == ''user'' row, and that filter is asserted as a control rather
+    than
+
+    trusted as a detail. (3) AN EXISTING READER IS EXTENDED, NOT DUPLICATED. born_sessions already read this table
+    from
+
+    its ONE declared pointer (config/agent_context.yaml#homes.cache_ledger) and was already a declaring line in
+    both
+
+    just health and just preflight; its SELECT projected every column EXCEPT the one that decides sovereignty, so
+    the
+
+    fix was one projected column, one pure comparison and one printed verdict. A MISSING value is DRIFT and never
+    the
+
+    benign default (D-2957: absent is not local), and the verdict is OWNER-OWED rc 2 rather than FATAL because D-3023
+
+    says escalation is ALLOWED - it must only never be SILENT, and a fatal would abort the declaring lines that
+    follow
+
+    it, which is BUG-1025''s shape.
+
+    '
+  measured:
+  - 'sessions.db#sessions, read-only: 20261026_1 user custom_deepseek 20,515,807 accumulated tokens; 20261026_2..7
+    sub_agent maxwell_omlx 7,339-43,118 each - the six delegate rows are NEWER than the cloud conversation row'
+  - 'scripts/check_harness_homes.py in the same minutes: 5 BOUND / 0 conflicting - the config-side rail was right
+    and blind at once'
+  - 'python3 scripts/goose_profile.py --check, after the fix, LIVE: OWNER-OWED provider (D-3023): 1 reading(s) say
+    this conversation is NOT on the declared active provider maxwell_omlx / USER session 20261026_1 was born on
+    the ESCALATION provider custom_deepseek, rc 2'
+  - 'python3 scripts/goose_profile.py --selftest: 47/47 known-answer controls, rc 0, of which six are this rail
+    - a local user session is not drift, an escalation user session is drift naming D-3023, a newer LOCAL sub-agent
+    does not hide a cloud user session, a missing provider is drift, no user row is drift, an undeclared provider
+    is drift'
+  - justfile:32 invokes it with || [ $? -eq 2 ], so rc 2 is loud and cannot cascade into a FATAL that hides the
+    declaring lines after it (the BUG-457 tri-state convention)
+  - 'the harness-only alternative was measured as a NON-fix candidate and refused: goose writes no provider into
+    ~/.config/goose/config.yaml per session, and the birth record it does keep (extension_data) was already being
+    read by the same function'
+  files:
+  - scripts/goose_profile.py
+  - config/engine.yaml
+  - config/agent_context.yaml
+  - config/extension_profiles.yaml
+  - governance/buglog.md
+  supersedes_note: 'EXTENDS T-157/D-3044 rather than replacing it: that comparison is CONFIG against CONFIG (agent_context.yaml#home_facts
+    vs engine.yaml#harnesses) and it is what catches a paste that flips the active provider; this one is CONFIG
+    against SESSION and it is what catches a session that was born off-route while the config stayed right. Neither
+    reading subsumes the other, which is why both keep a declaring line. NAMED REJECTION (D-3038): reading the NEWEST
+    row of the store, refused because the newest row is a delegate and the answer would be structurally wrong rather
+    than occasionally wrong.'

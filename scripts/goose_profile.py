@@ -401,7 +401,8 @@ def born_sessions(db: pathlib.Path, limit: int) -> list[dict[str, Any]]:
         limit: how many of the newest sessions to read.
 
     Returns:
-        One row per session: id, created, name, type, surface (None = NOT RECORDED), extensions (raw count).
+        One row per session: id, created, name, type, surface (None = NOT RECORDED), provider ("" = NOT RECORDED)
+        and the raw extension count.
 
     Raises:
         SystemExit: when the store is absent - a reading of nothing is not a reading.
@@ -414,11 +415,11 @@ def born_sessions(db: pathlib.Path, limit: int) -> list[dict[str, Any]]:
     conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     try:
         cur = conn.execute(
-            "select id, created_at, name, session_type, extension_data from sessions "
+            "select id, created_at, name, session_type, extension_data, provider_name from sessions "
             "order by created_at desc, id desc limit ?",
             (int(limit),),
         )
-        for sid, created, name, stype, blob in cur.fetchall():
+        for sid, created, name, stype, blob, provider in cur.fetchall():
             surface: list[str] | None = None
             try:
                 data = json.loads(blob or "{}")
@@ -436,11 +437,80 @@ def born_sessions(db: pathlib.Path, limit: int) -> list[dict[str, Any]]:
                     "name": str(name or ""),
                     "type": str(stype or ""),
                     "surface": surface,
+                    "provider": str(provider or ""),
                 }
             )
     finally:
         conn.close()
     return rows
+
+
+#: T-174/D-3023: the ESCALATION provider is allowed, never the ACTIVE one, never silent. The harness records the
+#: provider each session was BORN with (`sessions.provider_name`), and until BUG-1029 nothing on this machine
+#: compared it to the declaration - so a USER session billed upstream read BOUND in every rail that only read the
+#: CONFIG (MEASURED 2026-10-26: session 20261026_1 held provider_name custom_deepseek and 20,515,807 accumulated
+#: tokens while scripts/check_harness_homes.py printed 5 BOUND / 0 conflicting in the same minutes).
+ENGINE = REPO / "config" / "engine.yaml"
+SESSION_TYPE_USER = "user"
+#: How far back the provider reading looks for the newest USER session. A sub-agent session is born on the provider
+#: its delegate call names, so it can never answer for the conversation; the depth only has to out-reach a burst of
+#: delegates - MEASURED 2026-10-26, SIX sub-agent rows sat above the one cloud USER row.
+PROVIDER_SCAN_DEPTH = 24
+
+
+def engine_providers() -> tuple[str, str]:
+    """Read the two provider ids config/engine.yaml declares: the ACTIVE one and the escalation one.
+
+    Returns:
+        (active, escalation).
+
+    Raises:
+        SystemExit: when either id is absent - a sovereignty rail with no referent is a comment (D-3034).
+    """
+    harnesses = _yaml(ENGINE).get("harnesses") or {}
+    active = str(harnesses.get("goose_provider_id") or "").strip()
+    escalation = str(harnesses.get("escalation_provider_id") or "").strip()
+    missing = [k for k, v in (("goose_provider_id", active), ("escalation_provider_id", escalation)) if not v]
+    if missing:
+        raise SystemExit(f"FATAL: {ENGINE.name}#harnesses.{missing[0]} is not declared - the provider rule has no "
+                         f"referent, so it cannot be enforced")
+    return active, escalation
+
+
+def session_provider_drift(rows: list[dict[str, Any]], active: str, escalation: str) -> list[str]:
+    """Which USER session was born on a provider the engine does not declare as the ACTIVE one (D-3023).
+
+    THE SUBJECT IS THE NEWEST `session_type == "user"` ROW, never the newest row. A sub-agent is born on the
+    provider its delegate call names, so a rail that read the newest row would report a LOCAL delegate as the
+    conversation's provider - MEASURED 2026-10-26, six sub-agent rows sat above the cloud user session and a
+    newest-row reading would have answered "maxwell_omlx". That is why the filter is a control, not a detail.
+
+    Args:
+        rows: born_sessions output, newest first.
+        active: engine.yaml#harnesses.goose_provider_id.
+        escalation: engine.yaml#harnesses.escalation_provider_id.
+
+    Returns:
+        One line per reason the conversation's provider is not the declared active one. EMPTY means it is.
+    """
+    users = [r for r in rows if str(r.get("type") or "").strip().lower() == SESSION_TYPE_USER]
+    if not users:
+        return [f"no USER session appears in the newest {len(rows)} harness row(s) - nothing to read is not a pass "
+                f"(D-2957)"]
+    newest = users[0]
+    born = str(newest.get("provider") or "").strip()
+    sid = str(newest.get("id") or "?")
+    if not born:
+        return [f"USER session {sid} records NO provider - absent is not 'local' (D-2957), and this row is the only "
+                f"evidence of what the conversation costs"]
+    if born == active:
+        return []
+    if born == escalation:
+        return [f"USER session {sid} was born on the ESCALATION provider {born} while {ENGINE.name}"
+                f"#harnesses.goose_provider_id is {active} - D-3023 allows escalation, never SILENTLY: this "
+                f"conversation is billed upstream, and DELEGATE-001's reasoning_content defect applies to it"]
+    return [f"USER session {sid} was born on {born}, neither the active provider {active} nor the declared escalation "
+            f"{escalation} - an undeclared route (D-3034)"]
 
 
 def profile_of(surface_keys: set[str], policy: dict[str, Any], classes: dict[str, str]) -> list[str]:
@@ -483,6 +553,7 @@ def render_born(rows: list[dict[str, Any]], policy: dict[str, Any], classes: dic
     lines: list[str] = []
     for row in rows:
         lines.append(f"{row['id']}  {row['created']}  [{row['type']}] {row['name'][:46]!r}")
+        lines.append(f"   provider: {row.get('provider') or NOT_RECORDED} (D-3023: the provider this session is BILLED on)")
         surface = row["surface"]
         if surface is None:
             lines.append(f"   surface: {NOT_RECORDED} (born before the harness recorded one, or by a build that does not)")
@@ -1046,6 +1117,28 @@ def _selftest() -> int:
     controls.append(("a shell value EQUAL to the declaration is not a conflict",
                      bind_harness_env({_probe: _names[_probe]})[_probe] == _names[_probe]))
 
+    # BUG-1029: the provider rail's controls, and the FIRST of them is the trap the bug was found through - the
+    # newest row is a SUB-AGENT on the local engine, so a newest-row reading answers "local" while the
+    # conversation is billed upstream.
+    _local, _esc = "maxwell_omlx", "custom_deepseek"
+    _cloud_user = {"id": "s2", "type": "user", "provider": _esc}
+    _local_user = {"id": "s1", "type": "user", "provider": _local}
+    _delegate_row = {"id": "s3", "type": "sub_agent", "provider": _local}
+    controls.append(("a USER session born on the declared ACTIVE provider is not drift",
+                     session_provider_drift([_local_user], _local, _esc) == []))
+    controls.append(("a USER session born on the ESCALATION provider is OWNER-OWED and names D-3023",
+                     len(session_provider_drift([_cloud_user], _local, _esc)) == 1
+                     and "D-3023" in session_provider_drift([_cloud_user], _local, _esc)[0]))
+    controls.append(("a NEWER sub-agent row on the local engine does NOT hide a cloud USER session",
+                     len(session_provider_drift([_delegate_row, _delegate_row, _cloud_user], _local, _esc)) == 1))
+    controls.append(("a USER session with NO provider recorded is drift, never read as local",
+                     len(session_provider_drift([{"id": "s4", "type": "user", "provider": ""}], _local, _esc)) == 1))
+    controls.append(("no USER row at all is drift - nothing to read is not a pass",
+                     len(session_provider_drift([_delegate_row], _local, _esc)) == 1))
+    controls.append(("a provider that is neither declared route is drift, not a third answer",
+                     len(session_provider_drift([{"id": "s5", "type": "user", "provider": "some_cloud"}],
+                                                _local, _esc)) == 1))
+
     for label, ok in controls:
         print(f"  {'ok  ' if ok else 'FAIL'} {label}")
     passed = sum(1 for _, ok in controls if ok)
@@ -1149,6 +1242,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     rc, faults, drift, pending = check(policy, config)
+    provider_drift: list[str] = []
+    try:
+        active, escalation = engine_providers()
+        provider_drift = session_provider_drift(born_sessions(sessions_db(), PROVIDER_SCAN_DEPTH), active, escalation)
+    except SystemExit as exc:
+        provider_drift = [f"the provider reading could not be taken: {exc}"]
+        active = "?"
     if faults:
         print(f"FAIL extension-profiles: {len(faults)} structural fault(s)")
         for f in faults:
@@ -1165,6 +1265,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"OWNER-OWED quarantine: {len(pending)} extension(s) arrived and carry no decision (D-3060)")
         for p in pending:
             print("   " + p)
+    if provider_drift:
+        print(f"OWNER-OWED provider (D-3023): {len(provider_drift)} reading(s) say this conversation is NOT on the "
+              f"declared active provider {active}")
+        for d in provider_drift:
+            print("   " + d)
+        if not faults:
+            rc = 2
+    elif not faults:
+        print(f"ok provider: the newest USER session was born on {active}, the declared active provider (D-3023)")
     return rc
 
 

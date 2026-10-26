@@ -22200,3 +22200,39 @@ change cheaper, and no claim is made that it does.
 `import sys`, `from pathlib import Path` sitting BELOW `BLOCK_MARKERS`), which my edit would have added three more to.
 `BLOCK_MARKERS` now sits below every import and `ruff check scripts/lib/yaml_guard.py` is clean. This is not the
 BUG-1015 fix - `scripts/` is still linted nowhere - it merely refuses to add to a debt already filed.
+
+### R5 REVIEW of the memo (2026-10-26) - taken by a DIRECT temperature-0.0 call because the delegate harness still fails, and then AUDITED rather than trusted: 6/6 conclusions right, 2 of 6 REASONINGS wrong, 1 named limit gained, no code change
+
+`DJ-20261026T092031Z-f73d` (journalled BEFORE the call, closed with its artifact so a hung call could not vanish):
+gemma-4-E4B-it-MLX-4bit, temperature **0.0** (R7 replayable), **27.9 s**, `finish_reason=stop`, 1513 content
+characters, 0 reasoning characters, artifact `temp/r5_review_954.json` (13,825 B, sha256_16 `3f9dd13aa247bc5f`).
+
+**Second datapoint for BUG-1020, same conclusion.** The DIRECT path answered this class of task in 27.9 s; the
+delegate harness has now failed 4/4 times across two sessions on the same class. The harness is the bug, and it is
+still OPEN.
+
+**The audit - the reviewer is evidence, the controls are the verdict.**
+
+| Q | its letter | audit |
+|---|---|---|
+| A (can a HIT differ from the walk?) | N | **correct** - the key carries `source_digest()`, so a moved rule cannot hit |
+| B (is `source_digest()` sufficient?) | N | **conclusion wrong, premise false, limit genuine** - the per-file rule (parse + dup walk) lives in the file being hashed, so it IS covered; but the answer points at a REAL limit: a helper that MOVED to another module would stop being covered, and the digest must follow the rule |
+| C (can the memo change what is REPORTED?) | N | **correct** - register-level readings are recomputed every run |
+| D (does the trim drop the least recently USED?) | Y | **right conclusion, incomplete mechanism** - it credits insertion order alone; the mechanism is the re-insert on hit (`entries.pop` then `entries[key] = hit`), which is what makes order equal recency |
+| E (can a corrupt book be trusted?) | N | **correct** - `OSError`/`ValueError`/schema all fall to `{}` |
+| F (crash risk from JSON lists vs tuples?) | N | **correct** - it spotted the `[list(d) for d in ...]` normalisation that makes the round trip unpack identically |
+
+**The one thing the review bought.** Question B's *premise* is wrong but its *worry* is real and is now recorded as a
+NAMED LIMIT rather than argued away: `source_digest()` covers THIS module's bytes plus PyYAML's version, and it does
+NOT cover a helper that a future refactor moves OUT of this module. Its docstring already claims to digest "every
+input to a per-file verdict that is not the artifact's own bytes", so such a move would make the sentence false -
+the next reader sees the contradiction in one line rather than discovering it as a stale verdict. **No code change
+is made for it now, and that is a deliberate trade stated plainly:** editing `yaml_guard.py` moves `source_digest()`
+and therefore invalidates all 522 recorded verdicts, which costs one full 500 s scan; a docstring sentence does not
+justify spending that unannounced. It is batched with the next real change to this file.
+
+**This is the second time the same lesson repeated, so it is registered as a pattern, not an incident.** Last night
+the reviewer reached the right conclusion by the wrong mechanism; tonight it reached six right conclusions with two
+wrong mechanisms. A reviewer that is right for the wrong reason is worse than a reviewer that is wrong, because its
+agreement feels like confirmation. The controls are what make the difference: `_memo_respects_its_ceiling` proves the
+LRU behaviour two-sided, and it - not the prose - is why the incomplete mechanism in answer D cost nothing.

@@ -476,7 +476,8 @@ tasks:
     INV-10); the SURFACE change-set it owes (stop publishing borp_score 0.0, publish the tier) is tracked as T-107
 - id: T-119
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-26'
   mover: pipeline
   title: the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE
   why: 'D-2990 measured that the count-based BORP is already COARSER than the measure we hold: of the served rows the
@@ -505,7 +506,15 @@ tasks:
     0.90, 217 at 0.99); 369 of them are SERVED and 134 of the store''s 257 advertised-corroborated rows are in the set;
     isor rates 205 of the 530 strong/medium, so the metadata axis does not screen it. Write-up: governance/WORK_IDENTITY_COLLAPSE_20261014.md;
     sheet: governance/work_identity_collapse_review_20261014.csv'
-  gate: 'MEASURED 2026-10-14 - the limb that was reported BLOCKED probed the WRONG ARTIFACT (persisted EMBEDDINGS; the
+  gate: 'CLOSED 2026-10-26 by measurement: the falsifier fired (FINDING), the collapse is REAL and its repair (T-129)
+    landed 2026-10-18. RE-MEASURED 2026-10-26 (check_corroboration_collapse.py --json --voice, rc=0): population 898,
+    limb_voice rows_tested 895 -> 245 collapsed (27.37%, 160 served), 80 pairs / 35 identical-text / 68 groups,
+    segments_matched 146851; falsifier FINDING (p_multi_author 0.9209, p_multi_domain 0.8118, both < 0.95). The lexical
+    census in config/corroboration_collapse.yaml#lexical_limb.measured is dated 2026-10-19 - one trivial re-measure
+    behind (rows_tested 896->895, segments_matched 146847->146851; the 245 collapsed rows are UNCHANGED, so the FINDING
+    is STABLE). limb_semantic now reports persisted (426 artifacts) from idempotency-TEST caches (idem_a/idem_b
+    2026-10-20), NOT the canonical index, so the paraphrase residual stays decision-gated (unblock_is: decision) and
+    OPTIONAL. The lexical limb answered the question at $0. MEASURED 2026-10-14 - the limb that was reported BLOCKED probed the WRONG ARTIFACT (persisted EMBEDDINGS; the
     limb needs the segment TEXT, which the S1 chunk store persists at 730 MB on the canonical run). limb_voice is now
     COMPUTABLE read-only at $0 by scripts/check_corroboration_collapse.py --voice and its census lives in config/corroboration_collapse.yaml#lexical_limb.measured.
     What REMAINS is the RESIDUAL class only: paraphrase/translation, which needs the embedding+NLI limb (reported blocked,

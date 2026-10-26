@@ -207,6 +207,8 @@ health:
     python3 scripts/build_archive_index.py --check || exit 1
     python3 scripts/check_rail_registry.py --selftest || exit 1   # D-2665/BUG-492: the registry's OWN decisions (an unowned rail, a stale dormancy, a guard the ladder contradicts, a writer with no proven remedy) must be SEEN to fire
     python3 scripts/check_rail_registry.py || exit 1   # D-2665: the rail set had NO registry - classes (i) a rail nothing runs, (ii) a printed verdict that disagrees with its exit code, (iii) a remedy or INPUT nobody controls (BUG-537/BUG-556)
+    python3 scripts/check_rail_families.py --selftest || exit 1   # T-207/BUG-492: the PARTITION's own decisions (an unowned rail, a rail with two owners, a stale family member, a command form in a family) must be SEEN to fire - a control nothing runs is a comment
+    python3 scripts/check_rail_families.py || exit 1   # T-207/D-2665: every ladder rail is in EXACTLY ONE invariant family and every family member is a REAL ladder subject - the partition is a PARTITION and a CENSUS, so a new rail without a family (or a renamed rail left in one) is a RED rail, never a silent drift (the BUG-1030 coupling #3 class)
     python3 scripts/recompute_decision_summary.py --selftest || exit 1  # D-2660/BUG-492: the MINT gate's own controls - a record is joined to the tree BEFORE a byte is written
     python3 scripts/recompute_decision_summary.py --check || exit 1
     python3 scripts/check_decision_membership.py --selftest || exit 1  # BUG-587/BUG-492: the MEMBERSHIP rail's own known-answer controls (the ABSORBED-mint shape, a STALE pin) - a control nothing runs is a comment

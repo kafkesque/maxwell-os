@@ -28,7 +28,7 @@ authority: D-2665
 #: `schema` LISTS ITSELF: a closure that does not cover its own description is the same defect one level up, and
 #: self-membership is what makes the NEXT stray key a fault instead of a shrug.
 schema:
-  keys: [schema, schema_version, authority, ladder, recipes, ladder_receipt, dormant, writers, guards, commit_boundary]
+  keys: [schema, schema_version, authority, ladder, recipes, ladder_receipt, dormant, writers, guards, families, commit_boundary]
   required: [ladder, recipes, dormant, writers, guards, commit_boundary]
 ladder: justfile
 recipes: [health, health-deep]     # the ladder(s) this registry governs; every other recipe is out of scope
@@ -345,6 +345,172 @@ guards:
   scripts/check_commit_scope_guard.py: fatal
   scripts/check_commit_scope_guard.py --selftest: fatal
   scripts/measure_extension_cost.py --selftest: fatal
+
+#: T-207 phase-1(a) / D-2665: THE INVARIANT PARTITION. The guards/writers/dormant sections above answer "is every
+#: rail invoked or declared dormant, and is every declared writer's remedy proven?" at the grain of ONE rail. They
+#: do NOT answer "which INVARIANT has no owner": an entire family of rails could vanish and every surviving rail
+#: would still answer "owned". A FAMILY is the set of rails that guard ONE invariant - what breaks TOGETHER - so a
+#: rail in ZERO families and a family whose member no longer exists are the same defect one level up, and a
+#: per-rail registry cannot name either. Each family lists SUBJECTS (bare script paths), NOT command forms: a
+#: script's --selftest and --check serve the SAME invariant, so they are ONE member, and flags belong to the
+#: guards/writers sections above that pin a SPECIFIC invocation. scripts/check_rail_families.py verifies this is a
+#: PARTITION and a CENSUS in BOTH directions (every ladder subject in exactly one family, every family subject a
+#: real ladder subject) - so a NEW rail without a family, or a RENAMED rail left in a family, is a RED rail, not a
+#: silent drift (the BUG-1030 coupling #3 class: an unverified path). The banner echo and the
+#: `{{just_executable()}} --list` template line are NOT rails (output + a harness self-check), so they carry no
+#: family. The 13 families are a measurement (D-3036), not a belief: each was derived from the ladder's own 123
+#: subjects and verified to cover them exactly once.
+families:
+  #: F1 COMMIT-UNIT INTEGRITY - the tree, the commit and the hook that guards them are one legitimate unit.
+  F1:
+    - pipeline/integrity_check.py
+    - pipeline/status.py
+    - scripts/check_commit_frontier.py
+    - scripts/check_repo_integrity.py
+    - scripts/install_git_hooks.sh
+    - scripts/resolve_dropbox_conflicts.py
+  #: F2 DECLARATION RESOLUTION & ONE HOME - every declared value resolves, has ONE home, and a reader.
+  F2:
+    - pipeline/config_audit.py
+    - scripts/audit_flag_consumers.py
+    - scripts/check_config_defaults.py
+    - scripts/check_config_duplicate_keys.py
+    - scripts/check_declaration_consumers.py
+    - scripts/check_derivation_homes.py
+    - scripts/check_model_claims.py
+    - scripts/check_rail_registry.py
+    - scripts/check_retired_names.py
+    - scripts/check_revoked_references.py
+    - scripts/guard_stacks_single_source.py
+    - scripts/lib/yaml_guard.py
+    - scripts/verify_declared_inputs.py
+  #: F3 REGISTER <-> FACE <-> DECISION GRAPH - no face contradicts its register; succession is coherent.
+  F3:
+    - scripts/check_bug_recall.py
+    - scripts/check_bug_status.py
+    - scripts/check_buglog_coverage.py
+    - scripts/check_decision_membership.py
+    - scripts/check_governance_faces.py
+    - scripts/check_register_divergence.py
+    - scripts/gov_sync.py
+    - scripts/recompute_decision_summary.py
+    - scripts/reconcile.py
+  #: F4 INGEST IDENTITY & NAMING - one work is one work; the ingest door and the naming debt are READ.
+  F4:
+    - scripts/apply_admission.py
+    - scripts/census_source_names.py
+    - scripts/check_ingest_identity_gate.py
+    - scripts/container_alert.py
+    - scripts/detect_same_work_content.py
+    - scripts/detect_title_renames.py
+    - scripts/gate_duplicate_candidates.py
+    - scripts/normalise_corpus_names.py
+    - scripts/owner_marks.py
+    - scripts/plan_admission.py
+    - scripts/plan_source_rename.py
+    - scripts/verify_duplicate_gate.py
+    - scripts/verify_source_identity.py
+  #: F5 STORE TRUTH & SERVED CLAIMS - what the store holds and advertises equals what it can derive.
+  F5:
+    - pipeline/stage6_commit.py
+    - scripts/apply_relabel_store_write.py
+    - scripts/build_anchor_store_bridge.py
+    - scripts/check_corroboration_bit.py
+    - scripts/check_corroboration_collapse.py
+    - scripts/check_depth_load_bearing.py
+    - scripts/check_depth_menu.py
+    - scripts/check_domain_cardinality.py
+    - scripts/check_existence_negatives.py
+    - scripts/check_feedback_parity.py
+    - scripts/check_human_instruments.py
+    - scripts/check_instrument_cohorts.py
+    - scripts/check_served_fields.py
+    - scripts/check_store_authority.py
+    - scripts/check_store_columns.py
+    - scripts/consolidate_anchor4_context.py
+    - scripts/ingest_relabel_rulings.py
+    - scripts/repair_classification_status.py
+    - scripts/restamp_content_type_adjudications.py
+  #: F6 EXTRACTION & VERIFICATION RECALL - nothing certified is lost between source and store.
+  F6:
+    - pipeline/subagent_fanout.py
+    - scripts/check_extraction_recall.py
+    - scripts/check_verification_sequence.py
+    - scripts/r5_review_gate.py
+    - scripts/resolve_route.py
+    - scripts/tier_b_evidence.py
+  #: F7 RETRIEVAL GOLDENS, EVAL LEAKAGE & MENU AXES - the ruler is not leaked, stale or silently re-anchored.
+  F7:
+    - scripts/check_label_provenance.py
+    - scripts/check_menu_reclass_gate.py
+    - scripts/check_s5_score_axis.py
+    - scripts/check_serving_gate.py
+    - scripts/depth_pass_agreement.py
+    - scripts/reanchor_retrieval_goldens.py
+    - scripts/verify_anchor_family_registry.py
+    - scripts/verify_anchor_manifest.py
+    - scripts/verify_menu_policy.py
+    - scripts/verify_menu_routing.py
+    - scripts/verify_split_manifest.py
+    - scripts/verify_vec_integrity.py
+  #: F8 WRITE BOUNDARY & OWNER GATE - no write without an owner word; the boundary is rehearsed.
+  F8:
+    - scripts/apply_anchor_axis_authority.py
+    - scripts/apply_owner_domain_review.py
+    - scripts/apply_workbook_rulings.py
+    - scripts/check_anchor_axis_consistency.py
+    - scripts/check_boundary_rehearsal.py
+    - scripts/check_rail_mutations.py
+    - scripts/verify_artifact_authority.py
+    - scripts/verify_boundary_injection.py
+    - scripts/verify_evidence_manifests.py
+    - scripts/verify_frozen_pair.py
+  #: F9 MACHINE SURFACE - the engine, the harness and the model store match their declarations.
+  F9:
+    - agent/adapters/goose/apply_provider_flip.py
+    - pipeline/delegation_economy.py
+    - pipeline/engine_boot_report.py
+    - pipeline/harness_contract.py
+    - pipeline/harness_env.py
+    - pipeline/model_store_census.py
+    - pipeline/model_store_sweep.py
+    - scripts/agent_context_probe.py
+    - scripts/check_agent_surface.py
+    - scripts/check_harness_homes.py
+    - scripts/delegate_journal.py
+    - scripts/goose_profile.py
+    - scripts/measure_extension_cost.py
+  #: F10 SESSION ADMISSION & PLAN - the run's declared plan bounds what it may touch.
+  F10:
+    - scripts/check_commit_scope_guard.py
+    - scripts/check_session_plan.py
+    - scripts/lib/handoff.py
+    - scripts/lib/measure.py
+    - scripts/r3_preflight.py
+    - scripts/verify_handoffs.py
+  #: F11 PINS, FREEZE WINDOW & ARCHIVE - a pin moves only by an owner re-mint; a listing cannot vanish.
+  F11:
+    - scripts/build_archive_index.py
+    - scripts/check_freeze_window.py
+    - scripts/menu_axis_hashes.py
+    - scripts/verify_generator_pins.py
+    - scripts/verify_recalibration_pins.py
+  #: F12 THE BYTES - no undeclared codec, no silent repair, no implicit environment.
+  F12:
+    - scripts/check_encoding_homes.py
+    - scripts/check_silent_repair.py
+    - scripts/check_undeclared_encoding.py
+    - scripts/lib/artifact_encoding.py
+    - scripts/lib/operator_env.py
+  #: F13 THE RAIL SYSTEM ITSELF - the suite, the lint gate, the write guard, the shared fixtures, the ladder.
+  F13:
+    - scripts/check_rail_families.py
+    - scripts/check_tests.py
+    - scripts/lib/fixture.py
+    - scripts/lib/write_guard.py
+    - scripts/lint_gate.py
+    - scripts/run_ladder.py
+    - scripts/validate_depth_domain_contract.py
 commit_boundary:
   path: git-path:hooks/pre-commit
   why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'

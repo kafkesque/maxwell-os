@@ -294,7 +294,7 @@ def discover() -> list[str]:
 def selftest() -> int:
     """Known-answer controls over SYNTHETIC ladders: a registry that never reports a fault is not a registry."""
     schema = {"keys": ["schema", "schema_version", "authority", "ladder", "recipes", "ladder_receipt",
-                       "dormant", "writers", "guards", "commit_boundary"],
+                       "dormant", "writers", "guards", "families", "commit_boundary"],
               "required": ["ladder", "recipes", "dormant", "writers", "guards", "commit_boundary"]}
     base = {"schema": schema, "recipes": ["health"], "ladder": "justfile", "dormant": {}, "writers": {}, "guards": {}}
     ok = fail = 0
@@ -391,6 +391,11 @@ def selftest() -> int:
     f, _ = audit(L, ["scripts/check_a.py"], {**base, "schema": {"keys": ["recipes", "ladder"], "required": ["ladder"]}})
     check("schema_must_list_itself", len([x for x in f if "ITSELF" in x]), 1,
           "schema.keys must cover its own description: a closure that exempts itself is not a closure (BUG-837)")
+
+    # T-207 phase-1(a): the FAMILIES section is a declared top-level key, so it is accepted - never a stray key.
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "families": {"F1": ["scripts/check_a.py"]}})
+    check("families_section_declared", len([x for x in f if "(iv)" in x]), 0,
+          "a families section listed in schema.keys is a legal section, not a stray key (T-207 phase-1(a))")
 
     BL = "health:" + chr(10) + "    bash scripts/install_x.sh --check || exit 1" + chr(10)
     f, _ = audit(BL, [], {**base, "guards": {"scripts/install_x.sh --check": "fatal"}})

@@ -27,6 +27,23 @@ config_audit:
       because making an exit code configurable would make the meaning of a run configurable; every MEANING value
       moves to YAML. Raising this ceiling requires a named decision, not an edit.
 
+#: BUG-1015 — THE LINT GATE'S OWN DEBT IS DECLARED, COUNTED AND SHRINK-ONLY.
+#: MEASURED 2026-10-26: `just audit` ran `ruff | tail -5` under `@`, so its exit status was always tail's 0 and
+#: the real findings grew to 2462 unseen (a control that cannot be seen to FAIL is not a control, BUG-492). The
+#: certified gate narrows to the CORRECTNESS family (F = pyflakes: undefined name, unused import/local, f-string
+#: defect, redefinition) because that is the family whose growth means a real defect; E722 (bare except) is already
+#: 0 and C16 covers it. The modernisation/style families (UP/I/W/E/B) are registered as acknowledged debt OUTSIDE
+#: the failing gate (D-3038) and reported by `scripts/lint_gate.py --report`, never allowed to fail the build until
+#: a named decision promotes them. The count is held against a ceiling that may only move DOWN (D-2644); a new
+#: F-finding is therefore a FAULT, never a shrug.
+lint_gate:
+  certified_select: ["F"]      # pyflakes correctness only
+  direction: shrink_only
+  ceiling: 252                 # MEASURED 2026-10-26 baseline (pipeline/ + scripts/); 182 are auto-fixable
+  baseline: 252
+  measured_on: '2026-10-26'
+  scope: ["pipeline/", "scripts/"]
+
 serving:
   # D-2936 (2026-10-11): SERVING INDEX SCOPE — scope must be enforced by the INDEX, not
   # only by a WHERE clause. The store holds every run ever committed (t11: 7855 rows,

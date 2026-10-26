@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1283 decisions (census stamp 53b27463fb8e6d2c, 2026-10-26) · 793 bugs (246 open / 547 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1283 decisions (census stamp 53b27463fb8e6d2c, 2026-10-26) · 793 bugs (245 open / 548 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1283 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1283, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 246 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 245 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21708,7 +21708,7 @@ look present, which would have turned an evidence check into a rubber stamp. Now
 `UnicodeDecodeError` reported as `UNREADABLE-EVIDENCE` rather than raised. **The rail caught the rail.** That is the
 whole argument for the ladder in one line.
 
-## BUG-1015 (MED - OPEN 2026-10-25) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and 428 ruff errors read as "✅ Audit complete"
+## BUG-1015 (MED - FIXED 2026-10-26) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and 428 ruff errors read as "✅ Audit complete"
 
 **MEASURED.**
 ```
@@ -21745,6 +21745,18 @@ can absorb a status again; (4) two-sided controls: 1 finding above the ceiling i
 nowhere by the ladder**. `scripts/resolve_route.py` alone carries 6 findings (UP035, 3× UP037, B007, 2× E741, 2×
 F541), invisible because no ladder line looks there — the BUG-580 shape ("a directory no rail reads"). Reported, not
 fixed: it is the same decision as the ceiling above and belongs in the same landing.
+
+**FIXED 2026-10-26 BY MEASUREMENT, exactly to the declared fix shape above.** `scripts/lint_gate.py` now captures and
+compares the count against a shrink-only ceiling declared in `config/pipeline_config.yaml#lint_gate`, never piped
+through `tail`; its `--selftest` proves the bound goes RED at ceiling+1 and GREEN at ceiling and below (the two-sided
+control BUG-492 owed); and it is WIRED INTO BOTH `just audit` AND the `just health` ladder, so the certified whole-set
+receipt now includes it. The scope is `pipeline/ + scripts/` (the second hole, closed in the same landing).
+MEASURED 2026-10-26 (re-measured, not remembered): `python3 -m ruff check pipeline/ scripts/` = **2462** findings
+under the pyproject select (E,F,I,W,UP,B) with `ignore E501/B008`; the CORRECTNESS family alone is **F = 252** (182
+auto-fixable), which is the count the gate enforces. The modernisation/style families (UP/I/W/E/B) are registered as
+acknowledged debt OUTSIDE the failing gate (`lint_gate.py --report` names the 2462 total) and never fail the build
+until a named decision promotes them (D-3038). Driving F from 252 to 0 is a SEPARATE tracked task (shrink the ceiling
+as it falls); this landing makes the gate ABLE TO FAIL and BOUNDED, which is the defect the filing named.
 
 ## BUG-1016 (MED - FIXED 2026-10-25) - the architecture ORACLE outlived its ENGINE: a cache keyed on nothing but TIME answered for a build that had already been replaced
 

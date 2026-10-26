@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 793,
-  "open_n": 246,
-  "closed_n": 547,
+  "open_n": 245,
+  "closed_n": 548,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1221,11 +1221,6 @@
       "events": 1
     },
     {
-      "id": "BUG-1015",
-      "title": "(MED - OPEN 2026-10-25) - `just audit` cannot fail its own lint gate: the check is piped to `tail -5`, so the exit status is TAIL's, and",
-      "events": 1
-    },
-    {
       "id": "BUG-1021",
       "title": "(LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict,",
       "events": 1
@@ -1778,6 +1773,7 @@
     "BUG-1012",
     "BUG-1013",
     "BUG-1014",
+    "BUG-1015",
     "BUG-1016",
     "BUG-1017",
     "BUG-1018",

@@ -223,6 +223,10 @@ health:
     python3 scripts/lib/fixture.py --selftest || exit 1                   # BUG-577: the shared fixture rules own known-answer controls (ONE home; a control nothing runs is a comment, BUG-492)
     python3 scripts/run_ladder.py --selftest || exit 1                    # D-2680/BUG-582: the ladder collector own known-answer controls (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_declaration_consumers.py || exit 1              # D-2669: no declaration without its reader - BUG-562 landed the pair in one commit; this makes the JOIN a property, not an act
+    python3 pipeline/config_audit.py --selftest || exit 1                  # T-206/BUG-492: the config<->code drift ceiling's known-answer controls (a control nothing runs is a comment)
+    python3 pipeline/config_audit.py --check-unchecked --strict || exit 1  # T-206: config drift or unchecked hardcoded values are a FAULT; joins the drift audit INTO the certified ladder (was preflight/audit-only, a disjoint set)
+    python3 scripts/lint_gate.py --selftest || exit 1                      # BUG-1015/BUG-492: the lint gate's known-answer controls (a ceiling that cannot be SEEN to fail is a comment)
+    python3 scripts/lint_gate.py --check || exit 1                         # BUG-1015: certified lint (F family) counted against a shrink-only ceiling; a GROWTH is a FAULT
     python3 scripts/run_ladder.py --receipt-check || [ $? -eq 2 ]         # D-2983/BUG-759: the last FULL scan is a MEASUREMENT with a COVERAGE and an AGE - 1 (a red RECORDED under exactly this coverage) is FATAL, 2 (UNKNOWN: never measured here, measured against a different ladder, or older than the declared budget) is OWNER-OWED, loud, never fatal. Declared in config/rail_registry.yaml#ladder_receipt. It stands LAST on purpose: a whole-set report placed early would hide every line it speaks for
 
 healthcheck: health
@@ -492,7 +496,8 @@ audit:
     @echo "=== Maxwell OS Full Audit ==="
     python3 pipeline/config_audit.py --check-unchecked --strict || { echo "  ❌ Config drift or hardcoded values — fix before continuing"; exit 1; }
     python3 pipeline/integrity_check.py --quick
-    @python3 -m ruff check pipeline/ 2>&1 | tail -5
+    python3 scripts/lint_gate.py --selftest || { echo "  ❌ lint gate controls did not hold — a ceiling nothing runs is a comment (BUG-492)"; exit 1; }
+    python3 scripts/lint_gate.py --check || { echo "  ❌ certified lint findings grew past the shrink-only ceiling — fix before continuing (BUG-1015)"; exit 1; }
     python3 tools/delegate_safe.py
     @echo "✅ Audit complete"
 

@@ -32562,3 +32562,25 @@ decisions:
   - governance/buglog.md
   - governance/HANDOFF_20261026_OMLX_HF_TOKEN_AND_PREFLIGHT.md
   supersedes_note: 'T-205''s registered premise (that no declaring line reads the harness config) is falsified by measurement, not by preference; the task is CLOSED against this clause (1) with the false premise retired IN PLACE, never deleted (D-3038).'
+- id: D-3154
+  state: ACTIVE
+  date: '2026-10-26'
+  by: assistant
+  category: RAILS / INSTRUCTION PROTOCOL / CONFIG
+  title: a FIELD'S TYPE is part of its CONTRACT - a credential pasted into a URL field fails CLOSED and silently, and the app's own log names the second of the write
+  bugs: [BUG-1027, BUG-1024, BUG-789]
+  decision: 'Four clauses, each bought by a measurement on 2026-10-26. (1) BEFORE telling anyone to paste a secret, name the field BY THE LABEL AND TYPE THE APP ITSELF RENDERS, and if no such field exists say so AND say where the value actually goes - an instruction that names a surface which does not resolve can CONFIGURE the wrong thing, not merely waste a step (BUG-1024 consequence instance). (2) A URL field is not a credential field: a value interpolated into a remote URL needs a TYPE GATE AT THE WRITE, because an invalid one fails closed across the whole product while local-only endpoints keep answering 200 - a partial green hides it. (3) THE ENV PATH AND THE ARGUMENT PATH ARE NOT THE SAME PATH: verify a config defect through the path the PRODUCT uses, never through a convenience wrapper. (4) For "it broke after I pasted X", the FIRST reading is the app''s own log, which names the second of the write; the file mtime is the second reading.'
+  measured:
+  - 'oMLX v0.7.3.dev2, its own log: 10:46:45,036 and ,915 "HuggingFace endpoint updated to: hf_dDOr..." then 11:29:30 / 11:30:54 / 11:35:40 (x2) / 11:35:45 / 11:37:11 GET /admin/api/hf/search|recommended -> 502 "Request URL is missing an http:// or https:// protocol"'
+  - 'the same window: GET /admin/api/hf/models -> 200 the whole time (local model list, no network) - the partial green that hid it'
+  - 'repro in the app OWN interpreter + site-packages (huggingface_hub 1.33.0): HF_ENDPOINT=<stored value> -> httpx.UnsupportedProtocol; HF_ENDPOINT unset -> 200 with rows; HfApi(endpoint=<same value>) passed explicitly does NOT reproduce (env path only)'
+  - 'source: admin/routes.py:5373-5381 persists hf_endpoint and sets os.environ[HF_ENDPOINT]; cli.py:249-250 does the same at startup; fixing deletes the env var (routes.py:5377-5378)'
+  - 'FIX via the app own API: POST /admin/api/global-settings {"hf_endpoint": ""} -> 200, runtime_applied [hf_endpoint]; settings.json#huggingface = {endpoint: "", hf_cache_enabled: true}'
+  - 'TWO-SIDED: search BEFORE 502 -> AFTER 200 hf_token_invalid=False n=3; recommended AFTER 200 n=38 first mlx-community/Qwen3.8-27B-4bit; app log GET https://huggingface.co/api/models?... 200 OK at 11:37:49'
+  - 'the complete oMLX Hugging Face settings surface, from the shipped i18n bundle: settings.huggingface.endpoint ("Mirror Endpoint"), endpoint_hint, endpoint_clear_hint - NO token field exists'
+  - 'the only two token inputs in the product, both non-persisting: models.downloader.hf_token "HF Token (optional)" (per-download, task.token never in to_dict()) and models.uploader.hf_token_label "HuggingFace Token" (write token, POST /admin/api/upload/validate-token)'
+  - 'state at close: auth.sub_keys = 0 (owner deleted the mislabelled sub-key); /v1/models keyless still 401 by design; ~/.cache/huggingface/token and ~/.huggingface/token both dbc9178ddc7b mode 600; app config.json#hf_token still the REVOKED a78e54f87d15 at mode 644 (BUG-789 limb, inert)'
+  files:
+  - governance/buglog.md
+  - ~/.omlx/settings.json
+  supersedes_note: 'BUG-1024 is the instruction defect; BUG-1027 is its CONSEQUENCE with a live product outage, and it is the reason clause (1) is a RAIL and not advice. The declared app-side rail (refuse a non-URL hf_endpoint) is NOT built here and needs its own two-sided control.'

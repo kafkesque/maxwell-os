@@ -12,8 +12,9 @@ Repo: `12b539a` · working tree clean · **whole-set certification GREEN: 194 li
 
 | # | Finding | State |
 |---|---|---|
-| 1 | The oMLX Hugging Face token has **no Settings surface**. It lives inside the *model-upload sheet* reached from **"Add Model from Hugging Face"** and is stored in the macOS **Keychain**. Two instructions sent you to a door that does not exist. | **BUG-1024** — agent side closed, **owner-owed** for the GUI paste + sub-key deletion |
-| 2 | Your pasted token is a **working local inference credential**, because oMLX Sub Keys *are* local API keys. | same bug, owner-owed (delete the sub-key) |
+| 1 | **There is NO Hugging Face token field anywhere in oMLX.** Measured from the app's shipped i18n bundle: `Settings → Hugging Face` holds exactly ONE field — **"Mirror Endpoint"** (`settings.huggingface.endpoint`) — and the only two token inputs in the whole product are the per-download **"HF Token (optional)"** and the uploader's write token. Two instructions sent you to a door that does not exist. | **BUG-1024 + BUG-1027** — CORRECTED 11:37 (§2.2, §3) |
+| 2 | The token you pasted into **Mirror Endpoint** was not stored as a credential — it was copied into `HF_ENDPOINT`, which **502'd every Hugging Face call in the product** from 10:46:45 until 11:37. Cleared through the app's own API; browsing green again (200, 38 models). | **BUG-1027 FIXED**, two-sided receipt |
+| 2b | The mislabelled sub-key is **already deleted** (`auth.sub_keys` = 0), so the read-only token is no longer a working local inference bearer. | **CLOSED** by you, verified at 11:37 |
 | 3 | Three files held the **revoked** token, and a revoked token is refused even for a PUBLIC repo. | **CLOSED** — the live token is now in both canonical homes, verified by the library |
 | 4 | `just preflight` was **dying at its 7th of 13 declared lines**, so six rails never ran — including the only `check_omlx_health` line in the whole justfile. | **BUG-1025 CLOSED** |
 | 5 | Closing #4 revealed **10 C12 items** (9 unchecked hardcoded values + 1 mismatch) the dead gate had been hiding. | **T-206 open**, ceiling declared |
@@ -56,10 +57,27 @@ Stored in macOS Keychain. Needs write access to your account.
 Add Model from Hugging Face
 ```
 
-⇒ the token row is **inside the upload sheet** opened by **"Add Model from Hugging Face"**, and the store is the
-**Keychain**. *Labelled hypothesis (D-3036):* the surface **name** is measured from the binary; the exact **click
-order** is inferred from those labels and cannot be verified without the GUI. If the sheet has no token row, use the
-branch in §3 step 4 — nothing currently depends on it.
+⇒ **those strings belong to the UPLOAD sheet** (`models.uploader.hf_token_label` — "HuggingFace Token", placeholder
+*"Enter HF write token (hf_…)"*, validated by `POST /admin/api/upload/validate-token`). It is a **write** token for
+uploading models TO the Hub, **not** a download token, and it is **not persisted**. The download path has no stored
+token at all.
+
+**CORRECTED 2026-10-26 11:37 — the exhaustive, measured list of every token-bearing field in oMLX v0.7.3.dev2**, read
+from the app's own i18n bundle and source, not from a UI description:
+
+```
+settings.huggingface.endpoint        "Mirror Endpoint"     <- the ONLY field Settings -> Hugging Face has. A URL.
+settings.huggingface.endpoint_hint   "Custom endpoint URL for HuggingFace API (e.g. https://hf-mirror.com)"
+settings.huggingface.endpoint_clear_hint "To use the default endpoint, clear the field and save."
+models.downloader.hf_token          "HF Token (optional)"  <- per-download ONLY; DownloadTask.token is
+                                       "Never in to_dict()"; passed as token=hf_token or None
+models.uploader.hf_token_label       "HuggingFace Token"   <- WRITE token for uploading, validate-only
+```
+
+⇒ **there is nowhere in oMLX to store an HF token, and nothing needs storing.** With no per-request token the app calls
+`snapshot_download(token=None)`, so `huggingface_hub` uses `HF_TOKEN` or the `hf auth login` token file — the home that
+already holds your live token. oMLX's own client proves it accepts it: `hf_token_invalid=False`, a flag
+`_list_models_stale_token_fallback` sets **only** on a 401.
 
 ### 2.3 What "Sub Keys" really is
 
@@ -95,24 +113,30 @@ fingerprints only, never the secret), and confirmed by the library itself — `h
 
 ## 3. Your manual steps — numbered, with the branch when it differs
 
-> **Step 1 — open the right sheet.** oMLX → the **Models** area → **"Add Model from Hugging Face"**.
-> *Expected:* a sheet with a section that holds an **HF token** row and a **Validate** button.
-> *If it differs (no token row):* skip to step 4. Nothing current needs it.
+> **Step 1 — DO NOTHING. There is no token field to paste into.** (Corrected 11:37: the previous version of this step
+> described a sheet that does not exist. It cost you a wrong paste into **Mirror Endpoint**, which broke every HF call
+> in oMLX — BUG-1027. That is on the instruction, not on you.) The token belongs in exactly one place, and it is
+> already there: `~/.cache/huggingface/token` at mode 600, verified `whoami → neanderground`.
+> *Verify in one line:*
+> `python3 -c "import huggingface_hub as h;print(h.HfApi().whoami()['name'])"` → *Expected:* `neanderground`.
 
-> **Step 2 — paste and validate.** Paste the new read token, press **Validate**.
-> *Expected success signal:* the sheet shows **`neanderground`** (the app's own string: "Subtitle when a token has
-> been validated. Placeholder is the HF username"). That username *is* the proof — no file inspection needed.
-> *If it shows an error instead:* the token is not valid or has been revoked; regenerate at
-> `https://huggingface.co/settings/tokens` (Read, no expiry) and repeat.
+> **Step 2 — CHECK the one HF field in oMLX is EMPTY** (it is now, verified 11:37, and this is the field that broke it).
+> oMLX → **Settings → Hugging Face → Mirror Endpoint** → it must be **empty**; `Save`. The app's own hint:
+> *"To use the default endpoint, clear the field and save."*
+> *Verify:* `python3 -c "import json,pathlib;d=json.loads((pathlib.Path.home()/'.omlx/settings.json').read_text());print(repr(d['huggingface']['endpoint']))"`
+> *Expected:* `''`. *If it shows `'hf_…'`:* a token has been pasted there again — clear it. A non-URL value sets
+> `HF_ENDPOINT` in the server's environment and every Hugging Face request then fails **502** with
+> *"Request URL is missing an 'http://' or 'https://' protocol"*, while local-only pages keep answering 200 and hide it.
 
 > **Step 3 — delete the mislabelled sub-key.** oMLX → **Settings → Security → Sub Keys** → the row named
 > **`hugging face`** → delete.
 > *Verify:* `python3 -c "import json,pathlib;d=json.loads((pathlib.Path.home()/'.omlx/settings.json').read_text());print('sub_keys:',len(d['auth']['sub_keys']))"`
 > *Expected:* `sub_keys: 0`. *If it still says `1`:* the app had the file open — re-open Settings and delete again.
 
-> **Step 4 — only if you could not find the token row.** Do nothing. Public model downloads work anonymously; your
-> two pipeline models are already cached; no gated download is pending. The only thing that must never be present is
-> the **old** token, and it is gone from both files your tools read.
+> **Step 4 — a gated model, only if you ever download one.** Then use the downloader's own per-download field:
+> **Models → Model Downloader → "Download from HuggingFace" → `HF Token` (optional)** — paste there for THAT download
+> only; it is never stored. Public downloads need nothing: your two pipeline models are already cached and no gated
+> download is pending.
 
 > **Step 5 — the provider (this is "Task C").** go to go and the *new* session's check, not the dropdown.
 > The config on disk already reads `active_provider: maxwell_omlx` (mtime 09:34:57, nothing has re-flipped it;

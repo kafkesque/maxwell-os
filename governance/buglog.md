@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1279 decisions (census stamp cba418519bbb0876, 2026-10-26) · 790 bugs (247 open / 543 closed; highest OPEN = BUG-1026) · 60 open tasks (MUST 9 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1280 decisions (census stamp e56cb90b7a8a823d, 2026-10-26) · 791 bugs (247 open / 544 closed; highest OPEN = BUG-1026) · 60 open tasks (MUST 9 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1279 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 659 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1279, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1280 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 660 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1280, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 247 open.
 >
@@ -22332,3 +22332,72 @@ declaration with no referent (D-3034). TWO-SIDED CONTROL: an append given a rela
 `last_governed_write` FINDS (positive), and an append whose path resolves outside the repo must be REFUSED (negative).
 NAMED WRONG FIX: teaching `last_governed_write` to accept any path SUFFIX - that would let a record about another
 repository's `config/decisions.yaml` attribute THIS one.
+
+## BUG-1027 (HIGH - FIXED 2026-10-26 11:37) - the HF TOKEN was pasted into oMLX's "Mirror Endpoint" field, which set `HF_ENDPOINT` in the server's environment and 502'd EVERY Hugging Face call in the product - silently, for 51 minutes
+
+**MEASURED, from the application's own log and settings file - not inferred from a UI description.**
+`~/.omlx/settings.json#huggingface.endpoint` held a **37-char `hf_…` string** where a URL belongs. The app's own log
+names the second of the write: `2026-10-26 10:46:45,036 - omlx.admin.routes - HuggingFace endpoint updated to:
+hf_dDOr…` and again at `,915`. From that moment every Hugging Face request through the admin API returned
+`http=502 {"detail":"Request URL is missing an 'http://' or 'https://' protocol."}`: 11:29:30 `/admin/api/hf/recommended`,
+11:30:54, 11:35:40 (×2), 11:35:45, 11:37:11 `/admin/api/hf/search`. Meanwhile `GET /admin/api/hf/models` answered
+**200** the whole time - it reads the LOCAL model list and never leaves the machine - so a partial green was
+available to hide the outage.
+
+**Mechanism, read from the shipped source (`/Applications/oMLX.app/Contents/Resources/omlx`, v0.7.3.dev2).**
+`admin/routes.py:5373-5381` persists `hf_endpoint` **and** does `os.environ["HF_ENDPOINT"] = request.hf_endpoint`;
+`cli.py:249-250` does the same at startup from the settings file. The app's bundled `huggingface_hub 1.33.0`
+(lives at `Resources/Python/framework-mlx-base/lib/python3.11/site-packages`) builds every request URL from
+`HF_ENDPOINT`, so a non-URL value fails in `httpx` before a packet leaves the machine.
+
+**Two-sided repro, run in the app's OWN interpreter and site-packages** (`Resources/Python/cpython-3.11/bin/python3.11`
+with `PYTHONPATH` on the bundle's site-packages):
+`HF_ENDPOINT=<the stored value>; HfApi().list_models(limit=1)` → **`httpx.UnsupportedProtocol: Request URL is missing
+an 'http://' or 'https://' protocol.`**; the identical call with `HF_ENDPOINT` unset → **200, rows returned**.
+**A DISTINCTION THAT WOULD HAVE MISLED THE FIX, measured and named:** `HfApi(endpoint=<the same value>)` passed
+EXPLICITLY does **not** reproduce (it is normalised/ignored), so the defect lives on the **ENV** path only. A fix
+validated with the argument path would have reported "cannot reproduce".
+
+**No rail refused the write.** The field accepts any string. Its only guidance is static copy in the app's i18n:
+`settings.huggingface.endpoint` = **"Mirror Endpoint"**, `endpoint_hint` = "Custom endpoint URL for HuggingFace API
+(e.g. https://hf-mirror.com)", `endpoint_clear_hint` = "To use the default endpoint, clear the field and save." A
+one-line `http(s)://` check at `routes.py:5373` would have caught this at 10:46 instead of at 11:29.
+
+**FIX APPLIED through the app's own API - never by hand-editing `settings.json`.**
+`POST /admin/api/global-settings {"hf_endpoint": ""}` → **http 200**, `runtime_applied: ['hf_endpoint']` (the handler
+also DELETES `HF_ENDPOINT` from the live process, `routes.py:5377-5378`), and
+`settings.json#huggingface` became `{"endpoint": "", "hf_cache_enabled": true}`.
+**Two-sided receipt:** BEFORE `/admin/api/hf/search` **502**; AFTER **200**, `hf_token_invalid=False`, 3 results;
+`/admin/api/hf/recommended` **200**, 38 models, first `mlx-community/Qwen3.8-27B-4bit`; the app log then shows
+`GET https://huggingface.co/api/models?… "HTTP/1.1 200 OK"` at 11:37:49.
+
+**WHY IT HAPPENED, and the defect is on THIS repository's side, not oMLX's.** Two consecutive instructions told the
+owner to paste the HF token into an oMLX "Hugging Face" settings surface. The surface's **complete** field list,
+read from the app's own i18n bundle, is: `settings.huggingface.endpoint` ("Mirror Endpoint"), `endpoint_hint`,
+`endpoint_clear_hint`. **There is no token field and there never was.** The owner did the only thing the surface
+allowed, and it broke the product. This is the CONSEQUENCE INSTANCE of BUG-1024 / D-3153 clause (2): an instruction
+that names a surface which does not resolve does not merely waste a step - it can CONFIGURE the wrong thing.
+
+**WHERE AN HF TOKEN MAY BE TYPED IN oMLX - exhaustively, measured from the shipped i18n bundle.** There are exactly
+two, and neither persists:
+1. `models.downloader.hf_token` **"HF Token" (optional)**, placeholder `hf_...`, inside `download_section` =
+   **"Download from HuggingFace"** on the **"Model Downloader"** panel. Per-download only: `DownloadTask.token` is
+   annotated "Never in to_dict()" and is passed as `token=hf_token or None` (`hf_downloader.py:1796`).
+2. `models.uploader.hf_token_label` **"HuggingFace Token"**, placeholder "Enter HF write token (hf_...)", in
+   **"Upload oQ Models"** → `POST /admin/api/upload/validate-token` (`routes.py:9629`) - a WRITE token, for uploading.
+**Consequence, and it is the answer to the class question:** because no persistent token store exists, the only home
+`huggingface_hub` reads is `~/.cache/huggingface/token` (or `HF_TOKEN`), which already holds the live token at mode
+600. oMLX's own client proves it accepts that token: `hf_token_invalid=False`, a flag
+`_list_models_stale_token_fallback` sets **only on a 401**. So oMLX needs **no** manual token step at all.
+
+**STATE AT CLOSE (measured 11:37):** `auth.sub_keys` = **0** - the owner deleted the mislabelled `hugging face` sub-key,
+so the read-only download token is no longer a working LOCAL INFERENCE bearer (`/v1/models` keyless is still **401**
+by design, BUG-1023); `huggingface.endpoint` = `""`; HF browsing green; both token homes `dbc9178ddc7b` mode 600.
+
+**REMAINING, unchanged and NOT closed by this fix:** `~/Library/Application Support/oMLX/config.json#hf_token` still
+holds the **REVOKED** token `a78e54f87d15` at mode **644**, 215 bytes - app-owned, inert to the Python path, and still
+with no rail refusing a secret-shaped literal in an app config (BUG-789 limb 3).
+
+**DECLARED RAIL, not built in this turn (needs its own two-sided control):** the admin settings write should REFUSE an
+`hf_endpoint` that is neither empty nor an `http(s)://` URL, and the refusal should name the field's type. Control:
+`{"hf_endpoint": "hf_…"}` → 400 and settings unchanged; `{"hf_endpoint": "https://hf-mirror.com"}` → 200; `""` → 200.

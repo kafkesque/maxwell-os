@@ -87,7 +87,7 @@ tasks:
   gate: none
 - id: T-104
   priority: MUST
-  state: open
+  state: done
   mover: pipeline
   title: BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality
   why: 'Measured by scripts/gov_sync.py against the CENSUS''s own open set (the number lives in the census and the derived
@@ -98,7 +98,7 @@ tasks:
     class).'
   source:
   - BUG-757
-  evidence: 'bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERED 101 -> 99 by the BUG-481 reconciliation batch, which took eight reconciled ids out of the open set (253 -> 245 open). The census prints CRITICAL 0 / HIGH 35 / MED 80 / LOW 31 / UNLABELLED 99 = 245, so the ceiling now has ZERO headroom: limb (a) is no longer a claim, it is the ceiling, because a new heading without a severity takes the count over it and scripts/gov_sync.py --check NAMES the id. LOWERED AGAIN 99 -> 98 on 2026-10-26 (live census UNLABELLED 98 of 244 open; zero headroom restored).'
+  evidence: 'DONE 2026-10-26 (owner word, T-104 limb (b)): 31 deterministic PROMOTE from body Severity labels + 65 gemma-4-E4B advisory on the ambiguous set; BUG-516 CLOSED by owner word. Live census CRITICAL 29 / HIGH 57 / MED 118 / LOW 41 = 245 open (BUG-1032 added during the pass), UNLABELLED 0; severity_grandfathered lowered 97 -> 0 so the next unlabelled heading fires --check RED, naming the id.'
   gate: none
 - id: T-105
   priority: SHOULD
@@ -2832,3 +2832,21 @@ tasks:
     gate that did not run is NOT zero - the reading must prove it reached its own report (that is BUG-1025's whole
     lesson, and it is the difference between 0 findings and 0 output). (5) SEQUENCING: this adds declaring lines, so
     land it while BUG-954's yaml_guard memo is warm, or certification costs a full rescan (BUG-1010).
+- id: T-207
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collapse the manifest run-records into one'
+  why: >-
+    Owner-approved 2026-10-26 (D-3159). BUG-1030 documents the hidden couplings that make the rail surface a
+    non-atomic cascade to change. Phase-1 is the reversible half (rearrange + manifest collapse), each step
+    receipted. The STRIP is irreversible and is NOT in this task (D-3159 keeps it behind its own gate).
+  source: 'D-3159 / BUG-1030 / D-2981 (face derivation) / D-2644 (shrink-only ceiling)'
+  evidence: >-
+    Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transaction; owner_marks
+    pair-object rule_digest forcing a full corroboration re-render; rail_mutations path references
+    (owner_marks.py 955/1082); write_guard owned_keys cell-scoping; gov_sync D-2981 face derivation.
+  gate: >-
+    FORENSIC AUDIT BEFORE ANY REARRANGE (D-3036: a red loop first). Produce the ~12 invariant rail map grounded
+    in config/rail_registry.yaml, and the one-manifest collapse. Reversible only; just health stays green after
+    each step; the five couplings are DISCHARGED, not papered over.

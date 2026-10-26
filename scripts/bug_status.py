@@ -42,8 +42,15 @@ sys.path.insert(0, str(REPO / "scripts"))
 from lib import write_guard  # noqa: E402
 
 C15_THRESHOLD = 5
-CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED")
-REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
+CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED", "TOMBSTONED")
+# BUG-1031 (2026-10-26): TOMBSTONED is a TERMINAL verdict (a dead/abandoned bug is not open), unlike LANDED
+# ("a fix landed" != "the bug is closed" — BUG-773/731 declare both). LANDED stays OUT of CLOSE_WORDS.
+# BUG-1032 (2026-10-26): "REGRESS" was matched by SUBSTRING, so the NOUN "regression" (as in
+# "not a regression" — a type of defect, NOT a reopened event) read as `reopened`. The reopen signal is the
+# past-participle VERB "REGRESSED" ("FIXED, REGRESSED 2026-09-21"); the noun "regression"/"regressions" names a
+# defect class and may never un-close a bug. The old token would have read a genuinely-CLOSED heading that
+# mentions "regression" (e.g. "FIXED - not a regression") as reopened -> open.
+REOPEN_WORDS = ("REOPEN", "REGRESSED", "RECURRED")
 # BUG-347 (2026-09-21): "PARTIALLY FIXED" contains the substring FIXED and was classified CLOSED,
 # silently retiring a LIVE bug (BUG-333). A partial fix is an OPEN bug with progress attached.
 PARTIAL_WORDS = ("PARTIAL", "MITIGATED", "IN PROGRESS")
@@ -347,8 +354,12 @@ def self_test() -> int:
         "HIGH - OPEN 2026-09-21": "open",
         "MED - PARTIALLY FIXED 2026-09-21": "open",
         "MED - FIXED, REGRESSED 2026-09-21": "reopened",
+        # BUG-1032: "regression" is a noun, not a reopen event; only the verb "REGRESSED" re-opens.
+        "MED - OPEN (not a regression)": "open",
         "LOW - CLOSED INVALID": "closed",
         "MED - RESOLVED (cleaned up)": "closed",
+        # BUG-1031: a TOMBSTONED verdict in a slot position is terminal (closed), not open.
+        "MED - TOMBSTONED 2026-09-25": "closed",
         # BUG-429 shapes, taken from live headers:
         "HIGH, OPEN - UNRESOLVED": "open",
         "MED - UNFIXED 2026-09-24": "open",

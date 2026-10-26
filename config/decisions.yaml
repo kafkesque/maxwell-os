@@ -32872,3 +32872,40 @@ decisions:
   - config/recalibration_pins.yaml
   - config/decisions.yaml
   - governance/buglog.md
+- id: D-3159
+  state: RATIFIED
+  category: GOVERNANCE / CONSOLIDATION
+  title: Owner approves governance consolidation PHASE-1-ONLY (reversible rearrange + manifest collapse); STRIP
+    stays behind its own owner gate
+  decision: "Owner word 2026-10-26, recorded so it does not live only in session prose (an act that leaves no trace\
+    \ did\nnot happen). APPROVE PHASE-1-ONLY of the governance consolidation.\n\nSCOPE (both reversible, receipt-able\
+    \ at every step boundary):\n  (a) REARRANGE the rail surface into ~12 invariant rails, down from the current\
+    \ multi-list surface\n      (58 guards + 11 writers + 2 dormant + 2 recipes in config/rail_registry.yaml, plus\
+    \ commit-boundary\n      invocations), and\n  (b) collapse the manifest run-records into ONE.\nNOT approved:\
+    \ the STRIP of proven subsets (Strangler Fig) — irreversible and not verifiable in advance; it\nstays behind\
+    \ its OWN owner gate and is not part of this word.\n\nFIVE CASCADE RISKS (the hidden-conflict / future-tax findings\
+    \ this decision makes durable, filed as\nBUG-1030 — a decision must cite the defect it discharges, D-2660):\n\
+    \  1. config/rail_registry.yaml is the ladder source-of-truth AND the mutation-gate subject, so a rearrange\n\
+    \     is a non-atomic multi-file transaction;\n  2. scripts/owner_marks.py::build_pair_object derives rule_digest\
+    \ as a sha256 of the pair-object parameters\n     (config/corroboration_collapse.yaml), so any edit to that\
+    \ config forces a full re-render of 3 tracked\n     artifacts over the corpus;\n  3. config/rail_mutations.yaml\
+    \ references subject scripts BY PATH (scripts/owner_marks.py at lines 955 and\n     1082), so a rail rename/relocate\
+    \ breaks the mutation gate;\n  4. scripts/lib/write_guard.py ownership markers (owned_keys) are cell/row-shape-scoped,\
+    \ so a structural\n     rearrange shifts who owns which cell;\n  5. scripts/gov_sync.py (D-2981) derives the\
+    \ four faces from the registers, so the derivation invariant\n     must survive the rearrange or every face\
+    \ fails its re-derivation join.\n\nHONEST FRAMING (not \"verified best\"): Phase-1's rearrange + manifest collapse\
+    \ are the SAFEST VERIFIABLE\npath — reversible, every step boundary receipted. The STRIP is not verifiable in\
+    \ advance and stays\nowner-gated. Execution is tracked by T-207.\n"
+  bugs:
+  - BUG-1030
+  files:
+  - config/rail_registry.yaml
+  - config/rail_mutations.yaml
+  - config/gov_sync.yaml
+  - config/corroboration_collapse.yaml
+  - scripts/gov_sync.py
+  - scripts/owner_marks.py
+  - scripts/lib/write_guard.py
+  - scripts/recompute_decision_summary.py
+  - governance/buglog.md
+  - config/task_register.yaml

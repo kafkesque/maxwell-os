@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (244 open / 549 closed; highest OPEN = BUG-1028) · 57 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1285 decisions (census stamp d1d4b1e1e38c9253, 2026-10-26) · 796 bugs (243 open / 553 closed; highest OPEN = BUG-1030) · 57 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1284 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1284, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1285 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 149 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1285, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 244 open.
+> Open BUGS by severity (population = the census's 243 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 57 · 🟨 MED 117 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 243 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -27,13 +27,13 @@
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-101 | 🔴 MUST | 🔴 open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candida |
-> | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERE |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
+> | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
@@ -66,7 +66,7 @@
 >
 > _the face is a VIEW: 12 of 81 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
-> **Open bugs, most severe first:** 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341 · 🟧 BUG-391 · 🟧 BUG-400 · 🟧 BUG-406 · 🟧 BUG-417 · 🟧 BUG-426 · 🟧 BUG-433.
+> **Open bugs, most severe first:** 🟥 BUG-159 · 🟥 BUG-222 · 🟥 BUG-261 · 🟥 BUG-263 · 🟥 BUG-264 · 🟥 BUG-455 · 🟥 BUG-462 · 🟥 BUG-464 · 🟥 BUG-465 · 🟥 BUG-468 · 🟥 BUG-475 · 🟥 BUG-484.
 <!-- GOV-INDEX:END -->
 
 <!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->

@@ -1,0 +1,45 @@
+- id: D-3159
+  state: RATIFIED
+  category: GOVERNANCE / CONSOLIDATION
+  title: 'Owner approves governance consolidation PHASE-1-ONLY (reversible rearrange + manifest collapse); STRIP stays behind its own owner gate'
+  decision: |
+    Owner word 2026-10-26, recorded so it does not live only in session prose (an act that leaves no trace did
+    not happen). APPROVE PHASE-1-ONLY of the governance consolidation.
+
+    SCOPE (both reversible, receipt-able at every step boundary):
+      (a) REARRANGE the rail surface into ~12 invariant rails, down from the current multi-list surface
+          (58 guards + 11 writers + 2 dormant + 2 recipes in config/rail_registry.yaml, plus commit-boundary
+          invocations), and
+      (b) collapse the manifest run-records into ONE.
+    NOT approved: the STRIP of proven subsets (Strangler Fig) — irreversible and not verifiable in advance; it
+    stays behind its OWN owner gate and is not part of this word.
+
+    FIVE CASCADE RISKS (the hidden-conflict / future-tax findings this decision makes durable, filed as
+    BUG-1030 — a decision must cite the defect it discharges, D-2660):
+      1. config/rail_registry.yaml is the ladder source-of-truth AND the mutation-gate subject, so a rearrange
+         is a non-atomic multi-file transaction;
+      2. scripts/owner_marks.py::build_pair_object derives rule_digest as a sha256 of the pair-object parameters
+         (config/corroboration_collapse.yaml), so any edit to that config forces a full re-render of 3 tracked
+         artifacts over the corpus;
+      3. config/rail_mutations.yaml references subject scripts BY PATH (scripts/owner_marks.py at lines 955 and
+         1082), so a rail rename/relocate breaks the mutation gate;
+      4. scripts/lib/write_guard.py ownership markers (owned_keys) are cell/row-shape-scoped, so a structural
+         rearrange shifts who owns which cell;
+      5. scripts/gov_sync.py (D-2981) derives the four faces from the registers, so the derivation invariant
+         must survive the rearrange or every face fails its re-derivation join.
+
+    HONEST FRAMING (not "verified best"): Phase-1's rearrange + manifest collapse are the SAFEST VERIFIABLE
+    path — reversible, every step boundary receipted. The STRIP is not verifiable in advance and stays
+    owner-gated. Execution is tracked by T-207.
+  bugs: [BUG-1030]
+  files:
+    - config/rail_registry.yaml
+    - config/rail_mutations.yaml
+    - config/gov_sync.yaml
+    - config/corroboration_collapse.yaml
+    - scripts/gov_sync.py
+    - scripts/owner_marks.py
+    - scripts/lib/write_guard.py
+    - scripts/recompute_decision_summary.py
+    - governance/buglog.md
+    - config/task_register.yaml

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (244 open / 549 closed; highest OPEN = BUG-1028) · 57 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 57; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1285 decisions (census stamp d1d4b1e1e38c9253, 2026-10-26) · 796 bugs (243 open / 553 closed; highest OPEN = BUG-1030) · 57 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1284 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1284, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1285 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 149 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1285, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 244 open.
+> Open BUGS by severity (population = the census's 243 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 57 · 🟨 MED 117 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 243 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24,13 +24,13 @@
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-101 | 🔴 MUST | 🔴 open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candida |
-> | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 99 (2026-10-25) - LOWERE |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
+> | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
@@ -63,7 +63,7 @@
 >
 > _the face is a VIEW: 12 of 81 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
-> **Open bugs, most severe first:** 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341 · 🟧 BUG-391 · 🟧 BUG-400 · 🟧 BUG-406 · 🟧 BUG-417 · 🟧 BUG-426 · 🟧 BUG-433.
+> **Open bugs, most severe first:** 🟥 BUG-159 · 🟥 BUG-222 · 🟥 BUG-261 · 🟥 BUG-263 · 🟥 BUG-264 · 🟥 BUG-455 · 🟥 BUG-462 · 🟥 BUG-464 · 🟥 BUG-465 · 🟥 BUG-468 · 🟥 BUG-475 · 🟥 BUG-484.
 <!-- GOV-INDEX:END -->
 
 <!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
@@ -188,7 +188,7 @@
 
 > Full bug history (217 distinct BUG-IDs): `archive/governance_pre_tiered_2026-09-03/buglog.md`.
 
-## BUG-253 — reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure)
+## BUG-253 (MED) — reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure)
 
 **Discovered:** 2026-09-16 00:05 during the voting suite run.
 
@@ -226,7 +226,7 @@ grammar flags) with no duplicate server and no app restart. Verified 9 -> 10 mod
 
 Standing rule: **never quit/reopen oMLX to register a model.** Run `scripts/omlx_reload.py`.
 
-## BUG-255 — `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark
+## BUG-255 (MED) — `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark
 **Found:** 2026-09-16 · **Severity:** medium (silent stall, no server-side trace) · **Status:** mitigated
 
 Symptom: the Ornith 4bit/8bit A/B wrote 0 checkpoint rows for 38 minutes while its process stayed alive.
@@ -271,7 +271,7 @@ the raw record, not against a truncated rendering of it. One `[:14]` produced a 
 governance log; the same class of unchecked inference is exactly what this benchmark effort exists to
 eliminate. RETRACTED, with the entry kept rather than deleted so the register stays auditable.
 
-## BUG-257 — the niah top tier exceeded oMLX's context window, making it unmeasurable
+## BUG-257 (MED) — the niah top tier exceeded oMLX's context window, making it unmeasurable
 **Found:** 2026-09-16 · **Severity:** medium (silent unmeasurable tier) · **Status:** FIXED
 
 Symptom: Run B's long-context suite produced `HTTPError 400 Bad Request` on every model at the
@@ -294,7 +294,7 @@ Related: `max_context_window: 32768` in `~/.omlx/settings.json` is itself a cand
 (the models advertise 131k-262k), but that requires a reload — and reloading during a run is BUG-255.
 Deferred deliberately.
 
-## BUG-258 — model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE)
+## BUG-258 (HIGH) — model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE)
 **Severity:** high (it is the artifact the portfolio decisions are read off) — **Found:** 2026-09-16, during the final-chain run
 **Symptom:** `tools/model_eval_report.py` scored every checkpoint row with `1 if r.get("ok") else 0`,
 including rows whose `err` field was set (404/400/timeout). A row with an error is a measurement we
@@ -319,7 +319,7 @@ checkpoint, so the correction applies retroactively to every already-measured mo
 at the same token size and printed Qwen3-Coder 16000tok = 0.38 — which is neither a real niah score
 (3/3 = 1.00) nor a real lc_reasoning score (0/5 = 0.00). Now emitted per suite with explicit n.
 
-## BUG-259 — report tables quoted PRUNED models as if they were candidates
+## BUG-259 (MED) — report tables quoted PRUNED models as if they were candidates
 **Severity:** medium (misleads consolidation docs) — **Found:** 2026-09-16
 **Symptom:** the checkpoint is an append-only log, so pruned models keep their rows. After Prune #3/#4
 the aggregate table still listed granite-4.2-8b (116 rows), gemma-4-12B (122 rows) and
@@ -344,7 +344,7 @@ process start (v2), so it is sweeping the DELETED Ornith-1.5-9B-OptiQ-4bit (all 
 fast) and does not cover the keeper Ornith-1.5-9B-MLX-8bit. Harmless but incomplete: the queued
 `scripts/rerun_niah_fixed.sh` reads the file at its own start (v3, keepers only) and closes the gap.
 
-## BUG-260 — pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured)
+## BUG-260 (HIGH) — pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured)
 **Severity:** high (it is the number the S4 model-swap decision was to be taken on) — **Found:** 2026-09-16, on the step-3 results
 **Symptom:** the step-3 production table read `gpt-oss 0.200 / Qwen3.8 0.217 / gemma 0.150` discipline and
 `domF1 0.097 / 0.109 / 0.060` — implausibly low next to the 0.709 benchmark-prompt headline, i.e. a BUG-253-class
@@ -376,7 +376,7 @@ available, not a reproduction of the production scorer; the true absolute accura
 comparison — the thing the swap decision rests on — is unaffected. Settling the absolute number needs the real
 mapping function, not a replica.
 
-## BUG-261 — safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK
+## BUG-261 (CRITICAL) — safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK
 **Severity:** critical (near-miss: got to 1.7 GB free on a 926 GB volume, 100% used, during a routine
 reclaim) — **Found:** 2026-09-17 10:22, while retiring Qwen3.8-27B-OptiQ-4bit
 **Symptom:** the reclaim was launched to free 19 GB. Free space went 24 GB -> 3.9 GB -> 1.7 GB, i.e.
@@ -398,7 +398,7 @@ rows (4,132 + 180). Free space recovered to 48 GB. No data lost.
 **Standing rule:** anything larger than free space / 2 does NOT go through safe_delete.py. Weights,
 model caches and anything reproducible from a hash are direct deletes with the reason logged.
 
-## BUG-263 — the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record)
+## BUG-263 (CRITICAL) — the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record)
 **Severity:** critical (the R5 control for FORM drift has been silently doing nothing) — **Found:** 2026-09-17, from a failing stage probe
 **Symptom:** `scripts/pipe_stage_probe.py` measured S2 relabel on 12 real FBs: 12/12 errors,
 `RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-...)'`.
@@ -460,7 +460,7 @@ to be FAILED: budget 64/256 -> content 0c; 1024 -> JSON parses.
 Retraction note: the earlier "wasted the whole run" framing in this session was wrong and is
 withdrawn here.
 
-## BUG-264 — poisoned rows survive every re-run (found by drift_monitor, 2026-09-17)
+## BUG-264 (CRITICAL) — poisoned rows survive every re-run (found by drift_monitor, 2026-09-17)
 
 `tools/model_eval_suite._done_keys()` skips any (model, suite, id) already present in the
 checkpoint without `err`. So a row measured while the HARNESS was broken is never re-measured:
@@ -483,7 +483,7 @@ C12), criterion `P1.no_stale_gptoss_toolcall_rows` in `governance/p0_p1_criteria
 - `governance/p0_p1_contract.md` (frozen acceptance criteria) + `governance/p0_p1_criteria.yaml`
   (executable form) + `scripts/drift_monitor.py` (20 criteria, re-derived from the filesystem).
 
-## BUG-265 — toolcalling scored the HARNESS, not the model: native tool_calls ignored
+## BUG-265 (HIGH) — toolcalling scored the HARNESS, not the model: native tool_calls ignored
 
 **Found:** 2026-09-17 by `scripts/omlx_raw_dump.py` (new). **Severity: high — it corrupted a
 model role.**
@@ -513,7 +513,7 @@ committing the suite would have caught it; that test is now `scripts/omlx_raw_du
 **Fix:** normalise `message.tool_calls` into a graded JSON form when `content` is empty, so every
 model is graded on the same rule (tool name + argument containment).
 
-## BUG-266 — gpt-oss toolcalling is truncated, not incapable
+## BUG-266 (HIGH) — gpt-oss toolcalling is truncated, not incapable
 
 Same probe: gpt-oss returned `finish_reason=length` with 805 characters of `reasoning_content`
 and zero content at max_tokens=200. At 1024/2048 it emits ~1433 characters of prose and never the
@@ -620,7 +620,7 @@ change without re-calling a model.
 does not beat the constant; not enough to *certify* one. The proper instrument (Krippendorff alpha +
 a per-task n_min) remains unbuilt (market research A1/A2).
 
-## BUG-270 — OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomies
+## BUG-270 (HIGH) — OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomies
 
 Both found from the operator's G3 answer for T6-01, whose note read: *"DISCIPLINE IS MISSING,
 RESEARCH METHODOLOGY IS DISCIPLINE NOT DOMAIN BUT LABELLED AS DOMAIN."*
@@ -712,7 +712,7 @@ membership-vs-disjointness guard, and this — all three were plausible, all thr
 
 ---
 
-## BUG-273 — the domains axis violates its own cardinality contract (2026-09-17)
+## BUG-273 (MED) — the domains axis violates its own cardinality contract (2026-09-17)
 
 **Severity:** medium. **Status:** OPEN.
 
@@ -750,7 +750,7 @@ symmetric by nature; `source_crossover` may not be); normalise the symmetric sub
 
 ---
 
-## BUG-275 — LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17)
+## BUG-275 (MED) — LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17)
 
 **Severity:** medium. **Status:** OPEN.
 
@@ -824,7 +824,7 @@ a dead backup path can never again be silent.
 
 ---
 
-## BUG-277 — the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17)
+## BUG-277 (LOW) — the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17)
 
 **Severity:** LOW (documentation / consumer hazard; no live validator defect found). **Status:** OPEN.
 
@@ -857,7 +857,7 @@ and the first where the measurement *exonerated* the code and convicted the tool
 
 ---
 
-## BUG-278 — stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19)
+## BUG-278 (HIGH) — stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19)
 
 **Severity:** HIGH (largest single recall loss in the system). **Status:** OPEN. Found by the blind ruler + DB audit.
 
@@ -885,7 +885,7 @@ include `UNVERIFIED` at a lower evidence tier (R14) rather than hiding it. Human
 
 ---
 
-## BUG-279 — the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19)
+## BUG-279 (HIGH) — the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19)
 
 **Severity:** HIGH (root cause of the classification drift). **Status:** OPEN.
 
@@ -919,7 +919,7 @@ bounded by the string.
 
 ---
 
-## BUG-280 — `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19)
+## BUG-280 (HIGH) — `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19)
 
 **Severity:** HIGH (an entire axis is decorative). **Status:** OPEN.
 
@@ -956,7 +956,7 @@ and replaced by the verification status (BUG-278). Human ruling required.
 
 ---
 
-## BUG-281 — `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19)
+## BUG-281 (HIGH) — `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19)
 
 **Severity:** HIGH (the schema cannot express what the user actually asked for). **Status:** OPEN.
 
@@ -986,7 +986,7 @@ re-extraction. Human ruling required.
 
 ---
 
-## BUG-282 — the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19)
+## BUG-282 (HIGH) — the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19)
 
 **Severity:** HIGH (this is *why* failures stay invisible). **Status:** OPEN.
 
@@ -1157,7 +1157,7 @@ collisions. Human-owned: one line.
 
 ---
 
-## BUG-287 — graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19)
+## BUG-287 (HIGH) — graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19)
 
 **Severity:** HIGH. **Status:** OPEN.
 
@@ -1182,7 +1182,7 @@ explicit verification tier instead of silently mixing them.
 
 ---
 
-## BUG-288 — the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19)
+## BUG-288 (HIGH) — the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19)
 
 **Severity:** HIGH. **Status:** OPEN.
 
@@ -1205,7 +1205,7 @@ a filename. No column at FB level holds source text.
 
 ---
 
-## BUG-289 — `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19)
+## BUG-289 (MED) — `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19)
 
 **Severity:** MEDIUM-HIGH (it feeds the merge decision at stage 1.5). **Status:** OPEN.
 
@@ -1221,7 +1221,7 @@ signal contaminated by the ingestion layer. Work-identity dedup is a **prerequis
 
 ---
 
-## BUG-290 — two illegal values sit inside the retrieval facets (2026-09-19)
+## BUG-290 (MED) — two illegal values sit inside the retrieval facets (2026-09-19)
 
 **Severity:** MEDIUM. **Status:** OPEN.
 
@@ -1257,7 +1257,7 @@ re-embedding is mandatory after R1/R5 land regardless.
 
 ---
 
-## BUG-292 — `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19)
+## BUG-292 (LOW) — `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19)
 
 **Severity:** LOW (latent; hypothesis tested). **Status:** OPEN.
 
@@ -1275,7 +1275,7 @@ and run `integrity-check` at the end of stage 6.
 
 ---
 
-## BUG-293 — mega-merges up to 244 sources for a single FB (2026-09-19)
+## BUG-293 (LOW) — mega-merges up to 244 sources for a single FB (2026-09-19)
 
 **Severity:** LOW (no measurable label impact; merge-sanity risk). **Status:** OPEN.
 
@@ -1293,7 +1293,7 @@ population (all 83 sheet rows flagged untraceable have `source_diversity = 1`).
 
 ---
 
-## BUG-294 — the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19)
+## BUG-294 (MED) — the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19)
 
 **Severity:** MEDIUM (estimator validity). **Status:** OPEN.
 
@@ -1310,7 +1310,7 @@ Two different questions — *"is the stored label trustworthy across the KB?"* a
 labelled?"* — are being answered by one number. **Fix:** cross the ruler strata with `status` and report both
 frames; the scorer must never quote a single frame as if it were the answer.
 
-## BUG-295 — The ruler compares stored-label ACCURACY to a human-provenance SHARE (MEDIUM, my instrument)
+## BUG-295 — The ruler compares stored-label ACCURACY to a human-provenance SHARE (HIGH, gemma advisory overrides MEDIUM)
 
 config/eval_integrity.yaml defines the floor as: *"Minimum share of labels that must come from a
 HUMAN-authoritative source before the axis may be used as ground truth for a MODEL comparison...
@@ -1329,7 +1329,7 @@ Found by an external reviewer (temp/claude0080.md Q5); confirmed in source. Fix:
 constant-baseline lift plus coverage and abstention bounds; express the floor separately as a per-axis
 provenance share, computed from a provenance column that does not yet exist (BUG-298).
 
-## BUG-296 — F-14 pocket retarget is statistically null; the claim is withdrawn (MEDIUM, my instrument)
+## BUG-296 — F-14 pocket retarget is statistically null; the claim is withdrawn (MED, my instrument)
 
 D272g retargeted F-14 to ROLE on the strength of a pocket contrast (content_type 0.667 untraceable vs
 0.816 traceable; extraction_type 0.860 vs 0.804). Re-measured with Wilson intervals:
@@ -1344,7 +1344,7 @@ the best-measured axis, not because the pocket is clean. D272g must be restated,
 
 BUG-280 / D6 / D272g all assert that content_type influences nothing. The opposite is true — see BUG-299.
 
-## BUG-298 — No label carries human provenance; the floor gate is unsatisfiable (MEDIUM)
+## BUG-298 — No label carries human provenance; the floor gate is unsatisfiable (MED)
 
 min_human_share cannot be evaluated on any axis because there is no provenance column: the fbs table
 has primary_source (a book field) and NO content_type_source / discipline_source. The ruler key renders
@@ -2868,14 +2868,14 @@ reader takes the exact name) but they invite a human to cite a stale reference.
 - **logged**: 2026-09-23
 - **detail**: Register drift: governance/BUG326_REPAIR_SCOPING_20260921.md closed the BUG-326 repair as NOT APPLICABLE on 2026-09-21 (403 raw->canonical / 147 both-axes / 703 no-domain DO NOT REPRODUCE: 757 'non-canonical' are all the legitimate catch-all 'emerging', 0 alias-map hits, 65 mixed-axis, 0 domain-less), yet the session handoff, the task register and the gate list still carried 'BUG-326 GO' as an open owner gate - so the assistant recommended authoring a repair script for a target that cannot be re-derived. FIXED 2026-09-23 by re-reading the scoping doc and correcting the gate list (BUG-342 class: quote the generator, never carry a stale count).
 
-## BUG-381
+## BUG-381 (HIGH)
 
 - **severity**: HIGH
 - **status**: OPEN
 - **logged**: 2026-09-23
 - **detail**: Terminal-store vintage mismatch: knowledge pipeline/maxwell.db (mtime 2026-09-19T21:47) reports PASS 3299 / QUARANTINE 4696 of 7995 FBs, while the S5 t11 run of 2026-09-22 produced PASS 5023 / QUARANTINE 2972 over the same 7995 rows. The committed store therefore does NOT carry the verdicts of the run that the pipeline status reports. Source of each number quoted: pipeline/status.py (DB) vs the S5 checkpoint verdict counts (frozen manifest). Owner gate: which vintage is the committed truth - stage6 re-commit of the 2026-09-22 verdicts against the frozen pair, or accept the 09-19 vintage as the store of record.
 
-## BUG-382
+## BUG-382 (MED)
 
 - **severity**: MED
 - **status**: OPEN
@@ -3840,7 +3840,7 @@ Also recorded: config/human_instrument_locks.yaml and scripts/check_human_instru
 no heading exists in this file - a citation without an entry is the same traceability hole as BUG-428. Stands as the
 missing-rails defect id; do not reuse 430.
 
-### BUG-432 - INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the
+### BUG-432 (MED) - INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the
 owner's depth pass was coded against a 58%-stale context (260/450 context cells differ from ANCHOR-3). The judged row
 TEXT (DEFINITION/APPLICATION/MECHANISM/BOUNDARY/SOURCE EXCERPT) is identical apart from R147's DEFINITION, and the
 D282 check (depth is not determined by content_type) passes - so the labels stand, but the staleness must be declared
@@ -4122,7 +4122,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
   mismatch that did not exist (bytes `bc537701...` never equal a rendering hash). The instrument that stamps the
   rows must be the instrument that verifies them (C21) — a second implementation is a second truth.
 
-## BUG-448 - OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression)
+## BUG-448 (MED) - OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression)
 - **Severity:** MEDIUM  |  **Status:** OPEN  |  **Found:** 2026-09-25  |  **Class:** C12 / missing guard
 - **Symptom.** Nothing asserted the two axes agree, so: an off-menu token could normalise to ZERO domains with no
   exception and no log (sandbox S10: a truncation DEGRADING INTO A VALID-LOOKING ABSTENTION); an abstention
@@ -4146,7 +4146,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
   the raw reader's separator set (already done: the raw reader accepts `,` and `|`). Declaration preferred: the
   point of `anchor_workbook_fixes.yaml` is that every transformation of the owner's bytes is written down.
 
-## BUG-450 - OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance
+## BUG-450 (HIGH) - OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance
 - **Severity:** HIGH | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** R14 / provenance
 - `governance/R2_EXTRACTION_TYPE_RULER_20260923.json`: 150 `extraction_type` labels, and every one of the 728
   labels in that file has `coder: None`. The FORM axis is `owned` by ANCHOR-3 (`extraction_type_final`,
@@ -4155,7 +4155,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
 - Also: R2 stamps `menu_hash: d2fc500c8835db54...` = the LIVE render, which the frozen `closed_menu_v5.sha256`
   contradicts (`73597ee2b1bb1eb9...`). Concrete instance of the BUG-447 drift propagating into an artifact stamp.
 
-## BUG-451 - OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission
+## BUG-451 (MED) - OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission
 - **Severity:** MED | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** axis design / falsified assumption
 - Measurement on the frozen ANCHOR-3 sheet (`extraction_type_human`, 145 present / 5 declared-missing):
   the 7 known retractions (the negatives class-1 admission must reject) span **3 of the 4 FORM classes**:
@@ -4169,7 +4169,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
 - This falsifies the standing "build the FORM anchor first, then derive depth" plan. The un-anchored object is
   the CLAIM-SHAPE bit (comparative + STATED exchange rate + BOUNDARY), not FORM.
 
-## BUG-452 - OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models
+## BUG-452 (LOW) - OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models
 - **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** statistic / instrument coverage
 - `governance/F11_ANCHOR_REVIEW_20260923.csv` carries `human_form, claude_form, kimi_form, form_agree,
   form_consensus` on 108 rows. `form_agree` is RAW agreement (YES 83 / NO 25 = 76.9 %) on a 4-class axis with a
@@ -4208,7 +4208,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
 - Remaining owner act: whether to also re-render + re-freeze the composite pin under a declared `menu_version`
   (a stamp every future row carries), or to leave the composite as historical and pin the answer space only.
 
-## BUG-454 - OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer
+## BUG-454 (LOW) - OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer
 - **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 16:50 | **Class:** registry / naming collision
 - `config/flag_consumer_registry.yaml` tracks CONFIG flags (`config: ... path: ...`). The workbook column named
   `flags` is a per-row classification flag set (`DOMAIN_NO_OVERLAP` etc.). `scripts/validate_depth_domain_contract.py`
@@ -4218,7 +4218,7 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
   exist). Owner ruling owed: rename the workbook column (e.g. `row_flags`) or add a second registry section.
 - STANDING RULE: same token, two namespaces = a lookup that silently answers the wrong question.
 
-## BUG-455 - OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible
+## BUG-455 (CRITICAL) - OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible
 
 MEASURED 2026-09-25. `archive/index.yaml` records per entry: name, kind, bytes, files, dirs, modified,
 category, disposition, authority, reason - and one `body_sha256` over the INDEX itself. It records NO
@@ -4239,7 +4239,7 @@ distinct NAMES that are the audit trail (`pre_cascade_dereg`, `pre_axis_decision
 deleting the older of two identical DB backups destroys the fact that a step was a byte no-op, which is
 itself evidence. Prevention belongs at the backup layer, not the archive layer.
 
-## BUG-456 - OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names
+## BUG-456 (MED) - OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names
 
 MEASURED 2026-09-25. `archive/session_20260923/scratch/backup/s4_rolling/checkpoint.slot1..6.jsonl` are
 all 95.26 MB and all share sha256 a35ebd46bf2d217a - a 7-copy identical group (571 MB) that also matches
@@ -4365,7 +4365,7 @@ FIX: columns renamed `claim_shape_q1..q4` / `claim_shape_bit` / `claim_shape_not
 `build_claim_shape_instrument.py` and `score_claim_shape_gate.py`; `config/claim_shape_instrument.yaml` states the
 naming rule (C21) and the file carries no depth/verdict column.
 
-## BUG-462 - OPEN - the declared agreement floor (D-373) has no consumer
+## BUG-462 (CRITICAL) - OPEN - the declared agreement floor (D-373) has no consumer
 `config/agreement_floor.yaml` (Krippendorff alpha, reporting 0.667 / operative 0.800) is read by nothing:
 `grep -rl agreement_floor` -> the yaml itself and the decisions prose only. A floor nobody reads cannot gate
 anything. Remedy: the FORM ceiling panel scorer (>=2 raters, missing-cell capable) must LOAD the floor and
@@ -4388,22 +4388,22 @@ STANDING RULE: an "intersection: N" claim in config must name the artifact and c
 ## BUG-462 - OPEN - the declared agreement floor still has no consumer
 `config/agreement_floor.yaml` (reporting 0.667 / operative 0.800, D-373) is read by nothing. This pass produced the first real measurement that SHOULD be scored against it (depth intra-rater alpha 0.914 nominal / 0.896 ordinal, above the operative floor) and recorded it in `config/anchor_family.yaml`, but the scorer is still owed: `scripts/depth_pass_agreement.py` reading the floor and the two depth columns from config and exiting 1 below the operative floor. UNTIL THEN the floor is a decoration.
 
-## BUG-464 - OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open
+## BUG-464 (CRITICAL) - OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open
 `owner_answer_needed` in `governance/anchor_adjudication_workbook_20260924.csv` is a snapshot from before the owner answered: it claims `domain` is still needed for ~150 rows whose `domains_final` is filled, and it does NOT flag the cell that is actually blank (R080/depth). It is a TRUE snapshot of what the machine recommended at generation time, and a FALSE statement of what is owed today. Deriving the owed set from the data gives exactly 4 cells: `domains_final` blank (R140), `depth_final_class` blank (R070, R080, R130), plus R040's abstention-vs-depth-class contradiction.
 FIX (owed, 1 line): rename the column to `owner_answer_needed_at_generation` (the BUG-454 pattern - one token, one namespace) and re-derive the owed set from the data at read time.
 STANDING RULE: a "what is still owed" column must be RE-DERIVED from the artifact it describes, or be named as the snapshot it is. A stale owed-list does not just misinform - it asks the owner to redo work that is already done.
 
-## BUG-465 - OPEN - a blank cell carries four meanings and the contract can only see one
+## BUG-465 (CRITICAL) - OPEN - a blank cell carries four meanings and the contract can only see one
 R070/R080/R130 have `depth_final_class` blank. The owner DID answer depth for all three in the 24.09 pass (`owner_depth` = 2/3/3, carried into the workbook and identical to the 24.09 drop-in). The workbook was then superseded by the 25.09 pass, in which those three cells are blank. Nothing distinguishes: not-answered / withdrawn / declined (the workbook has an explicit token for a decline - `DEPTH_MENU_DECLINED`, used on 2 rows and NOT on these 3) / carried-forward. The contract can only report "blank", so it reports the same 3 rows every run forever, and the owner cannot clear them without inventing an answer.
 FIX (owed, owner ruling): one supersession policy, applied to all four states, so a blank in a later pass does not silently erase an earlier filled answer. R040/R140 are NOT this bug: R040 is a CONTRADICTION (`emerging` + depth class 3), R140 is a declared blank (`BLANK-AS-SUBMITTED` in `governance/anchor_adjudication_fixlog_20260925.csv`).
 STANDING RULE: a blank in a SUPERSEDING artifact is not the same fact as a blank in a primary one. Where two passes exist, the later pass must declare whether a blank means not-revisited or withdrawn - otherwise the earlier answer is destroyed by omission, not by judgement.
 
-## BUG-466 - OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule
+## BUG-466 (HIGH) - OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule
 `governance/anchor_adjudication_workbook_20260924.csv` carries 148 rows; `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` and `governance/ANCHOR4_MANIFEST_20260924.json` (`"rows": 150`) carry 150. R003 and R146 appear in NEITHER the workbook nor any cohort/exclusion declaration in the manifest, the cohort builders, or the fix config - every depth/domain rate is therefore computed over 148 while the declared cohort is 150. Nothing was deleted from disk (both ids are present in the blind sheet, the consolidated ruler and `frontier_pack_20260924/BLIND_INPUT_150.csv`), so this is an UNDECLARED cohort narrowing, not data loss.
 FIX (owed, owner declaration): state why R003/R146 are outside the adjudication population (`retracted` / `duplicate` / `out-of-scope`) and record it as a cohort exclusion with a reason, or restore them.
 STANDING RULE: any artifact whose cohort differs from the declared cohort must DECLARE the difference where the cohort is declared. A 148-row file under a 150-row manifest is a denominator that changed silently.
 
-## BUG-468 - OPEN - a digest recorded in prose for a live file that has since been written
+## BUG-468 (CRITICAL) - OPEN - a digest recorded in prose for a live file that has since been written
 `config/anchor_family.yaml` (`interim_20260924`) records the owner's complete depth drop-in as sha256 `be1a39e0...`; MEASURED 2026-09-25 it is `bc1cc956...`. The drop-in was written after that evaluation, so the record describes bytes that no longer exist - the same defect as the false existence-negative (BUG-459) and the stale register (BUG-467/BUG-464), now on a DIGEST.
 STANDING RULE: a sha256 written next to a file that anything may still write is a claim with a shelf life. Record it as `sha256_measured_at: <stamp>` beside the value, or point the record at a frozen copy under `backups/` - never a bare digest next to a live path.
 
@@ -4471,7 +4471,7 @@ Two blocks declared the same top-level key. PyYAML resolves a duplicate key by l
 `[R140]`/`[R070,R080,R130]` declaration was silently discarded. The surviving reading was the intended one, but the
 file held two answers. Declaration now lives in exactly ONE place.
 
-## BUG-475 - OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated
+## BUG-475 (CRITICAL) - OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated
 `pipeline/stage5_verify.py:560` computes `S5_LOCK_PATH` from `STAGE5_CHECKPOINT` at import. Every test that isolates
 the checkpoint must ALSO know to patch the lock, and a future test that forgets it writes into the live tree again.
 STRUCTURAL FIX (not applied: pipeline/** is production code): resolve the lock path AT CALL TIME from the same
@@ -4488,7 +4488,7 @@ constant, or take the lock path as a parameter. Until then the conftest guard is
 ## BUG-479 - FIXED (same-session) - the elicitation composed the gate bit BEFORE assigning its inputs
 - `scripts/elicit_claim_shape.py` computed `claim_shape_bit` from `r["claim_shape_q1..q3"]` and only then did `r.update(bits)`, so every bit was 0 regardless of the answers. Caught by `score_claim_shape_gate.py` in the FIRST run; the canonical instrument was NOT written (the run wrote a receipt file), so no contaminated artifact exists. Fixed by moving the composition after `r.update(bits)`; the bit on the receipt was recomputed deterministically from the stored q-columns.
 
-## BUG-480 - OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable
+## BUG-480 - OPEN (severity MED) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable
 - MEASURED (blind, non-author elicitor Qwen3.8-27B-MLX-4bit, 11 rows, identity withheld, temp 0 server-side): negatives REJECTED **7/7**, false positives **0**, candidates ADMITTED **3/4** (miss U002 Proxy Decay: q1=0). Declared rule q1&q2&q3 and the q4 variant agree exactly (3/4).
 - WHY IT FAILS THE BAR: D-395 requires 7/7 AND 4/4 to ship the gate; `score_claim_shape_gate.py` exits 1 by design. Class-1 admission therefore stays UN-GATED - the honest state.
 - MEASURED STRUCTURAL DEFECT: **q3 (boundary) is answered 1 on 11/11 rows** - it is a CONSTANT on this cohort and can contribute nothing to a gate; q4 is 10/11. The only discriminating questions are q1 (4/11) and q2 (3/11).
@@ -4514,7 +4514,7 @@ constant, or take the lock path as a parameter. Until then the conftest guard is
 - ROOT FIX (owner): either RUN the two depth passes, or amend the declaration to the panel that exists.
   Do not leave a 5-rater declaration over a 3-rater measurement.
 
-## BUG-477 - OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty
+## BUG-477 (LOW) - OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty
 - **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 18:58 | **Class:** format / declared-but-empty column
 - `governance/F11_ANCHOR_REVIEW_20260923.csv` (108 rows) carries `human_form` (103/108), `claude_form`
   (108/108), `kimi_form` (108/108), `owner_form` (**0/108**), `form_agree`, `form_consensus`.
@@ -4644,7 +4644,7 @@ count now comes from somewhere a reader can check.
 - **fix**: reach() split into _reach_closure() + _base(); readers normalised by basename; each declared edge is now COUNTED and one row per edge is reported every run. New config key meta.reach.require_edge_fires: true makes an edge that fires nothing DRIFT (never a silent pass) — the same rule the engine applies to every other declared object. MEASURED after: 79 reachable (was 66), 0 uninvoked, 1 declared edge live.
 - **guardrail**: config/reconciliation.yaml#meta.reach.require_edge_fires. A future declaration that cannot fire is RED by construction, not by someone remembering.
 
-### BUG-487 - OPEN (owner gate)
+### BUG-487 (MED) - OPEN (owner gate)
 - **status**: OPEN
 - **class**: RC-3 (self-certifying rail) / green by vacancy
 - **detail**: governance/METRICS.jsonl and governance/MUTATION_JOURNAL.jsonl DID NOT EXIST, yet "just health" reported "ok metric envelopes: 0 metric(s) carry population/denominator/ruler/code_sha" and "ok write_guard selftest". scripts/lib/measure.py#envelope_gaps() returns [] for an absent registry, so the rail is green because there is NOTHING to check: D-404/I4 had zero records and D-401/I1 had zero production writes. An empty population read as compliance.
@@ -4658,7 +4658,7 @@ count now comes from somewhere a reader can check.
 - **evidence**: scripts/verify_handoffs.py (D-403 rail), first execution, VH_RC=1.
 - **owed (owner)**: rule the identity of the three paths (same / derived / distinct). The assistant must not assert it. Once ruled, the rail compares.
 
-### BUG-484 - OPEN
+### BUG-484 (CRITICAL) - OPEN
 - **status**: OPEN
 - **detail**: governance/p0_p1_criteria.yaml declares 28 executable criteria since 2026-09-17 and scripts/drift_monitor.py evaluates every one, but NOTHING invoked the monitor: the chain was dead at its ROOT (BUG-482 one level up). Adding a caller reveals the board is RED: 3 DRIFT (P1.gate_artifact_fresh stale gate artifact; AX4.runtime_matches_gold_4axis; AX5.form_axis_traceable) + 2 WARN. A rail known red does not belong in the fail-fast invariant chain, so the caller is "just criteria", NOT "just health".
 - **owed**: repair the 3 DRIFT criteria before any of them joins the invariant chain.
@@ -5596,7 +5596,7 @@ pinned by declaration rather than by accident); a test asserts every declared ke
 
 ## 2026-09-26 — D-2648 session: the Dropbox conflicted-copy hazard + a YAML write class
 
-### BUG-500 (CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict
+### BUG-500 (CRITICAL, CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict
 MEASURED: 36 siblings `<name> (M1 max's conflicted copy YYYY-MM-DD)<ext>` in this tree; 26 held NEWER work than the
 live file, which Dropbox had REVERTED to an older blob. The D-2645/D-2646 rail work, the WIRED justfile (live: 16,485 B
 and UNPARSEABLE, recipe line 13 lost its indentation) and the 782-record config/decisions.yaml all lived in a sibling
@@ -5656,7 +5656,7 @@ did NOT contain it — a claim and an artifact disagreeing, which is the class t
 duplicate is DELETED, all three CSV read sites go through artifact_encoding.read_encoding(path, REPO), and the rule
 now carries known-answer controls that `just health` actually runs (8/8).
 
-### BUG-511 (OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text
+### BUG-511 (CRITICAL, OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text
 scripts/audit_human_verification.py:79 opens governance/s4_domain_review_sheet.csv as `cp1252`. MEASURED 2026-09-26:
 that artifact is MacRoman (2 x 0xD1); 0xD1 is an em dash in MacRoman and 'N-tilde' in cp1252, so the guess NEVER
 raises — it quietly rewrites the very text two readers then compare (D-2644 says an encoding is a declared fact).
@@ -5683,7 +5683,7 @@ ONE write (`_surgical_text` is now the single implementation of that surgery, us
 post-condition is checked on the bytes about to be written. Same class as BUG-505: a writer may not leave a document
 in a state its own reader would reject (D-2648). Now: 784 decisions, --check rc=0, reconcile rc=0.
 
-### BUG-514 (OPEN) — three readers still decide an encoding by GUESS
+### BUG-514 (CRITICAL, OPEN) — three readers still decide an encoding by GUESS
 Confirmed by the 2026-09-26 audit: scripts/normalize_owner_workbook.py carries a measured FALLBACK LIST where a
 declaration belongs, scripts/audit_human_verification.py hardcodes cp1252 for a MacRoman artifact, and
 scripts/cross_examine_anchor_axes.py opens owner sheets as utf-8-sig. None is wired into `just health`, so nothing
@@ -5779,7 +5779,7 @@ utf-8 bytes and fails LOUDLY and actionably otherwise - which is the behaviour o
 RESIDUAL (declared, not hidden): the three SHELL copies still parse .env. Unifying them needs a shell-safe home that does not
 `eval` a secret (a shell-quoting hazard worse than the duplication). OWED.
 
-### BUG-520 (DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING
+### BUG-520 (MED, DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING
 
 MEASURED by a tree-wide AST census: 28 `errors="replace"` / `errors="ignore"` read sites in scripts/ and pipeline/, and 4 more
 in tools/ - a directory the first census never looked at (a blind spot found by widening the scan roots, not by a report).
@@ -5797,7 +5797,7 @@ tested. BUG-518(c) - the .env errors="ignore" read it named as remaining OPEN - 
 CONTAINMENT: no stored object changes; the two pipeline/ sites that write back what they repaired are inside pipeline/**, which
 is will_not_touch this session (rail 4) and are declared debt, not touched. NOTHING IS COMMITTED.
 
-### BUG-521 (MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them
+### BUG-521 (CRITICAL, MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them
 
 MEASURED by a tree-wide AST census over scripts/, pipeline/ and tools/: 393 text read/write sites in 166 modules take their codec
 from locale.getpreferredencoding(False) instead of from the artifact - read_text 138, open() 178, write_text 47, Path.open 27, plus 3
@@ -5833,7 +5833,7 @@ open(path, encoding=_INPUT_ENCODING), _read_input_text(path) derives from that r
 consume the rule. AST-verified: zero `errors=` calls remain in the module. CONTAINMENT: the default input is the IMPORTED
 pipeline.pipeline_paths.STAGE5_CHECKPOINT (no new literal), and a missing input still exits 1 with a message naming the artifact.
 
-### BUG-523 (OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered the TOKEN and left the ID SPACE unclaimed: two live decision ids are already spent as fixture data
+### BUG-523 (CRITICAL, OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered the TOKEN and left the ID SPACE unclaimed: two live decision ids are already spent as fixture data
 
 MEASURED: the literal "D-2650" occurs 7 times in this repo and ALL 7 live inside the known-answer controls of
 scripts/check_revoked_references.py (lines 290-308). A SECOND fabricated id, "D-2651", is used at line 303. Neither id is declared,
@@ -5863,7 +5863,7 @@ is minted - otherwise the next mint either collides with the fixture or the fixt
 CASCADE (declared, not hidden): appending to this buglog makes governance/bug_status.json/md STALE, and both are currently HELD under an
 unresolved Dropbox conflict, so their re-derivation cannot run until that is resolved (D-2647). NOTHING IS COMMITTED.
 
-### BUG-524 (OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselves
+### BUG-524 (CRITICAL, OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselves
 
 CLASS (not an instance): six of eight audit axes had no machine; every finding that closed the gap came from the two
 with none - STORES and COLUMNS. A rail is a triple (subject, site-shape, roots); its blindness IS its boundary.
@@ -5895,7 +5895,7 @@ ORDERING CONSTRAINT (BUG-523 follow-through): both rails were written WITHOUT sp
 may be landed and wired while its governing decision is still owner-pending, but the register must SAY so
 (`decided: PENDING-OWNER`), never pre-empt the id.
 
-### BUG-525 (OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it
+### BUG-525 (CRITICAL, OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it
 
 CLASS (found by the audit the owner demanded BEFORE the implementation was committed): PyYAML does not refuse a key
 declared twice in the same mapping - it keeps the LAST one. The first declaration is therefore a fact nobody reads
@@ -5937,7 +5937,7 @@ literal -> platform default (392 sites / 156 modules); namespace -> claimed-by-s
 COLUMNS (BUG-524); and now DECLARATION AMBIGUITY (BUG-525, 6 instances, 2 in LIVE config). The mechanism that keeps
 finding them is not insight, it is widening the subject and demanding the scan receipt its own coverage.
 
-### BUG-526 (OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consulting the pin
+### BUG-526 (CRITICAL, OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consulting the pin
 
 CLASS (a rail that runs only when someone remembers to run it is not a rail during the interval in which the
 work happens). config/recalibration_pins.yaml pins 6 artifacts by sha256 (D-353) and `just health` refuses a
@@ -5982,7 +5982,7 @@ now has a write moment, from the same home, with controls that can fail.
 STANDING RULE (until `just health` is the last thing before a commit): run the gate BEFORE the work is described as
 done. The gate found two defects of this assistant's own making, both hours old, both invisible by construction.
 
-## BUG-527 (OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed
+## BUG-527 (CRITICAL, OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed
 
 MEASURED 2026-09-26, by the A/B harness built to test the `scripts/*.sh` widening recommendation. The harness
 copied the repo index to /tmp/abidx and set GIT_INDEX_FILE to point a SYNTHETIC staged set at the real rail
@@ -6049,7 +6049,7 @@ unrelated path must be TOLERATED (anti-overreach, BUG-492). Also review why the 
 may_touch at all - if it is stale, it is a standing laundering path.
 STATUS: OPEN.
 
-## BUG-529 (OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant
+## BUG-529 (HIGH, OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant
 
 MEASURED 2026-09-26:
   - .pre-commit-config.yaml (D2552/GOV-CI) declares one hook: id c11-c12-gate -> python3 scripts/pre_commit_gate.py.
@@ -6116,7 +6116,7 @@ STATUS: OPEN.
 - MEASURED AFTER: --selftest 9/9 controls fire; --staged rc=0 over 42 paths; the index was RE-COUNTED at 42
   after every probe (the control-on-the-control holds - on 2026-09-26 a 42->43 move went unobserved by hand).
 
-## BUG-532 (OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks
+## BUG-532 (MED, OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks
 - FOUND by rail 4 refusing its own plan: `governance/F11_DISC_REVIEW_*.csv` sat in may_touch while
   `governance/F11_*` sat in will_not_touch, which OUTRANKS may_touch (BUG-445) - so the entry was already DEAD
   and the contradiction was invisible in every earlier audit.
@@ -6527,7 +6527,7 @@ CARRIED, UNCHANGED: NOTHING minted (784 records, stamp 0d7a746350d62e14, receipt
 D-2655 remains the top implementation item; it was deliberately NOT started here because the remaining budget could not carry
 the full verify chain, and a half-applied registry migration is the exact hazard that forced the last revert.
 
-## BUG-545 (MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history and no receipt
+## BUG-545 (MED - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history and no receipt
 
 MEASURED (the rail list is grep -oE 'scripts/[a-z0-9_/]*[.]py' justfile | sort -u, minus git ls-files): 17 of 60 rails
 invoked by just health are absent from the index - including the newest control family AND the three libraries they all
@@ -7104,7 +7104,7 @@ WHY IT WAS INVISIBLE: the ONLY rail that could have refused those bytes was the 
 SECOND DEFECT IN THE SAME EVENT (the cause of the cause): config/reconciliation.yaml declared the workbook `mac_roman`, measured on 0xCA at offset 42564 - a byte of the FOREIGN BODY. A declaration derived from whatever bytes are on disk turns a clobber into a certified-looking artifact: the reader stops failing closed and the file is laundered. The declaration named the INPUT while the OUTPUT lives at that path. All three homes now say `utf-8`, with the reason and the measurement beside them.
 VERIFICATION: `just health` rc=0; `just health-deep --strict` rc=0; verify_handoffs rc=0 (6 paths / 13 digests / 3 revisions all agree with their bytes); the 3 formerly declared-red depth/domain tests PASS (12 passed in 0.75s); and the D-2649 encoding join was SEEN to refuse this very disagreement before it was fixed - a control proven on real data, not asserted.
 
-## BUG-559 (STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a foreign body for as long as nobody read the path
+## BUG-559 (CRITICAL, STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a foreign body for as long as nobody read the path
 
 FOUND BY: BUG-558 - `scripts/verify_handoffs.py` reported `ok anchor4_workbook: ... unchanged (574aafef64f0cff7)` WHILE the path held foreign bytes, because the receipt (stamp 2026-09-26T10:34:24Z, code_sha 96b1e9c+dirty) had been cut over them. The rail was not broken; it verified exactly what it was told. What is MISSING is a join to the certified tree.
 MECHANISM: a receipt is {digest, size, mutability, code_sha, stamp, origin} about BYTES, and nothing requires those bytes to be a revision of the repo or a declared DERIVATION from one - so receipt()/--backfill can bless whatever a process finds on disk, including a body that has never existed in any revision of that path.
@@ -8049,13 +8049,13 @@ THEREFORE the freeze window reads nothing_still_held = 2 still parked (BUG-559 a
 | BUG-595 | 2026-09-29 | **clean_markdown() never applies _CLEAN_SUBS (D2471) -> Pandoc/calibre residue survives into 41.4% of S1 chunk bodies (124,268/300,270).** The D2471 residue stripper exists ONLY in clean_evidence_passage(); the S1 path (stage0->stage1_chunk) runs clean_markdown() which strips Markdown/HTML/boilerplate but MISSES `{...}` attribute syntax, `[ ]{...}` empty links, `{#...}` heading anchors, `^n^` superscripts, `.xhtml_pN`. Measured: empty-link 69,983 segs / heading-anchor 43,358 / raw-brace 114,890. Impact: residue embedded into stage1_5 embeddings and stage2_extract input = model must see through noise; also pollutes section_heading if structural splitting is later revived. FIX: add _CLEAN_SUBS + 3 extra patterns to clean_markdown (deterministic, $0, proven-conservative), then ONE coordinated re-chunk. |
 | BUG-596 | 2026-09-29 | **probe_run.py:199 writes both `evidence_passages` (actual passages) and `evidence_passages_shown` (what the LLM saw) -> schema divergence / provenance gap.** The two can differ (truncated/re-ordered passages) and downstream consumers (golden_validate, nli_calibrate, calibrate, disagreement_sample) read only `evidence_passages`, so the SHOWN-vs-STORED provenance is unverified. FIX: join the two fields (assert shown subset-of stored, or store shown provenance) in probe_run.py + add a golden_validate check. |
 
-## BUG-594 (OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings)
+## BUG-594 (MED, OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings)
 Filed in the 2026-09-29 MUST-inbox table (full description above). D-2706 smoke A/B: the heading-first reorder
 mechanically works (coverage 6.7%->97.5%, 0 boundary violations) but is COUNTERPRODUCTIVE (58.1% segment_id churn;
 80.5% of captured headings are converter artifacts). RE-SCOPED: keep current chunker; build a heading SANITIZER
 first; re-evaluate structural splitting only after sanitization. OPEN.
 
-## BUG-595 (OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies
+## BUG-595 (HIGH, OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies
 Filed in the 2026-09-29 MUST-inbox table (full description above). FIX: add _CLEAN_SUBS + 3 extra patterns to
 clean_markdown (deterministic, $0, proven-conservative), then ONE coordinated re-chunk. OPEN.
 
@@ -8159,7 +8159,7 @@ canonical form — sha256 of the newline-joined, sorted golden_pool_ids — reco
 over golden_pool_ids and fails on any drift/tamper). Pin reproduced: b6ec66e62f7bf83e14bad2eba287736d384c5c216874f27e06421b5048bc9f18.
 Rail --selftest green (clean PASS, leak FAIL, option-C FAIL, tampered-pin FAIL); live rail rc=0 (ids_sha256 verified).
 
-## BUG-604 (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book identities)
+## BUG-604 (HIGH, OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book identities)
 
 SCOPE: pipeline/book_metadata.py parse_filename_metadata() / stage0_5_extract_metadata.py; knowledge pipeline/checkpoints/book_metadata.jsonl.
 FINDING (2026-09-30 forensic audit, D-2736): the source_book filenames from the "liber3" corpus are formatted
@@ -8711,7 +8711,7 @@ SHRINK-ONLY (a declared cell that starts agreeing makes it exit 2 and must be re
 remain OWED (a gold rewrite, owner-gated) — the blindspot is CLOSED, the debt is COUNTED.
 DEBT PAID 2026-10-03 (D-2812): scripts/apply_anchor_axis_authority.py (the missing WRITE limb) propagated the authority into every consumer: 117 cells rewritten in the two five-axis views, 30 more resolved by re-deriving ANCHOR_208_DISCIPLINE_NORMALIZED (via normalize_anchor_discipline.py) and ANCHOR_208_CONSOLIDATED (via consolidate_anchor_208.py) from the corrected views. Rail ceiling 149 -> 2. The 2 residual cells are R021 (depth authority value is the provenance sentinel 'noise_drop', NOT a depth class - refused on purpose, C12d). REPORTED-GAP (not silent): the discipline authority covers 204/208, excluding R021/R040/R080/R091 (R021 noise_drop; R040/R080/R091 owner-confirmed 'emerging'), so 8 view cells cannot be re-derived from it - the rail joins on the intersection and therefore does not compare them. REMAINING: RATIFY-2 still gated on the 46-KEEP gold split (anchor_triage_v2 + sha256 split manifest), which must be cut AFTER this propagation (it was the whole reason).
 
-## BUG-629 (OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from valid raw labels
+## BUG-629 (HIGH, OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from valid raw labels
 FINDING (RATIFY-2 S4 in-flight forensic audit, 2026-10-04; checkpoint sample 4,640/8,215 clusters): discipline=emerging is
 1,249 rows = 26.9%, UP from 21.2% at the [750] sample. Raw-label disposition: on-menu raw 23.5%, off-menu->MAPPED 49.6%,
 off-menu->EMERGING 27.0%. The classifier IS confident — 100% of emerging rows carry a VALID off-menu raw label
@@ -8724,7 +8724,7 @@ choice'), so no crash — this is a taxonomy COVERAGE gap, not a hidden failure.
 RECOMMENDED FIX (owner-gated, C12): extend config/closed_menu_v5.json + config/menu_merge_map.yaml for the design/business
 sub-discipline family (marketing, marketing science, graphic design, ...); re-measure the final rate at S4 completion.
 
-## BUG-630 (OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead of falling through to a SAME-axis home
+## BUG-630 (MED, OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead of falling through to a SAME-axis home
 SCOPE: pipeline/stage4_merge.py map_to_canonical_with_fallback (~line 546, the _opposite guard) + pipeline/schemas.py
 _build_synonym_index (forbidden_keys). READ-ONLY forensic audit; the live S4 run was NOT touched.
 FINDING: the guard correctly blocks the BUG-200/D2422 coercion class (a raw discipline equal to a CANONICAL DOMAIN,
@@ -8770,7 +8770,7 @@ re-derivation. SECONDARY: the store grew 7,995 -> 14,574 rows (rechunk-v4-202609
 still declares 7,995 — a stale declaration to refresh at the menu-v6 commit. REMAINING: re-derive the 52 and
 re-measure after the replay in BUG-630.
 
-## BUG-632 (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 are UNREACHABLE on any S4 run with >=1 failed cluster (the BUG-609 class, applied to S2 only)
+## BUG-632 (CRITICAL, OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 are UNREACHABLE on any S4 run with >=1 failed cluster (the BUG-609 class, applied to S2 only)
 
 **MEASURED** (run `rechunk-v4-20260929`, S4 complete 2026-10-04 18:22):
 - `checkpoint.jsonl` on disk = **6,587** records (verified `wc -l`).
@@ -8831,7 +8831,7 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 **META-NOTE (worth recording):** this bug was found, filed, but its own body was then LOST by a read-then-append-then-replace ordering mistake in the same session - i.e. the register's append-only convention (C6: append, never rewrite a snapshot) was violated by the very hand editing that was documenting the violation. Re-appended here. The lesson is that buglog edits must be APPEND-ONLY, one write, never read-modify-replace on the whole file.
 
 
-## BUG-635 (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropping valid applications
+## BUG-635 (HIGH, OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropping valid applications
 
 **DISCOVERED** this session by replaying `merged_cribs_classify` on the four Stage-4 failures (rechunk-v4-20260929, exit code 2). The D2371 quarantine line in the ratify log reads "Empty/short application (0 chars < 10)" for all four clusters — but that is a SECONDARY symptom, not the actual failure.
 
@@ -8850,7 +8850,7 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 **CANDIDATE REMEDIES (owner-gated, R5 review before apply).** (a) in `stage4_merge.py`, distinguish the exception type: on empty-domains `SparseClassificationError`, salvage `application` + CRIBS fields and set `domains=["emerging"]` instead of quarantining; quarantine only on genuinely short/absent application (D2371 stays fail-closed on the application field itself); (b) surface the real exception in the summary line (currently just `⚠️merged`), not only `enrichment_error`; (c) align with D-2814/BUG-630 so sparse domains fall through to a same-axis home rather than aborting the whole FB.
 
 
-## BUG-636 (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" instead starts fresh and re-runs the whole 27h stage
+## BUG-636 (CRITICAL, OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" instead starts fresh and re-runs the whole 27h stage
 
 **DISCOVERED** auditing `--resume-from 4` before retrying the four rechunk-v4-20260929 failures. `ls` showed `checkpoint.jsonl.state.json` and `.segids` ABSENT even though the run ended in exit code 2 (CONDITIONAL_SUCCESS, 4 failed).
 
@@ -8877,7 +8877,7 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 
 **REMEDY (owner-gated).** (a) after D-2818 lands, re-run `--cluster 3776,26074` delta-merge to recover the 2 FBs; (b) extend the D-2496 preflight to assert `expected == on_disk + declared + dedup` so a phantom is loud instead of silent; (c) confirm the D2424 reconstruction never marks a cluster processed whose FB is absent from the reloaded checkpoint.
 
-## BUG-638 (OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause UNCONFIRMED
+## BUG-638 (CRITICAL, OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause UNCONFIRMED
 
 **STATUS.** Root cause UNCONFIRMED — no truncate/rotate/unlink of METRICS.jsonl found in scripts/. Mitigation applied 2026-10-05: `emit_metric` reads a record-count floor (`governance/METRICS.jsonl.floor`), fails-closed if the journal shrinks below it, fsyncs the append, rewrites the floor (BUG-487 class). The 747 lost samples were RESTORED (HEAD 817 + 70 new lines re-joined → 887 lines / 6 metric names). Shrink-only floor guard is the remaining deterministic close.
 
@@ -8893,7 +8893,7 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 
 **RELATED.** The D-2825 disposition changes from "accept-as-failed" to "recovered": all 6,591 S4 FBs are now on-disk, declared_failed_count=0.
 
-## BUG-640 (IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829
+## BUG-640 (MED, IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829
 
 **RULING.** Owner ruled (D-2829): the three B&M discipline slots are renamed to discipline-scoped JEL M forms — 'business administration' / 'marketing' / 'entrepreneurship studies'. 'entrepreneurship studies' removes the string-collision with the existing domain 'entrepreneurship' (D-2500 owl:disjointWith + BUG-200 opposite-axis guard satisfied). Implementation lands with the menu v6 atomic commit (D-2814→2815→2816), gated on S4 idle.
 
@@ -8901,11 +8901,11 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 
 **STATUS.** RESOLVED: `config/taxonomy_shacl.ttl` regenerated to v5.7 — `sh:in ("v5.7")` and the canonical lists now carry 43 domains + 64 disciplines (the menu v6 bump: +business administration / +marketing / +entrepreneurship studies), matching `config/taxonomy_v5.yaml` (v5.7). The regen-after-menu-bump clause stays in force: any FUTURE taxonomy bump must regenerate the ttl atomically in the same commit (D-2828 C2). Wiring pySHACL (D-2816) remains OPEN as its own task — the stale pin that would have made that wiring reject every v5.7 FB is gone.
 
-## BUG-642 (OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts)
+## BUG-642 (CRITICAL, OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts)
 
 **STATUS.** Shrink-then-remove with consumer migration, never a delete. Consumers: get_synonym_index + apply_alias_corrections / demote_disciplines_to_domains / resolve_domains_emerging / resolve_data_absent_domains / rederive_kindsafe_domains / extend_alias_index / consolidate_anchor_ruler / remap_emerging / revote_queue_59 / build_discipline_domain_vote / review_aliases / resolve_emerging_deterministic / apply_enrichment. Must fail-closed on no-synonym mode (EL1 — no silent 'emerging' fall-through).
 
-## BUG-643 (IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830
+## BUG-643 (MED, IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830
 
 **RULING.** Owner ruled (D-2830): single abstention token = 'emerging'. `pipeline/closed_menu.py` `_ABSTENTION_VALUE` changes 'none' → 'emerging' (or the constant is retired in favor of the existing 'emerging' catch-all), reconciling closed_menu_v5.json + emerging_disciplines.yaml + the 27.2% emerging metric (BUG-629). `emerging_discipline_rate_max 0.35` stays defined on 'emerging'. Implementation lands with menu v6.
 
@@ -8938,7 +8938,7 @@ PLUS a label+definition list, plus the free-gen "DO NOT use emerging / Be PRECIS
 **FIX (D-2833, pending menu-v6 commit):** a module-scope guard in `pipeline/stage4_merged_call.py` raises
 `RuntimeError` when both flags are true (C16). Verified: flag-off import clean, both-true import trips the guard.
 
-## BUG-648 (OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization)
+## BUG-648 (MED, OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization)
 **Bloat.** `definition_anchored_block()` renders ~14,889 chars (64 disciplines + 43 domains + definitions), a
 CONSTANT byte-deterministic preamble ≈ ~5k tokens per classify call. Not a correctness defect. **D-2835 ruling:**
 amortize via a serving-layer prefix cache (the menu is a stable prefix, so it is paid once per contiguous run, and
@@ -8958,7 +8958,7 @@ covers the batch path; direct path surfaces 'emerging' in schema; abstention wor
 independence + value placement. Flag stays OFF; residual gemma findings (round 2+) are philosophy on the
 "ontologically AND pragmatically" criterion (D-2830), deferred to the full-204 A/B (D-2767).
 
-## BUG-650 (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular
+## BUG-650 (CRITICAL, PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular
 **Blindspot + Hidden failure (fail-closed gap, C16).** D-2820 froze the 204-gold domain/discipline axis as
 FROZEN-INVALID until re-derived against menu v6 (the axis was adjudicated against the PRE-D-2814 free-gen menu).
 D-2837 gates the flag flip on the full-204 A/B (D-2767: kappa >= 0.800, emerging <= 0.35) "against a RE-DERIVED
@@ -8989,7 +8989,7 @@ and DEFAULT_OUT -> d2767_ab_eval_v8_20261010.json. The full A/B re-run is now un
 it remains an ADVISORY measurement (D-2798, never fails closed) requiring OMLX (owner-owned to start) — not a
 correctness gate. d2767_ab_eval.py stays LIVE (distinct gpt-oss gate + live coarse_collapse/coarse_report consumers).
 
-## BUG-651 (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d))
+## BUG-651 (CRITICAL, PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d))
 
 The D2507/B2 cross-passage MAJORITY rule is the wrong ontology for claim verification. It requires a STRICT
 majority of clean evidence passages to entail before PASS, so a single strong entailment buried under neutral
@@ -9084,18 +9084,18 @@ The 25 bugs below lost their `## BUG-NNN` heading sections during the 2026-09-03
 Full history lives in `archive/governance_pre_tiered_2026-09-03/buglog.md`; these headings re-sync
 the canonical register to the verdict already recorded in each row's own prose (no re-adjudication).
 
-## BUG-099 (OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)
+## BUG-099 (MED, OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)
 ## BUG-148 (CLOSED, 2026-09-13) — S2 route field stale/uniform — route deprecated as ontology carrier (D2616)
-## BUG-151 (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases)
-## BUG-159 (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%)
-## BUG-160 (OPEN, 2026-08-21) — evidence-passage topical relevance not verified
+## BUG-151 (MED, OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases)
+## BUG-159 (CRITICAL, OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%)
+## BUG-160 (MED, OPEN, 2026-08-21) — evidence-passage topical relevance not verified
 ## BUG-168 (CLOSED, 2026-09-08) — dspy_trainer.py built-not-wired — ARCHIVED (D2592); re-open gate D2594
-## BUG-169 (OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton
-## BUG-182 (OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun
-## BUG-222 (OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation)
-## BUG-223 (OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs)
-## BUG-224 (OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581)
-## BUG-228 (OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references
+## BUG-169 (MED, OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton
+## BUG-182 (MED, OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun
+## BUG-222 (CRITICAL, OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation)
+## BUG-223 (MED, OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs)
+## BUG-224 (HIGH, OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581)
+## BUG-228 (LOW, OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references
 ## BUG-229 (RESOLVED, 2026-09-10) — Stale content_types.py docstring — corrected
 ## BUG-230 (RESOLVED, 2026-09-10) — growth_edge lacked a positive entry criterion — codified in content_types.yaml
 ## BUG-231 (FIXED, 2026-09-08) — Convergent extraction principle-only — item 9 clarified + rules injected (D2589)
@@ -9103,8 +9103,8 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-234 (RESOLVED, 2026-09-10) — depth_vote_checkpoint duplicate records — save_checkpoint upsert (D2610)
 ## BUG-235 (RESOLVED, 2026-09-10) — Depth fail-closed fabricated a label — abstain path (D2610)
 ## BUG-236 (RESOLVED, 2026-09-10) — Qwen3-Coder-30B unreliable depth voter — demoted to advisory (D2610)
-## BUG-237 (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611)
-## BUG-238 (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified)
+## BUG-237 (MED, OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611)
+## BUG-238 (MED, OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified)
 
 **REFEREE-AXIS SPLIT (2026-10-08, D-2871):** the ANCHOR-2 60-row sheet's content_type_verdict column was
 conflating the closed 5-role KIND axis with the DISPOSITION axis (quarantine ×8, noise_drop ×2 — which
@@ -9117,7 +9117,7 @@ This resolves the referee-side hybrid-axis conflation; the corpus-scale 341 medi
 and the calibrated/conformal disposition layer remain the OPEN remediation body below.
 
 ## BUG-241 (CLOSED, 2026-09-13) — 'Golden' set unverified silver — retired at the DATA level (D2617)
-## BUG-242 (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute
+## BUG-242 (MED, OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute
 ## BUG-243 (CLOSED, 2026-10-09) — DeepSeek-v4 empty content on open-ended adjudication (ADOPTED: local-Qwen-only; DeepSeek banned from open-ended)
 
 Root cause (two stacked defects): (1) DELEGATE-001 family — DeepSeek-v4 is a REASONING model that emits CoT into
@@ -9136,7 +9136,7 @@ CLOSE RATIONALE: the mitigation is permanently adopted (active_provider=maxwell_
 ban), so the bug cannot recur on the open-ended path. Reopening is possible only if a NEW cloud reasoning provider is
 introduced for open-ended work — a C1/C3 violation caught by the delegate-safe guard, not by this bug.
 
-## BUG-267 (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
+## BUG-267 (MED, OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
 ## BUG-658 (CLOSED, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). CLOSED 2026-10-10 (no-wedge reproduced end-to-end, D-2910): (1) gemma-4-E4B-it-MLX-4bit clean JSON success in
 0.53s under the D-2854 wall-clock deadline; (2) gpt-oss-20b-MXFP4-Q8 in the KNOWN Harmony cold-reload
 empty-content state returned a clean RuntimeError in 46-73s (deadline fired, NO hang) — proving the
@@ -9392,7 +9392,7 @@ application fields (primary=product design); row 39 replaced with 'code & comput
 - **Deterministic fix (no LLM, R5 not implicated).** Replace the token with `discipline = ''` + `discipline_abstained = true` + `discipline_status = 'abstained'` on all 11 rows, and mirror into ANCHOR_208_CONSOLIDATED + discipline_anchor_rederived_v8 (the ruler re-stamp follows via scripts/apply_owner_domain_review.py --apply).
 - **OWNER GATE.** Per row, confirm ONE of: (a) abstention accepted (discipline stays empty, flagged), or (b) name the discipline from the closed menu. Blind fill is refused: a rigid kind is not inferable from a domain list.
 
-## BUG-677 (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler)
+## BUG-677 (CRITICAL, OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler)
 
 - **Symptom.** ANCHOR-2 rows ARE anchor items R151-R210 (59/60 matched by name; the 60th, row 17, is R080, a bug-676 row with no domain cell). Comparing the two HUMAN sides: **45/60 rows disagree on domains, 31/60 on discipline.** Example R159/row 9: sheet `research practice, product design` vs ruler `research practice, user experience, digital product, product design`. Example R041/row 44: sheet `product design, user experience` vs ruler 5 domains.
 - **Root cause.** The ANCHOR-2 v8 re-mint (D-2865/D-2866, scripts/remint_anchor2_v8.py) corrects the sheet ONLY where a triage row exists (4 rows: 6, 7, 9, 39). The owner's later adjudication of the same items (D-2874, D-2875, D-2876 and the 2026-10-08 review sheet) was applied to the ruler, NOT back-propagated to the sheet. Two owner-gated authorities therefore describe one item set and are unreconciled.
@@ -9522,7 +9522,7 @@ Method & Operations; repointed discipline_macro_classify.py DEFAULT_MENU + disci
 v5 -> v8; verified the fail-closed load_macro guard covers all 10 v8 groups (0 uncovered). PART 1 (coarse-kappa
 3-way collapse output in d2767_ab_eval.py + a regression test) FIXED 2026-10-09 (commit 8895cbf): coarse_collapse()/coarse_report() + tests/test_d2767_coarse_kappa.py (4/4 pass).
 
-## BUG-680 (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual)
+## BUG-680 (MED, OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual)
 
 BUG-676's fix landed in the FROZEN RULER (`discipline: ""` for the 8 owner-confirmed abstained rows). The two
 UPSTREAM faces still carry the out-of-menu token for those rows:
@@ -10053,7 +10053,7 @@ FIX (applied, deterministic, LLM-free, C12-compliant): moved the single
 VERIFIED: `python3 pipeline/retrieve.py --fts "swappable infrastructure modularity" --limit 2 --status PASS`
 → exit 0, 2 results; `python3 -m pipeline.retrieve` unchanged.
 
-## BUG-698 (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained rows store `''` (not `emerging`) and noise_drop rows would be mis-classified by the re-derivation harness
+## BUG-698 (HIGH, OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained rows store `''` (not `emerging`) and noise_drop rows would be mis-classified by the re-derivation harness
 
 SCOPE ERROR. The prior plan framed the v8→v9 discipline re-derivation as a "7-row delta" (rows whose
 discipline was removed from the menu: computational theory / information retrieval / visual semiotics).
@@ -22644,3 +22644,102 @@ failing control asserts.
 
 **RECEIPTS.** `handoff --selftest` rc 0; `pytest -q tests/test_handoff_obligation.py` 6 passed; whole-set ladder GREEN
 (198 lines, 0 faults) under head c49f618.
+
+## BUG-1030 (MED, OPEN 2026-10-26) — the governance rail surface accreted five hidden couplings, so any consolidation is a non-atomic cascade (future tax)
+
+**Found.** 2026-10-26, during the Phase-1 governance-consolidation audit (owner word D-3159). Every rail is
+green today; this is FUTURE TAX, not a live fault: five measured couplings mean a rearrange of the rail surface
+is a multi-file transaction with no atomicity, and one edit can force a disproportionate re-render.
+
+**The five couplings (measured, not asserted).**
+1. `config/rail_registry.yaml` is the ladder's source-of-truth AND the mutation gate's subject — its
+   `guards`/`writers`/`commit_boundary` lists cross-reference one another, so a rail rename is a transaction,
+   not an edit.
+2. `scripts/owner_marks.py::build_pair_object` derives `rule_digest` as a sha256 of the pair-object parameters
+   (`config/corroboration_collapse.yaml`), so ANY edit to that config forces a `--render` that rewrites 3
+   tracked derived artifacts and re-runs the corroboration measurement over the corpus.
+3. `config/rail_mutations.yaml` references subject scripts BY PATH (`scripts/owner_marks.py` at lines 955 and
+   1082), so renaming or relocating a rail breaks the mutation gate's fixture.
+4. `scripts/lib/write_guard.py` ownership markers (`owned_keys`) are cell/row-shape-scoped, so a structural
+   rearrange of a register silently shifts which cell a writer may touch.
+5. `scripts/gov_sync.py` (D-2981) derives the four faces from the registers; a register/face rearrange must
+   preserve the derivation invariant or every face fails its re-derivation join.
+6. Rail identity is command-form-scoped, not script-scoped (measured 2026-10-26): the 58 `guards` entries are 34
+   distinct scripts, each appearing under 1-3 flag forms (base / `--selftest` / `--check` / `--brief`). The
+   ladder's `health` recipe invokes command forms and its receipt fingerprint is a function of that exact command
+   list, so "~12 invariant rails" must be a re-grouping at the script level that PRESERVES the command-form list
+   — otherwise `scripts/run_ladder.py --collect` re-certifies a new receipt and every `config/rail_mutations.yaml`
+   fixture (67 `subject:` path references) re-resolves. SCOPE RECONCILIATION OWED: the working figure "~125 rails"
+   does not reconcile with the measured registry (71 command-form entries = 58 guards + 11 writers + 2 dormant),
+   so the ~12-rail map must be grounded in the actual registry, not the prior estimate.
+
+**Remedy (owner-approved 2026-10-26, D-3159).** PHASE-1-ONLY: (a) rearrange the rail surface into ~12 invariant
+rails and (b) collapse the manifest run-records into one — both reversible and receipted at every step boundary.
+The STRIP of proven subsets (Strangler Fig) is IRREVERSIBLE and is NOT in Phase-1; it stays behind its own owner
+gate. Tracked by T-207.
+
+## BUG-1031 (MED, OPEN 2026-10-26) — the parser's CLOSE_WORDS lacks TOMBSTONED/LANDED, so slot-verdict headers keep genuinely-closed bugs OPEN
+
+**Found.** 2026-10-26, during the T-104(b) severity reconciliation (`scripts/reconcile_bug_headers.py`), which reports
+`parser_status` per UNLABELLED bug. Three ids read `open` whose LAST header carries a terminal verdict in a genuine
+slot position, but the verdict word is absent from `scripts/bug_status.py` `CLOSE_WORDS`.
+
+**The gap (measured, not asserted).** `CLOSE_WORDS = (RESOLVED, CLOSED, FIXED, INVALID, RETRACTED)`. It lacks
+`TOMBSTONED` and `LANDED`. Three headers declare these in a slot position and the parser folds them OPEN:
+1. `BUG-503` last header `## BUG-503 - TOMBSTONED 2026-09-25 - the abandoned ontology has no reachable write path`
+   (candidate-2 slot: first segment) -> `TOMBSTONED` not in CLOSE_WORDS -> open.
+2. `BUG-516` last header `### BUG-516 UPDATE (2026-09-26, sweep LANDED)` (trailing parenthetical) -> open.
+3. `BUG-520` last header `### BUG-520 (DETECTOR LANDED 2026-09-26)` (leading parenthetical) -> open.
+
+**The asymmetry (why this is NOT a one-line fix).** `TOMBSTONED` is terminal — a tombstone means the bug is dead
+(BUG-503's own body: "the abandoned ontology has no reachable write path"). `LANDED` is NOT terminal: a fix landing
+does not close a bug that stays open for verification — `BUG-773` ("the bug stays OPEN") and `BUG-731`
+("the instrument half LANDED") declare LANDED and OPEN in the SAME header. So adding LANDED to CLOSE_WORDS would
+wrongly close those.
+
+**Remedy.** (a) APPLIED 2026-10-26: `TOMBSTONED` added to `CLOSE_WORDS` with a known-answer self-test control
+(`MED - TOMBSTONED 2026-09-25` -> closed); selftest 44/44 fire. Re-derivation closed exactly BUG-503 (open 246 ->
+245, closed 549 -> 550, divergent 0); the severity ceiling shrank 98 -> 97 to keep zero headroom. (b) `LANDED`
+stays OUT of CLOSE_WORDS; the two LANDED bugs (516, 520) are closed by per-id owner judgement, not a vocabulary
+change. (c) a sweep for other terminal words (DONE/COMPLETED/MERGED) in slot position is owed and belongs to the
+T-104 scope, not this bug. Tracked separately from T-104(b): severity backfill is a claim (owner-gated); closure
+is a parser semantic (D-2642).
+### BUG-516 CLOSED (owner word 2026-10-26) — the decode rule now has ONE home and ZERO copies (sweep LANDED 2026-09-26); the NINE-copies/three-vocabularies defect is resolved
+
+### BUG-520 UPDATE (2026-10-26, owner word KEEP OPEN) - severity MED (gemma advisory)
+
+Owner word 2026-10-26: keep OPEN. LANDED is not terminal (BUG-1031); the silent-repair `errors=` debt is
+declared (20 of ceiling 20), not drained. Severity MED per the gemma-4-E4B advisory run (T-104(b)).
+
+## BUG-1032 (LOW, OPEN 2026-10-26) - classify/status_slot substring-match REOPEN_WORDS, so a heading that says "not a regression" is read as a reopened event
+
+**Found.** 2026-10-26, during T-104(b) (BUG-448 first heading rewritten). scripts/bug_status.py
+REOPEN_WORDS = (REOPEN, REGRESS, RECURRED) is matched by SUBSTRING (`w in up`), not word boundary, so the word
+"regression" contains "REGRESS" and BUG-448's heading `OPEN - ... (existence gap, not a regression)`
+classifies `reopened`.
+
+**The latent harm (measured, not asserted).** Inert today: `reopened` folds to `open`, and BUG-448 is genuinely
+open. But the same shape would silently read a genuinely-CLOSED heading that mentions "regression" (e.g.
+`FIXED - not a regression`) as `reopened` -> open, un-closing a closed bug. It fails SAFE (never wrongly closes),
+which is why it is LOW, not higher: the C16 direction that costs a look, not the one that abandons work.
+
+**Remedy (owed).** Word-boundary matching in classify/status_slot (or a NEGATED guard for "not a regression"),
+with a known-answer self-test control. Parser-semantics defect (D-2642), out of T-104(b) scope.
+
+## BUG-1032 (LOW, RESOLVED 2026-10-26) - REOPEN_WORDS matches the verb "REGRESSED", not the noun "regression"
+
+RESOLVED 2026-10-26 (parser fix, T-104(b) follow-through): REOPEN_WORDS changed "REGRESS" -> "REGRESSED"
+so the reopen signal is the past-participle VERB, never the noun "regression". A heading that says "not a
+regression" now reads OPEN (it never was a reopened event). Known-answer self-test control added:
+"MED - OPEN (not a regression)" -> open, alongside the preserved "MED - FIXED, REGRESSED 2026-09-21" ->
+reopened. Blast radius measured BEFORE the edit: only BUG-341 and BUG-448 carried "regression" in slot
+position, both OPEN and both fold to open either way - ZERO live bug changes status (245/551/796 unchanged).
+
+## BUG-1031 (MED, RESOLVED 2026-10-26) - CLOSE_WORDS covers TOMBSTONED; LANDED ruled non-terminal; the DONE/COMPLETED/MERGED sweep is CLEAN
+
+RESOLVED 2026-10-26 (all three limbs): (a) TOMBSTONED added to CLOSE_WORDS with a known-answer self-test
+control. (b) LANDED ruled non-terminal by BUG-773/731; BUG-516 CLOSED and BUG-520 kept OPEN by owner word.
+(c) the terminal-word sweep (DONE/COMPLETED/MERGED, plus DEPRECATED/SUPERSEDED/OBSOLETE/WONTFIX/ABANDONED/
+REMOVED/RETIRED/SHIPPED) over every OPEN bug's status slot is CLEAN: zero hits. The only terminal-looking
+slot word is "LANDED" on BUG-749, whose own slot also marks OPEN — and LANDED is ruled non-terminal, so no
+further CLOSE_WORDS addition is warranted.

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**244 open** / 549 closed of 793 ids.
+**243 open** / 553 closed of 796 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -11,50 +11,50 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 
 | id | title (last header) | events |
 |---|---|---|
-| BUG-099 | (OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred) | 1 |
-| BUG-151 | (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases) | 1 |
-| BUG-159 | (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%) | 1 |
-| BUG-160 | (OPEN, 2026-08-21) — evidence-passage topical relevance not verified | 1 |
-| BUG-169 | (OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton | 1 |
-| BUG-182 | (OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun | 1 |
-| BUG-222 | (OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation) | 1 |
-| BUG-223 | (OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs) | 1 |
-| BUG-224 | (OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581) | 1 |
-| BUG-228 | (OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references | 1 |
-| BUG-237 | (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611) | 1 |
-| BUG-238 | (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified) | 1 |
-| BUG-242 | (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute | 1 |
-| BUG-253 | reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure) | 1 |
-| BUG-255 | `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark | 1 |
-| BUG-257 | the niah top tier exceeded oMLX's context window, making it unmeasurable | 2 |
-| BUG-258 | model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE) | 1 |
-| BUG-259 | report tables quoted PRUNED models as if they were candidates | 1 |
-| BUG-260 | pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured) | 1 |
-| BUG-261 | safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK | 1 |
-| BUG-263 | the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record) | 3 |
-| BUG-264 | poisoned rows survive every re-run (found by drift_monitor, 2026-09-17) | 1 |
-| BUG-265 | toolcalling scored the HARNESS, not the model: native tool_calls ignored | 2 |
-| BUG-266 | gpt-oss toolcalling is truncated, not incapable | 1 |
-| BUG-267 | (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16) | 1 |
-| BUG-270 | OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH | 1 |
-| BUG-273 | the domains axis violates its own cardinality contract (2026-09-17) | 1 |
-| BUG-275 | LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17) | 1 |
-| BUG-277 | the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17) | 1 |
-| BUG-278 | stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19) | 1 |
-| BUG-279 | the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19) | 1 |
-| BUG-280 | `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19) | 1 |
-| BUG-281 | `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19) | 1 |
-| BUG-282 | the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19) | 1 |
-| BUG-287 | graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19) | 1 |
-| BUG-288 | the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19) | 1 |
-| BUG-289 | `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19) | 1 |
-| BUG-290 | two illegal values sit inside the retrieval facets (2026-09-19) | 1 |
-| BUG-292 | `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19) | 1 |
-| BUG-293 | mega-merges up to 244 sources for a single FB (2026-09-19) | 1 |
-| BUG-294 | the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19) | 1 |
-| BUG-295 | The ruler compares stored-label ACCURACY to a human-provenance SHARE (MEDIUM, my instrument) | 1 |
-| BUG-296 | F-14 pocket retarget is statistically null; the claim is withdrawn (MEDIUM, my instrument) | 1 |
-| BUG-298 | No label carries human provenance; the floor gate is unsatisfiable (MEDIUM) | 1 |
+| BUG-099 | (MED, OPEN, 2026-08-13) — Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred) | 1 |
+| BUG-151 | (MED, OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases) | 1 |
+| BUG-159 | (CRITICAL, OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%) | 1 |
+| BUG-160 | (MED, OPEN, 2026-08-21) — evidence-passage topical relevance not verified | 1 |
+| BUG-169 | (MED, OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton | 1 |
+| BUG-182 | (MED, OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun | 1 |
+| BUG-222 | (CRITICAL, OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation) | 1 |
+| BUG-223 | (MED, OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs) | 1 |
+| BUG-224 | (HIGH, OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581) | 1 |
+| BUG-228 | (LOW, OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references | 1 |
+| BUG-237 | (MED, OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611) | 1 |
+| BUG-238 | (MED, OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified) | 1 |
+| BUG-242 | (MED, OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute | 1 |
+| BUG-253 | (MED) — reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure) | 1 |
+| BUG-255 | (MED) — `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark | 1 |
+| BUG-257 | (MED) — the niah top tier exceeded oMLX's context window, making it unmeasurable | 2 |
+| BUG-258 | (HIGH) — model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE) | 1 |
+| BUG-259 | (MED) — report tables quoted PRUNED models as if they were candidates | 1 |
+| BUG-260 | (HIGH) — pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured) | 1 |
+| BUG-261 | (CRITICAL) — safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK | 1 |
+| BUG-263 | (CRITICAL) — the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record) | 3 |
+| BUG-264 | (CRITICAL) — poisoned rows survive every re-run (found by drift_monitor, 2026-09-17) | 1 |
+| BUG-265 | (HIGH) — toolcalling scored the HARNESS, not the model: native tool_calls ignored | 2 |
+| BUG-266 | (HIGH) — gpt-oss toolcalling is truncated, not incapable | 1 |
+| BUG-267 | (MED, OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16) | 1 |
+| BUG-270 | (HIGH) — OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in | 1 |
+| BUG-273 | (MED) — the domains axis violates its own cardinality contract (2026-09-17) | 1 |
+| BUG-275 | (MED) — LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17) | 1 |
+| BUG-277 | (LOW) — the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17) | 1 |
+| BUG-278 | (HIGH) — stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19) | 1 |
+| BUG-279 | (HIGH) — the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19) | 1 |
+| BUG-280 | (HIGH) — `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19) | 1 |
+| BUG-281 | (HIGH) — `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19) | 1 |
+| BUG-282 | (HIGH) — the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19) | 1 |
+| BUG-287 | (HIGH) — graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19) | 1 |
+| BUG-288 | (HIGH) — the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19) | 1 |
+| BUG-289 | (MED) — `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19) | 1 |
+| BUG-290 | (MED) — two illegal values sit inside the retrieval facets (2026-09-19) | 1 |
+| BUG-292 | (LOW) — `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19) | 1 |
+| BUG-293 | (LOW) — mega-merges up to 244 sources for a single FB (2026-09-19) | 1 |
+| BUG-294 | (MED) — the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19) | 1 |
+| BUG-295 | The ruler compares stored-label ACCURACY to a human-provenance SHARE (HIGH, gemma advisory overrides MEDIUM) | 1 |
+| BUG-296 | F-14 pocket retarget is statistically null; the claim is withdrawn (MED, my instrument) | 1 |
+| BUG-298 | No label carries human provenance; the floor gate is unsatisfiable (MED) | 1 |
 | BUG-303 | Stored extraction_type over-claims causal_mechanism; normative_heuristic 50% mislabeled (HIGH, 2026-09-19) | 1 |
 | BUG-304 | Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20) | 1 |
 | BUG-306 | Single-coder ceiling κ is contaminated: same-person + ruleset mismatch (HIGH, 2026-09-20) | 3 |
@@ -83,8 +83,8 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-367 | (MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings | 1 |
 | BUG-377 | (LOW-MED — OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled | 1 |
 | BUG-378 | (LOW-MED — OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift | 1 |
-| BUG-381 |  | 1 |
-| BUG-382 |  | 1 |
+| BUG-381 | (HIGH) | 1 |
+| BUG-382 | (MED) | 1 |
 | BUG-389 | MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) | 1 |
 | BUG-391 | (HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force | 1 |
 | BUG-395 | (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration | 2 |
@@ -104,62 +104,60 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-426 | (HIGH, OPEN - UNRESOLVED) - twice asserted "the 150's domain axis was never asked" while the owner states it WAS done. My search was | 1 |
 | BUG-427 | (LOW, OPEN) - the F-11 human instrument carries 4 trailing blank-`item_id` padding rows, so `len(rows)` is 154 while the anchor is 150 | 1 |
 | BUG-431 | ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN) | 1 |
-| BUG-432 | INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the | 3 |
+| BUG-432 | (MED) - INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the | 3 |
 | BUG-433 | a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN) | 1 |
-| BUG-448 | OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression) | 1 |
-| BUG-450 | OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance | 2 |
-| BUG-451 | OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission | 1 |
-| BUG-452 | OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models | 1 |
-| BUG-454 | OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer | 1 |
-| BUG-455 | OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible | 1 |
-| BUG-456 | OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names | 1 |
-| BUG-462 | OPEN - the declared agreement floor (D-373) has no consumer | 2 |
-| BUG-464 | OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open | 1 |
-| BUG-465 | OPEN - a blank cell carries four meanings and the contract can only see one | 2 |
-| BUG-466 | OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule | 1 |
-| BUG-468 | OPEN - a digest recorded in prose for a live file that has since been written | 1 |
-| BUG-475 | OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated | 1 |
-| BUG-477 | OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty | 1 |
+| BUG-448 | (MED) - OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression) | 1 |
+| BUG-450 | (HIGH) - OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance | 2 |
+| BUG-451 | (MED) - OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission | 1 |
+| BUG-452 | (LOW) - OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models | 1 |
+| BUG-454 | (LOW) - OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer | 1 |
+| BUG-455 | (CRITICAL) - OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible | 1 |
+| BUG-456 | (MED) - OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names | 1 |
+| BUG-462 | (CRITICAL) - OPEN - the declared agreement floor (D-373) has no consumer | 2 |
+| BUG-464 | (CRITICAL) - OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open | 1 |
+| BUG-465 | (CRITICAL) - OPEN - a blank cell carries four meanings and the contract can only see one | 2 |
+| BUG-466 | (HIGH) - OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule | 1 |
+| BUG-468 | (CRITICAL) - OPEN - a digest recorded in prose for a live file that has since been written | 1 |
+| BUG-475 | (CRITICAL) - OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated | 1 |
+| BUG-477 | (LOW) - OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty | 1 |
 | BUG-478 | OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells | 1 |
-| BUG-480 | OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable | 1 |
+| BUG-480 | OPEN (severity MED) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable | 1 |
 | BUG-482 | OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report | 1 |
-| BUG-484 | OPEN | 1 |
-| BUG-487 | OPEN (owner gate) | 3 |
-| BUG-500 | (CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict | 1 |
-| BUG-503 | OPEN - a live recipe would add 8 abandoned D2205 columns (incl. a 4th epistemic column) to the governed store | 2 |
-| BUG-511 | (OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text | 1 |
-| BUG-514 | (OPEN) — three readers still decide an encoding by GUESS | 1 |
-| BUG-516 | (OPEN, root cause of BUG-514) — the decode rule had NO home: NINE copies, three vocabularies | 2 |
-| BUG-520 | (DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING | 1 |
-| BUG-521 | (MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them | 1 |
-| BUG-523 | (OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered the TOKEN | 1 |
-| BUG-524 | (OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails | 1 |
-| BUG-525 | (OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it | 1 |
-| BUG-526 | (OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing | 1 |
-| BUG-527 | (OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed | 1 |
-| BUG-529 | (OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant | 1 |
-| BUG-532 | (OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks | 1 |
-| BUG-545 | (MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no | 1 |
-| BUG-559 | (STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a | 1 |
+| BUG-484 | (CRITICAL) - OPEN | 1 |
+| BUG-487 | (MED) - OPEN (owner gate) | 3 |
+| BUG-500 | (CRITICAL, CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict | 1 |
+| BUG-511 | (CRITICAL, OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text | 1 |
+| BUG-514 | (CRITICAL, OPEN) — three readers still decide an encoding by GUESS | 1 |
+| BUG-520 | (MED, DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING | 2 |
+| BUG-521 | (CRITICAL, MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them | 1 |
+| BUG-523 | (CRITICAL, OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered | 1 |
+| BUG-524 | (CRITICAL, OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the | 1 |
+| BUG-525 | (CRITICAL, OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could | 1 |
+| BUG-526 | (CRITICAL, OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with | 1 |
+| BUG-527 | (CRITICAL, OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed | 1 |
+| BUG-529 | (HIGH, OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant | 1 |
+| BUG-532 | (MED, OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks | 1 |
+| BUG-545 | (MED - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history | 1 |
+| BUG-559 | (CRITICAL, STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` | 1 |
 | BUG-593 | (OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED | 1 |
-| BUG-594 | (OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings) | 1 |
-| BUG-595 | (OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies | 1 |
-| BUG-604 | (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book | 1 |
-| BUG-629 | (OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from | 1 |
-| BUG-630 | (OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead | 1 |
-| BUG-632 | (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and | 1 |
-| BUG-635 | (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and | 1 |
-| BUG-636 | (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" | 1 |
-| BUG-638 | (OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause UNCONFIRMED | 1 |
-| BUG-640 | (IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829 | 1 |
-| BUG-642 | (OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts) | 1 |
-| BUG-643 | (IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830 | 1 |
-| BUG-648 | (OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization) | 1 |
-| BUG-650 | (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular | 1 |
-| BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
-| BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
-| BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
-| BUG-698 | (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained | 1 |
+| BUG-594 | (MED, OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings) | 1 |
+| BUG-595 | (HIGH, OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies | 1 |
+| BUG-604 | (HIGH, OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split | 1 |
+| BUG-629 | (HIGH, OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS | 1 |
+| BUG-630 | (MED, OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' | 1 |
+| BUG-632 | (CRITICAL, OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, | 1 |
+| BUG-635 | (HIGH, OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure | 1 |
+| BUG-636 | (CRITICAL, OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed | 1 |
+| BUG-638 | (CRITICAL, OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause | 1 |
+| BUG-640 | (MED, IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829 | 1 |
+| BUG-642 | (CRITICAL, OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts) | 1 |
+| BUG-643 | (MED, IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830 | 1 |
+| BUG-648 | (MED, OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization) | 1 |
+| BUG-650 | (CRITICAL, PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is | 1 |
+| BUG-651 | (CRITICAL, PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
+| BUG-677 | (CRITICAL, OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
+| BUG-680 | (MED, OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 | 2 |
+| BUG-698 | (HIGH, OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; | 1 |
 | BUG-700 | (HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store) | 1 |
 | BUG-701 | (HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation | 1 |
 | BUG-702 | (MED - OPEN 2026-10-10): S5 `practicality` is STORED but was not a first-class retrieval facet | 1 |
@@ -255,3 +253,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1002 | (LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and | 1 |
 | BUG-1024 | (MED - OPEN, OWNER-OWED 2026-10-26) - the oMLX Hugging Face token has NO Settings surface: two instructions named a door that does not | 1 |
 | BUG-1028 | (LOW - OPEN 2026-10-26, RE-SCOPED out of BUG-1020 limb 2) - a delegate failure is reported as the word `Other`: the harness names no cause, | 1 |
+| BUG-1030 | (MED, OPEN 2026-10-26) — the governance rail surface accreted five hidden couplings, so any consolidation is a non-atomic cascade (future | 1 |

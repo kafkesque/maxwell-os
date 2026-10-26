@@ -233,3 +233,21 @@ then re-sync gov faces with `python3 scripts/gov_sync.py --apply` and certify wi
 Every governed write above went through `scripts/lib/write_guard.py` (receipted in
 `governance/MUTATION_JOURNAL.jsonl`); the delegate runs are receipted in `governance/delegate_journal.jsonl` with the
 wall time measured from the journal's own two rows.
+
+---
+
+## 8. FINAL RECEIPT (appended AFTER the certified run, so it never claims to certify itself)
+
+- **The whole ladder was MEASURED GREEN at `b74d39a`** — the commit that carries this file, section 1 to section 7:
+  `python3 scripts/run_ladder.py --collect health` in the FOREGROUND, **194 declaring line(s), 0 fault(s), worst
+  rc=0, 563.4 s**, schema 2, `state: finished`, `head_at_start == head_at_end == b74d39a`, all four worktree readings
+  EMPTY (`modified_at_start`, `modified_at_end`, `untracked_at_start`, `minted_during_scan`), fingerprint
+  `18d1b2d71f73dc70`.
+- `python3 scripts/run_ladder.py --receipt-check` → `the whole ladder 'just health' was MEASURED GREEN under exactly
+  this 194 declaring line(s) 0.0h ago (fingerprint 18d1b2d71f73dc70, head b74d39a)`, rc 0.
+- **What moved after that receipt, named rather than implied:** THIS section, appended through
+  `scripts/lib/write_guard.py` in the commit that follows `b74d39a`. That is the T-204 residual shape the repo already
+  declares — a receipt names the bytes it ran, and an act that must FOLLOW the receipt cannot be inside it. The next
+  session's `just health` re-takes the reading (the yaml_guard memo is warm, so ~9–10 minutes rather than ~17).
+- The pre-handoff certification of the first landing (`9e2a81b`) is unchanged and is quoted in §1: 194 lines, 0
+  faults, 581.1 s, same fingerprint, empty worktree at both ends.

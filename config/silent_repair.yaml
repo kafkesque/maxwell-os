@@ -128,7 +128,7 @@ debt:
   # non-UTF-8 artifacts in this repo are all declared, and no source file is non-UTF-8), so nothing is mis-read
   # right now. It is declared debt because a repair that never fired cannot be trusted to have been tested.
   - path: scripts/audit_final_chain.py
-    lines: [43]
+    match: 'read_text(encoding="utf-8", errors="replace")'
     mode: replace
     why: reads run jsonl; a repaired byte becomes U+FFFD INSIDE a parsed row. Repoint to scripts/lib/artifact_encoding.py.
   # REMOVED 2026-10-14 (the debt was PAID in code and never shrunk here): scripts/check_config_defaults.py carried

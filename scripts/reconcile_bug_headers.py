@@ -27,9 +27,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import bug_status  # noqa: E402  (reuse its HEADER_RE / scan / classify — never re-parse)
 import gov_sync  # noqa: E402
 
-CFG = yaml.safe_load(open(ROOT / "config" / "gov_sync.yaml"))
-BS = json.load(open(ROOT / "governance" / "bug_status.json"))
-LOG = (ROOT / "governance" / "buglog.md").read_text()
+CFG = yaml.safe_load(open(ROOT / "config" / "gov_sync.yaml", encoding="utf-8"))
+BS = json.load(open(ROOT / "governance" / "bug_status.json", encoding="utf-8"))
+LOG = (ROOT / "governance" / "buglog.md").read_text(encoding="utf-8")
 LINES = LOG.splitlines()
 
 open_ids = [b["id"] for b in BS["open"]]
@@ -84,11 +84,11 @@ record = {
     "parser_status": {u: scan[u]["status"] for u in unlabelled},
 }
 (ROOT / "temp" / "t104_limb_b_reconciliation.json").write_text(
-    json.dumps(record, indent=2) + "\n"
+    json.dumps(record, indent=2) + "\n", encoding="utf-8"
 )
 # Source text for the AMBIGUOUS ids, dumped for delegated classification (gemma, WITH source).
 (ROOT / "temp" / "t104_limb_b_ambiguous_bodies.json").write_text(
-    json.dumps({u: authoritative_body(u) for u in ambiguous}, indent=2) + "\n"
+    json.dumps({u: authoritative_body(u) for u in ambiguous}, indent=2) + "\n", encoding="utf-8"
 )
 
 print(f"UNLABELLED {len(unlabelled)} of {len(open_ids)} open  (severity_grandfathered={CFG['severity_grandfathered']})")

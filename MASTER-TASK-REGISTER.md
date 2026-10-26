@@ -11,18 +11,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (245 open / 548 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (244 open / 549 closed; highest OPEN = BUG-1028) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1284 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1284, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 244 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -39,7 +39,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >

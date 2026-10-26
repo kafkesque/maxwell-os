@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (245 open / 548 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (244 open / 549 closed; highest OPEN = BUG-1028) · 58 open tasks (MUST 9 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1284 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1284, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 244 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 244 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -22102,7 +22102,7 @@ first failure tonight was a text diff handed to an IMAGE decoder). Tonight's evi
 sound and cheap while the HARNESS side has failed 4/4 attempts across two sessions - so the R5 pairing can be
 kept by hand in the meantime, and BUG-1020 stays OPEN until the harness is measured working, not routed around.
 
-## BUG-1021 (LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict, and the loss is reported only to the NEXT reader
+## BUG-1021 (LOW - CLOSED 2026-10-26) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict, and the loss is reported only to the NEXT reader
 
 **MEASURED, and not by breaking anything.** `record_open()` and `record_scan()` both write `receipt_path()`
 (`scripts/run_ladder.py:499` and `:547`), which `config/rail_registry.yaml#ladder_receipt` declares as ONE path,
@@ -22129,6 +22129,31 @@ cross-recipe rewrite is REFUSED - a rule that refuses both is not a rule (BUG-49
 **Not filed as a duplicate of BUG-1010.** BUG-1010 was that a record could not say WHICH BYTES it measured and is
 CLOSED by measurement tonight; this is that two subjects can occupy one name. Different referent, different fix,
 and the attribution work is what made it visible (the `recipe` field is now compared rather than assumed).
+
+**CLOSED 2026-10-26 by measurement, limb (b) — the writer refuses, at WRITE time, to replace a record whose
+`recipe` differs from the one it is about to write.** `write_record()` now parses the existing receipt, calls
+`cross_recipe_refusal(existing, recipe)`, and REFUSES a cross-recipe replace with `FAIL-CLOSED (C16)` naming both
+recipes before any byte is written; a same-recipe rewrite is allowed (the ledger is meant to be replaced, so a
+killed `health` run is recovered by re-running `health` — a rule that refuses both is not a rule, BUG-492). Limb
+(a) — deriving the path per recipe — was rejected as the wrong fix: two recipes sharing one declared home is the
+subject this entry registers, and a per-recipe path would hide the collision instead of refusing it, while a
+second `ladder_receipt.path` would be a value with two homes (C12). The refusal is the decision; the path stays
+ONE home, and the refusal is what keeps two subjects from occupying it.
+
+**Two-sided controls, both directions, all fire (45/45 ladder controls).** (1) `cross_recipe_refusal({"recipe":
+"health"}, "health") == ""` — a same-recipe rewrite is NOT refused. (2)
+`cross_recipe_refusal({"recipe": "health"}, "health-deep")` names BOTH `health` and `health-deep` and is non-empty,
+and the mirror (`health-deep` → `health`) is non-empty too. (3) an absent, recipe-less or non-object existing record
+(`None`, `{}`, `["not","a","dict"]`) is NOT refused — the writer must not brick the ladder over recoverable runtime
+state; the strict reader reports a corrupt record separately. The live demonstration of the companion note (T-204)
+is the same receipt layer: `--receipt-check` now reads "head c49f618, measured at c49f618, the tree now stands at
+fa913db" at rc=0.
+
+**One declared behavior change, named here rather than hidden.** An operator who runs `--collect health-deep` while
+a `health` receipt stands now gets a fail-closed refusal instead of silently destroying the whole-set verdict. That
+is intentional: the loss this entry filed was "reported to the NEXT reader and never at WRITE time", and the fix
+moves the report to the moment of the loss. The remedy is printed in the refusal (re-run the standing recipe to
+completion, or remove the record first).
 
 ## BUG-1022 (HIGH - CLOSED 2026-10-26) - pasting the Hugging Face token into `goose configure` flipped `active_provider` to the CLOUD router: a one-screen action silently moved the whole system off local inference, and NOTHING in this repository can see it
 

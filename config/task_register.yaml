@@ -2705,7 +2705,8 @@ tasks:
     offline, which is the opposite of what this OS wants.
 - id: T-204
   priority: SHOULD
-  state: open
+  state: done
+  closed: 2026-10-26
   mover: pipeline
   title: >-
     the recorded verdict names the head it MEASURED and, when they differ, the head the tree NOW stands at - as a
@@ -2725,6 +2726,10 @@ tasks:
     empty) | governance/buglog.md#BUG-1010 (MED - CLOSED 2026-10-25), the NAMED LIMIT "a commit made AFTER the
     scan" | git log: 24d2c01 (the measured code) then 6d5b4ee, f3f534f (documentation only)
   gate: >-
+    CLOSED 2026-10-26 by measurement: `receipt_verdict(current_head=...)` + `head_moved_note()` name BOTH heads when
+    they differ and add NO clause when they agree, with the rc unchanged (a NOTE, never a gate, per D-3151). Selftest
+    45/45 including two new bidirectional controls; the live `--receipt-check` reads "head c49f618, measured at
+    c49f618, the tree now stands at fa913db" at rc=0. The original gate below stands as the acceptance record:
     receipt_verdict() appends a clause to the GREEN message when the current head differs from head_at_end, naming
     BOTH ("measured at ..., the tree now stands at ..."), and it changes NOTHING about the rc. Two-sided control:
     equal heads produce NO clause (a message that always adds one is noise the eye learns to skip) and unequal

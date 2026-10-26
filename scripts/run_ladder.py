@@ -494,9 +494,61 @@ def uncommitted_note(payload: dict) -> str:
     return ("; " + ", ".join(parts)) if parts else ""
 
 
+def head_moved_note(payload: dict, current_head: str) -> str:
+    """The NOTE that the tree has moved since the scan - "" when it has not (T-204, D-3152 clause 4).
+
+    A green receipt naming `head_at_end = c49f618` is TRUE about the bytes it ran even after a
+    documentation-only commit moves the tree to `fa913db`, but a reader cannot tell from the message whether
+    "head c49f618" means "still here" or "left behind". This clause names BOTH when they differ, and says
+    NOTHING when they agree (a message that always adds it is noise the eye learns to skip). It is a NOTE,
+    never a gate: the rc is unchanged, because forcing a 17-minute rescan after every documentation commit is
+    a discipline nobody keeps (D-3151).
+    """
+    end = str(payload.get("head_at_end") or "")
+    current = str(current_head or "")
+    if not end or not current or end == current:
+        return ""
+    return ", measured at " + end + ", the tree now stands at " + current
+
+
+def cross_recipe_refusal(existing: dict | None, recipe: str) -> str:
+    """Why writing a `recipe` record may NOT replace `existing` - "" when it may (BUG-1021).
+
+    The receipt has ONE declared home (config/rail_registry.yaml#ladder_receipt.path) and the recipe it records
+    is part of its SUBJECT: `--collect health-deep` writing over a `health` verdict destroys a green whole-set
+    measurement and says nothing until the NEXT reader asks (BUG-1021). The refusal fires at WRITE time and
+    names both recipes. A same-recipe rewrite is ALLOWED - the ledger is meant to be replaced, so a killed
+    `health` run is recovered by re-running `health`; a rule that refuses both is not a rule (BUG-492). A record
+    with no readable recipe is treated as absent (the writer must not brick the ladder over recoverable runtime
+    state; the strict reader reports the corrupt record separately).
+    """
+    if not isinstance(existing, dict):
+        return ""
+    prior = str(existing.get("recipe") or "")
+    if not prior or prior == recipe:
+        return ""
+    return ("a `" + prior + "` record already stands here; refusing to replace it with a `" + recipe
+            + "` scan - re-run `--collect " + prior + "` to completion, or remove the record first")
+
+
 def write_record(payload: dict) -> pathlib.Path:
-    """Write the record crash-safely (C6): tempfile -> fsync -> os.replace, or REFUSE loudly (never a silent loss)."""
+    """Write the record crash-safely (C6): tempfile -> fsync -> os.replace, or REFUSE loudly (never a silent loss).
+
+    A cross-recipe replace is REFUSED before the write (BUG-1021): the receipt's recipe is part of its subject,
+    so a deep scan may not destroy a whole-set verdict by occupying its one home.
+    """
     path = receipt_path()
+    existing: dict | None = None
+    if path.is_file():
+        try:
+            parsed = json.loads(path.read_text(encoding="utf-8"))
+            existing = parsed if isinstance(parsed, dict) else None
+        except (OSError, ValueError):
+            existing = None  # unreadable carries no recipe to compare; the strict reader reports it separately
+    refusal = cross_recipe_refusal(existing, str(payload.get("recipe") or ""))
+    if refusal:
+        raise SystemExit("FAIL-CLOSED (C16): " + refusal + " (record home " + str(path.relative_to(REPO))
+                         + " - one home must serve one recipe, BUG-1021)")
     try:
         handle, tmp = tempfile.mkstemp(dir=str(path.parent), prefix="." + path.name + ".", suffix=".tmp")
         with os.fdopen(handle, "w", encoding="utf-8") as fh:
@@ -558,7 +610,8 @@ def recorded_scan() -> tuple[dict | None, str]:
 
 
 def receipt_verdict(payload: Any, fingerprint: str, line_count: int, *, recipe: str, now: datetime,
-                    max_age_hours: float, absent: str = "", remedy: str = "") -> tuple[int, str]:
+                    max_age_hours: float, absent: str = "", remedy: str = "",
+                    current_head: str = "") -> tuple[int, str]:
     """PURE: what a recorded full scan is evidence FOR, at THIS moment, about THIS ladder (D-2983/BUG-759).
 
     Three answers, in the tri-state the ladder already speaks (BUG-457):
@@ -616,6 +669,7 @@ def receipt_verdict(payload: Any, fingerprint: str, line_count: int, *, recipe: 
     return EXIT_CLEAN, ("the whole ladder `just " + recipe + "` was MEASURED GREEN under exactly this "
                         + str(line_count) + " declaring line(s) " + f"{age:.1f}" + "h ago (fingerprint "
                         + fingerprint + ", head " + str(payload.get("head_at_end") or "?")
+                        + head_moved_note(payload, current_head)
                         + uncommitted_note(payload) + ")")
 
 
@@ -646,7 +700,7 @@ def receipt_lines(*, strict: bool) -> tuple[int, list[str]]:
         return EXIT_OWED, ["ladder receipt: UNKNOWN - " + str(err)]
     rc, message = receipt_verdict(payload, line_set_fingerprint(recipe, lines), len(lines), recipe=recipe,
                                   now=datetime.now(UTC), max_age_hours=max_age, absent=absent,
-                                  remedy=remedy)
+                                  remedy=remedy, current_head=head_sha())
     return rc, ["ladder receipt: " + message]
 
 
@@ -965,6 +1019,33 @@ def selftest() -> int:
           "the one distinction the record has to keep: an inherited uncommitted file is state the run did not "
           "create, an appearing one is the run's own output - counting them as one number would make the note "
           "unreadable and its absence in the verdict unfalsifiable")
+    rc, message = receipt_verdict(record(), coverage, len(got), recipe="probe", now=moment, max_age_hours=72,
+                                  current_head="fa913db")
+    check("a_green_record_says_when_the_tree_MOVED_after_it",
+          rc == EXIT_CLEAN and "measured at abc1234" in message and "the tree now stands at fa913db" in message,
+          "T-204: a receipt naming head abc1234 read while the tree is at fa913db names BOTH, so a reader knows "
+          "'head abc1234' means 'measured there, since left' and never 'still here'")
+    rc, message = receipt_verdict(record(), coverage, len(got), recipe="probe", now=moment, max_age_hours=72,
+                                  current_head="abc1234")
+    check("a_green_record_at_the_CURRENT_head_adds_NO_clause",
+          rc == EXIT_CLEAN and "the tree now stands at" not in message,
+          "T-204 negative: equal heads earn no clause - a message that always names the tree moved is noise the "
+          "eye learns to skip, and the absence is what makes the clause falsifiable")
+    check("a_SAME_recipe_rewrite_is_ALLOWED", cross_recipe_refusal({"recipe": "health"}, "health") == "",
+          "BUG-1021: the ledger is meant to be replaced - a killed `health` run is recovered by re-running "
+          "`health`, so a same-recipe rewrite is not refused (a rule that refuses both is not a rule, BUG-492)")
+    deep_over_health = cross_recipe_refusal({"recipe": "health"}, "health-deep")
+    health_over_deep = cross_recipe_refusal({"recipe": "health-deep"}, "health")
+    check("a_CROSS_recipe_rewrite_is_REFUSED_naming_BOTH",
+          deep_over_health != "" and "health" in deep_over_health and "health-deep" in deep_over_health
+          and health_over_deep != "",
+          "BUG-1021: `--collect health-deep` may not destroy a `health` verdict (and vice versa) - the refusal "
+          "names both recipes and fires at WRITE time, not to the next reader")
+    check("a_first_write_and_an_unschema_record_are_NOT_refused",
+          cross_recipe_refusal(None, "health") == "" and cross_recipe_refusal({}, "health") == ""
+          and cross_recipe_refusal(["not", "a", "dict"], "health") == "",
+          "BUG-1021 negative: an absent, recipe-less or non-object existing record carries no recipe to compare, "
+          "so the writer recovers it rather than bricking the ladder over recoverable runtime state")
     check("git_OWN_overrides_are_CLEARED_before_the_worktree_is_read",
           all(name not in cleared({"GIT_DIR": "d", "GIT_WORK_TREE": "w", "GIT_INDEX_FILE": "i", "PATH": "/bin"})
               for name in GIT_OVERRIDES)

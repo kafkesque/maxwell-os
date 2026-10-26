@@ -1,0 +1,46 @@
+- id: D-3160
+  state: RATIFIED
+  category: PIPELINE / EXTRACTION RECALL
+  title: 'T-197 fix COMPOSED (owner word 2026-10-26): single insert = the bulk S2 path (option 3), window fixed once in that shared path (option 1), generator-side mechanism floor that REFUSES a short reply (option 2) — one extraction code path, anti-vacuous-pass'
+  decision: |
+    Owner word 2026-10-26 approves the COMPOSED fix for T-197 (the 14 owner-certified extraction gaps).
+    The three candidate fixes recorded in T-197's gate are NOT alternatives; they are three LAYERS of one design:
+
+      STRUCTURE  (option 3) - the single-concept insert routes through the SAME S2 generator window/prompt the
+        bulk path uses, so a single insert IS the bulk path with a population of one. ONE extraction code path,
+        ZERO copies (the BUG-516 lesson); a divergent second extraction path is the future drift bomb.
+
+      ROOT CAUSE (option 1) - the extraction window is fixed ONCE in that shared path. MEASURED (T-197 evidence):
+        a 420-char grounding excerpt cannot support a mechanism under MECHANISM_MIN_LENGTH, which is why the
+        dry-run returned status=QUARANTINE reason=vacuous. The tier-B proposer's max_window_chars is the precedent.
+        Fixing the window in the SHARED path means the bulk extraction and the single insert inherit it together.
+
+      GUARD      (option 2) - a generator-side mechanism floor REFUSES a short / no-mechanism reply rather than
+        letting it quarantine downstream at S5 (C16 fail-closed at the generator, not at the verifier). This is
+        NOT optional: D-3140 switched verify to deberta-nli entailment, which GREENED the dry-run
+        (status=PASS score=0.986 reason=entail method=deberta-nli), but NLI entailment alone cannot prove a
+        MECHANISM - so option 2 is the control that prevents turning the recall rail GREEN on knowledge retrieval
+        can never return (the vacuous-pass class, BUG-967).
+
+    RECEIPT (RED-LOOP FIRST, D-3036): the SAME named line is the receipt for both bulk and insert:
+        python3 pipeline/insert_single_concept.py --source-id <sid> --name "<concept>" --source-text-file <passage> --dry-run
+    must print status=PASS; then a real insert; then
+        python3 scripts/check_extraction_recall.py --check
+    must read concept 59/59 and expectation 433/433. A GREEN recall rail achieved by inserting QUARANTINE /
+    vacuous rows is the forbidden outcome (BUG-967) - the rail must be green because the knowledge is SERVABLE,
+    not because a quarantine row was counted.
+
+    HONEST FRAMING: this ratifies the DESIGN and the shared-path structure; it does NOT certify that any of the
+    14 concepts is inserted. The 14-insert remains the open act, and the composed design must be verified by the
+    same dry-run line before a real insert counts.
+  bugs:
+    - BUG-991
+    - BUG-967
+  tasks:
+    - T-197
+  files:
+    - pipeline/insert_single_concept.py
+    - pipeline/stage2_extract.py
+    - pipeline/stage5_verify.py
+    - config/extraction_recall.yaml
+    - governance/EXTRACTION_RECALL_REPORT.json

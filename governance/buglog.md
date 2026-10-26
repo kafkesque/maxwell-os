@@ -22309,3 +22309,26 @@ identifier interior — `re.search(rf"(?<![A-Za-z0-9_]){re.escape(token)}", gate
 directions on the same fixture: a pipeline-moved entry whose gate says "the owner must approve" is a FAULT, and a
 pipeline-moved entry whose gate mentions only `RC_OWNER_OWED` is GREEN. NAMED WRONG FIX: stripping underscores from
 the compared text, which would make `RC_OWNER_OWED` match by collapsing the very distinction that identifies it.
+### BUG-1026 INSTANCE 2 (same day, found while fixing instance 1) - a governance RECEIPT is unusable when the writer is handed a RELATIVE path, and it reports success while journalling it
+
+**MEASURED 2026-10-26.** `scripts/lib/write_guard.py#append_lines(path, lines, writer=...)` given a RELATIVE
+`Path("config/decisions.yaml")` records `"path": "config/decisions.yaml"` verbatim; every earlier record carries the
+ABSOLUTE path. `scripts/lib/handoff.py#last_governed_write` joins a record to a live file only when
+`declared == str(REPO / path)` or `declared.endswith("/" + path)` - and neither holds for a bare relative form, so the
+record is silently INVISIBLE to the very control it exists to satisfy. The writer printed its normal report, journalled
+the row, and returned a `post_sha16` that equalled the file: every local signal said SUCCESS while the governance
+reading said UNATTRIBUTED. `tests/test_handoff_obligation.py::test_the_attribution_is_joined_by_content` is the one
+test that noticed, and it went red inside a 180 s suite.
+
+**A SECOND, RELATED FACT worth having in the record.** `docguard__safe_append` (the append tool the agent is offered)
+is NOT `write_guard`: it fsyncs and refuses protected files, but it does not journal, so a governed append made with it
+is UNATTRIBUTED by construction. MEASURED: that is exactly how this instance was found - a D-3153 block appended to
+config/decisions.yaml through docguard left the file's bytes attributable to nothing, and the handoff control caught
+it. The correct route for a governed register is `write_guard.append_lines` with an ABSOLUTE path.
+
+**DECLARED FIX SHAPE.** `append_lines`/`write_document` must RESOLVE the path (`path.resolve()`) before journaling, or
+refuse a path that does not resolve inside the repo - a receipt keyed by a string form that no reader uses is a
+declaration with no referent (D-3034). TWO-SIDED CONTROL: an append given a relative path must produce a record that
+`last_governed_write` FINDS (positive), and an append whose path resolves outside the repo must be REFUSED (negative).
+NAMED WRONG FIX: teaching `last_governed_write` to accept any path SUFFIX - that would let a record about another
+repository's `config/decisions.yaml` attribute THIS one.

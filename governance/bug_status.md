@@ -257,4 +257,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1020 | (MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal | 1 |
 | BUG-1021 | (LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict, | 1 |
 | BUG-1024 | (MED - OPEN, OWNER-OWED 2026-10-26) - the oMLX Hugging Face token has NO Settings surface: two instructions named a door that does not | 1 |
-| BUG-1026 | (LOW - OPEN 2026-10-26) - a rail matched the WORD "owner" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to | 1 |
+| BUG-1026 | (LOW - OPEN 2026-10-26) - a rail matched the WORD "owner" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to | 2 |

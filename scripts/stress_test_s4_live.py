@@ -28,7 +28,7 @@ import json
 import random
 import sys
 import time
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -147,7 +147,7 @@ def main() -> int:
     # Audit fresh output against content_types.yaml
     onto = _load_ontology()
     s4_dir = pp.S4_DIR / args.run_id
-    print(f"\n🔍 === S4 CONTRACT AUDIT (metadata/properties/segments/classification) ===\n")
+    print("\n🔍 === S4 CONTRACT AUDIT (metadata/properties/segments/classification) ===\n")
     results, _ = audit_s4_dir(s4_dir, onto)
     hard_total = 0
     for ct, issues in results.items():

@@ -24,7 +24,6 @@ silently mis-scored.
 from __future__ import annotations
 
 import re
-import sys
 from pathlib import Path
 from typing import Any, Callable
 
@@ -46,7 +45,7 @@ def _load_config() -> dict[str, Any]:
     """Load config/practicality.yaml once. Raises on absence/parse failure (C16)."""
     if not _CONFIG_PATH.exists():
         raise PracticalityConfigError(
-            f"config/practicality.yaml missing — refusing to classify (C16)"
+            "config/practicality.yaml missing — refusing to classify (C16)"
         )
     try:
         cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}

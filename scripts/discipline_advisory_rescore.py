@@ -116,7 +116,7 @@ def main() -> int:
     committed_macro = [macro_map.get(p, p) for p in committed]
     macro_kappa = cohen_kappa(gold_macro, committed_macro)
 
-    print(f"committed discipline advisory re-score (D-2798, NO inference / NO re-fit)")
+    print("committed discipline advisory re-score (D-2798, NO inference / NO re-fit)")
     print(f"  N = {n}   gold distinct = {len(set(gold))}   committed distinct = {len(set(committed))}")
     print(f"  FINE-62  kappa = {fine_kappa:.4f}   raw agreement = {raw:.4f}")
     print(f"  MACRO-3  kappa = {macro_kappa:.4f}   (deterministic collapse via {MACRO_GROUPS.name})")

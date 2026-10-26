@@ -47,7 +47,6 @@ with open(_CFG_PATH_S4, encoding='utf-8') as _f:
 
 from pipeline.io_guard import load_jsonl, safe_write, safe_write_jsonl  # D2332 fail-closed + BUG-188 streaming/fail-loud writer
 from pipeline.content_types import (  # D2323: config-first enum source (C12)
-    CONTENT_TYPES,
     DEFAULT_CONTENT_TYPE,
     ROUTE_TO_CONTENT_TYPE,
     QUARANTINE_CONTENT_TYPE,  # D2616 Phase 0: BUG-148 route-deprecation (missing content_type → hold)
@@ -1812,7 +1811,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         _write_depth_checkpoint(_pre_depth, Path(_depth_file))
         print(f"\n🛑 --depth-only: depth pre-pass complete ({_depth_ok}/{len(_depth_pending)} FBs classified).")
         print(f"   Depth checkpoint: {_depth_file}")
-        print(f"   Paused BEFORE main classify loop. Resume with `python3 pipeline/stage4_merge.py`.")
+        print("   Paused BEFORE main classify loop. Resume with `python3 pipeline/stage4_merge.py`.")
         sys.exit(0)
 
     for i, cluster in enumerate(clusters, 1):
@@ -2187,7 +2186,6 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # reality (universal), bridges two disciplines (cross-domain), operates within
         # one field (domain), or is a narrow sub-technique (specialized).
         raw_depth = class_data.get("depth", "")
-        VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
         # ── BUG-075: Focused depth call (D2247) ──
         # The LONG combined classify prompt degrades depth accuracy for ALL models
         # (GPT-OSS: 62.5% short → 38% long; cross-domain 0/3 everywhere).

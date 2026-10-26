@@ -5,7 +5,6 @@ with the human verdict for each ladder — empirical answer to 'would tightening
 the ladder help?' """
 from __future__ import annotations
 import json, sys, time
-from collections import Counter
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))

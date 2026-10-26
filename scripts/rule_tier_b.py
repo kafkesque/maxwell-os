@@ -271,7 +271,6 @@ def run_interactive(cfg: dict) -> None:
 
 def selftest() -> int:
     import tempfile as _tf
-    import yaml
 
     with _tf.TemporaryDirectory() as td:
         td = Path(td)

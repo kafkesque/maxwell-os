@@ -89,7 +89,7 @@ def main() -> int:
 
     print(f"records flagged: {len(report)}")
     print(f"leading-framing stripped: {stripped}")
-    print(f"wrote: s2_passage_meta_report.jsonl, checkpoint.jsonl (in-place)")
+    print("wrote: s2_passage_meta_report.jsonl, checkpoint.jsonl (in-place)")
     return 0
 
 

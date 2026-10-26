@@ -224,7 +224,7 @@ def main() -> int:
 
     # ── Render visual ──
     out: list[str] = [
-        f"# Smoke Matrix 5×3 — Visual Examination",
+        "# Smoke Matrix 5×3 — Visual Examination",
         "",
         f"> `{s4_dir.resolve()}`  ·  run_id=`{run_id}`",
         "",

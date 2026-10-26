@@ -104,7 +104,7 @@ def main() -> int:
 
     total = len(rows)
     print(f"📊 Full-corpus label audit — {total} FBs")
-    print(f"\n🔴 AXIS LEAKS (BUG-197 class — deterministic, fixable by kind-swap):")
+    print("\n🔴 AXIS LEAKS (BUG-197 class — deterministic, fixable by kind-swap):")
     print(f"   domain label in discipline_raw:  {sum(leak_domain_in_disc_raw.values())} FBs ({len(leak_domain_in_disc_raw)} labels)")
     for l, c in leak_domain_in_disc_raw.most_common(10):
         print(f"      {c:4}  {l}")
@@ -112,7 +112,7 @@ def main() -> int:
     for l, c in leak_disc_in_domains_raw.most_common(10):
         print(f"      {c:4}  {l}")
 
-    print(f"\n🟡 RAW-LABEL VIOLATIONS:")
+    print("\n🟡 RAW-LABEL VIOLATIONS:")
     print(f"   emerging + EMPTY discipline_raw (reclass target): {emerging_empty_raw}")
     print(f"   canonical + EMPTY discipline_raw (D2378):         {canonical_empty_raw}")
     print(f"   emerging + non-empty raw (BUG-150 taxonomy gap):  {sum(emerging_nonempty_raw.values())} ({len(emerging_nonempty_raw)} labels)")
@@ -121,7 +121,7 @@ def main() -> int:
     for l, c in both_axes.most_common(10):
         print(f"      {c:4}  {l}")
 
-    print(f"\n🟣 UNKNOWN LABELS (not in taxonomy):")
+    print("\n🟣 UNKNOWN LABELS (not in taxonomy):")
     print(f"   unknown discipline: {sum(unknown_discipline.values())} FBs ({len(unknown_discipline)} labels)")
     for l, c in unknown_discipline.most_common(10):
         print(f"      {c:4}  {l}")

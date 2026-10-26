@@ -216,7 +216,7 @@ def main() -> None:
         if ds and qw and ds == qw:
             results.append((fb, "depth", ds, "p5:reliable-pair-D2619-revote"))
         else:
-            print(f"    -> ABSTAIN (no unanimous reliable pair)")
+            print("    -> ABSTAIN (no unanimous reliable pair)")
 
     print("\n=== discipline re-vote (Qwen3.8 vs recorded DeepSeek) ===")
     for r in disc_rows:
@@ -229,7 +229,7 @@ def main() -> None:
         if qw and qw == ds:
             results.append((fb, "discipline", ds, "p5:reliable-pair-D2619-revote"))
         else:
-            print(f"    -> ABSTAIN (Qwen3.8 disagrees with DeepSeek)")
+            print("    -> ABSTAIN (Qwen3.8 disagrees with DeepSeek)")
 
     if not results:
         print("\nNo unanimous re-votes — nothing to apply.")

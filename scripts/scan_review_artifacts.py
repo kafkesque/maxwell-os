@@ -15,7 +15,6 @@ from __future__ import annotations
 import csv
 import json
 import sys
-from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
 REPO = Path(__file__).resolve().parents[1]

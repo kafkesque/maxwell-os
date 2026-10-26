@@ -25,7 +25,6 @@ import argparse
 import csv
 import os
 import shutil
-import sys
 import tempfile
 import textwrap
 from pathlib import Path

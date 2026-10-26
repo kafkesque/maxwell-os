@@ -15,7 +15,7 @@ import json
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Set
+from typing import Any, Dict
 
 ROOT = Path(__file__).resolve().parent.parent
 GOV = ROOT / "governance"

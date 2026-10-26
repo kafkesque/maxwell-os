@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1283 decisions (census stamp 53b27463fb8e6d2c, 2026-10-26) · 793 bugs (245 open / 548 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1284 decisions (census stamp 41538b07331dde7e, 2026-10-26) · 793 bugs (245 open / 548 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1283 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1283, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1284 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 148 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1284, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 79 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 245 open.
 >
@@ -21757,6 +21757,25 @@ auto-fixable), which is the count the gate enforces. The modernisation/style fam
 acknowledged debt OUTSIDE the failing gate (`lint_gate.py --report` names the 2462 total) and never fail the build
 until a named decision promotes them (D-3038). Driving F from 252 to 0 is a SEPARATE tracked task (shrink the ceiling
 as it falls); this landing makes the gate ABLE TO FAIL and BOUNDED, which is the defect the filing named.
+
+**DRIVEN DOWN 2026-10-26 (F 252 → 62, ceiling shrunk to match).** The certified F-family count was driven from
+252 to 62 in one landing, all by measurement. (1) **3 latent runtime crashes** surfaced and fixed — they had sat
+invisible precisely because the gate could not fail: `pipeline/stage4_merge.py` (`VALID_DEPTHS` re-declared as a
+magic literal inside `run_stage4` AFTER an earlier reference → `UnboundLocalError` on the salvage path; removed the
+redundant shadow, now reads the import from `stage4_merged_call.py`), `pipeline/retrieval_benchmark.py`
+(`_run_self_retrieval` referenced `pool` which only existed in `main()` → `NameError`; the value is now passed in),
+`scripts/judge_calibration.py` (`main()` printed `cov`, a name local to `_write_md` → `NameError` on every full run;
+now prints `report["coverage"]`). (2) **5 hygiene fixes**: `Sequence` (missing typing import in
+`check_repo_integrity.py`), `Counter` (promoted to a module import in `stage2_extract.py`, two local imports
+removed), `NLI_MODEL_ID` (a dead `"NLI_MODEL_ID" in globals()` guard in `definition_nli_verify.py` that always
+yielded `None`; now stamps `S5_NLI_MODEL_LARGE`, the SAME value `stage5_verify.py` already writes), and two F402
+loop-variable shadows (`retrieve.py` `field`, `stage6_commit.py` `fb_id`). (3) **182 safe autofixes** (F401=99
+unused imports, F541=81 placeholder-less f-strings, F841=2) applied via `ruff --select F --fix`. The remaining
+**62 are all UNSAFE F841** (unused locals whose RHS may carry a side effect — e.g. an uncollected `future_results`,
+an unused `dedup_lock`, an un-stamped `pipeline_commit` at `stage2_extract.py:3003`). They are deliberately NOT
+`--unsafe-fixes`'d; each needs a per-item "does removing this change behaviour" review (a `pipeline_commit` assigned
+but never attached may be a real R14 stamping gap). Ceiling lowered 252 → 62 to lock the win; `--check` is GREEN at
+62 <= 62, and any NEW unused name now fires the gate.
 
 ## BUG-1016 (MED - FIXED 2026-10-25) - the architecture ORACLE outlived its ENGINE: a cache keyed on nothing but TIME answered for a build that had already been replaced
 

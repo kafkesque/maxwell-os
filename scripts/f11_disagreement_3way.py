@@ -24,7 +24,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import yaml  # noqa: E402
-from f11_llm_coder import _canon, _kappa  # noqa: E402
+from f11_llm_coder import _canon  # noqa: E402
 from pipeline.io_guard import safe_write  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent

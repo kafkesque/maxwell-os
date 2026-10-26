@@ -42,7 +42,6 @@ import csv
 from lib import artifact_encoding  # noqa: E402 - the ONE home for reading a declared encoding (D-2644)
 import json
 import sys
-from collections import OrderedDict
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -275,7 +274,7 @@ def report(floor: dict[str, Any], panel: dict[str, Any], units: list[dict[str, A
     print(f"  raters        : {', '.join(panel['rater_columns'])}")
     if rated:
         print("  raters rated  : " + ", ".join(f"{r}={rated.get(r, 0)}" for r in panel["rater_columns"]))
-    print(f"  excluded      : " + "; ".join(f"{k}={v}" for k, v in meta['excluded'].items() if v))
+    print("  excluded      : " + "; ".join(f"{k}={v}" for k, v in meta['excluded'].items() if v))
     print(f"  alpha nominal : {nominal['alpha']:.4f}   (Do {nominal['Do']:.4f} / De {nominal['De']:.4f}, n={nominal['n']:.0f})")
     print(f"  alpha ordinal : {ordinal['alpha']:.4f}   (Do {ordinal['Do']:.4f} / De {ordinal['De']:.4f})")
     print(f"  floor         : reporting {reporting} / operative {operative}  ({floor.get('statistic')})")

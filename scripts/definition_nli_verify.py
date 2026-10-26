@@ -32,9 +32,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
@@ -44,7 +42,7 @@ import yaml  # noqa: E402
 
 from pipeline.closed_menu import live_menu_path, menu_hash, render_closed_menu  # noqa: E402
 from pipeline.io_guard import safe_write  # noqa: E402
-from pipeline.pipeline_paths import S5_NLI_MAX_PREMISE_CHARS, STAGE5_CHECKPOINT  # noqa: E402
+from pipeline.pipeline_paths import S5_NLI_MAX_PREMISE_CHARS, S5_NLI_MODEL_LARGE, STAGE5_CHECKPOINT  # noqa: E402
 
 _R5_REPAIR_PATH = _ROOT / "config" / "r5_slot_repair.yaml"
 _DEFAULT_OUT = _ROOT / "governance" / "r2_definition_nli_20260920.json"
@@ -271,7 +269,7 @@ def _provenance(path: Path, menu: dict, rows_scored: int, rows_with_coder: int) 
         "answer_space_sha256": _digest(groups, "answer_space_hash"),
         "closed_menu_sha256_pin": composite.read_text(encoding="utf-8").strip() if composite.exists() else None,
         "menu_hash_rendered": menu_hash(menu),
-        "nli_model": NLI_MODEL_ID if "NLI_MODEL_ID" in globals() else None,
+        "nli_model": S5_NLI_MODEL_LARGE,
         "r5_hash": _r5_hash(),
     }
 

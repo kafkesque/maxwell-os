@@ -201,8 +201,8 @@ def probes_from(admission: dict[str, Any], error: type[Exception] = ValueError,
     block = (admission or {}).get("container_integrity")
     if not isinstance(block, dict):
         raise error(
-            f"FATAL: container_integrity is not declared beside the admission policy — which probe reads which "
-            f"container kind is a declared fact, never an inference (C12)"
+            "FATAL: container_integrity is not declared beside the admission policy — which probe reads which "
+            "container kind is a declared fact, never an inference (C12)"
         )
     declared = block.get("probes")
     if not isinstance(declared, dict) or not declared:

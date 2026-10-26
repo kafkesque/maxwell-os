@@ -256,11 +256,11 @@ def main(argv: list[str]) -> int:
         lock_ctx = RepoLock(lock)
         lock_ctx.__enter__()
     except LockHeld as exc:
-        print(f"FATAL: another fetch holds this repo - refusing to overlap (T-141/D-3015, BUG-814).")
+        print("FATAL: another fetch holds this repo - refusing to overlap (T-141/D-3015, BUG-814).")
         print(f"       lock:   {exc.path}")
         print(f"       holder: {exc.holder}")
-        print(f"       Two overlapping attempts at one repo leave unassemblable fragments; wait for it, "
-              f"or kill it, and try again.")
+        print("       Two overlapping attempts at one repo leave unassemblable fragments; wait for it, "
+              "or kill it, and try again.")
         return FATAL
 
     code = FATAL

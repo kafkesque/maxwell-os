@@ -44,7 +44,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import certifi
 import yaml
@@ -406,7 +406,7 @@ def report() -> None:
     recs = list(_load_checkpoint().values())
     agreed = sum(1 for r in recs if r.get("agreed"))
     print(f"total voted: {len(recs)} | agreed: {agreed} | abstain: {len(recs) - agreed}")
-    print(f"discipline distribution (agreed):",
+    print("discipline distribution (agreed):",
           dict(Counter(r["discipline"] for r in recs if r.get("discipline"))))
     disc_agree = sum(1 for r in recs if r.get("discipline_agreed"))
     dom_agree = sum(1 for r in recs if r.get("domains_agreed"))

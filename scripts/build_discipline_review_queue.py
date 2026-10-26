@@ -142,7 +142,7 @@ def write_md(artifact: dict) -> str:
     lines.append(f"- Total rows in queue: **{artifact['counts']['total_unreviewed']}**")
     lines.append(f"- Silver (`anchor_adjudication`): {artifact['counts']['anchor_adjudication_silver']}")
     lines.append(f"- Whitespace-fixed: {artifact['counts']['whitespace_fixed']}")
-    lines.append(f"- Already owner-finalized (NOT re-listed): **9**")
+    lines.append("- Already owner-finalized (NOT re-listed): **9**")
     lines.append(f"- Human target ≈ 150 → ~**{artifact['counts']['still_needed_approx']}** more verdicts")
     lines.append(f"- Distinct disciplines: {artifact['counts']['distinct_disciplines']}")
     lines.append("")

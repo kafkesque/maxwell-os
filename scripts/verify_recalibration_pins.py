@@ -46,7 +46,6 @@ import argparse
 import hashlib
 import pathlib
 import re
-import subprocess
 import sys
 import tempfile
 

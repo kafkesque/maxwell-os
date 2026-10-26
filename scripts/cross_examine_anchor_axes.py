@@ -481,7 +481,7 @@ def render_review(stats: dict[str, Any], dispute: list[dict[str, Any]], th: dict
                     "the recommendation this repo can defend. Advisory only: your `*_final` values are written by you,",
                     "in the workbooks CSV (`governance/anchor_adjudication_workbook_20260924.csv`), whose owner",
                     "columns are EMPTY and must stay empty until you type in them.", "",
-                    f"`machine_recommendation` legend: `domain=<label> as PRIMARY` = a coder plurality exists, confirm",
+                    "`machine_recommendation` legend: `domain=<label> as PRIMARY` = a coder plurality exists, confirm",
                     f"or replace | `domain=OWNER_ONLY` = no label reaches share {th['majority_min_share']}, yours to name |",
                     "`depth=KEEP` = coders agree with you, nothing to do | `depth=CHECK_OWNER_FIRST` = coders agree with",
                     "EACH OTHER against you, so it is a clean signal about the cell or the rubric | `depth=OWNER_RULING_NEAR`",
@@ -493,7 +493,7 @@ def render_review(stats: dict[str, Any], dispute: list[dict[str, Any]], th: dict
         for r in rows:
             rec, why, need = recommend_row(r, th)
             L.append(f"### {r['item_id']} - {r['name'][:90] or '(no name)'}")
-            L.append(f"- **coders** - " + " | ".join(
+            L.append("- **coders** - " + " | ".join(
                 f"{c}: d={(r['coders'].get(c) or {}).get('depth') if not (r['coders'].get(c) or {}).get('depth_declined') else 'none_fits'}"
                 f" / {'|'.join((r['coders'].get(c) or {}).get('domains') or []) or '-'}" for c in coders))
             L.append(f"- **owner depth** {r['owner_depth'] or '-'} (conf {r['owner_conf_depth'] or '-'}) | "
@@ -706,7 +706,7 @@ def main() -> int:
         dom = sum(1 for r in stats["per_row"] if (r["coders"].get(c) or {}).get("domains"))
         dep = sum(1 for r in stats["per_row"] if (r["coders"].get(c) or {}).get("depth"))
         print(f"  per coder {c}: domains {dom}/150, depth {dep}/150")
-    print(f"depth vs owner: " + ", ".join(f"{c}={stats['depth_vs_gold'].get(c,{}).get('exact',0)}exact/"
+    print("depth vs owner: " + ", ".join(f"{c}={stats['depth_vs_gold'].get(c,{}).get('exact',0)}exact/"
                                           f"{sum(stats['depth_vs_gold'].get(c,{}).get(k,0) for k in ('exact','within1','far'))}n"
                                           for c in stats["coder_ids"] if c in stats["depth_vs_gold"]))
     print(f"disputes: HARD={hard} of {len(stats['per_row'])} rows")

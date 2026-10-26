@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import html as html_module
 import re
-import urllib.parse
 from dataclasses import dataclass
 from typing import Any, Callable
 

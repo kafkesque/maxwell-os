@@ -354,7 +354,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
         out.append(f"> | {e['id']} | {e['state']} | {str(e.get('category',''))[:26]} | {str(e.get('title',''))[:100]} |")
     out += _hidden_rows(d, lim, len(decs))
     out += [">",
-            f"> **Open bugs, most severe first:** " +
+            "> **Open bugs, most severe first:** " +
             " · ".join(_cell(d, _sev_of(b), b["id"]) for b in _severe(x)[:lim]) + ".",
             IDX_E]
     return "\n".join(out)

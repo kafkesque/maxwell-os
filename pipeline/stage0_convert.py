@@ -865,7 +865,7 @@ def run_stage0(
 
         if outcome.get("skip"):
             skipped += 1
-            print(f"→ ⏭️ SKIPPED (image-heavy scan)")
+            print("→ ⏭️ SKIPPED (image-heavy scan)")
             print(S0_SKIP_IMAGE_HEAVY)  # the applier reads this token to record `skipped`, never `failed`
             continue
 

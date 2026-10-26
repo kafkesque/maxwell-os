@@ -23,7 +23,6 @@ import random
 import statistics
 import sys
 import time
-from collections import Counter
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

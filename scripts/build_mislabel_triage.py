@@ -122,7 +122,7 @@ def _build_md(triage: list[dict], top: int = _TOP_N) -> str:
         "(agreement ≤ 0.3) AND the T-NLI entailment audit (contradiction-dominant). "
         "Ranked by T-NLI contradiction gap (contra − entail), desc.",
         "",
-        f"| # | fb_id | knn min agree | nli contra gap | knn axes | nli axes |",
+        "| # | fb_id | knn min agree | nli contra gap | knn axes | nli axes |",
         "|---|-------|--------------:|---------------:|----------|----------|",
     ]
     for i, r in enumerate(triage[:top], 1):

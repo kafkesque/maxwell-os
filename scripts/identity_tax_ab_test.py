@@ -25,9 +25,7 @@ import argparse
 import hashlib
 import json
 import os
-import shutil
 import sqlite3
-import tempfile
 import sys
 from typing import Any
 
@@ -300,7 +298,7 @@ def main() -> int:
     for col, slot in sorted(base["per_column"].items()):
         print(f"  {col:22s} edges={slot['edges']:6d} dangling={slot['dangling']}")
     print("=" * 72)
-    print(f"FM-1/FM-2 rename probe on the highest-degree marked object:")
+    print("FM-1/FM-2 rename probe on the highest-degree marked object:")
     print(f"  {probe['old_name']!r} -> {probe['new_name']!r}")
     print(f"  fb_id {probe['old_id'][:16]} -> {probe['new_id'][:16]}  changed={probe['id_changed']} "
           f"collides={probe['id_collides']}")

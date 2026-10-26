@@ -281,7 +281,7 @@ def main() -> int:
           f"blank_lines_skipped={ruler_stats.get('blank_lines', 0)}")
     for tag, labels in coder_labels.items():
         print(f"coder        : {tag:<8} rows={len(labels)}")
-    print(f"menu         : " + ", ".join(f"{a}={len(ordered[a])}" for a in AXES))
+    print("menu         : " + ", ".join(f"{a}={len(ordered[a])}" for a in AXES))
 
     # --- anchor scope: the first n_anchor non-blank ruler rows, in sheet order
     anchor_ids = [r["item_id"] for r in ruler][:n_anchor]
@@ -431,7 +431,6 @@ def main() -> int:
         print("\nDRY RUN — nothing written. Re-run with --apply.")
         return 0
 
-    import hashlib
 
     input_hashes = {
         "ruler_sheet": ruler_path,

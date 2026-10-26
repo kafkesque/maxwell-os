@@ -54,7 +54,6 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -1420,7 +1419,7 @@ def main(argv: list[str]) -> int:
     write_census(census)
     print(f"✅ census written: {CENSUS_JSON.relative_to(ROOT).as_posix()} — {total} decisions, "
           f"stamp {digest}, source_sha256 {census['source_sha256'][:16]}")
-    print(f"   (registry untouched: records-only and byte-identical, so its prefix receipt still holds)")
+    print("   (registry untouched: records-only and byte-identical, so its prefix receipt still holds)")
     return 0
 
 

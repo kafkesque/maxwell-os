@@ -60,7 +60,6 @@ for p in (str(REPO), str(SCRIPTS)):
 # band, per_class_metrics. run_inference is the flag-OFF arm (baseline only).
 from discipline_conformance_gate import (  # noqa: E402
     OPERATIVE_FLOOR,
-    REPORTING_FLOOR,
     band,
     cohen_kappa,
     load_anchor,
@@ -491,7 +490,7 @@ def main() -> int:
     print(f"  N = {n}   model = {model}")
     print(f"  gold distinct disciplines = {len(set(gold))}")
     print(f"  gates: kappa >= {kappa_floor}  AND  emerging <= {emerging_max}")
-    print(f"  ARM = flag-ON (definition-anchored closed menu) — the D-2839 gate arm")
+    print("  ARM = flag-ON (definition-anchored closed menu) — the D-2839 gate arm")
     print(f"  wall-clock deadline: {deadline_sec}s/call   preflight smoke: {preflight_deadline}s (BUG-658)")
 
     # Fail-closed preflight (BUG-658): prove the model is loaded + JSON parseable
@@ -504,13 +503,13 @@ def main() -> int:
     coarse = coarse_report(gold, pred, coarse_floor)
     rows = _build_rows(examples, gold, pred)
 
-    print(f"\n[flag-ON definition-anchored]")
+    print("\n[flag-ON definition-anchored]")
     print(f"  raw agreement (accuracy): {result['raw_agreement']:.4f}   (reported, NOT gated)")
     print(f"  Cohen's kappa:            {result['cohen_kappa']:.4f}   -> {band(result['cohen_kappa'])}")
     print(f"  emerging rate:            {result['emerging_rate']:.4f}   (gold emerging rows: {sum(1 for g in gold if g == 'emerging')}/{n})")
     print(f"  VERDICT (advisory): kappa_pass={result['kappa_pass']}  emerging_pass={result['emerging_pass']}")
 
-    print(f"\n[coarse 3-way macro C+B gate (BUG-690 part 1)]")
+    print("\n[coarse 3-way macro C+B gate (BUG-690 part 1)]")
     print(f"  coarse kappa: {coarse['coarse_kappa']:.4f}   (floor {coarse_floor}; D-2796 human ceiling 0.766)")
     print(f"  coarse VERDICT: coarse_pass={coarse['coarse_pass']}")
     cb_pass = bool(result["emerging_pass"] and coarse["coarse_pass"])
@@ -549,7 +548,7 @@ def main() -> int:
         base_pred = run_inference(examples, model, 4)
         base = _report(gold, base_pred, kappa_floor, emerging_max)
         payload["baseline_flag_off"] = base
-        print(f"\n[flag-OFF cribs baseline — reference only]")
+        print("\n[flag-OFF cribs baseline — reference only]")
         print(f"  raw agreement: {base['raw_agreement']:.4f}   kappa: {base['cohen_kappa']:.4f}   emerging: {base['emerging_rate']:.4f}")
 
     payload["generated_at"] = datetime.now(timezone.utc).isoformat()

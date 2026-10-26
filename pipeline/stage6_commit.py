@@ -390,10 +390,10 @@ def _backfill_discipline_macro(conn: sqlite3.Connection) -> int:
         "WHERE pipeline_run_id = ? AND (discipline_macro IS NULL OR discipline_macro = '')",
         (CANONICAL_RUN,),
     ).fetchall()
-    for fb_id, discipline in rows:
+    for _fb_id, discipline in rows:
         conn.execute(
             "UPDATE fbs SET discipline_macro = ? WHERE fb_id = ?",
-            (macro_for(discipline), fb_id),
+            (macro_for(discipline), _fb_id),
         )
     return len(rows)
 

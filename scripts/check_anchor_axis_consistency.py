@@ -235,7 +235,7 @@ def main() -> int:
             print(f"    consumer_file: {row['consumer_file']}")
             print(f"    authority_value: {row['authority_value']!r}")
             print(f"    consumer_value: {row['consumer_value']!r}")
-            print(f"    why: OWED - propagate the authority value into this derived artifact")
+            print("    why: OWED - propagate the authority value into this derived artifact")
         print(f"# total drifting cells: {len(diffs)}")
         return 0
 

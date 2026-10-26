@@ -25,7 +25,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 # Ensure project root is on path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -395,7 +394,7 @@ def main() -> None:
         
         # Summary
         print(f"\n{'='*60}")
-        print(f"✅ PROBE COMPLETE")
+        print("✅ PROBE COMPLETE")
         print(f"   S2 FBs extracted: {len(fbs_s2)}")
         print(f"   S4 FBs classified: {len(fbs_s4)}")
         print(f"   S5 FBs verified: {len(fbs_s5)}")

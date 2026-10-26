@@ -42,7 +42,7 @@ sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from pipeline.io_guard import safe_write_jsonl  # D2496: C6 crash-safe JSONL
 
-from audit_content_type_contract import audit_s2, audit_s4, _load_ontology  # noqa: E402
+from audit_content_type_contract import audit_s2, _load_ontology  # noqa: E402
 
 SINGLETON = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "singleton_fbs.jsonl"
 DEDUP = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"

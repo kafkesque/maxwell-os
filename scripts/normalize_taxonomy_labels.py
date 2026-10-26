@@ -162,7 +162,7 @@ def main() -> int:
     conn.close()
     print(f"  ✅ [{mode}] {len(updates)} FBs re-derived "
           f"(domains decomposed: {dom_decomposed}, disciplines re-resolved: {disc_resolved}, NFKC edits: {nfkc_edits})")
-    print(f"  ✅ taxonomy_counts reconciled + recounted")
+    print("  ✅ taxonomy_counts reconciled + recounted")
     return 0
 
 

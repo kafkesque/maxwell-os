@@ -39,7 +39,6 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -55,7 +54,6 @@ from discipline_conformance_gate import (  # noqa: E402
     REPORTING_FLOOR,
     cohen_kappa,
     load_anchor,
-    per_class_metrics,
 )
 
 # C20: named constants (no magic numbers).

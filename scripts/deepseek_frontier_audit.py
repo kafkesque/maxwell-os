@@ -44,7 +44,6 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from pipeline.json_fixer import parse_json_robust  # noqa: E402
 
 OBJECTS = ROOT / "governance" / "frontier_qwen38_69_objects.json"
 GOLDEN = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
@@ -106,7 +105,6 @@ def _entry_line(canonical: str, meta: dict[str, Any]) -> str:
 
 
 def _embed_definitions(texts: list[str]) -> "Any":
-    import numpy as np  # noqa: E402
     from pipeline.embeddings import embed_texts_bge_m3  # noqa: E402
     return embed_texts_bge_m3(texts)
 
@@ -301,7 +299,6 @@ def main() -> int:
         file=sys.stderr,
     )
 
-    import numpy as np  # noqa: E402
     eids = sorted(objs)
     defns = [objs[e]["definition"] or objs[e].get("existing_discipline", "") or " " for e in eids]
     try:

@@ -80,7 +80,7 @@ def main() -> int:
             r["outcome_metric"] = ""
             filled_outcome += 1
 
-    print(f"📊 post-hoc fixes applied:")
+    print("📊 post-hoc fixes applied:")
     print(f"   elaboration blanked (non-principle): {blanked_elab}")
     print(f"   outcome_metric filled ('' on PI):     {filled_outcome}")
     print(f"   total records touched: {len({id(r) for r in recs if True})} / {len(recs)} loaded")

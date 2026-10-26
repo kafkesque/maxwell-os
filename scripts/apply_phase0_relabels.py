@@ -172,7 +172,7 @@ def main(argv: list[str]) -> int:
     targets = _load_targets()
     changes, skipped_missing, skipped_already = _plan(targets)
 
-    print(f"🧭 Phase 0 relabel (D2616) — vote-confirmed non-principle demotion")
+    print("🧭 Phase 0 relabel (D2616) — vote-confirmed non-principle demotion")
     print(f"   checkpoint targets (non-principle, unanimous): {len(targets)}")
     print(f"   → to apply (content_type/depth change):          {len(changes)}")
     print(f"   → skipped (missing from DB):                     {skipped_missing}")

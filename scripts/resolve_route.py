@@ -508,8 +508,8 @@ def census_report() -> str:
     verbs = sum(1 for p in files if arg.search(artifact_encoding.open_artifact(p, REPO).read()))
     lines = [f"census: {len(files)} python file(s) | {len(unnamed)} named by NO declared home | "
              f"{verbs} declare a check verb",
-             f"join: a file counts as NAMED when its BASENAME appears in the corpus - COARSE by declaration: "
-             f"a mention in prose counts, so the unnamed count is a LOWER bound",
+             "join: a file counts as NAMED when its BASENAME appears in the corpus - COARSE by declaration: "
+             "a mention in prose counts, so the unnamed count is a LOWER bound",
              f"declared homes: justfile + config/*.yaml|json + governance/**/*.md + the four faces "
              f"({len(corpus)} file(s), {len(blob)} bytes)",
              f"fingerprint {hashlib.sha256(blob.encode()).hexdigest()[:16]}"]

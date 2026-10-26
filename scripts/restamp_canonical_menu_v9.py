@@ -223,7 +223,7 @@ def main(argv: list[str]) -> int:
         ).fetchone()[0]
         if remaining != 0:
             raise RuntimeError(f"post-write: {remaining} stale rows remain (atomic txn should have prevented this)")
-        print(f"  post-write: 0 stale rows remain; canonical run now v9-stamped.")
+        print("  post-write: 0 stale rows remain; canonical run now v9-stamped.")
     finally:
         conn.close()
 

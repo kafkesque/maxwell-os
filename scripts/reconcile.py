@@ -34,7 +34,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 
 from lib.measure import (declared_resolver_metrics, emit_metric, floor_check,  # noqa: E402
-                          min_records)
+                          )
 from lib import artifact_encoding  # noqa: E402 - the ONE home for reading a declared encoding (D-2644/D-2646)
 
 CONFIG = REPO / "config" / "reconciliation.yaml"

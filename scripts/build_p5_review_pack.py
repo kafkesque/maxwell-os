@@ -17,7 +17,6 @@ governance/p5_review_pack.md (read-only summary).
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent

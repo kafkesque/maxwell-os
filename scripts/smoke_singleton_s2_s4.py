@@ -17,9 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import ast
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -29,7 +27,6 @@ sys.path.insert(0, str(ROOT))
 # Patch pipeline_paths BEFORE importing pipeline modules, so the inline imports
 # inside process_singletons()/load_stage2_fbs_via_clusters() resolve to smoke dirs.
 from pipeline import pipeline_paths as pp  # noqa: E402
-from pipeline.stage2_extract import load_segments  # noqa: E402
 
 VALID_CONTENT_TYPES = {"principle", "process_template", "process_instance", "growth_edge", "tool_instruction"}
 VALID_EXTRACTION_TYPES = {"causal_mechanism", "descriptive_model", "normative_heuristic", "empirical_pattern"}

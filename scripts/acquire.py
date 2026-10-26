@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.acquisition import adapters, config, downloader, gaps, mirrors, net, resolvers, sources  # noqa: E402
+from pipeline.acquisition import adapters, config, downloader, gaps, mirrors, resolvers, sources  # noqa: E402
 
 
 def _print(payload: dict[str, Any], as_json: bool) -> None:

@@ -353,7 +353,7 @@ def main() -> int:
         print(f"    missed  {str(sample['name'])[:40]!r} signal={sample['signal']!r}\n        ...{sample['sentence'][:130]}")
 
     c = out["side_c_ti_tier"]
-    print(f"\nSIDE C — TI->process_template tier (D-2955/BUG-729), measured BOTH ways:")
+    print("\nSIDE C — TI->process_template tier (D-2955/BUG-729), measured BOTH ways:")
     print(f"  tool_instruction rows: {c['tool_instruction_rows']} | name-prior candidates: {c['name_prior_candidates']} {c['by_keyword']}")
     print(f"  body proves a procedure: {c['body_evidence_pass']}")
     print(f"  RETIRED vocabulary (control): {c['retired_vocabulary_hits']} row(s) named an artifact; "

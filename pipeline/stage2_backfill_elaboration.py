@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed

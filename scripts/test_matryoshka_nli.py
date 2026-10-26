@@ -18,7 +18,7 @@ import math
 import time
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
+from typing import List, Dict, Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
@@ -227,12 +227,12 @@ def test_matryoshka_quality() -> Dict[str, Any]:
     avg_time_1024 = sum(times_1024) / len(times_1024)
     
     print(f"\n  Results (n={n} segments, top-K={TOP_K_OVERLAP}):")
-    print(f"  ┌─────────────────────────────────────────────┐")
+    print("  ┌─────────────────────────────────────────────┐")
     print(f"  │ Avg neighbor overlap:     {avg_overlap:.1%}             │")
     print(f"  │ Avg rank preservation:    {avg_rank_corr:.1%}             │")
     print(f"  │ Avg embedding time:       {avg_time_1024:.3f}s (same for both) │")
-    print(f"  │ 512-dim speedup (search): ~2× (half the multiply-adds) │")
-    print(f"  └─────────────────────────────────────────────┘")
+    print("  │ 512-dim speedup (search): ~2× (half the multiply-adds) │")
+    print("  └─────────────────────────────────────────────┘")
     
     # Quality classification
     if avg_overlap >= 0.90:
@@ -260,7 +260,7 @@ def test_matryoshka_quality() -> Dict[str, Any]:
 
 def load_nli_models():
     """Load both DeBERTa and ModernBERT NLI models."""
-    from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
+    from transformers import pipeline
     
     print("\n" + "=" * 70)
     print("  TEST 2: ModernBERT-base-nli vs DeBERTa-v3 NLI Comparison")
@@ -375,7 +375,7 @@ def run_nli_comparison(models: dict) -> Dict[str, Any]:
         results.append(result_row)
     
     # Summary
-    print(f"\n  ┌──────────────────────────────────────────────┐")
+    print("\n  ┌──────────────────────────────────────────────┐")
     
     avg_d_time = sum(deberta_times)/len(deberta_times) if deberta_times else 0
     avg_m_time = sum(modernbert_times)/len(modernbert_times) if modernbert_times else 0
@@ -388,7 +388,7 @@ def run_nli_comparison(models: dict) -> Dict[str, Any]:
     
     speedup = avg_d_time / avg_m_time if avg_m_time > 0 else 0
     print(f"  │ ModernBERT speedup: {speedup:.1f}×                  │")
-    print(f"  └──────────────────────────────────────────────┘")
+    print("  └──────────────────────────────────────────────┘")
     
     # Assessment
     if modernbert_correct >= deberta_correct and speedup >= 1.0:

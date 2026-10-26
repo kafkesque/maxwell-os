@@ -253,12 +253,12 @@ def main() -> int:
 
     # ── stdout summary ──────────────────────────────────────────────────────
     print(f"📄 report: {report}")
-    print(f"\nSurvival matrix (S2 → S4 → S5 → S6):")
+    print("\nSurvival matrix (S2 → S4 → S5 → S6):")
     for (ct, origin) in sorted(matrix.keys()):
         m = matrix[(ct, origin)]
         print(f"  {ct:18s} {origin:13s}  S2={m['S2']:5d}  S4={m['S4']:5d}  S5={m['S5']:5d}  S6={m['S6']:5d}")
     print(f"\nStage totals: S2={len(s2)+len(s2_singleton)}  S4={len(s4_ckpt)+len(s4_pt)+len(s4_pi)+len(s4_ti)+len(s4_ge)}  S5={len(s5)}  S6={len(s6)}")
-    print(f"\nFailure findings by class:")
+    print("\nFailure findings by class:")
     for cls in ("leak", "cascade", "hidden-failure", "contamination", "drift",
                 "bug", "blindspot", "gap", "conflict"):
         n = len(findings.get(cls, []))

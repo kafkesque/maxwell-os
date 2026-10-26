@@ -271,7 +271,7 @@ def _run_method(conn, name: str, query: str, expected: list[str],
     }
 
 
-def _run_self_retrieval(conn, args) -> int:
+def _run_self_retrieval(conn, args, pool: int) -> int:
     """D-2940 — the LABEL-FREE slice: query every sampled FB by its own NAME.
 
     Why this exists: every recall number in this harness needs an owner-signed
@@ -361,7 +361,7 @@ def main() -> int:
     conn = get_conn()
 
     if args.self_retrieval is not None:
-        return _run_self_retrieval(conn, args)
+        return _run_self_retrieval(conn, args, pool)
 
     # D-2939 (label vs pointer): an owner approves a NAME, not a content hash.
     # Resolve expected_names -> ids in the serving scope so the anchor survives a
@@ -389,7 +389,7 @@ def main() -> int:
     # D-2936 / BUG-710: refuse to emit a recall number for unreturnable goldens.
     resolution = _resolvability(conn, queries, args.serving_scope)
     if resolution["unreturnable"]:
-        print(f"\n  ❌ GOLDEN RESOLVABILITY FAILED (C16, BUG-710)")
+        print("\n  ❌ GOLDEN RESOLVABILITY FAILED (C16, BUG-710)")
         print(f"     serving scope: {resolution['serving_scope']} (canonical run = {resolution['canonical_run']})")
         print(f"     measurable goldens: {resolution['measurable']}/{resolution['total']}")
         for r in resolution["rows"]:

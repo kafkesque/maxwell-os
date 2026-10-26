@@ -54,7 +54,6 @@ from pipeline.serving_gate import (  # noqa: E402 - the ONE rule, imported never
     STATUS_MISMATCH,
     UNDECIDABLE,
     derive_epistemic_status,
-    derive_status,
     factual_check,
     load_config,
     load_label_config,

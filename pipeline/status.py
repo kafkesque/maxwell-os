@@ -91,8 +91,8 @@ def get_db_stats(db_path: Path) -> dict:
 
         for status in ["PASS", "FLAG", "QUARANTINE"]:
             row = conn.execute(
-                f"SELECT COUNT(*) as cnt FROM fbs WHERE status = ?"
-                + (f" AND pipeline_run_id = ?" if run_where else ""),
+                "SELECT COUNT(*) as cnt FROM fbs WHERE status = ?"
+                + (" AND pipeline_run_id = ?" if run_where else ""),
                 (status, *run_param),
             ).fetchone()
             if row:

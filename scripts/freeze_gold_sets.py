@@ -35,7 +35,6 @@ sys.path.insert(0, str(_ROOT))
 
 import yaml  # noqa: E402
 
-from pipeline.schemas import CANONICAL_DISCIPLINES  # noqa: E402
 
 _GOV_DIR = _ROOT / "governance"
 _MIN_PER_CLASS = 5  # mirror train script floor

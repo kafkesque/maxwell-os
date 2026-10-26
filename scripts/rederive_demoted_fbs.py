@@ -122,7 +122,7 @@ def main() -> int:
 
     conn.close()
     print(f"  ✅ {updated} FBs re-derived (discipline→emerging + domain added)")
-    print(f"  ✅ taxonomy_counts reconciled + recounted")
+    print("  ✅ taxonomy_counts reconciled + recounted")
     return 0
 
 

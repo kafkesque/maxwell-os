@@ -126,7 +126,7 @@ def _bench_cribs(fbs: list[dict]) -> None:
             if isinstance(r, list):
                 r = r[0] if r else {}
             serial_results.append(r if isinstance(r, dict) else {})
-        except Exception as e:
+        except Exception:
             serial_results.append({})
             serial_errs += 1
     serial_t = time.time() - t0
@@ -141,7 +141,7 @@ def _bench_cribs(fbs: list[dict]) -> None:
             batch_results = [batch_results]
         if not isinstance(batch_results, list):
             batch_results = []
-    except Exception as e:
+    except Exception:
         batch_results = []
         batch_errs = len(fbs)
     batch_t = time.time() - t0

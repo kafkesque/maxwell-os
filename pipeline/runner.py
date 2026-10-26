@@ -450,7 +450,7 @@ def run_stage(
                     print(f"   {preflight.stderr.decode()[-200:]}")
                     sys.exit(1)
                 else:
-                    print(f"   ⚠️  OMLX still restarting (continuing — non-LLM stage)")
+                    print("   ⚠️  OMLX still restarting (continuing — non-LLM stage)")
             else:
                 print("   ✅ OMLX healthy")
         except Exception as e:

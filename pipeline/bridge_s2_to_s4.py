@@ -10,7 +10,6 @@ Usage:
     python3 pipeline/bridge_s2_to_s4.py
 """
 
-import json
 import sys
 from pathlib import Path
 

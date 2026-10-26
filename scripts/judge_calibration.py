@@ -36,7 +36,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -361,7 +361,7 @@ def main() -> int:
     print("\n" + "=" * 88)
     for task, verdict in sorted(verdicts.items()):
         print("  " + task.ljust(20) + verdict)
-    print("\ncoverage: " + json.dumps(cov))
+    print("\ncoverage: " + json.dumps(report["coverage"]))
     print("artifacts: " + str(OUT_JSON.name) + " + " + str(OUT_MD.name))
     return 0
 

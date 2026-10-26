@@ -24,7 +24,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from build_anchor_v8_remap_triage import (  # noqa: E402
-    DROP,
     OWNER_OVERRIDES,
     REDERIVED,
     remap,
@@ -119,7 +118,7 @@ def main():
 
     print(f"wrote {OUT.relative_to(ROOT)}: {len(src['rows'])} rows, "
           f"{len(changed)} changed ({sorted(set(c['ctype'] for c in changed))})")
-    print(f"stamped taxonomy_version=v8 anchor_version=v8")
+    print("stamped taxonomy_version=v8 anchor_version=v8")
     print(f"menu_hash={menu_hash[:16]}... answer_space_hash={answer_space_hash[:16]}...")
     return 0
 

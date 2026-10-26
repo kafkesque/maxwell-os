@@ -34,7 +34,7 @@ import argparse
 import json
 import random
 import sys
-from collections import Counter, OrderedDict
+from collections import OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Tuple

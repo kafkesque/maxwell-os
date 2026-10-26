@@ -11,7 +11,6 @@ fsync -> os.replace where the file is rewritten in place (C6).
 from __future__ import annotations
 
 import os
-import re
 import tempfile
 from pathlib import Path
 
@@ -141,7 +140,7 @@ def append_once(path: Path, marker: str, block: str) -> bool:
 def insert_decision_entry(path: Path) -> bool:
     """Insert the D317 YAML entry immediately before the `summary:` block (unique anchor)."""
     text = path.read_text(encoding="utf-8")
-    if f"\n- id: D317\n" in text:
+    if "\n- id: D317\n" in text:
         print("SKIP (already present): decisions.yaml D317")
         return False
     anchor = "\nsummary:\n"

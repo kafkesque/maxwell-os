@@ -32840,3 +32840,35 @@ decisions:
     reading subsumes the other, which is why both keep a declaring line. NAMED REJECTION (D-3038): reading the NEWEST
     row of the store, refused because the newest row is a delegate and the answer would be structurally wrong rather
     than occasionally wrong.'
+- id: D-3158
+  state: RESOLVED
+  category: GOVERNANCE / PINS / R2 METER
+  date: '2026-10-26'
+  title: 're-mint r2_meter after a PROVENANCE-STAMP repair: the nli_model field was a dead guard that always
+    yielded None and now stamps S5_NLI_MODEL_LARGE - score-neutrality is PROVEN, not assumed'
+  decision: 'BUG-1015 drive-down touched scripts/definition_nli_verify.py (2 unused imports removed: os, tempfile;
+    1 F821 dead guard repaired), moving the r2_meter pin (D-2963, sha256 8c3d4edd...). Unlike D-2963 (docstring-only,
+    certified by ast-minus-docstrings), this move is SEMANTIC but confined to a provenance stamp: nli_model was
+    NLI_MODEL_ID if "NLI_MODEL_ID" in globals() else None - a guard that ALWAYS yielded None because NLI_MODEL_ID
+    is never defined - so the receipt declared the meter ran with NO model while it actually ran DeBERTa-v3-large
+    (a declaration with no referent, D-3034). The stamp now resolves to S5_NLI_MODEL_LARGE (= config#models.nli_large
+    = MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli), the SAME value pipeline/stage5_verify.py:106 loads
+    as _did. SCORE-NEUTRALITY IS PROVEN, NOT AN A/B (BUG-269: never ask an LLM what a machine can decide): (1) the
+    scoring path (_nli_pair_scores call, _score loop, premise/hypothesis construction) is byte-unchanged - the diff
+    is only 2 import removals + 1 import addition + the 1 provenance line; (2) nli_model has ZERO downstream
+    consumers (grep across pipeline/ + scripts/ finds none that read the field from the r2 receipt); (3) the model
+    stamped is the model actually loaded (stage5_verify.py:106 _did = S5_NLI_MODEL_LARGE). No score, gate or store
+    row can move, so NO measurement re-ran and no A/B is owed. Re-mint per D-353/D-2963: new sha256 recorded under
+    a NEW id (D-3158), never under D-2963 (BUG-391/BUG-535: overwriting under the old id turns the scan GREEN while
+    an old decision certifies a measurement nobody re-ran).'
+  measured: 'HEAD bytes sha256 8c3d4edd0de90daf47d68b2b0ea2389f46d0c11b7e42a5a26aca5f976e7a0595 (= the D-2963
+    pin, verified) -> worktree 189431cfbc2c93fb8b3a4e40da992ca9c507608a90adce1bf9e4038fe062435f. Diff scope: 2 unused
+    imports (os, tempfile) + 1 import (S5_NLI_MODEL_LARGE) + 1 provenance line. _nli_pair_scores call byte-unchanged.
+    grep nli_model consumers outside the meter + stage5_verify: 0.'
+  bugs:
+  - BUG-1015
+  files:
+  - scripts/definition_nli_verify.py
+  - config/recalibration_pins.yaml
+  - config/decisions.yaml
+  - governance/buglog.md

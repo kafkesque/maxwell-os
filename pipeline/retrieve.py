@@ -708,11 +708,11 @@ def search(
 def _row_to_dict(row: sqlite3.Row) -> dict:
     """Convert sqlite3.Row to dict, parsing JSON fields."""
     d = dict(row)
-    for field in ["domains", "source_clusters", "source_books", "source_ids",
-                  "verification_results", "classification_errors"]:
-        if field in d and isinstance(d[field], str):
+    for field_name in ["domains", "source_clusters", "source_books", "source_ids",
+                       "verification_results", "classification_errors"]:
+        if field_name in d and isinstance(d[field_name], str):
             try:
-                d[field] = json.loads(d[field])
+                d[field_name] = json.loads(d[field_name])
             except json.JSONDecodeError:
                 pass
     # BUG-497 / D-2640: the DECLARED traceability of this row's label provenance. menu_hash and the

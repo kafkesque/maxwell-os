@@ -110,7 +110,7 @@ def main(argv: list[str]) -> int:
     if proc.returncode not in (0, 2):
         emit("TERMINAL: FAILED - the fetch did not complete (rc=" + str(proc.returncode) + ")")
         return 1
-    emit(f"STEP 2: engine registry reload (the app caches it at start - D2637)")
+    emit("STEP 2: engine registry reload (the app caches it at start - D2637)")
     reloader = str(ROOT / "scripts" / "omlx_reload.py")
     if pathlib.Path(reloader).exists():
         rel = subprocess.run([sys.executable, reloader, "--json"], capture_output=True, text=True, timeout=RELOAD_S)

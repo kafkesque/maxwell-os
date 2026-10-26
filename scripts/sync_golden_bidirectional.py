@@ -262,12 +262,12 @@ def main(argv):
 
     print("🧭 golden<->production bidirectional sync (D2616 Phase 1)")
     print(f"   golden examples: {len(golden)}  |  p5 reviewed: {len(p5)}  |  298: {len(adj)}  |  joint-vote: {len(jv)}")
-    print(f"\n   DIRECTION A (p5 discipline/domains -> production):")
+    print("\n   DIRECTION A (p5 discipline/domains -> production):")
     print(f"     production field updates: {len(prod_changes)}")
     print(f"       discipline: {sum(1 for c in prod_changes if c['field']=='discipline')}")
     print(f"       domains:    {sum(1 for c in prod_changes if c['field']=='domains')}")
 
-    print(f"\n   DIRECTION B (merged 4-axis golden, sources):")
+    print("\n   DIRECTION B (merged 4-axis golden, sources):")
     for axis in ("depth", "content_type", "discipline", "domains"):
         c = Counter(m[f"{axis}_source"] for m in merged)
         print(f"       {axis:12s}: {dict(c)}")

@@ -248,7 +248,7 @@ def main() -> int:
         print(f"  discipline macro-F1: {a['discipline_macro_f1']:.4f}")
         print(f"  domain macro-F1:     {a['domain_macro_f1']:.4f}")
         print(f"  domain micro-F1:     {a['domain_micro_f1']:.4f}")
-        print(f"  abstention risk-coverage (threshold | coverage | precision | macro-F1):")
+        print("  abstention risk-coverage (threshold | coverage | precision | macro-F1):")
         for rc in a["abstention_risk_coverage"]:
             p = f"{rc['precision']:.3f}" if rc["precision"] is not None else "  -  "
             f = f"{rc['macro_f1']:.3f}" if rc["macro_f1"] is not None else "  -  "

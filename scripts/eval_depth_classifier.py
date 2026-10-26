@@ -17,12 +17,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict
 
-import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import AutoModel, AutoTokenizer

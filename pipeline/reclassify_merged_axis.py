@@ -48,7 +48,6 @@ from typing import Any
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
 
-from pipeline.io_guard import safe_write  # noqa: E402
 from pipeline.omlx_call import call_omlx_json  # noqa: E402
 from pipeline.pipeline_paths import (  # noqa: E402
     DB_PATH,
@@ -285,7 +284,7 @@ def _backup_db(db_path: Path) -> Path:
     with open(bak, "rb") as _f:  # C6: fsync so a crash can't leave a torn copy
         os.fsync(_f.fileno())
     if db_path.stat().st_size != bak.stat().st_size:
-        raise RuntimeError(f"backup size mismatch — aborting write")
+        raise RuntimeError("backup size mismatch — aborting write")
     print(f"  🔒 Backup: {bak} ({bak.stat().st_size:,} bytes)")
     return bak
 

@@ -45,7 +45,6 @@ from train_discipline_classifier import (  # noqa: E402
     NUM_DISCIPLINE_CLASSES,
     RANDOM_STATE,
     TRAIN_TEST_SPLIT_SIZE,
-    DisciplineClassifier,
     GoldenDataset,
     _filter_trainable,
     build_model,

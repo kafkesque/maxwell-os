@@ -189,7 +189,7 @@ def main() -> int:
     md = [
         "# P5 FREEZE PLAN — GOLD-A/B/CHALLENGE (D2585 P5)",
         "",
-        f"Classifier macro-F1 **0.2875** (target 0.75) — DATA-LIMITED, not model-selection.",
+        "Classifier macro-F1 **0.2875** (target 0.75) — DATA-LIMITED, not model-selection.",
         "",
         "## Tier assignment",
         f"- **GOLD-A** (high-suspicion, challenger-voted): **{len(gold_a)}**",
@@ -197,7 +197,7 @@ def main() -> int:
         f"- **CHALLENGE** (boundary corpus): **{boundary_n}** (target ~150)",
         f"- Total golden: **{len(golden)}**",
         "",
-        f"## Data-starvation (root cause of 0.2875)",
+        "## Data-starvation (root cause of 0.2875)",
         f"{len(data_starved)} of 61 disciplines have <{MIN_PER_CLASS} examples "
         f"(below the mining floor). These are the 0.00-F1 classes.",
         "",

@@ -47,7 +47,6 @@ import json
 import sqlite3
 import subprocess
 import sys
-from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -133,7 +132,7 @@ def _report(scan: dict[str, Any]) -> tuple[int, list[str]]:
     """
     to_write, unevaluable = _project(scan)
     print(f"{PREFIX}: canonical run = {CANONICAL_RUN}")
-    print(f"  current (status|classification_status) counts:")
+    print("  current (status|classification_status) counts:")
     for cell, n in sorted(scan["cells"].items(), key=lambda kv: -kv[1]):
         print(f"    {cell:24s} {n}")
     print(f"  non-canonical rows (reported, never written): {scan['non_canonical']}")

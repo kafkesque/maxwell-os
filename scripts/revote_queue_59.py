@@ -445,8 +445,8 @@ def report() -> None:
     dom_ag = sum(1 for r in recs if r.get("domains_agreed"))
     print(f"total voted: {len(recs)} | 3-axis agreed: {agreed} | abstain(any axis): {len(recs) - agreed}")
     print(f"depth unanimous: {d_ag} | discipline unanimous: {disc_ag} | domains unanimous: {dom_ag}")
-    print(f"depth distribution:", dict(Counter(r["depth"] for r in recs if r.get("depth"))))
-    print(f"discipline distribution:", dict(Counter(r["discipline"] for r in recs if r.get("discipline"))))
+    print("depth distribution:", dict(Counter(r["depth"] for r in recs if r.get("depth"))))
+    print("discipline distribution:", dict(Counter(r["discipline"] for r in recs if r.get("discipline"))))
 
 
 def main() -> None:

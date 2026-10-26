@@ -242,13 +242,13 @@ if __name__ == "__main__":
         model_count = pool.get("model_count")
         if loaded_count is not None:
             loaded_gb = (cur_mem or 0) / (1024 ** 3)
-            print(f"🔥 OMLX engine pool (authoritative /health):")
+            print("🔥 OMLX engine pool (authoritative /health):")
             print(f"   loaded models : {loaded_count}/{model_count}")
             print(f"   loaded memory : {loaded_gb:.1f} GB (RSS-level, not catalog estimate)")
         else:
             print("⚠️  /health unavailable — falling back to catalog estimate")
         loaded = get_loaded_models()
-        print(f"   catalog (all registered models, NOT load state):")
+        print("   catalog (all registered models, NOT load state):")
         for name, size in sorted(loaded.items(), key=lambda x: x[1], reverse=True):
             pinned = "📌" if name in PINNED_MODELS else "  "
             print(f"     {pinned} {name}: {size:.1f}GB est")

@@ -122,7 +122,7 @@ def main() -> int:
 
     d = Path(args.in_dir)
     sections: list[str] = [
-        f"# Stage 4 — Visual Summary",
+        "# Stage 4 — Visual Summary",
         "",
         f"> `{d.resolve()}`",
         "",

@@ -193,7 +193,7 @@ def _vote_text(row: dict[str, Any], models: list[str], labels: dict[str, str]) -
 
 def build_rows(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     """Join the panel envelope, the evidence sheet, the source bytes and the store into owner-readable rows."""
-    from pipeline.dedup_identity import content_tokens, concept_key
+    from pipeline.dedup_identity import content_tokens
 
     adj, sheet = cfg["adj"], cfg["sheet"]
     envelope = json.loads((PROJECT_ROOT / adj["path"]).read_text(encoding="utf-8"))

@@ -178,21 +178,21 @@ def main() -> int:
         print(f"SINGLETON S2 CONTRACT AUDIT — {args.checkpoint}")
         print(f"  records: {len(fbs)} | ontology: {args.config}")
         print(f"{'=' * 72}")
-        print(f"\n▶ Classification — content_type (5 roles):")
+        print("\n▶ Classification — content_type (5 roles):")
         for ct, n in ct_counts.most_common():
             ok = "✅" if ct in onto.get("content_types", {}) else "❌"
             print(f"    {ok} {ct:22} {n:4}")
-        print(f"\n▶ Classification — extraction_type (4 forms):")
+        print("\n▶ Classification — extraction_type (4 forms):")
         for et, n in et_counts.most_common():
             ok = "✅" if et in onto.get("extraction_types", {}) else "❌"
             print(f"    {ok} {et:22} {n:4}")
-        print(f"\n▶ content_type × extraction_type pairs:")
+        print("\n▶ content_type × extraction_type pairs:")
         for (ct, et), n in pairs.most_common():
             default = (onto.get("content_to_extraction_type") or {}).get(ct, "")
             tag = "default-match" if et == default else ""
             print(f"    {ct:18} × {et:20} {n:4}  {tag}")
 
-        print(f"\n▶ Violations by category:")
+        print("\n▶ Violations by category:")
         cats: Counter = Counter()
         for _, _, msg in violations:
             head = msg.split(" ")[0].split("=")[0].strip("'")
@@ -204,7 +204,7 @@ def main() -> int:
                 print(f"    ❌ {cat}: {n}")
 
         if violations:
-            print(f"\n▶ Sample violations (first 12):")
+            print("\n▶ Sample violations (first 12):")
             for idx, fid, msg in violations[:12]:
                 print(f"    [{idx}] {fid} — {msg}")
 

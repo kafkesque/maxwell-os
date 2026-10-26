@@ -39,7 +39,6 @@ MODES (mirrors discipline_conformance_gate.py)
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -53,7 +52,6 @@ for p in (str(REPO), str(SCRIPTS)):
 
 # Reuse the production conformance gate's load/join + statistics (no drift).
 from discipline_conformance_gate import (  # noqa: E402
-    REPORTING_FLOOR,
     cohen_kappa,
     load_anchor,
     per_class_metrics,

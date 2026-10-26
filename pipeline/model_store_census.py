@@ -866,8 +866,8 @@ def print_audit(audit: dict, repos: dict) -> None:
               f"{note['only_in_served'] or 'none'}; only in the second copy {note['only_in_second'] or 'none'}"
               f"{partial}")
         if note["redundant"]:
-            print(f"      these bytes may leave, and the name still resolves from the served copy "
-                  f"(T-167/D-3035); nothing is removed without an owner word")
+            print("      these bytes may leave, and the name still resolves from the served copy "
+                  "(T-167/D-3035); nothing is removed without an owner word")
 
 
 def main(argv: list) -> int:

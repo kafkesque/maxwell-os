@@ -19,11 +19,9 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
 import sys
 import time
-import urllib.request
 from datetime import datetime
 from pathlib import Path
 

@@ -72,7 +72,7 @@ from pipeline.stage4_merged_call import (  # noqa: E402
 from pipeline.intimacy_lattice import derive_context, resolve_intimacy  # noqa: E402
 from pipeline.stage5_verify import _load_dual_encoders  # noqa: E402
 from pipeline.stamp import stamp_record  # noqa: E402
-from pipeline.stage6_commit import init_db, insert_fb  # noqa: E402
+from pipeline.stage6_commit import insert_fb  # noqa: E402
 
 RECOVERED = Path("knowledge pipeline/stage2_extract/t11/recovered_singletons.jsonl")
 RUN_ID = "bug198_reinject"

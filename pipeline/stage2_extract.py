@@ -42,6 +42,7 @@ import random
 import sys
 import threading
 import time
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -93,7 +94,6 @@ from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, ma
 from pipeline.content_types import (  # D2323: config-first enum source (C12)
     CONTENT_TYPES,
     EXTRACTION_TYPES,
-    EXTRACTION_TYPE_ENUM,
     CONTENT_TO_EXTRACTION_TYPE,  # D2417: conflation-rescue mapping (BUG-145)
     S2_BODY_FIELDS,  # P2-1: type-specific body fields (BUG-152 follow-up)
 )
@@ -2772,7 +2772,6 @@ def run_stage2(
     print(f"📦 Total FBs:          {len(all_fbs)}")
     print(f"🔧 extraction_type defaulted: {_EXTRACTION_TYPE_DEFAULTED_COUNT} (BUG-226)")
     if all_fbs:
-        from collections import Counter
         depths = Counter(fb.get("depth", "?") for fb in all_fbs)
         print(f"📊 Depths:             {dict(depths)}")
         routes = Counter(fb.get("route", "?") for fb in all_fbs)
@@ -3238,7 +3237,6 @@ def process_singletons(
     print(f"   Output:        {STAGE2_SINGLETON_OUTPUT}")
 
     # Content type distribution
-    from collections import Counter
     ct_dist = Counter(fb.get("content_type", "principle") for fb in all_fbs)
     et_dist = Counter(fb.get("extraction_type", "") for fb in all_fbs)  # D2376: absent → "" (no over-claim)
     print(f"   Content types:  {dict(ct_dist)}")

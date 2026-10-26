@@ -18,10 +18,14 @@ pins:
   # BYTES, so a doc fix inside a pinned artifact is a re-mint by construction (BUG-535/BUG-740) - and the score-neutrality
   # is certified DETERMINISTICALLY (ast.dump with docstrings stripped is byte-identical at HEAD and in the worktree), so no
   # A/B is owed and no score can move.
+  # D-3158 (2026-10-26): re-pin after a PROVENANCE-STAMP repair (not docstring-only, so no ast-minus-docstrings
+  # proof). nli_model was a dead guard (always None); it now stamps S5_NLI_MODEL_LARGE (the model stage5_verify
+  # actually loads). Score-neutrality is PROVEN (scoring path byte-unchanged; nli_model has 0 downstream consumers),
+  # so no A/B is owed. Re-mint under a NEW id per D-353/BUG-535.
   r2_meter:
     path: scripts/definition_nli_verify.py
-    sha256: 8c3d4edd0de90daf47d68b2b0ea2389f46d0c11b7e42a5a26aca5f976e7a0595
-    decision: D-2963
+    sha256: 189431cfbc2c93fb8b3a4e40da992ca9c507608a90adce1bf9e4038fe062435f
+    decision: D-3158
   menu:
     path: config/closed_menu_v5.json
     sha256: bc53770103595f2a3674ced132e04297e87b590f6d7fb141c7eac6351c680544

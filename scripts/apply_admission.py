@@ -47,7 +47,6 @@ sys.path.insert(0, str(_PROJECT_ROOT / "scripts"))
 
 import plan_admission  # noqa: E402 — the reader whose rows this writer applies (never a second derivation)
 import census_source_names as census  # noqa: E402 — the library reader: roots, name classes, the cache join
-from pipeline.book_metadata import sanitize_source_book  # noqa: E402 — the door's OWN key (D-3045)
 from pipeline.container_integrity import is_readable, probes_from  # noqa: E402 — BUG-886/D-3071
 #: BUG-897/D-3076: the OUTER wall of a conversion is declared, not a constant. A Stage-0 subprocess killed by this
 #: ceiling is reported as `S0 could not be run`, which names neither the work nor the reason — so the docling
@@ -225,8 +224,8 @@ def batch_rc(counts: dict[str, int], decl: dict[str, Any]) -> int:
     fatal = [declared_state(str(state), decl) for state in (exits.get("fatal_states") or [])]
     owed = [declared_state(str(state), decl) for state in (exits.get("owner_owed_states") or [])]
     if not fatal and not owed:
-        raise ApplierError(f"FATAL: applier.exit_codes declares neither fatal_states nor owner_owed_states — a "
-                           f"mapping that decides nothing is a sentence, not a rule (D-3034)")
+        raise ApplierError("FATAL: applier.exit_codes declares neither fatal_states nor owner_owed_states — a "
+                           "mapping that decides nothing is a sentence, not a rule (D-3034)")
     for state in fatal:
         if counts.get(state):
             return RC_FATAL
@@ -2171,8 +2170,8 @@ def sign(plan_path: Path | None, decl: dict[str, Any], who: str, mode: str, rows
     print(f"        plan      {plan_path.name} sha256 {digest}")
     print(f"        scope     {acceptance['scope_sha256']}")
     print(f"        next      {decl['command']} --dry-run   (the price), then --apply")
-    print(f"                  the SAME signature authorises the SAME acts: REPEAT --apply until it reports nothing")
-    print(f"                  outstanding. Re-derive only when new files have arrived — then a new word is owed.")
+    print("                  the SAME signature authorises the SAME acts: REPEAT --apply until it reports nothing")
+    print("                  outstanding. Re-derive only when new files have arrived — then a new word is owed.")
     return RC_OK
 
 

@@ -93,7 +93,7 @@ def main(argv):
             if any(isinstance(x, dict) and "error" in x for x in v.values()):
                 work.append((fb, v))
 
-    print(f"🧭 targeted reliable-pair vote — flagged 149-core")
+    print("🧭 targeted reliable-pair vote — flagged 149-core")
     print(f"   vote set: {len(fb_ids)} | loaded: {len(fbs)} | to vote (new+retry): {len(work)}")
     print(f"   voters: {[v['model'] for v in voters]} | policy: {policy['policy']} | key: {'set' if key else 'MISSING'}")
 

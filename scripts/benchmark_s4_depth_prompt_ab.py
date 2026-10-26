@@ -131,7 +131,7 @@ def classify(prompt: str, fb: dict) -> tuple[str, float]:
         raw = call_omlx(prompt=text, model=MODEL, max_tokens=512, thinking_budget=128)
         label = _parse_depth_token(raw)
     except DepthClassificationError as e:
-        label = f"ERR:ambiguous"
+        label = "ERR:ambiguous"
         sys.stderr.write(f"    [parse] {fb['name'][:40]} -> {e}\n")
     except Exception as e:
         label = f"ERR:{type(e).__name__}"

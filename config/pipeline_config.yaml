@@ -39,7 +39,7 @@ config_audit:
 lint_gate:
   certified_select: ["F"]      # pyflakes correctness only
   direction: shrink_only
-  ceiling: 252                 # MEASURED 2026-10-26 baseline (pipeline/ + scripts/); 182 are auto-fixable
+  ceiling: 62                  # RE-MEASURED 2026-10-26 after 3 real-bug + 5 hygiene fixes + 182 safe autofixes (was 252); remaining 62 are UNSAFE F841 (RHS may carry a side effect — per-item review, never --unsafe-fixes)
   baseline: 252
   measured_on: '2026-10-26'
   scope: ["pipeline/", "scripts/"]

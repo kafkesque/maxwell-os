@@ -23,20 +23,25 @@ module's; this module only refuses to write what the next reader cannot load.
 """
 from __future__ import annotations
 
+import hashlib
+import json
+import os
+import sys
+import tempfile
 import time
+from pathlib import Path
 
 import yaml
 
 BLOCK_MARKERS: tuple[str, ...] = (">-", ">", "|-", "|", ">+", "|+")
-import os
-import sys
-from pathlib import Path
 
 PREFIX = "yaml-guard"
 EXIT_CLEAN, EXIT_DRIFT, EXIT_OWED = 0, 1, 2
 REGISTER = Path(__file__).resolve().parent.parent.parent / "config" / "yaml_guard.yaml"
 SCAN_SUFFIXES = (".yaml", ".yml")
 MIN_WHY = 20
+MEMO_SCHEMA = "1"
+MEMO_MAX_ENTRIES = 4000
 
 
 def today() -> str:
@@ -81,6 +86,104 @@ def duplicate_keys(text: str) -> list[tuple[str, int, int]]:
     except yaml.YAMLError:
         return []
     return found
+
+
+def file_verdict(text: str) -> dict:
+    """The RAW per-file measurement: does it parse (and WHY not), and which keys are declared twice.
+
+    BUG-954. This is deliberately the SMALLEST thing that is a pure function of the bytes: everything a scan
+    decides AROUND it - is the path exempt, is it declared `owed`, is an owed entry now stale, is a declared path
+    unreachable, did the scan shrink - is REGISTER-level and is NEVER memoised, because those readings are about
+    the register, not about the file. A cache that answered a register-level question would answer it about a
+    register it never read.
+    """
+    try:
+        yaml.safe_load(text)
+        broken = ""
+    except yaml.YAMLError as exc:
+        broken = str(getattr(exc, "problem", exc))
+    return {"broken": broken, "dups": [list(d) for d in duplicate_keys(text)]}
+
+
+def source_digest() -> str:
+    """A digest of every input to a per-file verdict that is NOT the artifact's own bytes.
+
+    MEASURED (BUG-954): the verdict is two computations over the same text - `yaml.safe_load` and the
+    `duplicate_keys` walk - over a set whose bytes are 98.7 % frozen pre-images, so the same bytes are re-decided
+    every run. A memo keyed by bytes ALONE would keep answering with the OLD rule after the rule changed: a cache
+    that outlives its own code is a silent verdict about code that no longer exists. PyYAML's own version is folded
+    in because `broken` is PyYAML's sentence, not ours - a library upgrade can change it without this file moving.
+    """
+    own = Path(__file__).resolve().read_bytes()
+    library = str(getattr(yaml, "__version__", "?"))
+    return hashlib.sha256(own + b"\x00" + library.encode("utf-8")).hexdigest()
+
+
+def memo_home(register: dict, root: Path) -> Path | None:
+    """The memo's DECLARED home, or None when the register does not enable one (C12: never a literal path here)."""
+    spec = register.get("memo") if isinstance(register.get("memo"), dict) else {}
+    if not spec.get("enabled") or not spec.get("path"):
+        return None
+    return (root / str(spec["path"])).resolve()
+
+
+def memo_read(path: Path | None) -> dict:
+    """Every recorded verdict, or {} - an unreadable, foreign or older-schema memo is a MISS, never a verdict.
+
+    Fail-OPEN toward recomputation (and closed toward trusting): the only cost of a miss is the time the memo
+    exists to save, while the cost of trusting a corrupt book is a wrong verdict about the repository.
+    """
+    if path is None or not path.is_file():
+        return {}
+    try:
+        book = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(book, dict) or str(book.get("schema")) != MEMO_SCHEMA:
+        return {}
+    entries = book.get("entries")
+    return entries if isinstance(entries, dict) else {}
+
+
+def memo_write(path: Path | None, entries: dict, ceiling: int) -> None:
+    """Trim to the declared ceiling and persist crash-safely (C6): tempfile -> fsync -> os.replace.
+
+    An unwritable memo is REPORTED and survived, never raised: the memo is an optimisation, and a cache whose
+    failure breaks the rail would be a new single point of failure bought with an old one's time.
+    """
+    if path is None:
+        return
+    while len(entries) > ceiling:
+        entries.pop(next(iter(entries)))          # json keeps insertion order, so this drops the LEAST recently used
+    book = {"schema": MEMO_SCHEMA, "entries": entries}
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".memo.", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(book, handle, sort_keys=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+    except OSError:
+        print("  note memo NOT written (" + path.name + "): the scan is unaffected")
+
+
+def memo_verdict(text: str, digest: str, entries: dict) -> tuple[dict, bool]:
+    """(verdict, was_a_hit) for these bytes under these rules; records a computed verdict in `entries`.
+
+    The key is content-addressed on purpose: two paths holding identical bytes hold one verdict, which is why the
+    frozen pre-images that dominate this scan's byte volume cost the parse ONCE each rather than once per run.
+    A hit is re-inserted so the ceiling drops the least recently USED entry, not the oldest written.
+    """
+    key = hashlib.sha256(digest.encode("utf-8") + b"\x00" + text.encode("utf-8")).hexdigest()
+    hit = entries.pop(key, None)
+    if (isinstance(hit, dict) and isinstance(hit.get("broken"), str)
+            and isinstance(hit.get("dups"), list) and all(len(d) == 3 for d in hit["dups"])):
+        entries[key] = hit
+        return {"broken": hit["broken"], "dups": hit["dups"]}, True
+    verdict = file_verdict(text)
+    entries[key] = verdict
+    return verdict, False
 
 
 def assert_yaml(text: str, path: str, writer: str) -> None:
@@ -177,6 +280,73 @@ def append_to_block(text: str, key: str, lines: list[str]) -> str:
     return "".join(rows[:end]) + added + "".join(rows[end:])
 
 
+def _memo_case() -> str:
+    """Bytes whose verdict is unambiguous and non-empty: it parses, and ONE key is declared twice."""
+    return "a: 1" + chr(10) + "b: 2" + chr(10) + "a: 3" + chr(10)
+
+
+def _memo_round_trip() -> bool:
+    """A hit must return the verdict the walk computes - not merely SOME verdict."""
+    entries: dict = {}
+    text = _memo_case()
+    first, hit_first = memo_verdict(text, "rule-a", entries)
+    second, hit_second = memo_verdict(text, "rule-a", entries)
+    return (not hit_first) and hit_second and first == second == file_verdict(text)
+
+
+def _memo_digest_is_an_input() -> bool:
+    """The control AGAINST staleness: same bytes under a moved rule must MISS, or the cache outlives its code."""
+    entries: dict = {}
+    text = _memo_case()
+    memo_verdict(text, "rule-a", entries)
+    _verdict, hit = memo_verdict(text, "rule-b", entries)
+    return (not hit) and len(entries) == 2
+
+
+def _memo_corrupt_is_a_miss() -> bool:
+    """A book that cannot be read, or was written by another schema, is a MISS - never a verdict."""
+    with tempfile.TemporaryDirectory() as tmp:
+        book = Path(tmp) / "memo.json"
+        book.write_text('{"schema": "1", "entries": ', encoding="utf-8")
+        if memo_read(book) != {}:
+            return False
+        book.write_text('{"schema": "999", "entries": {"k": {}}}', encoding="utf-8")
+        if memo_read(book) != {}:
+            return False
+        book.write_text('{"schema": "1", "entries": {"k": {"broken": "", "dups": [["a", 1, 3]]}}}',
+                        encoding="utf-8")
+        return memo_read(book) == {"k": {"broken": "", "dups": [["a", 1, 3]]}}
+
+
+def _memo_survives_a_disk_round_trip() -> bool:
+    """The memo exists to save time ACROSS runs, so the write/read pair is what has to work, not just the dict."""
+    with tempfile.TemporaryDirectory() as tmp:
+        book = Path(tmp) / "nested" / "memo.json"
+        entries: dict = {}
+        text = _memo_case()
+        memo_verdict(text, "rule-a", entries)
+        memo_write(book, entries, MEMO_MAX_ENTRIES)
+        if not book.is_file():
+            return False
+        _verdict, hit = memo_verdict(text, "rule-a", memo_read(book))
+        return hit
+
+
+def _memo_respects_its_ceiling() -> bool:
+    """Growth control: the ceiling must drop the least recently USED verdict, not the oldest written (D-3038)."""
+    entries: dict = {}
+    for index in range(5):
+        memo_verdict("k: " + str(index) + chr(10), "rule-a", entries)
+    memo_verdict("k: 0" + chr(10), "rule-a", entries)          # touch the oldest, so it is no longer least recently used
+    with tempfile.TemporaryDirectory() as tmp:
+        book = Path(tmp) / "memo.json"
+        memo_write(book, entries, 3)
+        kept = memo_read(book)
+        _v1, kept_the_touched = memo_verdict("k: 0" + chr(10), "rule-a", dict(kept))
+        _v2, kept_the_stale = memo_verdict("k: 1" + chr(10), "rule-a", dict(kept))
+        return len(kept) == 3 and kept_the_touched and not kept_the_stale
+
+
 def controls() -> list[tuple[str, bool]]:
     """Known-answer controls (BUG-492: a detector nobody has seen fail is not a detector)."""
     # MEASURED 2026-09-26 by this rail's own first run: the control MUST be handed a THUNK, not a value. With
@@ -222,6 +392,14 @@ def controls() -> list[tuple[str, bool]]:
          refused(lambda: assert_yaml("a: 1" + chr(10) + "a: 2" + chr(10), "control.yaml", PREFIX))),
         ("an unparseable document is NOT this rule's subject (assert_yaml owns it)",
          duplicate_keys("a: 1" + chr(10) + "  b: 2" + chr(10)) == []),
+        # BUG-954 controls: five readings, and the third and fourth are the controls AGAINST the memo being
+        # trusted - a corrupt book is a miss, and a book written under a DIFFERENT rule is a miss too. A cache
+        # nobody has seen refuse is a cache that will one day answer for code that no longer exists.
+        ("a memo HIT returns exactly the verdict the walk computes for the same bytes", _memo_round_trip()),
+        ("a memo recorded under a MOVED rule is a MISS, not a verdict", _memo_digest_is_an_input()),
+        ("a corrupt or foreign-schema memo file is a MISS, never a verdict", _memo_corrupt_is_a_miss()),
+        ("the memo survives a DISK round trip (it is there to save the NEXT run)", _memo_survives_a_disk_round_trip()),
+        ("the memo drops the LEAST RECENTLY USED verdict when it reaches its ceiling", _memo_respects_its_ceiling()),
     ]
 
 
@@ -254,12 +432,23 @@ def scan(register: dict, root: Path) -> tuple[list[str], int, int]:
     OWED debt is owed, not drift: an artifact whose ambiguity cannot be REMOVED by this rail (a snapshot with no
     original, a hand-authored prompt) is loud and rc=2, and the owner settles it. The owed list is shrink-only:
     an entry that now reads cleanly is STALE-OWED, so the ceiling can never be padded.
+
+    BUG-954: the two PER-FILE computations (the parse and the duplicate-key walk) are memoised on the FILE'S OWN
+    BYTES, because MEASURED they dominate this rail's cost over a set that is 98.7 % frozen pre-images. Everything
+    decided ABOVE a file - exempt, owed, STALE-OWED, MISSING-WHY, UNSCOPED, SCAN-SHRANK, the artifact count - is
+    register-level and is recomputed on EVERY run, so a memo can never answer a question about a register it did
+    not read. The memo is reported, never gated on: it changes the time this rail takes and nothing it says.
     """
     faults: list[str] = []
     owed = {str(e.get("path")): str(e.get("why") or "") for e in (register.get("owed") or []) if isinstance(e, dict)}
     exempt = {str(e.get("path")): str(e.get("why") or "") for e in (register.get("exempt") or [])}
     files = _artifacts(register, root)
     seen = {path.relative_to(root).as_posix() for path in files}
+    home = memo_home(register, root)
+    digest = source_digest() if home is not None else ""
+    entries = memo_read(home)
+    ceiling = int((register.get("memo") or {}).get("max_entries") or MEMO_MAX_ENTRIES)
+    hits = computed = 0
     for path in files:
         rel = path.relative_to(root).as_posix()
         if rel in exempt:
@@ -270,20 +459,21 @@ def scan(register: dict, root: Path) -> tuple[list[str], int, int]:
             faults.append("UNREADABLE: " + rel + " cannot be read as UTF-8 (" + type(exc).__name__ + ") - an"
                           " artifact whose bytes cannot be decoded is an undeclared artifact (C16/BUG-521)")
             continue
-        try:
-            yaml.safe_load(text)
-            broken = ""
-        except yaml.YAMLError as exc:
-            broken = str(getattr(exc, "problem", exc))
+        if home is None:
+            verdict = file_verdict(text)
+        else:
+            verdict, was_hit = memo_verdict(text, digest, entries)
+            hits, computed = hits + int(was_hit), computed + int(not was_hit)
+        broken = verdict["broken"]
         if rel in owed:
-            if not broken and not duplicate_keys(text):
+            if not broken and not verdict["dups"]:
                 faults.append("STALE-OWED: " + rel + " is declared `owed` but now reads cleanly - delete the entry"
                               " (the owed list is shrink-only, D-2642)")
             continue
         if broken:
             faults.append("UNPARSEABLE: " + rel + " does NOT parse (" + broken[:120] + ") - an artifact whose"
                           " declarations cannot be READ is an undeclared artifact (BUG-525/C16)")
-        for key, first, later in duplicate_keys(text):
+        for key, first, later in verdict["dups"]:
             faults.append("DUP-KEY: " + rel + " declares " + repr(key) + " at line " + str(first) + " and AGAIN at"
                           " line " + str(later) + " - PyYAML keeps the LAST and silently drops the first, so a"
                           " declared fact has two homes (D-2649)")
@@ -299,6 +489,11 @@ def scan(register: dict, root: Path) -> tuple[list[str], int, int]:
     if receipt and len(files) < receipt:
         faults.append("SCAN-SHRANK: the scan covered " + str(len(files)) + " artifact(s) and its receipt declares "
                       + str(receipt) + " - a scan that silently shrank is a blind spot reported as a clean scan")
+    if home is not None:
+        memo_write(home, entries, ceiling)
+        print("  memo " + str(hits) + " hit(s) / " + str(computed) + " computed | " + str(len(entries))
+              + " verdict(s) recorded (BUG-954: content-addressed on the BYTES + a digest of this module and of"
+              " PyYAML; every register-level reading is recomputed every run)")
     return faults, len(owed), len(files)
 
 

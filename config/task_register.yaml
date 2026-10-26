@@ -2731,3 +2731,28 @@ tasks:
     heads produce it with both shas. The wrong fix is GATING on it: that would force a 17-minute whole-set rescan
     after every commit - including every documentation commit - which is the discipline D-3151 says will not be
     kept, and it is why this is a SHOULD task and not a bug. The message is not a verdict; the fields are.
+
+- id: T-205
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: >-
+    a declared PROVIDER-SOVEREIGNTY check: the active provider in ~/.config/goose/config.yaml must be one this repo
+    declares LOCAL, and a cloud provider must red the ladder instead of being discovered on an invoice
+  source: BUG-1022 (HIGH - CLOSED 2026-10-26) / C1 ($0 marginal) / C3 (sovereign) / C22 (local-first, API opt-in)
+  evidence: >-
+    governance/buglog.md#BUG-1022 - MEASURED 2026-10-26: `goose configure`'s Hugging Face paste wrote
+    `active_provider: huggingface`, `providers.huggingface.enabled: true`, `model: MiniMaxAI/MiniMax-M2.1` and
+    `HF_HOST: https://router.huggingface.co/v1` at 09:29, against FOUR preceding generations that all read
+    `active_provider: maxwell_omlx`. Not one of the 194 declaring lines reads that file, so the flip was invisible
+    to the whole ladder while it pointed inference - and therefore money and data - at a cloud router.
+  gate: >-
+    A rail reads the config path DECLARED in config/ (C12: the path and the allowed-provider set both live in YAML,
+    never in the script) and returns rc=2 when `active_provider` is not in the declared LOCAL set. Three controls on
+    FIXTURES, never on the live file: a fixture naming a cloud provider reds, a fixture naming a local provider is
+    green, and an ABSENT config file reports NOT-RECORDED and stays green - a machine without goose must not fail a
+    rail about goose (the same fail-closed/absent distinction the harness facts make). The wrong fix, declared so it
+    cannot be taken: hardcoding "maxwell_omlx" in the script, which would make the rule stale the moment the local
+    provider is renamed and would be a value with two homes. SEQUENCING: this adds a declaring line, and every added
+    line costs a whole-set rescan to certify honestly (BUG-1010) - so it should land AFTER BUG-954's memo is warm,
+    where a certification costs minutes instead of 17.5 of them.

@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-25) · 785 bugs (246 open / 539 closed; highest OPEN = BUG-1021) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-26) · 787 bugs (245 open / 542 closed; highest OPEN = BUG-1021) · 60 open tasks (MUST 10 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 246 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 245 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (60) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -32,11 +32,11 @@
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
+> | T-205 | 🔴 MUST | 🔴 open | a declared PROVIDER-SOVEREIGNTY check: the active provider in ~/.config/goose/config.yaml must be one this rep | governance/buglog.md#BUG-1022 - MEASURED 2026-10-26: `goose configure`'s Hugging Face past |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
-> | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 60 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -22058,3 +22058,145 @@ cross-recipe rewrite is REFUSED - a rule that refuses both is not a rule (BUG-49
 **Not filed as a duplicate of BUG-1010.** BUG-1010 was that a record could not say WHICH BYTES it measured and is
 CLOSED by measurement tonight; this is that two subjects can occupy one name. Different referent, different fix,
 and the attribution work is what made it visible (the `recipe` field is now compared rather than assumed).
+
+## BUG-1022 (HIGH - CLOSED 2026-10-26) - pasting the Hugging Face token into `goose configure` flipped `active_provider` to the CLOUD router: a one-screen action silently moved the whole system off local inference, and NOTHING in this repository can see it
+
+**What was asked.** The owner was handed a three-step manual task (rotate the leaked `hf_token`) and reported back
+that step 4 failed with `{"error":{"message":"API key required",...}}`. Two separate things were wrong, and only one
+of them was the owner's.
+
+**MEASURED - the oMLX server was never the problem.** `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:11435/v1/models/status`
+answers **401**, and the SAME request with `-H "Authorization: Bearer $OMLX_API_KEY"` answers **200** with a real
+`/v1/models/status` payload (`final_ceiling 48354880704`, `model_count 8`, `loaded_count 4`). The engine is up and
+healthy; a keyless `/v1` request is REFUSED BY DESIGN (app strings: *"Required to authenticate /v1 requests and admin
+sessions"*). The verification step handed over in the previous session sent no header, so it could NEVER pass -
+see BUG-1023.
+
+**MEASURED - the token went to the wrong application, and it took the sovereignty rule with it.** `~/.config/goose/config.yaml`
+mtime **2026-10-26 09:29** (i.e. four minutes before this session). Diffed against the four preceding generations
+(`config.yaml.bak.20261021174911`, `.bak-20261020-1109`, `.bak.20261020_prelocalplanner`, `.bak.20261017134734.taskB-core`,
+ALL `active_provider: maxwell_omlx`):
+
+| field | before (2026-10-21 generation) | after the paste |
+|---|---|---|
+| `providers.huggingface.enabled` | `false` | `true` |
+| `providers.huggingface.model` | `''` | `MiniMaxAI/MiniMax-M2.1` |
+| `active_provider` | `maxwell_omlx` | **`huggingface`** |
+| `HF_HOST` | absent | **`https://router.huggingface.co/v1`** |
+
+So `goose configure` did not merely store a credential: it ENABLED a cloud provider, gave it a cloud model, made it
+ACTIVE, and wrote the router host. `active_provider` is what a NEW session is born on, which is C1 ($0 marginal) and
+C3 (sovereign) broken by a settings screen - and no rail in this repository reads `~/.config/goose/config.yaml`, so
+the flip was invisible to every one of the 194 declaring lines.
+
+**FIXED BY REVERT, verified by parsing.** `active_provider: maxwell_omlx`, `providers.huggingface` back to
+`{enabled: false, model: ''}`, `HF_HOST` removed; written tempfile -> fsync -> os.replace after `yaml.safe_load`
+accepted the new text, backup `~/.config/goose/config.yaml.bak.20261026_cloudprovider-flip`. Re-read back:
+`active_provider = maxwell_omlx`, `HF_HOST present: False`.
+
+**WHAT IS *NOT* CLAIMED.** Whether THIS session (born ~09:33, after the 09:29 write) inherited the cloud provider is
+**NOT RECORDED**: `sessions.db` holds no row for 2026-10-26 (newest is `20261025_4` at 19:48:52), and a resumed or
+in-flight session's provider is not re-derived from the config. The finding is therefore stated as: the flip was
+REAL and RECORDED in the config, the revert is REAL and verified in the config, and no measurement on this machine
+can say a cloud request was served. A config write also does not reach a session already running (harness fact), so
+the revert is live for every session born from now on.
+
+**Why it is HIGH despite no measured spend.** The failure is silent by construction and it points the wrong way: it
+spends money and leaves the machine, and it would have been discovered - if ever - by a provider invoice, not by a
+rail. Registered as **T-205** (a declared provider-sovereignty check) rather than left to the owner's memory.
+
+**This is the same class as BUG-1010, one layer out.** BUG-1010 was a receipt that could not say which bytes it ran;
+this is a HARNESS whose subject changed without any record of the change. The lesson both share: a claim is only as
+good as the field that names its subject, and the subject of "we run locally" lives OUTSIDE this repository.
+
+## BUG-1023 (LOW - CLOSED 2026-10-26) - a manual verification step whose expected output CANNOT occur: step 4 asked for a keyless curl to answer JSON from a server that refuses keyless requests BY DESIGN
+
+The previous session handed over (D-3100 noob-proof form): *"Verify: `curl -s http://127.0.0.1:11435/v1/models/status
+| head -c 120` returns JSON (not `API key required`); if it differs, launch oMLX and repeat."* MEASURED today: that
+exact command answers `{"error":{"message":"API key required","type":"authentication_error",...}}` **when the server is
+perfectly healthy**, because `auth.api_key` is set in `~/.omlx/settings.json` and `allow_unauthenticated_inference` is
+`false`. The instruction defined success as the exact string a working server returns on failure.
+
+The owner did nothing wrong. The step was unpassable, and an owner who follows a step and sees it fail learns to
+distrust the whole handover - which is more expensive than the bug.
+
+**The corrected form** (a step must be runnable exactly as written, with a visible expected value):
+`curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $OMLX_API_KEY" http://127.0.0.1:11435/v1/models/status`
+-> **200**. Anything else is a real failure. The key is read from the ambient `OMLX_API_KEY` (also present as
+`auth.api_key`, 16 chars, in `~/.omlx/settings.json` - a different file from
+`~/Library/Application Support/oMLX/config.json`, which holds only `hf_token`).
+
+**Rule this hardens (D-3100, extended).** A manual step must name (a) the command, (b) the EXACT expected output,
+(c) the branch when it differs - and (d) the expected output must be one the healthy system actually produces. A
+step whose success case is indistinguishable from its failure case is not a verification, it is a coin toss with a
+confident caption.
+
+## BUG-954 (MED - CLOSED 2026-10-26) - CLOSED BY MEASUREMENT: **500.63 s -> 0.823 s** on the same 525 artifacts with BYTE-IDENTICAL verdicts, and the memo that does it refuses its own value in four named ways
+
+**The cost was where the claim said, and it was split exactly in half.** `temp/measure_yaml_guard.py` (temp/, never
+committed) instrumented the register's OWN file set - not a re-implementation of it (D-2646) - and split the rail's
+time per file:
+
+| reading | measured 2026-10-26 |
+|---|---|
+| artifacts | 525 |
+| bytes | 322,605,053 |
+| distinct byte streams | 522 |
+| read | **0.73 s** |
+| `yaml.safe_load` | **250.01 s** |
+| `duplicate_keys` | **249.88 s** |
+| total | **500.63 s** |
+
+Three things this measurement settled that the filing had only asserted:
+1. It was NEVER I/O. 322 MB reads in 0.73 s; the 500 s is two pure CPU walks over the same text, and they cost the
+   same to the hundredth of a second (250.01 vs 249.88). "Parses 282 MB twice" was exactly right.
+2. **Content-dedup buys almost nothing here.** 525 paths are 522 distinct byte streams - ONE group of four identical
+   files. So a memo whose only trick was "two paths, one verdict" would have saved 0.6 %. The saving is entirely
+   ACROSS RUNS, which is why it had to be persisted rather than held in a dict.
+3. The slowest single artifact is 2.77 s (`backups/decisions.PRE_recompute_decision_summary_20261025T162322Z.yaml`,
+   1,860,163 bytes). Seven of the top eight are the same class: frozen pre-images, re-decided every single run.
+
+**What was built.** `file_verdict(text)` is the smallest thing that is a pure function of the bytes: does it parse
+(and PyYAML's own `problem` sentence if not) and which keys are declared twice. `memo_verdict()` keys that on
+sha256(the file's bytes) + `source_digest()`, which is a digest of **scripts/lib/yaml_guard.py's own bytes plus
+PyYAML's version** - because a cache keyed on bytes alone would keep answering with the OLD rule after the rule
+changed, and a cache that outlives its own code is a silent verdict about code that no longer exists. The home is
+DECLARED in `config/yaml_guard.yaml` (`memo.path: temp/yaml_guard_memo.json`, `max_entries: 4000`), never a literal
+(C12), and it is gitignored runtime state by design (D-2983): a speed fact must not travel to another machine.
+
+**What is deliberately NOT memoised** - and this is the whole safety argument: `exempt`, `owed`, `STALE-OWED`,
+`MISSING-WHY`, `UNSCOPED`, `SCAN-SHRANK`, and the artifact count are readings about the REGISTER, not about a file. A
+cache that answered them would answer about a register it never read, so they are recomputed on every run. The memo
+can move the CLOCK and cannot move the VERDICT.
+
+**The A/B, taken on this clone.** Memo file deleted, then two consecutive runs of the same command:
+
+| run | wall | memo | result |
+|---|---|---|---|
+| COLD (book absent) | **498 s** | 3 hit(s) / 522 computed | `OWED yaml-guard: 525 artifact(s) scanned \| owed 4`, rc=2 |
+| WARM (book present) | **0.823 s** | 525 hit(s) / 0 computed | `OWED yaml-guard: 525 artifact(s) scanned \| owed 4`, rc=2 |
+
+`diff` of the two outputs with only the memo line removed: **IDENTICAL**. Same faults (none), same owed debt (4),
+same artifact count (525), same rc (2, owed-not-drift). The 3 cold-run hits are the four byte-identical paths
+resolving to one verdict inside the run. Memo size for 522 verdicts: **50,271 bytes**.
+
+**Five new known-answer controls (12 -> 17), including two against the memo itself:**
+- a memo HIT returns exactly the verdict the walk computes (not merely *some* verdict);
+- **a memo recorded under a MOVED rule is a MISS, not a verdict** - the anti-staleness control;
+- **a corrupt or foreign-schema book is a MISS, never a verdict** - fail-open toward recomputation, closed toward trust;
+- the book survives a DISK round trip (it exists to save the NEXT run, so what must work is the write/read pair);
+- the ceiling drops the least recently USED verdict, not the oldest written (json insertion order + re-insert on hit).
+
+`memo_write` is tempfile -> fsync -> os.replace (C6), and an unwritable memo is REPORTED and survived, never raised:
+an optimisation whose failure breaks the rail would be a new single point of failure bought with an old one's time.
+
+**The honest cost, stated so it is not discovered later.** A first run under a CHANGED rule is always full price -
+`source_digest()` moves, every entry misses - and that is the correct behaviour, not a bug. The saving starts on the
+SECOND run. For the whole-set ladder this is the difference between a 17.5-minute certification and a ~9-minute one,
+which is the loop BUG-1010's honesty rule made expensive; it does not make the FIRST certification after a rule
+change cheaper, and no claim is made that it does.
+
+**Also cleared while in the file:** the import block carried three pre-existing `E402` violations (`import os`,
+`import sys`, `from pathlib import Path` sitting BELOW `BLOCK_MARKERS`), which my edit would have added three more to.
+`BLOCK_MARKERS` now sits below every import and `ruff check scripts/lib/yaml_guard.py` is clean. This is not the
+BUG-1015 fix - `scripts/` is still linted nowhere - it merely refuses to add to a debt already filed.

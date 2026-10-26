@@ -67,3 +67,27 @@ receipt:
   artifacts: 113
   at: '2026-09-26T11:58Z - first run of scripts/lib/yaml_guard.py --check'
   direction: shrink_only
+
+# BUG-954: THE PER-FILE VERDICT MEMO. MEASURED (2026-10-25 whole-set run): this rail was 491.5 s of a 1048.0 s
+# ladder, because it re-decides the SAME bytes every run - `yaml.safe_load` plus the `duplicate_keys` walk over a
+# set whose byte volume is 98.7 % frozen `backups/decisions.PRE_*` pre-images that never change. The memo records
+# ONLY the per-file measurement ({broken, dups}), keyed by sha256(the file's bytes) + a digest of
+# scripts/lib/yaml_guard.py itself and of PyYAML's version - so a changed RULE invalidates every entry, and two
+# paths holding identical bytes share one verdict.
+#
+# WHAT IS DELIBERATELY NOT MEMOISED: exempt, owed, STALE-OWED, MISSING-WHY, UNSCOPED, SCAN-SHRANK and the artifact
+# count. Those are readings about the REGISTER, not about a file; a cache answering them would answer about a
+# register it never read. They are recomputed on every run, which is why the memo cannot move the VERDICT - only
+# the clock.
+#
+# THE HOME IS DECLARED HERE, NEVER A LITERAL (C12), and it is runtime state under gitignored `temp/` on purpose
+# (D-2983): a memo is a machine-local speed fact, not a claim about this repository, and committing it would let a
+# stale book travel to another machine. `max_entries` bounds growth; the ceiling drops the least recently USED entry.
+memo:
+  enabled: true
+  path: temp/yaml_guard_memo.json
+  max_entries: 4000
+  why: >-
+    BUG-954. A first run under a CHANGED rule is always full price - the digest moves, every entry misses - and
+    that is the honest cost of a cache that cannot answer for code it was not built against. The saving starts on
+    the SECOND run and compounds from there, which is exactly the shape of the 17.5-minute certification loop.

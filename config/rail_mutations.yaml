@@ -1304,3 +1304,24 @@ mutations:
       GIT_INDEX_FILE are cleared), because an inherited empty index made the same command answer 3973 lines
       against 0 in this clone - which would have marked EVERY scan un-attributable and turned a green ladder
       permanently owner-owed from a variable nobody in that file set.
+  - id: a_memo_hit_returns_the_computed_verdict
+    subject: scripts/lib/yaml_guard.py
+    op: replace
+    find: '        return {"broken": hit["broken"], "dups": hit["dups"]}, True'
+    replace: '        return {"broken": "", "dups": []}, True  # MUTATION (D-2676): a hit answers "clean" instead of its recorded verdict'
+    runner: scripts/lib/yaml_guard.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a memo HIT returns exactly the verdict the walk computes for the same bytes'
+    why: >-
+      BUG-954. The memo's claim is narrow and it is the whole safety argument: a HIT returns the verdict the walk
+      would have computed for THOSE BYTES, and every register-level reading (exempt, owed, STALE-OWED, MISSING-WHY,
+      UNSCOPED, SCAN-SHRANK, the artifact count) is recomputed on every run. The mutation makes the hit path answer
+      "parses cleanly, no duplicate keys" unconditionally - which is exactly what a cache that has quietly outlived
+      its own rule looks like from the outside, and it is indistinguishable from a clean repository: no rc moves, no
+      message appears, 525 artifacts are still reported. The control that catches it runs the SAME bytes twice and
+      compares the two verdicts, so it reds on the mutated build at the first hit. MEASURED basis for the rule
+      (2026-10-26): the rail was 500.63 s over 525 artifacts of which 522 are DISTINCT byte streams, so the saving is
+      across runs, and a memo that cannot be seen to refuse is a memo that will one day certify a repository it
+      never read.

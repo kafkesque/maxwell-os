@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1278 decisions (census stamp 3288c3ac5e9658bd, 2026-10-26) · 787 bugs (245 open / 542 closed; highest OPEN = BUG-1021) · 60 open tasks (MUST 10 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1279 decisions (census stamp cba418519bbb0876, 2026-10-26) · 790 bugs (247 open / 543 closed; highest OPEN = BUG-1026) · 60 open tasks (MUST 9 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1278 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 658 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1278, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1279 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 659 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1279, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 33 · UNLABELLED 98 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 247 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -32,9 +32,9 @@
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
-> | T-205 | 🔴 MUST | 🔴 open | a declared PROVIDER-SOVEREIGNTY check: the active provider in ~/.config/goose/config.yaml must be one this rep | governance/buglog.md#BUG-1022 - MEASURED 2026-10-26: `goose configure`'s Hugging Face past |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
+> | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
 > _the face is a VIEW: 12 of 60 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
@@ -22236,3 +22236,76 @@ the reviewer reached the right conclusion by the wrong mechanism; tonight it rea
 wrong mechanisms. A reviewer that is right for the wrong reason is worse than a reviewer that is wrong, because its
 agreement feels like confirmation. The controls are what make the difference: `_memo_respects_its_ceiling` proves the
 LRU behaviour two-sided, and it - not the prose - is why the incomplete mechanism in answer D cost nothing.
+
+## BUG-1024 (MED - OPEN, OWNER-OWED 2026-10-26) - the oMLX Hugging Face token has NO Settings surface: two instructions named a door that does not exist, the DEAD token stayed in three homes, and the LIVE one became a local inference credential
+
+**The surface, read out of the app's own strings (not a plausible menu).** `strings /Applications/oMLX.app/Contents/MacOS/oMLX` returns, together: `Row label for the HF token input`, `Section heading inside the upload sheet for the HF token row`, `Button label that triggers HF token validation`, `Button label that re-runs HF token validation after a successful one`, `Subtitle when a token has been validated. Placeholder is the HF username`, `Stored in macOS Keychain. Needs write access to your account.`, `Add Model from Hugging Face`, `/admin/api/upload/validate-token`, `HFValidateTokenRequest/Response`. The token row therefore lives **inside the model-upload sheet reached from "Add Model from Hugging Face"** and is stored in the **macOS Keychain** — it is *not* in Settings, and `~/.omlx/settings.json#huggingface` is a MEASURED absence of any token field: `{endpoint: '', hf_cache_enabled: true}`. NAMED HYPOTHESIS (D-3036): the *name* of the surface is measured from the binary; the exact click ORDER is inferred from a menu-item label and an upload-sheet heading, and no agent can verify it without the GUI. `security find-generic-password -s oMLX|-s omlx|-s com.omlx.hf-token` currently finds no item, i.e. the app has not yet written one.
+
+**What the owner did instead — and it was the only reasonable act available.** With no HF surface named anywhere, the token went into Settings → Security → Sub Keys. MEASURED: `~/.omlx/settings.json#auth.sub_keys[0] = {name: 'hugging face', key len 37, created 2026-10-26T09:42:05Z}`.
+
+**MEASURED consequence — a token's CLASS is not its ABILITY.** That read-only download token is a *working local inference credential*: `Authorization: Bearer <sub-key>` on `/v1/models/status` → **HTTP 200**, identical to the 16-char `auth.api_key` (`sk-…`, 200). A credential placed in the wrong store does not merely fail to help; it acquires the powers of that store.
+
+**MEASURED: three homes held ONE dead token, and the live one was in neither of the homes anything reads.**
+
+| home | len | sha256[:12] | mtime | `whoami-v2` |
+|---|---|---|---|---|
+| `~/Library/Application Support/oMLX/config.json#hf_token` | 37 | `a78e54f87d15` | 2026-07-22 18:00 | — |
+| `~/.cache/huggingface/token` | 37 | `a78e54f87d15` | 2026-07-22 18:04 | **401 REJECTED** |
+| `~/.huggingface/token` | 37 | `a78e54f87d15` | 2026-07-22 17:58 | — |
+| `~/.omlx/settings.json#auth.sub_keys[0]` (the paste) | 37 | `dbc9178ddc7b` | 2026-10-26 09:42 | **200 — user `neanderground`, role `read`, createdAt 2026-10-26T09:41:43Z** |
+
+**Why a dead token outranks no token.** `huggingface_hub` SENDS a credential it has been given, so a revoked token is refused with 401 **even for a PUBLIC repo**; an absent token degrades to anonymous, a dead one degrades to refusal. Nothing had broken yet only because both models the pipeline actually needs were already CACHED — DeBERTa NLI `3.9G` and bge-m3 `4.3G` under `~/.cache/huggingface/hub/`.
+
+**FIX, limb 1 — DISCHARGED by measurement.** The live token was written to both canonical homes (`~/.cache/huggingface/token`, `~/.huggingface/token`, mode 600, tmp→fsync→replace, fingerprints printed and never the secret), and verified by the library itself rather than by an assertion: `huggingface_hub 1.9.0` `whoami() -> neanderground`.
+
+**OWNER-OWED, limbs 2 and 3** (a GUI and a deletion cannot be done by an agent): paste the token in the app's own sheet, whose success signal is the HF **username** appearing (the app's own string: "Subtitle when a token has been validated. Placeholder is the HF username"), and DELETE the `hugging face` sub-key, which is an inference key wearing a download token's name.
+
+**PROTOCOL DEFECT, owned.** Two consecutive instructions (this session and the one before it) told the owner to paste into an oMLX "Settings → Hugging Face" section that does not exist. That is D-3100 violated in its strongest clause: a manual step must name a surface that RESOLVES, and the resolver must be the application's own strings or the config's own keys. Recorded as D-3153 clause (2).
+
+**NOT claimed:** that any gated download has failed, or that the app has read `config.json#hf_token` since 2026-07-22 — `config.json`'s mtime is unchanged and no Keychain item exists, so what the app would send today is unmeasured rather than known.
+
+## BUG-1025 (HIGH - CLOSED 2026-10-26) - a module called `sys.exit(1)` at IMPORT, which killed the config audit that reflects on it, which aborted `just preflight` at the SEVENTH of thirteen declared lines: six rails never ran, including the only `check_omlx_health` line
+
+**MEASURED, one command.** `python3 -c 'import pipeline.dspy_trainer'` → **rc=1**, stdout `ERROR: dspy-ai not installed. Run: pip install dspy-ai`. The guard sat at `pipeline/dspy_trainer.py:72-76` and it printed, then `sys.exit(1)`.
+
+**Why that ended a DIFFERENT program.** `pipeline/config_audit.py:83` maps the config key `s2.dspy_max_tokens` to `("pipeline.dspy_trainer", "DSPY_MAX_TOKENS", "int")` and reads it through `importlib.import_module`, inside `get_code_value`'s `except Exception: return None` — a handler written precisely so an unimportable module is HARMLESS. **`SystemExit` derives from `BaseException`, not `Exception`**, so the guard walked straight through the one handler that existed to contain it and took the *consuming process* with it.
+
+**MEASURED consequence: the cheap front door was part dead.** `just preflight` → **rc=1 in 4.7 s**, dying at `pipeline/config_audit.py --check-unchecked --strict`, the 7th of 13 declared lines. Behind it, six declared readings never executed — taxonomy, `check_omlx_health`, `recompute_decision_summary --check`, `check_config_duplicate_keys`, `subagent_fanout doctor`, `research_run --check`. **`check_omlx_health` has exactly ONE declaring line in the whole justfile, and it was one of the dead six** — so the harness's only cheap "is the engine UP" reading was unreachable. A gate that cannot run does not report "unknown"; it reports SILENCE, and silence is indistinguishable from clean.
+
+**FIX (two-sided, then measured).** The guard now gives the CLI its single clean sentence (`if __name__ == "__main__": print + sys.exit(1)`) and raises a catchable `ImportError` to a library caller. VERIFIED: `import pipeline.dspy_trainer` → rc=1, **empty stdout**, last stderr line `ImportError: dspy-ai is not installed (pip install dspy-ai); pipeline.dspy_trainer needs it`; `python3 -m pipeline.dspy_trainer --dry-run` → rc=1 with the original clean sentence intact; `config_audit --check-unchecked --strict` → **completes in 1.6 s** instead of dying.
+
+**WHAT CLOSING IT EXPOSED, which is the real finding.** The audit can now speak, and it had ten things to say that it had never been able to report: **1 config/code mismatch** (`s2.dspy_max_tokens: 4096` at an unreadable default) and **9 unchecked hardcoded values** — `container_integrity.py:35 TAIL_BYTES=4096`, `:80 PALMDB_MAGIC_OFFSET=60`, `:81 PALMDB_HEADER_BYTES=78`, `:82 PALMDB_RECORD_ENTRY_BYTES=8`, `:114 OLE_HEADER_BYTES=512`, `:208 HEAD_BYTES=512`, `model_store_census.py:115 RC_FAULT=1`, `:116 RC_OWNER_OWED=2`, `stage0_convert.py:84 MIN_OUTPUT_BYTES=100`. Registered as **T-206** with a shrink-only ceiling instead of being folded into `ACKNOWLEDGED_HARDCODED`, because an acknowledgement set that absorbs a finding is a register that cannot shrink.
+
+**REFUSED, and why (D-3038).** Reordering `just preflight` so the six rails would run before the fragile gate was rejected: it would trade an honest RED for a cosmetic GREEN. What WAS done instead is placing the sovereignty read (T-205/D-3153) *ahead* of the fragile gate, so the reading that matters most can never be shadowed by a later abort — measured working: `harness homes: 5 bound | 0 conflicting` printed before the abort line.
+
+**NAMED LIMIT.** `preflight` is still rc=1, now for a REAL and newly visible reason (the 10 items above), and the six rails behind it are still unreachable in that door. They do run in the whole-set ladder, so the exposure is the cheap door and not the certification.
+
+## BUG-1026 (LOW - OPEN 2026-10-26) - a rail matched the WORD "owner" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to write around a variable
+
+**MEASURED, one command, on a task written minutes earlier.** `python3 scripts/gov_sync.py --apply` →
+`!! T-206: the gate names the 'owner' but mover says 'pipeline' - the two fields disagree`. T-206's gate is a
+`mover: pipeline` task and mentions no human. It mentions `RC_OWNER_OWED`, the name of a Python constant in
+`pipeline/model_store_census.py:116`.
+
+**The mechanism, read from the source.** `scripts/gov_sync.py:130` is
+`if mv != "owner" and token and token in gate:` — a plain SUBSTRING test of the declared owner token (`owner`) against
+the gate text. `"owner" in "an EXIT-CODE VOCABULARY (RC_FAULT, RC_OWNER_OWED) stays in code"` is True, so a pipeline
+task that correctly DESCRIBES an exit-code constant is accused of gating on a person.
+
+**Why it matters more than one false positive.** The rail's demand is unsatisfiable without losing information: the
+only ways out are to rename the constant, to spell it differently, or to stop mentioning it — i.e. **the register must
+write around a variable name**. A governance rail that forces prose to avoid identifiers is a rail that degrades the
+record it protects, and this repository uses underscored rc vocabularies everywhere (`RC_OK`, `RC_FAULT`,
+`RC_OWNER_OWED`, and the owner-owed/owner-word vocabulary in `config/decisions.yaml`), so the shape recurs.
+
+**What was done instead of a silent workaround, and why.** The gate was reworded to point at `evidence` (which already
+names both constants), because a fact the register owns should have ONE home (the repo's own D-2692 principle) - so
+the rewording is correct on its own merits and not merely an evasion. The rail was NOT changed in this turn: it is a
+governance instrument and the change needs its own two-sided control.
+
+**DECLARED FIX SHAPE (so it is not re-derived):** replace the substring test with a boundary test that excludes an
+identifier interior — `re.search(rf"(?<![A-Za-z0-9_]){re.escape(token)}", gate, re.I)` — which still catches
+`the owner`, `owner's`, `OWNER WORD` and `owner-owed`, and does not catch `RC_OWNER_OWED`. TWO-SIDED CONTROL, both
+directions on the same fixture: a pipeline-moved entry whose gate says "the owner must approve" is a FAULT, and a
+pipeline-moved entry whose gate mentions only `RC_OWNER_OWED` is GREEN. NAMED WRONG FIX: stripping underscores from
+the compared text, which would make `RC_OWNER_OWED` match by collapsing the very distinction that identifies it.

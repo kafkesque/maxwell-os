@@ -2734,25 +2734,81 @@ tasks:
 
 - id: T-205
   priority: MUST
+  state: done
+  closed: 2026-10-26
+  mover: pipeline
+  title: >-
+    CLOSED 2026-10-26 (D-3153 clause 1) - the PROVIDER-SOVEREIGNTY READING, at a door cheap enough to walk through.
+    The rail already existed; what was missing was an INVOCATION, and the registered premise that said otherwise was
+    falsified by measurement before a line was written
+  source: BUG-1022 (HIGH - CLOSED 2026-10-26) / BUG-1025 (HIGH - CLOSED 2026-10-26) / C1 ($0 marginal) / C3 (sovereign) / C22 (local-first, API opt-in)
+  why: >-
+    D-3153. THE PREMISE THIS ROW WAS OPENED ON IS FALSE and is retired IN PLACE (D-3038), never deleted. It read
+    "not one of the 194 declaring lines reads that file". MEASURED 2026-10-26: justfile line 81 runs
+    scripts/check_harness_homes.py inside the ladder, and that rail reads config/agent_context.yaml#home_facts[0],
+    which declares `active_provider` and compares it against config/engine.yaml#harnesses.goose_provider_id through
+    a POINTER (C12: no literal in the script, no value with two homes), decided_by [D-295, D-3023, D-3044], row T-174.
+    It costs 0.32 s and carries 7/7 known-answer controls, of which control #2 is EXACTLY the shape BUG-1022 needed:
+    a home that says someone_else reads CONFLICT, rc 2, and NAMES the decision and the row that own it. What failed
+    was INVOCATION, not presence: the whole-set scan ENDED 2026-10-26T09:20:12Z and the owner's paste landed at 09:29,
+    and a RESUMED session never re-runs the boot sequence. Building the rail this row described would have produced a
+    SECOND rail reading the same key - drift wearing the costume of diligence - so the wrong fix is declared here as
+    well: a new script, a new config file, or a hardcoded "maxwell_omlx" anywhere.
+  evidence: >-
+    MEASURED 2026-10-26. (a) BEFORE the change: python3 scripts/check_harness_homes.py -> "5 declared fact(s) | bound
+    5 | conflicting 0 | waiting 0 | unreadable 0", rc 0, 0.32 s, control #2 green. (b) The gap was reachability of the
+    cheap door, and it was WORSE than assumed: `just preflight` was dying at its 7th of 13 declared lines (BUG-1025),
+    so any reading placed after that line was unreachable in the door a human actually uses. (c) AFTER: the reading is
+    the SECOND declared line of just preflight, ahead of the fragile gate, so it can never be shadowed by a later
+    abort - verified by running it and watching "harness homes: 5 bound | 0 conflicting" print BEFORE the abort line.
+  gate: >-
+    DELIVERED and closed, so there is nothing left to decide. Three things must survive this closure. (1) The reading
+    must stay AHEAD of any line in just preflight that can abort (measured: it is line 2 of 14). (2) The expectation
+    must stay a POINTER into config/engine.yaml, never a literal: a provider name written into a script is a value
+    with two homes and goes stale the moment the provider is renamed. (3) TWO semantic differences from this row's
+    original proposal are DECLARED rather than quietly reversed, so nobody re-opens the row on the same false premise:
+    the rail checks ONE named provider (must_equal a pointer) and not a declared LOCAL SET, because the harness config
+    must point at the engine that OWNS the models - a legitimate local provider that is not that engine is still a
+    session that cannot reach its models; and an ABSENT home is FATAL, not NOT-RECORDED, which is D-795 and unchanged:
+    fail-closed is right on the machine that owns the harness, and reversing it needs a measurement, not a preference.
+- id: T-206
+  priority: SHOULD
   state: open
   mover: pipeline
   title: >-
-    a declared PROVIDER-SOVEREIGNTY check: the active provider in ~/.config/goose/config.yaml must be one this repo
-    declares LOCAL, and a cloud provider must red the ladder instead of being discovered on an invoice
-  source: BUG-1022 (HIGH - CLOSED 2026-10-26) / C1 ($0 marginal) / C3 (sovereign) / C22 (local-first, API opt-in)
+    the TEN C12 items a DEAD gate had been hiding: 1 config/code mismatch and 9 unchecked hardcoded values, counted
+    against a SHRINK-ONLY ceiling - because a gate that cannot run reports SILENCE, and silence is indistinguishable
+    from clean
+  source: BUG-1025 (HIGH - CLOSED 2026-10-26) / D-3153 clause 6 / C12 (no hardcoded values) / C20 (no magic numbers)
+  why: >-
+    MEASURED 2026-10-26, and they were invisible until BUG-1025 was fixed. pipeline/config_audit.py
+    --check-unchecked --strict could not complete on the canonical interpreter because an import-time sys.exit(1) in
+    pipeline/dspy_trainer.py killed the audit itself; with that guard fixed the audit speaks, and it reported ten
+    items it had never been able to report: 1 config/code mismatch (s2.dspy_max_tokens: 4096, expected at
+    pipeline.dspy_trainer.DSPY_MAX_TOKENS, unreadable while dspy-ai is absent) and 9 UNCHECKED HARDCODED values in
+    pipeline/*.py. They are REGISTERED rather than folded into ACKNOWLEDGED_HARDCODED: an acknowledgement set that
+    can absorb a finding is a register that cannot shrink, and the repo already carries a shrink-only-ceiling idiom
+    for exactly this (D-2644).
   evidence: >-
-    governance/buglog.md#BUG-1022 - MEASURED 2026-10-26: `goose configure`'s Hugging Face paste wrote
-    `active_provider: huggingface`, `providers.huggingface.enabled: true`, `model: MiniMaxAI/MiniMax-M2.1` and
-    `HF_HOST: https://router.huggingface.co/v1` at 09:29, against FOUR preceding generations that all read
-    `active_provider: maxwell_omlx`. Not one of the 194 declaring lines reads that file, so the flip was invisible
-    to the whole ladder while it pointed inference - and therefore money and data - at a cloud router.
+    MEASURED 2026-10-26 by `python3 pipeline/config_audit.py --check-unchecked --strict` (rc=1, wall 1.6 s), the first
+    run that ever reached its own report. Unchecked: container_integrity.py:35 TAIL_BYTES = 4096 |
+    container_integrity.py:80 PALMDB_MAGIC_OFFSET = 60 | :81 PALMDB_HEADER_BYTES = 78 | :82 PALMDB_RECORD_ENTRY_BYTES = 8 |
+    :114 OLE_HEADER_BYTES = 512 | :208 HEAD_BYTES = 512 | model_store_census.py:115 RC_FAULT = 1 |
+    model_store_census.py:116 RC_OWNER_OWED = 2 | stage0_convert.py:84 MIN_OUTPUT_BYTES = 100. Mismatch: 1.
   gate: >-
-    A rail reads the config path DECLARED in config/ (C12: the path and the allowed-provider set both live in YAML,
-    never in the script) and returns rc=2 when `active_provider` is not in the declared LOCAL set. Three controls on
-    FIXTURES, never on the live file: a fixture naming a cloud provider reds, a fixture naming a local provider is
-    green, and an ABSENT config file reports NOT-RECORDED and stays green - a machine without goose must not fail a
-    rail about goose (the same fail-closed/absent distinction the harness facts make). The wrong fix, declared so it
-    cannot be taken: hardcoding "maxwell_omlx" in the script, which would make the rule stale the moment the local
-    provider is renamed and would be a value with two homes. SEQUENCING: this adds a declaring line, and every added
-    line costs a whole-set rescan to certify honestly (BUG-1010) - so it should land AFTER BUG-954's memo is warm,
-    where a certification costs minutes instead of 17.5 of them.
+    Count it FIRST, then hold it. (1) A deterministic reading of the same command must report a COUNT against a
+    SHRINK-ONLY ceiling declared in config/ - never a prose number (the T-203 shape: a prose table may not RESTATE a
+    hub count). Baseline to capture on the first run: 9 unchecked + 1 mismatch; the ceiling may only move DOWN.
+    (2) THREE item classes, decided ONCE and applied consistently, because they are not the same defect: a MEANING
+    value (MIN_OUTPUT_BYTES, TAIL_BYTES, HEAD_BYTES) moves to YAML (C12); an EXIT-CODE VOCABULARY (the two rc
+    constants in model_store_census.py, named in evidence above and NOT restated here - a fact this register owns
+    has ONE home) stays in code with its reason stated in ACKNOWLEDGED_HARDCODED, following the precedent already
+    written there for the same shape ("config-ising an exit code would make the meaning of a run's result
+    configurable"); a FORMAT LAYOUT CONSTANT (the PalmDB header offsets and record-entry width) is a binary format
+    spec and must be declared as such with its source, never a tunable. (3) The s2.dspy_max_tokens leg has a
+    DEPENDENCY condition and must be stated as one: the default is unreadable only while dspy-ai is absent, so the
+    gate is "re-read it on an interpreter that can import pipeline.dspy_trainer", not "assume it matches".
+    (4) TWO-SIDED CONTROL: a count BELOW the ceiling is green, a count ABOVE it is a fault, and an EMPTY report from a
+    gate that did not run is NOT zero - the reading must prove it reached its own report (that is BUG-1025's whole
+    lesson, and it is the difference between 0 findings and 0 output). (5) SEQUENCING: this adds declaring lines, so
+    land it while BUG-954's yaml_guard memo is warm, or certification costs a full rescan (BUG-1010).

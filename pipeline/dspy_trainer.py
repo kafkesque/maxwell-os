@@ -71,9 +71,19 @@ from pipeline.pipeline_paths import OMLX_API_KEY  # noqa: E402  (D2482: fix Dire
 
 try:
     import dspy
-except ImportError:
-    print("ERROR: dspy-ai not installed. Run: pip install dspy-ai")
-    sys.exit(1)
+except ImportError as _dspy_missing:
+    # BUG-1025 (D-3153): THIS MODULE MAY NOT END THE PROCESS AT IMPORT.
+    # It used to print + sys.exit(1) here, and SystemExit is a BaseException, so it escaped every
+    # `except Exception` that reflects on this module. pipeline/config_audit.py maps the config key
+    # `s2.dspy_max_tokens` to this module and imports it to read DSPY_MAX_TOKENS, so the WHOLE audit
+    # died on line 83 of its own mapping - and `just preflight` aborts at that line, taking the six
+    # declared rails after it (including the only check_omlx_health line) with it. MEASURED 2026-10-26:
+    # `import pipeline.dspy_trainer` -> rc=1, stdout "ERROR: dspy-ai not installed...".
+    # The CLI still gets its one clean sentence; an IMPORTER gets an ImportError it can catch.
+    if __name__ == "__main__":
+        print("ERROR: dspy-ai not installed. Run: pip install dspy-ai")
+        sys.exit(1)
+    raise ImportError("dspy-ai is not installed (pip install dspy-ai); pipeline.dspy_trainer needs it") from _dspy_missing
 
 
 class ConvergentExtraction(dspy.Signature):

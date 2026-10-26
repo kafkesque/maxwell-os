@@ -32504,3 +32504,61 @@ decisions:
   - governance/evidence/ENGINE_AB_20261025.json
   - governance/OWNER_STEPS_T200_20261025.md
   - governance/buglog.md
+- id: D-3153
+  state: ACTIVE
+  date: '2026-10-26'
+  by: assistant
+  category: RAILS / INSTRUCTION PROTOCOL
+  title: a RAIL that exists is not a rail that RUNS - a library may not end the process at import - and an instruction must name a surface that RESOLVES
+  bugs:
+  - BUG-1024
+  - BUG-1025
+  decision: 'Six clauses, each bought by a measurement on 2026-10-26. (1) AN EXISTING RAIL IS NOT NEW WORK.
+    T-205 was registered on the premise that "not one of the 194 declaring lines reads that file". That premise is
+    FALSE and was falsified before a line was written: config/agent_context.yaml#home_facts[0] declares active_provider
+    and compares it to config/engine.yaml#harnesses.goose_provider_id through a POINTER (C12, never a literal),
+    scripts/check_harness_homes.py has read it since T-157/D-3044, justfile:81 runs it inside the ladder, it costs
+    0.32 s, and it carries 7/7 known-answer controls of which the SECOND is exactly the shape the bug needed: a home
+    that says someone_else reads CONFLICT, rc 2, and NAMES D-295 and T-157. What failed was INVOCATION: the whole-set
+    scan ENDED 2026-10-26T09:20:12Z and the owner''s paste landed at 09:29, and a RESUMED session never re-runs the
+    boot sequence. The fix is therefore a door CHEAP ENOUGH TO WALK THROUGH, not a second rail: the reading was
+    inserted into just preflight AHEAD of the fragile gate, so it can never be shadowed by a later abort (MEASURED:
+    it prints 5 bound / 0 conflicting before anything else can fail). A duplicate rail would have been drift wearing
+    the costume of diligence. (2) AN INSTRUCTION MUST NAME A SURFACE THAT RESOLVES, and its resolver must be the
+    application''s own strings or the configuration''s own keys. Two consecutive instructions sent the owner to an
+    oMLX "Settings -> Hugging Face" section that does not exist; the app''s binary places the row inside the
+    model-upload sheet reached from "Add Model from Hugging Face" and stores it in the macOS Keychain, and
+    ~/.omlx/settings.json#huggingface carries no token field at all. A plausible menu is a declaration with no
+    referent (D-3034 applied to instructions, and D-3100''s strongest clause). (3) A LIBRARY MAY NOT END THE PROCESS
+    AT IMPORT, and the reason is narrower than taste: SystemExit derives from BaseException, so an import-time
+    sys.exit(1) escapes every `except Exception` written to make an unimportable module HARMLESS. pipeline/config_audit.py
+    imports pipeline.dspy_trainer to read one default, so the guard killed the AUDIT, and just preflight died at the
+    seventh of thirteen declared lines - six readings never ran, and check_omlx_health has exactly one declaring line
+    in the whole justfile. A module that exits at import converts a missing dependency into a silent outage of every
+    instrument that reflects on it. (4) A DEAD CREDENTIAL IS NOT AN ABSENT ONE: huggingface_hub sends the token it is
+    given, so a revoked token is refused with 401 even for a PUBLIC repo, while an absent token degrades politely to
+    anonymous. Three homes held one revoked token (sha256 a78e54f87d15, all from 2026-07-22) while the live one sat
+    in a store nothing reads for downloads; both pipeline models happened to be cached (DeBERTa 3.9G, bge-m3 4.3G),
+    which is the only reason nothing had broken. (5) A TOKEN''S CLASS IS NOT ITS ABILITY: a read-only HF download
+    token stored in oMLX''s sub-key store returns HTTP 200 as a local inference bearer, the same as the 16-char
+    server key - a credential placed in the wrong store acquires the powers of that store rather than merely failing
+    to help. (6) CLOSING A DEAD GATE EXPOSES DEBT, AND THE DEBT MUST BE COUNTED, NOT ACKNOWLEDGED: closing BUG-1025
+    made config_audit report 10 C12 items that were never reportable before (1 config/code mismatch plus 9 unchecked
+    hardcoded values), and they are registered as T-206 against a shrink-only ceiling rather than folded into
+    ACKNOWLEDGED_HARDCODED, because an acknowledgement set that can absorb a finding is a register that cannot shrink.'
+  measured:
+  - 'check_harness_homes.py: 5 declared facts, 5 bound, 0 conflicting, 0 unreadable, rc 0, 0.32 s; --selftest 7/7 green, control #2 = a foreign provider reads CONFLICT and names D-295/T-157'
+  - 'import pipeline.dspy_trainer BEFORE: rc=1, stdout "ERROR: dspy-ai not installed. Run: pip install dspy-ai" (SystemExit, uncaught by except Exception)'
+  - 'import pipeline.dspy_trainer AFTER: rc=1, EMPTY stdout, ImportError on stderr; the CLI keeps its one clean sentence; config_audit completes in 1.6 s'
+  - 'just preflight BEFORE: rc=1 in 4.7 s, aborting at the 7th of 13 declared lines, 6 readings unreachable'
+  - 'just preflight AFTER: rc=1 for a REAL reason - 9 unchecked hardcoded values + 1 config/code mismatch, never reportable before'
+  - 'HF token homes: three files at sha256 a78e54f87d15 (2026-07-22) answer 401; the pasted token at sha256 dbc9178ddc7b answers 200 as user neanderground, role read; written to both canonical homes at mode 600 and verified with huggingface_hub.whoami()'
+  - 'oMLX: /v1/models/status keyless 401, with the 16-char auth.api_key 200, with the 37-char HF sub-key 200 (the class confusion, measured)'
+  files:
+  - pipeline/dspy_trainer.py
+  - justfile
+  - config/decisions.yaml
+  - config/task_register.yaml
+  - governance/buglog.md
+  - governance/HANDOFF_20261026_OMLX_HF_TOKEN_AND_PREFLIGHT.md
+  supersedes_note: 'T-205''s registered premise (that no declaring line reads the harness config) is falsified by measurement, not by preference; the task is CLOSED against this clause (1) with the false premise retired IN PLACE, never deleted (D-3038).'

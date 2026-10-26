@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 787,
-  "open_n": 245,
-  "closed_n": 542,
+  "total_ids": 790,
+  "open_n": 247,
+  "closed_n": 543,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1234,6 +1234,16 @@
       "id": "BUG-1021",
       "title": "(LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict,",
       "events": 1
+    },
+    {
+      "id": "BUG-1024",
+      "title": "(MED - OPEN, OWNER-OWED 2026-10-26) - the oMLX Hugging Face token has NO Settings surface: two instructions named a door that does not",
+      "events": 1
+    },
+    {
+      "id": "BUG-1026",
+      "title": "(LOW - OPEN 2026-10-26) - a rail matched the WORD \"owner\" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to",
+      "events": 1
     }
   ],
   "closed": [
@@ -1778,6 +1788,7 @@
     "BUG-1018",
     "BUG-1019",
     "BUG-1022",
-    "BUG-1023"
+    "BUG-1023",
+    "BUG-1025"
   ]
 }

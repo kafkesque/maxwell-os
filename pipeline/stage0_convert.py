@@ -45,6 +45,7 @@ from pipeline.pipeline_paths import (
     S0_ARTIFACT_IMAGE_MODE,
     S0_ARTIFACT_MAX_EMBEDDED_IMAGES,
     S0_ARTIFACT_MAX_MB,
+    S0_MIN_OUTPUT_BYTES,
     S0_BUDGET_BASIS,
     S0_CONTAINERS,
     S0_DOCLING_CEILING_S,
@@ -81,7 +82,9 @@ SUPPORTED_EXTENSIONS = set(S0_CONTAINERS)
 #: this machine, by the pandoc and KindleUnpack steps below. The container axis is now DECLARED, one line per
 #: container naming its reader (config/pipeline_config.yaml#stage0.containers), and this set DERIVES from it.
 MD_EXTENSION = ".md"
-MIN_OUTPUT_BYTES = 100  # C20: a converter that "succeeded" into <100 bytes wrote a receipt, not a work
+#: T-206/D-3153: an ALIAS, never a second value. The floor is declared at
+#: config/pipeline_config.yaml#stage0.artifact.min_output_bytes and read through pipeline_paths (C12).
+MIN_OUTPUT_BYTES = S0_MIN_OUTPUT_BYTES
 #: BUG-898: where the FULL tail of a failed conversion rests. Derived from the checkpoint it belongs to, so no new
 #: path has to be declared, and NOT the checkpoint itself: the checkpoint's keys are what a resume SKIPS, so a
 #: failure written there would never be retried (the failure would become permanent by accident).

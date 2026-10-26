@@ -49,7 +49,9 @@ with open(CONFIG_PATH, encoding='utf-8') as f:
 _gen = _cfg.get("models", {}).get("generator", {})
 DSPY_MODEL = _gen.get("model", "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit") if isinstance(_gen, dict) else str(_gen)
 DSPY_TEMPERATURE = float(_gen.get("temperature", 0.0)) if isinstance(_gen, dict) else 0.0
-DSPY_MAX_TOKENS = int(_cfg.get("s2", {}).get("dspy_max_tokens", 4096))  # D2304/C12: config-driven (was hardcoded 4096)
+#: T-206/D-3153: read from pipeline_paths, which is importable without the optional `dspy-ai` dependency.
+#: The constant is imported below, after the project root is on sys.path.
+
 # T-007b/D2250: MIPROv2 demo counts — config-driven (C12). D2248 showed 2 demos =
 # design-only (Cooper/Krug/Norman) while the golden pool spans 38 domains; 4 demos
 # give the optimizer enough labeled coverage for positive-fidelity extraction.
@@ -62,7 +64,7 @@ RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 # NOTE: Depth is now classified in Stage 4, not S2 (A-001/D2241).
 # DEPTHS removed from S2 metric — see CONSTITUTION §2, D2241.
 from pipeline.content_types import EXTRACTION_TYPES  # noqa: E402  (config-first enum)
-from pipeline.pipeline_paths import OMLX_API_KEY  # noqa: E402  (D2482: fix DirectOMLXLM auth — was hardcoded "not-needed", OMLX now enforces sk-maxwell-local)
+from pipeline.pipeline_paths import OMLX_API_KEY, S2_DSPY_MAX_TOKENS  # noqa: E402  (D2482 auth; T-206: the output budget's ONE home, importable without dspy)
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -75,7 +77,7 @@ except ImportError as _dspy_missing:
     # BUG-1025 (D-3153): THIS MODULE MAY NOT END THE PROCESS AT IMPORT.
     # It used to print + sys.exit(1) here, and SystemExit is a BaseException, so it escaped every
     # `except Exception` that reflects on this module. pipeline/config_audit.py maps the config key
-    # `s2.dspy_max_tokens` to this module and imports it to read DSPY_MAX_TOKENS, so the WHOLE audit
+    # `s2.dspy_max_tokens` to this module and imports it to read the constant, so the WHOLE audit
     # died on line 83 of its own mapping - and `just preflight` aborts at that line, taking the six
     # declared rails after it (including the only check_omlx_health line) with it. MEASURED 2026-10-26:
     # `import pipeline.dspy_trainer` -> rc=1, stdout "ERROR: dspy-ai not installed...".
@@ -592,7 +594,7 @@ class DirectOMLXLM(dspy.LM):
         api_base: str = f"http://localhost:{OMLX_PORT}/v1",
         api_key: str = OMLX_API_KEY,
         temperature: float = DSPY_TEMPERATURE,
-        max_tokens: int = DSPY_MAX_TOKENS,
+        max_tokens: int = S2_DSPY_MAX_TOKENS,
         **kwargs,
     ):
         super().__init__(model=model, temperature=temperature, max_tokens=max_tokens, **kwargs)

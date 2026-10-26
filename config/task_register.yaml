@@ -2773,12 +2773,13 @@ tasks:
     fail-closed is right on the machine that owns the harness, and reversing it needs a measurement, not a preference.
 - id: T-206
   priority: SHOULD
-  state: open
+  state: done
   mover: pipeline
+  closed: '2026-10-26'
   title: >-
-    the TEN C12 items a DEAD gate had been hiding: 1 config/code mismatch and 9 unchecked hardcoded values, counted
-    against a SHRINK-ONLY ceiling - because a gate that cannot run reports SILENCE, and silence is indistinguishable
-    from clean
+    CLOSED 2026-10-26 - the TEN C12 items a DEAD gate had been hiding: 1 config/code mismatch and 9 unchecked
+    hardcoded values, counted against a SHRINK-ONLY ceiling - because a gate that cannot run reports SILENCE, and
+    silence is indistinguishable from clean
   source: BUG-1025 (HIGH - CLOSED 2026-10-26) / D-3153 clause 6 / C12 (no hardcoded values) / C20 (no magic numbers)
   why: >-
     MEASURED 2026-10-26, and they were invisible until BUG-1025 was fixed. pipeline/config_audit.py
@@ -2796,6 +2797,11 @@ tasks:
     :114 OLE_HEADER_BYTES = 512 | :208 HEAD_BYTES = 512 | model_store_census.py:115 RC_FAULT = 1 |
     model_store_census.py:116 RC_OWNER_OWED = 2 | stage0_convert.py:84 MIN_OUTPUT_BYTES = 100. Mismatch: 1.
   gate: >-
+    CLOSED 2026-10-26 by measurement, not by prose: `python3 pipeline/config_audit.py --check-unchecked --strict`
+    now reads 0 unchecked / ceiling 0 (scanned 122 modules, rc 0), `--selftest` is 4/4 - and that selftest is
+    INVOKED by `just preflight` on the line before the strict count, because a control nothing runs is a comment
+    (BUG-492) - and `just preflight` is rc 0 end-to-end. The ceiling is declared at config/pipeline_config.yaml#config_audit.unchecked_hardcoded and a
+    new hardcode is a FAULT, not a shrug. The original gate, kept as the record of what was owed:
     Count it FIRST, then hold it. (1) A deterministic reading of the same command must report a COUNT against a
     SHRINK-ONLY ceiling declared in config/ - never a prose number (the T-203 shape: a prose table may not RESTATE a
     hub count). Baseline to capture on the first run: 9 unchecked + 1 mismatch; the ceiling may only move DOWN.

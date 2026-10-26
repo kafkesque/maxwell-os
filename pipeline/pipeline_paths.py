@@ -328,7 +328,7 @@ def _s0_artifact_rule() -> dict:
             f"{sorted(allowed_modes)} (docling's own closed vocabulary; C12)"
         )
     out = {"image_export_mode": mode}
-    for key, minimum in (("max_embedded_images", 0), ("max_artifact_mb", 1)):
+    for key, minimum in (("max_embedded_images", 0), ("max_artifact_mb", 1), ("min_output_bytes", 1)):
         if key not in block:
             raise RuntimeError(
                 f"FATAL: stage0.artifact.{key} is not declared — an absent ceiling is refused, never defaulted "
@@ -351,6 +351,14 @@ S0_ARTIFACT = _s0_artifact_rule()
 S0_ARTIFACT_IMAGE_MODE: str = S0_ARTIFACT["image_export_mode"]
 S0_ARTIFACT_MAX_EMBEDDED_IMAGES: int = S0_ARTIFACT["max_embedded_images"]
 S0_ARTIFACT_MAX_MB: int = S0_ARTIFACT["max_artifact_mb"]
+#: T-206/D-3153: the "a receipt is not a work" floor is a DECLARED fact, not a converter default. It lives beside
+#: the other artefact-shape ceilings so a converter that under-produces is judged by ONE declared shape.
+S0_MIN_OUTPUT_BYTES: int = S0_ARTIFACT["min_output_bytes"]
+
+#: T-206/D-3153: DSPy's output budget is read HERE, beside the other config constants, so the value has ONE home
+#: that is importable without the optional `dspy-ai` dependency. Before this, config_audit could not read
+#: `pipeline.dspy_trainer.DSPY_MAX_TOKENS` on an interpreter without dspy and reported a false config/code mismatch.
+S2_DSPY_MAX_TOKENS: int = int(required(_CFG, "s2", "dspy_max_tokens", where=_CFG_HOME))
 #: D-3034: the two classes the shape gate emits must EXIST in the declared vocabulary. A code path that can emit a
 #: class name the register does not carry is the tail again — the reader gets a word nobody defined.
 for _required_class in ("artifact_images_embedded", "artifact_oversize"):

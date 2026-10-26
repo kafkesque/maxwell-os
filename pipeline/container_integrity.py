@@ -28,11 +28,49 @@ import zipfile
 from pathlib import Path
 from typing import Any, Callable
 
-#: How far from the END a trailer marker may sit. Named, because "how much tail is enough" is a judgement a
-#: reader must be able to see and argue with (C20). A zip's end-of-central-directory is within the last 64 KiB
-#: by construction; a PDF's `%%EOF` is the last thing a well-formed file carries, and readers tolerate a little
-#: trailing junk, so 4 KiB is generous in both directions.
-TAIL_BYTES = 4096
+import yaml
+
+#: T-206/D-3153: the probe's READ WINDOWS are DECLARED, not magic numbers. They live beside the admission
+#: policy that already owns which probe reads which kind, because "how much tail/head is enough" is a judgement
+#: about this machine's containers and must be readable without editing the module (C12).
+_INGEST_GATE = Path(__file__).resolve().parent.parent / "config" / "ingest_identity_gate.yaml"
+
+
+def _probe_limits() -> dict[str, int]:
+    """Read the declared probe windows, failing closed when the declaration is absent or not an integer."""
+    doc = yaml.safe_load(_INGEST_GATE.read_text(encoding="utf-8")) or {}
+    block = (((doc.get("source_library") or {}).get("admission") or {}).get("container_integrity") or {})
+    limits = block.get("probe_limits")
+    if not isinstance(limits, dict):
+        raise RuntimeError(
+            "FATAL: ingest_identity_gate.yaml#source_library.admission.container_integrity.probe_limits is "
+            "not declared - a probe window with no home is a magic number (C12/T-206)"
+        )
+    out: dict[str, int] = {}
+    for key in ("tail_bytes", "head_bytes"):
+        if key not in limits:
+            raise RuntimeError(f"FATAL: container_integrity.probe_limits.{key} is not declared (C12/T-206)")
+        try:
+            value = int(limits[key])
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError(
+                f"FATAL: container_integrity.probe_limits.{key}={limits[key]!r} is not an integer (C12/T-206)"
+            ) from exc
+        if value <= 0:
+            raise RuntimeError(
+                f"FATAL: container_integrity.probe_limits.{key}={value} must be positive - a zero window "
+                "cannot see a trailer or a magic (C12/T-206)"
+            )
+        out[key] = value
+    return out
+
+
+_PROBE_LIMITS = _probe_limits()
+
+#: A zip's end-of-central-directory is within the last 64 KiB by construction; a PDF's `%%EOF` is the last thing
+#: a well-formed file carries, and readers tolerate a little trailing junk. Both windows are declared in the
+#: admission policy rather than restated here (C12/T-206).
+TAIL_BYTES = _PROBE_LIMITS["tail_bytes"]
 
 #: A PDF's two ends. The magic alone is NOT enough: MEASURED 2026-10-17, the corrupt `.pdf` in the library fails
 #: the magic outright, but a TRUNCATED pdf keeps its `%PDF-` header and loses its trailer — the exact shape a
@@ -205,7 +243,7 @@ def probes_from(admission: dict[str, Any], error: type[Exception] = ValueError,
 #: refusal whose only advice is "it is corrupt" leaves an owner to re-download a file they already have.
 APPLE_BOOKMARK_MAGIC = b"book\x00\x00\x00\x00mark"  #: a macOS alias/Finder bookmark (NOT an archive)
 ZIP_LOCAL_HEADER = b"PK\x03\x04"                    #: a zip that STARTED and never finished
-HEAD_BYTES = 512                                    #: enough to hold either magic and to see a run of zeros
+HEAD_BYTES = _PROBE_LIMITS["head_bytes"]  #: enough to hold either magic and to see a run of zeros (declared)
 
 
 def _head(path: Path, size: int = HEAD_BYTES) -> bytes:

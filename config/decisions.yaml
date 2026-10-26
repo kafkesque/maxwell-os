@@ -32584,3 +32584,175 @@ decisions:
   - governance/buglog.md
   - ~/.omlx/settings.json
   supersedes_note: 'BUG-1024 is the instruction defect; BUG-1027 is its CONSEQUENCE with a live product outage, and it is the reason clause (1) is a RAIL and not advice. The declared app-side rail (refuse a non-URL hf_endpoint) is NOT built here and needs its own two-sided control.'
+- id: D-3155
+  state: ACTIVE
+  date: '2026-10-26'
+  by: assistant
+  category: DELEGATION / INSTRUCTION PROTOCOL / RAILS
+  title: a DELEGATE INSTRUCTION is a CONTRACT - it names the TOOL that reads the file, its artifact declares a RESULT
+    and never a rule, and a turn budget is a MEASUREMENT rather than a verdict
+  bugs:
+  - BUG-1020
+  - BUG-1028
+  decision: 'Four clauses, each bought by a measurement on 2026-10-26 - and clause (1) REVERSES the diagnosis BUG-1020
+    was
+
+    written with. (1) A DELEGATE INSTRUCTION THAT NEEDS FILE CONTENT NAMES THE TOOL THAT READS IT. BUG-1020 declared
+
+    that a delegate''s surface "must include a TEXT reader that is not an image decoder"; MEASURED, that premise
+    is
+
+    FALSE - the failing child (20261025_2) was born with `developer` alone, and `developer` carries a shell, so
+    it
+
+    already had a text reader. What it did NOT have was an instruction that chose one: the instruction named a PATH
+
+    and let the child pick, and the child picked read_image, so a text diff arrived at a pixel decoder. Every run
+
+    that closed the bug names the tool inside the instruction ("use the shell tool to run: cat <path>"). A surface
+
+    rule would have been a fix that cannot fire on a surface that was already sufficient. (2) AN ARTIFACT DECLARES
+    A
+
+    RESULT, NEVER A CONDITIONAL RULE. A child handed the template line "verdict: PASS if the answer line is X,
+
+    otherwise FAIL" copied that CONDITIONAL into its artifact verbatim - the answer was right and the verdict line
+
+    was the instruction; the same child handed "verdict: PASS" reproduced it. For a small model a conditional in
+    an
+
+    instruction is a sentence to COPY, so the delegate is told what to WRITE, and the caller computes the verdict.
+
+    (3) A TURN BUDGET THAT CUTS A CORRECT ANSWER IS INDISTINGUISHABLE FROM A WRONG ANSWER. max_turns=3 recorded
+    a
+
+    CORRECT Ornith answer as a failure; the same prompt at max_turns=5 completed in 84.4 s with the same answer.
+    So
+
+    the budget is set above the observed need, the wall time is MEASURED by the journal''s own two rows (a caller
+
+    cannot restate it), and a re-run - not a lowered claim - is the remedy. (4) A CLOSURE CONDITION THAT MIXES A
+
+    REPO-OWNED DEFECT WITH AN UPSTREAM ONE IS SPLIT, NOT HELD OPEN. BUG-1020''s third limb ("`Other` must name a
+
+    cause") is emitted by the goose harness, which this repository does not own; holding a path that three receipts
+
+    now measure WORKING open until an upstream string changes would leave the register asserting a broken path
+
+    (D-3034: an entry must resolve to its referent). The limb is RE-SCOPED to BUG-1028, with the reason written
+    into
+
+    the BUG-1020 closure rather than left for a reader to infer.
+
+    '
+  measured:
+  - 'three consecutive completed known-answer delegate runs across three model families, every one journalled BEFORE
+    the call: Ornith-1.5-9B-MLX-8bit 84.4 s (DJ-20261026T111018Z-adbb), gemma-4-E4B-it-MLX-4bit 33.0 s (DJ-20261026T111445Z-fe35,
+    artifact 253 B sha16 89931c37bc656765), MiniCPM5-2B-MLX 35.1 s (DJ-20261026T111518Z-79f4, artifact 114 B sha16
+    a7ac9d01c9284199)'
+  - each of the three answered BUG1020_TEXT_READER_OK from temp/bug1020_probe.txt with extensions [developer] and
+    a temperature of 0.0 (R7)
+  - python3 scripts/delegate_journal.py status -> 58 row(s), 29 run(s), 0 open, 0 past budget, rc 0
+  - max_turns=3 cut a CORRECT answer into a recorded failure (DJ-20261026T110846Z-52aa); the same prompt at max_turns=5
+    completed in 84.4 s with the identical answer
+  - 'probe A copied "verdict: PASS if the answer line is X, otherwise FAIL" into its artifact instead of evaluating
+    it; probe B, given "verdict: PASS", reproduced it - the conditional is what travelled, not the judgement'
+  - the failing 20261025_2 report names "persistent unsupported image format errors from the read_image tool" while
+    its birth record shows the child held developer, i.e. a shell - the surface was adequate, the instruction was
+    not
+  - 'config/extension_profiles.yaml#delegate_profiles.review = [developer, analyze, skills]: the closing runs used
+    a subset of the surface a declared profile already provisions'
+  files:
+  - governance/buglog.md
+  - scripts/delegate_journal.py
+  - config/extension_profiles.yaml
+  - config/engine.yaml
+  supersedes_note: BUG-1020's own closure condition clause 3 ("a delegate surface with a TEXT reader") is SUPERSEDED
+    by clause (1) of this record, because the surface already carried one and the measured cause was the instruction.
+    The superseded clause is kept verbatim inside the buglog entry, marked as reversed by measurement, never deleted
+    (D-3038). DELEGATE-002's "only gemma can drive a loop" was already retired in AGENTS.md (2026-10-17) on the
+    same evidence class - a capability ban that a receipt contradicts is a ban that must be withdrawn, not softened.
+- id: D-3156
+  state: ACTIVE
+  date: '2026-10-26'
+  by: assistant
+  category: C12 / CONFIG DISCIPLINE / AUDIT
+  title: a HARDCODED VALUE is CLASSIFIED ONCE by WHAT FIXES IT - a format fact stays in code with its spec cited,
+    an exit code stays because configuring it configures MEANING, and every MEANING value moves to YAML - with the
+    residue counted against a SHRINK-ONLY ceiling
+  bugs:
+  - BUG-1025
+  decision: 'Three clauses, and the point of the record is that the CLASSIFICATION is the decision - a future reader
+    must not
+
+    "config-ise" a binary offset. (1) THE THREE CLASSES, each named by what FIXES the value. FORMAT_SPEC_HARDCODED:
+
+    the value is a fact of a FILE FORMAT, so the thing that fixes it is the format''s own specification, not a config
+
+    key - the Palm Database type/creator field at byte 60, the record table at byte 78, the 8-byte record entry,
+    the
+
+    OLE header''s 512-byte sector. Making those tunable would turn "what a .pdb IS" into a knob a config edit can
+
+    falsify, so they stay in code and carry the format fact beside them.
+
+    ACKNOWLEDGED_HARDCODED: an exit-code vocabulary (RC_FAULT, RC_OWNER_OWED), because an exit code that can be
+
+    configured makes the MEANING OF A RUN configurable - a run whose success is declared in YAML is a run whose
+
+    success can be edited. YAML: every value whose one home should be config, which is where the probe windows,
+    the
+
+    S0 output floor and the S2 token budget went. (2) THE RESIDUE IS COUNTED against a declared SHRINK-ONLY ceiling
+
+    (config/pipeline_config.yaml#config_audit.unchecked_hardcoded: direction shrink_only, ceiling 0, baseline 9,
+
+    with the reason for each class written beside it). An acknowledgement set that can ABSORB a finding is a
+
+    register that cannot shrink (D-2644), which is why these ten items were never folded into ACKNOWLEDGED_HARDCODED.
+
+    (3) THE COUNT''S CONTROL IS PURE AND MUST BE INVOKED. unchecked_verdict(count, ceiling) is a pure function with
+
+    known answers - (0,0) ok, (1,0) fault, (9,9) ok, (10,9) fault - and --strict ALSO fails when files_scanned ==
+    0,
+
+    because an empty report from a gate that did not run is not zero (the BUG-1025 lesson: a gate that cannot run
+
+    reports SILENCE, and silence is indistinguishable from clean). A control nothing invokes is a comment (BUG-492),
+
+    so `just preflight` now runs `pipeline/config_audit.py --selftest` on the line IMMEDIATELY BEFORE
+
+    `--check-unchecked --strict`.
+
+    '
+  measured:
+  - python3 pipeline/config_audit.py --check-unchecked --strict -> 0 unchecked / ceiling 0 (0 headroom), scanned
+    122 pipeline module(s), rc 0 - the first run that ever reached its own report
+  - python3 pipeline/config_audit.py --selftest -> 4/4 known-answer controls, rc 0
+  - 'the ten items BUG-1025 had been hiding: 1 config/code mismatch (s2.dspy_max_tokens 4096, unreadable while dspy-ai
+    is absent) and 9 unchecked (container_integrity.py:35 TAIL_BYTES 4096, :80 PALMDB_MAGIC_OFFSET 60, :81 PALMDB_HEADER_BYTES
+    78, :82 PALMDB_RECORD_ENTRY_BYTES 8, :114 OLE_HEADER_BYTES 512, :208 HEAD_BYTES 512, model_store_census.py:115
+    RC_FAULT 1, :116 RC_OWNER_OWED 2, stage0_convert.py:84 MIN_OUTPUT_BYTES 100)'
+  - 'each resolved to exactly ONE home: the probe windows to config/ingest_identity_gate.yaml#...(container_integrity)
+    .probe_limits (tail_bytes 4096 / head_bytes 512, failing closed when absent or non-positive), the S0 floor to
+    config/pipeline_config.yaml#stage0.artifact.min_output_bytes via pipeline_paths (a stage0 ALIAS, never a second
+    value), and the S2 budget to s2.dspy_max_tokens read through pipeline_paths, which imports without dspy-ai'
+  - 'the refactor did not move the admission path: plan_admission.py --selftest 28/28, apply_admission.py --selftest
+    82/82'
+  - just preflight is rc 0 end-to-end for the first time in this thread (repo integrity, harness homes 5 bound /
+    0 conflicting, monitor_stacks single-source guard, golden hash, config audit 0/0, taxonomy 42/64, decisions
+    census records-only 1280 stamp e56cb90b7a8a823d, duplicate keys 150 files clean, fanout doctor, integrity_quick
+    10/10, stress)
+  files:
+  - pipeline/config_audit.py
+  - config/pipeline_config.yaml
+  - config/ingest_identity_gate.yaml
+  - pipeline/container_integrity.py
+  - pipeline/pipeline_paths.py
+  - config/task_register.yaml
+  - justfile
+  supersedes_note: 'T-206 is CLOSED by this classification rather than by a prose promise, and the ceiling it counts
+    against is declared beside the classes so the bound and the classes cannot drift apart. Nothing here supersedes
+    D-2644 (the shrink-only ceiling idiom) - it applies it. NAMED REJECTION (D-3038): folding these ten into ACKNOWLEDGED_HARDCODED,
+    refused because a set that can absorb its findings cannot shrink; and making a binary-format offset configurable,
+    refused because it would let a config edit falsify what a file format is.'

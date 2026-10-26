@@ -64,6 +64,23 @@ def _label(path: Path) -> str:
         return str(path)
 
 
+def _receipt_path(path: Path, *, journal: bool) -> Path:
+    """RESOLVE the artifact path before it can enter a receipt (BUG-1026 instance 2).
+
+    A receipt keyed by a RELATIVE path is invisible to every reader that joins it to the live file: the writer
+    printed success and journalled a string no reader uses (D-3034). The path is therefore resolved before the
+    write and the journal share it. A JOURNALED write outside the audited tree is refused, because its receipt
+    would be evidence of nothing this repository can audit (the same containment rule as a pre-image).
+    """
+    resolved = path.resolve()
+    if journal and resolved != REPO and REPO not in resolved.parents:
+        print("REFUSED journaled write to " + str(resolved) + " by " + str(path))
+        print("  !! the artifact lies OUTSIDE the audited tree " + str(REPO) + " - its receipt would attribute "
+              "bytes this repository does not own. Pass journal=False for a fixture, or write inside the tree.")
+        raise WriteRefused(1)
+    return resolved
+
+
 def _stamp() -> str:
     """Return a filesystem-safe UTC timestamp for backup names and journal records."""
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -306,6 +323,7 @@ def write_rows(path: Path, rows: list[dict[str, str]], *, owned_keys: set[str], 
     when a merge cannot produce a legal result. The caller never gets to "just write it anyway".
     Raises WriteRefused (a SystemExit subclass) on any offence - nothing is written.
     """
+    path = _receipt_path(path, journal=journal)
     before = read_rows(path, encoding)
     merged: list[dict[str, str]] = []
     if mode == "merge" and owned_keys != {OWNED_ANY}:
@@ -362,6 +380,7 @@ def append_rows(path: Path, rows: list[dict[str, str]], *, owned_keys: set[str],
     and an added row may only fill the caller's own columns (plan_append). The pre-image is backed up, the write
     is crash-safe, the post-image is re-read and re-judged, and the receipt records how many rows were added.
     """
+    path = _receipt_path(path, journal=journal)
     before = read_rows(path, encoding)
     after = before + [dict(r) for r in rows]
     _require_id_column(columns or (list(after[0]) if after else []), id_column, path, writer)
@@ -426,6 +445,7 @@ def append_lines(path: Path, lines: list[str], *, writer: str, encoding: str = "
     backup defaults to False, for write_document's reason: an append does not destroy the pre-image that R-D410
     exists to preserve, and the receipt still records the digest it replaced.
     """
+    path = _receipt_path(path, journal=journal)
     pre = path.read_bytes()
     if pre and not pre.endswith((b"\n", b"\r")):
         print("REFUSED append to " + _label(path) + " by " + writer)
@@ -486,6 +506,7 @@ def write_document(path: Path, text: str, *, writer: str, owned_keys: set[str],
         print("  !! a document is not cell-partitioned, so owned_keys=" + str(sorted(owned_keys)) + " cannot be "
               "honoured (D-401); declare OWNED_ANY for a whole-file regeneration")
         raise WriteRefused(1)
+    path = _receipt_path(path, journal=journal)
     pre16 = _sha16(path)
     backup_path: Path | None = _backup(path, writer) if backup else None
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -806,6 +827,25 @@ def selftest() -> int:
         for _n, _got, _want in _ctl2:
             print(("ok   selftest/" if _got == _want else "FAIL selftest/") + _n)
         if any(_got != _want for _n, _got, _want in _ctl2):
+            return 1
+        # 17. A RECEIPT PATH IS RESOLVED BEFORE IT IS JOURNALLED (BUG-1026 instance 2). A relative path must
+        #    join the live file; a journaled write outside the tree must be refused; a fixture (journal=False)
+        #    may still live outside, because it leaves no receipt.
+        _relative = _receipt_path(Path("config/decisions.yaml"), journal=True)
+        _outside_refused = False
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                _receipt_path(_outside, journal=True)
+        except WriteRefused:
+            _outside_refused = True
+        _ctl3 = [
+            ("a_relative_receipt_path_resolves_to_the_live_file", _relative == REPO / "config" / "decisions.yaml", True),
+            ("a_journaled_path_outside_the_tree_is_refused", _outside_refused, True),
+            ("a_fixture_without_a_receipt_may_live_outside", _receipt_path(_outside, journal=False) == _outside.resolve(), True),
+        ]
+        for _n, _got, _want in _ctl3:
+            print(("ok   selftest/" if _got == _want else "FAIL selftest/") + _n)
+        if any(_got != _want for _n, _got, _want in _ctl3):
             return 1
     _inv, _ref = _selftest_counts()
     print("ok write_guard selftest: " + str(_inv) + " invariants hold (own-cell edit lands, foreign-cell edit refused, row-count "

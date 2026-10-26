@@ -86,6 +86,16 @@ def cfg() -> dict:
     return doc
 
 
+def gate_names_owner(gate: str, token: str) -> bool:
+    """True when the gate names the OWNER as a word, never when `owner` is part of an identifier.
+
+    BUG-1026: a plain substring test read `RC_OWNER_OWED` as a human gate and forced a pipeline task to write
+    around a Python constant. The boundary before the token is what distinguishes prose from an identifier;
+    the suffix is deliberately unconstrained so `owner's`, `owner-word` and `owner-owed` still match.
+    """
+    return bool(re.search(rf"(?<![A-Za-z0-9_]){re.escape(token)}", gate, re.IGNORECASE))
+
+
 def task_faults(tasks: list, d: dict) -> list[str]:
     """D-2985: the task register must obey its OWN declared schema (PURE - no I/O, so the oracle is testable).
 
@@ -127,7 +137,7 @@ def task_faults(tasks: list, d: dict) -> list[str]:
         if mv == "owner" and gate in ("", "none"):
             out.append(f"{tid}: mover: owner but gate is 'none' - name the owner's word that unblocks it "
                        f"(a task cannot be gated on a person who is never told what to decide)")
-        if mv != "owner" and token and token in gate:
+        if mv != "owner" and token and gate_names_owner(gate, token):
             out.append(f"{tid}: the gate names the {token!r} but mover says {mv!r} - the two fields disagree; "
                        f"a task the pipeline cannot advance is mover: owner")
         for field in ("title", "why"):
@@ -746,6 +756,8 @@ def selftest() -> int:
          any("mover: owner but gate is 'none'" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "owner", "title": "t"}], d))),
         ("a pipeline-moved task whose gate names the owner must fire",
          any("the two fields disagree" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "gate": "the owner word"}], d))),
+        ("a pipeline-moved task that merely NAMES an exit-code constant must NOT fire (BUG-1026)",
+         not any("the two fields disagree" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "gate": "an EXIT-CODE VOCABULARY (RC_FAULT, RC_OWNER_OWED) stays in code"}], d))),
         ("a title that restates a measured count must fire",
          any("ONE home" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "108 of 185 open bugs"}], d))),
         ("an evidence line carrying a count with no date must fire",

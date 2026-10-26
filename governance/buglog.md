@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1280 decisions (census stamp e56cb90b7a8a823d, 2026-10-26) · 791 bugs (247 open / 544 closed; highest OPEN = BUG-1026) · 60 open tasks (MUST 9 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 60; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1282 decisions (census stamp fea65bda08364e09, 2026-10-26) · 792 bugs (246 open / 546 closed; highest OPEN = BUG-1028) · 59 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1280 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 660 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1280, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **81** of 1282 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 662 · ⚖ ratified 148 | closed: ✅ resolved 356 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1282, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 81 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 247 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 0 · 🟧 HIGH 34 · 🟨 MED 80 · 🟩 LOW 34 · UNLABELLED 98 (BUG-757) of 246 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (60) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 60 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -21894,7 +21894,7 @@ D-2692): **a count a register owns has ONE home, and prose cites it.** The reaso
 resolution is exactly the reason it recurred: a number in prose is the one claim in this tree that no verdict can
 be derived from.
 
-## BUG-1020 (MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal knew a run had happened
+## BUG-1020 (MED - CLOSED 2026-10-26) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal knew a run had happened - CLOSED BY MEASUREMENT: three consecutive completed known-answer delegate runs on three model families
 The R5 verifier for a 66-line diff could not be obtained through delegation, and the failure modes were opaque.
 MEASURED, all three recorded in `scripts/delegate_journal.py` BEFORE the claim (the row is written before the
 call, so a call that hangs is visible):
@@ -21928,6 +21928,46 @@ then the recorded fallback is the direct engine call at temperature 0.0 with its
 session used and what `governance/evidence/MODEL_SWEEP_20261025_POSTENGINE.json#verified_by.r5_review` records —
 including the AUDIT of that review's five findings, two of which were false positives that repeated a risk instead
 of resolving it (a delegated answer is not self-certifying either).
+
+**CLOSED 2026-10-26 BY MEASUREMENT - and the measurement REVERSED part of the diagnosis this entry was
+written with.** Limb 1 (three consecutive delegate runs complete a KNOWN-ANSWER task) is MET; limb 3 (a provisioned
+surface that carries a TEXT reader) is MET; limb 2 (`Other` must name a cause rather than a word) is NOT MET and is
+RE-SCOPED to BUG-1028, with the reason stated below rather than left for a reader to guess.
+
+| run | journal id | model | surface | wall | artifact | what it answered |
+|---|---|---|---|---|---|---|
+| retry of 3/3 | `DJ-20261026T111018Z-adbb` | Ornith-1.5-9B-MLX-8bit | `[developer]` | 84.4 s | `temp/bug1020_probe3_result.txt` | `BUG1020_TEXT_READER_OK` |
+| A of 3 | `DJ-20261026T111445Z-fe35` | gemma-4-E4B-it-MLX-4bit | `[developer]` | 33.0 s | `temp/bug1020_probe4_result.txt` (253 B, sha16 `89931c37bc656765`) | `BUG1020_TEXT_READER_OK` |
+| B of 3 | `DJ-20261026T111518Z-79f4` | MiniCPM5-2B-MLX | `[developer]` | 35.1 s | `temp/bug1020_probe5_result.txt` (114 B, sha16 `a7ac9d01c9284199`) | `BUG1020_TEXT_READER_OK` |
+
+Three runs, three DIFFERENT model families, three consecutive COMPLETIONS, every run journalled BEFORE the call
+(`scripts/delegate_journal.py start`) and closed only against an artifact present on disk - `end --state done` is
+REFUSED when the claimed artifact is absent ("a claimed artifact that is not there is a NAMED fault, BUG-844").
+Receipt: `python3 scripts/delegate_journal.py status` -> `58 row(s), 29 run(s), 0 open, 0 past budget`, rc 0.
+
+**WHAT LIMB 3 WAS WRONG ABOUT, and this is the part worth keeping.** This entry proposed that a delegate's surface
+"must include a TEXT reader that is not an image decoder". MEASURED: the failing child (`20261025_2`) ALREADY had
+one - `developer` carries a **shell**, and `cat` is a text reader - so the fault was never the surface. The fault was
+that the INSTRUCTION named a FILE and let the model pick the tool, and the model picked `read_image`, so a text diff
+arrived at a pixel parser. Every successful run above names the tool inside the instruction ("use the shell tool to
+run: cat <path>"). The rail this actually yields is an INSTRUCTION rule, not a surface rule: **a delegate instruction
+that needs file CONTENT names the tool that reads it** - because a model's default reader for a path is the image
+decoder. A surface rule would have been a fix that cannot fire on a surface that was already sufficient.
+
+**TWO DEFECTS THIS CLOSURE MEASURED, kept because both are cheap to avoid next time.** (1) Probe A was handed a
+template whose last line read `verdict: PASS if the answer line is X, otherwise FAIL`, and the child copied the
+CONDITIONAL into its artifact verbatim instead of evaluating it - the answer was right, the verdict line was the
+instruction. Probe B was given the single word `verdict: PASS` and reproduced it. A conditional in a delegate
+instruction is a sentence to COPY for a small model; a delegate artifact should declare a RESULT, never a rule.
+(2) Earlier the same day, `max_turns: 3` recorded a CORRECT Ornith answer as a FAILURE - a turn budget that cuts an
+answer is indistinguishable from a wrong answer unless the run was journalled and can be re-read. Both are the same
+class: the harness reports a STATE, and only the journal carries the SHAPE.
+
+**RE-SCOPED, NOT NARROWED SILENTLY: limb 2 becomes BUG-1028.** `Other` is emitted by the goose HARNESS's subagent
+failure classifier, a component this repository does not own. Holding a delegate path that is now measured WORKING
+open until an upstream string changes would leave the register asserting a broken path three receipts say is not
+broken (D-3034: an entry must resolve to its referent). The repo-side substitute that does hold is named in
+BUG-1028, and it is why `Other` can no longer be a silent unknown event.
 
 ## BUG-1010 (MED - CLOSED 2026-10-25) - CLOSED BY MEASUREMENT: the receipt now NAMES the bytes it ran (HEAD at BOTH ends, the worktree at both ends), and a scan that is killed leaves a NAMED state instead of a tree indistinguishable from one never scanned
 
@@ -22280,7 +22320,7 @@ LRU behaviour two-sided, and it - not the prose - is why the incomplete mechanis
 
 **NAMED LIMIT.** `preflight` is still rc=1, now for a REAL and newly visible reason (the 10 items above), and the six rails behind it are still unreachable in that door. They do run in the whole-set ladder, so the exposure is the cheap door and not the certification.
 
-## BUG-1026 (LOW - OPEN 2026-10-26) - a rail matched the WORD "owner" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to write around a variable
+## BUG-1026 (LOW - FIXED 2026-10-26) - a rail matched the WORD "owner" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to write around a variable
 
 **MEASURED, one command, on a task written minutes earlier.** `python3 scripts/gov_sync.py --apply` →
 `!! T-206: the gate names the 'owner' but mover says 'pipeline' - the two fields disagree`. T-206's gate is a
@@ -22298,18 +22338,31 @@ write around a variable name**. A governance rail that forces prose to avoid ide
 record it protects, and this repository uses underscored rc vocabularies everywhere (`RC_OK`, `RC_FAULT`,
 `RC_OWNER_OWED`, and the owner-owed/owner-word vocabulary in `config/decisions.yaml`), so the shape recurs.
 
-**What was done instead of a silent workaround, and why.** The gate was reworded to point at `evidence` (which already
-names both constants), because a fact the register owns should have ONE home (the repo's own D-2692 principle) - so
-the rewording is correct on its own merits and not merely an evasion. The rail was NOT changed in this turn: it is a
-governance instrument and the change needs its own two-sided control.
+**What was done instead of a silent workaround, and why.** The gate was reworded to point at `evidence`
+(which already names both constants), because a fact the register owns should have ONE home (the repo's own D-2692
+principle) - so the rewording is correct on its own merits and not merely an evasion. That wording stays. But it is no
+longer what carries the fix, because **the rail itself was changed in the same session: a rail that forces prose to
+avoid identifiers is the bug, not an inconvenience**, and a rewording would have to be repeated by every future author
+who needs to name a constant.
 
-**DECLARED FIX SHAPE (so it is not re-derived):** replace the substring test with a boundary test that excludes an
-identifier interior — `re.search(rf"(?<![A-Za-z0-9_]){re.escape(token)}", gate, re.I)` — which still catches
-`the owner`, `owner's`, `OWNER WORD` and `owner-owed`, and does not catch `RC_OWNER_OWED`. TWO-SIDED CONTROL, both
-directions on the same fixture: a pipeline-moved entry whose gate says "the owner must approve" is a FAULT, and a
-pipeline-moved entry whose gate mentions only `RC_OWNER_OWED` is GREEN. NAMED WRONG FIX: stripping underscores from
-the compared text, which would make `RC_OWNER_OWED` match by collapsing the very distinction that identifies it.
-### BUG-1026 INSTANCE 2 (same day, found while fixing instance 1) - a governance RECEIPT is unusable when the writer is handed a RELATIVE path, and it reports success while journalling it
+**FIXED 2026-10-26 - the boundary test, which is the fix shape DECLARED above, not a redesign of it.**
+`scripts/gov_sync.py#gate_names_owner` replaces the substring test with
+`re.search(rf"(?<![A-Za-z0-9_]){re.escape(token)}", gate, re.IGNORECASE)`: the owner token must BEGIN A WORD and may
+never sit inside an identifier. The call site reads
+`if mv != "owner" and token and gate_names_owner(gate, token):`. Both directions now hold on one fixture: `the owner`,
+`owner's`, `OWNER WORD` and `owner-owed` still fire, and `RC_OWNER_OWED` does not.
+
+**TWO-SIDED CONTROL (BUG-492), and it is a CONTROL, not a comment.** A new known-answer row asserts the NEGATIVE
+direction: `task_faults([... mover: pipeline, gate: "an EXIT-CODE VOCABULARY (RC_FAULT, RC_OWNER_OWED) stays in
+code"])` must produce NO "the two fields disagree" fault. The positive direction is carried by the existing rows in the
+same fixture. Receipt: `python3 scripts/gov_sync.py --selftest` ->
+`ok gov-sync --selftest: 30 known answers (a stale block is DETECTED, not trusted)`, rc 0.
+
+**NAMED WRONG FIX, kept as a refusal (D-3038):** stripping underscores from the compared text. It removes the boundary
+instead of reading it, so every identifier that mentions a constant becomes a human gate - exactly the false positive
+this entry exists to remove, made general.
+
+### BUG-1026 INSTANCE 2 (FIXED 2026-10-26) - a governance RECEIPT is unusable when the writer is handed a RELATIVE path, and it reports success while journalling it
 
 **MEASURED 2026-10-26.** `scripts/lib/write_guard.py#append_lines(path, lines, writer=...)` given a RELATIVE
 `Path("config/decisions.yaml")` records `"path": "config/decisions.yaml"` verbatim; every earlier record carries the
@@ -22332,6 +22385,19 @@ declaration with no referent (D-3034). TWO-SIDED CONTROL: an append given a rela
 `last_governed_write` FINDS (positive), and an append whose path resolves outside the repo must be REFUSED (negative).
 NAMED WRONG FIX: teaching `last_governed_write` to accept any path SUFFIX - that would let a record about another
 repository's `config/decisions.yaml` attribute THIS one.
+
+**FIXED 2026-10-26, in the shape declared above.** `scripts/lib/write_guard.py#_receipt_path(path, *, journal)`
+resolves every artifact path BEFORE the journal can record it, and REFUSES a JOURNALED write whose resolution lies
+outside the audited tree (`REFUSED journaled write to ... by ...` -> `WriteRefused(1)`); a FIXTURE written with
+`journal=False` may still live outside, because a fixture's receipt is not part of the audit. Applied at the top of
+all four public writers - `write_rows`, `append_rows`, `append_lines`, `write_document` - so no writer can be added
+later that skips it.
+
+**THREE NEW CONTROLS, both directions.** `a_relative_receipt_path_resolves_to_the_live_file` (a relative path yields
+the ABSOLUTE receipt `last_governed_write` joins on), `a_journaled_path_outside_the_tree_is_refused` (the negative),
+`a_fixture_without_a_receipt_may_live_outside` (the exemption is deliberate, not an oversight). Receipts:
+`python3 scripts/lib/write_guard.py --selftest` -> `ok write_guard selftest: 17 invariants hold ... the 8 expected
+refusals are asserted with their output captured ...`, rc 0; `pytest -q tests/test_handoff_obligation.py` -> 6 passed.
 
 ## BUG-1027 (HIGH - FIXED 2026-10-26 11:37) - the HF TOKEN was pasted into oMLX's "Mirror Endpoint" field, which set `HF_ENDPOINT` in the server's environment and 502'd EVERY Hugging Face call in the product - silently, for 51 minutes
 
@@ -22401,3 +22467,32 @@ with no rail refusing a secret-shaped literal in an app config (BUG-789 limb 3).
 **DECLARED RAIL, not built in this turn (needs its own two-sided control):** the admin settings write should REFUSE an
 `hf_endpoint` that is neither empty nor an `http(s)://` URL, and the refusal should name the field's type. Control:
 `{"hf_endpoint": "hf_…"}` → 400 and settings unchanged; `{"hf_endpoint": "https://hf-mirror.com"}` → 200; `""` → 200.
+
+## BUG-1028 (LOW - OPEN 2026-10-26, RE-SCOPED out of BUG-1020 limb 2) - a delegate failure is reported as the word `Other`: the harness names no cause, and the only reason such a run is attributable at all is the journal this repository wrote BEFORE the call
+
+**MEASURED, twice, and the word is the entire report.** `20261025_3` (gemma-4-E4B-it-MLX-4bit, failed) reported
+`Other`, and the run's own wall time was **2962.8 s** against a declared 300 s budget - a 9.9x overrun the harness did
+not mention. `20261025_4` (Ornith-1.5-9B-MLX-8bit, failed) reported `Other` with `extensions: []`, so not even a tool
+could be blamed. In both cases the ONE thing that could be re-read afterwards was the row
+`scripts/delegate_journal.py start` had written before the call.
+
+**WHY THIS IS ITS OWN ENTRY RATHER THAN A LIMB OF BUG-1020 (D-3034).** BUG-1020's subject was a WORKING task the
+delegate path could not deliver; that path is now CLOSED by three consecutive known-answer receipts across three model
+families. This entry's subject is different - the REPORTING of a failure inside the goose harness, a component this
+repository does not own. Keeping them joined would either keep a measured-working path registered as broken or close a
+reporting defect nobody has fixed.
+
+**WHAT THIS REPOSITORY CAN DO, and does, measured.** `scripts/delegate_journal.py` writes a `start` row BEFORE the
+call, so an `Other` can never be an unattributed event: the row carries the declared purpose, model, claimed artifact
+and budget; `status` names any run open past its budget (rc 2); and `end --state done` is REFUSED when the claimed
+artifact is absent on disk. Receipt: `python3 scripts/delegate_journal.py status` -> `58 row(s), 29 run(s), 0 open,
+0 past budget`, rc 0.
+
+**WHAT IS NOT DONE, named as such (D-3036).** The harness's failure string is still a word, not a cause, and nothing in
+this repository can change it. The substitute is BOUNDED, not equivalent: a caller still cannot learn WHY a run failed,
+only that it failed, how long it took, and what it claimed to leave.
+
+**CLOSURE CONDITION.** Either a delegate failure reports a cause drawn from a declared vocabulary (timeout /
+tool-missing / model-error / context-overflow), or the harness is documented as naming none and `delegate_journal`
+carries a mandatory `--cause` slot instead - with a two-sided control proving that a TIMEOUT and a MISSING TOOL report
+DIFFERENT causes (a single "failed" bucket is a bucket that declares nothing).

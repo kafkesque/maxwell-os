@@ -80,7 +80,18 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "services.ollama.embed_max_chars":  ("pipeline.ollama_embed", "EMBED_MAX_CHARS", "int"),
     "services.ollama.batch_size":       ("pipeline.ollama_embed", "BATCH_SIZE", "int"),
     # ── D2304/D2307: DSPy + recall thresholds (C12) ──
-    "s2.dspy_max_tokens":               ("pipeline.dspy_trainer", "DSPY_MAX_TOKENS", "int"),
+    # T-206/D-3153: the constant lives in pipeline_paths, which is importable WITHOUT the optional dspy-ai
+    # package. The old mapping pointed at pipeline.dspy_trainer, so on an interpreter without dspy the audit
+    # could not read it and reported a false config/code mismatch.
+    "s2.dspy_max_tokens":               ("pipeline.pipeline_paths", "S2_DSPY_MAX_TOKENS", "int"),
+    # T-206/D-3153: the "receipt, not a work" floor is a MEANING value, so it moved to YAML (C12).
+    "stage0.artifact.min_output_bytes": ("pipeline.stage0_convert", "MIN_OUTPUT_BYTES", "int"),
+    # T-206/D-3153: probe read windows are measurements about this machine's containers, declared beside the
+    # admission probes that use them. The binary format offsets remain FORMAT_SPEC_HARDCODED.
+    "ingest_identity_gate.yaml#source_library.admission.container_integrity.probe_limits.tail_bytes":
+        ("pipeline.container_integrity", "TAIL_BYTES", "int"),
+    "ingest_identity_gate.yaml#source_library.admission.container_integrity.probe_limits.head_bytes":
+        ("pipeline.container_integrity", "HEAD_BYTES", "int"),
     "recall.match_threshold":           ("pipeline.recall_measure", "DEFAULT_MATCH_THRESHOLD", "float"),
     # ── Coverage (T0.3) ──
     "coverage.threshold":               ("pipeline.coverage_check", "COVERAGE_THRESHOLD", "float"),
@@ -130,6 +141,10 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
     "RC_OK",
     "RC_BREACH",
     "RC_UNMEASURED",
+    # model_store_census.py — the same rc VOCABULARY (0 ok / 1 fault / 2 owner-owed). T-206: an exit code is
+    # a language for reading a run's RESULT; making it configurable makes the result's meaning configurable.
+    "RC_FAULT",
+    "RC_OWNER_OWED",
     "BORP_MIN_SOURCES",      # e2e_test.py — except fallback (mirrors config default=2)
     "S4_DEPTH_MAX_TOKENS",   # stage4_merged_call.py — except fallback (mirrors stage4.depth_max_tokens=1024)
     "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)
@@ -144,6 +159,17 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
                              # budget it serves is declared (fanout.guards), the interval is implementation
     "TEMPERATURE",           # oneshot_ask.py — R7 mandates temp=0.0 on every generation script; a
                              # CONSTITUTIONAL constant, so making it configurable would make R7 violable
+}
+
+# ── Binary FORMAT constants: declared, with their source, and deliberately NOT tunable ──
+# T-206/D-3153: a Palm database offset is not a policy knob. Making it configurable would let a config edit
+# silently change which bytes a container probe reads, which is the opposite of C12's purpose (one DECLARED
+# home, not every number made editable). Each entry names the format fact that fixes the value.
+FORMAT_SPEC_HARDCODED: dict[str, str] = {
+    "PALMDB_MAGIC_OFFSET": "Palm Database type/creator field is at byte 60 (PalmDOC/MOBI container format)",
+    "PALMDB_HEADER_BYTES": "Palm Database record table begins at byte 78",
+    "PALMDB_RECORD_ENTRY_BYTES": "Palm Database record entry is 8 bytes: 4-byte offset, 1-byte attributes, 3-byte unique id",
+    "OLE_HEADER_BYTES": "OLE Compound Document header is one 512-byte sector",
 }
 
 
@@ -207,9 +233,9 @@ def get_code_value(module_name: str, attr_name: str):
         return None
 
 
-def run_audit() -> tuple[list[dict], list[dict], list[dict]]:
+def run_audit(cfg: dict | None = None) -> tuple[list[dict], list[dict], list[dict]]:
     """Run full audit. Returns (drifts, missing_in_config, missing_in_code)."""
-    cfg = load_config()
+    cfg = load_config() if cfg is None else cfg
     drifts = []
     missing_in_config = []
     missing_in_code = []
@@ -263,14 +289,19 @@ def run_audit() -> tuple[list[dict], list[dict], list[dict]]:
     return drifts, missing_in_config, missing_in_code
 
 
-def check_hardcoded_elsewhere() -> list[dict]:
-    """Scan for hardcoded values NOT in the registry — potential future drift."""
+def check_hardcoded_elsewhere() -> tuple[list[dict], int]:
+    """Scan for hardcoded values NOT in the registry — potential future drift.
+
+    Returns the findings AND the number of modules actually read. The count is part of the reading: an empty
+    report from a scan that never reached its own file set is not zero (BUG-1025's lesson).
+    """
     import re
     unchecked = []
     py_files = sorted(Path(__file__).resolve().parent.glob("*.py"))
 
     known_attrs = {m[1] for m in CONFIG_TO_CODE.values() if m is not None}
     known_attrs |= ACKNOWLEDGED_HARDCODED  # Tier 1+ pending migrations
+    known_attrs |= set(FORMAT_SPEC_HARDCODED)  # T-206: binary layout facts are declared, never tunable
 
     for fp in py_files:
         with open(fp, encoding='utf-8') as f:
@@ -295,10 +326,45 @@ def check_hardcoded_elsewhere() -> list[dict]:
                 "value": m.group(2),
             })
 
-    return unchecked
+    return unchecked, len(py_files)
 
 
-def print_report(drifts, missing_in_config, missing_in_code, unchecked, fmt="text"):
+def unchecked_verdict(count: int, ceiling: int) -> tuple[bool, str]:
+    """PURE: the two-sided rule for the shrink-only unchecked ceiling (T-206, D-2644).
+
+    At-or-below is green; above is a FAULT. A ceiling that refuses both directions is not a rule (BUG-492).
+    """
+    if count <= ceiling:
+        return True, f"unchecked {count} <= ceiling {ceiling} ({ceiling - count} headroom)"
+    return False, f"unchecked {count} EXCEEDS ceiling {ceiling} by {count - ceiling}"
+
+
+def audit_ceiling(cfg: dict) -> int:
+    """Read the declared shrink-only ceiling for unchecked hardcodes, failing closed when absent."""
+    block = (cfg.get("config_audit") or {}).get("unchecked_hardcoded")
+    if not isinstance(block, dict):
+        raise SystemExit(
+            "FATAL: config/pipeline_config.yaml#config_audit.unchecked_hardcoded is not declared - the audit's "
+            "own debt needs a ceiling with a home (C12/T-206)"
+        )
+    if str(block.get("direction")) != "shrink_only":
+        raise SystemExit(
+            "FATAL: config_audit.unchecked_hardcoded.direction must be 'shrink_only' - a ceiling that can be "
+            "raised by an edit is not a shrink guard (D-2644/T-206)"
+        )
+    try:
+        ceiling = int(block["ceiling"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise SystemExit(
+            "FATAL: config_audit.unchecked_hardcoded.ceiling is absent or not an integer (C12/T-206)"
+        ) from exc
+    if ceiling < 0:
+        raise SystemExit("FATAL: config_audit.unchecked_hardcoded.ceiling cannot be negative (T-206)")
+    return ceiling
+
+
+def print_report(drifts, missing_in_config, missing_in_code, unchecked, fmt="text", *,
+                 unchecked_ceiling: int | None = None, files_scanned: int | None = None):
     """Print audit report."""
     if fmt == "json":
         print(json.dumps({
@@ -306,6 +372,8 @@ def print_report(drifts, missing_in_config, missing_in_code, unchecked, fmt="tex
             "missing_in_config": missing_in_config,
             "missing_in_code": missing_in_code,
             "unchecked_hardcoded": unchecked,
+            "unchecked_ceiling": unchecked_ceiling,
+            "files_scanned": files_scanned,
         }, indent=2, default=str))
         return
 
@@ -333,21 +401,48 @@ def print_report(drifts, missing_in_config, missing_in_code, unchecked, fmt="tex
         for m in missing_in_code:
             print(f"  {m['key']}: {repr(m['config_value'])} (expected at {m['expected_source']})")
 
-    if unchecked:
-        print(f"\n📋 UNCHECKED — {len(unchecked)} hardcoded values not in audit registry:")
-        shown = 0
+    if unchecked_ceiling is not None:
+        ok, msg = unchecked_verdict(len(unchecked), unchecked_ceiling)
+        mark = "✅" if ok else "🔴"
+        print(f"\n{mark} UNCHECKED — {len(unchecked)} hardcoded value(s) not in the registry | {msg}")
+        if files_scanned is not None:
+            print(f"  scanned {files_scanned} pipeline module(s)")
         for u in unchecked[:15]:
             print(f"  {u['file']}:{u['line']} {u['name']} = {u['value']}")
-            shown += 1
         if len(unchecked) > 15:
             print(f"  ... and {len(unchecked) - 15} more")
+        if not ok:
+            print("  ❌ classify each item (YAML / rc vocabulary / declared format spec) or lower the count - "
+                  "raising the ceiling requires a named decision, not an edit (T-206/D-2644)")
 
-    if not has_issues:
+    if not has_issues and (unchecked_ceiling is None or len(unchecked) <= unchecked_ceiling):
         print("\n✅ No config-code drift detected.")
 
     print("\n" + "=" * 70)
 
     return bool(drifts or missing_in_config)
+
+
+def _selftest() -> int:
+    """Known-answer controls for the shrink-only unchecked rule: both directions must be SEEN."""
+    cases = [
+        (0, 0, True, "zero at zero"),
+        (1, 0, False, "one above zero"),
+        (9, 9, True, "at the ceiling"),
+        (10, 9, False, "one above the ceiling"),
+    ]
+    failed = []
+    for count, ceiling, expected, label in cases:
+        got, _ = unchecked_verdict(count, ceiling)
+        if got != expected:
+            failed.append(f"{label}: expected {expected}, got {got}")
+    if failed:
+        for f in failed:
+            print(f"  !! {f}")
+        print(f"config-audit selftest: {len(cases) - len(failed)}/{len(cases)} known-answer controls")
+        return 1
+    print(f"config-audit selftest: {len(cases)}/{len(cases)} known-answer controls")
+    return 0
 
 
 def main():
@@ -357,24 +452,40 @@ def main():
     parser.add_argument("--check-unchecked", action="store_true",
                         help="Also scan for unregistered hardcoded values")
     parser.add_argument("--strict", action="store_true",
-                        help="Fail if ANY unregistered hardcoded values exist (enforcement mode)")
+                        help="Fail when the unchecked count is ABOVE its declared shrink-only ceiling")
+    parser.add_argument("--selftest", action="store_true",
+                        help="Run the two-sided known-answer controls for the unchecked-ceiling rule")
     args = parser.parse_args()
 
-    drifts, mic, mico = run_audit()
-    unchecked = check_hardcoded_elsewhere() if (args.check_unchecked or args.strict) else []
+    if args.selftest:
+        sys.exit(_selftest())
+
+    cfg = load_config()
+    drifts, mic, mico = run_audit(cfg)
+    unchecked: list[dict] = []
+    files_scanned: int | None = None
+    ceiling: int | None = None
+    if args.check_unchecked or args.strict:
+        unchecked, files_scanned = check_hardcoded_elsewhere()
+        ceiling = audit_ceiling(cfg)
 
     fmt = "json" if args.json else "text"
-    has_issues = print_report(drifts, mic, mico, unchecked, fmt)
+    has_issues = print_report(drifts, mic, mico, unchecked, fmt,
+                              unchecked_ceiling=ceiling, files_scanned=files_scanned)
 
     if args.fix and mic:
         print("\n💡 To fix, add these to config/pipeline_config.yaml:")
         for m in mic:
             print(f"  {m['key']}: {repr(m['code_value'])}")
 
-    # --strict: unchecked hardcoded values also cause failure
     exit_code = 1 if has_issues else 0
-    if args.strict and unchecked:
-        exit_code = 1
+    if args.strict:
+        if files_scanned == 0:
+            print("FATAL: the unchecked scan read ZERO pipeline modules - an empty report from a gate that did "
+                  "not run is not zero (BUG-1025/T-206)")
+            exit_code = 1
+        elif ceiling is not None and len(unchecked) > ceiling:
+            exit_code = 1
     sys.exit(exit_code)
 
 

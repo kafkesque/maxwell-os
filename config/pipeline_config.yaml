@@ -11,6 +11,22 @@ run:
   # `just health` at line 20. scripts/resolve_python.sh reads this list and PROVES the pin against it, so a pin
   # that points at an interpreter missing a dep is refused with a diagnostic instead of failing 40 rails later.
   python_required_modules: [yaml, mcp]
+#: T-206/D-3153 — THE CONFIG AUDIT'S OWN DEBT IS DECLARED, COUNTED AND SHRINK-ONLY.
+#: MEASURED 2026-10-26: fixing BUG-1025 let the audit speak for the first time and it reported 9 unchecked
+#: hardcoded values plus 1 config/code mismatch. The count is held against a ceiling that may only move DOWN
+#: (D-2644); a new hardcode is therefore a FAULT, never a shrug absorbed by an acknowledgement set.
+config_audit:
+  unchecked_hardcoded:
+    direction: shrink_only
+    ceiling: 0          # after T-206's classification every item has a declared home (format spec, rc vocabulary, or YAML)
+    baseline: 9         # the first reading BUG-1025 exposed, recorded so the shrink is visible
+    measured_on: '2026-10-26'
+    why: >-
+      A hardcoded value is a value with two homes unless its class says otherwise. Binary-format offsets stay in
+      code as FORMAT_SPEC_HARDCODED with their source; exit-code vocabulary stays in ACKNOWLEDGED_HARDCODED
+      because making an exit code configurable would make the meaning of a run configurable; every MEANING value
+      moves to YAML. Raising this ceiling requires a named decision, not an edit.
+
 serving:
   # D-2936 (2026-10-11): SERVING INDEX SCOPE — scope must be enforced by the INDEX, not
   # only by a WHERE clause. The store holds every run ever committed (t11: 7855 rows,
@@ -357,6 +373,7 @@ stage0:
     image_export_mode: placeholder   # placeholder | embedded | referenced (docling --image-export-mode)
     max_embedded_images: 0           # an artefact carrying MORE `data:image` blobs than this is refused
     max_artifact_mb: 8               # a text artefact above this ceiling is refused; a real book is 0.3–3 MB
+    min_output_bytes: 100             # T-206/D-3153: below this a "success" wrote a receipt, not a work (C20)
   #: D-3077 — A LIBRARY'S DECLARED KINDS MAY NOT EXCEED ITS STAGE'S DECLARED READERS. MEASURED 2026-10-17 on the
   #: live plan: 389 of 626 refusals were `refused_container_no_stage_reads_it` — works the door says the library OWNS
   #: (books root kinds: epub, pdf, md, mobi, azw3, djvu; journals:notes kinds: pdf, docx, md, txt) that Stage 0 could

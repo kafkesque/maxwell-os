@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 791,
-  "open_n": 247,
-  "closed_n": 544,
+  "total_ids": 792,
+  "open_n": 246,
+  "closed_n": 546,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1226,11 +1226,6 @@
       "events": 1
     },
     {
-      "id": "BUG-1020",
-      "title": "(MED - OPEN 2026-10-25) - the DELEGATE path failed three times on a task the model itself completed in eight seconds, and only the journal",
-      "events": 1
-    },
-    {
       "id": "BUG-1021",
       "title": "(LOW - OPEN 2026-10-25) - the whole-set record has ONE declared home and TWO recipes can write it: a deep scan replaces the health verdict,",
       "events": 1
@@ -1241,9 +1236,9 @@
       "events": 1
     },
     {
-      "id": "BUG-1026",
-      "title": "(LOW - OPEN 2026-10-26) - a rail matched the WORD \"owner\" inside a CONSTANT NAME: it faulted a correct entry, and the fix it demands is to",
-      "events": 2
+      "id": "BUG-1028",
+      "title": "(LOW - OPEN 2026-10-26, RE-SCOPED out of BUG-1020 limb 2) - a delegate failure is reported as the word `Other`: the harness names no cause,",
+      "events": 1
     }
   ],
   "closed": [
@@ -1787,9 +1782,11 @@
     "BUG-1017",
     "BUG-1018",
     "BUG-1019",
+    "BUG-1020",
     "BUG-1022",
     "BUG-1023",
     "BUG-1025",
+    "BUG-1026",
     "BUG-1027"
   ]
 }

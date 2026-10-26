@@ -540,6 +540,12 @@ source_library:
     container_integrity:
       authority: D-3071
       module: pipeline/container_integrity.py
+      #: T-206/D-3153: the READ WINDOWS are declared here, with the probes that use them, so the module holds no
+      #: magic byte count. A zip's EOCD lives inside the last 64 KiB; a PDF trailer tolerates trailing junk, so
+      #: 4 KiB is generous. HEAD_BYTES must hold both diagnostics magics (OLE/Apple bookmark/zip/zeros).
+      probe_limits:
+        tail_bytes: 4096
+        head_bytes: 512
       probes:
         epub: zip          # a zip-family container: an end-of-central-directory record must resolve
         pdf: pdf            # `%PDF-` at the head AND a `%%EOF` trailer near the end (a truncated pdf keeps its magic)

@@ -528,7 +528,18 @@ unrouted:
   #: shrink-only ceiling plus an ever-growing register means the metric can only be kept green by hollowing itself out.
   #: BUG-953 did NOT need one (its title names config/acquisition.yaml, which acquisition_lane owns - it ROUTED). This
   #: one does, and it is honest: yaml_guard.py is a rail, and no capability owns any rail's SCAN BUDGET.
-  BUG-954: route_graph_incomplete   # the scan budget of a rail has no owner: narrowing the roots SHRINKS the scan against a declared receipt.artifacts, so the fix is a decision plus a receipt re-cut, and nobody is declared to make it
+  #: BUG-954 RETIRED FROM THIS BLOCK 2026-10-26 (D-3038: what we reject we REGISTER, not silently delete).
+  #: The override read `BUG-954: route_graph_incomplete` - "the scan budget of a rail has no owner: narrowing the roots
+  #: SHRINKS the scan against a declared receipt.artifacts, so the fix is a decision plus a receipt re-cut, and nobody
+  #: is declared to make it". MEASURED 2026-10-26 and now discharged WITHOUT a receipt re-cut: the scan was never
+  #: I/O-bound (322,605,053 bytes read in 0.73 s) and never short of ways to shrink; it was re-deciding frozen bytes
+  #: (yaml.safe_load 250.01 s + duplicate_keys 249.88 s), so a content-addressed memo took the same 525 artifacts and
+  #: the same verdicts from 500.63 s to 0.823 s. `receipt.artifacts: 113` was a FLOOR and stays untouched - the memo
+  #: removes the COST, so no root had to be narrowed and nothing had to be re-cut. The remaining shape the reason
+  #: named (no capability owns a rail's scan budget) is real but no longer costs anything, so it is recorded HERE
+  #: rather than carried as an override for a closed item, which would be a declaration with no referent (D-3034).
+  #: The key is removed because the rail refused it at (v) STALE: "BUG-954 is not an open item - the reason
+  #: outlived the item it explained".
   #: BUG-909/956 appended 2026-10-21. Both are the `bug_is_a_finding` shape (the DEFAULT reason for every bug), made
   #: PER-ITEM so the rail's debt count subtracts them (BUG-913: only the per-item override moves the number). Neither
   #: title names a repo artifact; both have real OWNED work elsewhere: BUG-909's fix is the LibGen circuit breaker in

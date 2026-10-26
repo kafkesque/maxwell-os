@@ -4,7 +4,7 @@
 owner can do, what is still open, and the exact commands to resume. Nothing here is reconstructed from memory —
 every claim carries the reading that produced it (D-3109).
 
-Repo: `b9cd108` · working tree clean · certification running at the time of writing (see §7).
+Repo: `12b539a` · working tree clean · **whole-set certification GREEN: 194 lines, 0 faults, 546.8 s** (see §7).
 
 ---
 
@@ -19,6 +19,8 @@ Repo: `b9cd108` · working tree clean · certification running at the time of wr
 | 5 | Closing #4 revealed **10 C12 items** (9 unchecked hardcoded values + 1 mismatch) the dead gate had been hiding. | **T-206 open**, ceiling declared |
 | 6 | **T-205's premise was false**: a sovereignty rail already exists, is 0.32 s, and already catches a cloud provider. The gap was *invocation*, not absence. | **T-205 CLOSED** on the falsified premise, corrected in place |
 | 7 | `gov_sync` faulted a correct entry for containing the constant name `RC_OWNER_OWED`. | **BUG-1026 open** (LOW), filed not worked around |
+| 8 | **My own append to `config/decisions.yaml` bypassed `write_guard`**, so the file's bytes were attributable to nothing — the handoff attribution control and one test both went red, on one defect read twice. | **FIXED** and re-appended through `write_guard` (twice: the first attempt failed because a *relative* path makes an unusable record) |
+| 9 | `write_guard.append_lines` accepts a **relative** path and journals it verbatim, producing a receipt no reader can join — while printing success. | **BUG-1026 INSTANCE 2**, fix shape declared |
 
 ---
 
@@ -192,9 +194,13 @@ acknowledgement set that absorbs a finding is a register that can never shrink.
 ## 7. State at handover
 
 ```
-head                 b9cd108   working tree clean
-certification        started 2026-10-26T10:02:45Z on b9cd108 (detached: temp/ladder_post1026.log)
-                     -> read with:  tail -5 temp/ladder_post1026.log ; python3 scripts/run_ladder.py --receipt-check
+head                 12b539a   working tree clean
+certification        GREEN — schema 2, state finished, recipe health, 194 lines, worst_rc 0, 546.8 s
+                     started 2026-10-26T10:16:21Z -> measured 10:25:28Z
+                     head_at_start == head_at_end == 12b539a · all four worktree readings EMPTY · faults []
+                     fingerprint 18d1b2d71f73dc70 · log temp/ladder_final.log
+                     -> re-read with: python3 scripts/run_ladder.py --receipt-check
+                     A FIRST run (b9cd108, 551.3 s) was RED on 2 faults, both §1 row 8; that receipt is superseded.
 census               1279 decisions / 790 bugs (247 open, 543 closed, DIVERGENT 0) / 107 tasks
                      (60 open, 46 done, 1 rule; movers pipeline 88 / owner 19)
 gov_sync             4 faces equal their re-derivation
@@ -211,8 +217,11 @@ engine               127.0.0.1:11435, auth required by design (keyless 401 is CO
   it stays as inert legacy until something asks oMLX to fetch gated weights.
 * **BUG-789** already registers "the local model server's app config carries a Hugging Face token in plaintext"
   (OPEN). BUG-1024 is the *placement and liveness* defect on top of it, not a duplicate — cross-reference them.
-* This session did **not** re-run the whole-set ladder before handing over; it was started on the committed tree and
-  its receipt is the authority. Do not claim green from this prose.
+* The green receipt certifies **`12b539a`**. If the head has moved since (documentation-only commits included), the
+  receipt still names the head it MEASURED — that is T-204's whole point: believe the receipt's `head_at_*`, never this
+  prose. Check with `python3 scripts/run_ladder.py --receipt-check`.
+* `just preflight` remains rc=1 (T-206's ten items) while the whole-set ladder is green: they are different doors, and
+  the certification does not cover the cheap one.
 * `gov_sync --apply` **re-wraps** `config/task_register.yaml`, so exact-text edits to it must be re-read after every
   sync (measured this turn: one edit failed on stale wrapping).
 

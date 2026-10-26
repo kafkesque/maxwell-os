@@ -22591,3 +22591,31 @@ provider; it does not report a DELEGATE's, does not bill anything, and cannot re
 choice escalation makes is the owner's (D-3023 says ALLOWED, never silent), and the second owed item is still
 BUG-957's: `~/.config/goose/custom_providers/` carries no `custom_deepseek.json`, so the harness has no
 `context_limit` to compute a compaction trigger from on the provider this conversation is actually using.
+
+
+### BUG-1026 INSTANCE 3 (FIXED 2026-10-26) - the D-3158 append to `config/decisions.yaml` skipped the journal: a SECOND occurrence of the `docguard__safe_append`-does-not-journal class, restored by a truthful receipt
+
+**MEASURED, one defect read twice.** The D-3158 re-mint (a provenance-stamp repair re-pinning the r2_meter) appended
++32 lines to `config/decisions.yaml`, moving its sha16 71968df1655e3271 -> 7cf32672dcc09a27, but NO
+`MUTATION_JOURNAL` record carried `post_sha16` 7cf32672dcc09a27. `handoff.last_governed_write` returned None for the
+governed subject, and two independent consumers went red on that one fact: `handoff --selftest` and
+`tests/test_handoff_obligation.py::test_the_attribution_is_joined_by_CONTENT_and_never_by_recency`.
+
+**WHY RECORD A SECOND OCCURRENCE OF A DOCUMENTED CLASS.** INSTANCE 2 (above) already names the class: a governed
+append made with a NON-journaling path (`docguard__safe_append` / a plain write) is UNATTRIBUTED by construction,
+because only `write_guard.append_lines` / `write_document` journal into `MUTATION_JOURNAL`. D-3153 was the first
+occurrence; D-3158 is the second. A class that recurs AFTER it was documented is evidence the documented route
+("use `write_guard.append_lines` with an ABSOLUTE path") is carried in prose, and prose does not gate a write. The
+durable fix is NOT more prose: either (a) route every governed append through `write_guard`, or (b) make the append
+surface REFUSE a `write_guard`-governed file so a non-journaling append to the registry cannot succeed silently.
+Neither is built here; both are the remaining closure condition of this class.
+
+**WHAT WAS DONE (the repair, not a re-route).** The live bytes were NOT touched (`config/decisions.yaml` is
+append-only records, D-2655). ONE truthful `WriteReport` record was appended to `governance/MUTATION_JOURNAL.jsonl`
+in the exact schema — mode `append_lines`, `pre_sha16` 71968df1655e3271, `post_sha16` 7cf32672dcc09a27, `rows` 32874,
+`added` 32, absolute path, writer `session-20261026_D3158 (attribution repair: D-3158 append left unjournaled at mint
+time)`. The join is restored by CONTENT (the `post_sha16` matches the live bytes), never by recency — the property the
+failing control asserts.
+
+**RECEIPTS.** `handoff --selftest` rc 0; `pytest -q tests/test_handoff_obligation.py` 6 passed; whole-set ladder GREEN
+(198 lines, 0 faults) under head c49f618.

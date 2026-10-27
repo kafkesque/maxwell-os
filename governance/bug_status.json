@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 835,
-  "open_n": 262,
-  "closed_n": 573,
+  "total_ids": 837,
+  "open_n": 263,
+  "closed_n": 574,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1319,6 +1319,11 @@
       "id": "BUG-1069",
       "title": "(MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and",
       "events": 1
+    },
+    {
+      "id": "BUG-1073",
+      "title": "(LOW, OPEN 2026-10-27) - the R5 reviewer REJECTED a write whose verification lives in an imported helper: a contract 100 lines away is not",
+      "events": 1
     }
   ],
   "closed": [
@@ -1894,6 +1899,7 @@
     "BUG-1067",
     "BUG-1068",
     "BUG-1070",
-    "BUG-1071"
+    "BUG-1071",
+    "BUG-1072"
   ]
 }

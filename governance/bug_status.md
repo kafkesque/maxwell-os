@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**262 open** / 573 closed of 835 ids.
+**263 open** / 574 closed of 837 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -273,3 +273,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1059 | (MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's | 1 |
 | BUG-1064 | (MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget: | 1 |
 | BUG-1069 | (MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and | 1 |
+| BUG-1073 | (LOW, OPEN 2026-10-27) - the R5 reviewer REJECTED a write whose verification lives in an imported helper: a contract 100 lines away is not | 1 |

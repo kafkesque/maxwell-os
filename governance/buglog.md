@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1322 decisions (census stamp a61dafc68fb57454, 2026-10-27) · 835 bugs (262 open / 573 closed; highest OPEN = BUG-1069) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1323 decisions (census stamp f6f2e20b42f5e7f0, 2026-10-27) · 837 bugs (263 open / 574 closed; highest OPEN = BUG-1073) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1322 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 386 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1322, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1323 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1323, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 262 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 262 open.
+> Open BUGS by severity (population = the census's 263 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 263 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23693,3 +23693,60 @@ FOUND while wiring the pointer into the resolver, ten minutes after declaring it
 5. WHAT THE BUG COST: nothing, because the pointer was never exercised before it was fixed - but only because the
    resolver was written with a walk rather than a `dict.get(pointer)` one-liner. The lesson recorded (D-3034, D-3109):
    resolve a pointer by WALKING it and prove the walk with a control that fails, never by trusting the comment above it.
+
+## BUG-1072 (MED, FIXED 2026-10-27) - a deliberate UNSET was read as an EMPTY MODEL ID by two verification tools: the "3-family vote" had a phantom member and the cross-family judge could silently be the generator
+FOUND by resolving (not quoting) the lanes D-3194 had attributed to gemma-4-E4B, one hour after that record was
+committed - i.e. by applying D-3034 to my own decision rather than to someone else's.
+1. THE READING: `pipeline/pipeline_paths.py:509` sets `S4_DEPTH_MODEL = ""` when `stage4.depth_model` is absent from
+   config/pipeline_config.yaml, and the key IS absent - deliberately (`BUG-403/405 Gate D: config-first, NO code
+   default - the model it named is refuted, D2454`). MEASURED: `python3 -c "from pipeline.pipeline_paths import
+   S4_DEPTH_MODEL; print(repr(S4_DEPTH_MODEL))"` -> `''`.
+2. WHAT READ IT ANYWAY: `pipeline/disagreement_sample.py` bound `JUDGE_MODEL = S4_DEPTH_MODEL` with the comment
+   "gemma-4-E4B-it-MLX-4bit (default S4 depth model)" - a COMMENT naming a model over a VALUE of "" - and passed it
+   as `model=` to `call_omlx_json`. `tools/relabel_depth_bias.py` built `models = {"qwen": GEN_MODEL, "gemma":
+   S4_DEPTH_MODEL, "gptoss": VERIFY_MODEL}` and voted with all three.
+3. TWO DISTINCT FAILURES, and the second is the dangerous one. (a) An empty model id is not a neutral value: an
+   endpoint that fills it in judges with a model NOBODY CHOSE, and the script's entire purpose is R5 - a VERIFIER of
+   a DIFFERENT family. If the endpoint picks the Qwen family, the check silently self-verifies and reports agreement.
+   That is generator == verifier with no error, no warning and a green-looking artifact. (b) The 3-family vote printed
+   a member that could only ever contribute a FAIL or a phantom label, so "winner if tally >= 2" could be decided by
+   a family that did not vote. Both are the slop class this OS exists to refuse.
+4. THE ARTIFACT THAT PROVES IT USED TO WORK, AND CANNOT BE REGENERATED: `governance/depth_bias_relabel_vote.json`
+   (committed) carries real gemma labels (11 cross-domain / 3 domain, 0 FAIL) - so that run happened while
+   `stage4.depth_model` still named a model. Re-running TODAY yields a TWO-family vote. The receipt is therefore
+   HISTORY THAT CANNOT BE REPRODUCED, and it was left byte-identical by this fix (a test run was reverted with
+   `git checkout`), because re-deriving a historical receipt is a NEW measurement with its own name, never an
+   overwrite.
+5. FIX, FAIL-CLOSED IN BOTH FILES: `disagreement_sample.py` gains `judge_or_refuse()` and calls it BEFORE any record
+   is read - an empty judge is a `SystemExit` naming the key, the reason and the remedy (rc 1, MEASURED).
+   `relabel_depth_bias.py` DROPS a member with no id, NAMES the dropped member, and refuses below TWO real families;
+   its per-record line is rendered from the members that actually voted, so a column can no longer imply a family
+   that abstained.
+6. CORRECTION TO D-3194, recorded because a lane that does not resolve is not a lane: its limb (b) cited
+   "JUDGE_MODEL = S4_DEPTH_MODEL in pipeline/disagreement_sample.py" as a live gemma use. It is a NAMED SLOT whose
+   value is currently empty. gemma-4-E4B therefore stands on THREE resolved lanes, not four: the fan-out
+   `fallback_model` (config/engine.yaml:193, value equal to the served id), the 164/182 R5 verdicts it authored
+   (governance/r5_reviews.jsonl), and the fast tier (0.48 s, 7.12 GiB). KEEP is unchanged - three resolved lanes and
+   a 164-verdict authorship history are not redundant with gpt-oss - but the count is corrected, and the
+   hardware_profile row now says so.
+
+## BUG-1073 (LOW, OPEN 2026-10-27) - the R5 reviewer REJECTED a write whose verification lives in an imported helper: a contract 100 lines away is not a missing contract
+FOUND when both BUG-1072 files came back REJECT with the same concern: "writes an output file but does not verify that
+the write succeeded or that the contents match".
+1. ONE WAS A REAL DEFECT: `tools/relabel_depth_bias.py:125` read `json.dump(results, open(OUT_JSON, "w"))` - a bare
+   handle (leaked fd), no fsync, no read-back, no atomic replace. Fixed with `io_guard.safe_write`.
+2. ONE WAS A FALSE POSITIVE: `pipeline/disagreement_sample.py:114` read `safe_write(out_path, ...)`, and
+   `io_guard.safe_write` (io_guard.py:102) is exactly the C6 pattern - temp file in the destination directory,
+   fsync, atomic replace, a byte-count refusal ("the written byte count does not match the intended content") and a
+   >10% shrink guard. The reviewer resolved neither the import nor the docstring that states all four properties,
+   and issued a REJECT on a call site that is correct.
+3. WHY IT MATTERS EVEN AT LOW SEVERITY: a REJECT is not advisory - it blocks a file from being the reviewed bytes,
+   so a false positive costs a rewrite cycle AND invites the generator to change correct code to satisfy a reader who
+   did not look (the churn D-2646's "a suggested remedy is a hypothesis" rule exists to prevent). The correct answer
+   to this concern was a POINTER, not a patch - which is what was done: the call site now names the callee's contract.
+4. OWED (the rail, not the patch): the reviewer's prompt (`config/r5_review_gate.yaml`) should NAME the repo's
+   atomic-write helpers (`io_guard.safe_write`, `safe_write_jsonl`) and state that "the verification is in the named
+   callee" is a RESOLVED concern, so this class is answered once instead of once per file. Until then, every reviewer
+   must be assumed to read one file.
+5. NOT A REASON TO WEAKEN THE GATE: the same reviewer found a REAL unverified write on the same pass and a real
+   unguarded judge in the same sitting (BUG-1072). The finding is about resolution, not about trust.

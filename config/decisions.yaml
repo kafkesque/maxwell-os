@@ -34626,3 +34626,68 @@ decisions:
   - config/engine.yaml
   - governance/kv_working_set.jsonl
   supersedes: []
+- id: D-3197
+  state: RESOLVED
+  category: VERIFICATION / FAIL-CLOSED CONSUMERS / R5 (BUG-1072, BUG-1051, D-3034)
+  title: 'A deliberately UNSET config value is a REFUSAL, not an empty string: every consumer of a nullable model id must fail closed, because an empty id lets the ENDPOINT choose a verifier - and it can choose the generator'
+  decision: |
+    WHAT WAS FOUND (BUG-1072, MEASURED 2026-10-27). `stage4.depth_model` is ABSENT from config/pipeline_config.yaml
+    BY DECISION - the model it once named was refuted for depth classification (D2454) - so `S4_DEPTH_MODEL`
+    resolves to "" by design (`pipeline_paths.py:509`: "null/absent -> "" (UNSET), never the literal string
+    'None'"). Two verification tools read it anyway:
+      · pipeline/disagreement_sample.py bound `JUDGE_MODEL = S4_DEPTH_MODEL` with a COMMENT naming gemma over a
+        VALUE of "", and passed it as `model=` to the engine.
+      · tools/relabel_depth_bias.py voted with `{"qwen": GEN, "gemma": "", "gptoss": VERIFY}` and reported the
+        quorum as THREE families.
+
+    THE RULING, in one sentence: a value that is deliberately unset must cause a REFUSAL at the point of use, never
+    be carried into a request, because an empty model id is not neutral - the endpoint fills it in, and the model it
+    fills in is chosen by nobody. For a VERIFICATION tool that difference is not cosmetic: this repo's whole R5
+    discipline is "generator != verifier", and a judge the endpoint picked may BE the generator, producing a
+    self-verification that reports agreement, raises nothing, and leaves a green-looking artifact. The failure is
+    invisible exactly where invisibility is most expensive.
+
+    THREE APPLICATIONS, all done in this record:
+      1. `judge_or_refuse()` is called BEFORE any record is read; an empty judge exits with the key, the reason and
+         the remedy (MEASURED rc 1). A check with no verifier must not start, so the refusal cannot be mistaken for
+         a result over zero rows.
+      2. `relabel_depth_bias.py` DROPS an id-less member, PRINTS that it dropped it, and REFUSES below TWO real
+         families; its per-record line is rendered from the members that voted, so no column implies an abstention.
+      3. A historical receipt is NOT re-derived by a fix: governance/depth_bias_relabel_vote.json carries real
+         gemma labels from a run made while the key was still set, and re-running today yields a TWO-family vote.
+         That file was left byte-identical; a new measurement gets a new name.
+
+    WHAT THIS DOES NOT DO, stated so it is not over-read: it does not RESTORE `stage4.depth_model`. Re-populating a
+    key that was emptied by a quality ruling, in order to make a lane resolve, would reintroduce the refuted path
+    as a side effect of a cleanup. If the owner wants a declared cross-family judge for
+    `disagreement_sample.py`, that is a NEW declaration with a named model and its own receipt - not a default
+    resurrected to fill a hole.
+
+    WHY IT IS A RULE AND NOT A PATCH (the class recurs): BUG-1051 already carries the same shape for
+    `decider_advisory_best_arm` / `decider_emerging_abstention_signal` - an id in config that no consumer wires, or
+    a consumer of an id config does not set. The rule is therefore: an id that can be NULL must be consumed through
+    a refusal, and a null-consuming site must be NAMED in the register so the next reader knows the path is closed
+    on purpose rather than forgotten.
+  measured: |
+    `python3 -c "from pipeline.pipeline_paths import S4_DEPTH_MODEL; print(repr(S4_DEPTH_MODEL))"` -> ''
+    `python3 pipeline/disagreement_sample.py --sample 1` -> FATAL: stage4.depth_model is UNSET ... , rc=1
+    `python3 tools/relabel_depth_bias.py` -> NOTE: member(s) gemma declare NO model id and are EXCLUDED from the
+      vote (BUG-1072); runs as a 2-family vote; refuses below 2 (not reached: qwen + gptoss are both declared)
+    `git show HEAD:governance/depth_bias_relabel_vote.json` -> 14 rows carrying REAL gemma labels
+      (11 cross-domain / 3 domain, 0 FAIL): the committed receipt predates the key's removal and cannot be
+      regenerated today. It was restored with `git checkout` after the test run overwrote it.
+    `python3 -m ruff check pipeline/disagreement_sample.py tools/relabel_depth_bias.py` -> All checks passed!
+    R5, generator != verifier: FIRST PASS REJECTED BOTH, and the two concerns were separated rather than obeyed.
+      relabel_depth_bias.py was RIGHT (bare `json.dump(open(...))`) -> io_guard.safe_write, APPROVE on the fixed
+      bytes (0857c171e91e29e4). disagreement_sample.py was a FALSE POSITIVE (its write is io_guard.safe_write, which
+      fsyncs, replaces atomically and refuses a byte-count mismatch); the answer was a POINTER at the call site, not
+      a patch, and it then APPROVED (262efcfa1f65bcdf). The false positive is BUG-1073, because a REJECT blocks a
+      file from being the reviewed bytes and must not be satisfied by changing correct code.
+  bugs:
+  - BUG-1072
+  - BUG-1051
+  files:
+  - pipeline/disagreement_sample.py
+  - tools/relabel_depth_bias.py
+  - config/hardware_profile.yaml
+  supersedes: []

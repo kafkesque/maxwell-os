@@ -315,15 +315,18 @@ candidates:
   kind: dense
   moe_active_fraction: 1.0
   why: >-
-    REFUSED by the r5_review gate (accuracy 0.7083, false_approve 0.125 against a 0.10 ceiling) and KEPT for four
-    named lanes it still holds, none of which is reviewer-of-record: (1) the declared RETRY model
-    (config/engine.yaml#fanout.guards.fallback_model), so a failed call has a different-family second route;
-    (2) the S4 depth judge (pipeline/disagreement_sample.py, JUDGE_MODEL = S4_DEPTH_MODEL) and the fan-out's
-    default reviewer model; (3) the cross-family verifier when the AUTHOR is gpt-oss/qwen - it is the only
-    non-gpt-oss, non-qwen model with any reviewing_verdict history at all (48 rows; Ornith and Phi-4 have none);
-    (4) the fast tier (MEASURED 0.48 s, 7.12 GB resident, the smallest resident reviewer on the host). It holds
-    164 of the 178 R5 verdicts ever recorded, so deleting it would delete the review history's author, not a
-    redundant copy. What is REFUSED is narrower and is the reason the register keeps it visible: it may not be
+    REFUSED by the r5_review gate (accuracy 0.7083, false_approve 0.125 against a 0.10 ceiling) and KEPT for THREE
+    named lanes it RESOLVES to, none of which is reviewer-of-record: (1) the declared RETRY model
+    (config/engine.yaml#fanout.guards.fallback_model:193 - the value IS the served id), so a failed call has a
+    different-family second route; (2) the cross-family verifier when the AUTHOR is gpt-oss/qwen - it is the only
+    non-gpt-oss, non-qwen model with any reviewing_verdict history at all (164 of 182 R5 verdicts; Ornith and Phi-4
+    have none); (3) the fast tier (MEASURED 0.48 s, 7.12 GB resident, the smallest resident reviewer on the host).
+    CORRECTED 2026-10-27 (BUG-1072, D-3194 limb b): a FOURTH lane was claimed - "the S4 depth judge
+    (pipeline/disagreement_sample.py, JUDGE_MODEL = S4_DEPTH_MODEL)" - and it does NOT resolve: stage4.depth_model
+    is unset in config/pipeline_config.yaml by decision, so that constant is "" and the script now refuses to run
+    rather than let an endpoint choose its own verifier. A lane named by a comment is a MENTION (D-3034), so the
+    count is three. It holds 164 of the 182 R5 verdicts ever recorded, so deleting it would delete the review
+    history's author, not a redundant copy. What is REFUSED is narrower and is the reason the register keeps it visible: it may not be
     the VERDICT OF RECORD for a review, because it approves one item in eight that should be refused.
   roles:
   - review

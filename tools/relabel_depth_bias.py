@@ -32,6 +32,7 @@ OUT_JSON = PROJECT_ROOT / "governance" / "depth_bias_relabel_vote.json"
 def load_disputed() -> list[dict]:
     """Load golden FBs whose benchmark pred != gold, matched by name."""
     import yaml
+
     from pipeline.pipeline_paths import S2_GOLDEN_PATH
 
     verify = json.loads(VERIFY_JSON.read_text(encoding='utf-8'))
@@ -71,6 +72,21 @@ def main() -> int:
     from pipeline.pipeline_paths import GEN_MODEL, S4_DEPTH_MODEL, VERIFY_MODEL
 
     models = {"qwen": GEN_MODEL, "gemma": S4_DEPTH_MODEL, "gptoss": VERIFY_MODEL}
+    # A VOTE NEEDS MEMBERS (BUG-1072/D-3197). `stage4.depth_model` is UNSET by decision, so the "gemma" member was
+    # an EMPTY ID: the 3-family vote was a 2-family vote printed under a three-member heading, and the phantom
+    # member could contribute a FAIL (or, worse, whatever the endpoint defaulted to). Empty members are DROPPED and
+    # named, and a vote with fewer than two real families REFUSES rather than reporting a quorum it does not have.
+    dropped = sorted(tag for tag, model in models.items() if not str(model or "").strip())
+    models = {tag: str(model) for tag, model in models.items() if str(model or "").strip()}
+    if len(models) < 2:
+        raise SystemExit(
+            f"FATAL: only {len(models)} model(s) declared ({', '.join(models) or 'none'}); a cross-family vote needs "
+            f"at least 2. Unset member(s): {', '.join(dropped)} - stage4.depth_model is unset in "
+            f"config/pipeline_config.yaml (BUG-1072/D-3197). Declare it, or do not run this adjudication."
+        )
+    if dropped:
+        print(f"NOTE: member(s) {', '.join(dropped)} declare NO model id and are EXCLUDED from the vote (BUG-1072)",
+              file=sys.stderr)
     disputed = load_disputed()
 
     print("Depth-bias relabel adjudication — 3-model cross-family vote")
@@ -96,16 +112,24 @@ def main() -> int:
             "recommend": winner if relabel else None,
         }
         results.append(row)
-        print(f"  {fb['golden_id']:<10} gold={fb['gold_depth']:<12} "
-              f"qwen={votes['qwen']['pred']:<12} gemma={votes['gemma']['pred']:<12} "
-              f"gptoss={votes['gptoss']['pred']:<12} -> "
+        # ONE COLUMN PER MEMBER THAT ACTUALLY VOTED (BUG-1072): a hardcoded 3-column line would raise KeyError on
+        # a dropped member, so the line is rendered from the vote itself and can never claim a family that abstained.
+        cols = " ".join(f"{tag}={votes[tag]['pred']:<12}" for tag in models)
+        print(f"  {fb['golden_id']:<10} gold={fb['gold_depth']:<12} {cols} -> "
               f"{'RELABLE -> ' + winner if relabel else 'keep'}")
         print(f"      {fb['name']}")
 
     relabel_count = sum(1 for r in results if r["recommend"])
     print("=" * 78)
     print(f"recommend relabel: {relabel_count}/{len(results)}")
-    json.dump(results, open(OUT_JSON, "w", encoding='utf-8'), indent=2)
+    # CRASH-SAFE AND VERIFIED (C6/BUG-188, raised by R5 as a REJECT on the bare `json.dump(open(...))` this
+    # replaced): safe_write writes to a temp file in the destination directory, fsyncs, atomically replaces, and
+    # refuses if the bytes on disk differ from the content handed to it. shrink_guard=False is EXPLICIT because a
+    # later adjudication may legitimately dispute FEWER fixtures, and a shrink guard would then refuse a valid run
+    # rather than a truncated one - the atomicity and the byte-count check are what protect this file.
+    from pipeline.io_guard import safe_write
+
+    safe_write(OUT_JSON, json.dumps(results, indent=2, ensure_ascii=False) + "\n", shrink_guard=False)
     print(f"flag list -> {OUT_JSON}")
     return 0
 

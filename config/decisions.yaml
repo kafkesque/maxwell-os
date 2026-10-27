@@ -35595,8 +35595,8 @@ decisions:
     DECLARED CONTEXT the budget can pay, or it belongs in batch (`BATCH_ONLY_DO_NOT_INTERACTIVE`), not in the harness.
     The three admissible shapes, each with its receipt:
       (i)  keep the 26k context, bind gemma-4-E4B-it-MLX-4bit, accept a ~735-token answer (the only payable row);
-      (ii) keep a long-form role and DECLARE a smaller context (e.g. 8k), where Ornith-REAP-19B pays
-           `floor((90 - 8000/289.14) x 36.1)` = 2249 tokens;
+      (ii) keep a long-form role and DECLARE a smaller context, where Ornith-REAP-19B pays
+           `floor((90 - 8000/289.14) x 36.1)` = 2250 tokens at 8k (1,750 at 12k, 1,251 at 16k);
       (iii) move the role to batch, where the budget is 3,600 s and 27B's 672 s bill is affordable.
     (4) NEITHER LIMB IS EXECUTED HERE. Both are owner-lane acts (D-3035): an approval flips the binding IN THE REGISTER,
     and a silent re-bind would repeat exactly the fault BUG-1084 records. The recommendation is recorded with its

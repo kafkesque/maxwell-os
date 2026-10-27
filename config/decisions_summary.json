@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
   "source_path": "config/decisions.yaml",
-  "source_sha256": "7f10724c5fdadd5847b9981d065d903ea1d8a9059feef65e82dfe68c5fa84d04",
+  "source_sha256": "988b1895db9489ad7a5d1db0de42b1034100808a00ccd4083b692cc7e34f2ea4",
   "written_by": "scripts/recompute_decision_summary.py",
-  "decisions_sha256_16": "a70c95cd6af64a0e",
+  "decisions_sha256_16": "4a82ef2ee6cf1251",
   "total_decisions": 1324,
   "summary": {
     "total": 1324,

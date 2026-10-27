@@ -34737,7 +34737,17 @@ decisions:
     declaration, one re-derived reading and one battery run away, not a download. (5) WHAT THIS DOES NOT CLAIM. It
     does not re-rank the 2026-10-25 matrix (same receipt, same temperature, same fixtures); it does not touch the
     review, classify or code roles; it does not claim any model CANNOT orchestrate - only that no receipt says it
-    can, and an assignment made without one is a preference wearing a role name.
+    can, and an assignment made without one is a preference wearing a role name. (6) A FOURTH BLOCKER WAS ALREADY IN
+    THE REGISTER AND IS CITED HERE SO THE QUESTION IS NOT ANSWERED AROUND IT: BUG-951 (HIGH, OPEN 2026-10-20) is not
+    a capability score, it is a PRODUCTION DEFECT in tool-call EMISSION - gpt-oss-20b, bound as GOOSE_PLANNER_MODEL
+    (~/.config/goose/config.yaml:314) and as AGENT_LOOP_SHORT, sent `"name":"shell<|channel|>commentary"` in 6 of
+    about 30 calls (each a call to a tool that does not exist) and had FOUR CONSECUTIVE tool calls dropped by the
+    harmony parser (finish_reason=stop, 28 tokens, the call never reached the harness). A battery cannot see that
+    class: it is intermittent (~1 in 5 calls) and it costs a small number of calls per fixture, so a 4-fixture pass
+    is compatible with it - which is exactly why a capability matrix may not be read as a reliability certificate.
+    The corpus of this decision is therefore: gpt-oss is ADMITTED by T-187, RANKED 2/4 by T-199 with two rows
+    invisible, and carries an OPEN HIGH EMISSION DEFECT on the very path that would make it an orchestrator. Three
+    readings, one direction, and none of them says "assign it".
   measured: |
     T-199 battery 2026-10-25 (governance/evidence/LOOP_BATTERY_20261025.json), warm turn, temperature 0.0:
       MiniCPM5-2B-MLX                 4/4  warm= 1.5s load= 4.0s
@@ -34761,6 +34771,7 @@ decisions:
   - BUG-1075
   - BUG-1076
   - BUG-1064
+  - BUG-951
   files:
   - governance/evidence/LOOP_BATTERY_20261027_GPTOSS_RC1.json
   - config/model_assignments.yaml

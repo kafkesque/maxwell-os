@@ -35558,7 +35558,7 @@ decisions:
   supersedes: []
 
 - id: D-3209
-  state: ACTIVE
+  state: RESOLVED
   date: '2026-10-27'
   by: assistant
   category: ROLE BINDING / OWNER-LANE RECOMMENDATION (D-3035, D-3109, D-3198, D-3204, D-3205, BUG-1084, BUG-1090, BUG-1091)
@@ -35620,5 +35620,73 @@ decisions:
   - BUG-1091
   files:
   - config/model_assignments.yaml
+  - config/agent_context.yaml
+  supersedes: []
+- id: D-3210
+  state: ACTIVE
+  date: 2026-10-27
+  by: assistant
+  category: ROLE BINDING / MEMORY ACCOUNTING / OWNER APPROVAL (D-3034, D-3109, D-3177, D-3209, D-3210, BUG-1069,
+    BUG-1090, BUG-1091)
+  title: OWNER-APPROVED (2026-10-27) - AGENT_EDIT_LONG_CONTEXT re-bound to gpt-oss-20b-MXFP4-Q8 as a ONE-SHOT at
+    the 600 s agent_probe class, and the non-MTP Qwen3.8-27B is KEPT (never deleted); memory accounting is completed
+    for both MTP4 and the gemma-4-12B candidate
+  decision: '(1) THE RE-BIND (resolves D-3209 limb 2, which had waited on the owner''s word). config/model_assignments.yaml#harness_roles.AGENT_EDIT_LONG_CONTEXT.model
+    is now gpt-oss-20b-MXFP4-Q8. At the role''s real 26,214-token context EVERY big-brain model is UNPAYABLE against
+    the 90 s loop budget (BUG-1091 table), so the defect was the budget CLASS, not the model. gpt-oss pays ~16.8k
+    tokens at the 600 s agent_probe prefill class (600 - 124.83 s = 475.17 s x 35.32 tok/s) and is the only served
+    model passing the R5 verdict gate (false_approve 0.0), stable unlike Ornith-REAP-19B''s 0.2 stability (rejected
+    for R14/R5 reproducibility). Re-scoping the context cannot work either: 20k/210 = 95.2 s still exceeds 90 s.
+
+    (2) THE ANNOTATIONS ARE DECLARATIVE, NOT ENFORCED - recorded as such, not claimed otherwise. `class: agent_probe`,
+    `mode: oneshot`, `not_a_loop`, `rehomed` resolve to real referents (config/agent_context.yaml#classes.agent_probe=600
+    s; pipeline/subagent_fanout.py''s oneshot mode; config/pipeline_config.yaml#reliable_voters; hardware_profile.yaml
+    roles: []), but no reader currently consumes harness_roles.<role>.class/.mode - role_model() reads only `model`.
+    The re-bind itself IS enforced (the model resolves), and no live invocation path names this role today, so an
+    enforcement reader is deferred as a named follow-up (T-218), never silently asserted.
+
+    (3) Qwen3.8-27B-MLX-4bit IS NOT DELETED. It was never released anywhere new: it already held live homes as a
+    config/pipeline_config.yaml reliable_voters member (deep-batch 3,600 s: 3600 - 672.15 = 2927.85 s x 7.5 tok/s
+    = ~22k payable) + delegate_local.allowed_models, and it is the D-3177 control arm in hardware_profile.yaml (roles:
+    []). scripts/check_delete_target.py REFUSES the delete (SERVED + SYMLINK-REFERENCED by MTP4''s 13 shard symlinks
+    + ADVERTISED). The owner''s clarification is recorded: the question was whether the BASE Qwen3.8-27B should
+    be deleted - answer: NO, and MTP4 was never proposed for deletion.
+
+    (4) MEMORY ACCOUNTING COMPLETED in pipeline/model_lazyload.py#MODEL_SIZES: Qwen3.8-27B-MTP4 15.93 GB (the hardware_profile
+    plan role''s model) and lmstudio-community--gemma-4-12B-it-MLX-4bit 6.59 GB (the served reviewer-quant candidate,
+    BUG-1069''s 6,773.4 MB orphan) are added - now 10 distinct byte-sets keyed by engine id. DELIBERATE EXCLUSION
+    (D-3038): the 6 remaining hub-cache ids (lmstudio-community--Qwen3-Coder/Ornith/gpt-oss, mlx-community--Ornith/gpt-oss/clef-flash,
+    openbmb--MiniCPM5, ornith-ai--Ornith-9B) are ALIASES of these same bytes (adding them would double-count residency),
+    and clef-flash is parked/never-loaded.
+
+    '
+  rejected:
+  - option: re-bind to Ornith-REAP-19B (fastest measured, 3028 payable at 8k)
+    why: its stability 0.2 (BATCH_ONLY_DO_NOT_INTERACTIVE) contradicts the reproducible long-context edit role (R14/R5)
+      - throughput bought with an unreproducible answer.
+  - option: re-scope the role to long-input/short-output and keep the 27B
+    why: measured - 20k/210 = 95.2 s prefill still exceeds the 90 s loop budget, so the axis being re-scoped is
+      not the axis that binds (D-3209).
+  - option: hold Qwen3.8-27B-MLX-4bit as the binding
+    why: UNPAYABLE at 26k (672 s prefill) - a declaration with no referent (D-3034).
+  - option: delete the non-MTP Qwen3.8-27B base
+    why: check_delete_target.py REFUSES (SERVED + 13 MTP4 symlinks + ADVERTISED); it is the D-3177 control arm and
+      a live reliable_voters member.
+  measured:
+  - BUG-1091 table at 26,214 tokens / 90 s: gemma-4-E4B 735 DERIVED, MiniCPM5-2B 51, Ornith-REAP-19B 0 UNPAYABLE,
+      gpt-oss-20b 0 UNPAYABLE, Qwen3.8-27B-MLX 0 UNPAYABLE, Qwen3.8-27B-MTP4 0 UNPAYABLE - the loop budget pays
+      NO big-brain model at 26k.
+  - governance/evidence/BUG1090_REBIND_MEASUREMENT_20261027.json: Ornith @8k payable 3028 / @12k 2249 / @16k 1785;
+      gpt-oss @8k 2215 - Ornith fastest at every candidate but stability 0.2.
+  - engine /admin/api/models (2026-10-27): Qwen3.8-27B-MTP4 15.93 GB, lmstudio-community--gemma-4-12B-it-MLX-4bit
+      6.59 GB, 17 registered models of which 6 are hub-cache aliases of the 10 distinct byte-sets.
+  bugs:
+  - BUG-1090
+  - BUG-1091
+  - BUG-1069
+  files:
+  - config/model_assignments.yaml
+  - pipeline/model_lazyload.py
+  - config/hardware_profile.yaml
   - config/agent_context.yaml
   supersedes: []

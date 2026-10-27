@@ -271,9 +271,12 @@ harness_roles:
     also_best_at: "long_context_reasoning_16k 1.0 (ties Qwen3.8-27B); native tool loop"
     never_for: "code generation (route to Qwen3-Coder) and STRATEGIC decisions (escalate to custom_deepseek per D-3023)"
   AGENT_EDIT_LONG_CONTEXT:
-    model: Qwen3.8-27B-MLX-4bit
-    basis: "lc_reason 1.0, niah 1.0, reviewing 1.0, humaneval 0.96, ifeval 1.0 - the strongest axis set in the portfolio"
-    watch: "BUG-793: its prefill was the anomaly; measure prefill at the class context size before long interactive loops (BUG-805)"
+    model: gpt-oss-20b-MXFP4-Q8
+    basis: "BUG-1090 OWNER-APPROVED RE-BIND 2026-10-27 (D-3210). At 26,214 tokens every big-brain model is UNPAYABLE against the 90 s loop budget, so the defect was the budget CLASS, not the model (BUG-1091 table). gpt-oss pays ~16.8k tokens at the 600 s agent_probe prefill class (600 - 124.83 s = 475.17 s x 35.32 tok/s) and is the only served model passing the R5 verdict gate (false_approve 0.0) - stable, unlike Ornith-REAP-19B's 0.2 stability (rejected for R14/R5 reproducibility)."
+    class: agent_probe
+    mode: oneshot
+    not_a_loop: "UNPAYABLE at the 60 s / 120 s loop classes at 26k (124.83 s prefill bill) - this role runs as a ONE-SHOT at the 600 s agent_probe class, never as an interactive AGENT_LOOP_* (a 26k loop turn cannot be paid by ANY served model)."
+    rehomed: "Qwen3.8-27B-MLX-4bit (former binding) is NOT rehomed - it already had a live deep-batch home: config/pipeline_config.yaml reliable_voters (deep-batch 3,600 s class: 3600 - 672.15 = 2927.85 s x 7.5 tok/s = ~22k tokens payable) + delegate_local.allowed_models. It is ALSO the D-3177 control arm in hardware_profile.yaml (roles: []). Never deleted - MTP4's 13 shard symlinks resolve INTO it; scripts/check_delete_target.py REFUSES the delete."
   AGENT_TOOL_SHORT_ONESHOT:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     basis: "toolcalling 0.7 (portfolio best), mbpp 0.68, humaneval 0.8"

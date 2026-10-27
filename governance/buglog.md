@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1335 decisions (census stamp 5edccacd9b6f345c, 2026-10-27) · 857 bugs (270 open / 587 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1336 decisions (census stamp f1cd2d6611dfc897, 2026-10-27) · 857 bugs (269 open / 588 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1335 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1335, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1336 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 388 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1336, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 270 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 270 open.
+> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 269 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24683,3 +24683,16 @@ decision, not a speed win. The owner-lane options (D-3035, D-3209 limb 2): (i) r
 at a DECLARED 8k-16k context and accept batch semantics; (ii) re-bind to gpt-oss-20b at a reduced context
 (stable, but 2215 < 3028); (iii) hold and keep Qwen3.8-27B-MLX-4bit (UNPAYABLE at 26k, 672 s prefill).
 Awaiting the owner's word. Re-bind, do NOT re-scope (BUG-1090 original).
+
+## BUG-1090 (MED, RESOLVED 2026-10-27) — OWNER-APPROVED RE-BIND (D-3210): AGENT_EDIT_LONG_CONTEXT → gpt-oss-20b-MXFP4-Q8, a ONE-SHOT at the 600 s agent_probe class
+
+Owner approved 2026-10-27 ("approve your BUG 1090 recommendation"). The binding is re-homed:
+- config/model_assignments.yaml#harness_roles.AGENT_EDIT_LONG_CONTEXT.model = gpt-oss-20b-MXFP4-Q8 (was Qwen3.8-27B-MLX-4bit).
+
+WHY THE CLASS, NOT THE MODEL (BUG-1091): at the role's real 26,214-token context every big-brain model is UNPAYABLE against the 90 s loop budget, so re-scoping output length could not help (20k/210 = 95.2 s > 90 s). gpt-oss pays ~16.8k tokens at the 600 s agent_probe prefill class (600 - 124.83 = 475.17 s x 35.32 tok/s) and is the only served model passing the R5 verdict gate (false_approve 0.0). Ornith-REAP-19B was faster at every context (3028 payable @8k) but rejected for its 0.2 stability (BATCH_ONLY_DO_NOT_INTERACTIVE), which conflicts with a reproducible edit role (R14/R5).
+
+NOT DELETED: the non-MTP Qwen3.8-27B-MLX-4bit is KEPT. scripts/check_delete_target.py REFUSES the delete (SERVED + SYMLINK-REFERENCED by MTP4's 13 shards + ADVERTISED); it remains a config/pipeline_config.yaml reliable_voters member and the D-3177 control arm. Owner clarification recorded: the delete question was about the BASE Qwen3.8-27B, not MTP4.
+
+ANNOTATIONS class: agent_probe / mode: oneshot / not_a_loop / rehomed are DECLARATIVE (they resolve to real referents — config/agent_context.yaml#classes.agent_probe, fanout's oneshot mode — but no reader consumes harness_roles.<role>.class/.mode yet; role_model() reads only `model`). Enforcement is deferred as T-218, not silently asserted.
+
+Receipt: governance/evidence/BUG1090_REBIND_MEASUREMENT_20261027.json. Decision: D-3210 (ACTIVE). D-3209 limb 2 RESOLVED by it.

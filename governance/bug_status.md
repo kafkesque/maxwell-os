@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**270 open** / 587 closed of 857 ids.
+**269 open** / 588 closed of 857 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -278,6 +278,5 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |
 | BUG-1083 | (MED, OPEN 2026-10-27) — the SUITE rail is RED on a census receipt mismatch, and the ladder's own comment still declares three reds that no | 1 |
 | BUG-1088 | (MED, OPEN 2026-10-27) — THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20` | 1 |
-| BUG-1090 | (MED, OPEN 2026-10-27) — A ROLE WHOSE NAME PROMISES LONG-FORM OUTPUT IS BOUND TO THE SLOWEST SERVED MODEL, AND ITS HONEST GRANT IS 675 | 3 |
 | BUG-1092 | (LOW, OPEN 2026-10-27) - 34 of the 269 OPEN ids have no section in the append-only register: a COUNT with no evidence BODY | 1 |
 | BUG-1093 | (LOW, OPEN 2026-10-27) - A SUPERLATIVE OVER A COMPLEMENT SET READS AS A GLOBAL CLAIM: "worst measured non-27B decode (13.4 tok/s)" produced | 1 |

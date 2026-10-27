@@ -60,9 +60,15 @@ PINNED_MODELS = {"Phi-4-mini-instruct-8bit"}
 
 # ── Model memory estimates (GB, from OMLX observations) ──────────────
 MODEL_SIZES = {
-    # Refresh 2026-10-20 from GET /admin/api/models (estimated_size_formatted) — the 8 registered models.
+    # Refresh 2026-10-20 from GET /admin/api/models (estimated_size_formatted) — now 10 distinct byte-sets:
+    # the 9 canonical served harness models + the lmstudio gemma-4-12B candidate below. The 6 remaining
+    # hub-cache ids the engine registers are ALIASES of these same bytes (double-count risk), and clef-flash is
+    # parked/never-loaded - both are deliberately excluded (D-3210).
     # Receipt: MiniCPM5 1.38 · Ornith-1.5-35B 12.08 · Ornith-1.5-9B 9.30 · Phi-4-mini 3.99 (pinned)
     #           Qwen3-Coder-30B 16.80 · Qwen3.8-27B 15.70 · gemma-4-E4B 6.68 · gpt-oss-20b 11.81.
+    # Qwen3.8-27B-MTP4 15.93 added 2026-10-27 (same admin source, READ back this turn): the MTP head is the
+    # base 15.70 GB checkpoint + its own 0.23 GB model-00004 shard, the 13 other shards are SYMLINKS into the
+    # base. It is the hardware_profile.yaml `plan` role's model, so a size table without it mis-accounts residency.
     # Phantom/stale entries (Qwopus, Ornith-1.0, gemma-4-26B/31B/12b, Qwen2.5-Coder) removed — D-3109: a size
     # table that names models the server no longer registers declares nothing and mis-accounts residency.
     "MiniCPM5-2B-MLX": 1.38,
@@ -71,8 +77,15 @@ MODEL_SIZES = {
     "Phi-4-mini-instruct-8bit": 3.99,
     "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 16.80,
     "Qwen3.8-27B-MLX-4bit": 15.70,
+    "Qwen3.8-27B-MTP4": 15.93,
     "gemma-4-E4B-it-MLX-4bit": 6.68,
     "gpt-oss-20b-MXFP4-Q8": 11.81,
+    # lmstudio-community--gemma-4-12B-it-MLX-4bit 6.59 added 2026-10-27: a SERVED candidate in
+    # config/hardware_profile.yaml (the reviewer-quant test, BUG-1069's 6,773.4 MB orphan). DISTINCT from the
+    # RETIRED 'gemma-4-12B-it-qat-OptiQ-4bit' (T-139/D-3013) named in the stale-entry comment below - two
+    # different byte-sets, one name fragment. It carries the engine's hub-cache id as its canonical id, so a
+    # size table keyed by engine id must carry THAT spelling, not a shortened alias (D-3034: one id per bytes).
+    "lmstudio-community--gemma-4-12B-it-MLX-4bit": 6.59,
 }
 
 # ── Model last-used timestamps (in-memory, resets on restart) ────────

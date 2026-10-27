@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 814,
-  "open_n": 251,
+  "total_ids": 819,
+  "open_n": 256,
   "closed_n": 563,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1263,6 +1263,31 @@
     {
       "id": "BUG-1050",
       "title": "(HIGH, OPEN 2026-10-27) - `hf cache prune` names the SERVED snapshot of a live model as \"detached\", and `du -shL` reports 48G for a 16G",
+      "events": 1
+    },
+    {
+      "id": "BUG-1051",
+      "title": "(HIGH, OPEN 2026-10-27) - oMLX 0.7.3rc1 makes the RATIFIED advisory best-arm UNLOADABLE (pplx-decider -> HTTP 409 on both endpoints), and",
+      "events": 1
+    },
+    {
+      "id": "BUG-1052",
+      "title": "(MED, OPEN 2026-10-27) - rc1 ships `specprefill_enabled: true` on three models whose prompts never reach its 8192-token trigger: a",
+      "events": 1
+    },
+    {
+      "id": "BUG-1053",
+      "title": "(MED, OPEN 2026-10-27) - the documented \u00a77.1 re-baseline command cannot run on this host: bare `python3` is /usr/bin/python3, which has no",
+      "events": 1
+    },
+    {
+      "id": "BUG-1054",
+      "title": "(MED, OPEN 2026-10-27) - the delete-safety test has TWO more holes: the served portfolio spans 3 roots, and the engine's pool (17 ids) is",
+      "events": 1
+    },
+    {
+      "id": "BUG-1055",
+      "title": "(MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing",
       "events": 1
     }
   ],

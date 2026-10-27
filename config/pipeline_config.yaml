@@ -636,7 +636,15 @@ stage4:
   # recall 0.4286 = 3/7). The symmetric emerging gate (rate ceiling + recall floor) STANDS as the future
   # certification gate.
   decider_mode: advisory   # D-2798 — the decider never fails closed on its own; promotion is owner-gated
-  decider_advisory_best_arm: pplx-decider-v1.1-27b-4bit
+  # D-3184 (2026-10-27): the advisory best-arm is RETIRED, not parked. pplx-decider-v1.1-27b-4bit CANNOT LOAD under
+  # oMLX 0.7.3rc1 — HTTP 409 on /v1/chat/completions AND on /v1/systemone ("VLM load failed: Received 1 parameters not
+  # in model: language_model.lm_head.weight.; LLM fallback also failed: Expected shape (248320, 5120) but received
+  # shape (255, 5120)"). A 255-row head is a decision head and decision_kind() accepts only Clef/OpenJev/D3, so no
+  # engine can serve it. Its A/B is CLOSED (kappa 0.6738 FAIL, D-2901), so the honest value is null rather than a
+  # name that resolves to nothing (D-3034). Missing rail: BUG-1051. Pre-rc1 value was pplx-decider-v1.1-27b-4bit.
+  decider_advisory_best_arm: null
+  # D-3184: RETAINED. It loads as a decision engine (5.88 GB) and answers /v1/systemone with typed noul/choice/score
+  # answers, zero decoding, 3.2 s cold and 0.96-1.16 s warm — measured 2026-10-27 while deciding whether to delete it.
   decider_emerging_abstention_signal: clef-flash-4bit
   # D-2820 (2026-10-05): anchor re-derivation harness (scripts/rederive_anchor_axes_v6.py).
   # generator produces CANDIDATE labels (INPUT only); the owner adjudicates (D-2839 c2); a

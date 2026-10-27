@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**251 open** / 563 closed of 814 ids.
+**256 open** / 563 closed of 819 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -262,3 +262,8 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1048 | (MED, OPEN 2026-10-27) - R5 review coverage silently depends on FILE LENGTH: gpt-oss returns UNPARSED on a 26 KB script at both output | 1 |
 | BUG-1049 | (LOW, OPEN 2026-10-27) - the severity vocabulary is DECLARED as MED and WRITTEN as MEDIUM: 20 headings use the undeclared word, and a bug | 1 |
 | BUG-1050 | (HIGH, OPEN 2026-10-27) - `hf cache prune` names the SERVED snapshot of a live model as "detached", and `du -shL` reports 48G for a 16G | 1 |
+| BUG-1051 | (HIGH, OPEN 2026-10-27) - oMLX 0.7.3rc1 makes the RATIFIED advisory best-arm UNLOADABLE (pplx-decider -> HTTP 409 on both endpoints), and | 1 |
+| BUG-1052 | (MED, OPEN 2026-10-27) - rc1 ships `specprefill_enabled: true` on three models whose prompts never reach its 8192-token trigger: a | 1 |
+| BUG-1053 | (MED, OPEN 2026-10-27) - the documented §7.1 re-baseline command cannot run on this host: bare `python3` is /usr/bin/python3, which has no | 1 |
+| BUG-1054 | (MED, OPEN 2026-10-27) - the delete-safety test has TWO more holes: the served portfolio spans 3 roots, and the engine's pool (17 ids) is | 1 |
+| BUG-1055 | (MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing | 1 |

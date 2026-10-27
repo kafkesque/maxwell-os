@@ -33483,7 +33483,7 @@ decisions:
   - governance/CALIBRATION_ROLE_MARKET_20261027.md
   - governance/r5_review_gate_bench.jsonl
 - id: D-3179
-  state: PROPOSED
+  state: RESOLVED
   category: ENGINE / UPGRADE RULING
   title: 'oMLX 0.7.3rc1 IS worth taking on this host — because the alternative (0.7.2) would LOSE the M1 prefill
     route the machine already has on 0.7.3.dev2 — but it is taken as a MEASURED upgrade: five new items appraised
@@ -33606,3 +33606,244 @@ decisions:
   - governance/buglog.md
   - governance/CALIBRATION_ROLE_MARKET_20261027.md
   - config/hardware_profile.yaml
+- id: D-3182
+  state: RESOLVED
+  category: ENGINE / UPGRADE RECEIPT / PERSONAL CALIBRATION
+  title: 'oMLX 0.7.3rc1 is INSTALLED and re-baselined: the version key did its job (all six roles went UNCALIBRATED
+    on launch) and rc1 buys NO measurable decode speed on this portfolio (+2.4/-3.7/-3.3% = noise), while the re-baseline
+    DISCOVERED Ornith-19B at 48.54 t/s and moved plan+analyze off the 27B — which resolved the 43.7-vs-40.4 GiB
+    co-residency overrun by measurement instead of by hand'
+  decision: "THE OWNER ACTED and this record is the receipt. Live bundle: /Applications/oMLX.app = 0.7.3rc1, CFBundleVersion\n\
+    3517 (was 0.7.3.dev2 / 3464). Only ONE oMLX bundle remains in /Applications, so the second defect D-3178 named\
+    \ -\ntwo bundles both declaring the `omlxapp` URL scheme, making \"the engine\" ambiguous - is CLOSED by the\
+    \ same act.\nD-3179 (the ruling that rc1 was worth taking, PROPOSED because installing an RC under the engine\
+    \ that serves every\npipeline is an owner act, D-381) is therefore RESOLVED.\n\n1. THE VERSION FILTER FIRED,\
+    \ AND THAT IS THE HEADLINE. `scripts/hardware_calibrate.py` on a cold journal read\n   engine_version 0.7.3rc1,\
+    \ found all 19 receipts keyed to 0.7.3.dev2, and returned SIX roles UNCALIBRATED with\n   \"RESIDENCY 0 GiB\
+    \ of 39.6 usable\". Nothing was filled by a prediction. That is D-3036 working as declared, and it\n   is the\
+    \ first time the fail-closed path has run for real rather than in a fixture.\n2. RE-BASELINE: 15 new receipts\
+    \ (3 readings x 5 models, cold nonce, server counters, medians - never a single\n   reading). gpt-oss-20b-MXFP4-Q8\
+    \ 40.47 t/s (40.18-41.04) / prefill 275.9; Qwen3-Coder-30B-A3B 44.39\n   (43.14-47.50) / 281.6; Qwen3.8-27B-MTP4\
+    \ 16.39 (11.42-22.85) / 50.2; MiniCPM5-2B 80.77 (72.58-86.29) / 283.8;\n   Ornith-1.5-35B-A3B-REAP-19B 48.54\
+    \ (48.02-51.69) / 396.63.\n3. rc1 BUYS NO MEASURABLE DECODE SPEED HERE: +2.4% (gpt-oss), -3.7% (Qwen3-Coder),\
+    \ -3.3% (MiniCPM5) against their\n   dev2 medians - all inside the noise band of their own ranges. That is not\
+    \ a refutation of the vendor's \"+9%\n   Float16 Activations on M1/M2\": every vendor figure is on oQ checkpoints\
+    \ and this portfolio is mlx-community\n   4-bit / MXFP4-Q8, so the claim was and remains a HYPOTHESIS here (stated\
+    \ as such in D-3179 before the install).\n   Neither rc1's prefill-side timeout relaxation nor its memory-guard\
+    \ change was exercised by a 2048-token receipt.\n4. The 27B's apparent +38% (11.88 -> 16.39) is NOT a gain and\
+    \ is recorded as noise: its own range is 11.42-22.85,\n   i.e. the dev2 median sits INSIDE the rc1 spread. A\
+    \ 2x spread on one model means the median is trustworthy to\n   about +/-40%, which is not enough to rank it.\n\
+    5. THE RE-BASELINE'S REAL FINDING IS A CANDIDATE, NOT AN ENGINE: Ornith-1.5-35B-A3B-REAP-19B measured for the\
+    \ first\n   time (11.5 GB, MoE, 48.02-51.69 - the tightest spread of any candidate) and took BOTH `plan` (decode)\
+    \ and\n   `analyze` (prefill 396.63). Qwen3.8-27B-MTP4, which held `plan`, now holds NO role.\n6. THAT RESOLVED\
+    \ THE OUTSTANDING PORTFOLIO QUESTION WITHOUT HAND-CURATION. The pending task was \"curate so the set\n   is\
+    \ co-resident - 43.7 GiB against 40.4 usable\". Substituting an 11.5 GB model for a 15.2 GB one on measured\n\
+    \   evidence reports RESIDENCY 40.0 GiB of 41.5 usable - all assigned models fit at once. The three weights\
+    \ that\n   actually serve roles are gpt-oss (11.2) + Qwen3-Coder (16.0) + Ornith-19B (11.5) + MiniCPM5 (1.3).\
+    \ No role was\n   chosen by preference; each fell out of the declared objective.\n7. TWO COSTS ARE RECORDED\
+    \ RATHER THAN HIDDEN. (a) The Qwen3.8-27B PAIR now holds nothing and occupies ~30.2 GB -\n   keep-or-delete\
+    \ is a question that needs a plan-quality gate, not an opinion (BUG-1055). (b) \"all fit at once\" is\n   a\
+    \ WEIGHTS-ONLY statement: 41.5 - 40.0 = 1.5 GiB of headroom, and `plan`/`analyze` both declare min_ctx 131072\n\
+    \   with no KV term anywhere in the sum (BUG-1055 limb 4).\n8. THE PER-MODEL FLAG SET CHANGED UNDER US: rc1\
+    \ ships `specprefill_enabled: true` for Phi-4, Qwen3-Coder and\n   gemma-4-E4B, which is inert below its own\
+    \ 8192-token trigger and so measures nothing at our 2048-token\n   instrument (BUG-1052). The bundled engine\
+    \ also now LOGS the MTP no-op that BUG-1046 recorded: \"config declares\n   mtp heads but checkpoint ships no\
+    \ mtp.* weights; MTPModule attachment skipped to keep strict load_weights\n   happy\" - the same silent failure,\
+    \ now audible.\n9. THE DOCUMENTED RECOVERY PATH COULD NOT RUN AS WRITTEN: §7.1's `python3 scripts/specdec_probe.py\
+    \ bench` dies\n   `ModuleNotFoundError: No module named 'yaml'` because bare `python3` is /usr/bin/python3 (BUG-1053).\
+    \ Every\n   command in this record was run as /Users/barn/miniforge3/bin/python3.\nWHAT IT FIXES: BUG-1052 (rc1\
+    \ flips specprefill ON where D-2772 recorded \"already false, no change\" - a dated\nobservation that expired\
+    \ silently when the engine changed), BUG-1053 (the re-baseline command named its script but\nnot its interpreter,\
+    \ the D-3100 defect), and BUG-1055 (the plan/analyze reassignment is speed-only, because review\nis the ONLY\
+    \ role carrying a require_gate). It also narrows BUG-1046 by showing the engine's own log now names the\nMTP\
+    \ no-op instead of swallowing it.\n"
+  rationale: 'A calibration feature''s value is proved when the thing it refuses to do is the useful thing. Launching
+    a new engine
+
+    without a re-baseline would have carried six role assignments measured on a different binary and nobody would
+    have
+
+    known they were stale; instead the table emptied itself and demanded measurement. The second reason is
+
+    anti-overfit: the honest reading of the deltas is "no change", and the only reason rc1 is still worth having
+    is
+
+    that it closed the bundle ambiguity and added auditable logging - not a speed story we cannot measure on this
+    quant.
+
+    '
+  measured: '/Applications/oMLX.app Info.plist CFBundleShortVersionString 0.7.3rc1 / CFBundleVersion 3517; `ls -d
+
+    /Applications/oMLX*.app` = one bundle; GET /health final_ceiling 58841720848 (55.6 GiB) -> 41.5 GiB usable after
+
+    the 80% cap and 3 GB KV headroom; disk_free 115.8 -> 111.9 GB across the run. Journal: 19 rows @ 0.7.3.dev2,
+    then
+
+    15 rows @ 0.7.3rc1. Medians and ranges as quoted above. hardware_calibrate.py --write produced config/model_roles.yaml
+
+    with engine_version 0.7.3rc1 and six PROVISIONAL/QUALIFIED rows; the pre-rc1 table is preserved at
+
+    /tmp/model_roles_before_rc1.yaml for the delta.
+
+    '
+  bugs:
+  - BUG-1052
+  - BUG-1053
+  - BUG-1055
+  files:
+  - config/model_roles.yaml
+  - governance/calibration_receipts.jsonl
+- id: D-3183
+  state: RESOLVED
+  category: ENGINE / SPECULATIVE DECODING / ROUTING
+  title: 'Speculative decoding for the REST of the portfolio is NOT worth the effort, and the reason is measurable:
+    every model that could gain already decodes at 40-81 t/s where decode is not the wall-clock bottleneck; the
+    only slow model (27B, 16 t/s) already runs native MTP; and the engine offers THREE mechanisms (MTP, DFlash,
+    SpecPrefill) of which the untried one targets PREFILL, not decode'
+  decision: "THE QUESTION: \"are the rest of the local LLMs speculative-decoding optimised, or is it not worth the\
+    \ effort - they\nare already fast enough?\" ANSWER: already fast enough is CORRECT for the fast set, the one\
+    \ slow model is already\ncovered, and the remaining lever is a different axis entirely.\n\n1. THE THREE MECHANISMS\
+    \ THE INSTALLED ENGINE ACTUALLY OFFERS (read from the 0.7.3rc1 bundle, not from training\n   data). (a) MTP:\
+    \ a native multi-token-prediction head beside the model, `mtp_enabled`. (b) DFlash: block-diffusion\n   speculative\
+    \ decoding inside the batched engine, \"Qwen3.5-family, Qwen3, Laguna and MiMo V2 targets, and GLM-5.3,\n  \
+    \ Gemma 4 and Muse Glimmer VLM targets\", requiring a per-architecture trained draft checkpoint. (c) SpecPrefill:\n\
+    \   \"experimental sparse prefill for MoE\", `specprefill_threshold` default 8192 tokens, `specprefill_keep_pct`\n\
+    \   0.1-0.5 default 0.2, draft must share the tokenizer. Only (a) is a decode lever; (c) is a PREFILL lever.\n\
+    2. WHAT EXISTS ON THIS HOST: `mtp_enabled` is True for exactly ONE model, Qwen3.8-27B-MTP4, whose staged head\
+    \ is\n   228 MB; every other served model has it False and ships no mtp.* weights. So \"the rest are optimised\"\
+    \ is not a\n   setting we forgot - the checkpoints have nothing to turn on.\n3. WHAT THE OS HAS ALREADY MEASURED,\
+    \ and all of it is against: native MTP on the 27B = 1.54x (7.99 -> 12.34 t/s,\n   accept 66/86 = 76.7%, 2.84\
+    \ tokens/cycle, head costs 2% of the round); an external draft model = 1.70-3.80x\n   SLOWER (7.606 -> 4.582/3.204/2.021\
+    \ t/s at draft lengths 1/2/4, PR 1821); MTP on Qwen3-Coder = NEUTRAL 0.98x\n   (D-293); DFlash/Splash drafts\
+    \ = no coverage for gpt-oss and no swap (D-2768, D-2772).\n4. THE ARITHMETIC THAT SETTLES IT: the measured decode\
+    \ rates are gpt-oss 40.47, Qwen3-Coder 44.39,\n   Ornith-19B 48.54, MiniCPM5 80.77 t/s. A perfect 1.5x on 48\
+    \ t/s buys 72 t/s that NOTHING WAITS ON, because a\n   pipeline step's wall clock is prefill + model load +\
+    \ queue, not decode - and on this host a cold load alone is\n   5.8-7.2 s per role switch, which is 300-700\
+    \ generated tokens at these rates. Spending memory (a draft costs\n   GBs), a failure mode (draft/target mismatch)\
+    \ and a config surface to optimise the smallest term is negative\n   value. RULED: no speculative decoding is\
+    \ added to gpt-oss, Qwen3-Coder, Ornith-19B, Ornith-9B, MiniCPM5,\n   Phi-4 or gemma-4-E4B.\n5. THE ONE MODEL\
+    \ IT MATTERS FOR ALREADY HAS IT: the 27B decodes at 16.39 t/s and its MTP head is enabled and\n   measured.\
+    \ There is no external-draft win available for it either, because that path was measured 1.7-3.8x\n   SLOWER\
+    \ on this exact hardware.\n6. WHAT IS *NOT* CLOSED - and is recorded so it cannot be re-proposed from memory\
+    \ (D-3038): SpecPrefill is a\n   PREFILL lever for MoE models with prompts above 8192 tokens, and the two models\
+    \ that would benefit most sit\n   exactly there - Ornith-19B (MoE) holds `analyze` with min_ctx 131072 and Qwen3-Coder\
+    \ (MoE) holds `code`. But it\n   is (i) inert below its 8192-token trigger, (ii) ON by default on three models\
+    \ where it can never fire at our\n   2048-token instrument (BUG-1052), and (iii) needs a tokenizer-sharing draft.\
+    \ So it is a BOUNDED EXPERIMENT with\n   a long-context receipt, not a config change: measure analyze-role prefill\
+    \ at >=16k tokens with and without\n   SpecPrefill on Ornith-19B before any flag is trusted.\n7. DFlash is recorded\
+    \ as WATCH, not ADOPT and not SKIP: it targets qwen3_5 (which our 27B and Ornith are) and\n   Gemma 4, it ships\
+    \ in the installed engine, and it needs a per-architecture draft that does not exist on this\n   host. The precedent\
+    \ (D-2768: Splash does not cover gpt-oss; D-2772: no swap, no integration) stands unchanged.\nWHAT IT FIXES:\
+    \ BUG-1052 (three models declare `specprefill_enabled: true` while its own 8192-token threshold makes\nit inert\
+    \ at our 2048-token instrument - a capability that measures nothing) and BUG-1053 (the benchmark that would\n\
+    have re-tested any of this could not run as documented, because bare `python3` has no PyYAML).\n"
+  rationale: 'The user''s instinct ("they are already fast enough") is the correct engineering call here, but it
+    needed the
+
+    arithmetic to be defensible rather than a feeling: speculative decoding optimises the term that is already smallest.
+
+    Recording the refusals WITH their reasons is what stops the loop from re-opening next week, and naming SpecPrefill
+
+    as a prefill lever (not a decode one) is the only direction with unfilled headroom left on this machine.
+
+    '
+  measured: '~/.omlx/model_settings.json read for all 17 engine ids: mtp_enabled True only for Qwen3.8-27B-MTP4;
+    specprefill_enabled
+
+    True for Phi-4-mini-instruct-8bit, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, gemma-4-E4B-it-MLX-4bit; dflash_enabled
+
+    False on every model. Definitions read from /Applications/oMLX.app/Contents/Resources/omlx/model_settings.py:314-317,
+
+    467-483 and the ban list at :116-124 (K2 ANE prefill cannot be combined with dflash/specprefill/mtp/vlm_mtp).
+
+    Rates from governance/calibration_receipts.jsonl @ 0.7.3rc1 (3 readings each, medians, ranges in D-3182).
+
+    '
+  bugs:
+  - BUG-1052
+  - BUG-1053
+  files:
+  - config/model_roles.yaml
+  - config/hardware_profile.yaml
+- id: D-3184
+  state: RESOLVED
+  category: DISK HYGIENE / DECISION-MODEL POOL / BACK-LOG CLOSURE
+  title: 'The parked `rm -rf` is SPLIT, not run: clef-flash is RETAINED (it loads, it answers typed verdicts at
+    0.96-1.16 s, and D-2901 RATIFIED names it the emerging-abstention signal) while pplx-decider is RETIRED and
+    deletable for 14 GB (it fails to load on BOTH endpoints under rc1, and its advisory gate closed at kappa 0.6738)'
+  decision: "THE QUESTION ON THE TABLE, unanswered since D-3181: \"I have not run `rm -rf ... models--mlx-community--pplx-decider-v1.1-27b-4bit\n\
+    ... models--mlx-community--clef-flash-4bit` because you previously said those LLMs are worth testing.\" That\
+    \ caution\nwas RIGHT, and the instruction as written was wrong. Running it would have deleted one component\
+    \ that works.\n\n1. BOTH ARE ADVERTISED. `GET /v1/models` returns 17 ids while `~/.omlx/models` holds 9 symlinks\
+    \ - the two repo dirs\n   are ids 13 and 14 in that list. So neither is \"unreferenced\": the engine serves\
+    \ them from the HF blob cache, which\n   is precisely why the earlier \"not in ~/.omlx/models = never served\"\
+    \ reading was incomplete (BUG-1054).\n2. CLEF-FLASH WORKS, AND IS RATIFIED. It loads as a DECISION engine (log:\
+    \ \"Starting decision engine (clef)\" then\n   \"Decision engine started\" then \"Loaded model: mlx-community--clef-flash-4bit\
+    \ (actual: 5.88GB)\") and answers\n   `POST /v1/systemone` with HTTP 200 and a TYPED verdict - no decoding at\
+    \ all, `output_tokens: 0`. Probed with a\n   deliberate divide-by-zero defect it returned `safe: noul 0.0827`\
+    \ (correctly not-safe), `severity: choice\n   div_zero` at confidence 0.9442, and a `score` answer, in 3.2 s\
+    \ cold and 0.96-1.16 s warm. `config/pipeline_config.yaml:640`\n   names it `decider_emerging_abstention_signal`,\
+    \ and D-2901 (RATIFIED, owner 2026-10-09) assigns it exactly that\n   role. A serving, ratified, 5.8 GB component\
+    \ is NOT deletable.\n3. MY OWN PROBE IS A HYPOTHESIS AND MUST NOT BE READ AS PROMOTION. One correct verdict\
+    \ on one synthetic case does\n   not overturn a RATIFIED gate result: D-2901 records clef-flash at coarse_kappa\
+    \ 0.5705 (FAIL < 0.73) and\n   emerging_recall 0.4286 (FAIL < 0.5). The engine's typed API does remove one real\
+    \ failure mode that BUG-1048\n   exposed for chat reviewers - an answer that CANNOT be unparsed, because the\
+    \ schema returns numbers and keys\n   rather than prose - but that is a reason to test it as a reviewer IF the\
+    \ gate is ever re-opened, not a reason to\n   re-open it today. The D-2886 D1 symmetric emerging gate stands\
+    \ as the only certification route.\n4. PPLX-DECIDER IS BROKEN UNDER rc1 AND RETIRED. It fails on `/v1/chat/completions`\
+    \ (409) AND on `/v1/systemone`\n   (409): \"VLM load failed: Received 1 parameters not in model: language_model.lm_head.weight.;\
+    \ LLM fallback also\n   failed: Expected shape (248320, 5120) but received shape (255, 5120)\". A 255-row head\
+    \ is a decision head, and\n   `decision_kind()` classifies only Clef/OpenJev/Decision-3.0, so this checkpoint\
+    \ is loadable by neither engine.\n   Its only standing role was `decider_advisory_best_arm` (D-2901, coarse_kappa\
+    \ 0.6738 - advisory, never a silent\n   pass, and that A/B is CLOSED). RULING: 14 GB of unloadable weight whose\
+    \ gate has already closed is RETIRED, and\n   its advisory-best-arm status is recorded as UNAVAILABLE-UNDER-0.7.3rc1\
+    \ rather than left to look merely dormant\n   (BUG-1051).\n5. THE ACT (owner): delete pplx-decider ONLY, after\
+    \ the BUG-1050 pre-check proves the engine does not read it.\n   ```\n   readlink -f ~/.cache/huggingface/hub/models--mlx-community--pplx-decider-v1.1-27b-4bit/snapshots/*\
+    \ | head -2\n   # expect: paths under .../blobs/  (NOT under ~/.omlx/models, and no symlink from models_staged/\
+    \ or models_stashed/)\n   du -sh ~/.cache/huggingface/hub/models--mlx-community--pplx-decider-v1.1-27b-4bit\
+    \    # expect 14G\n   rm -rf ~/.cache/huggingface/hub/models--mlx-community--pplx-decider-v1.1-27b-4bit\n  \
+    \ # then confirm the pool shrank and nothing else moved:\n   curl -s -H \"Authorization: Bearer sk-maxwell-local\"\
+    \ http://127.0.0.1:11435/v1/models | grep -c pplx   # expect 0\n   ```\n   DO NOT delete `models--mlx-community--clef-flash-4bit`.\
+    \ `hf cache prune` remains FORBIDDEN (BUG-1050).\n6. THE REVERSAL COST IS THE REASON THIS IS SAFE: the repo\
+    \ is ungated and 14 GB, so re-acquiring it is a download,\n   not a loss. A retired artifact that is cheap to\
+    \ restore does not need to be kept \"just in case\" - that instinct is\n   what produced the 94 GB cache in\
+    \ the first place.\nWHAT IT FIXES: BUG-1051 (rc1 makes a ratified arm unloadable while two config keys name\
+    \ it and no code consumes\neither) and BUG-1054 (the deletability test is wrong on two axes - three serving\
+    \ roots, and an engine pool wider\nthan models_root - which is exactly why this instruction had to be corrected\
+    \ before it ran).\n"
+  rationale: 'Two different verdicts are correct here and the only way to see it is to ASK EACH MODEL TO SERVE.
+    A back-log item
+
+    that says "delete two repos" is a hypothesis about both; the measurement splits it. Keeping the component that
+
+    answers and retiring the one that cannot load is the whole content of the ruling - and stating that a single
+
+    successful probe does not overturn a ratified gate keeps the record honest rather than flattering the discovery.
+
+    '
+  measured: '`curl /v1/chat/completions` for pplx-decider = HTTP 409 with the lm_head shape mismatch; for clef-flash
+    = HTTP 400
+
+    "not an LLM / chat model. Use /v1/systemone for decision models"; `curl /v1/systemone` for clef-flash = HTTP
+    200 with
+
+    {"safe":{"noul":0.0827},"severity":{"choice":"div_zero","confidence":0.9442},"confidence":{"score":1.2669}},
+
+    usage {"input_tokens":312,"output_tokens":0}; warm repeats 1.16/0.96/1.03 s; pplx on /v1/systemone = HTTP 409.
+
+    Server log corroborates: "Starting decision engine (clef) ... Decision engine started ... Loaded model:
+
+    mlx-community--clef-flash-4bit (actual: 5.88GB)" and "Model load failed for ''mlx-community--pplx-decider-v1.1-27b-4bit'';
+
+    caching failure until next discovery refresh". Sizes: du -sh 14G / 5.8G (no -L; snapshots are symlink farms
+    so
+
+    `du -shL` would double count, BUG-1050). Prior gate figures quoted from D-2901 in config/decisions.yaml.
+
+    '
+  bugs:
+  - BUG-1051
+  - BUG-1054
+  files:
+  - config/pipeline_config.yaml
+  - governance/buglog.md

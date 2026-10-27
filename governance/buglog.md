@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1307 decisions (census stamp 5072bcdf2b54b15b, 2026-10-27) · 814 bugs (251 open / 563 closed; highest OPEN = BUG-1050) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1310 decisions (census stamp 464d929b87a06f04, 2026-10-27) · 819 bugs (256 open / 563 closed; highest OPEN = BUG-1055) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **83** of 1307 — 🔴 open 33 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 371 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1307, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1310 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 375 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1310, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 59 · 🟨 MED 122 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 251 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 126 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 256 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -61,7 +61,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 83 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 82 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-159 · 🟥 BUG-222 · 🟥 BUG-261 · 🟥 BUG-263 · 🟥 BUG-264 · 🟥 BUG-455 · 🟥 BUG-462 · 🟥 BUG-464 · 🟥 BUG-465 · 🟥 BUG-468 · 🟥 BUG-475 · 🟥 BUG-484.
 <!-- GOV-INDEX:END -->
@@ -23305,3 +23305,84 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    deletion is preceded by `readlink -f ~/.omlx/models/<model>` to prove which copy the engine reads.
 6. OWED: a pre-delete rail (`scripts/check_delete_target.py`) that refuses a delete target that any `~/.omlx/models`
    symlink resolves into, and that reports size as `du -sh` (no -L) beside the blob total.
+
+## BUG-1051 (HIGH, OPEN 2026-10-27) - oMLX 0.7.3rc1 makes the RATIFIED advisory best-arm UNLOADABLE (pplx-decider -> HTTP 409 on both endpoints), and neither decider key has a code consumer
+1. THE READING (taken this sitting, engine 0.7.3rc1 build 3517, `POST /v1/chat/completions`):
+   `{"error":{"message":"Model 'mlx-community--pplx-decider-v1.1-27b-4bit' is unavailable after a previous load
+   failure: VLM load failed: Received 1 parameters not in model: language_model.lm_head.weight.; LLM fallback also
+   failed: Expected shape (248320, 5120) but received shape (255, 5120) for parameter
+   language_model.lm_head.weight."}}` -> **HTTP 409**. The same id also returns 409 on `POST /v1/systemone`, so it is
+   dead on BOTH paths, not merely mis-routed.
+2. WHY IT MATTERS: `config/pipeline_config.yaml:639` names exactly that id as `decider_advisory_best_arm`
+   (D-2901 RATIFIED, owner 2026-10-09: "gpt-oss-20b routing authority, pplx advisory best-arm, clef-flash
+   emerging-abstention signal"). A ratified decision's named artifact now resolves to nothing that can load.
+3. THE SECOND, QUIETER LIMB: `grep -rn "decider_advisory_best_arm|decider_emerging_abstention_signal"` over every
+   `*.py` in the tree finds **no consumer** - the two keys are read by nothing. So the advisory lane has been
+   DECLARATIVE ONLY since it was ratified: a declaration with no referent (D-3034). Fixing the load would not by itself
+   make the lane live.
+4. WHAT IS *NOT* WRONG: the engine's failure is honest and fail-closed - it caches the failure and refuses rather than
+   degrading silently, and the log line names both the VLM and the LLM attempt. The 255x5120 head is a *decision* head,
+   so this checkpoint is a decision model that `decision_kind()` does not classify as Clef/OpenJev/D3.
+5. OWED (red loop): a rail that resolves every model id named in `config/pipeline_config.yaml` against a live
+   one-token request and goes RED on 409/400 - a config value that names an unloadable model must never be committable.
+   Second leg: either wire the two keys to a caller or retire them with their reason (D-3038).
+
+## BUG-1052 (MED, OPEN 2026-10-27) - rc1 ships `specprefill_enabled: true` on three models whose prompts never reach its 8192-token trigger: a capability declared ON that measures nothing, contradicting D-2772
+1. `~/.omlx/model_settings.json` now reads `specprefill_enabled: True` for **Phi-4-mini-instruct-8bit,
+   Qwen3-Coder-30B-A3B-Instruct-MLX-4bit and gemma-4-E4B-it-MLX-4bit** (False elsewhere).
+2. The bundled definition (`omlx/model_settings.py:314-317, 467-473`) is `SpecPrefill (experimental sparse prefill for
+   MoE)` with `specprefill_threshold: Min tokens to trigger (default 8192)` and `specprefill_keep_pct (0.1-0.5,
+   default 0.2)`. The OS's receipt instrument measures **2048-token** prompts, so this flag is INERT on every receipt
+   this host has ever taken - and it is inert on any real call shorter than 8192 tokens.
+3. D-2772 recorded "Live settings are already mtp/dflash/specprefill false - correct, no change". That was true when it
+   was written and is now FALSE for three models because rc1 changed the defaults. A dated observation was read as a
+   standing fact; nothing re-read it after the engine changed.
+4. TWO FAULTS, ONE SHAPE (D-3034): a flag that is ON but cannot fire is a declaration that measures nothing, and a
+   decision's "no change needed" verdict silently expired. Nothing in the repo re-checks either after an engine upgrade.
+5. OWED (red loop): print the per-model flag set the engine will actually apply into the re-baseline procedure, and
+   refuse a receipt whose prompt length is below a flag's own declared threshold while that flag is ON.
+
+## BUG-1053 (MED, OPEN 2026-10-27) - the documented §7.1 re-baseline command cannot run on this host: bare `python3` is /usr/bin/python3, which has no PyYAML
+1. `governance/CALIBRATION_ROLE_MARKET_20261027.md` §7.1 gives, verbatim,
+   `python3 scripts/specdec_probe.py bench --no-draft`. On this host that dies:
+   `ModuleNotFoundError: No module named 'yaml'` (specdec_probe.py:54 `import yaml`).
+2. RESOLVED (D-3034): `which -a python3` = `/usr/bin/python3`; `/usr/bin/python3 -c "import yaml"` fails, while
+   `/Users/barn/miniforge3/bin/python3 -c "import yaml"` = 6.0.2. The procedure is not wrong about the script, it is
+   wrong about the INTERPRETER - the exact D-3100 (noob-proof handover) defect: a manual step whose command cannot run
+   is a step the owner cannot execute.
+3. BLAST RADIUS: same hole in any doc that writes bare `python3 scripts/...`. The re-baseline is the step that restores
+   all six roles after an engine change, so this defect blocks the recovery path, not a peripheral one.
+4. OWED (red loop): a doc-guard rail that resolves every `python3 <script>` in `governance/*.md` against the interpreter
+   that can actually import the script's deps, and reports the absolute path that works.
+
+## BUG-1054 (MED, OPEN 2026-10-27) - the delete-safety test has TWO more holes: the served portfolio spans 3 roots, and the engine's pool (17 ids) is wider than models_root (9 symlinks)
+1. `--record mlx-community--pplx-decider-v1.1-27b-4bit` returned `HTTP 409`, and
+   `--record mlx-community--clef-flash-4bit` returned `HTTP 400`. Both ids are ADVERTISED by `GET /v1/models`
+   (17 ids) while `~/.omlx/models` holds only 9 symlinks. So **`/v1/models` over-declares**: two of its 17 ids cannot
+   serve a chat completion at all (one is a broken decision checkpoint, the other is a decision model whose endpoint is
+   `/v1/systemone`).
+2. `readlink -f` on the 9 served entries resolves into THREE roots plus the blob cache: `~/.omlx/models` (Qwen3.8-27B),
+   `~/.omlx/models_stashed/` (Phi-4-mini-instruct-8bit), `~/.omlx/models_staged/` (Qwen3.8-27B-MTP4), and
+   `~/.cache/huggingface/hub/.../snapshots/...` (MiniCPM5, Ornith-19B, Ornith-9B, Qwen3-Coder, gemma-4-E4B, gpt-oss).
+3. CONSEQUENCE: "not referenced by `~/.omlx/models`" is NOT the deletability test - it is wrong in both directions
+   (it would pass a model the engine still serves from the HF cache, and it would pass a model whose bytes live in
+   `models_staged/`). This is BUG-1050's rule one axis further out, and it is why the pending `rm -rf` of the two HF
+   repos had to be stopped before it ran: the engine was serving one of them.
+4. OWED: extend the pre-delete rail (BUG-1050 item 6) to resolve against ALL FOUR roots and to cross-check
+   `GET /v1/models`, then refuse any target that any of them resolves into.
+
+## BUG-1055 (MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing measured whether its plans are as good
+1. Under rc1 the resolver assigned **plan AND analyze to Ornith-1.5-35B-A3B-REAP-19B** (decode 48.54 t/s, prefill
+   396.63 t/s, spread 48.02-51.69 - the tightest of any candidate) because `config/hardware_profile.yaml` declares both
+   roles with `require_gate: null`. Qwen3.8-27B-MTP4, which held `plan`, now holds NO role.
+2. THAT IS THE DECLARATION WORKING, NOT THE RESOLVER FAILING: `review` is the only role with a `require_gate`
+   (`r5_review`). For every other role the winner is the fastest ELIGIBLE model, and eligibility is declared per
+   candidate, not inferred. So "the best planner" currently means "the fastest model that declares `plan`".
+3. THE HIDDEN COST: Ornith is a REAP-pruned MoE (35B -> 19B experts removed). Replacing a 27B with a pruned 19B on
+   the strength of a 3x decode advantage is a QUALITY bet that no fixture in this repo tests. It is also why the
+   Qwen3.8-27B pair (30.2 GB) still sits on disk holding nothing.
+4. SECOND LIMB: `RESIDENCY 40.0 GiB of 41.5 usable - all assigned models fit at once` counts WEIGHTS ONLY. `plan` and
+   `analyze` both declare `min_ctx: 131072`, and no KB/GiB of KV cache at that context is in the 40.0. The claim
+   "all fit at once" is true of weights and untested of working set.
+5. OWED: a `plan`/`reasoning` accuracy fixture with a gate (the review gate's shape), and a KV term in the residency
+   check at each role's declared `min_ctx`. Until then the plan/analyze assignment is speed-only and must be read as such.

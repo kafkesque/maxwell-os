@@ -13,11 +13,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1307 decisions (census stamp 5072bcdf2b54b15b, 2026-10-27) · 814 bugs (251 open / 563 closed; highest OPEN = BUG-1050) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1310 decisions (census stamp 464d929b87a06f04, 2026-10-27) · 819 bugs (256 open / 563 closed; highest OPEN = BUG-1055) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **83** of 1307 — 🔴 open 33 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 371 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1307, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1310 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 375 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1310, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 59 · 🟨 MED 122 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 251 open.
+> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 126 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 256 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -66,7 +66,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 83 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 82 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-159 · 🟥 BUG-222 · 🟥 BUG-261 · 🟥 BUG-263 · 🟥 BUG-264 · 🟥 BUG-455 · 🟥 BUG-462 · 🟥 BUG-464 · 🟥 BUG-465 · 🟥 BUG-468 · 🟥 BUG-475 · 🟥 BUG-484.
 <!-- GOV-INDEX:END -->

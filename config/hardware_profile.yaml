@@ -1,0 +1,230 @@
+# config/hardware_profile.yaml — THE DECLARATION of the personal-calibration feature (D-3178).
+#
+# WHAT THIS IS FOR. Whoever runs Maxwell OS should not have to repeat the search that produced
+# `governance/SPECULATIVE_DECODING_M1_20261027.md`. On a new machine the OS must be able to say, in one command:
+#   "this is your hardware, this is your measured ceiling, THESE are the models that fit, and this is which one
+#    gets which role — with the receipt that decided it."
+#
+# THE THREE LAYERS (and why they are separate — each fails differently, so each is reported differently):
+#   1. DETECT  — deterministic facts (chip, memory, engine ceiling, engine version). Never a claim.
+#   2. PREDICT — a roofline from a MEASURED streaming bandwidth. Reported as PREDICTED and never allowed to
+#                assign a role on its own (`allow_predicted_assignment: false`): a prediction is a pruning tool,
+#                not a reading (D-3036).
+#   3. VERIFY  — a MEASURED receipt (cold prefill + real decode + the role's accuracy gate). Only a receipt may
+#                assign a role. Receipts are keyed to the hardware fingerprint AND the engine version, because a
+#                reading taken on 0.7.3.dev2 is not a reading of 0.7.3rc1 (BUG-1033's instrument row).
+#
+# C12: no value used by scripts/hardware_calibrate.py is written in that file. Everything below is a value.
+
+version: 1
+
+# ── layer 3 wiring: where readings and gates are read from ────────────────────────────────────────────────
+receipts: governance/calibration_receipts.jsonl   # append-only; one row per measured run
+gate_bench: governance/r5_review_gate_bench.jsonl # the R5 verdict gate's own artifact
+out: config/model_roles.yaml                      # the resolver's output (generated, never hand-edited)
+
+# ── layer 1: what to read, and how to name what was read ──────────────────────────────────────────────────
+detect:
+  sysctl_keys:
+    chip: machdep.cpu.brand_string
+    ram_bytes: hw.memsize
+    perf_cores: hw.perflevel0.physicalcpu
+    wired_limit_mb: iogpu.wired_limit_mb
+    bf16_native: hw.optional.arm.FEAT_BF16
+  paths:
+    app_plist: /Applications/oMLX.app/Contents/Info.plist
+    app_version_key: CFBundleShortVersionString
+    models_root: ~/.omlx/models
+    server_log: ~/.omlx/logs/server.log
+  engine: config/engine.yaml        # host/port have ONE home already; this file does not repeat them
+  health_path: /health
+
+# ── layer 2: the roofline. MEASURED bandwidth, not a spec sheet ───────────────────────────────────────────
+predict:
+  bandwidth_probe:
+    buffer_gb: 2                    # 2 GiB float32 array; large enough to leave L2, small enough to be cheap
+    repeats: 5
+    kind: elementwise               # `src + 1.0` is materialised: a copy view would measure nothing
+    # A bandwidth reading above this is not a fast machine, it is a broken probe (MEASURED 2026-10-27: the first
+    # version of this probe printed 5,149,844 GB/s because `mx.array(src)` does not materialise a copy).
+    max_plausible_gbs: 1500
+  # decode is weight-read bound on this chip (MEASURED: 7.58 t/s at 157 tokens vs 7.54 at 1850 — FLAT in
+  # context), so the ceiling is bandwidth / bytes_read_per_token, times the efficiency this device actually
+  # reaches. 0.30 is the CALIBRATED anchor from this host: 27B 4-bit = 15.4 GB, copy bandwidth ~400 GB/s,
+  # predicted ceiling 26 t/s, MEASURED 7.99 t/s => 0.31.
+  decode_efficiency: 0.30
+  # MoE rows may declare a smaller traffic footprint than the file size. It is a CLAIM unless the row's own
+  # receipt says otherwise, so the default is the honest dense assumption.
+  default_bytes_read_fraction: 1.0
+
+# ── memory gates: a model must FIT before it may be ranked ────────────────────────────────────────────────
+memory:
+  # the engine publishes its own ceiling (`final_ceiling` in /health); this fraction is what a model may claim
+  max_resident_fraction: 0.80
+  # KV cache + prefill activations are not in the weights; a candidate must leave this much of the budget free
+  kv_headroom_gb: 3.0
+  # below this the machine cannot host a competent 4-bit reviewer at all — a named floor, not a surprise
+  min_viable_model_gb: 4.0
+  # used ONLY when the engine cannot be reached: physical RAM minus this reserve is the fallback budget
+  fallback_reserve_gb: 8.0
+
+# a receipt is a reading only if it generated enough tokens to be a sample (D-3102 / BUG-1042)
+receipts_min_decode_tokens: 24
+# a candidate's rate must be the median of at least this many readings before it may win a role: an MTP model's
+# rate is CONTENT-dependent (draft acceptance varies with the text), MEASURED 12.34 vs 16.98 t/s on one checkpoint
+min_readings_per_candidate: 3
+
+# ── roles: the ontology the OS actually routes on ─────────────────────────────────────────────────────────
+# `objective` is the declared ranking key. `require_gate` names a gate artifact that MUST pass (fail-closed).
+# `min_ctx` is a hard requirement, not a preference (a reviewer reading a 4k script needs the window).
+# ELIGIBILITY IS DECLARED PER CANDIDATE (`roles:` on each row below), not inferred from speed. Ranking by speed
+# alone put a 2B tool-driver in the brain seat on the first run of this resolver — the slop this file exists to
+# prevent. A candidate may only take a role it DECLARES, and a role that names a gate may only be filled by a
+# PASSING gate. `status` in the output is QUALIFIED (gate-backed) or PROVISIONAL (measured, no role gate exists yet).
+roles:
+  brain:      {objective: decode_tps,        require_gate: null,        min_ctx: 32768}
+  review:     {objective: seconds_per_item,  require_gate: r5_review,   min_ctx: 32768}
+  code:       {objective: decode_tps,        require_gate: null,        min_ctx: 32768}
+  plan:       {objective: decode_tps,        require_gate: null,        min_ctx: 131072}
+  analyze:    {objective: prefill_tps,       require_gate: null,        min_ctx: 131072}
+  classify:   {objective: decode_tps,        require_gate: null,        min_ctx: 8192}
+
+# ── the candidate register: what MAY be considered, and the honest footprint of each ──────────────────────
+# `bytes_read_fraction` < 1.0 only for MoE rows, and the reason is recorded with the row (D-3038).
+candidates:
+- model: Qwen3.8-27B-MTP4
+  family: qwen
+  kind: dense
+  moe_active_fraction: 1.0
+  why: 27B hybrid (3 linear_attention + 1 full_attention per 4 layers) with the published MTP head attached; MEASURED 1.54x decode over the same checkpoint without it (D-3177)
+  roles:
+  - brain
+  - plan
+  - analyze
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: Qwen3.8-27B-MLX-4bit
+  family: qwen
+  kind: dense
+  moe_active_fraction: 1.0
+  why: the same checkpoint WITHOUT mtp.* weights; kept as the control, not as a production brain
+  roles: []
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: gpt-oss-20b-MXFP4-Q8
+  family: gpt-oss
+  kind: moe
+  moe_active_fraction: 0.3
+  why: MoE ~3.6B active of 20.9B; the only model that has PASSED the R5 verdict gate (false_approve 0.0)
+  roles:
+  - brain
+  - review
+  - analyze
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  family: qwen
+  kind: moe
+  moe_active_fraction: 0.1
+  why: 30B total / 3B active; the code generator; SLOW per loop turn (MEASURED 79.9 s for 3 calls) but correct
+  roles:
+  - code
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: Ornith-1.5-35B-A3B-REAP-19B
+  family: ornith
+  kind: moe
+  moe_active_fraction: 0.1
+  why: REAP-pruned 35B-A3B at 19B resident; long context
+  roles:
+  - analyze
+  - plan
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: Ornith-1.5-9B-MLX-8bit
+  family: ornith
+  kind: dense
+  moe_active_fraction: 1.0
+  why: 9B 8-bit; the fast loop driver (MEASURED 11.5 s for 3 calls)
+  roles:
+  - code
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: MiniCPM5-2B-MLX
+  family: minicpm
+  kind: dense
+  moe_active_fraction: 1.0
+  why: 2B; fastest completed tool loop on this host (2.1 s for 3 calls)
+  roles:
+  - classify
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: gemma-4-E4B-it-MLX-4bit
+  family: gemma
+  kind: dense
+  moe_active_fraction: 1.0
+  why: REFUSED by the R5 gate (false_approve 0.125); kept in the register so it cannot be re-proposed from memory
+  roles:
+  - review
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: Phi-4-mini-instruct-8bit
+  family: phi
+  kind: dense
+  moe_active_fraction: 1.0
+  why: 0 tool calls in 3 turns (BUG-053 shape, MEASURED); summary-with-source only
+  roles:
+  - classify
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+
+# ── the record step: how a receipt is produced (composes scripts/measure_prefill.py, C21) ────────────────
+record:
+  prompt_tokens: 2048      # >= the engine's fixed prefill shape; small enough to be cheap per candidate
+  max_tokens: 128          # a real decode sample, never a 1-token artifact (D-3102)
+  timeout_s: 1800

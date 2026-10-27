@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1287 decisions (census stamp a6a5cbddfa07a274, 2026-10-26) · 800 bugs (247 open / 553 closed; highest OPEN = BUG-1036) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1306 decisions (census stamp 075bcb3eaec118e5, 2026-10-27) · 813 bugs (250 open / 563 closed; highest OPEN = BUG-1049) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **81** of 1287 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 357 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1287, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **83** of 1306 — 🔴 open 33 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 370 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1306, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 120 · 🟩 LOW 40 · UNLABELLED 0 (BUG-757) of 247 open.
+> Open BUGS by severity (population = the census's 250 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 122 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 250 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -61,7 +61,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 81 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 83 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-159 · 🟥 BUG-222 · 🟥 BUG-261 · 🟥 BUG-263 · 🟥 BUG-264 · 🟥 BUG-455 · 🟥 BUG-462 · 🟥 BUG-464 · 🟥 BUG-465 · 🟥 BUG-468 · 🟥 BUG-475 · 🟥 BUG-484.
 <!-- GOV-INDEX:END -->
@@ -17025,7 +17025,7 @@ work — estimated page count × a declared per-page budget, with a floor — so
 the book following the budget. A timeout must be recorded as `timeout`, never as `unreadable`, because the two
 have opposite remedies (more time vs. a new copy).
 
-## BUG-898 (MEDIUM, OPEN 2026-10-17) — THE RECEIPT KEEPS THE TAIL, NOT THE DIAGNOSIS
+## BUG-898 (MED, OPEN 2026-10-17) — THE RECEIPT KEEPS THE TAIL, NOT THE DIAGNOSIS
 
 `scripts/apply_admission.py` records a failed row as
 `S0 rc=…, markdown absent — {last three lines of stdout/stderr}`. MEASURED consequence: 4 failures in the 17:09
@@ -23101,7 +23101,7 @@ reviewer call. Instrument: `scripts/specdec_probe.py` (`verify` / `convert` / `b
 capability.** §3 and §4 read as fact before anything ran; the first execution refuted them. D-3036's red loop exists
 precisely to prevent this: the command that goes RED on the defect had to exist before the claim did.
 
-## BUG-1041 (MEDIUM, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel
+## BUG-1041 (MED, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel
 
 **Reading.** `tools/model_eval_suite.py` accepts only `--models/--models-file/--suites/--limit`, and `_done_keys()`
 skips any `(model, suite, id)` already present without an error. So a second identical run reports "0 new results" and
@@ -23240,3 +23240,43 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    invocation was attempted.
 5. STANDING RULE RESTATED: a decision id may not appear in a commit message, a docstring or a handoff until
    `recompute_decision_summary.py --check` counts it. (Same shape as BUG-1040: a route recorded as a capability.)
+
+## BUG-1048 (MED, OPEN 2026-10-27) - R5 review coverage silently depends on FILE LENGTH: gpt-oss returns UNPARSED on a 26 KB script at both output budgets, and would return APPROVE on the same subject as a 10 KB YAML
+1. FOUND while obtaining the cross-family review R5 demands for `scripts/hardware_calibrate.py` before commit. Three
+   invocations, all against the same file digest (sha256_16=94cc1334250f98da):
+   - default budget -> `VERDICT UNPARSED`, raw_len=6008, `raw_head` = "We need to judge correctness and safety. ..."
+   - `--max-tokens 3000` -> `VERDICT UNPARSED`, raw_len=12139 (so the budget was NOT the constraint)
+   - gemma-4-E4B-it-MLX-4bit on the same file -> `VERDICT APPROVE`
+   - gpt-oss-20b-MXFP4-Q8 on `config/hardware_profile.yaml` (same subject, 10 KB) -> `VERDICT APPROVE`
+2. WHY IT MATTERS: the artifact does NOT say APPROVE for an unparsed run (it prints "the reviewer did not approve
+   or reject - do not read this as approval"), so nothing is laundered. But the PRACTICAL effect is that R5 coverage
+   is a function of the reviewed file's LENGTH, and a reviewer that rambles is silently replaced by whichever other
+   family answers. `raw_len` growing 6008 -> 12139 with a bigger budget is the shape of a model that never reaches a
+   verdict, not of a truncated one.
+3. NOT YET DIAGNOSED: whether the cause is the reviewer's chain-of-thought being returned in `content`, a prompt that
+   invites prose, or the JSON-only instruction being buried in a long context. A fix must be measured (a red loop on a
+   long file: UNPARSED now, verdict later), not guessed (D-3036).
+4. INTERIM RULE APPLIED: the review is recorded as it happened - gemma APPROVE on the script, gpt-oss APPROVE on the
+   declaration - and the unparsed attempts stay in `governance/r5_reviews.jsonl` beside them. No second attempt is
+   described as an approval.
+5. NOT A BUG IN THE FILE UNDER REVIEW: the reviewer never disagreed; it never concluded.
+
+## BUG-1049 (LOW, OPEN 2026-10-27) - the severity vocabulary is DECLARED as MED and WRITTEN as MEDIUM: 20 headings use the undeclared word, and a bug written MEDIUM is invisible to the openness census that reads the token
+1. FOUND by running the join rail instead of trusting the register: `scripts/gov_sync.py` refused with
+   "buglog: 2 of the register's OPEN ids carry no severity token, over the shrink-only ceiling 0 (BUG-757).
+   New: ['BUG-1041', 'BUG-1048']". Both headings read `(MEDIUM, OPEN ...)`.
+2. THE MISMATCH, resolved in two files: `config/gov_sync.yaml` declares `severity_tokens: [CRITICAL, HIGH, MED,
+   LOW]` and `scripts/gov_sync.py` matches `\b(CRITICAL|HIGH|MED|LOW)\b`. `MEDIUM` cannot match: `\b` after `MED`
+   fails against the following `I`. MEASURED with `grep -c '^## BUG-[0-9]* (MEDIUM'` = 20 headings, of which 3
+   were OPEN (BUG-898 since 2026-10-17, BUG-1041 and BUG-1048 written 2026-10-27).
+3. WHY IT MATTERED BEYOND A COUNT: the token is what the OPEN population is BUCKETED by, so the severity line
+   printed a distribution that was short by however many bugs were written with the natural English word. A
+   declaration (`severity_tokens`) and a usage (`MEDIUM`) disagreeing is the D-3034 shape this register exists to
+   catch, and it survived because the rail that would catch it is a JOIN, not a read of either file alone.
+4. INTERIM FIX (applied): the 3 OPEN headings now carry the declared token `MED` - the open population is
+   complete, and no historical record was rewritten (17 CLOSED/older headings still read MEDIUM and are counted
+   only by the bucket they honestly belong to).
+5. OWED (the durable fix): an ALIAS declaration - `severity_aliases: {MEDIUM: MED}` in config/gov_sync.yaml with
+   the matcher extended to accept the long form - so the next author who writes MEDIUM is COUNTED instead of
+   corrected. That is a rail change and needs its own red loop (a MEDIUM heading that is invisible now and
+   bucketed after), which is why it is not bundled into this sitting.

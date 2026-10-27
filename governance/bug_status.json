@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 811,
-  "open_n": 248,
+  "total_ids": 813,
+  "open_n": 250,
   "closed_n": 563,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1247,7 +1247,17 @@
     },
     {
       "id": "BUG-1041",
-      "title": "(MEDIUM, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel",
+      "title": "(MED, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel",
+      "events": 1
+    },
+    {
+      "id": "BUG-1048",
+      "title": "(MED, OPEN 2026-10-27) - R5 review coverage silently depends on FILE LENGTH: gpt-oss returns UNPARSED on a 26 KB script at both output",
+      "events": 1
+    },
+    {
+      "id": "BUG-1049",
+      "title": "(LOW, OPEN 2026-10-27) - the severity vocabulary is DECLARED as MED and WRITTEN as MEDIUM: 20 headings use the undeclared word, and a bug",
       "events": 1
     }
   ],

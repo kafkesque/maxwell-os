@@ -33430,3 +33430,141 @@ decisions:
   - config/specdec_m1.yaml
   - governance/SPECULATIVE_DECODING_M1_20261027.md
   created: '2026-10-27'
+- id: D-3178
+  state: RESOLVED
+  category: HARDWARE / MODEL PORTFOLIO / PERSONAL CALIBRATION
+  title: 'The personal-calibration feature EXISTS and is proven on this host: DETECT the machine, PREDICT only to
+    prune, VERIFY by receipt keyed to (chip, engine version) and gate, assign a role only from a measurement — six
+    roles resolved from receipts, and the 43.7 GiB portfolio is reported OVER the 40.4 GiB budget instead of hidden'
+  decision: "Owner request 2026-10-27: a feature that stops a future user repeating a day-long search, by identifying\
+    \ on\nANY hardware/OS at first use the best configuration, the most suitable inference engine and the most suitable\n\
+    local models for each ROLE (brain, review, code, plan, analyze, classify).\n\nBUILT, on this host, in three\
+    \ layers with one command (scripts/hardware_calibrate.py, declaration in\nconfig/hardware_profile.yaml, receipts\
+    \ in governance/calibration_receipts.jsonl, output in\nconfig/model_roles.yaml):\n\n  DETECT - read, never infer:\
+    \ chip / RAM / performance cores / wired limit / native-bf16 from sysctl, OS from\n    platform, engine version\
+    \ from the LIVE bundle's Info.plist, memory budget from the engine's own\n    /health.final_ceiling. An unreadable\
+    \ fact is NOT RECORDED, never defaulted.\n  PREDICT - a roofline (measured bandwidth / bytes-per-token x decode_efficiency,\
+    \ MoE scaled by active\n    fraction). It may PRUNE a candidate. It may NEVER fill a role: `allow_predicted_assignment:\
+    \ false`.\n  VERIFY - a reading counts only when hardware.chip AND engine.version match, median of >= 3 readings,\
+    \ the\n    candidate DECLARES that role, and a role naming a gate may only be filled by a PASSING gate.\n\n\
+    MEASURED RESULT here (Apple M1 Max / 64 GB / bf16 not native / engine 0.7.3.dev2):\n  brain      gpt-oss-20b-MXFP4-Q8\
+    \      39.51 t/s decode (n=3)  PROVISIONAL, gate=True\n  review     gpt-oss-20b-MXFP4-Q8      0.345 s/item (n=3)\
+    \      QUALIFIED, gate=True\n  code       Qwen3-Coder-30B-A3B-4bit  46.11 t/s decode (n=3)  PROVISIONAL\n  plan\
+    \       Qwen3.8-27B-MTP4          11.88 t/s decode (n=4)  PROVISIONAL\n  analyze    gpt-oss-20b-MXFP4-Q8   \
+    \   274.87 t/s prefill (n=3)\n  classify   MiniCPM5-2B-MLX           83.54 t/s decode (n=3)\n  RESIDENCY  43.7\
+    \ GiB assigned against 40.4 GiB usable -> the portfolio does NOT fit co-resident, so a\n    role-crossing call\
+    \ pays a cold load (5.8-7.2 s measured). Reported, not hidden.\n\nTHE POINT IS THE REFUSAL, not the ranking.\
+    \ Two slops were caught by the feature's own rules while building it:\n  (a) ranking by raw speed put MiniCPM5-2B\
+    \ (83.54 t/s) in brain, code, plan AND analyze - fixed by requiring a\n      candidate to DECLARE a role;\n\
+    \  (b) gemma-4-E4B is 4x cheaper per review item than gpt-oss but is REFUSED for `review` because the gate\n\
+    \      reads false_approve=0.1250 > 0.10. A calibration feature without an accuracy gate can only rank speed,\n\
+    \      and speed is what the owner already had too much of.\n\nMARKET RESEARCH (governance/CALIBRATION_ROLE_MARKET_20261027.md)\
+    \ classifies every existing candidate with its\nreason: llmfit (38,415 stars) = ADAPT its confidence vocabulary\
+    \ and MoE tiers, REJECT its 0.55 efficiency\n(1.8x over-prediction on this host) and its single composite score;\
+    \ oMLX's own \"Find the Right Model for Your\nMac\" + omlx.ai community benchmarks = REFERENCE/CLAIMED, never\
+    \ receipt (all rows are M3 Ultra); MLPerf Client\n= REFERENCE for metric vocabulary; Ollama/LM Studio/llmfit-web/hf-agents\
+    \ = WATCH/SKIP.\n\nWHAT IT FIXES: BUG-1044 (the cold-prefill receipt was not cold - the instrument the receipts\
+    \ depend on now\nrefuses a cached reading), BUG-1046 (an index-only MTP rename was silently ignored, so the\
+    \ plan role's model\nmeasured the base checkpoint), BUG-1047 (a decision id was cited before the register contained\
+    \ it), and\nBUG-1048 (R5 coverage silently depends on file length - recorded while reviewing this very deliverable).\n\
+    \nHONEST SCOPE: the CONTRACT is OS-agnostic, the DETECTOR is macOS-only and says so. \"Works on any hardware/OS\"\
+    \nis not claimed - that would be a declaration with no resolution (D-3034). Requirements and the portability\n\
+    path are in section 3 of the research note; owed items are T-1..T-5 there.\n"
+  bugs:
+  - BUG-1044
+  - BUG-1046
+  - BUG-1047
+  - BUG-1048
+  files:
+  - config/hardware_profile.yaml
+  - scripts/hardware_calibrate.py
+  - config/model_roles.yaml
+  - governance/calibration_receipts.jsonl
+  - governance/CALIBRATION_ROLE_MARKET_20261027.md
+  - governance/r5_review_gate_bench.jsonl
+- id: D-3179
+  state: PROPOSED
+  category: ENGINE / UPGRADE RULING
+  title: 'oMLX 0.7.3rc1 IS worth taking on this host — because the alternative (0.7.2) would LOSE the M1 prefill
+    route the machine already has on 0.7.3.dev2 — but it is taken as a MEASURED upgrade: five new items appraised
+    one by one, and the M1 Float16 Activations +9% is a HYPOTHESIS here because every vendor figure is on oQ checkpoints
+    and this portfolio is not oQ'
+  decision: "Owner question 2026-10-27: is upgrading to oMLX 0.7.3rc1 worth it - speed, optimisation, useful features\
+    \ for\nMaxwell OS? Answered per item against THIS host, from the vendor's own release body (read 2026-10-27;\
+    \ every\nfigure CLAIMED, none a receipt).\n\nFRAMING FACT: this host already runs 0.7.3.dev2, so the dev line's\
+    \ M1 work (speculative verify + long-context\nattention routes tuned on an M1 Max; M1 Ultra prefill 429 -> 644\
+    \ t/s at 100K) is ALREADY here. rc1's new\ncontent for this machine is five items:\n\n  1. Float16 Activations\
+    \ (M1/M2) - converts bf16 scales/norms/embeddings to fp16, which these GPUs run\n     natively. Vendor: Qwen3.6-35B-A3B\
+    \ oQ4e decode 75.9 -> 82.4 t/s (+9%) ON AN M1 MAX. This host reports\n     hw.optional.arm.FEAT_BF16 = 0, i.e.\
+    \ it cannot do bf16 natively, so the mechanism is exactly on target.\n     HYPOTHESIS, NOT A BENEFIT: the measured\
+    \ model was oQ4e and this portfolio is mlx-community 4-bit /\n     MXFP4-Q8. Whether it helps a non-oQ checkpoint\
+    \ is UNMEASURED (D-3036).\n  2. pre-M5 relaxed compute context-store timeout at start (against Metal 0000000e\
+    \ in long prefills) - prefill\n     is this host's bottleneck (39 s TTFT at 2k tokens), so this is free insurance\
+    \ on the failure class we\n     would actually hit.\n  3. memory guard re-reads iogpu.wired_limit_mb live -\
+    \ this host pins 57344 MB and today a change needs a\n     restart, which costs a model reload.\n  4. logprobs\
+    \ / top_logprobs in /v1/chat/completions - a capability the VERIFICATION side of this OS does not\n     currently\
+    \ have (confidence, not just text). Unmeasured upside; no consumer written yet.\n  5. MoE expert-offload resident-percent\
+    \ suggestion - informs the residency fix this portfolio needs (it is\n     3.3 GiB over budget).\nNOT reasons\
+    \ here: Ask AI and GPU Power Limit (UX/battery, not throughput), Ling 3.1 Flash / MiniMax M3.1 (not in\nthis\
+    \ portfolio), better low-bit oQ bit splits (only binds on oQ quants, which the portfolio does not use).\n\n\
+    COST, stated before the act: every calibration receipt is keyed to engine.version = 0.7.3.dev2, so the upgrade\n\
+    makes all six role assignments UNCALIBRATED until re-measured. That is the fail-closed filter working, not a\n\
+    regression; the five-command re-baseline is written in section 7.1 of\ngovernance/CALIBRATION_ROLE_MARKET_20261027.md.\n\
+    \nWHY IT IS THE NEXT LEVER AT ALL: BUG-1045 recorded the hardware lever (ANE prefill) as inoperable on this\
+    \ chip -\n112 of 112 modules fail and the attempt costs a 733 s load - and BUG-1044 fixed the instrument any\
+    \ decoder-lever\nclaim must now use. With the hardware side closed, the remaining levers are engine-side, which\
+    \ is exactly what\nitems 1-3 are. The re-baseline in section 7.1 runs THAT instrument, so a post-upgrade +9%\
+    \ claim would be a cold\nreceipt rather than a vendor figure.\n\nSTATE IS PROPOSED, NOT RATIFIED, ON PURPOSE:\
+    \ installing a release candidate under the engine that serves every\npipeline is an OWNER act (D-381 owner gate).\
+    \ The ruling that it is WORTH the act is made; the act is not.\n"
+  bugs:
+  - BUG-1045
+  - BUG-1044
+  files:
+  - governance/CALIBRATION_ROLE_MARKET_20261027.md
+  - config/hardware_profile.yaml
+  - scripts/hardware_calibrate.py
+  - config/engine.yaml
+- id: D-3180
+  state: RESOLVED
+  category: MODEL PORTFOLIO / RUNTIME / DISK HYGIENE
+  title: 'GGUF vs MLX is settled per model, not in general: a WASH on gpt-oss-20b (45.81 vs ~47 t/s) and a 1.75x
+    MLX WIN on Qwen3.8-27B (9.3 vs 5.31 t/s) — so no llama.cpp provider, and the deletable weights are the temp-only
+    LLM repos plus four duplicate revisions, NOT the "0 B" embedders that live pipeline code reads'
+  decision: "Owner question 2026-10-27: which version won - GGUF or MLX - for gpt-oss and Qwen3.8, and which copy\
+    \ should be\ndeleted? Answered from the receipt of record (governance/GGUF_MLX_AB_20261027.md, MEASURED on this\
+    \ host), not\nfrom a general preference:\n\n  gpt-oss-20b   llama.cpp Metal Q4_K_M  tg128 45.81 +/- 0.93 t/s\
+    \ (pp512 461.41), 10.81 GiB\n                oMLX MLX MXFP4-Q8      43.88 t/s incl TTFT (~47 pure decode), 11\
+    \ GiB\n                -> WASH (within measurement noise, and MLX wins on residency)\n  Qwen3.8-27B   llama.cpp\
+    \ Metal UD-Q4_K_M  tg128 5.31 +/- 0.03 t/s (pp512 58.19), 15.32 GiB\n                oMLX MLX 4bit         \
+    \   8.98 t/s incl TTFT (~9.3 pure), 15 GiB\n                -> MLX WINS by ~1.75x\n\nCaveats kept on the record:\
+    \ the quants are not equal (Q4_K_M / unsloth-dynamic vs MXFP4-Q8 / 4bit), and UD\nUNDERSTATES a plain GGUF,\
+    \ so the Qwen gap is a floor rather than a ceiling. Consequence, already decided in\nD-3175: do NOT write pipeline/providers/llama_cpp_provider.py;\
+    \ Ollama (installed, 5.4 GB) is the lower-tax\nGGUF route if a GGUF-only checkpoint ever becomes necessary.\n\
+    \nWHICH COPY IS DELETED - resolved by reference, not by size (a \"0 B / unreferenced\" sweep is the trap):\n\
+    \  - There are NO .gguf files on this host at all; the only GGUF-adjacent artefact is ~/.ollama (5.4 GB). So\n\
+    \    \"delete the GGUF copy\" means do not download one, not remove one.\n  - DELETE (referenced ONLY by ./temp\
+    \ scratch): mlx-community/pplx-decider-v1.1-27b-4bit (14.3 GiB) and\n    mlx-community/clef-flash-4bit (5.8\
+    \ GiB).\n  - PRUNE THE STALE REVISION (two copies of one model): lmstudio-community/Qwen3-Coder-30B-A3B (32.0\
+    \ GiB for a\n    16 GB model: bbecedef + main) and lmstudio-community/gemma-4-E4B-it (12.8 GiB for a 6.4 GB\
+    \ model:\n    ce713a00 + main) - about 22 GiB recovered with no capability lost.\n  - DO NOT TOUCH, even though\
+    \ unreferenced by ~/.omlx/models: BAAI/bge-m3, AnswerDotNet/ModernBERT, bge-small,\n    bge-reranker, docling-layout,\
+    \ potion, bge-m3-zeroshot - all read by LIVE pipeline code\n    (pipeline/student_classifier.py, pipeline/stage1_5_fastembed.py,\
+    \ pipeline/rerank.py, pipeline_paths.py,\n    pipeline/stage2_relabel_extraction_type.py).\n  - THE du TRAP:\
+    \ a symlinked model reports 0 B. ~/.omlx/models_staged/Qwen3.8-27B-MTP4 is a symlink farm and\n    reports 0\
+    \ B while producing the `plan` role; deleting \"the 0-byte model\" would remove a measured role.\n    Always\
+    \ du -shL, and the resolver uses stat() for the same reason.\n\nPRECEDENT THIS RULING HONOURS: BUG-804 was a\
+    \ census that MEASURED SYMLINKS and reported double-counted bytes, and\nBUG-1046 produced a 238 MB MTP head\
+    \ attached through a symlinked staging checkpoint. Together they are why this\nruling is written as \"resolved\
+    \ by REFERENCE, delete by NAME\" rather than \"delete what is unreferenced or 0 B\":\nthe same filesystem shape\
+    \ that made a copy look absent makes a live model look empty.\n\nOWED (owner acts, not assistant acts, because\
+    \ a deletion is irreversible): the two temp-only repos, the two\nstale revisions, and retiring the duplicate\
+    \ oMLX bundles (/Applications/oMLX-0.7.0.app and\n/Applications/oMLX-0.7.2-20261025.app) that share the `omlxapp`\
+    \ URL scheme with the live app.\n"
+  bugs:
+  - BUG-804
+  - BUG-1046
+  files:
+  - governance/GGUF_MLX_AB_20261027.md
+  - governance/CALIBRATION_ROLE_MARKET_20261027.md
+  - config/hardware_profile.yaml

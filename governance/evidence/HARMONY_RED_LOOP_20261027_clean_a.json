@@ -1,0 +1,319 @@
+{
+  "measured_at": "2026-10-27T17:46:05",
+  "fixture": "T-213 harmony red loop",
+  "axis": "the CONTROL: the same N calls with NO seeded corruption (the pair attributes a defect to the transcript rather than to the model's own habit)",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "clean",
+      "replay_tail": null,
+      "calls_target": 30,
+      "attempts": 16,
+      "clean_calls": 16,
+      "malformed_names": 0,
+      "contaminated": [],
+      "undeclared": [],
+      "dropped_calls": 3,
+      "drops": [
+        {
+          "turn": 9,
+          "kind": "engine_parse_error",
+          "detail": "the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined"
+        },
+        {
+          "turn": 17,
+          "kind": "engine_parse_error",
+          "detail": "the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined"
+        },
+        {
+          "turn": 19,
+          "kind": "engine_parse_error",
+          "detail": "the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined"
+        }
+      ],
+      "engine_parse_errors": 3,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 19,
+      "nudges": 3,
+      "stop_reason": "stopped after 3 dropped call(s) (the verdict is already RED and cannot change)",
+      "slowest_turn_s": 26.2,
+      "verdict": "RED",
+      "detail": "3 DROPPED CALL(S) in 16 call(s); first at turn 9 (engine_parse_error: the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined) - BUG-951 symptom 2",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 16.15,
+          "ttft_s": 0.81,
+          "decode_tps": 41.7,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 4.86,
+          "ttft_s": 0.97,
+          "decode_tps": 42.02,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 3,
+          "wall_s": 1.87,
+          "ttft_s": 0.41,
+          "decode_tps": 41.43,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 4,
+          "wall_s": 1.67,
+          "ttft_s": 0.45,
+          "decode_tps": 41.27,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 5,
+          "wall_s": 1.99,
+          "ttft_s": 0.44,
+          "decode_tps": 42.65,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 6,
+          "wall_s": 2.17,
+          "ttft_s": 0.44,
+          "decode_tps": 42.32,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 7,
+          "wall_s": 2.17,
+          "ttft_s": 0.44,
+          "decode_tps": 42.29,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 8,
+          "wall_s": 2.07,
+          "ttft_s": 0.3,
+          "decode_tps": 41.26,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 9,
+          "wall_s": 0.8,
+          "ttft_s": 0.44,
+          "decode_tps": 45.15,
+          "parse_errors": 1,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [
+            "2026-10-27 17:44:40,827 - omlx.adapter.harmony - WARNING - [-] - Error parsing tool calls from tokens: unexpected tokens remaining in message header: Some(\"<|start|>assistant\")"
+          ],
+          "drop": "engine_parse_error"
+        },
+        {
+          "turn": 10,
+          "wall_s": 2.82,
+          "ttft_s": 0.44,
+          "decode_tps": 40.92,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 11,
+          "wall_s": 2.23,
+          "ttft_s": 0.4,
+          "decode_tps": 40.63,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 12,
+          "wall_s": 2.27,
+          "ttft_s": 0.48,
+          "decode_tps": 41.38,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 13,
+          "wall_s": 2.99,
+          "ttft_s": 0.4,
+          "decode_tps": 41.73,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 14,
+          "wall_s": 5.3,
+          "ttft_s": 0.43,
+          "decode_tps": 40.93,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 15,
+          "wall_s": 11.23,
+          "ttft_s": 0.43,
+          "decode_tps": 40.58,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 16,
+          "wall_s": 3.05,
+          "ttft_s": 0.08,
+          "decode_tps": 41.85,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 17,
+          "wall_s": 25.91,
+          "ttft_s": 0.42,
+          "decode_tps": 40.19,
+          "parse_errors": 1,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [
+            "2026-10-27 17:45:36,630 - omlx.adapter.harmony - WARNING - [-] - Error parsing tool calls from tokens: Unexpected EOS while waiting for message header to complete"
+          ],
+          "drop": "engine_parse_error"
+        },
+        {
+          "turn": 18,
+          "wall_s": 2.61,
+          "ttft_s": 0.47,
+          "decode_tps": 40.51,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 19,
+          "wall_s": 26.18,
+          "ttft_s": 0.65,
+          "decode_tps": 40.13,
+          "parse_errors": 1,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [
+            "2026-10-27 17:46:05,420 - omlx.adapter.harmony - WARNING - [-] - Error parsing tool calls from tokens: Unexpected EOS while waiting for message header to complete"
+          ],
+          "drop": "engine_parse_error"
+        }
+      ]
+    }
+  ]
+}

@@ -3063,7 +3063,8 @@ tasks:
     unverifiable faults are unchanged (RC=2), so no new fault was introduced by the class addition.
 - id: T-213
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-27'
   mover: pipeline
   title: BUILD THE RED LOOP BUG-951 OWES - a fixture that replays one corrupted tool name into the message history and reports whether the NEXT call is clean, because the only instrument that ever tested it lived in /tmp and is gone
   why: >-
@@ -3122,3 +3123,99 @@ tasks:
        UNMEASURED, never FAIL (D-3148 clause 3, BUG-375's shape one layer in).
     Only then may AGENT_LOOP_WORKHORSE be declared, and only from a receipt naming the model, engine, temperature
     (0.0) and the arguments it sent.
+  closure_evidence: >-
+    THE INSTRUMENT EXISTS, IN THE TREE, AND IT GOES RED ON DEMAND - all three verdicts of the gate are exercised by
+    a receipt, not by an argument. `scripts/harmony_red_loop.py` (32/32 known-answer controls) reuses the loop
+    instrument's HTTP call, declaration reader, turn budget and engine identity, reads its subject from
+    `config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model` (so no model name is typed into it), and
+    reads the ENGINE'S OWN LOG in each turn's byte window - because a LOST CALL and a SPENT ALLOWANCE are
+    byte-identical from outside, and only the engine says which happened. MEASURED 2026-10-27, engine oMLX
+    0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f, temperature 0.0, receipts governance/evidence/HARMONY_RED_LOOP_*:
+    (1) clause 1 satisfied on TWO axes - `--mode replay` seeds one corrupted `read_index<|channel|>commentary`
+    exchange into the history and issues N real calls (`--mode clean` is the same run minus exactly those two
+    messages, so the pair attributes a defect to the transcript rather than to the model's habit), and `--mode
+    parallel` demands two calls in ONE assistant message; (2) clause 2 satisfied - gpt-oss-20b-MXFP4-Q8 is RED on
+    both axes: 14 of 30 names corrupted (byte-identical to the seeded one, every call from turn 11 onward) and 3
+    of 16 calls LOST with the engine's log naming the parser on turns 9, 17 and 19 - the same three turns in three
+    independent runs, which is a reproduction RATE, not an anecdote; (3) clause 3 satisfied IN CODE - `MIN_BOUND_CALLS
+    = 30` and a clean run returns UNMEASURED_WITH_BOUND ("0 in 30 bounds the rate at <= 1 in 10"), never "fixed".
+    THE CONTROL THAT MAKES IT A FINDING RATHER THAN A TRAP: Qwen3.8-27B-MTP4 ran the identical seeded-corruption
+    fixture 30/30 clean and the clean fixture 30/30 clean, so the fixture does not fail everyone and the defect is
+    model-specific to gpt-oss on this build. STILL OPEN, and said so by the receipts: the defect is not fixed (both
+    gpt-oss axes are RED), the parallel axis is blocked on a per-turn token allowance the repo has no ratified knob
+    for (reported UNMEASURED, never guessed), and `--mode replay` cannot say which HALF of the seeded pair teaches
+    the copy. Fixes and their measurement are T-215; the role consequence is T-216 (owner). D-3200, BUG-951,
+    BUG-1079.
+
+- id: T-215
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: >-
+    MAKE A LOST CALL IMPOSSIBLE TO MISTAKE FOR A DECLINED ONE - measure the one mitigation with a mechanism behind
+    it (never echo a malformed tool name back into the transcript) and the one that costs no model change (detect an
+    owed call the parser ate, and retry the turn), because BUG-951 is RED and neither fix has a reading
+  why: >-
+    T-213 built the red loop and both of BUG-951's symptoms are now reproducible on demand (D-3200). What that
+    buys is ATTRIBUTION, not a fix: symptom 1 is CONTAGION proven by control (one seeded corrupted name -> 14 of 30
+    calls corrupted, from turn 11 to the end, while the same fixture on MTP4 is 30/30 clean), and symptom 2 is the
+    engine's harmony parser refusing a header the model emitted (3 of 16 calls lost on the clean control, turns 9,
+    17, 19, deterministic). BUG-1079 adds the cost of leaving it: the T-199 battery reads that loss as an
+    instrument limit, so the loop role is chosen by a gate that cannot see its worst failure. A fix invented before
+    these two mechanisms are separated would be a guess wearing a patch.
+  source: 'D-3200 / T-213 / BUG-951 / BUG-1079 / D-3036 / D-3104'
+  evidence: >-
+    READ 2026-10-27: `scripts/harmony_red_loop.py` already isolates the pair - `seed_history(total, tail, seed)`
+    writes the seeded corruption ONLY when `seed` is true, and the seeded pair is the corrupted assistant
+    `tool_call` PLUS the harness's `error: tool '<name>' does not exist` echo (exactly what production does). So the
+    echo axis is a two-line change to an instrument that already has a control, not a new fixture; and the
+    detect-and-retry axis is a wrapper around the existing turn loop, whose receipt already records per-turn
+    `parse_errors` and `evictions`.
+  gate: >-
+    THREE readings, each two-sided, none of them a rewrite:
+    1) ECHO ISOLATION - add a fourth axis that seeds the corrupted `tool_call` WITHOUT the error echo; if the copy
+       rate collapses, the echo is what teaches it and the mitigation is "sanitise the transcript before reuse";
+       if it does not, the assistant turn alone is enough and sanitising the echo is useless. ONE axis, one run.
+    2) RETRY RECOVERS A LOST CALL - apply the client-side guard (a turn that owed a call, returned none, and has a
+       parse error in its window is RETRIED, bounded) and re-run `--mode clean` N=30 on gpt-oss: RED today with 3
+       lost calls, and the guard is only a fix if the count falls to 0 AND the total wall time is reported (a fix
+       that triples the run is a trade, not a win - it must be stated as one).
+    3) THE CONTROL DOES NOT MOVE - `--only Qwen3.8-27B-MTP4 --mode clean` must stay 30/30 with 0 parse errors, so a
+       guard that "fixes" things by changing what counts is refused (BUG-1079's shape inverted).
+    Receipts name the engine build and the script digest; nothing here may be reported as "fixed" from a bounded
+    zero (D-3200 clause 1).
+
+- id: T-216
+  priority: MUST
+  state: open
+  mover: owner
+  title: >-
+    YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose
+    gpt-oss-20b for CAPABILITY and it is now RED on EMISSION, so either the short-loop role moves to a model measured
+    clean, or the role keeps gpt-oss and accepts the guard T-215 has to prove first
+  why: >-
+    D-3104 (OWNER brain DECIDE 2026-10-19) bound gpt-oss-20b-MXFP4-Q8 to AGENT_LOOP_SHORT because it was the only
+    served model clearing all three local-brain gates. That decision measured what the model can DO on a good turn.
+    MEASURED 2026-10-27 (D-3200): on this engine build the same model loses 3 of 16 calls with NOTHING corrupted in
+    the history, the loss is at fixed turns (9, 17, 19 - three runs), and a corrupted tool name in its transcript is
+    copied verbatim on 14 of 30 subsequent calls. Qwen3.8-27B-MTP4 ran both axes 30/30 clean. Both readings can be
+    true at once, and that is the decision now: a role can be given to the model that reasons best, or to the model
+    whose calls arrive, and only the owner may trade one for the other (D-3104 was an owner act). No pipeline actor
+    may demote an owner-set role from a fixture, however red it is.
+  source: 'D-3200 / D-3104 / T-213 / T-215 / BUG-951'
+  evidence: >-
+    READ 2026-10-27, `governance/evidence/HARMONY_RED_LOOP_20261027_*.json` and `config/model_assignments.yaml`:
+    harness_roles.AGENT_LOOP_SHORT.model = gpt-oss-20b-MXFP4-Q8 with basis D-3104; the receipts record 3/16 lost
+    calls and 14/30 corrupted names for that model, and 0/30 and 0/30 for Qwen3.8-27B-MTP4 (which is ALSO the plan
+    role's model, routed BATCH by D-3199 on prefill grounds - so moving the short loop to it is not free either:
+    check its per-turn latency against the class budget before proposing it as the answer).
+  gate: >-
+    A decision row, not a measurement: ONE of three, written with its reason (D-3038 - a rejected option is
+    registered, never dropped):
+    (a) MOVE the SHORT loop to the model measured clean on both axes, naming its cost (MTP4's prefill/latency on
+        short turns, and the fact that D-3199 routed it to BATCH);
+    (b) KEEP gpt-oss and make T-215's guard a PRECONDITION of the role, i.e. the role is conditional on a receipt
+        showing 0 lost calls over N >= 30 with the guard in place;
+    (c) ACCEPT the loss explicitly, with the rate (about 1 in 5 calls), the failure mode (a spent turn and a retried
+        call) and what it costs inside a pipeline.
+    Whatever is chosen, `state` flips from open and the reason is recorded - a deferral is RECORDED as deferred.

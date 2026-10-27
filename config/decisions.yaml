@@ -34897,3 +34897,76 @@ decisions:
   - scripts/agent_context_probe.py
   - config/task_register.yaml
   supersedes: []
+- id: D-3200
+  state: ACTIVE
+  date: 2026-10-27
+  category: MEASUREMENT / TOOL-CALL EMISSION / THE LOOP ROLE (T-213, T-214, T-215, T-216, BUG-951, BUG-1079, D-3036, D-3104, D-3152, D-3198, D-3199)
+  title: >-
+    A CAPABILITY BATTERY CANNOT ADMIT A MODEL THAT LOSES CALLS - the harmony red loop BUG-951 owed now exists and
+    goes RED on demand, its two symptoms are separated by their own axis, and emission integrity becomes a GATE the
+    AGENT_LOOP roles must pass before capability is asked about
+  decision: >-
+    (1) THE INSTRUMENT IS A GATE, NOT A BATTERY, AND IT HAS NO PASS. `scripts/harmony_red_loop.py` returns exactly
+    three verdicts - RED (the defect fired), UNMEASURED (the instrument could not see) and UNMEASURED_WITH_BOUND (0
+    defects in N) - because a clean run is a BOUND, not a certificate: 0 in 30 caps the rate at <= 1 in 10 by the
+    rule of three, which cannot retire a defect observed at ~1 in 5. `MIN_BOUND_CALLS = 30` is enforced in code, so
+    a shorter run returns UNMEASURED and may never claim a bound (T-213 clause 3 / D-3036).
+    (2) A DROPPED CALL IS NEVER INFERRED FROM THE RESPONSE. A lost call and a spent allowance are byte-identical
+    from outside (empty content, finish_reason=length, no tool_calls), so the fixture reads the ENGINE'S OWN LOG in
+    each turn's byte window - path and markers declared once in `config/engine.yaml#engine.log` and `.log_markers`
+    - and attributes a drop to the parser that refused the header. This is the mechanic BUG-1079 says the T-199
+    battery lacks, and the helper must be SHARED rather than copied when that fix is made.
+    (3) ATTRIBUTION BEFORE BLAME. An engine eviction inside the turn's window is a SECOND, sufficient cause for a
+    loss (BUG-950 mechanism A), so a drop that coincides with one is UNMEASURED and may never be charged to the
+    model. A malformed NAME is exempt from that guard: a special token leaked into an identifier field cannot be
+    produced by an eviction.
+    (4) THE CONTROL IS PART OF THE INSTRUMENT, NOT AN OPTION. `--mode replay` seeds ONE corrupted name into the
+    history and `--mode clean` is the same run with exactly those two messages removed; a defect is attributed to
+    the transcript only against that control, and a model-specificity claim requires a SECOND model clean on BOTH
+    axes - otherwise the trap may simply fail everyone (the build_argname lesson: a trap that fails EVERYONE
+    measures nothing). MEASURED: MTP4 30/30/30/30 clean, so this fixture's RED rows are about gpt-oss-20b, not
+    about the fixture.
+    (5) THE ROLE RULE, WHICH IS WHY (1)-(4) EXIST. No model may be bound to AGENT_LOOP_SHORT, AGENT_LOOP_FAST or
+    the still-undeclared AGENT_LOOP_WORKHORSE while it is RED here. A capability gate (D-3104's three local-brain
+    gates) measures what a model can DO on a good turn; this measures whether the turn ARRIVES. A model that loses
+    3 of 16 calls does not merely fail a benchmark - it burns its budget proving it is "incapable" while the
+    plumbing failed, which is BUG-951's own recorded impact. Emission integrity therefore comes BEFORE capability
+    in the order of evidence, exactly as BUG-951's entry asked ("queue this ABOVE any further model-capability A/B
+    on this machine").
+    (6) WHAT THIS DECISION DOES NOT SETTLE, NAMED. (a) The FIX is not known: three candidate directions are
+    registered (sanitise the transcript, detect-and-retry an owed call the parser ate, or route the role away) and
+    NONE is measured - T-215 owns measuring the mitigation. (b) The two-calls-in-one-message axis is BLOCKED on a
+    per-turn token allowance the repo has no ratified knob for, and a blocked axis is reported UNMEASURED, never
+    guessed. (c) The current occupant of AGENT_LOOP_SHORT is now RED on this fixture, and demoting a role the OWNER
+    set by D-3104 is an owner act: T-216 carries the choice, with T-215 as its input.
+  measured: |-
+    ALL READINGS 2026-10-27, engine oMLX 0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f, temperature 0.0, receipts
+    governance/evidence/HARMONY_RED_LOOP_20261027_{clean_a,clean_b,replay,parallel,mtp4_replay,mtp4_clean}.json:
+      gpt-oss-20b clean    16 calls   0 malformed   3 dropped   3 engine parse errors   RED   (turns 9,17,19)
+      gpt-oss-20b clean(2) 16 calls   0 malformed   3 dropped   3 engine parse errors   RED   (SAME three turns)
+      gpt-oss-20b replay   30 calls  14 malformed   1 dropped   0 parse errors          RED   (corrupt from turn 11 on)
+      gpt-oss-20b parallel  3 calls   0 malformed   1 dropped   0 parse errors          UNMEASURED (allowance)
+      MTP4 replay          30 calls   0 malformed   0 dropped   0 parse errors          UNMEASURED_WITH_BOUND
+      MTP4 clean           30 calls   0 malformed   0 dropped   0 parse errors          UNMEASURED_WITH_BOUND
+    the rail, each command run before and after (D-3036 - a named command, red then green, with its controls):
+      before   grep -rl harmony scripts/*.py            -> scripts/arm4_omlx.py ONLY (no emission fixture existed)
+      after    grep -rl "harmony\|corrupt" scripts/*.py -> scripts/harmony_red_loop.py (+ arm4_omlx.py)
+      controls python3 scripts/harmony_red_loop.py --selftest -> 32/32 known-answer controls
+      green    python3 scripts/harmony_red_loop.py --mode replay  -> RED 14/30 malformed   (the bug's symptom 1)
+      green    python3 scripts/harmony_red_loop.py --mode clean   -> RED 3/16 dropped      (the bug's symptom 2)
+      control  python3 scripts/harmony_red_loop.py --mode replay --only Qwen3.8-27B-MTP4 -> bound, 0/30
+  bugs:
+  - BUG-951
+  - BUG-1079
+  files:
+  - scripts/harmony_red_loop.py
+  - config/engine.yaml
+  - governance/buglog.md
+  - config/task_register.yaml
+  - governance/evidence/HARMONY_RED_LOOP_20261027_clean_a.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_clean_b.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_replay.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_parallel.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_mtp4_replay.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_mtp4_clean.json
+  supersedes: []

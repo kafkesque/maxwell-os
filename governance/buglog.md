@@ -8,16 +8,17 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1325 decisions (census stamp a1c6d6aa304c1d9c, 2026-10-27) · 842 bugs (265 open / 577 closed; highest OPEN = BUG-1077) · 61 open tasks (MUST 10 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 61; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1326 decisions (census stamp ed9ab27029803be5, 2026-10-27) · 843 bugs (266 open / 577 closed; highest OPEN = BUG-1079) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1325 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 666 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1325, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1326 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 667 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1326, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
+> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-216 | 🔴 MUST | YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose g | A decision row, not a measurement: ONE of three, written with its reas |
 >
 > **PIPELINE LANE (61) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -31,8 +32,8 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
-> | T-213 | 🔴 MUST | 🔴 open | BUILD THE RED LOOP BUG-951 OWES - a fixture that replays one corrupted tool name into the message history and  | READ 2026-10-27: `grep -rl harmony scripts/*.py` -> only scripts/arm4_omlx.py; no repeated |
 > | T-214 | 🔴 MUST | 🔴 open | BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since  | READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gp |
+> | T-215 | 🔴 MUST | 🔴 open | MAKE A LOST CALL IMPOSSIBLE TO MISTAKE FOR A DECLINED ONE - measure the one mitigation with a mechanism behind | READ 2026-10-27: `scripts/harmony_red_loop.py` already isolates the pair - `seed_history(t |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
@@ -23889,3 +23890,92 @@ saying the number had been taken at one sixth of the size the class divides.
    CONDITIONS of its measurement invites arithmetic to be read as evidence. The same shape sits in BUG-803 (pool
    state), BUG-805 (decode is a function of context length) and BUG-1064 (a reasoning model measured at a budget it
    cannot answer within).
+
+### BUG-951 (HIGH, OPEN 2026-10-27) — REPRODUCED IN-REPO AND ATTRIBUTED: the red loop this bug owed now EXISTS, it goes RED on demand, and its two symptoms are separated by their own axis
+
+**The instrument (T-213).** `scripts/harmony_red_loop.py` — one fixture, three declared axes, three verdicts and no
+PASS (RED / UNMEASURED_WITH_BOUND / UNMEASURED). It reuses the loop instrument's HTTP call, declaration reader, turn
+budget and engine identity (`scripts/measure_subagent_loop.py`), reads the served set from the harness's own
+declaration, and reads its subject from `config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model` — the
+role the defect damages — so no model name is typed into it (C12). 32/32 known-answer controls green.
+
+**Why the API response alone could not decide it.** A LOST CALL and a SPENT ALLOWANCE are byte-identical from
+outside: empty content, `finish_reason=length`, no `tool_calls`. So the fixture reads the ENGINE'S OWN LOG in each
+turn's byte window (path and markers from `config/engine.yaml#engine.log` / `.log_markers`, added 2026-10-27) and
+attributes a drop to the parser that refused the header, never to an allowance the turn never reached.
+
+**MEASURED 2026-10-27, engine oMLX 0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f, temperature 0.0**, receipts
+`governance/evidence/HARMONY_RED_LOOP_20261027_*.json`:
+
+| axis | model | calls | malformed names | dropped calls | engine parse errors | verdict |
+|---|---|---|---|---|---|---|
+| clean (no seeded corruption) | gpt-oss-20b-MXFP4-Q8 | 16 | 0 | **3** | **3** | **RED** (symptom 2) |
+| clean, repeat run | gpt-oss-20b-MXFP4-Q8 | 16 | 0 | **3** | **3** | **RED** (same three turns) |
+| replay (one corrupted name seeded) | gpt-oss-20b-MXFP4-Q8 | 30 | **14** | 1 | 0 | **RED** (symptom 1) |
+| parallel (two calls in one message) | gpt-oss-20b-MXFP4-Q8 | 3 | 0 | 1 | 0 | UNMEASURED (allowance) |
+| replay | Qwen3.8-27B-MTP4 | 30 | 0 | 0 | 0 | UNMEASURED_WITH_BOUND (<= 1 in 10) |
+| clean | Qwen3.8-27B-MTP4 | 30 | 0 | 0 | 0 | UNMEASURED_WITH_BOUND (<= 1 in 10) |
+
+1. **SYMPTOM 2 REPRODUCES WITH *NOTHING* CORRUPTED IN THE HISTORY, AND IT IS DETERMINISTIC.** The clean control lost
+   three calls out of sixteen in **the same three turns (9, 17, 19) in three independent runs**. Turn 9's window
+   carries BUG-951's own verbatim line — `Error parsing tool calls from tokens: unexpected tokens remaining in
+   message header: Some("<|start|>assistant")` — and turns 17 and 19 carry the second form already recorded here,
+   `Unexpected EOS while waiting for message header to complete`. So the trigger does not require a long error-laden
+   session: a 400-token prompt repeating "call the tool with the next index" is enough, and the loss rate is
+   **3 of 16 calls = 18.8%** (against the 4-in-~19-turns production reading this entry recorded).
+2. **SYMPTOM 1 IS CONTAGION, AND IT PERSISTS.** With ONE corrupted `read_index<|channel|>commentary` call seeded
+   into the history before the first real call, the SAME model returned that corrupted name **verbatim on 14 of 30
+   calls, every one of them from turn 11 onward** (sequence `CCCCCCCCCCXXCXXCXCXXCXCdXXXXCXX`: ten clean turns,
+   then corruption to the end). The engine parsed those headers fine — the calls simply addressed a tool that does
+   not exist, which is exactly the production shape `"name":"shell<|channel|>commentary"`. The bug's own candidate
+   trigger, "a prior corrupted name echoed back in history", is therefore CONFIRMED as sufficient on this build.
+3. **IT IS NOT A TRAP THAT FAILS EVERYONE (the control the build_argname lesson demands).** `Qwen3.8-27B-MTP4` ran
+   the IDENTICAL seeded-corruption fixture 30/30 clean and the clean fixture 30/30 clean: it saw the same corrupted
+   name in the same position and never copied it. So the defect is **model-specific to gpt-oss-20b-MXFP4-Q8 on this
+   engine build**, and both of its symptoms belong to that model-plus-parser pair — not to the fixture and not to
+   the engine alone (MTP4 passes 4/4 on the T-199 battery under the same build).
+4. **NEITHER SYMPTOM IS FIXED, AND THE VERDICT SAYS SO.** The clean run is RED because a call was LOST; the replay
+   run is RED because a call addressed nothing. MTP4's two green runs are **bounds, not certificates**: 0 in 30 caps
+   the rate at <= 1 in 10, which cannot retire a defect observed at ~1 in 5 — the gate's clause 3, enforced in code
+   (`MIN_BOUND_CALLS = 30`, and any shorter run returns UNMEASURED and may not claim a bound).
+5. **THE PARALLEL AXIS IS BLOCKED ON A TOKEN ALLOWANCE, NOT ON THE DEFECT (stated, not hidden).** The two-calls-in-
+   one-message shape — the one that produced the `to=<name>` + garbage header in this machine's log at 16:10 and
+   16:12 today — spent its whole 1024-token allowance with no content and NO parse error in the window, so the
+   fixture reports UNMEASURED rather than inventing a cause. Raising the allowance is a ratified knob the repo does
+   not have yet (the T-199 battery records the same gap); until it exists this axis cannot be read.
+6. **WHAT THIS ENTRY DOES *NOT* CLAIM.** The fix is not known; only the instrument and the attribution are. Three
+   candidate directions, none measured yet: (a) sanitise the transcript so a malformed name is never echoed back
+   (symptom 1 is contagion, so this is the one with a mechanism behind it); (b) detect "a call was owed, none
+   arrived, and the engine logged a parse error" client-side and RETRY the turn instead of spending it; (c) route
+   the loop role to a model measured clean on both axes. Also NOT tested, per the fixture's own `not_tested` list:
+   `enable_thinking=False` on a harmony model that emits an analysis channel anyway, and which HALF of the seeded
+   pair teaches the copy (the corrupted assistant `tool_call` and the harness's `error: tool '<name>' does not
+   exist` echo are seeded together, as production does).
+
+## BUG-1079 (MED, OPEN 2026-10-27) — THE LOOP BATTERY READS A *LOST CALL* AS AN *ALLOWANCE LIMIT*, so the one instrument that runs on every model reported UNMEASURED where the engine had already said a tool header was refused
+
+MEASURED 2026-10-27, engine oMLX 0.7.3rc1. `scripts/measure_subagent_loop.py#turn_unmeasured` treats "empty
+content + `finish_reason=length`" as the instrument's own limit and returns UNMEASURED, deliberately and correctly
+in principle (BUG-375: a probe's limit is not a fact about its subject). But a LOST CALL arrives in exactly that
+shape, and the engine is the only witness that distinguishes them.
+1. THE READING. `temp/battery_20261027_gptoss_rc1.json` (16:12:50) records two gpt-oss rows as
+   `UNMEASURED - the turn spent its whole token allowance (finish_reason=length) and returned no content`. The
+   engine log at the same minutes (16:10:26,795 and 16:12:04,152) carries
+   `omlx.adapter.harmony - WARNING - Error parsing tool calls from tokens: Unexpected EOS while waiting for message
+   header to complete`, preceded by `parse_tool_calls input (1026 tokens): <|start|>assistant to=lines???...`.
+   So the allowance was never "spent with nothing to say": 1024 tokens were generated and the PARSER refused them.
+   The battery charged the instrument's limit for a defect it could not see, and the same shape appears in the
+   2026-10-25 battery receipt for the same model and fixture.
+2. WHY IT MATTERS. This is the battery that decides which model may drive a loop (T-199/D-3198/D-3199), and an
+   UNMEASURED row is read as "we cannot see this model yet" - i.e. as a REASON TO WAIT, not as a defect. Two of
+   four fixtures for the model bound to AGENT_LOOP_SHORT were silently RED.
+3. FIX DIRECTION (not implemented, and not to be implemented without its own red loop). In `run_battery_fixture`,
+   before `turn_unmeasured` decides, read the engine log window for that turn exactly as
+   `scripts/harmony_red_loop.py#window` does (path and marker from `config/engine.yaml#engine.log_markers`); if the
+   parser refused a header, the row is a DROP with the parser named, never UNMEASURED. The helper must be SHARED,
+   never copied (a second copy of a log reader is the drift class this repo keeps finding).
+4. RED LOOP OWED (the gate, named): (a) run `python3 scripts/measure_subagent_loop.py --battery --only
+   gpt-oss-20b-MXFP4-Q8` -> today the `distractor` and `parallel` rows print UNMEASURED with the allowance text;
+   (b) apply the fix; (c) the same command must print those rows as RED naming the harmony parser, and
+   (d) the two-sided control: `--only Qwen3.8-27B-MTP4` must stay 4/4 PASS (a fix that reddens every row is not a
+   fix - it is the BUG-1079 shape inverted).

@@ -13,16 +13,17 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1325 decisions (census stamp a1c6d6aa304c1d9c, 2026-10-27) · 842 bugs (265 open / 577 closed; highest OPEN = BUG-1077) · 61 open tasks (MUST 10 / SHOULD 45 / WORTH 5; OWNER-moved 0, pipeline-moved 61; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1326 decisions (census stamp ed9ab27029803be5, 2026-10-27) · 843 bugs (266 open / 577 closed; highest OPEN = BUG-1079) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1325 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 666 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1325, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1326 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 667 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1326, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
+> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-216 | 🔴 MUST | YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose g | A decision row, not a measurement: ONE of three, written with its reas |
 >
 > **PIPELINE LANE (61) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -36,8 +37,8 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
-> | T-213 | 🔴 MUST | 🔴 open | BUILD THE RED LOOP BUG-951 OWES - a fixture that replays one corrupted tool name into the message history and  | READ 2026-10-27: `grep -rl harmony scripts/*.py` -> only scripts/arm4_omlx.py; no repeated |
 > | T-214 | 🔴 MUST | 🔴 open | BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since  | READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gp |
+> | T-215 | 🔴 MUST | 🔴 open | MAKE A LOST CALL IMPOSSIBLE TO MISTAKE FOR A DECLINED ONE - measure the one mitigation with a mechanism behind | READ 2026-10-27: `scripts/harmony_red_loop.py` already isolates the pair - `seed_history(t |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >

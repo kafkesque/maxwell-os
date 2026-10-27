@@ -1,0 +1,446 @@
+{
+  "measured_at": "2026-10-27T17:57:17",
+  "fixture": "T-213 harmony red loop",
+  "axis": "the CONTROL: the same N calls with NO seeded corruption (the pair attributes a defect to the transcript rather than to the model's own habit)",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation"
+  ],
+  "rows": [
+    {
+      "model": "Qwen3.8-27B-MTP4",
+      "mode": "clean",
+      "replay_tail": null,
+      "calls_target": 30,
+      "attempts": 30,
+      "clean_calls": 30,
+      "malformed_names": 0,
+      "contaminated": [],
+      "undeclared": [],
+      "dropped_calls": 0,
+      "drops": [],
+      "engine_parse_errors": 0,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 30,
+      "nudges": 0,
+      "stop_reason": "reached N",
+      "slowest_turn_s": 9.9,
+      "verdict": "UNMEASURED_WITH_BOUND",
+      "detail": "0 malformed, 0 dropped, 0 parse errors in 30 call(s): the rate is bounded at <= 1 in 10 (rule of three, 95%) - which cannot retire a defect observed at ~1 in 5, so this is NOT 'fixed'",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 9.92,
+          "ttft_s": 8.43,
+          "decode_tps": 16.39,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 3.48,
+          "ttft_s": 2.11,
+          "decode_tps": 17.59,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 3,
+          "wall_s": 3.47,
+          "ttft_s": 2.12,
+          "decode_tps": 17.82,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 4,
+          "wall_s": 3.45,
+          "ttft_s": 2.12,
+          "decode_tps": 18.12,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 5,
+          "wall_s": 3.55,
+          "ttft_s": 2.13,
+          "decode_tps": 17.06,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 6,
+          "wall_s": 3.59,
+          "ttft_s": 2.22,
+          "decode_tps": 17.65,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 7,
+          "wall_s": 3.51,
+          "ttft_s": 2.15,
+          "decode_tps": 17.72,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 8,
+          "wall_s": 3.54,
+          "ttft_s": 2.15,
+          "decode_tps": 17.46,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 9,
+          "wall_s": 3.45,
+          "ttft_s": 2.12,
+          "decode_tps": 18.16,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 10,
+          "wall_s": 3.73,
+          "ttft_s": 2.13,
+          "decode_tps": 15.72,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 11,
+          "wall_s": 3.48,
+          "ttft_s": 2.12,
+          "decode_tps": 18.61,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 12,
+          "wall_s": 3.75,
+          "ttft_s": 2.15,
+          "decode_tps": 15.71,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 13,
+          "wall_s": 3.75,
+          "ttft_s": 2.17,
+          "decode_tps": 16.0,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 14,
+          "wall_s": 3.8,
+          "ttft_s": 2.17,
+          "decode_tps": 15.43,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 15,
+          "wall_s": 3.97,
+          "ttft_s": 2.28,
+          "decode_tps": 14.89,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 16,
+          "wall_s": 4.01,
+          "ttft_s": 2.3,
+          "decode_tps": 14.72,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 17,
+          "wall_s": 4.0,
+          "ttft_s": 2.33,
+          "decode_tps": 15.1,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 18,
+          "wall_s": 3.96,
+          "ttft_s": 2.28,
+          "decode_tps": 14.99,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 19,
+          "wall_s": 3.87,
+          "ttft_s": 2.28,
+          "decode_tps": 15.8,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 20,
+          "wall_s": 3.77,
+          "ttft_s": 2.13,
+          "decode_tps": 15.4,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 21,
+          "wall_s": 3.74,
+          "ttft_s": 2.11,
+          "decode_tps": 15.48,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 22,
+          "wall_s": 3.79,
+          "ttft_s": 2.18,
+          "decode_tps": 15.64,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 23,
+          "wall_s": 3.75,
+          "ttft_s": 2.16,
+          "decode_tps": 15.81,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 24,
+          "wall_s": 3.79,
+          "ttft_s": 2.16,
+          "decode_tps": 15.51,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 25,
+          "wall_s": 3.69,
+          "ttft_s": 2.12,
+          "decode_tps": 16.13,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 26,
+          "wall_s": 3.68,
+          "ttft_s": 2.08,
+          "decode_tps": 15.78,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 27,
+          "wall_s": 3.76,
+          "ttft_s": 2.12,
+          "decode_tps": 15.4,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 28,
+          "wall_s": 3.74,
+          "ttft_s": 2.12,
+          "decode_tps": 15.59,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 29,
+          "wall_s": 3.78,
+          "ttft_s": 2.15,
+          "decode_tps": 15.48,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 30,
+          "wall_s": 3.77,
+          "ttft_s": 2.15,
+          "decode_tps": 15.55,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        }
+      ]
+    }
+  ]
+}

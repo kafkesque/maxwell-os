@@ -1,0 +1,123 @@
+{
+  "measured_at": "2026-10-27T17:53:15",
+  "fixture": "T-213 harmony red loop",
+  "axis": "two tool calls demanded in ONE assistant message",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "parallel",
+      "replay_tail": null,
+      "calls_target": 30,
+      "attempts": 3,
+      "clean_calls": 3,
+      "malformed_names": 0,
+      "contaminated": [],
+      "undeclared": [],
+      "dropped_calls": 1,
+      "drops": [
+        {
+          "turn": 2,
+          "kind": "silent_stop",
+          "detail": "empty content with finish_reason=stop and no parse error: a real non-answer"
+        }
+      ],
+      "engine_parse_errors": 0,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 5,
+      "nudges": 1,
+      "stop_reason": "stopped after 1 dropped call(s) (the verdict is already RED and cannot change)",
+      "slowest_turn_s": 26.4,
+      "verdict": "UNMEASURED",
+      "detail": "spent the whole token allowance with no content and NO parse error in the window - the instrument cannot see this model at this allowance (UNMEASURED, not a verdict)",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 25.14,
+          "ttft_s": 0.69,
+          "decode_tps": 41.23,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 11.72,
+          "ttft_s": 1.0,
+          "decode_tps": 41.71,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "drop": "silent_stop"
+        },
+        {
+          "turn": 3,
+          "wall_s": 25.7,
+          "ttft_s": 1.11,
+          "decode_tps": 41.08,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 4,
+          "wall_s": 11.15,
+          "ttft_s": 1.27,
+          "decode_tps": 41.16,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 5,
+          "wall_s": 26.39,
+          "ttft_s": 1.45,
+          "decode_tps": 41.08,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "drop": "allowance"
+        }
+      ]
+    }
+  ]
+}

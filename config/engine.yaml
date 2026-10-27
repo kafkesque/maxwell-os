@@ -26,6 +26,20 @@ engine:
   parked_dir: /Users/barn/.omlx/_unloaded
   settings: /Users/barn/.omlx/settings.json
   launch_cli: /Users/barn/.omlx/bin/omlx
+  # WHERE THE ENGINE WITNESSES ITS OWN PARSE FAILURES (T-213/BUG-951, added 2026-10-27). A harmony parse failure
+  # is INVISIBLE to a client: the turn simply arrives with no tool_calls and finish_reason=stop|length, so a
+  # probe that reads only the API response cannot tell a LOST CALL from a model that declined. The engine's own
+  # log is the only witness, so the red-loop fixture reads it from HERE rather than restating a path (C12).
+  # MEASURED 2026-10-27 16:10 and 16:12: both marker forms below fired on gpt-oss-20b-MXFP4-Q8 at a 410-token
+  # prompt while the T-199 battery recorded the two turns as "spent its whole token allowance" (a mis-attribution
+  # the fixture exists to prevent - the battery cannot see the parser, and the parser is what failed).
+  log: ~/.omlx/logs/server.log
+  log_markers:
+    harmony_parse_error: 'Error parsing tool calls from tokens'   # the harmony parser refused a tool header
+    harmony_stream_fallback: 'Harmony streaming parser error'     # same defect on the streaming path
+    eviction: 'Evicting idle model'                               # BUG-950 mechanism A: a drop's OTHER cause
+    prefill_pressure: 'adaptive_prefill_throttle'                 # the pressure that triggers that eviction
+    completion: 'Chat completion: model='                         # per-turn completion line (model attribution)
   install: app                              # gui app with auto_start_on_launch true (measured)
   status_endpoint: /v1/models/status        # residency, pinned flag, engine_type, config_model_type
   observed:

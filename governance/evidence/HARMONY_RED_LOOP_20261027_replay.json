@@ -1,0 +1,478 @@
+{
+  "measured_at": "2026-10-27T17:51:35",
+  "fixture": "T-213 harmony red loop",
+  "axis": "a corrupted name seeded into history, then N real calls",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "replay",
+      "replay_tail": "commentary",
+      "calls_target": 30,
+      "attempts": 30,
+      "clean_calls": 16,
+      "malformed_names": 14,
+      "contaminated": [
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary",
+        "read_index<|channel|>commentary"
+      ],
+      "undeclared": [],
+      "dropped_calls": 1,
+      "drops": [
+        {
+          "turn": 24,
+          "kind": "silent_stop",
+          "detail": "empty content with finish_reason=stop and no parse error: a real non-answer"
+        }
+      ],
+      "engine_parse_errors": 0,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 31,
+      "nudges": 1,
+      "stop_reason": "reached N",
+      "slowest_turn_s": 20.7,
+      "verdict": "RED",
+      "detail": "14 MALFORMED NAME(S) in 30 call(s): contaminated=['read_index<|channel|>commentary', 'read_index<|channel|>commentary', 'read_index<|channel|>commentary'] undeclared=[] - a call to a tool that does not exist (BUG-951 symptom 1)",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 19.29,
+          "ttft_s": 0.83,
+          "decode_tps": 40.9,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 6.26,
+          "ttft_s": 1.31,
+          "decode_tps": 41.87,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 3,
+          "wall_s": 13.56,
+          "ttft_s": 0.42,
+          "decode_tps": 41.43,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 4,
+          "wall_s": 2.24,
+          "ttft_s": 0.56,
+          "decode_tps": 41.78,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 5,
+          "wall_s": 2.17,
+          "ttft_s": 0.44,
+          "decode_tps": 41.23,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 6,
+          "wall_s": 3.86,
+          "ttft_s": 0.43,
+          "decode_tps": 41.76,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 7,
+          "wall_s": 8.45,
+          "ttft_s": 0.31,
+          "decode_tps": 41.06,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 8,
+          "wall_s": 9.87,
+          "ttft_s": 0.13,
+          "decode_tps": 41.16,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 9,
+          "wall_s": 16.98,
+          "ttft_s": 0.41,
+          "decode_tps": 40.75,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 10,
+          "wall_s": 11.3,
+          "ttft_s": 0.55,
+          "decode_tps": 41.15,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 11,
+          "wall_s": 20.72,
+          "ttft_s": 0.72,
+          "decode_tps": 40.72,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 12,
+          "wall_s": 12.62,
+          "ttft_s": 0.89,
+          "decode_tps": 41.03,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 13,
+          "wall_s": 9.67,
+          "ttft_s": 1.07,
+          "decode_tps": 40.73,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 14,
+          "wall_s": 11.09,
+          "ttft_s": 1.24,
+          "decode_tps": 40.84,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 15,
+          "wall_s": 13.74,
+          "ttft_s": 1.39,
+          "decode_tps": 40.53,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 16,
+          "wall_s": 14.52,
+          "ttft_s": 1.54,
+          "decode_tps": 40.85,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 17,
+          "wall_s": 13.1,
+          "ttft_s": 0.28,
+          "decode_tps": 40.73,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 18,
+          "wall_s": 12.31,
+          "ttft_s": 0.43,
+          "decode_tps": 40.27,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 19,
+          "wall_s": 9.92,
+          "ttft_s": 0.6,
+          "decode_tps": 40.8,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 20,
+          "wall_s": 19.82,
+          "ttft_s": 0.45,
+          "decode_tps": 40.39,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 21,
+          "wall_s": 15.18,
+          "ttft_s": 0.57,
+          "decode_tps": 40.48,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 22,
+          "wall_s": 14.66,
+          "ttft_s": 0.76,
+          "decode_tps": 40.33,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 23,
+          "wall_s": 10.53,
+          "ttft_s": 0.92,
+          "decode_tps": 40.24,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 24,
+          "wall_s": 11.57,
+          "ttft_s": 1.09,
+          "decode_tps": 40.38,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "drop": "silent_stop"
+        },
+        {
+          "turn": 25,
+          "wall_s": 3.06,
+          "ttft_s": 1.17,
+          "decode_tps": 40.96,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 26,
+          "wall_s": 2.59,
+          "ttft_s": 0.46,
+          "decode_tps": 40.06,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 27,
+          "wall_s": 5.42,
+          "ttft_s": 0.6,
+          "decode_tps": 40.52,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 28,
+          "wall_s": 7.36,
+          "ttft_s": 0.41,
+          "decode_tps": 40.07,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 29,
+          "wall_s": 6.79,
+          "ttft_s": 0.13,
+          "decode_tps": 40.57,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 30,
+          "wall_s": 13.65,
+          "ttft_s": 0.45,
+          "decode_tps": 39.66,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 31,
+          "wall_s": 7.15,
+          "ttft_s": 0.1,
+          "decode_tps": 40.49,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        }
+      ]
+    }
+  ]
+}

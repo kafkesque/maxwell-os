@@ -17,6 +17,11 @@ engine:
   host: 127.0.0.1
   port: 11435
   auth_token_home: pipeline.pipeline_paths.OMLX_API_KEY   # POINTER ONLY - the value lives in one place
+  # WHICH PROCESS IS THE ENGINE (BUG-1067): `current_model_memory` is a WEIGHTS-ONLY sum maintained by
+  # load/unload, so the memory that must actually fit is the server process's own footprint. MEASURED
+  # 2026-10-27: the process is argv[0] == "omlx-server" (psutil reports its NAME as python3.11, so matching by
+  # name fails; matching by argv[0] finds it).
+  server_process: omlx-server
   model_dir: /Users/barn/.omlx/models
   parked_dir: /Users/barn/.omlx/_unloaded
   settings: /Users/barn/.omlx/settings.json

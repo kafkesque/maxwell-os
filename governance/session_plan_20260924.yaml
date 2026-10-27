@@ -476,6 +476,11 @@ may_touch:
 #: D-3178 (the personal-calibration feature): its append-only receipt journal and its ONE research home. Named
 #: paths, not a family - governance/*.jsonl and governance/*.md stay deliberately un-patterned (BUG-548).
 - governance/calibration_receipts.jsonl
+#: D-3194/D-3195/D-3196 (2026-10-27): the two receipts this act creates. NAMED, never `governance/*.jsonl`:
+#: each is the ONE home of a different reading (the ceiling's clock/range and the KV working set's slope), and a
+#: pattern would let a future receipt land without a decision behind it.
+- governance/ceiling_readings.jsonl
+- governance/kv_working_set.jsonl
 - governance/CALIBRATION_ROLE_MARKET_20261027.md
 will_not_touch:
 - governance/F11_*
@@ -1687,3 +1692,33 @@ widening_log:
     (governance/model_eval_*), governance/buglog.md, governance/bug_status.json|md, governance/r5_reviews.jsonl,
     config/decisions.yaml, governance/delegate_journal.jsonl and the four derived faces. No pipeline/** crossing,
     no pinned artifact staged, no glob asked for.
+- date: '2026-10-27'
+  actor: agent
+  reason: >-
+    D-3194 (the model roster ruled from instruments), D-3195 (BUG-1060: the memory ceiling is a READING - clock,
+    second sample, observed range, measured resident, and the assignment plans on the LOWEST observed ceiling) and
+    D-3196 (BUG-1055 limb 4: the KV working set is measured on the ENGINE PROCESS, because the engine's own
+    `current_model_memory` is a weights-only sum maintained by load/unload and cannot see a KV cache at all).
+    Two new append-only receipts are produced by that work, and neither had a declared home.
+  owner_ack: >-
+    the instruction that opened this sitting: 'also examine if this model any use case gemma-4-E4B-MLX-4bit or should be deleted / what else llm should be deleted and what should be kept / continue with the next critical step starting with the highest leverage step'. The deletion question IS the licence for the census work, and the BUG-1055 ruling the owner already accepted yesterday is the licence for the KV measurement it still owed.
+  additions:
+  - pattern: governance/ceiling_readings.jsonl
+    why: >-
+      every ceiling reading this host takes, appended with its clock (append + fsync, C6). It exists because the
+      figure moved 48.8 -> 56.7 GiB inside one minute and a range must be a set of MEASUREMENTS, not a memory of
+      four numbers (BUG-1060).
+  - pattern: governance/kv_working_set.jsonl
+    why: >-
+      one row per measured context length - prompt tokens, weights bytes, KV bytes, KiB/token, the peak sample
+      count and the flags (EVICTED / NOT_RETAINED / NO_SETTLE). It is the receipt BUG-1055 limb 4 owed and the only
+      basis on which the flat 3.0 GiB KV reserve may be replaced by a measured slope.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: >-
+    Everything else touched by this act already sits inside existing grants: scripts/kv_working_set.py and
+    scripts/hardware_calibrate.py (scripts/*.py), config/hardware_profile.yaml + config/engine.yaml +
+    config/decisions.yaml (config/*.yaml), governance/buglog.md, governance/bug_status.json|md,
+    governance/r5_reviews.jsonl, governance/r5_review_gate_bench.jsonl, governance/delegate_journal.jsonl,
+    config/decisions_summary.json and the four derived faces. No model_roles.yaml write (the report was read, not
+    written), no pipeline/** crossing, no pinned artifact staged, no glob asked for, and `temp/` is gitignored.

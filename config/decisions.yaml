@@ -34384,3 +34384,245 @@ decisions:
   - scripts/hardware_calibrate.py
   - config/plan_quality_gate.yaml
   supersedes: []
+
+- id: D-3194
+  state: RESOLVED
+  category: MODEL PORTFOLIO / DELETION RULING / STORE CENSUS DOMAIN (D-3010, D-3018, D-3034)
+  title: 'gemma-4-E4B is KEPT with four named lanes and refused only as reviewer-of-record; the 12B reviewer test is DECLARED, not deleted; the deletion question exposed 8.8 GB of bytes and one store the census cannot see'
+  decision: |
+    THE QUESTION THE OWNER ASKED, answered from instruments rather than memory: "is gemma-4-E4B any use, or should it
+    be deleted" and "what else should be deleted and what should be kept". The readings: `pipeline/model_store_census.py`
+    (rc 2, one OFFERED repo), the engine's `/v1/models/status` (17 served ids), `governance/r5_reviews.jsonl` (178
+    verdicts by reviewer) and `governance/model_eval_checkpoint.jsonl` (261 rows), plus a call-site sweep of
+    pipeline/, scripts/, tools/ and config/.
+
+    1. THE ROSTER IS 11 MODELS SERVED UNDER 17 IDS. Six models carry TWO ids each - the farm name
+       (`gemma-4-E4B-it-MLX-4bit`) and the hub-cache form the engine discovers
+       (`lmstudio-community--gemma-4-E4B-it-MLX-4bit`) - with IDENTICAL `model_path` and `estimated_size`; two more
+       (`lmstudio-community--gemma-4-12B-it-MLX-4bit`, `mlx-community--clef-flash-4bit`) exist ONLY in hub-cache
+       form. A shadow id is not harmless: a receipt row keyed to it can never satisfy a gate keyed to the farm name
+       (fail-closed, so it wastes the measurement silently rather than breaking), and the 24-row PASS of the 12B
+       candidate sat under exactly such a name. THE RULE THIS DECISION SETS: **a candidate is declared under the id
+       the ENGINE SERVES**, and for a hub-cache model that IS the canonical id - creating a second short name for
+       one set of bytes would be the duplication this register refuses.
+    2. gemma-4-E4B-it-MLX-4bit: **KEPT**, refused only as REVIEWER OF RECORD. It fails the r5_review gate
+       (accuracy 0.7083, false_approve 0.125 against a 0.10 ceiling) and it holds four lanes that nothing else
+       covers: (a) `config/engine.yaml#fanout.guards.fallback_model` - the declared retry route, which R5 requires to
+       be a DIFFERENT family from the failing call; (b) `JUDGE_MODEL = S4_DEPTH_MODEL` in
+       `pipeline/disagreement_sample.py` and the fan-out's default reviewer model; (c) the cross-family verifier when
+       the AUTHOR is gpt-oss or qwen - it is the ONLY non-gpt-oss, non-qwen model with any `reviewing_verdict` history
+       at all (48 rows; Ornith and Phi-4 have none); (d) the fast tier (0.48 s, 7.12 GB resident - the smallest
+       resident reviewer on the host). It also authored 164 of the 178 R5 verdicts ever recorded, so deleting it
+       would delete the review history's author. Its register row now NAMES those lanes, so a later reader cannot
+       delete it for being "redundant with gpt-oss" without contradicting a written reason.
+    3. lmstudio-community/gemma-4-12B-it-MLX-4bit (6,773.4 MB): **DECLARED, NOT DELETED.** It was the ONLY repo above
+       the 256 MiB floor in ORPHAN, because the only home that ever named it was PROSE in the research register - a
+       MENTION declares nothing (D-3034/BUG-840). But the deletion question is not a housekeeping question here: it
+       is a model under an OPEN measurement, and it PASSED the r5_review gate at 0.7083 with false_approve 0.0000 -
+       the same accuracy as gemma-4-E4B with its false-approve defect REMOVED, and the best false-approve of any
+       non-gpt-oss candidate. Deleting it would close that test by destroying its subject. So the ORPHAN is closed
+       from the other side: a candidate row with `roles: []` and the promotion BLOCKED (not refused) on BUG-1048 and
+       BUG-1041, which are coverage defects in the INSTRUMENT.
+    4. Phi-4-mini-instruct-8bit (3.8 GB): **KEPT** - the highest measured prefill on this host (343.5 tok/s) and the
+       declared CONTROL model, i.e. the model a prompt experiment must be re-run on so a gain cannot be a property of
+       one model. Ornith-9B, MiniCPM5, Qwen3-Coder, MTP4, the 27B base, Ornith-REAP and clef-flash: unchanged, and
+       clef-flash is RETAINED by name in D-3184/D-2901, so the census's `code:` declaration of it is a real home.
+    5. `~/.omlx/drafts` IS NOT SCRATCH: 3.5 GB there is DECLARED by `config/specdec_m1.yaml` (source_dir,
+       staging_dir, mlx_out_dir) and is the OPEN SpecPrefill / speculative-decoding experiment of D-3183 section 6 -
+       deleting it would destroy a declared experiment's inputs. The ONE exception is `drafts/Qwen3.8-0.6B` (1.1 GB),
+       which that declaration does NOT name and whose draft was REFUSED for a tokenizer mismatch (vocab 151643
+       against the target's 248320): 1.1 GB of refused bytes named only by a sentence. It is a deletion CANDIDATE and
+       needs an owner word (D-3010) - not executed here.
+    6. `~/.omlx/ssd_cache` is 103 GB - the largest object on this machine - and it is the engine's own SSD offload
+       cache: a CACHE, not a store. Its purge is a LATENCY trade, never a byte "win", and it is not offered as a
+       deletion. Stated so the next disk-pressure conversation starts from what it is.
+    7. BELOW THE FLOOR: 51 further ORPHAN entries totalling ~303 MB, each at or under `deletion_floor_bytes`
+       (D-3018) - reported and NOT offered, because below the floor the decision costs more attention than the bytes.
+  measured: |
+    `pipeline/model_store_census.py` (miniforge interpreter, BUG-1000 shape) -> STORE CENSUS: hub total 68,285.2 MB,
+    model repos 66,799.4 MB over 67 repos; LIVE 6 / 36,823.8 MB, PARKED 0, DECLARED 9 / 22,899.0 MB, ORPHAN 52 /
+    7,076.7 MB; OWNER-OWED 1 repo / 6,773.4 MB (the 12B); rc 2. After the declaration the same instrument is expected
+    to report that repo DECLARED - the census is re-run as the verification of this decision, not as decoration.
+    `/v1/models/status`: `model_count 17, loaded_count 4`, with the six duplicated ids carrying the same
+    `model_path`/`estimated_size` as their farm twin (e.g. gemma-4-E4B 7.17 GB twice).
+    r5 verdicts by reviewer: gemma-4-E4B 164 (150 APPROVE / 2 REJECT / 3 UNPARSED / 9 INSUFFICIENT),
+    gpt-oss-20b 9, Qwen3.8-27B-MLX-4bit 5.
+    `du -sh` (no `-L`: the symlink farm double count BUG-1050/BUG-1051 forbids): clef-flash 5.8 GB, gemma-4-12B 6.3 GB,
+    gemma-4-E4B 6.4 GB, Ornith-9B 8.9 GB, gpt-oss 11 GB, Ornith-REAP 13 GB, Qwen3-Coder 16 GB; `~/.omlx/ssd_cache`
+    103 GB, `~/.omlx/drafts` 3.5 GB, `~/.omlx/models_stashed` 3.8 GB.
+  bugs:
+  - BUG-1068
+  - BUG-1069
+  files:
+  - config/hardware_profile.yaml
+  - scripts/hardware_calibrate.py
+  - config/engine.yaml
+  supersedes: []
+
+- id: D-3195
+  state: RESOLVED
+  category: MEMORY BUDGET / DYNAMIC CEILING / RESIDENCY (BUG-1060)
+  title: 'The memory ceiling is a READING, not a property: clock + second sample + observed range + measured resident, and the assignment plans on the LOWEST observed ceiling - because the same command printed "fits" and "does not fit" fifteen minutes apart'
+  decision: |
+    1. WHAT WAS WRONG, in one sentence: `final_ceiling` is computed against AVAILABLE memory, so it moves; the report
+       printed one sample as a property, and `fits` was computed against that sample, so the ROLE ASSIGNMENT itself
+       depended on when it was read. MEASURED in this sitting, by the same command, nineteen minutes apart:
+       at a 61.3 GiB reading -> `RESIDENCY 43.7 GiB of 46.0 usable` (fits), and at a 48.8 GiB reading ->
+       `RESIDENCY 43.7 GiB of 36.0 usable - the assigned WEIGHTS exceed the budget`. Nothing about the portfolio
+       changed. A plan that rewrites itself when another application holds RAM is a hidden failure wearing a
+       reading's clothes.
+    2. THE FACE NOW CARRIES ITS OWN EVIDENCE: `ceiling 48.8 GiB read at 2026-10-27T14:31:16, 48.9 GiB two seconds
+       later (the ceiling MOVES); observed range 48.8-53.8 GiB over the last 3 reading(s) in
+       governance/ceiling_readings.jsonl`. Every reading is appended (append + fsync, C6), so the quoted range is a
+       set of measurements and N is printed with it.
+    3. MEASURED RESIDENT IS PRINTED AS ITS OWN QUANTITY, over its own object:
+       `MEASURED 19.9 GiB resident at <ts> - 2/4 of the assigned portfolio's model(s) are loaded; the engine figure
+       includes KV, activations and any unassigned resident, while the 43.7 GiB sum counts WEIGHTS only`. The loaded
+       count against the portfolio size is what stops a SUBSET being printed as the SET - the defect a bare
+       difference of "23.8 GiB below" would have introduced.
+    4. THE ASSIGNMENT PLANS ON THE BOUND: the resolver is given the LOWEST ceiling the receipt has observed, and the
+       current reading is printed beside it (`planning on ... GiB`). A portfolio that only fits at the top of a
+       moving range is a portfolio that thrashes at the bottom, and the resolver must not be the thing that notices.
+    5. WHAT THIS DOES NOT CLAIM: the KV term is still owed (BUG-1055 limb 4) and the report says so in the same
+       breath (`KV NOT MODELLED: ... no role is covered by it; highest declared min_ctx 131072 tokens - analyze,
+       plan`). Replacing the flat reserve is D-3196's measurement, not this fix.
+  measured: |
+    `python3 scripts/hardware_calibrate.py --selftest` -> 9/9, including the two new pairs: a ceiling that moved
+    between two samples must SAY so and quote its measured range (and a stable one must NOT be dressed in a movement
+    caveat); a partially loaded portfolio must print `2/6`, never the whole set. Both controls SEEN RED on the
+    pre-fix code.
+    Readings inside ONE MINUTE while writing the entry: 48.8 / 48.9 / 53.8 / 56.7 GiB, receipt
+    governance/ceiling_readings.jsonl.
+    The two-sided fit/no-fit receipt is the same command's own output: 43.7 GiB of 46.0 usable at a 61.3 GiB reading
+    (this morning) and 43.7 GiB of 36.0 usable at a 48.8 GiB reading (this sitting), with the portfolio unchanged.
+  bugs:
+  - BUG-1060
+  - BUG-1055
+  files:
+  - scripts/hardware_calibrate.py
+  - config/hardware_profile.yaml
+  - governance/ceiling_readings.jsonl
+  supersedes: []
+- id: D-3196
+  state: RESOLVED
+  category: MEMORY BUDGET / KV RESERVE / MEASUREMENT (BUG-1055 limb 4, BUG-1067, BUG-1070, BUG-1071, D-3195)
+  title: 'The KV reserve is the engine''s own hot-cache BUDGET, walked from a declared pointer - not a per-token geometry: this engine PAGES KV, so the measured retained set is a CAP (0.29 GiB at 32,813 tokens), and the reserve is priced as the worst case in RAM'
+  decision: |
+    THE QUESTION (BUG-1055 limb 4): `config/hardware_profile.yaml#roles.plan` requires `min_ctx: 131072`, and the
+    memory report reserved a flat 3.0 GiB for KV while saying the reserve covered NO context. The reserve was a
+    round number with no reading behind it, printed beside a WEIGHTS-ONLY "fits" claim.
+
+    1. WHAT WAS MEASURED, and by what. `scripts/kv_working_set.py` (the instrument this limb owed) takes ONE point
+       at a time: unload the model, WAIT until the engine's own status agrees it is unloaded, read residency, send a
+       1-token prompt (the LOAD receipt) and read residency again, then send an N-token COLD prompt while a poller
+       samples the SERVER PROCESS RSS (psutil, argv[0] == `omlx-server`) and keeps the PEAK. Rows are appended to
+       governance/kv_working_set.jsonl (append + fsync, C6). FOUR rows exist; TWO are usable:
+         · 8,236 prompt tokens  -> 0.14 GiB retained  (18.43 KiB/token)
+         · 32,813 prompt tokens -> 0.29 GiB retained  (9.33 KiB/token)   [flags: none; loaded set unchanged]
+       Least squares over the clean points: 6.29 KiB/token, intercept +0.10 GiB. At the role's declared 131,072
+       tokens the fit gives ~0.88 GiB - and that number is an EXTRAPOLATION 4x beyond the largest clean
+       measurement, which is why it is printed with that label and never as a reading.
+
+    2. THE MODEL THAT WAS RETIRED BY THE DATA. A per-token arithmetic predicts ~2.0 GiB at 32k and ~8 GiB at 131k
+       for a model this size. The instrument measured 0.29 GiB at 32k. The reason is architectural and was then
+       READ, not assumed: the engine PAGES its KV - a RAM hot tier (`cache.hot_cache_max_size` = '8GB' in
+       ~/.omlx/settings.json) plus an SSD tier (`cache.ssd_cache_dir` = ~/.omlx/ssd_cache, 103 GB observed). A 4x
+       context increase bought 0.15 GiB of retained KV. That is a CAP, not a slope, and any reserve derived from a
+       slope would overstate the working set by roughly an order of magnitude at the context this host actually
+       serves. The per-token model is therefore WITHDRAWN, and the comment in hardware_profile.yaml that promised
+       this probe would "replace the reserve with the measured slope" is RECORDED AS WRONG in place rather than
+       silently rewritten (D-3038) - a stale promise in a comment is how a later reader rebuilds a refuted model.
+
+    3. THE DECISION. The reserve is the engine's OWN HOT-CACHE BUDGET, resolved through a POINTER, because that
+       budget is a value the engine's document owns and a second copy here would be a silent second source of
+       truth (C12):
+         memory.kv_headroom_source: engine.settings.cache.hot_cache_max_size
+         memory.kv_headroom_gb: 3.0      # FALLBACK ONLY, used only when the pointer cannot be walked
+         memory.kv_headroom_ctx: null    # null ON PURPOSE: the reserve is a BUDGET, not a per-token model
+       MEASURED resolution on this host: DERIVED, 8.0 GiB, raw token '8GB', read from /Users/barn/.omlx/settings.json.
+       WHY THE BUDGET AND NOT THE MEASUREMENT: the reserve is the RAM a weights plan must LEAVE FREE. Pricing it at
+       the 0.29 GiB the engine happened to retain would under-reserve the worst case by ~7.7 GiB and invite exactly
+       the adaptive eviction that failed the agent_loop budget (BUG-803); pricing it at the 8 GiB the engine MAY hold
+       is the honest upper bound, and the measurement is printed beside it so the bound is falsifiable in one line:
+         KV  the reserve is 8.0 GiB - the engine's own hot-cache BUDGET (DERIVED from
+             engine.settings.cache.hot_cache_max_size, declared '8GB'), NOT a per-token model: this engine PAGES KV
+             (SSD tier), so the retained set is a CAP. MEASURED 0.29 GiB retained at 32813 tokens over 3 clean
+             point(s) in governance/kv_working_set.jsonl; highest assigned min_ctx 131072 tokens - analyze, plan
+
+    4. A POINTER IS ONLY WORTH WHAT IT RESOLVES TO (D-3034). The first draft of this pointer was
+       `engine.settings.hot_cache_max_size`, and `hot_cache_max_size` is NOT a top-level key of the engine's document
+       - it lives under `cache` (MEASURED: `'hot_cache_max_size' in json.load(settings)` is False). That pointer
+       would have declared a derivation while producing a FALLBACK behind a comment asserting the opposite
+       (BUG-1071). The resolver now WALKS every segment and a failure names the segment that stopped it:
+         pointer 'engine.settings.hot_cache_max_size'
+           -> FALLBACK 3.0 GiB, why: "pointer does not name <file>.<block>.<key...>"
+         pointer 'engine.settings.cache.NO_SUCH_KEY'
+           -> FALLBACK 3.0 GiB, why: "the pointer stops resolving at 'engine.settings.cache': key 'NO_SUCH_KEY' is
+              absent from /Users/barn/.omlx/settings.json"
+       Three-sided controls, all SEEN: a walkable pointer RESOLVES its declared value; a broken one falls back AND
+       names the segment; a config with neither pointer nor context basis still prints NOT MODELLED, so the honest
+       branch survives the new one (selftest 13/13).
+
+    5. TWO FALSE RECEIPTS WERE REFUSED, NOT RESCUED. Row 1 of the receipt read 10.56 GiB at 32,811 tokens with a
+       clean flag - but the engine counter moved 19.92 -> 31.73 GiB and the loaded SET changed inside the window:
+       that was a NEIGHBOUR MODEL's load (gpt-oss) attributed to this model's cache (BUG-1070). Row 2 read 0 GiB,
+       which is the engine RELEASING a finished request's KV before the next status read, not an absent cache
+       (BUG-1067). Both are kept in the receipt, flagged, and EXCLUDED from any fit; the buglog states that the
+       reserve stays a declared budget until a clean run exists, rather than publishing a curve the instrument
+       itself marked as unusable.
+
+    6. WHAT CHANGED ON THE FACE, and what did not. At the same 48.8 GiB planning ceiling, `usable` moved 36.0 ->
+       31.0 GiB because the reserve is now 8.0 instead of 3.0. NO ROLE ASSIGNMENT MOVED and no `fits` column flipped:
+       the assigned portfolio (43.7 GiB of weights) already exceeded the planning bound at 36.0, and the report said
+       so in both readings - which is the point of D-3195's low-end planning. The JSON and the human report share ONE
+       resolved reserve (`memory.kv_reserve` in the machine report), so they cannot disagree (BUG-1062's shape).
+
+    7. WHAT THIS DOES NOT CLAIM. (a) Whether paging to SSD at 131,072 tokens costs prefill/decode latency that
+       matters - UNMEASURED, and the honest next instrument is a timed long-context call, not a bigger reserve.
+       (b) That 0.88 GiB at 131,072 is real: it is an extrapolation and is labelled one. (c) That the 8 GiB budget
+       is optimal for this host - it is what the engine DECLARES, and changing it is an engine setting, not a
+       decision this record can make alone.
+
+    8. CONSEQUENCE FOR A FROZEN FIXTURE, recorded so no future reader "fixes" it. `tools/plan_quality_fixture.py`
+       quotes `kv_headroom_gb = 3.0 with kv_headroom_ctx = null` as MATERIAL, and config/plan_quality_gate.yaml
+       #frozen_materials declares that such quotation must NOT be edited: a fixture material is a snapshot of the
+       world a model was asked to reason about, and editing one invalidates 72 receipt rows and requires a VERSION
+       bump plus a full re-measure. The 3.0 in that fixture is therefore HISTORY, not a live value, and the live
+       value is whatever the pointer resolves to.
+
+    9. PARTIAL SUPERSESSION, stated precisely because a blunt `supersedes` would retire a live decision. D-3195 is
+       NOT superseded: its ruling (the ceiling is a reading, plan on the lowest observed one) stands and is what this
+       record relies on. What is superseded is ONE SENTENCE it quoted from the face at the time -
+       "KV NOT MODELLED: ... no role is covered by it" - and only for the KV TERM. D-3195 itself anticipated the
+       replacement in its limb 5. A reader comparing the two records must therefore read D-3195's quotation as the
+       state on 2026-10-27 before this measurement, never as a claim about the current face.
+  measured: |
+    `python3 scripts/kv_working_set.py --sizes 8192 32768` (run g) ->
+      point 8192:  prompt_tokens= 8236 kv=155402240 (0.14 GiB) wall= 337.4s flags=[]
+      point 32768: prompt_tokens=32813 kv=313606144 (0.29 GiB) wall= 967.3s flags=[]
+      FIT 6.29 KiB/token over 2 clean point(s); intercept +0.10 GiB
+        at  32768 tok KV ~ 0.29 GiB MEASURED
+        at 131072 tok KV ~ 0.88 GiB EXTRAPOLATED beyond 32813
+    `python3 -c "import yaml; print(yaml.safe_load(open('config/hardware_profile.yaml'))['memory'])"` ->
+      kv_headroom_gb 3.0 (fallback), kv_headroom_source 'engine.settings.cache.hot_cache_max_size', kv_headroom_ctx None
+    kv_reserve(cfg) -> {'gb': 8.0, 'kind': 'DERIVED', 'source': 'engine.settings.cache.hot_cache_max_size',
+      'why': 'read from /Users/barn/.omlx/settings.json', 'raw': '8GB'}
+    engine document, read not assumed: cache.hot_cache_max_size '8GB', cache.ssd_cache_dir ~/.omlx/ssd_cache,
+      cache.ssd_cache_max_size 'auto' (the same document also shows ssd_cache at 103 GB on disk)
+    pointer resolution, three-sided: the correct pointer DERIVES 8.0 GiB; 'engine.settings.hot_cache_max_size'
+      FALLS BACK naming the shape; 'engine.settings.cache.NO_SUCH_KEY' FALLS BACK naming the missing key
+    `python3 scripts/hardware_calibrate.py --selftest` -> 13/13 controls green (was 9/9)
+    `python3 scripts/hardware_calibrate.py` -> RESIDENCY 43.7 GiB of 31.0 usable (was 36.0 at the same ceiling);
+      MEASURED 19.9 GiB resident, 2/4 of the assigned portfolio's model(s) loaded; the KV line above, unedited
+  bugs:
+  - BUG-1055
+  - BUG-1067
+  - BUG-1070
+  - BUG-1071
+  files:
+  - config/hardware_profile.yaml
+  - scripts/hardware_calibrate.py
+  - scripts/kv_working_set.py
+  - config/engine.yaml
+  - governance/kv_working_set.jsonl
+  supersedes: []

@@ -76,3 +76,17 @@ not_done:
       a second model in the grading path is exactly the drift the fixture exists to exclude.
 
 exit: {pass: 0, refused: 1, unusable: 2}
+
+# ── THE FIXTURE'S MATERIALS ARE FROZEN EXCERPTS, AND THAT IS A DECLARATION, NOT AN OVERSIGHT ─────────────────
+# Several items quote LIVE config as their MATERIAL (e.g. "memory.kv_headroom_gb = 3.0 with memory.kv_headroom_ctx
+# = null"). On 2026-10-27 that config was superseded by a measurement (D-3196), so the quotation is now a
+# HISTORICAL fact. It must stay: the fixture grades whether a model reasons correctly over the MATERIAL SUPPLIED,
+# and the receipt rows key on `fixture_sha256_16`. Editing an item to track config would (a) invalidate 72 receipt
+# rows, (b) require a VERSION bump and a full re-measure of every model, and (c) replace a controlled instrument with
+# a moving one. A future reader who notices the stale number has found the declaration working, not a defect.
+frozen_materials:
+  applies: true
+  since: '2026-10-27'
+  because: >-
+    a material is a SNAPSHOT of the world a model is asked to reason about; the gate measures the REASONING, not the
+    currency of the world. Changing an item is a NEW FIXTURE VERSION with its own re-measure, never a silent edit.

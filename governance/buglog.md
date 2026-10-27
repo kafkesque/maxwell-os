@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1319 decisions (census stamp 510c12436eadd9f0, 2026-10-27) · 830 bugs (262 open / 568 closed; highest OPEN = BUG-1064) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1322 decisions (census stamp a61dafc68fb57454, 2026-10-27) · 835 bugs (262 open / 573 closed; highest OPEN = BUG-1069) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1319 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 383 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1319, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1322 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 386 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1322, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 262 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 262 open.
 >
@@ -23386,6 +23386,19 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    "all fit at once" is true of weights and untested of working set.
 5. OWED: a `plan`/`reasoning` accuracy fixture with a gate (the review gate's shape), and a KV term in the residency
    check at each role's declared `min_ctx`. Until then the plan/analyze assignment is speed-only and must be read as such.
+6. LIMB 4 ANSWERED 2026-10-27 (D-3196), and the answer RETIRED the model this limb assumed. A KV term now exists and
+   it is measured, not arithmetic: `scripts/kv_working_set.py` measured 0.14 GiB retained at 8,236 prompt tokens and
+   0.29 GiB at 32,813 (governance/kv_working_set.jsonl), a 4x context increase buying 0.15 GiB - because this engine
+   PAGES KV (RAM hot tier `cache.hot_cache_max_size` '8GB' plus an SSD tier, ~/.omlx/ssd_cache 103 GB observed). So
+   the working set is a CAP, and the reserve is the engine's own hot-cache BUDGET via a WALKED pointer
+   (`memory.kv_headroom_source`), 8.0 GiB DERIVED on this host, 3.0 GiB only as a named fallback.
+7. THE FACE NOW SAYS BOTH QUANTITIES: the reserve (worst case the engine may hold in RAM) AND the measurement (what it
+   actually retained), with the roles at the highest declared min_ctx named - `analyze, plan` at 131,072 tokens.
+   RESIDENCY moves from "43.7 GiB of 36.0 usable" to "43.7 GiB of 31.0 usable": the portfolio already exceeded the
+   planning bound, so no assignment and no `fits` cell changed (D-3195's low-end planning is what kept that stable).
+8. STILL OWED ON THIS BUG: limbs 1-3, i.e. a `plan`/`reasoning` ACCURACY fixture with a gate, which is what would
+   stop a REAP-pruned 19B holding `plan` on speed alone. The KV limb is closed; the quality limb is not, so this bug
+   stays OPEN.
 
 ## BUG-1056 (MED, OPEN 2026-10-27) - the handover was UNRUNNABLE AS WRITTEN: interactive zsh does not treat `#` as a comment, so the verification line never ran and its `expect 0` words became filenames
 1. The D-3184 §5 block ran as: `du -sh <repo>     # expect 14G` -> `du -sh <repo> '#' expect 14G`, printing
@@ -23447,7 +23460,7 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
 5. REMAINS OPEN because the DECISION is open: the 27B pair (30.2 GB) either stays as a SET or goes as a SET. Deleting the base alone
    is now mechanically impossible to do by accident, which is the point of the rail.
 
-## BUG-1060 (MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property
+## BUG-1060 (MED, FIXED 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property
 1. `final_ceiling` read **58,841,720,848 -> 61,820,040,640 -> 58,304,261,480 -> 56,106,449,680** within one hour on the same host,
    because it is computed against AVAILABLE memory as models load. `config/model_roles.yaml` records the derived line
    `RESIDENCY 40.0 GiB of 41.5 usable - all assigned models fit at once`, i.e. 96% utilisation quoted as a standing fact.
@@ -23550,3 +23563,133 @@ FIX SHIPPED AND VERIFIED IN BOTH DIRECTIONS (`--selftest` 7/7, each control SEEN
 - limb 1: receipts are keyed `(gate, model)`. A row carries its own `gate:`; a row written before that field existed resolves through the receipt's DECLARED `row_gate_default`. Control: a `plan_quality` row declared under an `r5_review` receipt returns `{}` - RED on the old code with "a plan_quality row satisfied the r5_review gate".
 - limb 2: the PREDICTED pool now applies the same eligibility + gate filters as the MEASURED pool. Control: with every candidate declaring no role, no prediction fills any role - RED on the old code with "a model that declares NO role must never be seated by a roofline prediction".
 The standing rule this leaves behind: **a prediction prunes; it never confers eligibility, and it never satisfies a gate.**
+
+FIX SHIPPED 2026-10-27, in four limbs, each one visible on the report's own face:
+1. THE CLOCK AND A SECOND SAMPLE. `ceiling_reading()` reads the pool document TWICE in the same call (gap declared in
+   `memory.ceiling_readings.second_sample_gap_s`) and prints `{gb} GiB read at {ts}, {gb_second} GiB two seconds
+   later (the ceiling MOVES)`. MEASURED while writing this entry: 48.8 / 48.9 / 53.8 / 56.7 GiB within ONE MINUTE.
+2. THE OBSERVED RANGE. Every reading is appended to `governance/ceiling_readings.jsonl` (append + fsync) and the
+   reported range is min/max over the last N rows, with N and the receipt path printed beside it. A range is now a
+   set of measurements; before, it was a memory of four numbers quoted in this bug.
+3. MEASURED RESIDENT BESIDE THE WEIGHTS-ONLY SUM, as two quantities over possibly different objects:
+   `MEASURED 19.9 GiB resident at <ts> - 2/4 of the assigned portfolio's model(s) are loaded; the engine figure
+   includes KV, activations and any unassigned resident, while the 43.7 GiB sum counts WEIGHTS only`. The loaded
+   count against the portfolio size is what stops a subset being printed as the set.
+4. THE PLANNING BOUND (a defect found WHILE fixing this one, and the worst of them): `fits` was computed against
+   the INSTANTANEOUS ceiling, so the SAME command printed `RESIDENCY 43.7 GiB of 46.0 usable` at a 61.3 GiB reading
+   and `43.7 GiB of 36.0 usable - the assigned WEIGHTS exceed the budget` at a 48.8 GiB reading FIFTEEN MINUTES
+   LATER, with nothing about the portfolio changed. A role assignment that rewrites itself because another
+   application is holding RAM is a hidden failure, not a reading. The resolver is now given the LOWEST ceiling the
+   receipt has observed (printed as `planning on ...`) and the current reading is printed beside it.
+CONTROLS: `--selftest` 9/9, two new pairs, each SEEN RED on the pre-fix code - a ceiling that moved between two
+samples must SAY so and quote its measured range (and a stable one must NOT be dressed in a movement caveat), and a
+partially loaded portfolio must print `2/6`, never the whole set. TEETH LEFT IN: the KV term is still the probe of
+BUG-1055 limb 4, not of this fix, and the report still names the roles no reserve covers.
+
+## BUG-1067 (MED, FIXED 2026-10-27) - the KV probe measured NOTHING twice before it measured anything: it raced an asynchronous unload, and then read residency after the engine had already released the cache
+
+FOUND by the first three runs of `scripts/kv_working_set.py` (the instrument BUG-1055 limb 4 owes). Every limb below
+is a reading, not a theory, and the instrument's own FLAGS caught each one before a false receipt could be written.
+1. THE UNLOAD IS ASYNCHRONOUS. `POST /v1/models/<id>/unload` RETURNS before the model leaves memory (the pool drains
+   in-flight work first). Reading residency straight after it measured a model that was still resident: the first
+   run printed `point 8192: prompt_tokens=0 kv=-32824478984 flags=['EVICTED']` - a NEGATIVE working set - and then
+   died with `FATAL: the engine refused or did not answer (HTTP Error 409: Conflict)`.
+2. A REFUSED REQUEST IS NOT A FAILED MEASUREMENT. The same 8,192-token prompt that returned `HTTP 400 Bad Request`
+   inside the probe returned a clean `prompt_tokens=8217, prefill 47.98 tok/s` when sent alone seconds later. A retry
+   is now allowed for a refusal that produced NO reading (`HTTP Error`/`did not answer`) and still REFUSED for an
+   ANSWER - re-asking a model that already replied is the BUG-1048 shape.
+3. THE ONE THAT MATTERED: THE ENGINE RELEASES A FINISHED REQUEST'S KV. Second clean run printed
+   `point 8192: prompt_tokens=8238 kv=0 flags=['NOT_RETAINED']`: `current_model_memory` read the SAME before and
+   after a completed 8,238-token request, because the KV cache of a finished request is released before the next
+   status read. A post-hoc delta would have reported **"KV is free at 8k tokens"** - a confident, false receipt on
+   the exact question the bug exists to settle. FIX: a poller thread samples residency every `kv_probe.poll_s` (2 s)
+   WHILE the prompt prefills and keeps the PEAK; the working set is now read during the request, which is the only
+   time it exists.
+4. THE LAUNCH FORM DECIDED THE IMPORT ROOT. `sys.path.insert(0, ROOT / "pipeline")` followed by
+   `from pipeline.pipeline_paths import OMLX_API_KEY` worked only when the module was imported from the repo root and
+   died under the form actually used - `nohup ... scripts/kv_working_set.py` - with
+   `ModuleNotFoundError: No module named 'pipeline'`. ROOT goes on sys.path, not ROOT/pipeline (the BUG-842 shape:
+   declare the form you RUN).
+RED LOOP, which is why this entry is credible: two FLAGS fired RED on the pre-fix code (EVICTED with a -32.8 GB
+delta; NOT_RETAINED with 0 GiB at 8,238 prompt tokens) BEFORE any clean point existed, and the run ABORTED rather
+than writing them into the receipt. The flags are kept as controls in `--selftest`.
+
+## BUG-1068 (LOW, FIXED 2026-10-27) - a candidate the ENGINE discovered from the hub cache could not be SIZED, so a model the register declared was a model no role could ever be seated from
+
+FOUND while declaring the 12B reviewer candidate (D-3194). `model_bytes()` looks only under
+`detect.paths.models_root` (`~/.omlx/models`), and a hub-cache-discovered model has NO entry there - the engine serves
+`lmstudio-community--gemma-4-12B-it-MLX-4bit` straight from `~/.cache/huggingface/hub`. So the new row rendered
+`gb: None`, and `fits` is computed as `nbytes and nbytes/2**30 <= usable_gb` - i.e. False by construction. A
+declared candidate with an unknown footprint cannot be ranked, cannot be reported and can never take a role, and
+nothing on the face said why.
+FIX: `engine_model_paths()` asks the ENGINE where an id's bytes live (`/v1/models/status`, `model_path`), consulted
+ONLY when the candidate's farm entry is absent so the common path pays no request; an unreachable engine returns {}
+rather than inventing a path. Each candidate row now carries `bytes_source` (`serving dir` | `engine model_path`).
+MEASURED after the fix: the same row reads `6.3 GB ... bytes_source=engine model_path`, and its gate column reads
+`r5_review=pass` from the row that was already in the receipt.
+
+## BUG-1069 (MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and 1.1 GB of REFUSED draft bytes sat there unseen
+
+FOUND by asking the owner's deletion question rather than by any rail. `config/engine.yaml#model_store.census_domain`
+declares the domain as the model repos the HUB holds, and the reader walks `~/.cache/huggingface/hub` (plus the
+engine store). MEASURED 2026-10-27 by `du -sh`: `~/.omlx/drafts` 3.5 GB, `~/.omlx/ssd_cache` 103 GB,
+`~/.omlx/models_stashed` 3.8 GB - three stores the engine itself writes, NONE of them inside the partition.
+1. The drafts store is MOSTLY declared: `config/specdec_m1.yaml` names `source_dir`, `staging_dir` and
+   `mlx_out_dir` inside it, so those bytes have a live resolver and are correctly untouchable.
+2. The EXCEPTION is the defect: `~/.omlx/drafts/Qwen3.8-0.6B` (1.1 GB) is named by NO declaration - only by a
+   SENTENCE in a decision that REFUSED it for a tokenizer mismatch (vocab 151643 against the target's 248320). Under
+   D-3034 a sentence declares nothing, so those bytes are ORPHAN-class, they are ABOVE the 256 MiB floor, and NO
+   instrument in this repo can report them: the census cannot see the store, and the hash-farm scan does not look
+   there either.
+3. `ssd_cache` is a CACHE, not a model store: purging it trades load latency for disk, and the honest declaration is
+   that it is never an ORPHAN candidate - which is exactly the kind of class the census's `non_member_repo_prefixes`
+   and `store_metadata` lists already exist to declare. It simply has no entry for a store that lives OUTSIDE the hub.
+OWED: the domain grows a declared `additional_stores` list (path, class, whether a deletion may ever be proposed
+from it), the reader reports them without offering them, and `drafts/Qwen3.8-0.6B` becomes an offered candidate
+under an owner word (D-3010). Until then the 1.1 GB is recorded here and in D-3194 section 5, and NOTHING is deleted:
+an unobserved byte is not the same as a safe byte, and it is certainly not a licence.
+
+## BUG-1070 (MED, FIXED 2026-10-27) - the KV probe attributed a NEIGHBOUR MODEL'S LOAD to this model's cache: 10.56 GiB of "KV" at 32,768 tokens was gpt-oss arriving inside the window
+
+FOUND by reading the receipt rows the probe wrote for its first full run (governance/kv_working_set.jsonl), and it is
+the most dangerous class this instrument can produce: a WRONG NUMBER THAT LOOKS CLEAN.
+1. THE POINT LOOKED PERFECT: `prompt_tokens 32811, weights 15.21 GiB, kv 10.56 GiB, 337.57 KiB per token, flags []`,
+   against an architectural prediction of ~64 KiB/token. A 5.3x overshoot that raised no flag would have become the
+   number the KV reserve was set from.
+2. THE RECEIPT ITSELF CARRIED THE CONTRADICTION: `engine_counter_loaded 19.92 GiB -> engine_counter_after 31.73 GiB`
+   (+11.8 GiB, the footprint of gpt-oss-20b) and `loaded_at_read` names THREE models where `loaded_at_load` named two.
+   The engine loaded gpt-oss inside the window. The WHY is not asserted (no request named it); the FACT is that the
+   pool changed, and a process-RSS delta over a changing pool measures the ENGINE, not the cache under test.
+3. SECOND FACE OF THE SAME DEFECT: the 65,580-token point came back `NOT_RETAINED` with `peak_resident_bytes
+   14.62 GiB == rss_loaded_bytes 14.62 GiB` and `rss_after_bytes 15.38 GiB` - RSS is not monotone inside a window in
+   which the engine evicts a neighbour to make room, so "the peak never exceeded the load" can mean EVICTION, not
+   absence. The flag fired; the number is unusable.
+FIX: the probe records `loaded_at_load`, `loaded_at_read` and the engine counter's delta per point, and raises
+`CONCURRENT_LOAD` when the loaded SET differs across the window. A flagged point is EXCLUDED from the slope by the
+same rule that excludes an evicted one, so no fit can quietly absorb it. CONTROL ADDED to `--selftest` and SEEN to
+fire. WHAT IT MEANS FOR THE RESERVE: 3.0 GiB stays a declared placeholder for one more measurement - the honest
+sequence is a clean two-point run, not a rescuing of this one.
+
+
+## BUG-1071 (LOW, FIXED 2026-10-27) - the KV pointer I wrote the same afternoon was a MENTION, not a resolution: `hot_cache_max_size` is not a top-level key, so the "derived" reserve would have been a silent fallback
+FOUND while wiring the pointer into the resolver, ten minutes after declaring it (D-3034 applied to my own patch).
+1. THE DECLARED POINTER was `engine.settings.hot_cache_max_size`, with a comment asserting the reserve was "read from
+   config/engine.yaml#engine.settings". READ: `'hot_cache_max_size' in json.load(open('~/.omlx/settings.json'))` is
+   **False** - the key lives under `cache` (`cache.hot_cache_max_size` = '8GB'). The pointer named a path that does
+   not exist in the document it pointed at.
+2. WHY IT IS THE SAME CLASS AS BUG-840/BUG-1063: a DECLARATION must RESOLVE. A pointer that walks into a missing key
+   is a declaration whose referent is absent, and because the resolver falls back to a number with a *plausible*
+   reason ("cannot be read"), the face would have printed 3.0 GiB while the config comment claimed derivation. The
+   number would have looked sourced.
+3. FIX: the pointer is `engine.settings.cache.hot_cache_max_size` and the resolver WALKS every segment (`_engine_doc`
+   resolves `engine` -> config/engine.yaml, `settings` -> the declared settings path, then keys inside the JSON), so a
+   missing segment produces `kind: FALLBACK` with the segment NAMED:
+   "the pointer stops resolving at 'engine.settings.cache': key 'NO_SUCH_KEY' is absent from <path>". The RAW token the
+   engine declared ('8GB') travels beside the converted GiB figure, so the reader sees the engine's words, not only
+   this repo's unit choice. `parse_size_gb` refuses `auto`/`null` (real engine values) instead of reading them as 0.0.
+4. CONTROLS, three-sided and SEEN: a walkable pointer DERIVES 8.0 GiB from this host's document; a broken pointer falls
+   back AND names the failed segment; a config with neither pointer nor basis still prints NOT MODELLED, so the honest
+   branch survives. `--selftest` 9/9 -> 13/13.
+5. WHAT THE BUG COST: nothing, because the pointer was never exercised before it was fixed - but only because the
+   resolver was written with a walk rather than a `dict.get(pointer)` one-liner. The lesson recorded (D-3034, D-3109):
+   resolve a pointer by WALKING it and prove the walk with a control that fails, never by trusting the comment above it.

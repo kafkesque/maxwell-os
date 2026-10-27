@@ -76,13 +76,65 @@ predict:
 memory:
   # the engine publishes its own ceiling (`final_ceiling` in /health); this fraction is what a model may claim
   max_resident_fraction: 0.80
-  # KV cache + prefill activations are not in the weights; a candidate must leave this much of the budget free
-  kv_headroom_gb: 3.0
-  # The DECLARED BASIS of that flat reserve. null = NOT DECLARED: the reserve is then derived from no context at all,
-  # so it covers no role's working set, and the report must say so instead of printing "fits at once" unqualified
-  # (BUG-1055 limb 4). Set this to the context the reserve was actually sized at; roles declaring a larger min_ctx
-  # are then named individually as uncovered.
+  # ── THE KV RESERVE (BUG-1055 limb 4, answered 2026-10-27) ─────────────────────────────────────────────────
+  # MEASURED, and it retires the model this field used to assume: this engine PAGES its KV cache - a RAM "hot tier"
+  # plus an SSD tier (`~/.omlx/ssd_cache`, 103 GB observed) - so the working set is bounded by the ENGINE'S OWN HOT
+  # CACHE BUDGET, not by model geometry. Four independent readings of the same model (governance/kv_working_set.jsonl)
+  # put the RETAINED KV at 0.68 GiB at 8,236 prompt tokens and 0.83 GiB at 32,813 - a 4x context increase buying
+  # 0.15 GiB - which is a CAP, not a slope. A per-token model would have predicted 2.0 GiB at 32k and 8 GiB at 131k;
+  # the architecture says otherwise, so the reserve is DERIVED FROM THE ENGINE'S DECLARED SETTING through the
+  # pointer below, never from a per-token arithmetic that this engine does not obey.
+  # The pointer is WALKED, segment by segment, and every segment must RESOLVE (D-3034): `engine` is the file
+  # alias (config/engine.yaml), `settings` is that block's path to the engine's own settings document, and the
+  # remaining segments are keys INSIDE that document. The nesting is declared because it is real: `hot_cache_max_size`
+  # is NOT a top-level key — it lives under `cache`, and a pointer naming a key that does not exist is a declaration
+  # with no referent. MEASURED 2026-10-27: a first draft of this pointer omitted `cache`, which would have fallen
+  # back to the 3.0 GiB fallback while a comment claimed derivation (BUG-1071).
+  kv_headroom_source: engine.settings.cache.hot_cache_max_size   # POINTER: walked, never pattern-matched
+  kv_headroom_gb: 3.0        # FALLBACK ONLY: used when that setting cannot be read, and the report says which one ran
+  # null ON PURPOSE: the reserve is not sized against a context, so there is no context it covers. The report names
+  # the roles that declare a context and says the reserve is a BUDGET, not a per-token model (D-3196).
   kv_headroom_ctx: null
+
+  # ── THE PROBE THAT REPLACES THAT RESERVE WITH A READING (BUG-1055 limb 4) ────────────────────────────────
+  # `scripts/kv_working_set.py` takes ONE point at a time: it unloads the model, reads resident, sends a 1-token
+  # prompt (the LOAD receipt), reads resident again, then sends an N-token COLD prompt and reads resident at once.
+  # KV(N) = resident(after N) − resident(after load). Each point is INDEPENDENT because the engine's prefix cache
+  # would otherwise add one point's KV to the next and invent a slope. Sizes ascend; 65536 is the largest point
+  # that is still affordable on this host (MEASURED prefill 52.3 tok/s on this model = ~21 min for that one call),
+  # so the reading at the declared 131072 is an EXTRAPOLATION and says so.
+  # ⚠ THE RUN LANDED AND IT RETIRED THE PLAN THAT WAS WRITTEN HERE: the note used to promise that this probe would
+  # replace the reserve with a measured SLOPE. It measured a CAP instead (0.14 GiB at 8,236 tokens, 0.29 GiB at
+  # 32,813 - a 4x context increase buying 0.15 GiB), so the reserve is derived from the engine's own hot-cache
+  # BUDGET, and `kv_headroom_ctx` stays null because there is no context the reserve is sized against. The promise
+  # is not deleted, it is RECORDED AS WRONG (D-3038): a stale promise in a comment is how a later reader rebuilds
+  # a model the measurement already refuted.
+  kv_probe:
+    model: Qwen3.8-27B-MTP4            # the `plan` role's model: the role whose 131072 is currently unmetered
+    sizes: [32768, 65536]
+    timeout_s: 3600                    # per call: the largest point is ~21 min of prefill at the measured rate
+    poll_s: 2                          # residency is sampled this often WHILE a prompt prefills: the KV of a
+                                       # FINISHED request is released before the next status read, so a post-hoc
+                                       # delta measured 0 GiB at 8k tokens (MEASURED 2026-10-27)
+    settle_timeout_s: 240              # how long the engine is given to AGREE a load/unload finished (MEASURED:
+                                       # the unload route is asynchronous, so a point taken without this race
+                                       # produced a NEGATIVE delta and then HTTP 409 - BUG-1067)
+    max_wall_s: 5400                   # the whole run; a point past this is NOT taken and the receipt says so
+    receipt: governance/kv_working_set.jsonl
+    extrapolate_to: [32768, 131072]
+
+  # ── THE CEILING IS A READING, NOT A PROPERTY (BUG-1060) ─────────────────────────────────────────────────
+  # `final_ceiling` is computed against AVAILABLE memory, so it MOVES as models load: MEASURED on this host
+  # 2026-10-27 between 49.2 and 61.3 GiB within one hour (52,836,686,428 -> 65,794,438,328 B), and the earlier
+  # readings 56.1/57.5/58.8/60.1 GiB are the same figure on other minutes. A point reading printed as a property
+  # made "43.7 GiB curated into 40.4 usable" look like a standing fact when neither number was stable. So every
+  # print carries the clock, a SECOND sample taken inside the same call, and the range observed over the last N
+  # readings kept in the receipt below.
+  ceiling_readings:
+    receipt: governance/ceiling_readings.jsonl
+    second_sample_gap_s: 2       # a second read in the same call: one run can show the figure moving
+    report_window_n: 24          # the quoted range covers the last N readings, and N is printed with it
+
   # below this the machine cannot host a competent 4-bit reviewer at all — a named floor, not a surprise
   min_viable_model_gb: 4.0
   # used ONLY when the engine cannot be reached: physical RAM minus this reserve is the fallback budget
@@ -262,7 +314,17 @@ candidates:
   family: gemma
   kind: dense
   moe_active_fraction: 1.0
-  why: REFUSED by the R5 gate (false_approve 0.125); kept in the register so it cannot be re-proposed from memory
+  why: >-
+    REFUSED by the r5_review gate (accuracy 0.7083, false_approve 0.125 against a 0.10 ceiling) and KEPT for four
+    named lanes it still holds, none of which is reviewer-of-record: (1) the declared RETRY model
+    (config/engine.yaml#fanout.guards.fallback_model), so a failed call has a different-family second route;
+    (2) the S4 depth judge (pipeline/disagreement_sample.py, JUDGE_MODEL = S4_DEPTH_MODEL) and the fan-out's
+    default reviewer model; (3) the cross-family verifier when the AUTHOR is gpt-oss/qwen - it is the only
+    non-gpt-oss, non-qwen model with any reviewing_verdict history at all (48 rows; Ornith and Phi-4 have none);
+    (4) the fast tier (MEASURED 0.48 s, 7.12 GB resident, the smallest resident reviewer on the host). It holds
+    164 of the 178 R5 verdicts ever recorded, so deleting it would delete the review history's author, not a
+    redundant copy. What is REFUSED is narrower and is the reason the register keeps it visible: it may not be
+    the VERDICT OF RECORD for a review, because it approves one item in eight that should be refused.
   roles:
   - review
   min_ctx:
@@ -276,9 +338,43 @@ candidates:
   family: phi
   kind: dense
   moe_active_fraction: 1.0
-  why: 0 tool calls in 3 turns (BUG-053 shape, MEASURED); summary-with-source only
+  why: >-
+    0 tool calls in 3 turns (BUG-053 shape, MEASURED), so never a loop driver; it is KEPT for the two lanes it
+    wins outright: the highest MEASURED prefill on this host (343.5 tok/s at 2,608 prompt tokens) and the
+    declared CONTROL model (config/agent_context.yaml), i.e. the model a prompt experiment must be re-run on so a
+    gain cannot be a property of one model. 3.8 GB is the cheapest lane in the portfolio.
   roles:
   - classify
+  min_ctx:
+    brain: 32768
+    review: 32768
+    code: 32768
+    plan: 131072
+    analyze: 131072
+    classify: 8192
+- model: lmstudio-community--gemma-4-12B-it-MLX-4bit
+  # THE ID WE CALL and THE REPO WE OWN BYTES FROM are two different facts, and a register that carries only the
+  # first cannot declare the second (D-3034: a declaration must RESOLVE). `model` is the engine's id - the string a
+  # request must carry - while `source_repo_id` is the hub repo whose bytes they are, which is the form
+  # `pipeline/model_store_census.py` resolves by value. Without this field the census classified 6,773.4 MB as
+  # ORPHAN while the register declared the model, and both statements were true of their own question (BUG-1069).
+  source_repo_id: lmstudio-community/gemma-4-12B-it-MLX-4bit
+  family: gemma
+  kind: dense
+  moe_active_fraction: 1.0
+  why: >-
+    THE OPEN REVIEWER-QUANT TEST, and the reason this row exists is the census: 6,773.4 MB of its bytes sat in
+    ORPHAN because the only home that ever named it was PROSE in the research register, and a sentence that
+    MENTIONS a model declares nothing (D-3034/BUG-840). MEASURED 2026-10-27 it PASSED the r5_review gate at
+    accuracy 0.7083 with false_approve 0.0000 over 24 items (governance/r5_review_gate_bench.jsonl), i.e. the
+    SAME accuracy as gemma-4-E4B with its false-approve defect removed (0.125 -> 0.0), while gpt-oss stays the
+    model of record at 0.9167/0.0. The id is the one THE ENGINE SERVES (hub-cache form): creating a second short
+    name for one set of bytes is the duplication this register refuses, so the engine's own id is the canonical
+    one here. roles: [] because promotion is BLOCKED, not refused - BUG-1048 (R5 coverage silently depends on
+    file length) and BUG-1041 (a tag-blind done-key lets a re-measurement pool silently) are coverage defects
+    in the INSTRUMENT, and seating a model on evidence an instrument cannot re-take is the slop this file
+    exists to prevent.
+  roles: []
   min_ctx:
     brain: 32768
     review: 32768

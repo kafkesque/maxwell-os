@@ -28,7 +28,7 @@
 # `--route T-156`; (2) "is the graph well-formed and is its debt shrinking?" — `--check`.
 schema_version: '1'
 authority: D-3024
-updated: '2026-10-15'
+updated: '2026-10-27'
 
 # ─── THE VOCABULARIES (a value that is not declared here is refused, never inferred) ───
 #: The KIND of route. A kind is a CLAIM about how a capability is entered and what it leaves behind.
@@ -293,6 +293,20 @@ capabilities:
       - scripts/plan_source_rename.py
       - scripts/plan_admission.py   # D-3051: the admission plan - what the pipeline has never seen, by the door own key
       - scripts/apply_admission.py  # T-183/D-3068: the APPLIER half - one crash-safe, plan-keyed, receipted writer
+  # ── the tool-call emission instruments (T-213 / T-215 / BUG-951 / D-3200) ──
+  #: WHY THIS CAPABILITY EXISTS (added 2026-10-27, MEASURED). These two instruments are the most active lane in the
+  #: repo and NO capability owned them, so every task and bug about them resolved to no route: `resolve_route.py
+  #: --check` listed T-217, T-218 and BUG-1084 among its unowned_artifact items while the instruments sat in
+  #: scripts/ owned by nothing. That is a missing ROUTE, not prose that cannot be routed, and the SHRINK-ONLY ceiling
+  #: could not be met by work on the items themselves.
+  - id: loop_emission
+    kind: script
+    entrypoint: python3 scripts/harmony_red_loop.py --mode replay
+    check: python3 scripts/harmony_red_loop.py --selftest
+    receipt: governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_2970_REPLAY.json
+    cost_tier: T1
+    owns: [scripts/harmony_red_loop.py, scripts/measure_subagent_loop.py, config/model_assignments.yaml]
+    note: 'the T-213 emission gate and the T-199 loop battery share ONE engine witness (D-3200 clause 2); the role registry is owned here because the gate adjudicates the ROLE it names (D-3202) and BUG-1084 is about that registry holding a second home'
   - id: bug_recall
     kind: script
     entrypoint: python3 scripts/check_bug_recall.py

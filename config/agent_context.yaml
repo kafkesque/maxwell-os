@@ -443,6 +443,33 @@ classes:
       selected on window ARITHMETIC and the measurement says the binding constraint is the prefill BILL:
       at the measured throughputs a 131072-token turn costs ~56 minutes on the 27B and ~10 minutes on the
       20B, so no local model can hold a loop at that size. A loop is a SMALL working set paid REPEATEDLY.
+  agent_loop_patient:
+    min_window: 32768
+    working_set: 26214
+    prefill_budget_s: 120
+    # ── T-212: the agent_loop's OWN second point - the OWNER's ratified per-turn prefill budget, beside the
+    # aspirational 60s point above. SAME working set; the two classes differ ONLY in the latency ceiling,
+    # because a loop is one role with more than one acceptable turn length and quietly re-budgeting the 60s
+    # point is the class of defect this repo keeps finding. `patient` names the latency the owner will accept
+    # per turn, never a different context size.
+    workstream_class: false           # a PRICING point, not a runner-resolved class: the runner never INFERS a
+    max_turns: 1                      # class from budget bytes (BUG-828). It declares what a 26k loop turn COSTS,
+    stall_s: 120                      # not that a workstream may run AS it - that claim needs T-214's dependent chain.
+    transcript_in_ws: false
+    timeout_guard: default_timeout_s
+    env: {}
+    evidence:
+      owner_number_s: 120             # T-212: the OWNER's ONE number (approved 2026-10-27), never a measurement
+      required_prefill_tps: 218.45    # DERIVED: working_set / budget = 26214 / 120 - the rate a model must beat
+      admits_at_class_context: [gemma-4-E4B-it-MLX-4bit, MiniCPM5-2B-MLX, Ornith-1.5-35B-A3B-REAP-19B]
+      source: 'D-3199 / T-209 closure / calibration_receipts.jsonl rows 35-36'
+    why: >-
+      THE SECOND POINT T-212 OWED. The 60s point above is a budget no served model pays at 26,214 tokens
+      (best class-context reading 417.67 tok/s = 62.8s), so the class declared exactly one thing a loop is
+      NOT at that size. The owner ratified 120s as the longest prefill a loop turn may spend; at 26,214
+      tokens that needs 218.45 tok/s and is paid by gemma (62.8s), MiniCPM5 (88.8s) and Ornith-REAP (90.7s)
+      on class-context readings - and not by the batch models (Ornith-9B 185.4s, MTP4 611.2s, Qwen3.8-27B
+      672.2s). The two classes are ONE curve: fast (60s, a target) and patient (120s, ratified).
   agent_probe:
     min_window: 32768
     working_set: 32768

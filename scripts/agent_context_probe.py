@@ -633,6 +633,7 @@ CONTROL_LABELS = (
     "a_reading_row_that_names_no_measured_at_is_refused",
     "a_newer_dated_block_supersedes_an_older_one_without_rewriting_it",
     "a_reading_below_the_class_working_set_is_a_reading_not_a_bill",
+    "the_second_agent_loop_point_is_priced_by_the_same_predicate",
 )
 
 
@@ -728,6 +729,15 @@ def selftest(cfg: dict[str, Any]) -> int:
     toy_bill = prefill_bill(1000000, 1.0, toy, cfg)
     control(CONTROL_LABELS[13], toy_bill["routable"] == ["c"]
             and toy_bill["evaluated"][0]["working_set"] == 10)
+    # T-212: the SECOND agent_loop point is priced by the SAME predicate (control 12's shape, applied to the
+    # new class - not a borrowed verdict, D-3199 limb 2). The demanded rate is derived from the class's own
+    # working_set and budget; 2x routes, 0.5x does not.
+    patient_class = live_classes["agent_loop_patient"]
+    patient_needed = float(patient_class["working_set"]) / float(patient_class["prefill_budget_s"])
+    patient_fast = prefill_bill(floor, patient_needed * 2, live_classes, cfg)
+    patient_slow = prefill_bill(floor, patient_needed / 2, live_classes, cfg)
+    control(CONTROL_LABELS[20], "agent_loop_patient" in patient_fast["routable"]
+            and "agent_loop_patient" not in patient_slow["routable"])
     # the verdict comes from the NUMBERS: a status string alone may not manufacture one
     control(CONTROL_LABELS[14],
             cache_verdict({"min_speedup": 5, "measured_20261014": {"speedup_measured": 1.01}}) == "disproven"

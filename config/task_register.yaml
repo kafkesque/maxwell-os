@@ -3018,7 +3018,8 @@ tasks:
     class-context call is ~5 minutes of wall clock.
 - id: T-212
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-27'
   mover: owner
   title: THE agent_loop CLASS IS BILLABLE BY NO SERVED MODEL - 26,214 tokens inside 60s needs 437 tok/s and the best class-context reading on this machine is 417.67, so the class needs a SECOND POINT declared from a measured latency target the OWNER sets
   why: >-
@@ -3049,6 +3050,17 @@ tasks:
        set, not the window, is what gets divided;
     4) re-run the probe and show which served models the new point admits, with their basis - the point is admitted
        by a READING, never by an assumption about prompt size.
+  closure_evidence: >-
+    THE OWNER RATIFIED 120s (T-212: 120, approved 2026-10-27) as the longest prefill a single agent-loop turn
+    may spend. IMPLEMENTED as a SECOND class beside agent_loop - `agent_loop_patient` (min_window 32768,
+    working_set 26214, prefill_budget_s 120) - with the old 60s point left untouched (a declaration that quietly
+    re-budgets is the class of defect this repo keeps finding). Selftest grew 20->21 with control
+    `the_second_agent_loop_point_is_priced_by_the_same_predicate` (2x the demanded rate routes, 0.5x does not),
+    and the probe now admits, on class-context readings: gemma 62.8s, MiniCPM5 88.8s, Ornith-REAP 90.7s; Phi-4
+    (394 tok/s) also clears but only on its 4,466-token reading, so its basis is reading_only_not_a_bill (flagged,
+    never promoted). Refused: Ornith-9B 185.4s, Qwen3.8-27B 672.2s, MTP4 611.2s, and gpt-oss 124.8s (a 4.8s
+    near-miss measured at 50,082 tokens, conservatively slow - its SHORT-loop role stays short). The 8 shadow-id
+    unverifiable faults are unchanged (RC=2), so no new fault was introduced by the class addition.
 - id: T-213
   priority: MUST
   state: open

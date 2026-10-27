@@ -102,7 +102,10 @@ capabilities:
     check: python3 scripts/resolve_route.py --selftest
     receipt: config/capability_registry.yaml#routing_debt
     cost_tier: T0
-    owns: [scripts/resolve_route.py, config/capability_registry.yaml]
+    # D-3212: scripts/lib/artifact_tokens.py is owned HERE because the route graph is where "is this token an
+    # artifact?" is ENFORCED; the census imports the same definition (D-2642 - one home), so a finding that names
+    # the token pattern itself routes to the rail that judges it.
+    owns: [scripts/resolve_route.py, config/capability_registry.yaml, scripts/lib/artifact_tokens.py]
   - id: store_write
     kind: script
     entrypoint: python3 scripts/apply_relabel_store_write.py
@@ -509,9 +512,15 @@ unrouted:
   #: documented escape. It is honoured by BOTH checks now: the fault at (v) and the debt count at (vi) - before
   #: BUG-913 the declaration was inert, which is why the ceiling had to be raised instead of the debt lowered.
   BUG-911: bug_is_a_finding   # Anna's needs a headed browser (the engine is the finding, not a route)
-  BUG-912: bug_is_a_finding   # an OA route can hand back an HTML landing page (the adapter's finding)
-  BUG-914: bug_is_a_finding   # the lane records delivery and never custody (a model gap, not a file's route)
-  BUG-915: bug_is_a_finding   # a conversion BUDGET's basis is a finding about docling's cost, not a file's route
+  #: BUG-912 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-912: bug_is_a_finding`. an OA route can hand back an HTML landing page (the adapter's finding) - ROUTED to acquisition_lane by its own evidence.
+  #: [historical comment] an OA route can hand back an HTML landing page (the adapter's finding)
+  #: BUG-914 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-914: bug_is_a_finding`. the lane records delivery and never custody (a model gap, not a file's route) - ROUTED to acquisition_lane by its own evidence.
+  #: [historical comment] the lane records delivery and never custody (a model gap, not a file's route)
+  #: BUG-915 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-915: bug_is_a_finding`. a conversion BUDGET's basis is a finding about docling's cost, not a file's route - ROUTED to pipeline_ingest by its own evidence.
+  #: [historical comment] a conversion BUDGET's basis is a finding about docling's cost, not a file's route
   #: BUG-917 RETIRED FROM THIS BLOCK 2026-10-20 (D-3038: what we reject we REGISTER, we do not silently delete).
   #: The entry read `BUG-917: bug_is_a_finding` and was correct while BUG-917 was open. BUG-917 is now CLOSED
   #: (the D-3101 two-class split is implemented and the ceiling was never raised), so the reason OUTLIVED the item
@@ -523,12 +532,20 @@ unrouted:
   #: not a file's route) and was correct while BUG-920 was OPEN. BUG-920 is now FIXED (2026-10-24: resume_has_work is
   #: the ONE home the resume and audit both use; a checkpoint honour is now checked against bytes), so the reason
   #: outlived the item and the rail refused it at (v) — correctly.
-  BUG-921: bug_is_a_finding   # filename punctuation drift is a finding about the missing per-work identity, not a file's route
-  BUG-948: bug_is_a_finding   # rule_digest whole-file sha256: the title names the script by dotted id, not a path; the fix task will name scripts/owner_marks.py, which routes to owner_marks
+  #: BUG-921 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-921: bug_is_a_finding`. filename punctuation drift is a finding about the missing per-work identity, not a file's route - ROUTED to decision_mint/ingest_identity_door/source_library_names by its own evidence.
+  #: [historical comment] filename punctuation drift is a finding about the missing per-work identity, not a file's route
+  #: BUG-948 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-948: bug_is_a_finding`. rule_digest whole-file sha256: the title named the script by dotted id, not a path - the EVIDENCE names scripts/owner_marks.py, which routes to owner_marks/harness_adapter.
+  #: [historical comment] rule_digest whole-file sha256: the title names the script by dotted id, not a path; the fix task will name scripts/owner_marks.py, which routes to owner_marks
   #: BUG-950/951/952 appended 2026-10-20 by the act that diagnosed them (commit cb23258). Each reason is stated so the
   #: override is a DECISION and not a shrug; the debt ceiling was NOT touched (223 before and after).
-  BUG-950: bug_is_a_finding   # the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - the title names no owned artefact. The FIX does have an owner: the planner pin belongs to agent/adapters/goose/apply_provider_flip.py (capability harness_adapter), which is why this override is not a route waiver for the work, only for the reading
-  BUG-951: bug_is_a_finding   # a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT, not about a file this repo owns. Its red loop WILL name scripts/toolcall_probe2.py when that probe is promoted out of /tmp
+  #: BUG-950 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-950: bug_is_a_finding`. the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - ROUTED to harness_adapter by its own evidence.
+  #: [historical comment] the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - the title names no owned artefact. The FIX does have an owner: the planner pin belongs to agent/adapters/goose/apply_provider_flip.py (capability harn
+  #: BUG-951 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-951: bug_is_a_finding`. a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT - ROUTED to fanout/loop_emission by its own evidence (scripts/toolcall_probe2.py, T-218's parser).
+  #: [historical comment] a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT, not about a file this repo owns. Its red loop WILL name scripts/toolcall_probe2.py when that probe is promoted out of /tmp
   #: BUG-1091/1092/1093 appended 2026-10-27 by the audit that measured them. THE STRUCTURAL FACT THEY EXPOSE, stated
   #: here because this block is where the route graph's own honesty is recorded: `load_items()` reads a BUG as
   #: "id + title" ONLY (governance/bug_status.json), while the thing that names an artifact is the bug's EVIDENCE BODY
@@ -548,8 +565,13 @@ unrouted:
   #: "id + title" ONLY (governance/bug_status.json), while the artifact that gives a bug its route is named in its
   #: EVIDENCE BODY in governance/buglog.md. All three named artifacts an owning capability already held
   #: (config/agent_context.yaml, governance/buglog.md) and all three were still counted unrouted, because their
-  #: TITLES did not. Widening the reader is a DECISION (it changes what the rail counts), not an edit - recorded,
-  #: still not taken.
+  #: TITLES did not. Widening the reader is a DECISION (it changes what the rail counts), not an edit.
+  #: TAKEN 2026-10-28 (D-3212), and taken the way this block said it had to be: NOT by teaching resolve_route to
+  #: parse the buglog (a second parser for one fact, C12) but by teaching the CENSUS to publish the artifacts each
+  #: bug's own evidence names (governance/bug_status.json#open[].artifacts), which is the same surface it already
+  #: owns. MEASURED: bugs routed 20 -> 89 of 266, unrouted debt 231 -> 172, and TEN per-item declarations in this
+  #: very block went INERT in the same change - which is why fault (vii) now refuses an override on a routed item.
+  #: The ceilings were LOWERED to the new readings in the same act (a shrink follows its measurement down).
   #: BUG-952 RETIRED FROM THIS BLOCK 2026-10-21 (D-3038: what we reject we REGISTER, we do not silently delete).
   #: The entry read `BUG-952: route_graph_incomplete` and was correct while BUG-952 was open. BUG-952 is now CLOSED
   #: (2026-10-20: pipeline/unloader.py calls the real POST /v1/models/{model}/unload endpoint with a red-loop
@@ -562,7 +584,9 @@ unrouted:
   #: TITLE names no artifact and whose WORK has no owning capability (the ledger writer does not exist yet).
   #: It is `route_graph_incomplete`, NOT `bug_is_a_finding`: there is real engineering here, and the day a pipeline cloud-spend
   #: capability is declared this line is deleted and the ceiling is LOWERED - never raised (D-3023).
-  BUG-949: route_graph_incomplete   # pipeline cloud spend is unmetered: the writer that would emit the declared rows has NO owning capability. Measured here: no capability owns pipeline/delegation_economy.py, config/delegation_economy.yaml, config/model_assignments.yaml or pipeline/parallel.py - the economy has a READER and no declared owner
+  #: BUG-949 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-949: route_graph_incomplete`. pipeline cloud spend is unmetered - ROUTED to loop_emission by its own evidence once the reader saw the body; the missing cloud-spend writer is a real ENGINEERING gap recorded in the bug, not a route the graph cannot name.
+  #: [historical comment] pipeline cloud spend is unmetered: the writer that would emit the declared rows has NO owning capability. Measured here: no capability owns pipeline/delegation_economy.py, config/delegation_economy.yaml, config/model_assignments.yaml or pipeline/parallel.py - the economy has a READER and no declared
   #: BUG-954 appended 2026-10-20. NOTE THE PATTERN, because it is the real finding: this ceiling is a NUMBER fixed at
   #: 223 on 2026-10-17 while bugs keep arriving, so EVERY new bug forces one more override or the ladder goes red. A
   #: shrink-only ceiling plus an ever-growing register means the metric can only be kept green by hollowing itself out.
@@ -585,7 +609,9 @@ unrouted:
   #: title names a repo artifact; both have real OWNED work elsewhere: BUG-909's fix is the LibGen circuit breaker in
   #: pipeline/acquisition/adapters.py (owned by acquisition_lane), BUG-956's is T-191 / D-3116 re-anchoring (owned by
   #: the owner gate). The override is not a route waiver for the work, only for the reading (D-3023 SHRINK-ONLY).
-  BUG-909: bug_is_a_finding   # every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane)
+  #: BUG-909 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-909: bug_is_a_finding`. every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane) - ROUTED there the moment the reader could see the body.
+  #: [historical comment] every LibGen front answers 500 max_user_connections: a finding about the EXTERNAL shadow-rung SPOF, not a file this repo owns; the circuit breaker lives in pipeline/acquisition/adapters.py (acquisition_lane)
   #: BUG-956 RETIRED FROM THIS BLOCK 2026-10-24 (D-3038: what we reject we REGISTER, not silently delete).
   #: The entry read `BUG-956: bug_is_a_finding` (the store halved 14,574 -> 7,640 — a canonical-run consolidation,
   #: NOT data loss — and the anchor-bridge rail witnessed it: a FINDING, not a file's route). BUG-956 is now CLOSED
@@ -601,9 +627,9 @@ unrouted:
   #: (prose, no owned path), so it does NOT route; its WORK is T-198, which names pipeline/stage4_merge.py and
   #: therefore ROUTES to pipeline_merge. So the bug is a FINDING whose work already has a home — the honest class
   #: is bug_is_a_finding, not a missing ROUTE (D-3038: the disposition is registered with its reason, not a shrug).
-  BUG-992: bug_is_a_finding
-
-#: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
+  #: BUG-992 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-992: bug_is_a_finding`. RETIRED 2026-10-28 with the other nine: its evidence names an artifact an owning capability holds, so the override excused a route that EXISTS.
+  #: [historical comment] : SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
 #: SHRINK as good news. Clearing an item is a route declaration or an item edit - never a raised ceiling.
 routing_debt:
@@ -611,8 +637,16 @@ routing_debt:
   #: `ingest_identity_door` routed 2 tasks (T-172, T-173) and 3 bugs that resolved to NOTHING before - the debt
   #: these items carried was the route graph's, not the tasks'. A shrink-only ceiling follows its measurement
   #: DOWN (D-2644/D-3023), so the next unrouted item is a fault rather than a shrug.
-  measured: '2026-10-17'
-  unrouted_open_tasks: 31
+  #: RE-MEASURED 2026-10-28 (D-3212) and both ceilings LOWERED to the reading: tasks 31 -> 26, bugs 221 -> 172.
+  #: THE BUGS NUMBER MOVED BY COVERAGE, NOT BY PAYMENT, and the distinction is the whole point of recording it here:
+  #: the rail used to read a bug as `id + title` while it read a task from six evidence fields, so a bug whose
+  #: EVIDENCE named an artifact an owning capability already held was counted as debt. The census now publishes
+  #: those artifacts and 69 more bugs resolve (routed 20 -> 89 of 266). The ceiling follows the measurement DOWN
+  #: (D-2644/D-3023), and that is deliberate: from here EVERY new finding must be BORN routed or explicitly
+  #: dispositioned, because one unrouted item is over a ceiling set at today's reading. That is the whole
+  #: closure mechanism - the register stops being a pool of observations with no owner (D-3212).
+  measured: '2026-10-28'
+  unrouted_open_tasks: 26
   #: RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080, and the raise is DISCLOSED rather than smuggled: two bugs
   #: (BUG-911, BUG-912) were appended to a register that is APPEND-ONLY, so their TITLES could not be made to name
   #: an artifact owned by `acquisition_lane` — and this file's own reason `bug_is_a_finding` says a bug routes only
@@ -627,7 +661,7 @@ routing_debt:
   #: this line is the current number, and it may only go down.
   #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
   #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
-  unrouted_open_bugs: 221
+  unrouted_open_bugs: 172
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

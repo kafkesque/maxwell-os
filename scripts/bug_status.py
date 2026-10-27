@@ -40,6 +40,7 @@ WRITER = "scripts/bug_status.py"
 # as a subprocess of scripts/check_bug_status.py, whose cwd and sys.path are its own.
 sys.path.insert(0, str(REPO / "scripts"))
 from lib import write_guard  # noqa: E402
+from lib.artifact_tokens import tokens  # noqa: E402  (D-3212: ONE definition of an artifact token, D-2642)
 
 C15_THRESHOLD = 5
 CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED", "TOMBSTONED")
@@ -440,6 +441,18 @@ def scan(text_lines: list[str]) -> dict[str, dict]:
         hit = divergent_statement(text_lines[last:nxt - 1])
         if hit is not None:
             rec["divergent"] = {"line": last + hit[0], "statement": hit[1]}
+    # D-3212 (2026-10-28): a bug's EVIDENCE is the body under EVERY header event of that id, and this census is
+    # the ONE parser of that file (C12) - so it, and only it, may publish what the evidence NAMES. It publishes
+    # the artifact TOKENS, not the prose: the prose stays in the append-only register, and a derived index that
+    # carried 266 bodies would grow by megabytes on every re-derivation. A bug's route lives in its evidence
+    # body; a reader that saw only `id + title` reported 231 open bugs as unrouted when 83 of them name the very
+    # artifact an owning capability already holds (D-3212, measured).
+    for rec in bugs.values():
+        spans = []
+        for start in sorted(e["line"] for e in rec["events"]):
+            nxt = next((h for h in hdr_lines if h > start), len(text_lines) + 1)
+            spans.append("\n".join(text_lines[start:nxt - 1]))
+        rec["evidence"] = "\n".join(spans)
     return bugs
 
 
@@ -512,7 +525,11 @@ def main() -> int:
                "divergent_n": len(divergent),
                "divergent": [{"id": b["id"], "line": b["divergent"]["line"],
                               "statement": b["divergent"]["statement"]} for b in divergent],
-               "open": [{"id": b["id"], "title": b["title"], "events": len(b["events"])} for b in open_ids],
+               "open": [{"id": b["id"], "title": b["title"], "events": len(b["events"]),
+                         # D-3212: the artifacts this bug's OWN evidence names, so the route graph can ask the
+                         # same question of a bug that it already asks of a task (whose six evidence fields it
+                         # reads). Absent on purpose for CLOSED ids, which carry no route question.
+                         "artifacts": tokens(b.get("evidence", ""))} for b in open_ids],
                "closed": [b["id"] for b in closed_ids]}
     emit(REPO / json_out, json.dumps(payload, indent=2) + "\n")
     rows = ["| id | title (last header) | events |", "|---|---|---|"]

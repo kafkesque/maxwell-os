@@ -1,6 +1,6 @@
 {
  "counts": {
-  "modules": 659,
+  "modules": 660,
   "shadowed_declared": 300,
   "sites": 574,
   "undeclared": 3
@@ -333,7 +333,7 @@
    "text_config"
   ]
  },
- "measured_at": "2026-10-27",
+ "measured_at": "2026-10-28",
  "rail": "scripts/check_config_defaults.py",
  "schema_version": "1"
 }

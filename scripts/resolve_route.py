@@ -55,7 +55,9 @@ REQUIRED_KEYS = ("schema_version", "authority", "kinds", "capabilities", "dispos
 CAP_FIELDS = ("id", "kind", "entrypoint", "check", "receipt", "cost_tier", "owns")
 LANE_FIELDS = ("recipe", "cmd", "produces", "why")
 PRODUCES = ("reading", "receipt", "state")
-ARTIFACT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|ya?ml|json|md|sh|jsonl|txt)")
+# ARTIFACT is IMPORTED, not restated (D-3212 / D-2642): the census (scripts/bug_status.py) must publish exactly
+# the tokens this rail recognises, so the pattern has ONE home - scripts/lib/artifact_tokens.py.
+from lib.artifact_tokens import ARTIFACT  # noqa: E402  (after the path constants, matching this file's idiom)
 JUST = re.compile(r"\bjust\s+([A-Za-z0-9][A-Za-z0-9_-]*)")   # a recipe name may carry _ and - (justfile)
 TIER = re.compile(r"\bT[0-2]\b")
 RECIPE = re.compile(r"^([A-Za-z0-9_-]+)(?:\s+[^:\n]+)?:\s*(?:#.*)?$")
@@ -188,7 +190,23 @@ def load_items() -> list[Item]:
         items.append(Item(id=str(t["id"]), cls="task", mover=str(t.get("mover") or ""), text=text))
     bugs = json.loads(BUGS.read_text(encoding="utf-8"))
     for b in bugs.get("open") or []:
-        items.append(Item(id=str(b["id"]), cls="bug", mover="", text=f"{b.get('id', '')} {b.get('title', '')}"))
+        # D-3212 (2026-10-28): A TASK IS READ FROM SIX EVIDENCE FIELDS AND A BUG WAS READ FROM TWO OF ITS OWN
+        # (id + title), because the census — the ONE parser of the buglog (C12) — published no evidence. So a bug
+        # whose TITLE names no artifact read as `no_artifact_named` even when its EVIDENCE named the very file an
+        # owning capability holds: 231 open bugs against a declared ceiling of 221, and 63 of them were that
+        # artefact. The remedy is NOT to parse the buglog here (a second parser for one fact) - it is for the
+        # census to publish the artifacts its own evidence names, which is what `artifacts` now carries.
+        # LOUD, never `.get(...)`: an index written by an older census cannot answer this question at all, and a
+        # silent empty list would read as REAL debt (the BUG-1083 shape: a rail failing in the direction that
+        # inflates a number nobody can then tell from work).
+        if "artifacts" not in b:
+            raise SystemExit(
+                "FAIL-CLOSED (C16/D-3212): governance/bug_status.json carries an open bug with no `artifacts` "
+                f"field ({b.get('id')!r}) - the index predates the reader that asks this question.\n"
+                "  fix it with: python3 scripts/bug_status.py   (the census is the one parser of the buglog, C12)")
+        text = " ".join([str(b.get("id") or ""), str(b.get("title") or "")]
+                        + [str(a) for a in (b.get("artifacts") or [])])
+        items.append(Item(id=str(b["id"]), cls="bug", mover="", text=text))
     return sorted(items, key=lambda i: (i.cls, i.id))
 
 
@@ -350,11 +368,22 @@ def item_faults(w: World) -> tuple[list[str], list[tuple[Item, str, list[str]]],
     reasons = [str(k) for k in (w.cfg.get("reasons") or {})]
     rows = [(i, cat, hits) for i, cat, hits, _facts in ((i, *outcome(i, caps, w)) for i in w.items)]
     for i, category, hits in rows:
+        over = (w.cfg.get("unrouted") or {}).get(i.id)
         if category == "routed":
+            # D-3212 (2026-10-28): an escape declared for an item the graph DOES route is a declaration with no
+            # referent (D-3034) - it excuses nothing, and worse, it HIDES the fact that the cure already arrived.
+            # MEASURED the day the bug reader stopped seeing only id + title: 10 of 15 per-item declarations went
+            # inert in one change and NOTHING said so - the fault at (v) only asks whether the item is still OPEN,
+            # never whether it is still UNROUTED. This is the invariant behind BUG-1091/1092/1093 (retired by hand
+            # on 2026-10-27) and behind these ten: an instance-paying fix would have to be repeated every time an
+            # ownership declaration lands. It is paid once, here, as a refusal.
+            if over is not None:
+                faults.append(f"(vii) INERT unrouted declaration: {i.id} is ROUTED to {', '.join(hits)} and is "
+                              f"also declared unrouted with reason {over!r} - the reason outlived the defect it "
+                              f"excused (D-3034). Retire the declaration, or the route - but not both.")
             continue
         table = (disp.get("tasks") if i.cls == "task" else disp.get("bugs")) or {}
         reason = table.get(i.mover) if i.cls == "task" else table.get("default")
-        over = (w.cfg.get("unrouted") or {}).get(i.id)
         if over is not None:
             if str(over) not in reasons:
                 faults.append(f"(v) item {i.id} is declared unrouted with reason {over!r}, which is not declared "
@@ -473,7 +502,9 @@ def route_lines(census: dict, w: World) -> list[str]:
                  f"does not exist in the repo (a proposal, an out-of-repo home, or a stale citation - the reader "
                  f"reports the FACT and does not claim which)")
     lines.append(f"routing debt: tasks {census['debt']['tasks']}/{census['ceiling']['tasks']} "
-                 f"bugs {census['debt']['bugs']}/{census['ceiling']['bugs']} (measured/ceiling, SHRINK-ONLY)")
+                 f"bugs {census['debt']['bugs']}/{census['ceiling']['bugs']} (measured/ceiling, SHRINK-ONLY; a bug "
+                 f"is read by id + title + the artifacts its OWN evidence names, D-3212 - before that correction "
+                 f"the reader saw only id + title and 69 open bugs read as unrouted debt)")
     per = {}
     for _, _, hits in census["rows"]:
         for h in hits:
@@ -660,6 +691,16 @@ def selftest() -> int:
     f, _ = check_world(w)
     control("stale_unrouted_declaration", len([x for x in f if "STALE" in x]), 1,
           "an unrouted declaration for an item that is not open is refused")
+
+    # D-3212: the OTHER end of the same declaration. (v) above asks whether the item is still OPEN; this asks
+    # whether it is still UNROUTED. An escape on a routed item excuses nothing, and the day the bug reader was
+    # widened TEN of the fifteen live declarations went inert while the rail stayed silent.
+    w = synthetic(items=[Item("T-X", "task", "pipeline", "scripts/check_a.py")])
+    w.cfg["unrouted"] = {"T-X": "r_no_route"}
+    f, _ = check_world(w)
+    control("inert_unrouted_declaration", len([x for x in f if "INERT" in x]), 1,
+          "an unrouted declaration on an item the graph DOES route is refused - it excuses nothing and hides the "
+          "fact that the cure arrived (D-3034/D-3212)")
 
     w = synthetic(items=[Item("T-X", "task", "pipeline", "x"), Item("T-Y", "task", "pipeline", "y")])
     f, _ = check_world(w)

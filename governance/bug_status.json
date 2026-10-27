@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 859,
+  "total_ids": 860,
   "open_n": 266,
-  "closed_n": 593,
+  "closed_n": 594,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -13,1332 +13,2656 @@
     {
       "id": "BUG-099",
       "title": "(MED, OPEN, 2026-08-13) \u2014 Model registry (`config/engine.yaml`) drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-151",
       "title": "(MED, OPEN, 2026-08-20) \u2014 taxonomy structural overlap (education dual-listed + 267 raw aliases)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-159",
       "title": "(CRITICAL, OPEN, 2026-08-21) \u2014 prompt-injection contamination (cluster_11649, 0.007%)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-160",
       "title": "(MED, OPEN, 2026-08-21) \u2014 evidence-passage topical relevance not verified",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-169",
       "title": "(MED, OPEN, 2026-08-24) \u2014 TI parameters empty on 31/143 single-source + 100/307 singleton",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-182",
       "title": "(MED, OPEN, 2026-08-27) \u2014 48 singleton empty-shells re-return empty after S2 rerun",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-222",
       "title": "(CRITICAL, OPEN, 2026-09-04) \u2014 goose runtime drift: active_provider=custom_deepseek (C1/C3 violation)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-223",
       "title": "(MED, OPEN, 2026-09-05) \u2014 '[]' literal-array hygiene (54 emerging FBs)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-224",
       "title": "(HIGH, OPEN, 2026-09-05) \u2014 OMLX server wedges under sustained load (MITIGATED D2581)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-228",
       "title": "(LOW, OPEN, 2026-09-08) \u2014 Dead/aspirational schema fields \u2014 0 code references",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-237",
       "title": "(MED, OPEN, 2026-09-10) \u2014 production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-238",
       "title": "(MED, OPEN, 2026-09-10) \u2014 content_type is a VACUOUS axis (99.6% principle unverified)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/content_types.yaml",
+        "fix_anchor2_content_type_v8.py"
+      ]
     },
     {
       "id": "BUG-242",
       "title": "(MED, OPEN, 2026-09-11) \u2014 frontier69_v2 data-quality defects \u2014 override figures still to recompute",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-253",
       "title": "(MED) \u2014 reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-255",
       "title": "(MED) \u2014 `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/omlx_reload.py"
+      ]
     },
     {
       "id": "BUG-257",
       "title": "(MED) \u2014 the niah top tier exceeded oMLX's context window, making it unmeasurable",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "governance/eval_models_longctx.txt",
+        "omlx/settings.json",
+        "scripts/rerun_niah_fixed.sh"
+      ]
     },
     {
       "id": "BUG-258",
       "title": "(HIGH) \u2014 model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "tools/model_eval_report.py"
+      ]
     },
     {
       "id": "BUG-259",
       "title": "(MED) \u2014 report tables quoted PRUNED models as if they were candidates",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "model_eval_suite.py",
+        "run_final_chain.sh",
+        "scripts/audit_final_chain.py"
+      ]
     },
     {
       "id": "BUG-260",
       "title": "(HIGH) \u2014 pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-261",
       "title": "(CRITICAL) \u2014 safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/safe_delete.py",
+        "safe_delete.py",
+        "scripts/reclaim_optiq.sh"
+      ]
     },
     {
       "id": "BUG-263",
       "title": "(CRITICAL) \u2014 the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record)",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "checkpoint_gemma.json",
+        "config/pipeline_config.yaml",
+        "pipeline/omlx_call.py",
+        "scripts/pipe_stage_probe.py"
+      ]
     },
     {
       "id": "BUG-264",
       "title": "(CRITICAL) \u2014 poisoned rows survive every re-run (found by drift_monitor, 2026-09-17)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/bench_preflight.yaml",
+        "governance/p0_p1_contract.md",
+        "governance/p0_p1_criteria.yaml",
+        "scripts/check_stale_toolcall_rows.py",
+        "scripts/drift_monitor.py",
+        "scripts/purge_stale_rows.py",
+        "tools/bench_preflight.py",
+        "tools/model_eval_report.py",
+        "tools/model_eval_suite.py"
+      ]
     },
     {
       "id": "BUG-265",
       "title": "(HIGH) \u2014 toolcalling scored the HARNESS, not the model: native tool_calls ignored",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "backup/deletions/model_eval_checkpoint_pre_bug262_20260917_115539.json",
+        "scripts/omlx_raw_dump.py",
+        "tools/bench_preflight.py"
+      ]
     },
     {
       "id": "BUG-266",
       "title": "(HIGH) \u2014 gpt-oss toolcalling is truncated, not incapable",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-267",
       "title": "(MED, OPEN, 2026-09-17) \u2014 min_human_share floor is a substring classifier (F-16)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-270",
       "title": "(HIGH) \u2014 OPEN (2026-09-17) \u2014 the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/frontier_qwen38_69_objects.json"
+      ]
     },
     {
       "id": "BUG-273",
       "title": "(MED) \u2014 the domains axis violates its own cardinality contract (2026-09-17)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "canonical_labels_reference.md",
+        "config/content_types.yaml",
+        "pipeline/schemas.py"
+      ]
     },
     {
       "id": "BUG-275",
       "title": "(MED) \u2014 LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/retrieve.py",
+        "pipeline/schemas.py",
+        "query.py",
+        "retrieve.py",
+        "schemas.py"
+      ]
     },
     {
       "id": "BUG-277",
       "title": "(LOW) \u2014 the content_type axis mixes two vocabularies, and the docs say \"7 values\" (2026-09-17)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "AGENTS.md",
+        "config/content_types.yaml",
+        "pipeline/content_types.py",
+        "scripts/build_ruler_sheet.py"
+      ]
     },
     {
       "id": "BUG-278",
       "title": "(HIGH) \u2014 stage 5 treats \"unverifiable\" as \"untrue\", and never persists which one it was (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/retrieve.py",
+        "pipeline/stage5_verify.py"
+      ]
     },
     {
       "id": "BUG-279",
       "title": "(HIGH) \u2014 the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/alias_map.yaml",
+        "pipeline/stage4_merge.py"
+      ]
     },
     {
       "id": "BUG-280",
       "title": "(HIGH) \u2014 `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-281",
       "title": "(HIGH) \u2014 `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-282",
       "title": "(HIGH) \u2014 the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "eval_integrity.yaml",
+        "t11/checkpoint.json"
+      ]
     },
     {
       "id": "BUG-287",
       "title": "(HIGH) \u2014 graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-288",
       "title": "(HIGH) \u2014 the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "book.md"
+      ]
     },
     {
       "id": "BUG-289",
       "title": "(MED) \u2014 `source_diversity` counts FILENAMES, not works: 29.1% of \"convergence\" is duplicate ingestion (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-290",
       "title": "(MED) \u2014 two illegal values sit inside the retrieval facets (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-292",
       "title": "(LOW) \u2014 `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "feedback.py",
+        "reclassify_merged_axis.py",
+        "stage6_commit.py"
+      ]
     },
     {
       "id": "BUG-293",
       "title": "(LOW) \u2014 mega-merges up to 244 sources for a single FB (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-294",
       "title": "(MED) \u2014 the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-295",
       "title": "The ruler compares stored-label ACCURACY to a human-provenance SHARE (HIGH, gemma advisory overrides MEDIUM)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/eval_integrity.yaml",
+        "scripts/score_ruler_labels.py",
+        "temp/claude0080.md"
+      ]
     },
     {
       "id": "BUG-296",
       "title": "F-14 pocket retarget is statistically null; the claim is withdrawn (MED, my instrument)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-298",
       "title": "No label carries human provenance; the floor gate is unsatisfiable (MED)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-303",
       "title": "Stored extraction_type over-claims causal_mechanism; normative_heuristic 50% mislabeled (HIGH, 2026-09-19)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ruler_form_inverted_20260919.md",
+        "scripts/rescore_ruler_inverted.py"
+      ]
     },
     {
       "id": "BUG-304",
       "title": "Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/rescore_ruler_inverted.py",
+        "stage4_merge.py"
+      ]
     },
     {
       "id": "BUG-306",
       "title": "Single-coder ceiling \u03ba is contaminated: same-person + ruleset mismatch (HIGH, 2026-09-20)",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "governance/bug306_remeasure_protocol.md"
+      ]
     },
     {
       "id": "BUG-312",
       "title": "NEW: three divergent label snapshots (HIGH, provenance drift, 2026-09-20)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "definition_nli_verify.py",
+        "governance/r2_definition_nli_20260920.json"
+      ]
     },
     {
       "id": "BUG-314",
       "title": "Frozen ruler csv_sha256 provenance mismatch (MED, 2026-09-21)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/anchor1_frozen_20260920.json"
+      ]
     },
     {
       "id": "BUG-315",
       "title": "Hardcoded oMLX API key fallback (LOW-MED, C12, 2026-09-21)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "dspy_trainer.py",
+        "pipeline/model_lazyload.py",
+        "pipeline/pipeline_paths.py",
+        "unloader.py"
+      ]
     },
     {
       "id": "BUG-316",
       "title": "goose main-loop model is the known-bad agentic model (MED, Phase 3 risk, 2026-09-21)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/goose/config.yaml",
+        "config/taxonomy_v5.yaml"
+      ]
     },
     {
       "id": "BUG-317",
       "title": "Bake-off arm layer silently ran the NLI arm on CPU (MED, own wiring, 2026-09-21)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-318",
       "title": "Bake-off: config JSON braces killed the LLM arm + non-atomic artifact (HIGH, own wiring, 2026-09-21)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-326",
       "title": "(MED - BLOCKED 2026-09-21): the repair's TARGET NUMBERS do not reproduce on the live DB",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/alias_map.yaml",
+        "governance/BUG326_REPAIR_SCOPING_20260921.md",
+        "scripts/audit_full_corpus_labels.py"
+      ]
     },
     {
       "id": "BUG-331",
       "title": "Serving-gate write to the production DB has no R5 review on record (MED, OPEN)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/serving_gate_20260919.md",
+        "scripts/apply_serving_gate.py",
+        "stage5_verify.py"
+      ]
     },
     {
       "id": "BUG-333",
       "title": "(MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "scripts/r5_review_r3_adapter.py"
+      ]
     },
     {
       "id": "BUG-334",
       "title": "(MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-336",
       "title": "(MED - OPEN 2026-09-21, NEW STANDING RULE): an agent's measurement claim is not evidence",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-341",
       "title": "(HIGH \u2014 OPEN 2026-09-21, regression of BUG-311): the LIVE stage5 checkpoint is absent again",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "checkpoint.json",
+        "config/eval_integrity.yaml"
+      ]
     },
     {
       "id": "BUG-343",
       "title": "(LOW-MED \u2014 OPEN 2026-09-21) \u2014 a smoke test asserts a checkpoint that its own fixture cannot produce",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/bug_status.json",
+        "pipeline/stage4_merge/smoke_preflight_plumbing/checkpoint.json",
+        "scripts/bug_status.py",
+        "tests/test_stage4_preflight_smoke_stress.py"
+      ]
     },
     {
       "id": "BUG-349",
       "title": "(LOW \u2014 OPEN 2026-09-21, found by the session-11 forensic audit F-A)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/bug_status.json"
+      ]
     },
     {
       "id": "BUG-351",
       "title": "(LOW-MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-C)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "ANCHOR2_KEY_20260920.json",
+        "config/closed_menu_v5.sh",
+        "config/eval_integrity.yaml",
+        "pin_audit.py"
+      ]
     },
     {
       "id": "BUG-352",
       "title": "(MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-D)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ANCHOR1_KEY_20260920.json",
+        "governance/ARTIFACT_REGISTRY.md",
+        "governance/bakeoff_typed_decision_anchor2_20260921.json"
+      ]
     },
     {
       "id": "BUG-354",
       "title": "(MED \u2014 OPEN): the shared resolver rejects the catch-all on BOTH axes",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-355",
       "title": "(MED \u2014 OPEN): one surface string, two canonicals \u2014 and a dead entry in the domain block of normalization_map",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/normalization_map.yaml",
+        "governance/anchor2_kappa_20260921.json",
+        "scripts/anchor2_kappa.py"
+      ]
     },
     {
       "id": "BUG-356",
       "title": "(LOW \u2014 OPEN): the repair queue's own \"Next:\" line is stale and hides the real next action",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/normalization_map.yaml",
+        "governance/BOUNDARY_DISCRIMINATORS_20260921.md",
+        "governance/MENU_REPAIR_QUEUE_20260921.md",
+        "governance/bug_status.json",
+        "scripts/anchor2_kappa.py",
+        "scripts/bug_status.py"
+      ]
     },
     {
       "id": "BUG-359",
       "title": "(LOW \u2014 process, LOGGED 2026-09-21): a carried \"pending fix\" note that was never re-verified",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/config_audit.py",
+        "scripts/config_audit.py"
+      ]
     },
     {
       "id": "BUG-360",
       "title": "(LOW \u2014 process, LOGGED 2026-09-21): a second stale carried claim in one session",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/stage5_verify.py"
+      ]
     },
     {
       "id": "BUG-366",
       "title": "(LOW - process, OPEN): an LLM coder silently under-delivered (79 of 122 rows)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "labels.md"
+      ]
     },
     {
       "id": "BUG-367",
       "title": "(MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/f11_llm_coder.yaml"
+      ]
     },
     {
       "id": "BUG-377",
       "title": "(LOW-MED \u2014 OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "audit_e2e_cohesion.py"
+      ]
     },
     {
       "id": "BUG-378",
       "title": "(LOW-MED \u2014 OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "ab_off.json",
+        "ab_on.json",
+        "checkpoint.jsonl.depth.json",
+        "checkpoint_enriched.json",
+        "checkpoint_enriched_kindsafe.json",
+        "input_fingerprint.json",
+        "probe_clean.sh"
+      ]
     },
     {
       "id": "BUG-381",
       "title": "(HIGH)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/status.py"
+      ]
     },
     {
       "id": "BUG-382",
       "title": "(MED)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/audit_flag_consumers.py"
+      ]
     },
     {
       "id": "BUG-389",
       "title": "MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/incumbent_ruler_score.yaml",
+        "retrieve.py",
+        "scripts/incumbent_ruler_score.py"
+      ]
     },
     {
       "id": "BUG-391",
       "title": "(HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ABSTENTION_ROBUSTNESS_20260923.json"
+      ]
     },
     {
       "id": "BUG-395",
       "title": "(MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/flag_consumer_registry.yaml",
+        "config/pipeline_config.yaml",
+        "governance/SEQUENCE_STATUS_20260917.md",
+        "pipeline/stamp.py",
+        "scripts/verify_boundary_injection.py"
+      ]
     },
     {
       "id": "BUG-398",
       "title": "(MED, OPEN) - a receipt claimed a dated artifact that does not exist",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "governance/R2_DEFINITION_NLI_20260923.json",
+        "governance/R2_EXTRACTION_TYPE_RULER_20260923.json"
+      ]
     },
     {
       "id": "BUG-399",
       "title": "(MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/decisions.yaml",
+        "scripts/recompute_decision_summary.py",
+        "tests/test_decision_summary_sync.py"
+      ]
     },
     {
       "id": "BUG-400",
       "title": "(HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22)",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "CONSTITUTION.md",
+        "backup_guardian.sh",
+        "checkpoint.jsonl.manifest.json",
+        "config/decisions.yaml",
+        "pipeline/pipeline_paths.py",
+        "pipeline/stage5_verify/t11/checkpoint.jsonl.input_fingerprint.json",
+        "pipeline/stage6_commit.py",
+        "stage4_merge/t11/checkpoint_enriched.json",
+        "verify_declared_inputs.py"
+      ]
     },
     {
       "id": "BUG-401",
       "title": "(MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "MASTER-TASK-REGISTER.md"
+      ]
     },
     {
       "id": "BUG-406",
       "title": "(HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/archive_index.yaml",
+        "governance/folder_protocol.md",
+        "scripts/audit_false_convergence.py",
+        "scripts/build_boundary_corpus.py",
+        "scripts/content_type_sweep_rank.py",
+        "scripts/propagate_content_type_decisions.py",
+        "scripts/propagate_p5_final.py",
+        "scripts/run_forensic_audit_parallel.py",
+        "temp/ct818_oa_joined_partial.json",
+        "temp/forensic_audit_local_llms.json",
+        "temp/golden_labels_probabilistic.json",
+        "temp/golden_source_map.json",
+        "temp/p5_fewshot_manifest.json"
+      ]
     },
     {
       "id": "BUG-411",
       "title": "(LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "config/golden/stage4_golden.yaml",
+        "governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md",
+        "governance/s4_depth_frugal_benchmark.json",
+        "scripts/validate_role_claims.py"
+      ]
     },
     {
       "id": "BUG-412",
       "title": "(LOW, OPEN) - the archive index declares an absolute cloud path with no guard that it still resolves",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/archive_index.yaml"
+      ]
     },
     {
       "id": "BUG-415",
       "title": "(MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "2026-09-10.md",
+        "config/eval_integrity.yaml",
+        "governance/ANCHOR4_DEPTH_RUBRIC_20260923.md",
+        "governance/depth_vote_checkpoint.json",
+        "governance/gold_4axis.json"
+      ]
     },
     {
       "id": "BUG-416",
       "title": "(MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/content_types.yaml",
+        "config/taxonomy_v5.yaml"
+      ]
     },
     {
       "id": "BUG-417",
       "title": "(HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks,",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/MODEL_STORE_RECLAIM_A2_CORRECTED_20260923.md"
+      ]
     },
     {
       "id": "BUG-419",
       "title": "(LOW, OPEN 2026-09-23) - bug_status.json is schema-ASYMMETRIC: open is a list of objects, closed is a list of plain id strings",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/bug_status.json"
+      ]
     },
     {
       "id": "BUG-420",
       "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "depth_vote_checkpoint.json",
+        "gold_4axis.json",
+        "governance/ANCHOR4_DEPTH_PREDICTION_KEY_20260924.json"
+      ]
     },
     {
       "id": "BUG-425",
       "title": "(MED, OPEN 2026-09-24) - the `domains` axis is owned by a DIFFERENT cohort (intersection 2/150) and the family registry never said so",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "ANCHOR_FAMILY_CONSOLIDATION_PLAN_20260924.md",
+        "ANCHOR_RULER_CONSOLIDATED_20260923.md",
+        "config/eval_integrity.yaml",
+        "governance/joint_vote_production_checkpoint.json",
+        "governance/s4_domain_verdicts.json",
+        "pipeline/stage6_commit/t11/checkpoint.json",
+        "ruler_sheet_key_20260917.json",
+        "temp/ruler_input_20260923.json"
+      ]
     },
     {
       "id": "BUG-426",
       "title": "(HIGH, OPEN - UNRESOLVED) - twice asserted \"the 150's domain axis was never asked\" while the owner states it WAS done. My search was",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "discipline_domain_vote_checkpoint.json",
+        "ruler_sheet_key_20260917.json",
+        "s4_domain_verdicts.json"
+      ]
     },
     {
       "id": "BUG-427",
       "title": "(LOW, OPEN) - the F-11 human instrument carries 4 trailing blank-`item_id` padding rows, so `len(rows)` is 154 while the anchor is 150",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-431",
       "title": "ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "consolidate_anchor4_context.py"
+      ]
     },
     {
       "id": "BUG-432",
       "title": "(MED) - INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "build_discipline_domain_vote.py",
+        "config/human_instrument_locks.yaml",
+        "governance/anchor4_domain_vote_checkpoint.json",
+        "scripts/vote_anchor_domains.py"
+      ]
     },
     {
       "id": "BUG-433",
       "title": "a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md",
+        "check_human_instruments.py",
+        "config/anchor4_interim_state.json",
+        "consolidate_anchor4_context.py",
+        "verify_anchor_family_registry.py"
+      ]
     },
     {
       "id": "BUG-448",
       "title": "(MED) - OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/depth_domain_contract.yaml",
+        "scripts/validate_depth_domain_contract.py",
+        "tests/test_depth_domain_contract.py"
+      ]
     },
     {
       "id": "BUG-450",
       "title": "(HIGH) - OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "audit_form_axis.py",
+        "closed_menu_v5.sh",
+        "governance/R2_EXTRACTION_TYPE_RULER_20260923.json"
+      ]
     },
     {
       "id": "BUG-451",
       "title": "(MED) - OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-452",
       "title": "(LOW) - OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-454",
       "title": "(LOW) - OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "audit_flag_consumers.py",
+        "config/flag_consumer_registry.yaml",
+        "scripts/validate_depth_domain_contract.py"
+      ]
     },
     {
       "id": "BUG-455",
       "title": "(CRITICAL) - OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "archive/index.yaml"
+      ]
     },
     {
       "id": "BUG-456",
       "title": "(MED) - OPEN - the S4 \"rolling\" backup held 6 byte-identical slots: one recovery point, six names",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "archive/session_20260923/scratch/backup/s4_rolling/checkpoint.slot1..6.json",
+        "checkpoint.json"
+      ]
     },
     {
       "id": "BUG-462",
       "title": "(CRITICAL) - OPEN - the declared agreement floor (D-373) has no consumer",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/agreement_floor.yaml",
+        "config/anchor_family.yaml",
+        "scripts/depth_pass_agreement.py"
+      ]
     },
     {
       "id": "BUG-464",
       "title": "(CRITICAL) - OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-465",
       "title": "(CRITICAL) - OPEN - a blank cell carries four meanings and the contract can only see one",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "scripts/apply_workbook_rulings.py"
+      ]
     },
     {
       "id": "BUG-466",
       "title": "(HIGH) - OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ANCHOR4_MANIFEST_20260924.json"
+      ]
     },
     {
       "id": "BUG-468",
       "title": "(CRITICAL) - OPEN - a digest recorded in prose for a live file that has since been written",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/anchor_family.yaml"
+      ]
     },
     {
       "id": "BUG-475",
       "title": "(CRITICAL) - OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/stage5_verify.py"
+      ]
     },
     {
       "id": "BUG-477",
       "title": "(LOW) - OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-478",
       "title": "OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agreement_floor.yaml",
+        "parse_frontier_pack.py",
+        "scripts/cross_examine_anchor_axes.py",
+        "scripts/ingest_panel_column.py"
+      ]
     },
     {
       "id": "BUG-480",
       "title": "OPEN (severity MED) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "score_claim_shape_gate.py"
+      ]
     },
     {
       "id": "BUG-482",
       "title": "OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/check_depth_load_bearing.py",
+        "scripts/ingest_panel_column.py",
+        "scripts/score_claim_shape_gate.py"
+      ]
     },
     {
       "id": "BUG-484",
       "title": "(CRITICAL) - OPEN",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/p0_p1_criteria.yaml",
+        "scripts/drift_monitor.py"
+      ]
     },
     {
       "id": "BUG-487",
       "title": "(MED) - OPEN (owner gate)",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "APPLIED_MOVES.json",
+        "DECISION-LOG.md",
+        "METRICS.json",
+        "backups/write_guard.PRE_APPEND_20260925F.py",
+        "check_human_instruments.py",
+        "config/anchor4_interim_state.json",
+        "config/anchor_cross_exam.yaml",
+        "config/artifact_ownership.yaml",
+        "config/bench_preflight.yaml",
+        "config/closed_menu_v5.json",
+        "config/closed_menu_v6.json",
+        "config/decisions.yaml",
+        "config/depth_domain_contract.yaml",
+        "config/eval_integrity.yaml",
+        "config/evidence_floors.yaml",
+        "config/flag_consumer_registry.yaml",
+        "config/handoffs.yaml",
+        "config/human_instrument_locks.yaml",
+        "config/menu_axis_groups.yaml",
+        "config/menu_axis_hashes.yaml",
+        "config/reconciliation.yaml",
+        "config/register_divergence.yaml",
+        "config/repo_integrity.yaml",
+        "config/resolution_domains.yaml",
+        "config/serving_gate.yaml",
+        "decisions.yaml",
+        "f11_anchor_review.py",
+        "governance/ANCHOR4_MANIFEST_20260924.json",
+        "governance/HANDOFFS.json",
+        "governance/METRICS.json",
+        "governance/MUTATION_JOURNAL.json",
+        "governance/RECONCILIATION.json",
+        "governance/SESSION-HANDOFF-2026-09-23.md",
+        "governance/buglog.md",
+        "ingest_panel_column.py",
+        "instrument_control.py",
+        "measure.py",
+        "menu_axis_hashes.py",
+        "pipeline/serving_gate.py",
+        "pipeline/stage4_merge.py",
+        "pipeline/stage4_merge/checkpoint.json",
+        "pipeline/stage5_verify.py",
+        "pipeline/stage6_commit.py",
+        "recompute_decision_summary.py",
+        "reconcile.py",
+        "render_closed_menu.py",
+        "scripts/apply_serving_gate.py",
+        "scripts/build_closed_menu.py",
+        "scripts/check_depth_load_bearing.py",
+        "scripts/check_repo_integrity.py",
+        "scripts/check_serving_gate.py",
+        "scripts/check_session_plan.py",
+        "scripts/cross_examine_anchor_axes.py",
+        "scripts/f11_anchor_review.py",
+        "scripts/ingest_panel_column.py",
+        "scripts/install_git_hooks.sh",
+        "scripts/lib/measure.py",
+        "scripts/lib/write_guard.py",
+        "scripts/menu_axis_hashes.py",
+        "scripts/recompute_decision_summary.py",
+        "scripts/reconcile.py",
+        "scripts/render_closed_menu.py",
+        "scripts/validate_depth_domain_contract.py",
+        "scripts/verify_handoffs.py",
+        "tests/test_depth_domain_contract.py",
+        "tools/bench_preflight.py",
+        "write_guard.py"
+      ]
     },
     {
       "id": "BUG-500",
       "title": "(CRITICAL, CONFIRMED, systemic) \u2014 a Dropbox conflicted copy is silent drift, not a merge conflict",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/conflict_policy.yaml",
+        "config/decisions.yaml",
+        "decisions.yaml",
+        "governance/CONFLICT_REGISTER.md",
+        "governance/bug_status.json",
+        "governance/bug_status.md",
+        "scripts/resolve_dropbox_conflicts.py"
+      ]
     },
     {
       "id": "BUG-511",
       "title": "(CRITICAL, OPEN in two orphan readers) \u2014 a reader that GUESSES an encoding does not crash, it silently changes text",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/audit_human_verification.py",
+        "scripts/cross_examine_anchor_axes.py",
+        "scripts/lib/artifact_encoding.py",
+        "scripts/normalize_owner_workbook.py"
+      ]
     },
     {
       "id": "BUG-514",
       "title": "(CRITICAL, OPEN) \u2014 three readers still decide an encoding by GUESS",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/audit_human_verification.py",
+        "scripts/cross_examine_anchor_axes.py",
+        "scripts/normalize_owner_workbook.py"
+      ]
     },
     {
       "id": "BUG-520",
       "title": "(MED, DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/silent_repair.yaml",
+        "scripts/check_silent_repair.py"
+      ]
     },
     {
       "id": "BUG-521",
       "title": "(CRITICAL, MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/undeclared_encoding.yaml",
+        "scripts/check_encoding_homes.py",
+        "scripts/check_silent_repair.py",
+        "scripts/check_undeclared_encoding.py"
+      ]
     },
     {
       "id": "BUG-523",
       "title": "(CRITICAL, OPEN - found 2026-09-26 only because a human asked \"what exactly must I ratify in D-2650?\") - the reserved-fixture rule covered",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "config/decisions_policy.yaml",
+        "governance/bug_status.json",
+        "scripts/check_revoked_references.py"
+      ]
     },
     {
       "id": "BUG-524",
       "title": "(CRITICAL, OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/store_authority.yaml",
+        "config/store_columns.yaml",
+        "governance/gold_4axis.json",
+        "scripts/check_store_authority.py",
+        "scripts/check_store_columns.py"
+      ]
     },
     {
       "id": "BUG-525",
       "title": "(CRITICAL, OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "backups/decisions.PRE_config-first-data-edit_20260925T214936Z.yaml",
+        "backups/derivations.PRE_check_config_defaults_20260926T084048Z.yaml",
+        "columns_20260926T115814Z.yaml",
+        "config/pipeline_config.yaml",
+        "config/store_columns.yaml",
+        "evals/promptfooconfig.yaml",
+        "pipeline_paths.py",
+        "scripts/lib/yaml_guard.py"
+      ]
     },
     {
       "id": "BUG-526",
       "title": "(CRITICAL, OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "check_bug_status.py",
+        "config/recalibration_pins.yaml",
+        "governance/buglog.md",
+        "install_git_hooks.sh",
+        "scripts/definition_nli_verify.py",
+        "scripts/install_git_hooks.sh",
+        "scripts/verify_recalibration_pins.py"
+      ]
     },
     {
       "id": "BUG-527",
       "title": "(CRITICAL, OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "Scripts/check_session_plan.py",
+        "install_git_hooks.sh",
+        "scripts/check_session_plan.py",
+        "scripts/install_git_hooks.sh",
+        "scripts/verify_recalibration_pins.py"
+      ]
     },
     {
       "id": "BUG-529",
       "title": "(HIGH, OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "check_repo_integrity.py",
+        "check_session_plan.py",
+        "decisions.yaml",
+        "install_git_hooks.sh",
+        "pre-commit-config.yaml",
+        "scripts/pre_commit_gate.py",
+        "verify_recalibration_pins.py"
+      ]
     },
     {
       "id": "BUG-532",
       "title": "(MED, OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/apple_fm.yaml",
+        "config/artifact_ownership.yaml",
+        "config/human_instrument_locks.yaml",
+        "scripts/probe_apple_fm.py"
+      ]
     },
     {
       "id": "BUG-545",
       "title": "(MED - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "check_config_defaults.py",
+        "check_derivation_homes.py",
+        "check_encoding_homes.py",
+        "check_label_provenance.py",
+        "check_revoked_references.py",
+        "check_s5_score_axis.py",
+        "check_serving_gate.py",
+        "check_silent_repair.py",
+        "check_store_authority.py",
+        "check_store_columns.py",
+        "check_undeclared_encoding.py",
+        "config/apple_fm.yaml",
+        "config/artifact_ownership.yaml",
+        "config/decisions.yaml",
+        "config/decisions_policy.yaml",
+        "config/decisions_summary.json",
+        "config/derivations.yaml",
+        "config/silent_repair.yaml",
+        "config/store_authority.yaml",
+        "decisions.yaml",
+        "derivations.yaml",
+        "governance/METRICS.json",
+        "handoff.py",
+        "recompute_decision_summary.py",
+        "resolve_dropbox_conflicts.py",
+        "scripts/check_repo_integrity.py",
+        "scripts/lib/artifact_encoding.py",
+        "scripts/lib/handoff.py",
+        "scripts/lib/operator_env.py",
+        "scripts/lib/yaml_guard.py",
+        "scripts/recompute_decision_summary.py",
+        "scripts/reconcile.py",
+        "scripts/verify_handoffs.py",
+        "test_decision_summary_sync.py",
+        "tests/test_decision_summary_sync.py",
+        "tmp/mint_both.yaml",
+        "verify_generator_pins.py"
+      ]
     },
     {
       "id": "BUG-559",
       "title": "(CRITICAL, STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored`",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md",
+        "scripts/verify_handoffs.py"
+      ]
     },
     {
       "id": "BUG-593",
       "title": "(OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md",
+        "governance/HANDOFFS.json",
+        "governance/bug_status.json",
+        "probe_run.py",
+        "scripts/verify_handoffs.py",
+        "stage1_chunk.py",
+        "temp/_ab_heading_fix.py",
+        "text_cleaner.py"
+      ]
     },
     {
       "id": "BUG-594",
       "title": "(MED, OPEN, 2026-09-29, D-2706) \u2014 chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-595",
       "title": "(HIGH, OPEN, 2026-09-29, D-2706) \u2014 clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-604",
       "title": "(HIGH, OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "liber3.md",
+        "pipeline/book_metadata.py",
+        "pipeline/checkpoints/book_metadata.json",
+        "scripts/detect_title_renames.py",
+        "stage0_5_extract_metadata.py"
+      ]
     },
     {
       "id": "BUG-629",
       "title": "(HIGH, OPEN, 2026-10-04) \u2014 S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/boundary_discriminators.yaml",
+        "config/closed_menu_v5.json",
+        "config/menu_merge_map.yaml"
+      ]
     },
     {
       "id": "BUG-630",
       "title": "(MED, OPEN, 2026-10-04) \u2014 the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging'",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/discipline_domain_map.yaml",
+        "pipeline/schemas.py",
+        "pipeline/stage4_merge.py"
+      ]
     },
     {
       "id": "BUG-632",
       "title": "(CRITICAL, OPEN, 2026-10-04) \u2014 the D2496 \"authoritative expected FB count\" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop,",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "checkpoint.json",
+        "checkpoint.jsonl.expected_count.json",
+        "config/pipeline_config.yaml",
+        "pipeline/stage4_merge.py",
+        "pipeline_resume.json",
+        "s4.manifest.json",
+        "scripts/pre_s6_gate.py",
+        "scripts/preflight_checkpoint_check.py"
+      ]
     },
     {
       "id": "BUG-635",
       "title": "(HIGH, OPEN, 2026-10-04) \u2014 merged-call sparse classification is quarantined under D2371 as \"empty application\", masking the true failure",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "stage4_merge.py"
+      ]
     },
     {
       "id": "BUG-636",
       "title": "(CRITICAL, OPEN, 2026-10-04) \u2014 S4 exit-2 clears the resume sidecars before the failure check, so the documented \"re-run to retry failed",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "checkpoint.jsonl.state.json",
+        "cribs.json",
+        "depth.json",
+        "pipeline/runner.py",
+        "stage4_merge.py",
+        "state.json"
+      ]
     },
     {
       "id": "BUG-638",
       "title": "(CRITICAL, OPEN, 2026-10-05) \u2014 governance/METRICS.jsonl append-only journal truncated 817\u219270 lines (747 samples lost); root cause",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "METRICS.json",
+        "governance/METRICS.json"
+      ]
     },
     {
       "id": "BUG-640",
       "title": "(MED, IN PROGRESS, 2026-10-05) \u2014 D-2815 B&M discipline slot \"entrepreneurship\" string-collides with existing DOMAIN; owner ruling D-2829",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-642",
       "title": "(CRITICAL, OPEN, 2026-10-05) \u2014 alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-643",
       "title": "(MED, IN PROGRESS, 2026-10-05) \u2014 dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "closed_menu_v5.json",
+        "emerging_disciplines.yaml",
+        "pipeline/closed_menu.py"
+      ]
     },
     {
       "id": "BUG-648",
       "title": "(MED, OPEN, 2026-10-05) \u2014 definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-650",
       "title": "(CRITICAL, PARTIAL, 2026-10-05) \u2014 full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "anchor2_kappa.py",
+        "benchmark_s4_ab.py",
+        "config/menu_axis_hashes.yaml",
+        "d2767_ab_eval.py",
+        "d2767_ab_eval_v8_20261010.json",
+        "depth_conformance_gate.py",
+        "discipline_anchor_rederived_v8_20261007.json",
+        "fit_eval_model_swap.py",
+        "pipeline/anchor_menu_guard.py",
+        "scripts/anchor2_kappa.py",
+        "scripts/discipline_conformance_gate.py",
+        "taxonomy_v5.yaml",
+        "tests/test_anchor_menu_guard.py"
+      ]
     },
     {
       "id": "BUG-651",
       "title": "(CRITICAL, PARTIAL, 2026-10-05) \u2014 S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d))",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "nli_calibrate.py",
+        "pipeline/stage5_verify.py",
+        "tests/test_or_entail_no_contra.py"
+      ]
     },
     {
       "id": "BUG-677",
       "title": "(CRITICAL, OPEN, 2026-10-08) \u2014 two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/anchor2_kappa_v8_20261007.json",
+        "scripts/remint_anchor2_v8.py"
+      ]
     },
     {
       "id": "BUG-680",
       "title": "(MED, OPEN, 2026-10-08) \u2014 the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "ANCHOR_208_CONSOLIDATED_20261007.json",
+        "discipline_anchor_rederived_v8_20261007.json",
+        "governance/ANCHOR_208_CONSOLIDATED_20261007.json",
+        "governance/discipline_anchor_rederived_v8_20261007.json",
+        "scripts/check_anchor_axis_consistency.py"
+      ]
     },
     {
       "id": "BUG-698",
       "title": "(HIGH, OPEN, 2026-10-10) \u2014 v8\u2192v9 discipline-anchor off-menu rows are 22 in THREE categories, not the \"7 delta rows\" assumed in GATE-2;",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/closed_menu_v9.json",
+        "governance/discipline_anchor_rederived_v8_20261007.json",
+        "scripts/rederive_anchor_axes_v6.py"
+      ]
     },
     {
       "id": "BUG-700",
       "title": "(HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store)",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-701",
       "title": "(HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-702",
       "title": "(MED - OPEN 2026-10-10): S5 `practicality` is STORED but was not a first-class retrieval facet",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "retrieve.py"
+      ]
     },
     {
       "id": "BUG-703",
       "title": "(MED - OPEN 2026-10-10): 190/6,591 v9 rows have EMPTY `discipline_raw` while `discipline` is populated",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "retrieve.py"
+      ]
     },
     {
       "id": "BUG-704",
       "title": "(MED - OPEN 2026-10-10): S4 taxonomy scatter \u2014 engineering/agentic principles misclassified into Human&Design / Method&Business / emerging",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-705",
       "title": "(HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code \u2014 and 2,258 neutral rows are recoverable",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-706",
       "title": "(MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "discipline_macro.py",
+        "scripts/discipline_macro_classify.py"
+      ]
     },
     {
       "id": "BUG-711",
       "title": "(HIGH \u2014 OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/alias_map.yaml",
+        "scripts/repair_displaced_canonical_domains.py"
+      ]
     },
     {
       "id": "BUG-719",
       "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "FORENSIC_AUDIT_20261012.md",
+        "SESSION-HANDOFF-20261012.md",
+        "checkpoint.json",
+        "growth_edges.json",
+        "process_templates.json",
+        "quarantined.json",
+        "scripts/audit_sidecar_commit.py"
+      ]
     },
     {
       "id": "BUG-720",
       "title": "(LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/audit_sidecar_commit.py",
+        "stage4_merge.py"
+      ]
     },
     {
       "id": "BUG-721",
       "title": "(HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "audit_sidecar_commit.py",
+        "check_serving_gate.py"
+      ]
     },
     {
       "id": "BUG-723",
       "title": "(MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "archive/superseded_runs/20261012T090055Z/superseded_rows.json"
+      ]
     },
     {
       "id": "BUG-728",
       "title": "(LOW - OPEN 2026-10-12) \u2014 `source_authors` (FILE layer) repeats one source: 31 rows literally, 90 by carrier key",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "Godin.md",
+        "See.md",
+        "config/dedup_identity.yaml",
+        "integrity_check.py",
+        "scripts/audit_edition_layers.py",
+        "stage6b_anytype_push.py"
+      ]
     },
     {
       "id": "BUG-731",
       "title": "(MED - OPEN 2026-10-12) \u2014 the undeclared-default census is 12 over its ceiling (PRE-EXISTING), and the rail's receiver list cannot see",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/content_types.yaml",
+        "config/derivations.yaml",
+        "governance/content_type_calibration_20261012.json",
+        "pipeline/content_types.py",
+        "pipeline/integrity_check.py",
+        "pipeline/pipeline_paths.py",
+        "pipeline/stage4_merged_call.py",
+        "scripts/apply_anchor_axis_authority.py",
+        "scripts/audit_sidecar_commit.py",
+        "scripts/check_config_defaults.py",
+        "scripts/d2767_ab_eval.py"
+      ]
     },
     {
       "id": "BUG-736",
       "title": "(MED - OPEN 2026-10-12) \u2014 the verifier instruments, measured: the R5 reviewer is uninformative ~40-50% of the time and the S5 NLI's edge is",
-      "events": 5
+      "events": 5,
+      "artifacts": [
+        "config/eval_integrity.yaml",
+        "config/model_assignments.yaml",
+        "governance/VERIFIER_MODEL_SURVEY_20261012.md",
+        "governance/eval_models.txt",
+        "pipeline/stage6_commit.py",
+        "scripts/check_store_columns.py"
+      ]
     },
     {
       "id": "BUG-737",
       "title": "(MED - OPEN 2026-10-12) \u2014 the store's ABSENT SHAPE is `''` on 20 of 78 columns while the code declares `None`",
-      "events": 5
+      "events": 5,
+      "artifacts": [
+        "maxwell_mcp_server.py",
+        "pipeline/dedup_gate.py",
+        "pipeline/integrity_check.py",
+        "pipeline/query.py",
+        "pipeline/retrieve.py",
+        "pipeline/schema_accessor.py",
+        "pipeline/schemas.py",
+        "pipeline/stage6_commit.py",
+        "pipeline/stage6_okf_export.py",
+        "pipeline/stage6b_anytype_push.py",
+        "pipeline/stage6c_obsidian_export.py",
+        "schemas.py",
+        "scripts/build_discipline_ceiling_sample.py",
+        "scripts/check_store_columns.py",
+        "scripts/normalize_absent_shape.py",
+        "scripts/normalize_runtime_absents.py",
+        "tests/test_absent_shape_reader.py"
+      ]
     },
     {
       "id": "BUG-738",
       "title": "(MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/r5_review_gate.yaml",
+        "governance/r5_reviews.json",
+        "scripts/pre_commit_gate.py",
+        "scripts/r5_code_review.py",
+        "scripts/r5_review_gate.py",
+        "tools/model_eval_suite.py"
+      ]
     },
     {
       "id": "BUG-743",
       "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/r5_reviews.json"
+      ]
     },
     {
       "id": "BUG-748",
       "title": "(MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent",
-      "events": 5
+      "events": 5,
+      "artifacts": [
+        "scripts/audit_menu_rescope_cohort.py",
+        "scripts/check_menu_reclass_gate.py"
+      ]
     },
     {
       "id": "BUG-749",
       "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own",
-      "events": 5
+      "events": 5,
+      "artifacts": [
+        "alias_map.yaml",
+        "build_relabel_review_packet.py",
+        "config/alias_map.yaml",
+        "config/label_store_write_receipt.json",
+        "config/relabel_rulings.yaml",
+        "config/taxonomy.yaml",
+        "pipeline/schemas.py",
+        "pipeline/stage4_merge.py",
+        "scripts/apply_relabel_rulings.py",
+        "scripts/apply_relabel_store_write.py"
+      ]
     },
     {
       "id": "BUG-750",
       "title": "(LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/taxonomy.yaml",
+        "config/taxonomy_v5.yaml",
+        "governance/canonical_labels_reference.md",
+        "scripts/build_canonical_labels_md.py",
+        "taxonomy.yaml"
+      ]
     },
     {
       "id": "BUG-757",
       "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/gov_sync.yaml",
+        "governance/bug_status.json",
+        "scripts/gov_sync.py"
+      ]
     },
     {
       "id": "BUG-767",
       "title": "(HIGH - OPEN 2026-10-13) - the RETIRED trust metric still leaves the machine, published to agents and written into two exports",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/BORP_FEEDBACK_ASSESSMENT_20261013.md",
+        "maxwell_mcp_server.py",
+        "pipeline/retrieve.py",
+        "pipeline/run_monitor.py",
+        "pipeline/stage5_verify.py",
+        "pipeline/stage6_commit.py",
+        "pipeline/stage6_okf_export.py",
+        "pipeline/stage6b_anytype_push.py",
+        "scripts/check_served_fields.py"
+      ]
     },
     {
       "id": "BUG-768",
       "title": "(HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-771",
       "title": "(MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/golden/retrieval_queries.yaml",
+        "scripts/reanchor_retrieval_goldens.py"
+      ]
     },
     {
       "id": "BUG-772",
       "title": "(HIGH - OPEN 2026-10-13) - corroboration is frozen by ONE run's clustering, so a later independent source can never raise a row's tier",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/derivations.yaml",
+        "pipeline/dedup_gate.py",
+        "pipeline/dedup_identity.py",
+        "pipeline/stage1_5_embed_cluster.py"
+      ]
     },
     {
       "id": "BUG-773",
       "title": "(HIGH - OPEN 2026-10-13) - the declared rule \"a commit may never rewrite an existing row's body\" is contradicted by the live upsert",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "config/dedup_identity.yaml",
+        "config/pipeline_config.yaml",
+        "config/rail_registry.yaml",
+        "dedup_identity.yaml",
+        "pipeline/dedup_identity.py",
+        "pipeline/schemas.py",
+        "pipeline/stage6_commit.py",
+        "pipeline_config.yaml",
+        "scripts/check_commit_scope_guard.py"
+      ]
     },
     {
       "id": "BUG-774",
       "title": "(MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/eval_integrity.yaml",
+        "config/references.yaml",
+        "pipeline/book_metadata.py",
+        "pipeline/stage0_convert.py",
+        "scripts/verify_source_identity.py"
+      ]
     },
     {
       "id": "BUG-775",
       "title": "(MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/derivations.yaml",
+        "config/served_fields.yaml",
+        "governance/T120_S1_RECON_20261014.md",
+        "pipeline/schema_accessor.py",
+        "pipeline/stage1_5_embed_cluster.py"
+      ]
     },
     {
       "id": "BUG-780",
       "title": "(HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 \"corroborated\" rows (369 of them",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/corroboration_collapse.yaml",
+        "config/served_fields.yaml",
+        "governance/WORK_IDENTITY_COLLAPSE_20261014.md",
+        "scripts/check_corroboration_collapse.py",
+        "stage1_chunk/rechunk-v4-20260929/checkpoint.json"
+      ]
     },
     {
       "id": "BUG-781",
       "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/ingest_identity_gate.yaml",
+        "config/rail_registry.yaml",
+        "detect_same_work_content.py",
+        "detect_title_renames.py",
+        "gate_duplicate_candidates.py",
+        "governance/INGEST_IDENTITY_GATE_20261014.md",
+        "governance/duplicate_adjudication.json",
+        "pipeline/ingest_gate.py",
+        "pipeline/stage0_convert.py",
+        "scripts/check_ingest_identity_gate.py",
+        "verify_duplicate_gate.py"
+      ]
     },
     {
       "id": "BUG-789",
       "title": "(MED \u2014 OPEN) \u2014 the local model server's app config carries a Hugging Face token in plaintext",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "Support/oMLX/config.json"
+      ]
     },
     {
       "id": "BUG-790",
       "title": "(LOW \u2014 OPEN) \u2014 the ingest door's refusal names the WRONG TASK",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/check_ingest_identity_gate.py"
+      ]
     },
     {
       "id": "BUG-793",
       "title": "(MED \u2014 OPEN 2026-10-14) \u2014 Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "omlx/model_settings.json"
+      ]
     },
     {
       "id": "BUG-795",
       "title": "(LOW \u2014 OPEN 2026-10-14) \u2014 one ledger row carries a NULL model and 156,098,139 input tokens",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-796",
       "title": "(MED \u2014 OPEN 2026-10-14) \u2014 a decision written outside the receipting writer leaves the attribution control red",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "scripts/lib/handoff.py",
+        "scripts/recompute_decision_summary.py"
+      ]
     },
     {
       "id": "BUG-797",
       "title": "(MED \u2014 OPEN 2026-10-15) \u2014 the `llmfit` preflight cell is a control that CANNOT FAIL",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/MARKET-RESEARCH-QWEN3.8-HARNESS-2026-08-14.md",
+        "governance/NOT-YET-EVALUATED-RESEARCH.md"
+      ]
     },
     {
       "id": "BUG-800",
       "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 the approved corpus-name rename is a CASCADE until it rides a re-ingest",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/normalise_corpus_names_plan_20261015.json"
+      ]
     },
     {
       "id": "BUG-802",
       "title": "(MED \u2014 OPEN 2026-10-15) \u2014 the $0 local engine does not survive a reboot, and nothing starts it",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "omlx_watchdog.py"
+      ]
     },
     {
       "id": "BUG-803",
       "title": "(MED \u2014 OPEN 2026-10-15) \u2014 a prefill reading without the POOL STATE it was taken at is not comparable either",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/bench_preflight.yaml"
+      ]
     },
     {
       "id": "BUG-805",
       "title": "(MED \u2014 OPEN 2026-10-15) \u2014 decode is a function of CONTEXT LENGTH: the decode axis was measured on tiny prompts",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agent_context.yaml"
+      ]
     },
     {
       "id": "BUG-806",
       "title": "(LOW - OPEN 2026-10-15) - my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "temp/prefill_bench_20261015.json",
+        "temp/prefill_bench_20261015.py"
+      ]
     },
     {
       "id": "BUG-810",
       "title": "(MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agent_context.yaml",
+        "pipeline/harness_contract.py",
+        "pipeline/harness_env.py"
+      ]
     },
     {
       "id": "BUG-811",
       "title": "(HIGH - OPEN 2026-10-15) - a new instrument told three lies before its own selftest was written",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/model_loadability_probe.py",
+        "pipeline/research_run.py"
+      ]
     },
     {
       "id": "BUG-812",
       "title": "(MED - OPEN 2026-10-15) - a comment inserted into a plist silently broke the XML, and launchd reported only \"Input/output error\"",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/omlx_engine_guard.sh"
+      ]
     },
     {
       "id": "BUG-813",
       "title": "(MED - OPEN 2026-10-15) - the cache was enabled before its baseline was taken",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/omlx_cache_enable.sh"
+      ]
     },
     {
       "id": "BUG-815",
       "title": "(HIGH - OPEN 2026-10-15) - `goose run` was not bound to the local engine, so a headless agent run went elsewhere",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agent_context.yaml",
+        "config/goose/config.yaml",
+        "config/model_assignments.yaml",
+        "pipeline/harness_env.py"
+      ]
     },
     {
       "id": "BUG-817",
       "title": "(HIGH - OPEN 2026-10-15) - a failed edit was read as a success, so two declared config blocks never existed while three instruments",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/decisions.yaml",
+        "config/engine.yaml",
+        "pipeline/hf_fetch_model.py",
+        "pipeline/oneshot_ask.py",
+        "pipeline/subagent_fanout.py"
+      ]
     },
     {
       "id": "BUG-818",
       "title": "(MED - OPEN 2026-10-15) - the retire tool's dry run promises a park and its code performs a delete; and safe_delete would copy model",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/omlx_retire_model.sh",
+        "pipeline/safe_delete.py"
+      ]
     },
     {
       "id": "BUG-819",
       "title": "(MED - OPEN 2026-10-15) - a face that says \"generated from the live oMLX registry\" was hand-copied and had drifted",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/r5_review_gate.yaml",
+        "governance/eval_models.txt"
+      ]
     },
     {
       "id": "BUG-820",
       "title": "(MED - OPEN 2026-10-15) - a guard artifact rewritten by a generic YAML dumper loses the comments that ARE the guard",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/session_plan_20260924.yaml",
+        "scripts/check_session_plan.py"
+      ]
     },
     {
       "id": "BUG-821",
       "title": "(MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "MASTER-TASK-REGISTER.md",
+        "agent/session_seed.yaml",
+        "buglog.md",
+        "config/decisions.yaml",
+        "config/decisions_summary.json",
+        "scripts/recompute_decision_summary.py",
+        "temp/mut_recompute.py"
+      ]
     },
     {
       "id": "BUG-829",
       "title": "(MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/zed/settings.json"
+      ]
     },
     {
       "id": "BUG-832",
       "title": "(MED - OPEN 2026-10-15) \u2014 the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "config/agent_context.yaml",
+        "config/delegation_economy.yaml",
+        "config/goose/config.yaml",
+        "config/harness_policy.yaml",
+        "delegate_safe.py",
+        "governance/buglog.md",
+        "governance/model_eval_checkpoint.json",
+        "pipeline/delegation_economy.py",
+        "temp/subagent_loop_two_step_full_20261019.json"
+      ]
     },
     {
       "id": "BUG-834",
       "title": "(MED - OPEN 2026-10-15) \u2014 a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/delegation_economy.yaml",
+        "delegation_economy.py",
+        "pipeline/subagent_fanout.py"
+      ]
     },
     {
       "id": "BUG-836",
       "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/engine.yaml",
+        "config/rail_registry.yaml",
+        "governance/evidence/BUG836_gemma_citation_list.md",
+        "oneshot_ask.py",
+        "pipeline/research_run.py",
+        "pipeline/subagent_fanout.py",
+        "task.json",
+        "temp/t154_r5_review.md",
+        "temp/t154_r5_review2.md",
+        "temp/t154_review2_prompt.md",
+        "temp/t154_review_prompt.md"
+      ]
     },
     {
       "id": "BUG-846",
       "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "config/task_register.yaml",
+        "governance/INTAKE_ASSESSMENT_20261014.md"
+      ]
     },
     {
       "id": "BUG-857",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape,",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/bug_recall.yaml",
+        "config/goose/config.yaml",
+        "governance/CONTEXT_INDEX.md",
+        "scripts/check_bug_recall.py"
+      ]
     },
     {
       "id": "BUG-858",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/check_bug_recall.py"
+      ]
     },
     {
       "id": "BUG-862",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/census_source_names.py"
+      ]
     },
     {
       "id": "BUG-867",
       "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/census_source_names.py",
+        "scripts/plan_admission.py"
+      ]
     },
     {
       "id": "BUG-869",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agent_context.yaml",
+        "governance/delegate_journal.json",
+        "governance/r5_review_gate.json",
+        "governance/r5_reviews.json",
+        "pipeline/harness_contract.py",
+        "scripts/delegate_journal.py",
+        "scripts/plan_admission.py",
+        "scripts/r5_review_gate.py",
+        "tools/model_eval_suite.py"
+      ]
     },
     {
       "id": "BUG-875",
       "title": "(HIGH, OPEN) \u2014 A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "Users/barn/miniforge3/lib/python3.13/site-packages/scripts/__init__.py",
+        "__init__.py",
+        "agent_surface.yaml",
+        "config/rail_registry.yaml",
+        "config/repo_integrity.yaml",
+        "pipeline/config_audit.py",
+        "resolve_route.py",
+        "scripts/__init__.py",
+        "scripts/check_repo_integrity.py",
+        "scripts/delegate_journal.py",
+        "scripts/resolve_domains_emerging.py"
+      ]
     },
     {
       "id": "BUG-876",
       "title": "(MED, OPEN 2026-10-17) \u2014 THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "config/decisions.yaml",
+        "config/handoffs.yaml",
+        "scripts/lib/handoff.py"
+      ]
     },
     {
       "id": "BUG-877",
       "title": "(MED, OPEN 2026-10-17) \u2014 A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "apply_provider_flip.py",
+        "check_harness_homes.py",
+        "config.yaml",
+        "omlx/stats.json",
+        "pipeline/apply_provider_flip.py",
+        "scripts/check_harness_homes.py"
+      ]
     },
     {
       "id": "BUG-879",
       "title": "(LOW, OPEN 2026-10-17) \u2014 THE BIRTH RECORD NAMES A STDIO MEMBER BY ITS COMMAND, SO `scripts/goose_profile.py --born` CANNOT DISTINGUISH TWO",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/extension_profiles.yaml",
+        "scripts/goose_profile.py"
+      ]
     },
     {
       "id": "BUG-889",
       "title": "(MED, OPEN 2026-10-17) \u2014 `scripts/normalise_corpus_names.py --census` CANNOT SEE THE 6 NFD NAMES IT EXISTS TO CURE: ITS DEFECT CLASSES ARE",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-890",
       "title": "(MED, ADDRESSED 2026-10-17) \u2014 `AGENTS.md#delegate_rules` STILL CARRIES DELEGATE-002's \"SINGLE-SHOT ONLY / 6.8\u21920.4 tok/s COLLAPSE\", A CLAIM",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "AGENTS.md",
+        "config/agent_surface.yaml"
+      ]
     },
     {
       "id": "BUG-891",
       "title": "(MED, OPEN 2026-10-17) \u2014 `config/agent_surface.yaml`'s SWAP CHECKLIST NAMES A RENDER SOURCE THAT DOES NOT EXIST, SO EVERY CORRECTION TO",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "AGENTS.md",
+        "CONTRACT.md",
+        "goose/apply_provider_flip.py",
+        "goose/wiring.md"
+      ]
     },
     {
       "id": "BUG-899",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `pipeline/stage0_convert.py` \u2014 `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "stage0_convert.py"
+      ]
     },
     {
       "id": "BUG-900",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE IN `pipeline/container_integrity.py` AND STILL BE UNCONVERTIBLE, AND THIS",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "ADMISSION_PLAN_20261018.json"
+      ]
     },
     {
       "id": "BUG-901",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `pipeline/ingest_gate.py` \u2014 THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/ingest_identity_gate.yaml",
+        "pipeline/stage0_convert.py"
+      ]
     },
     {
       "id": "BUG-902",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING IN `config/capability_registry.yaml` BEFORE TODAY'S FINDINGS",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/capability_registry.yaml",
+        "resolve_route.py",
+        "scripts/container_alert.py"
+      ]
     },
     {
       "id": "BUG-905",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: config/ingest_identity_gate.yaml DECLARES A KIND FOLDER THAT",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/ingest_identity_gate.yaml"
+      ]
     },
     {
       "id": "BUG-906",
       "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none`",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "delegate_journal.py"
+      ]
     },
     {
       "id": "BUG-909",
       "title": "(HIGH \u2014 OPEN 2026-10-17) \u2014 THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "scripts/acquire.py"
+      ]
     },
     {
       "id": "BUG-911",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ONLY ROUTE INTO ANNA'S ARCHIVE IS A HEADED BROWSER WINDOW",
-      "events": 3
+      "events": 3,
+      "artifacts": []
     },
     {
       "id": "BUG-912",
       "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/acquisition/adapters.py",
+        "pipeline/acquisition/browser.py",
+        "pipeline/acquisition/mirrors.py"
+      ]
     },
     {
       "id": "BUG-914",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE LANE RECORDS DELIVERY AND NEVER CUSTODY, SO IT PAID THE SHADOW PRICE FOR A WORK THE CORPUS ALREADY HELD",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/evidence/ACQ_LANDED_LEDGER.md",
+        "index.json",
+        "pipeline/acquisition/index.json"
+      ]
     },
     {
       "id": "BUG-915",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE DOCLING BUDGET'S DECLARED BASIS IS **BYTES**, AND BYTES DO NOT PREDICT CONVERSION COST (MEASURED r = \u22120.131)",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/evidence/APPLIER_POPULATION_AUDIT_20261017.json",
+        "pipeline/stage0_convert.py"
+      ]
     },
     {
       "id": "BUG-919",
       "title": "(MED, OPEN 2026-10-18) \u2014 A SECOND ARTEFACT DEFECT: WHITESPACE PADDING, AND ARTEFACTS NO ENGINE PRODUCED",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-921",
       "title": "(MED, OPEN 2026-10-18) \u2014 19 DUPLICATE STEMS (38 FILES) IN THE CORPUS MD FROM FILENAME PUNCTUATION DRIFT; NO PER-WORK DEDUP KEY",
-      "events": 3
+      "events": 3,
+      "artifacts": [
+        "Book.md",
+        "Rand.md",
+        "config/decisions.yaml",
+        "config/ingest_identity_gate.yaml",
+        "pipeline/safe_delete.py",
+        "scripts/plan_admission.py"
+      ]
     },
     {
       "id": "BUG-948",
       "title": "(MED, OPEN 2026-10-19) \u2014 owner_marks.rule_digest is a whole-file sha256; any append to the rule file stale-ifies the pair object",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "agent/adapters/goose/apply_provider_flip.py",
+        "check_harness_homes.py",
+        "config/corroboration_collapse.yaml",
+        "config/goose/config.yaml",
+        "scripts/check_harness_homes.py",
+        "scripts/owner_marks.py"
+      ]
     },
     {
       "id": "BUG-949",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 pipeline cloud spend is UNMETERED while the routing table still declares cloud routes",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/delegation_economy.yaml",
+        "config/model_assignments.yaml",
+        "pipeline/delegation_economy.py",
+        "pipeline/parallel.py",
+        "scripts/agent_context_probe.py"
+      ]
     },
     {
       "id": "BUG-950",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 THE HARNESS ABORTS A LOCAL-MODEL REQUEST AT ~120 s AND REPORTS IT AS \"Failed to read response body: error",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "AGENTS.md",
+        "config/goose/config.yaml",
+        "governance/HANDOFF_20261020_LOCAL_PLANNER.md",
+        "tmp/bigprompt.txt",
+        "tmp/toolcall_probe2.py"
+      ]
     },
     {
       "id": "BUG-951",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS",
-      "events": 5
+      "events": 5,
+      "artifacts": [
+        "_clean_guard_IDENTICAL_RETRY.json",
+        "_clean_guard_NUDGE.json",
+        "config/engine.yaml",
+        "config/goose/config.yaml",
+        "config/model_assignments.yaml",
+        "functions.sh",
+        "scripts/harmony_red_loop.py",
+        "scripts/measure_subagent_loop.py",
+        "tmp/toolcall_probe2.py"
+      ]
     },
     {
       "id": "BUG-964",
       "title": "(LOW, OPEN 2026-10-22) \u2014 gpt-oss-20b same-row verdict flip: NONE(0.1) -> MATCH(0.85) on R111 (determinism unverified)",
-      "events": 2
+      "events": 2,
+      "artifacts": []
     },
     {
       "id": "BUG-967",
       "title": "(LOW, OPEN 2026-10-23) \u2014 the Phase 0 receipt reports S0.5 as \"identical\" over two EMPTY sets",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/PHASE0_IDEMPOTENCY_REPORT.md",
+        "idem_b/checkpoint.json",
+        "pipeline/stage0_5_extract_metadata/idem_a/checkpoint.json",
+        "stage0_5_extract_metadata.py",
+        "stage2_extract.py"
+      ]
     },
     {
       "id": "BUG-972",
       "title": "(LOW, OPEN 2026-10-23) \u2014 `r5_code_review.py --out <a path outside the repo>` writes the verdict, then DIES with a traceback",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/r5_review_gate.yaml",
+        "governance/r5_reviews.json",
+        "pipeline/golden.py",
+        "scripts/r5_code_review.py",
+        "tmp/r5_golden_969_970.json"
+      ]
     },
     {
       "id": "BUG-992",
       "title": "(HIGH \u2014 OPEN 2026-10-24) \u2014 the S4 writer derives classification_status from failure_mode LENGTH, not from status, so a long-fm row",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/stage4_merge.py",
+        "scripts/reinject_bug198_singletons.py",
+        "scripts/repair_classification_status.py"
+      ]
     },
     {
       "id": "BUG-999",
       "title": "(MED \u2014 OPEN 2026-10-24) \u2014 the store mutated at 19:07:30 with NO MUTATION_JOURNAL entry: the single-concept write path bypasses the",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/MUTATION_JOURNAL.json",
+        "pipeline/insert_single_concept.py",
+        "scripts/repair_single_concept_provenance.py",
+        "scripts/reverify_one_row.py"
+      ]
     },
     {
       "id": "BUG-1001",
       "title": "(LOW, OPEN 2026-10-25) \u2014 `guard_stacks_single_source.py` went RED once on a transient engine blip, so a flaky live-dependency can write a",
-      "events": 2
+      "events": 2,
+      "artifacts": [
+        "config/gov_sync.yaml",
+        "guard_stacks_single_source.py",
+        "run_ladder.py",
+        "scripts/bug_status.py",
+        "scripts/gov_sync.py",
+        "scripts/guard_stacks_single_source.py"
+      ]
     },
     {
       "id": "BUG-1002",
       "title": "(LOW - OPEN 2026-10-25) - the delegate journal's END vocabulary cannot express a READ-ONLY run: `done` demands an artifact, and",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/agent_surface.yaml",
+        "governance/evidence/R5_REVIEW_20261025_BUG481.md",
+        "scripts/delegate_journal.py"
+      ]
     },
     {
       "id": "BUG-1024",
       "title": "(MED - OPEN, OWNER-OWED 2026-10-26) - the oMLX Hugging Face token has NO Settings surface: two instructions named a door that does not",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "Support/oMLX/config.json",
+        "config.json",
+        "omlx/settings.json"
+      ]
     },
     {
       "id": "BUG-1028",
       "title": "(LOW - OPEN 2026-10-26, RE-SCOPED out of BUG-1020 limb 2) - a delegate failure is reported as the word `Other`: the harness names no cause,",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "scripts/delegate_journal.py"
+      ]
     },
     {
       "id": "BUG-1030",
       "title": "(MED, OPEN 2026-10-26) \u2014 the governance rail surface accreted five hidden couplings, so any consolidation is a non-atomic cascade (future",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/corroboration_collapse.yaml",
+        "config/rail_mutations.yaml",
+        "config/rail_registry.yaml",
+        "scripts/gov_sync.py",
+        "scripts/lib/write_guard.py",
+        "scripts/owner_marks.py",
+        "scripts/run_ladder.py"
+      ]
     },
     {
       "id": "BUG-1033",
       "title": "(MED, OPEN 2026-10-26) - market research had NO reference-class obligation, so a 2x throughput gap to a rival RUNTIME sat undetected across",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-1034",
       "title": "(HIGH, OPEN 2026-10-26) - the execute_javascript bridge ran each tools.call TWICE, so one append landed TWO identical blocks in AGENTS.md",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "AGENTS.md"
+      ]
     },
     {
       "id": "BUG-1035",
       "title": "(MED, OPEN 2026-10-26) - the decision register has NO governed append route, so every hand append leaves its bytes attributable to no",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "governance/MUTATION_JOURNAL.json",
+        "recompute_decision_summary.py",
+        "scripts/append_decision.py",
+        "scripts/lib/handoff.py",
+        "scripts/recompute_decision_summary.py",
+        "tests/test_handoff_obligation.py"
+      ]
     },
     {
       "id": "BUG-1036",
       "title": "(MED, OPEN 2026-10-26) - DECISION-LOG's tier tables lag the register by 22 records and NO rail can tell that from curation: the face",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "config/decisions.yaml",
+        "config/gov_sync.yaml",
+        "scripts/gov_sync.py"
+      ]
     },
     {
       "id": "BUG-1041",
       "title": "(MED, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "tools/model_eval_suite.py"
+      ]
     },
     {
       "id": "BUG-1048",
       "title": "(MED, OPEN 2026-10-27) - R5 review coverage silently depends on FILE LENGTH: gpt-oss returns UNPARSED on a 26 KB script at both output",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/hardware_profile.yaml",
+        "governance/r5_reviews.json",
+        "scripts/hardware_calibrate.py"
+      ]
     },
     {
       "id": "BUG-1049",
       "title": "(LOW, OPEN 2026-10-27) - the severity vocabulary is DECLARED as MED and WRITTEN as MEDIUM: 20 headings use the undeclared word, and a bug",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/gov_sync.yaml",
+        "scripts/gov_sync.py"
+      ]
     },
     {
       "id": "BUG-1050",
       "title": "(HIGH, OPEN 2026-10-27) - `hf cache prune` names the SERVED snapshot of a live model as \"detached\", and `du -shL` reports 48G for a 16G",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "added_tokens.json",
+        "scripts/check_delete_target.py"
+      ]
     },
     {
       "id": "BUG-1051",
       "title": "(HIGH, OPEN 2026-10-27) - oMLX 0.7.3rc1 makes the RATIFIED advisory best-arm UNLOADABLE (pplx-decider -> HTTP 409 on both endpoints), and",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/pipeline_config.yaml"
+      ]
     },
     {
       "id": "BUG-1052",
       "title": "(MED, OPEN 2026-10-27) - rc1 ships `specprefill_enabled: true` on three models whose prompts never reach its 8192-token trigger: a",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "omlx/model_settings.json",
+        "omlx/model_settings.py"
+      ]
     },
     {
       "id": "BUG-1053",
       "title": "(MED, OPEN 2026-10-27) - the documented \u00a77.1 re-baseline command cannot run on this host: bare `python3` is /usr/bin/python3, which has no",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/CALIBRATION_ROLE_MARKET_20261027.md",
+        "scripts/specdec_probe.py",
+        "specdec_probe.py"
+      ]
     },
     {
       "id": "BUG-1054",
       "title": "(MED, OPEN 2026-10-27) - the delete-safety test has TWO more holes: the served portfolio spans 3 roots, and the engine's pool (17 ids) is",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-1055",
       "title": "(MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/hardware_profile.yaml",
+        "governance/kv_working_set.json",
+        "scripts/kv_working_set.py"
+      ]
     },
     {
       "id": "BUG-1056",
       "title": "(MED, OPEN 2026-10-27) - the handover was UNRUNNABLE AS WRITTEN: interactive zsh does not treat `#` as a comment, so the verification line",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "tmp/x.sh"
+      ]
     },
     {
       "id": "BUG-1057",
       "title": "(MED, OPEN 2026-10-27) - after the bytes were deleted the engine still ADVERTISED the model and kept its full flag set: a declaration with",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "admin/routes.py",
+        "model_discovery.py",
+        "model_settings.json",
+        "omlx/model_settings.json",
+        "scripts/check_delete_target.py"
+      ]
     },
     {
       "id": "BUG-1058",
       "title": "(MED, OPEN 2026-10-27) - `hf cache delete` reported \"freed 24.1G\" with no measured counterpart: the cache arithmetic accounts for the 14G",
-      "events": 1
+      "events": 1,
+      "artifacts": []
     },
     {
       "id": "BUG-1059",
       "title": "(MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/delete_safety.yaml",
+        "governance/r5_reviews.json",
+        "scripts/check_delete_target.py"
+      ]
     },
     {
       "id": "BUG-1064",
       "title": "(MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget:",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "governance/model_eval_checkpoint.json"
+      ]
     },
     {
       "id": "BUG-1069",
       "title": "(MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/engine.yaml",
+        "config/specdec_m1.yaml"
+      ]
     },
     {
       "id": "BUG-1074",
       "title": "(LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work,",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/r5_review_gate.yaml",
+        "delegate_journal.py",
+        "governance/delegate_journal.json",
+        "governance/r5_reviews.json"
+      ]
     },
     {
       "id": "BUG-1076",
       "title": "(MED, OPEN 2026-10-27) - \"unverifiable\" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/pipeline_config.yaml",
+        "scripts/agent_context_probe.py"
+      ]
     },
     {
       "id": "BUG-1077",
       "title": "(MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "config/hardware_profile.yaml",
+        "config/model_roles.yaml",
+        "governance/calibration_receipts.json",
+        "measure_prefill.py",
+        "scripts/hardware_calibrate.py",
+        "scripts/measure_prefill.py"
+      ]
     },
     {
       "id": "BUG-1088",
       "title": "(MED, OPEN 2026-10-27) \u2014 THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`",
-      "events": 1
+      "events": 1,
+      "artifacts": [
+        "pipeline/oneshot_ask.py"
+      ]
     }
   ],
   "closed": [
@@ -1934,6 +3258,7 @@
     "BUG-1092",
     "BUG-1093",
     "BUG-1094",
-    "BUG-1095"
+    "BUG-1095",
+    "BUG-1096"
   ]
 }

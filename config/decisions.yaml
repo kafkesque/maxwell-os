@@ -35802,3 +35802,122 @@ decisions:
   - governance/buglog.md
   - governance/bug_status.json
   supersedes: []
+- id: D-3212
+  date: '2026-10-28'
+  state: RESOLVED
+  category: REGISTER STEWARDSHIP / INSTRUMENT INTEGRITY (D-3034, D-3038, D-2644, D-2982, D-2989, D-2642, D-3023,
+    BUG-1096)
+  bugs:
+  - BUG-1096
+  - BUG-1083
+  - BUG-1095
+  - BUG-1091
+  - BUG-1092
+  - BUG-1093
+  title: 'THE REGISTER GROWS BECAUSE A FINDING IS BORN UNTYPED - not because a fix breeds a bug: MEASURED 19 opened
+    vs 21 closed over 24 commits (net -2) and 175 disclosure sentences vs 55 regression sentences, so the growth
+    that is felt is a reader that asked a bug''s TITLE for a fact its EVIDENCE holds (20 of 266 bugs routed, 231
+    called debt against a ceiling of 221) plus an escape that went silently inert (10 of 15 overrides). Both are
+    instruments, not work: the census now publishes the artifacts each bug''s own evidence names, the ceilings follow
+    the reading DOWN to their floor, and from here every finding must be born routed or dispositioned'
+  decision: '(1) A FINDING IS BORN UNTYPED, AND THAT IS THE WHOLE MECHANISM. The registers carry no closure class
+    at birth, so an observation enters a pool whose only exit is an ad-hoc turn; the worked set (63 open tasks)
+    therefore stays the same size while the observed set (266 open bugs) grows, and the difference reads as mounting
+    workload when it is mounting VISIBILITY. The remedy is not fewer findings and not more tasks: it is that the
+    pool must have a closure mechanism that fires at BIRTH. (2) THE FOUR CLOSURE CLASSES, each with the act that
+    closes it - FIX (a red loop, D-3036: closes by receipt), FINDING (a recorded negative or a measurement of the
+    world, D-3038: closes by DECISION, not by a code change), OWNER-GATE (closes by the owner''s word, D-2941),
+    DEBT (closes by payment, D-2644). Every open bug is one of these four and the register should be readable as
+    such. (3) THE MECHANISM ALREADY EXISTED AND WAS ONLY HALF-PRICED: the route graph routes an item to an owning
+    capability or refuses it, a per-item `unrouted:` override dispositions a finding, and `routing_debt` is a SHRINK-ONLY
+    ceiling. What was missing was that a bug''s route question was asked of `id + title` while a task''s was asked
+    of six evidence fields, and that the ceiling sat 49 items above its own reading so one more untriaged observation
+    cost nothing. (4) BOTH LIMBS ARE NOW PAID AS INVARIANTS, NOT AS INSTANCES: `scripts/bug_status.py` publishes
+    `artifacts` per open bug (the census stays the ONE parser of the buglog, C12) and `scripts/lib/artifact_tokens.py`
+    is the ONE home of the token pattern (D-2642); fault (vii) refuses an `unrouted:` override on a routed item
+    (the invariant behind BUG-917/920/952/975/977 and BUG-1091/1092/1093, which had each been retired BY HAND);
+    and both ceilings were LOWERED to the measured set - tasks 31 -> 26, bugs 221 -> 172 - so the next unrouted
+    finding is a fault. (5) WHAT THIS DOES NOT CLAIM: 172 unrouted items remain, and they are REAL work-shaped facts,
+    not noise - 100 name an artifact that EXISTS and NO capability owns (a missing ROUTE, the honest engineering
+    queue), 63 name no artifact at all (the FINDING class the override exists for), 14 name a path that does not
+    exist (a proposal, an out-of-repo home, or a stale citation - the reader reports the FACT and does not claim
+    which). The debt was not erased; it was MEASURED and a floor was set under it.'
+  reason: 'The owner''s question was consequential and had to be answered with receipts, not reassurance: "with
+    structural re-engineering there won''t be more bugs, but we now have 3 extra tasks - does each fix create a
+    new bug, or what is the reason the workload increases?" MEASURED on this repo (2026-10-28, git over the last
+    24 commits): newly-opened bugs 19, closed 21, NET -2 - a fix is NOT breeding a bug here. The prose agrees: 175
+    sentences in governance/buglog.md describe a defect FOUND by a proxy for finding it (found while / discovered
+    while / the reading that / surfaced by / exposed by / born from) against 55 that describe a REGRESSION. What
+    grows is the TASK board: 107 -> 120 tasks over 40 commits, +12 minted, and the three the owner counted (T-217,
+    T-218, T-219) are each a FOLLOW-UP to a reading, which is the disclosure effect pointing at task-shaped work.
+    And what inflates the feeling of a bottomless queue is a number that was simply WRONG: 231 open bugs ''resolving
+    to no declared capability'' against a ceiling of 221, when 69 of them name the very artifact an owning capability
+    already holds - in their EVIDENCE, never in their title. A reader can be wrong in the alarming direction as
+    easily as in the reassuring one, and a debt figure nobody can recompute is a debt figure nobody should quote
+    (BUG-342''s lesson, one register over).'
+  rejected:
+  - option: Mass-disposition the 231 unrouted bugs to `bug_is_a_finding` so the debt reads near zero and the ladder
+      goes green.
+    why: That is hollowing the metric out, which this registry's own comment already names ("a shrink-only ceiling
+      plus an ever-growing register means the metric can only be kept green by hollowing itself out"). It would
+      also be a false declaration under D-3034 - most of those bugs are real engineering with a real owner, and
+      calling them findings would hide the queue, not shorten it.
+  - option: Teach `scripts/resolve_route.py` to parse `governance/buglog.md` for the artifacts a bug's body names.
+    why: A second parser for one fact (C12), and the docstring of the function that would have grown it says so.
+      The census already parses that file; it was publishing a subset of what it had read. The correct place to
+      widen the reader was the census.
+  - option: Raise the bugs ceiling from 221 to accommodate the arrival of new findings.
+    why: D-2644/D-3023 - a ceiling follows its measurement DOWN and a raise is a decision that must name its reason.
+      Here the measurement itself was wrong, so the lawful act was to correct the measurement and let the ceiling
+      follow it down; raising it would have priced a defect as policy.
+  - option: Build a new triage rail / LLM classifier over the 266 open bugs to assign each a closure class.
+    why: Over-engineering for a question three existing instruments already answer (the route graph, the dispositions
+      vocabulary, the shrink-only ceiling), and an LLM assignment would be a canonical classification of register
+      state, which D-2898 forbids (no LLM canonical promotion) and which would need the owner's word anyway (D-2941).
+      The classification surface exists; what was missing was that it was priced for free.
+  - option: Leave the ten inert `unrouted:` overrides in place because they cost nothing numerically.
+    why: They ARE declarations with no referent (D-3034) and they hide the fact that the cure arrived - exactly
+      what BUG-917/920/952/975/977 and BUG-1091/1092/1093 were retired by hand for on four previous dates. Retiring
+      them by hand a fifth time without adding fault (vii) would have been the instance-payment behaviour this decision
+      exists to end.
+  metrics:
+    commits_measured: 24
+    bugs_opened: 19
+    bugs_closed: 21
+    bugs_net: -2
+    disclosure_sentences: 175
+    regression_sentences: 55
+    open_bugs: 266
+    open_bugs_named_by_an_open_task: 2
+    bugs_routed_before: 20
+    bugs_routed_after: 89
+    unrouted_bugs_before: 231
+    unrouted_bugs_ceiling_before: 221
+    unrouted_bugs_after: 172
+    unrouted_bugs_ceiling_after: 172
+    unrouted_tasks_after: 26
+    unrouted_tasks_ceiling_after: 26
+    inert_overrides_found: 10
+    unknown_owner_artifacts: 100
+    no_artifact_named: 63
+    absent_path: 14
+  evidence:
+  - 'python3 scripts/resolve_route.py --check  -> before: 1 fault (vi) 231 > 221 ; after: rc 0, "debt tasks 26/26
+    bugs 172/172"'
+  - python3 scripts/resolve_route.py --selftest  -> 22/22 (was 21/21; the new control is inert_unrouted_declaration)
+  - python3 scripts/bug_status.py --selftest  -> 45 known-answer controls; OPEN 266 / CLOSED 594 of 860
+  - 'python3 scripts/check_bug_status.py  -> ok: register equals its re-derivation'
+  - python3 scripts/check_config_defaults.py --check  -> 574 sites over 660 modules, within ceiling (counts.modules
+    re-recorded via --record, D-2989)
+  - 'git log --format=%h -- governance/buglog.md over the last 24 commits, diffing added headers: opened 19 / closed
+    21'
+  - 'python3 scripts/resolve_route.py --check with the writer disabled: 20 of 266 bugs routed on id+title; 89 with
+    id+title+artifacts'
+  files:
+  - scripts/bug_status.py
+  - scripts/resolve_route.py
+  - scripts/lib/artifact_tokens.py
+  - config/capability_registry.yaml
+  - config/config_defaults_census.json
+  - governance/bug_status.json
+  - governance/buglog.md

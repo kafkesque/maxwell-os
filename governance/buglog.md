@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1337 decisions (census stamp 11caeecb3523511b, 2026-10-27) · 859 bugs (266 open / 593 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 860 bugs (266 open / 594 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1337 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 389 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1337, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1338 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 390 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1338, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
@@ -24787,3 +24787,56 @@ D-3210 clause 2 ends "an enforcement reader is deferred as a named follow-up (T-
 HOW IT HAPPENED: T-218 was already the highest id and was already open, so the reference was written from memory of "the next id" rather than from the register. That is the exact defect D-3109 names — a fact asserted instead of resolved.
 
 FIX: the reader is now T-219, minted with its own gate (a refusal that must be SEEN to fire on the live pair AGENT_EDIT_LONG_CONTEXT-as-loop vs as-agent_probe, plus an inverse control). D-3210 and the BUG-1090 entry are APPEND-ONLY and were NOT rewritten: a silent edit to a decision record is the drift this OS refuses, so the correction lives where a reader will meet it — here, and in T-219's own source field, which names D-3210 clause 2. This is the BUG-1092 CORRECTION precedent applied to a referent instead of a premise.
+## BUG-1096 (MED, FIXED 2026-10-28) — THE ROUTING DEBT WAS INFLATED BY A READER THAT ASKED A BUG'S *TITLE* FOR A FACT ITS *EVIDENCE* HOLDS, AND THE ONE ESCAPE THE RAIL OFFERS WENT SILENTLY INERT
+
+BORN FIXED, in the sitting that found it (D-3212). Registered rather than folded into the commit because it is a
+finding about the INSTRUMENT, and an instrument that misprices its own backlog is the number every later decision
+reads.
+
+TWO LIMBS, ONE ROOT - a question was answered from a surface that could not hold the answer.
+
+  (a) THE READER. `scripts/resolve_route.py#load_items()` built a TASK's text from SIX declared evidence fields
+      (`source, gate, evidence, title, why, blocked_by`) and a BUG's text from `f"{id} {title}"` - two of none.
+      The artifact that gives a bug its route is named in its EVIDENCE BODY in `governance/buglog.md`, and the
+      census that parses that file (`scripts/bug_status.py`) published no evidence, so the rail could only see the
+      title. MEASURED 2026-10-28 before the fix: 20 of 266 open bugs routed. The rail therefore reported 231 open
+      bugs "resolving to no declared capability" against a SHRINK-ONLY ceiling of 221, and that single sentence was
+      the ONLY remaining fault in a rail whose other 20+ judgements were clean - a false debt, quoted as work.
+
+  (b) THE ESCAPE. The rail's own message tells the reader "declare the route, or disposition the item", and the
+      per-item `unrouted:` override is that disposition. Fault (v) asked whether the overridden item was still
+      OPEN; NOTHING asked whether it was still UNROUTED. So an override declared on an item the graph DOES route
+      excused nothing and was invisible - and the moment limb (a) was fixed, TEN of the fifteen live declarations
+      went inert in one change while the rail stayed silent: BUG-909, 912, 914, 915, 921, 948, 949, 950, 951, 992.
+      This is the SAME class the block in `config/capability_registry.yaml#unrouted` had already paid BY HAND twice
+      (BUG-917/920/952/975/977 retired 2026-10-23..26; BUG-1091/1092/1093 retired 2026-10-27) - instance payments
+      for a missing invariant, which is why the class kept returning.
+
+THE FIX, TWO ACTS, neither of them an instance payment.
+
+  1. THE CENSUS PUBLISHES WHAT ITS OWN EVIDENCE NAMES. `scripts/bug_status.py` now emits `artifacts` per OPEN bug -
+     the distinct artifact tokens in that bug's own block bodies - and `resolve_route.load_items()` reads
+     `id + title + artifacts`. It does NOT parse the buglog (a second parser for one fact, C12): the census is the
+     declared parser and it publishes the tokens, not the prose (266 bodies in a derived index would be megabytes
+     of churn for 845 tokens). The pattern moved to ONE home, `scripts/lib/artifact_tokens.py` (D-2642), imported
+     by both readers, byte-identical to the one `resolve_route` carried - so no verdict changed on any text.
+     A missing `artifacts` field is a NAMED REFUSAL, never a silent empty list: an index older than the reader
+     cannot answer the question, and a silent `[]` would read as REAL debt (the BUG-1083 shape).
+     MEASURED AFTER: bugs routed 20 -> 89 of 266; unrouted 231 -> 172.
+
+  2. THE INVARIANT, ONCE. A new fault (vii) refuses an `unrouted:` override on an item the graph ROUTES: "the
+     reason outlived the defect it excused (D-3034)". Its known-answer control fires on a synthetic routed-and-
+     overridden item; `--selftest` went 21/21 -> 22/22. The ten inert declarations were then RETIRED with their
+     reasons kept as history (D-3038), which is this block's own convention, not a deletion.
+
+  BOTH CEILINGS WERE LOWERED TO THE NEW READING in the same act - tasks 31 -> 26, bugs 221 -> 172 - and that is the
+  point of the whole change, not a tidy-up: a shrink-only ceiling that follows its measurement DOWN means EVERY new
+  finding must be BORN routed or explicitly dispositioned, because ONE unrouted item is now over. That is the
+  closure mechanism a pool of 266 observations had been missing.
+
+VERIFIED: `python3 scripts/resolve_route.py --check` -> rc 0, `debt tasks 26/26 bugs 172/172` (was 1 fault);
+`--selftest` 22/22; `scripts/bug_status.py --selftest` 45 controls; `check_bug_status` register equals its
+re-derivation; `check_config_defaults --check` 574 sites / 660 modules within ceiling (counts.modules re-recorded
+through `--record`, D-2989 - never hand-edited). Files: `scripts/bug_status.py`, `scripts/resolve_route.py`,
+`scripts/lib/artifact_tokens.py`, `config/capability_registry.yaml`, `config/config_defaults_census.json`,
+`governance/bug_status.json`.

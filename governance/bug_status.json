@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 837,
-  "open_n": 263,
-  "closed_n": 574,
+  "total_ids": 840,
+  "open_n": 265,
+  "closed_n": 575,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1321,8 +1321,18 @@
       "events": 1
     },
     {
-      "id": "BUG-1073",
-      "title": "(LOW, OPEN 2026-10-27) - the R5 reviewer REJECTED a write whose verification lives in an imported helper: a contract 100 lines away is not",
+      "id": "BUG-1074",
+      "title": "(LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work,",
+      "events": 1
+    },
+    {
+      "id": "BUG-1075",
+      "title": "(MED, OPEN 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the",
+      "events": 1
+    },
+    {
+      "id": "BUG-1076",
+      "title": "(MED, OPEN 2026-10-27) - \"unverifiable\" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing",
       "events": 1
     }
   ],
@@ -1900,6 +1910,7 @@
     "BUG-1068",
     "BUG-1070",
     "BUG-1071",
-    "BUG-1072"
+    "BUG-1072",
+    "BUG-1073"
   ]
 }

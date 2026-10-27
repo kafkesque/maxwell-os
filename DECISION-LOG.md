@@ -13,18 +13,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1323 decisions (census stamp f6f2e20b42f5e7f0, 2026-10-27) · 837 bugs (263 open / 574 closed; highest OPEN = BUG-1073) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1324 decisions (census stamp a70c95cd6af64a0e, 2026-10-27) · 840 bugs (265 open / 575 closed; highest OPEN = BUG-1076) · 60 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1323 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1323, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1324 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 665 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1324, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 263 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 263 open.
+> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-208 | 🟠 SHOULD | ONE DELETION AWAITS THE OWNER WORD - ~/.omlx/drafts/Qwen3.8-0.6B (1.1 GB) is named by NO declaration and its d | THE PROCEDURE IS THE GATE (D-3100: numbered, copy-paste-able, no inlin |
 >
-> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,12 +37,12 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
+> | T-209 | 🔴 MUST | 🔴 open | GIVE THE plan ROLE'S MODEL A ROUTE, A DECLARATION AND A LOOP RECEIPT - MTP4 holds the only plan_quality gate P | MEASURED 2026-10-27. `python3 scripts/agent_context_probe.py` -> rc 2, "Qwen3.8-27B-MTP4:  |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
-> | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 >
-> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >

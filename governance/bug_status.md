@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**263 open** / 574 closed of 837 ids.
+**265 open** / 575 closed of 840 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -273,4 +273,6 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1059 | (MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's | 1 |
 | BUG-1064 | (MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget: | 1 |
 | BUG-1069 | (MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and | 1 |
-| BUG-1073 | (LOW, OPEN 2026-10-27) - the R5 reviewer REJECTED a write whose verification lives in an imported helper: a contract 100 lines away is not | 1 |
+| BUG-1074 | (LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work, | 1 |
+| BUG-1075 | (MED, OPEN 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the | 1 |
+| BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |

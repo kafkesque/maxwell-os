@@ -33,7 +33,13 @@ task: >-
   computes a value) - that clause is unanswerable for a pure function and produces false rejects. If the file is an
   orchestrator, judge it AS an orchestrator; judge what it would be used for ONLY when its own docstring claims that
   use. The deterministic layers listed in the evidence file have ALREADY proved syntax, lint and the C11/C12
-  contract - do not re-report those.
+  contract - do not re-report those. A write the file performs by CALLING one of the repo's own atomic-write
+  helpers, pipeline.io_guard.safe_write or pipeline.io_guard.safe_write_jsonl, IS ALREADY VERIFIED - the helper
+  writes a temp file in the destination directory, fsyncs, replaces atomically and REFUSES a byte count that does
+  not match - so do not reject that call site for a missing read-back and do not ask the caller to repeat a
+  contract its callee keeps. A write that does NOT go through such a helper and does not verify itself is a real
+  defect and must be reported. (This clause answers BUG-1073, where the reviewer rejected a correct
+  io_guard.safe_write call site and cost two files a rewrite cycle.)
 
 # DETERMINISTIC LAYERS. Run in order, before any model is called. fatal=true -> the file never reaches a
 # reviewer (a file that does not compile is not reviewable). A non-fatal layer is LOUD, never silently green.

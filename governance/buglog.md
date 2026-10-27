@@ -8,18 +8,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1323 decisions (census stamp f6f2e20b42f5e7f0, 2026-10-27) · 837 bugs (263 open / 574 closed; highest OPEN = BUG-1073) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1324 decisions (census stamp a70c95cd6af64a0e, 2026-10-27) · 840 bugs (265 open / 575 closed; highest OPEN = BUG-1076) · 60 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1323 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1323, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1324 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 665 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1324, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 263 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 263 open.
+> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-208 | 🟠 SHOULD | ONE DELETION AWAITS THE OWNER WORD - ~/.omlx/drafts/Qwen3.8-0.6B (1.1 GB) is named by NO declaration and its d | THE PROCEDURE IS THE GATE (D-3100: numbered, copy-paste-able, no inlin |
 >
-> **PIPELINE LANE (58) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -31,12 +32,12 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
+> | T-209 | 🔴 MUST | 🔴 open | GIVE THE plan ROLE'S MODEL A ROUTE, A DECLARATION AND A LOOP RECEIPT - MTP4 holds the only plan_quality gate P | MEASURED 2026-10-27. `python3 scripts/agent_context_probe.py` -> rc 2, "Qwen3.8-27B-MTP4:  |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
-> | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 >
-> _the face is a VIEW: 12 of 58 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -23750,3 +23751,73 @@ the write succeeded or that the contents match".
    must be assumed to read one file.
 5. NOT A REASON TO WEAKEN THE GATE: the same reviewer found a REAL unverified write on the same pass and a real
    unguarded judge in the same sitting (BUG-1072). The finding is about resolution, not about trust.
+
+## BUG-1073 (LOW, FIXED 2026-10-27) - the rail landed: the reviewer is now TOLD that a write through the repo's own atomic-write helper is already verified, so the false positive is answered once instead of once per file
+THE OWED RAIL FROM THE HEADING ABOVE, paid in config rather than in prose. `config/r5_review_gate.yaml#task` now names
+`pipeline.io_guard.safe_write` and `pipeline.io_guard.safe_write_jsonl` and states the four properties that make a
+call site verified (temp file in the destination directory, fsync, atomic replace, a byte-count refusal), then says
+explicitly: do not reject that call site for a missing read-back and do not ask the caller to repeat a contract its
+callee keeps. The complement is kept so the gate is not weakened by the fix: a write that does NOT go through such a
+helper and does not verify itself is still a real defect and must be reported. MEASURED: the block parses under
+`yaml_guard.assert_yaml(..., 'agent:BUG-1073-rail')`, duplicate keys none, the rendered task is 1493 chars and
+contains both helper names. Scope: the clause names SYMBOLS THE REPO OWNS; a helper that does not exist would be a
+declaration with no referent (D-3034), so both were resolved by grep before the clause was written
+(`pipeline/io_guard.py:102` and `:165`).
+
+## BUG-1074 (LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work, so a provenance row can name an actor that took no part
+FOUND while closing this sitting's own run. `governance/delegate_journal.jsonl` row DJ-20261027T144745Z-62af declared
+`--model gemma-4-E4B-it-MLX-4bit`; `config/r5_review_gate.yaml` names the reviewer per tier (gpt-oss-20b-MXFP4-Q8 for
+this one) and the verdict rows in `governance/r5_reviews.jsonl` name gpt-oss, so the MODEL THAT ACTUALLY RAN is in the
+verdict journal and the DECLARATION is in this one - they disagree.
+1. WHY IT IS A DEFECT AND NOT A TYPO: the journal exists so a delegated act cannot leave no trace (D-3036), and the
+   field a reader would use to reconstruct "which model reviewed these bytes" is the one field nothing checks. A
+   provenance row that names the wrong actor reads exactly like one that names the right one.
+2. WHY IT IS LOW: the two journals CONTRADICT EACH OTHER VISIBLY rather than agreeing on a falsehood - the verdict
+   journal is keyed to `sha256_16` of the reviewed bytes and names the model the gate selected, so the true actor is
+   recoverable. Nothing in this sitting was mis-attributed.
+3. REMEDY (cheap, do not over-build): print the field as what it is. `delegate_journal.py end` should accept the
+   ACTUAL model (or a receipt path it reads) and refuse a `done` whose declared model contradicts it; at minimum the
+   `status`/`start` output must label `--model` as DECLARED-BY-CALLER so a reader never mistakes it for a reading.
+4. NOT FIXED BY RE-DECLARING CORRECTLY NEXT TIME. The fix is the rail, not the habit - "record the slip in the note"
+   is what this sitting did, and a note is not a control (the BUG-1016 shape).
+
+## BUG-1075 (MED, OPEN 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the `plan` role's model cannot be reached, ranked or delegated to
+MEASURED, three readings, same model.
+1. `scripts/agent_context_probe.py#measured_prefill` reads ONE key - `config/agent_context.yaml#measured_20261014
+   .prefill` - and nothing else. There is no other live writer of that block (the only writers found are one-off
+   scripts under `temp/`), so the block is hand-maintained and its NAME is a date.
+2. `Qwen3.8-27B-MTP4` HAS a device-matched reading: `governance/calibration_receipts.jsonl`, 2026-10-27T12:39:14,
+   prompt_tokens 2090, prefill 50.82, decode 22.85, engine 0.7.3rc1, instrument `scripts/measure_prefill.py`. The probe
+   still prints `UNMEASURED throughput -> NO route, fail-closed: Qwen3.8-27B-MTP4` (rc 2) because that row is not in
+   the 20261014 block.
+3. The model that reading belongs to is the one holding `plan` (gate QUALIFIED, plan_quality 0.9167, D-3191) - and it
+   is ALSO absent from the harness declaration (8 declared in `~/.config/goose/custom_providers/maxwell_omlx.json`
+   against 11 served by the engine), so `measure_subagent_loop.py --battery --only Qwen3.8-27B-MTP4` refuses it with
+   `FATAL: ... is not DECLARED to the harness (the parity rail's job, BUG-874)`.
+THE FUTURE TAX, which is why this is MED rather than LOW: the only way to make a fresh reading visible is to write it
+into a block whose name asserts 2026-10-14, so the schema actively invites a lie in a config KEY - and once one row
+is dated wrongly, no reader can tell which rows are. It also means every future model is born unable to route until
+somebody notices the key, i.e. the cost is paid again per model (the BUG-1068 shape, on the speed axis instead of the
+size axis).
+REMEDY: the reader unions dated blocks and each ROW carries its own `measured_at`, refused when absent (a row without
+a date is a declaration, not a reading, D-3034). Then MTP4's row lands under its own date and the dated key stops
+being the schema. Then the harness declaration, then the battery under MTP4's own id (D-3192: an id-keyed receipt
+never transfers).
+
+## BUG-1076 (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing ledgers the count as it grows
+MEASURED 2026-10-27: `python3 scripts/agent_context_probe.py` -> `FAIL agent-context: 9 declared fault(s)`, rc 2. The
+nine are EIGHT hub-cache shadow ids (`lmstudio-community--*`, `mlx-community--*`, `openbmb--*`, `ornith-ai--*`) plus
+ONE role model (`Qwen3.8-27B-MTP4`). The same probe reported SIX drifts on 2026-10-14.
+1. TWO CLASSES, ONE WORD: a shadow id is DELIBERATE and harmless - the farm name is the declared id and the two forms
+   name identical `model_path` (D-3194 item 1) - while MTP4 is a model that holds `plan` and cannot be reached at all
+   (BUG-1075). The report cannot tell a reader which is which, so the one row that matters is buried in eight that do
+   not. That is absence-by-blindness (the BUG-772 shape) arriving through a status WORD.
+2. WHY IT SURVIVES: rc 2 is deliberately OWNER-OWED and NOT fatal (`justfile` line 79, the BUG-457 tri-state), which
+   is correct - a health rail that fails the ladder on an owner-owed reading is a rail nobody can run. But loud and
+   not-fatal, claimed EVERY run with no ledger, becomes wallpaper: the count rose 6 -> 9 and no register row names the
+   three that arrived or why.
+3. REMEDY: classify each unverifiable id (SHADOW_OF_DECLARED / ROLE_MODEL_UNDECLARED / NO_DECLARATION_AT_ALL) and hold
+   a declared CEILING per class, shrink-only in the manner of `config/pipeline_config.yaml#config_audit` - so a new
+   arrival is a DIFF a reader can see, not a number that was always 9.
+4. NOT A REASON TO SILENCE IT: the same probe is what named the window truncation of 2026-10-21 that silently dropped
+   five long-context models to 32768. The class is valuable; the vocabulary is the defect.

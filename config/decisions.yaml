@@ -34388,7 +34388,7 @@ decisions:
 - id: D-3194
   state: RESOLVED
   category: MODEL PORTFOLIO / DELETION RULING / STORE CENSUS DOMAIN (D-3010, D-3018, D-3034)
-  title: 'gemma-4-E4B is KEPT with four named lanes and refused only as reviewer-of-record; the 12B reviewer test is DECLARED, not deleted; the deletion question exposed 8.8 GB of bytes and one store the census cannot see'
+  title: 'gemma-4-E4B is KEPT with THREE resolved lanes, a claimed fourth having failed to resolve (BUG-1072, item 8), and refused only as reviewer-of-record; the 12B reviewer test is DECLARED, not deleted; the deletion question exposed 8.8 GB of bytes and one store the census cannot see'
   decision: |
     THE QUESTION THE OWNER ASKED, answered from instruments rather than memory: "is gemma-4-E4B any use, or should it
     be deleted" and "what else should be deleted and what should be kept". The readings: `pipeline/model_store_census.py`
@@ -34438,6 +34438,17 @@ decisions:
        deletion. Stated so the next disk-pressure conversation starts from what it is.
     7. BELOW THE FLOOR: 51 further ORPHAN entries totalling ~303 MB, each at or under `deletion_floor_bytes`
        (D-3018) - reported and NOT offered, because below the floor the decision costs more attention than the bytes.
+    8. CORRECTED 2026-10-27 (BUG-1072, the same evening): the FOURTH lane this decision claimed does not RESOLVE, so
+       the count is THREE. The lane was "the S4 depth judge", and it was a COMMENT over an empty value: the config key
+       `stage4.depth_model` is ABSENT by decision (D2454), so `S4_DEPTH_MODEL` resolves to '' and two verification
+       tools were binding that empty id. A lane named by a comment is a MENTION, not a resolution (D-3034) - and the
+       TITLE of this record asserted the inflated count until this item was added, which is why the title now says
+       three. The KEEP ruling is UNCHANGED and does not depend on the fourth lane: the three that remain each resolve
+       to something a reader can open - `config/engine.yaml#fanout.guards.fallback_model` whose VALUE is the served id,
+       164 of the 182 R5 verdicts ever recorded, and the fastest measured reviewer at 0.48 s / 7.12 GB.
+       WHAT THIS DOES NOT DO: it does not retire gemma (what is refused is narrower - it may not be the VERDICT OF
+       RECORD), and it does not reopen the deletion question, because deleting it would delete the AUTHOR of those 164
+       verdicts, not a redundant copy.
   measured: |
     `pipeline/model_store_census.py` (miniforge interpreter, BUG-1000 shape) -> STORE CENSUS: hub total 68,285.2 MB,
     model repos 66,799.4 MB over 67 repos; LIVE 6 / 36,823.8 MB, PARKED 0, DECLARED 9 / 22,899.0 MB, ORPHAN 52 /
@@ -34453,6 +34464,7 @@ decisions:
   bugs:
   - BUG-1068
   - BUG-1069
+  - BUG-1072
   files:
   - config/hardware_profile.yaml
   - scripts/hardware_calibrate.py
@@ -34690,4 +34702,68 @@ decisions:
   - pipeline/disagreement_sample.py
   - tools/relabel_depth_bias.py
   - config/hardware_profile.yaml
+  supersedes: []
+- id: D-3198
+  state: ACTIVE
+  date: '2026-10-27'
+  category: MODEL ASSIGNMENT / TOOL CALLING / ORCHESTRATION (T-187, T-199, T-202, D-3058, D-3104, D-3148, D-3192)
+  title: 'Tool-calling is a MEASURED MATRIX and the orchestrator question has NO qualified answer today - four models are proven parallel workers, one is proven incapable, and the plan-gate winner has no route at all'
+  decision: >-
+    THE OWNER'S THREE QUESTIONS (which local models can tool-call, which should be assigned so work runs in
+    parallel, which is the most reliable orchestrator besides the deepseek API) are answered from receipts, and
+    the third one is answered with a REFUSAL plus the three named blockers, because no reading supports a name.
+    (1) PARALLEL WORKERS ARE PROVEN AND THE RULE IS THE WARM TURN. The T-199 battery (D-3148, receipt
+    governance/evidence/LOOP_BATTERY_20261025.json, 8 served models x 4 fixtures = 32 rows, temperature 0.0, ZERO
+    GB downloaded) separates four models at 4/4 - MiniCPM5-2B-MLX (warm 1.5s), Ornith-1.5-35B-A3B-REAP-19B (5.9s),
+    Ornith-1.5-9B-MLX-8bit (13.6s), Qwen3.8-27B-MLX-4bit (15.6s) - and Phi-4-mini at 0/4, which is BUG-053's shape
+    measured a second time: it answers from memory instead of calling a tool. A model is ranked on its WARM turn
+    because a load is a property of the engine pool, not of the loop (D-3148 clause 2). (2) A FAILURE CLASS IS NOT
+    A DEPTH RANKING. The four fixtures measure whether a loop is SAFE (a distractor, a parallel-call format, an
+    argument-NAME trap, an enum-argument trap with a true wrong answer); none measures how many DEPENDENT steps a
+    model sustains, so AGENT_LOOP_FAST = MiniCPM5-2B stands and AGENT_LOOP_WORKHORSE stays UNDECLARED (D-3148
+    clause 4 is honoured here, not overwritten). (3) T-202's FENCE IS LIFTED BY MEASUREMENT, NOT BY HOPE. Under the
+    current engine (0.7.3rc1 / mlx_lm 0.32.3.dev8) gpt-oss-20b PASSES the enum fixture (12.1s) where it failed 3 of
+    3 attempts under 0.7.3.dev2, and that fixture is the one T-202 named as its own gate, so T-202 CLOSES on its
+    own words (receipt governance/evidence/LOOP_BATTERY_20261027_GPTOSS_RC1.json). (4) THE ORCHESTRATOR QUESTION IS
+    NOT ANSWERED AND THE THREE BLOCKERS ARE NAMED RATHER THAN FILLED IN (D-3038). MTP4 - the ONLY model that passes
+    the plan_quality gate (0.9167, D-3191) - has NO ROUTE (its rc1 reading sits in a dated census block the probe
+    cannot read, BUG-1075), is NOT DECLARED to the harness (8 declared against 11 served), and therefore cannot be
+    ranked by the battery at all (measured: "FATAL: ... is not DECLARED to the harness"). gpt-oss - the model that HOLDS
+    AGENT_LOOP_SHORT, brain, analyze and review - reads 2/4 with TWO rows UNMEASURED because its reasoning spent the
+    whole 1024-token allowance and returned no content, so its parallel-call capability is INVISIBLE rather than
+    absent (BUG-1064's shape on a second model; the allowance limit is a declared property of the instrument).
+    MiniCPM5 has never been through a plan-quality or dependent-depth measurement, so its 4/4 buys speed, not
+    judgement. RULING: no served model is QUALIFIED as orchestrator today; the closest is MTP4 and it is one
+    declaration, one re-derived reading and one battery run away, not a download. (5) WHAT THIS DOES NOT CLAIM. It
+    does not re-rank the 2026-10-25 matrix (same receipt, same temperature, same fixtures); it does not touch the
+    review, classify or code roles; it does not claim any model CANNOT orchestrate - only that no receipt says it
+    can, and an assignment made without one is a preference wearing a role name.
+  measured: |
+    T-199 battery 2026-10-25 (governance/evidence/LOOP_BATTERY_20261025.json), warm turn, temperature 0.0:
+      MiniCPM5-2B-MLX                 4/4  warm= 1.5s load= 4.0s
+      Ornith-1.5-35B-A3B-REAP-19B     4/4  warm= 5.9s load= 8.3s
+      Ornith-1.5-9B-MLX-8bit          4/4  warm=13.6s load= 9.5s
+      Qwen3.8-27B-MLX-4bit            4/4  warm=15.6s load=39.5s
+      Qwen3-Coder-30B-A3B-Instruct    3/4  warm= 1.6s enum UNMEASURED (engine HTTP 500)
+      gemma-4-E4B-it-MLX-4bit         3/4  warm= 1.7s FAIL distractor (counted 1 of 3 files)
+      gpt-oss-20b-MXFP4-Q8            2/4  warm=26.5s FAIL enum, parallel UNMEASURED (allowance)
+      Phi-4-mini-instruct-8bit        0/4  warm= 8.0s FAIL all four
+    T-202 re-measure on 0.7.3rc1, 2026-10-27 (governance/evidence/LOOP_BATTERY_20261027_GPTOSS_RC1.json):
+      gpt-oss-20b-MXFP4-Q8            2/4  distractor=UNMEASURED parallel=UNMEASURED argname=PASS enum=PASS
+      engine: app 0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f; enum 12.1s, argname 3.4s, warm 26.2s, load 25.5s
+    plan_quality gate (governance/plan_quality_gate_bench.jsonl, n=24, baseline 0.5):
+      Qwen3.8-27B-MTP4 0.9167 PASS | gpt-oss-20b 0.7083 PASS | Ornith-1.5-35B-REAP-19B 0.4167 REFUSED
+    route probe, 2026-10-27: `python3 scripts/agent_context_probe.py` -> rc 2, 9 fault(s), of which
+      "Qwen3.8-27B-MTP4: unverifiable" and 8 hub-cache shadow ids; and
+      `measure_subagent_loop.py --battery --only Qwen3.8-27B-MTP4` -> FATAL: not DECLARED to the harness (BUG-874)
+    harness declaration vs engine: 8 declared (~/.config/goose/custom_providers/maxwell_omlx.json) vs 11 served.
+  bugs:
+  - BUG-1075
+  - BUG-1076
+  - BUG-1064
+  files:
+  - governance/evidence/LOOP_BATTERY_20261027_GPTOSS_RC1.json
+  - config/model_assignments.yaml
+  - config/task_register.yaml
+  - governance/buglog.md
   supersedes: []

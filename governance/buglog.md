@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 861 bugs (267 open / 594 closed; highest OPEN = BUG-1097) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 861 bugs (266 open / 595 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1338 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 390 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1338, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
+> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24881,3 +24881,68 @@ half a declaration), and it must NOT raise the ceiling to make the control pass.
 GATE. One condition, and it must be SEEN to fire on both sides: the two-sided edit above goes RED-then-GREEN, and
 `--selftest` gains the two known-answer controls (raise refused without a decision; raise accepted with one, and
 the history line names both numbers). The fix must not touch `unrouted_open_tasks`/`unrouted_open_bugs` values.
+## BUG-1097 (MED, FIXED 2026-10-28) — THE ROUTING-DEBT CEILING NOW HAS A RAISE-GUARD: the declared number must be the number its own RECORD ends at, and a raise must cite a decision that EXISTS
+
+CLOSED IN THE SITTING AFTER IT WAS FILED, and closed as an INVARIANT rather than as a payment (D-3212's own rule:
+pay the class, not the instance).
+
+THE RED LOOP, SEEN ON BOTH SIDES BEFORE ANY CODE WAS WRITTEN (D-3036).
+  BEFORE: `unrouted_open_bugs: 172 -> 173` by a bare edit, then `scripts/resolve_route.py --check` printed
+          "ok the route graph is well-formed ... the routing debt is within its shrink-only ceiling", rc 0. The
+          raise was not merely unguarded, it was INVISIBLE - the rail read the new number as the allowance it was
+          being measured against.
+  AFTER:  the same registry, unchanged, prints
+          "(viii) CEILING UNANCHORED: unrouted_open_bugs is declared 173 but the record ends at 172 - the ceiling
+          was RAISED WITHOUT a recorded act", rc 1.
+
+THE FIX, THREE PARTS, none of them a number.
+  1. THE ANCHOR IS MACHINE-READABLE. `config/capability_registry.yaml#routing_debt.ceiling_changed` is now an
+     append-only list of rows `{date, target, frm, to, decision, why}`. The prose that used to carry the last
+     raise ("RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080") DECLARED NO BYTES (D-3034); a comment cannot be
+     read by a rail and therefore cannot be refused. It is kept as history where it is; the two ORIGIN rows
+     record the last MEASURED move of each ceiling (31 -> 26 and 221 -> 172, both D-3212) because both were
+     readings and neither had a line anything could point at.
+  2. THREE NAMED FAULTS, each one thing a reader can be wrong about, in `ceiling_faults()`:
+     (viii) UNANCHORED - the declared number is not the number the record ENDS at (the limb above);
+     (ix)   UNSIGNED RAISE - a row that raises a ceiling cites no decision, or one that does not EXIST in
+            config/decisions.yaml (resolved through `lib.handoff.decision_ids`, ONE home, C12), or a row whose
+            `frm` does not chain onto the row before it, because a record with holes justifies nothing;
+     (x)    STALE MEASUREMENT - `measured` is not a date, or it predates the last recorded act. This is the
+            consumer D-3034 required: MEASURED before the fix, `routing_debt.measured` was read by NO CODE AT ALL
+            (grep: only REQUIRED_KEYS, the fixture, and `ceilings.get(...)`).
+  3. THE ONE ACT THAT MAY MOVE A CEILING: `--rebaseline --set <tasks|bugs>=<n> [--because D-xxxx]`. It re-records
+     the number, APPENDS the chained row and re-dates `measured` in a single governed write (write_guard, backup,
+     journal, bytes verified BEFORE commit). Direction decides the requirement, which is the whole of D-2644: a
+     LOWERING needs no citation (a shrink is not a decision); a RAISE is refused without `--because` and refused
+     again if the id does not exist. The transform is PURE (`apply_ceiling(text, ...)`) so a control can prove it
+     on a fixture, including that it touches NEITHER the other class NOR anything outside its block.
+
+THE LIVE TWO-SIDED RUN (the receipt, not a description):
+  `--rebaseline --set bugs=173`                    -> rc 2, "raising unrouted_open_bugs 172 -> 173 needs
+                                                      --because <D-id> - a raise is a DECISION, not an edit"
+  `--rebaseline --set bugs=173 --because D-9999`   -> rc 2, "D-9999 is not an id in config/decisions.yaml
+                                                      (1338 known)"
+  `--rebaseline --set bugs=173 --because D-3212`   -> rc 0, row appended (pre 74c9ac783e676810 -> post
+                                                      c8cfed03f6a34c5c), `measured` re-dated, rail GREEN at 172/173
+  `--rebaseline --set bugs=172`                    -> rc 0, LOWERING recorded with no citation, rail GREEN at
+                                                      172/172 with FOUR recorded acts
+  The register therefore ends this sitting where D-3212 left it - 26/26 tasks, 172/172 bugs, zero headroom - and
+  the red loop is itself preserved in the history as acts 3 and 4. Nothing was raised to make a control pass.
+
+CONTROLS: 22 -> 30 known-answer controls, all firing. New: ceiling_moved_by_an_edit, raise_with_no_decision,
+raise_citing_an_absent_decision, signed_raise_is_accepted (the OTHER direction - a guard that cannot pass a lawful
+raise is a wall, not a guard), measurement_predating_the_act, measurement_is_not_a_date,
+measurement_as_a_yaml_date, rebaseline_writes_the_number_and_the_row.
+
+FOUND IN THE FORENSIC AUDIT OF THIS VERY FIX, and fixed before commit rather than registered as a new bug, because
+it was a defect IN the new code and not a separate finding (D-3038 distinguishes the two): the first version of the
+date reader accepted only a QUOTED date, but YAML hands `measured: 2026-10-28` back as a `datetime.date`, so a valid
+registry spelled without quotes would have been refused with a fault it did not have. A guard that is wrong in that
+direction trains the owner to distrust a true fault, which costs more than the check is worth. `_iso()` now reads
+both spellings of the same declaration; the `measurement_as_a_yaml_date` control holds it.
+
+SCOPE HELD: `scripts/bug_status.py`, `governance/bug_status.json` and the ceilings themselves were NOT touched by
+this fix; no other capability's files were edited; the ladder's two pre-existing growth faults were re-measured
+UNCHANGED by this work (`check_silent_repair` 14 of ceiling 13, `check_undeclared_encoding` files 2 / sites 5 /
+writes 2 of ceiling 0) and `check_config_defaults` stayed at exactly 300/300 shadowed-declared keys - the new keys
+are read WITHOUT a literal default precisely so the guard does not spend a ceiling it did not earn.

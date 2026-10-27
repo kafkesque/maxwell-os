@@ -662,6 +662,23 @@ routing_debt:
   #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
   #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
   unrouted_open_bugs: 172
+  #: BUG-1097 (2026-10-28): THE ANCHOR. Until this list existed the ceiling was a number nothing read in the
+  #: OTHER direction: `check()` compared `debt > ceiling` and never looked at the ceiling itself, so this register
+  #: could carry the receipt of a raise in PROSE ("RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080", above) and
+  #: still leave the ceiling 49 items above its own reading - a value merely MENTIONED in a comment declares no
+  #: bytes (D-3034). Now the declared number must be the number this record ENDS at, every row must chain onto
+  #: the row before it, a row that RAISES must cite a decision id that EXISTS in config/decisions.yaml, and
+  #: `measured` must be no older than the last act (so `measured` finally has a consumer - it had none at all).
+  #: Written ONLY by `scripts/resolve_route.py --rebaseline --set <tasks|bugs>=<n> [--because D-xxxx]`: a
+  #: LOWERING needs no citation (D-2644: a shrink is not a decision), a RAISE is a decision and is refused
+  #: without one. The two rows below are the ORIGIN: the last real move of each ceiling, recorded here because
+  #: both were MEASURED (D-3212) and neither had a machine-readable line to point at. A raise whose row is
+  #: missing/dates wrong is fault (viii); an unsigned raise is fault (ix); an undated or stale reading is (x).
+  ceiling_changed:
+    - {date: '2026-10-28', target: unrouted_open_tasks, frm: 31, to: 26, decision: D-3212, why: 'lowered to the corrected reading - a shrink-only ceiling follows its measurement DOWN (D-2644/D-3023)'}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 221, to: 172, decision: D-3212, why: 'lowered to the corrected reading: the reader saw only id + title, so 69 bugs whose EVIDENCE named an owner counted as debt (BUG-1096)'}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 173, decision: D-3212, why: "RAISED 172 -> 173 under D-3212"}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 173, to: 172, decision: null, why: "LOWERED 173 -> 172 to the measured reading"}
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

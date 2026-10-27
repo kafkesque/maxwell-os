@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 861,
-  "open_n": 267,
-  "closed_n": 594,
+  "open_n": 266,
+  "closed_n": 595,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -2663,18 +2663,6 @@
       "artifacts": [
         "pipeline/oneshot_ask.py"
       ]
-    },
-    {
-      "id": "BUG-1097",
-      "title": "(MED, OPEN 2026-10-28) \u2014 THE ROUTING-DEBT CEILING HAS NO RAISE-GUARD, SO THE FLOOR SET BY D-3212 IS A PROMISE AND NOT AN INVARIANT",
-      "events": 1,
-      "artifacts": [
-        "config/capability_registry.yaml",
-        "config/decisions.yaml",
-        "config/derivations.yaml",
-        "scripts/check_config_defaults.py",
-        "scripts/resolve_route.py"
-      ]
     }
   ],
   "closed": [
@@ -3271,6 +3259,7 @@
     "BUG-1093",
     "BUG-1094",
     "BUG-1095",
-    "BUG-1096"
+    "BUG-1096",
+    "BUG-1097"
   ]
 }

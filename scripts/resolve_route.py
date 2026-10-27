@@ -19,9 +19,20 @@ WHAT IT SETTLES, without judgement:
     longer open is a STALE declaration;
   * the routing DEBT is a SHRINK-ONLY ceiling (the D-3023 shape): inherited debt cannot grow unnoticed, and a
     shrink is reported as good news;
+  * the CEILING ITSELF is anchored (BUG-1097): the declared number must be the number the recorded history ENDS
+    at, every row must chain onto the one before it, a row that RAISES a ceiling must cite a decision id that
+    EXISTS in config/decisions.yaml, and `routing_debt.measured` must be a date no later than the last act. Until
+    this existed the rail compared in ONE direction only (`debt > ceiling`), so the ceiling could be edited
+    upward in silence - and `measured` was read by NO code at all, which made it a declaration with no consumer
+    (D-3034). MEASURED 2026-10-28 before the guard: `unrouted_open_bugs: 172 -> 173` by a bare edit, rail rc 0;
   * the report is BYTE-STABLE: it is rendered twice and the two digests must agree.
 It does NOT decide policy, and it never assigns: an LLM may write a PROPOSAL into temp/ and `--propose` validates
 it against this same schema while writing nothing (D-2898/D-2941).
+
+THE ONE WRITE, and it is the one act D-2644 permits: `--rebaseline --set <tasks|bugs>=<n> [--because D-xxxx]`
+re-records a ceiling, APPENDS the row that explains the move, and re-dates `measured`. A LOWERING needs no
+citation (D-2644: a ceiling may only be lowered, because a shrink is not a decision); a RAISE is a DECISION and
+is refused without `--because` naming an id that exists in config/decisions.yaml. `--check` never writes.
 
 Exit: 0 ok | 1 fault(s) | 2 the registry itself is unreadable/incomplete (fail closed, C16).
 --selftest: known-answer controls over SYNTHETIC graphs (no model, no live write, BUG-492).
@@ -30,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import datetime
 import hashlib
 import json
 import pathlib
@@ -40,7 +52,9 @@ from typing import Callable
 
 import yaml
 from lib import artifact_encoding  # noqa: E402
+from lib import handoff, write_guard, yaml_guard  # noqa: E402
 
+RAIL_REL = "scripts/resolve_route.py"
 REPO = pathlib.Path(__file__).resolve().parents[1]
 CFG = REPO / "config/capability_registry.yaml"
 RAIL = REPO / "config/rail_registry.yaml"
@@ -62,6 +76,24 @@ JUST = re.compile(r"\bjust\s+([A-Za-z0-9][A-Za-z0-9_-]*)")   # a recipe name may
 TIER = re.compile(r"\bT[0-2]\b")
 RECIPE = re.compile(r"^([A-Za-z0-9_-]+)(?:\s+[^:\n]+)?:\s*(?:#.*)?$")
 PATHISH = re.compile(r"^[\w.-]+(?:/[\w .&()-]+)+$")
+DEBT_CLASSES = ("tasks", "bugs")            # the ceiling key is `unrouted_open_<cls>`; the item class is singular
+HISTORY_KEY = "ceiling_changed"             # append-only: the anchor the declared number must END at (BUG-1097)
+ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _iso(value: object) -> "str | None":
+    """The DATE a declaration names, or None - reading both shapes YAML can give for one fact.
+
+    MEASURED while landing BUG-1097: `measured: '2026-10-28'` arrives as a str, but the identical unquoted
+    `measured: 2026-10-28` arrives as a datetime.date. A guard that only accepts the quoted form would refuse a
+    perfectly valid registry and would be WRONG in the dangerous direction (it would train the owner to distrust a
+    true fault). One reader for "what date does this name", and it accepts both spellings of the same declaration.
+    """
+    if isinstance(value, str):
+        return value.strip() if ISO_DATE.match(value.strip()) else None
+    if isinstance(value, datetime.date):          # datetime.datetime subclasses date; strftime normalises both
+        return value.strftime("%Y-%m-%d")
+    return None
 
 
 def _executable(rel: str) -> bool:
@@ -161,6 +193,11 @@ class World:
     tiers: set[str]
     items: list[Item]
     edges: tuple[int, int]                                   # (declaration edges, flag edges)
+    #: The ids config/decisions.yaml declares, INJECTED as a zero-argument callable (BUG-1097): a raise of a
+    #: ceiling must cite one that EXISTS, and the registry costs ~1.7 s to parse - so it is read ONLY on the path
+    #: that needs it (a raised ceiling exists) and never on the ordinary green run. A callable keeps `check()`
+    #: pure in the same way `exists`/`executable`/`tiers` already do.
+    decisions: "Callable[[], set[str]] | None" = None
 
 
 def load_cfg() -> dict:
@@ -222,7 +259,7 @@ def world() -> World:
                  governed=tuple(str(r) for r in (rail.get("recipes") or [])),
                  exists=lambda p: (REPO / p).exists(), executable=_executable,
                  tiers=set(TIER.findall(ECON.read_text(encoding="utf-8"))),
-                 items=load_items(), edges=edges)
+                 items=load_items(), edges=edges, decisions=handoff.decision_ids)
 
 
 # ------------------------------------------------------------------ the judgements (PURE, one reader each)
@@ -432,6 +469,258 @@ def facts_census(w: World, caps: list[dict]) -> dict:
     return {k: sorted(v) for k, v in out.items()}
 
 
+def ceiling_faults(ceilings: dict, known: "Callable[[], set[str]] | None") -> list[str]:
+    """Does the DECLARED ceiling match the history that explains it? PURE: every fact arrives injected.
+
+    BUG-1097 (MEASURED 2026-10-28). `check()` compared in ONE direction - `debt > ceiling` - so it could see debt
+    GROW but never see the CEILING MOVE, and `routing_debt.measured` was read by NO code at all (D-3034: a
+    declaration with no consumer). The register even held the receipt of the last raise, in prose:
+    "RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080" - a value merely MENTIONED in a comment declares no bytes,
+    so that raise left the ceiling 49 items above its own reading and nothing said a word. This reads the same
+    fact in the OTHER direction, and it is why the ceiling is now a number with a history instead of a number.
+
+    Three named faults, each one thing a reader can be wrong about:
+      (viii) UNANCHORED - the declared number is not the number the record ENDS at: the ceiling moved without a
+             recorded act. This is the limb that fires on a bare edit (the red loop's limb i).
+      (ix)   UNSIGNED RAISE - a row that raises a ceiling cites no decision, or one that does not EXIST in
+             config/decisions.yaml; or a row whose `frm` does not chain onto the row before it, because a gap is a
+             move nobody recorded (D-2644: a raise is a DECISION, not an edit).
+      (x)    STALE MEASUREMENT - `measured` is not an ISO date, or it predates the last recorded act: a ceiling
+             priced on an older reading is a belief wearing a receipt's clothes (D-3109/D-3036).
+    """
+    faults: list[str] = []
+    measured = _iso(ceilings.get("measured"))
+    if measured is None:
+        faults.append(f"(x) STALE MEASUREMENT: routing_debt.measured is {ceilings.get('measured')!r}, not a date "
+                      f"- a ceiling is priced on a READING, and a reading nobody can date cannot be re-taken "
+                      f"(D-3109)")
+    rows = ceilings.get(HISTORY_KEY)
+    if not isinstance(rows, list) or not rows:
+        faults.append(f"(viii) CEILING UNANCHORED: routing_debt.{HISTORY_KEY} records no act, so the declared "
+                      f"ceilings can be edited in either direction in silence - which is the defect BUG-1097 "
+                      f"names. Seed one row per class at the declared reading; move it only through --rebaseline")
+        return faults
+    valid = {f"unrouted_open_{c}" for c in DEBT_CLASSES}
+    for row in rows:
+        # The rows are NAMED here when they cannot be read (one fault per defect, and a defect a reader can act
+        # on); the per-class arithmetic below reads only rows that resolve (ceiling_record, one home).
+        if not isinstance(row, dict):
+            faults.append(f"(ix) UNSIGNED RAISE: a routing_debt.{HISTORY_KEY} row is not a mapping ({row!r}) - a "
+                          f"record that cannot be read cannot justify a number")
+            continue
+        target = str(row.get("target") or "")
+        if target not in valid:
+            faults.append(f"(ix) UNSIGNED RAISE: a routing_debt.{HISTORY_KEY} row moves {target!r}, which is not a "
+                          f"declared ceiling (expected one of {', '.join(sorted(valid))})")
+            continue
+        try:
+            int(row["frm"]), int(row["to"])
+        except (KeyError, TypeError, ValueError):
+            faults.append(f"(ix) UNSIGNED RAISE: the {target} row {row!r} carries no readable frm/to - a move "
+                          f"whose direction cannot be read cannot be judged a raise or a shrink")
+    for cls in DEBT_CLASSES:
+        key = f"unrouted_open_{cls}"
+        declared, recorded, chain = ceiling_record(ceilings, cls)
+        if not chain:
+            faults.append(f"(viii) CEILING UNANCHORED: {key} has NO recorded act in routing_debt.{HISTORY_KEY} - "
+                          f"the number below it is an assertion with no origin story (D-3034)")
+            continue
+        if declared is None:
+            faults.append(f"(viii) CEILING UNANCHORED: {key} declares no integer ceiling - a ceiling with no "
+                          f"number is a comment, and a comment cannot fail")
+            continue
+        prev: "int | None" = None
+        for row in chain:
+            if prev is not None and row["frm"] != prev:
+                faults.append(f"(ix) UNSIGNED RAISE: the {key} history does not chain - a row starts at "
+                              f"{row['frm']} while the record had ended at {prev}. A gap is a move nobody "
+                              f"recorded, and a record with holes justifies nothing (D-2644)")
+            prev = row["to"]
+        if recorded is not None and declared != recorded:
+            direction = "RAISED" if declared > recorded else "LOWERED"
+            faults.append(f"(viii) CEILING UNANCHORED: {key} is declared {declared} but the record ends at "
+                          f"{recorded} - the ceiling was {direction} WITHOUT a recorded act. A ceiling "
+                          f"moves through `--rebaseline --set {cls}=<n>`, never by an edit: a raise is a DECISION "
+                          f"that cites an existing id (D-2644/D-3023), and an edit nobody signed is the hole "
+                          f"BUG-1097 names")
+        raises = [r for r in chain if r["to"] > r["frm"]]
+        if raises and known is None:
+            faults.append(f"(ix) UNSIGNED RAISE: {key} holds {len(raises)} raise(s) and the decision registry was "
+                          f"not injected, so their citations cannot be verified - fail closed (C16)")
+        elif raises:
+            ids = known()
+            for row in raises:
+                decision = str(row.get("decision") or "").strip()
+                if not decision:
+                    faults.append(f"(ix) UNSIGNED RAISE: {key} {row['frm']} -> {row['to']} cites NO decision - a "
+                                  f"raise is a DECISION and must name the record that justifies it (D-2644)")
+                elif decision not in ids:
+                    faults.append(f"(ix) UNSIGNED RAISE: {key} {row['frm']} -> {row['to']} cites {decision}, which "
+                                  f"is not an id in config/decisions.yaml ({len(ids)} known) - mint the decision "
+                                  f"FIRST, then raise the ceiling (D-2660/D-2982)")
+        last = _iso(chain[-1].get("date"))
+        if measured is not None and last is not None and measured < last:
+            faults.append(f"(x) STALE MEASUREMENT: routing_debt.measured is {measured} but the last "
+                          f"recorded act is dated {last} - a ceiling priced on an older reading is a belief, and "
+                          f"--rebaseline re-dates it as part of the act (D-3109)")
+    return faults
+
+
+def ceiling_record(ceilings: dict, cls: str) -> tuple["int | None", "int | None", list[dict]]:
+    """(declared, recorded, rows) for ONE debt class. The RECORD is the ledger; the number is a cache of it.
+
+    One home for "what does this ceiling's history END at", because three readers need that same fact: the fault
+    reader (BUG-1097 limb viii), the transform that moves a ceiling, and the act that decides whether a move is a
+    RAISE (needs a decision) or a LOWERING (does not, D-2644). If they each derived it, one of them would
+    eventually derive it differently - the two-homes defect (D-2642).
+
+    `recorded` is None when the class has no row at all: an unanchored ceiling is not zero, it is unknown, and the
+    caller must fail closed on it rather than treat unknown as a number.
+    """
+    key = f"unrouted_open_{cls}"
+    declared = ceilings.get(key)
+    rows: list[dict] = []
+    for row in ceilings.get(HISTORY_KEY) or []:
+        if not isinstance(row, dict) or str(row.get("target") or "") != key:
+            continue
+        try:
+            rows.append({**row, "frm": int(row["frm"]), "to": int(row["to"])})
+        except (KeyError, TypeError, ValueError):
+            continue                      # UNREADABLE rows are NAMED by the fault reader, not silently dropped here
+    recorded = rows[-1]["to"] if rows else None
+    return (declared if isinstance(declared, int) else None), recorded, rows
+
+
+def apply_ceiling(text: str, cls: str, to: int, *, decision: str, why: str, date: str) -> str:
+    """The ONE act that MOVES a routing-debt ceiling (BUG-1097): re-record the number, APPEND the row, re-date.
+
+    PURE text->text on purpose. A write act that can only be exercised on the live registry cannot be proven, so
+    the transform is a function a known-answer control drives on a fixture, and `rebaseline` verifies the parsed
+    result BEFORE the bytes are committed (C6/D-401: the bytes on disk must be the bytes intended).
+
+    A LOWERING is the permitted direction (D-2644: a shrink is not a decision) and records `decision: null`; a RAISE
+    carries the decision id its caller proved EXISTS. The row is YAML flow style so the register stays one line
+    per act - a history a reader can diff, oldest first.
+    """
+    key = f"unrouted_open_{cls}"
+    value_re = re.compile(rf"(?m)^(?P<pad>[ \t]*{re.escape(key)}: )(?P<num>-?\d+)[ \t]*$")
+    found = value_re.search(text)
+    if found is None:
+        raise SystemExit(f"FAIL-CLOSED: config/capability_registry.yaml declares no `{key}: <int>` line - the act "
+                         f"may only re-record a ceiling that EXISTS (C16) and never invent one")
+    declared, recorded, _rows = ceiling_record((yaml.safe_load(text) or {}).get("routing_debt") or {}, cls)
+    if recorded is None and declared is None:
+        raise SystemExit(f"FAIL-CLOSED: {key} carries neither a declared number nor a readable history row - the "
+                         f"act cannot know which number it is moving away from (C16/D-3034)")
+    previous = recorded if recorded is not None else int(declared)
+    out = value_re.sub(lambda m: m.group("pad") + str(to), text, count=1)
+    date_re = re.compile(r"(?m)^(?P<pad>[ \t]*measured: )'?\d{4}-\d{2}-\d{2}'?[ \t]*$")
+    if date_re.search(out) is None:
+        raise SystemExit("FAIL-CLOSED: config/capability_registry.yaml#routing_debt declares no dated `measured:` "
+                         "- an act that cannot re-date the reading cannot honestly record it (BUG-1097)")
+    out = date_re.sub(lambda m: m.group("pad") + "'" + date + "'", out, count=1)
+    row = (f"- {{date: '{date}', target: {key}, frm: {previous}, to: {to}, decision: {decision}, "
+           f"why: {json.dumps(why)}}}")
+    rows = out.splitlines(keepends=True)
+    header = next((i for i, raw in enumerate(rows)
+                   if re.match(rf"^[ \t]*{re.escape(HISTORY_KEY)}:[ \t]*(#.*)?$", raw)), None)
+    if header is None:
+        raise SystemExit(f"FAIL-CLOSED: config/capability_registry.yaml#routing_debt declares no `{HISTORY_KEY}:` "
+                         f"list - the act appends the record it will be judged by, and a record it cannot append "
+                         f"to is a raise that would go unrecorded (BUG-1097)")
+    head_indent = len(rows[header]) - len(rows[header].lstrip())
+    insert_at, indent = header + 1, head_indent + 2
+    for index in range(header + 1, len(rows)):
+        raw = rows[index]
+        if not raw.strip():
+            continue
+        here = len(raw) - len(raw.lstrip())
+        if here <= head_indent:
+            break
+        indent, insert_at = here, index + 1
+    return "".join(rows[:insert_at]) + (" " * indent) + row + "\n" + "".join(rows[insert_at:])
+
+
+def rebaseline(spec: str | None, because: str | None) -> int:
+    """THE ONE ACT that may move a ceiling, and the only writer of config/capability_registry.yaml#routing_debt.
+
+    Direction decides the requirement, and that is the whole of D-2644: LOWERING pays debt down and needs nothing
+    (a shrink is not a decision); RAISING rides a DECISION, so `--because` is required and the id must EXIST in
+    config/decisions.yaml - mint it first, then raise (D-2660/D-2982). Everything about the act is verified before
+    a byte is committed, and the write itself is crash-safe, backed up and journaled (C6/D-401).
+    """
+    if not spec or "=" not in spec:
+        print("FAIL rebaseline: --rebaseline needs --set <tasks|bugs>=<n> - e.g. "
+              "--rebaseline --set bugs=172")
+        return 2
+    raw_cls, _, raw_to = spec.partition("=")
+    cls = raw_cls.strip().lower()
+    if cls not in DEBT_CLASSES:
+        print(f"FAIL rebaseline: {raw_cls!r} is not a declared debt class (expected one of "
+              f"{', '.join(DEBT_CLASSES)})")
+        return 2
+    try:
+        to = int(raw_to.strip())
+    except ValueError:
+        print(f"FAIL rebaseline: {raw_to!r} is not an integer - a ceiling is a count, not a phrase")
+        return 2
+    key = f"unrouted_open_{cls}"
+    text = CFG.read_text(encoding="utf-8")
+    block = (yaml.safe_load(text) or {}).get("routing_debt") or {}
+    declared, recorded, _rows = ceiling_record(block, cls)
+    if declared is None and recorded is None:
+        print(f"FAIL rebaseline: {key} carries neither a declared number nor a readable history row - the act "
+              f"cannot know which number it moves away from (C16)")
+        return 2
+    current = recorded if recorded is not None else declared
+    if declared is not None and recorded is not None and declared != recorded:
+        # A hand-edited number is a CACHE that disagrees with the ledger. The act moves from the LEDGER, because
+        # the alternative is that an owner who made the forbidden edit can only repair it with another forbidden
+        # edit - a guard with no legal way back is a guard that will be worked around.
+        print(f"note: {key} is DECLARED {declared} but its record ends at {recorded} - the record is the ledger, "
+              f"so this act moves from {current}, and recording it is the only way back")
+    to = int(raw_to.strip())
+    if to == current:
+        print(f"FAIL rebaseline: {key} is already {to} - nothing to record, and an empty act is noise in a "
+              f"history that is meant to be read")
+        return 2
+    if to > current:
+        if not because:
+            print(f"FAIL rebaseline: raising {key} {current} -> {to} needs --because <D-id> - a raise is a "
+                  f"DECISION, not an edit (D-2644/D-3023); mint the decision first, then cite it")
+            return 2
+        known = handoff.decision_ids()
+        if because not in known:
+            print(f"FAIL rebaseline: --because {because} is not an id in config/decisions.yaml ({len(known)} "
+                  f"known) - a raise may not cite a record that does not exist (D-2660)")
+            return 2
+        why = f"RAISED {current} -> {to} under {because}"
+    else:
+        why = f"LOWERED {current} -> {to} to the measured reading" + (f", cited {because}" if because else "")
+    date = yaml_guard.today()
+    updated = apply_ceiling(text, cls, to, decision=because or "null", why=why, date=date)
+    verdict = yaml.safe_load(updated) or {}
+    block = verdict.get("routing_debt") or {}
+    rows = [r for r in (block.get(HISTORY_KEY) or []) if isinstance(r, dict) and r.get("target") == key]
+    faults = []
+    if block.get(key) != to:
+        faults.append(f"{key} reads {block.get(key)!r} after the transform, not {to}")
+    if not rows or int(rows[-1].get("to", -1)) != to:
+        faults.append("the appended record does not END at the new value")
+    if block.get("measured") != date:
+        faults.append(f"measured reads {block.get('measured')!r}, not {date}")
+    if faults:
+        print("FAIL rebaseline: the transform did not produce the act it described, nothing was written "
+              f"(C6/D-401): {'; '.join(faults)}")
+        return 2
+    report = write_guard.write_document(CFG, updated, writer=RAIL_REL, owned_keys={write_guard.OWNED_ANY},
+                                        backup=True)
+    print(f"ok rebaseline: {key} {current} -> {to} RECORDED, measured re-dated {date}, history row appended "
+          f"(pre {report.pre_sha16} -> post {report.post_sha16}). A raise cites the decision that justifies it, "
+          f"so the next move is judged against this one.")
+    return 0
+
+
 def check(w: World) -> tuple[list[str], dict]:
     """Return (faults, census) for one world. PURE: every fact arrives injected (the controls prove the logic)."""
     caps = list(w.cfg.get("capabilities") or [])
@@ -450,7 +739,7 @@ def check(w: World) -> tuple[list[str], dict]:
     ifaults, rows, debt = item_faults(w)
     faults.extend(ifaults)
     ceilings = w.cfg.get("routing_debt") or {}
-    for cls in ("tasks", "bugs"):
+    for cls in DEBT_CLASSES:
         ceiling = ceilings.get(f"unrouted_open_{cls}")
         if isinstance(ceiling, int) and debt[cls] > ceiling:
             # BUG-855 (MEASURED 2026-10-16): `Item.cls` is the SINGULAR class token while `cls` here is the PLURAL
@@ -462,13 +751,20 @@ def check(w: World) -> tuple[list[str], dict]:
                           f"against a declared ceiling of {ceiling} (SHRINK-ONLY, the D-3023 shape). Declare the "
                           f"route, or disposition the item - never raise the ceiling. Now unrouted: "
                           f"{', '.join(sorted(grown)[:12])}" + (" ..." if len(grown) > 12 else ""))
+    # BUG-1097: the OTHER direction. The comparison above asks whether the DEBT outgrew its allowance; this asks
+    # whether the ALLOWANCE itself moved without a signed act. Without it a ceiling is a promise, not an invariant.
+    faults.extend(ceiling_faults(ceilings, w.decisions))
     census = {"capabilities": len(caps), "facts": facts_census(w, caps),
               "by_kind": {k: sum(1 for c in caps if str(c.get("kind")) == k)
                           for k in sorted({str(c.get("kind")) for c in caps})},
               "by_tier": {t: sum(1 for c in caps if str(c.get("cost_tier")) == t)
                           for t in sorted({str(c.get("cost_tier")) for c in caps})},
               "lanes": len(lanes), "edges": w.edges, "debt": debt,
-              "ceiling": {c: ceilings.get(f"unrouted_open_{c}") for c in ("tasks", "bugs")},
+              "ceiling": {c: ceilings.get(f"unrouted_open_{c}") for c in DEBT_CLASSES},
+              #: BUG-1097: the number is half the fact; the ANCHOR is what makes it an invariant. Both are carried
+              #: into the report so a reader can see the ceiling is DATED and RECORDED without opening the YAML.
+              "ceiling_measured": ceilings.get("measured"),
+              "ceiling_acts": len([r for r in (ceilings.get(HISTORY_KEY) or []) if isinstance(r, dict)]),
               "items": len(w.items), "rows": rows, "tiers": sorted(w.tiers)}
     return faults, census
 
@@ -505,6 +801,10 @@ def route_lines(census: dict, w: World) -> list[str]:
                  f"bugs {census['debt']['bugs']}/{census['ceiling']['bugs']} (measured/ceiling, SHRINK-ONLY; a bug "
                  f"is read by id + title + the artifacts its OWN evidence names, D-3212 - before that correction "
                  f"the reader saw only id + title and 69 open bugs read as unrouted debt)")
+    lines.append(f"ceiling anchor: measured {census.get('ceiling_measured')}, {census.get('ceiling_acts')} "
+                 f"recorded act(s) in routing_debt.{HISTORY_KEY} - the declared number must be the number the "
+                 f"record ENDS at, and a raise must cite a decision that exists (BUG-1097: the ceiling used to "
+                 f"move in silence and `measured` was read by no code at all)")
     per = {}
     for _, _, hits in census["rows"]:
         for h in hits:
@@ -550,6 +850,20 @@ def census_report() -> str:
 
 
 # ------------------------------------------------------------------ controls
+def ceiling_fixture(tasks: int = 1, bugs: int = 0, date: str = "2026-01-01",
+                    history: "list[dict] | None" = None) -> dict:
+    """A well-formed routing_debt block for fixtures: DATED, and ANCHORED by one row per class (BUG-1097).
+
+    Every control below turns ONE declared fact false, so every OTHER fact has to be true or the fault it counts
+    is a fault it merely happened to trip on. Here the numbers and the history agree BY CONSTRUCTION, which is
+    exactly the property the guard reads in the live registry.
+    """
+    rows = history if history is not None else [
+        {"date": date, "target": f"unrouted_open_{cls}", "frm": n, "to": n, "decision": None, "why": "fixture"}
+        for cls, n in (("tasks", tasks), ("bugs", bugs))]
+    return {"measured": date, "unrouted_open_tasks": tasks, "unrouted_open_bugs": bugs, HISTORY_KEY: rows}
+
+
 def synthetic(**over) -> World:
     """A small well-formed graph, so every control below turns ONE declared fact false and proves the fault fires."""
     cfg = {"schema_version": "1", "authority": "fixture", "kinds": {"script": "x", "recipe": "y"},
@@ -559,14 +873,14 @@ def synthetic(**over) -> World:
            "lanes": [{"recipe": "lane_a", "cmd": "scripts/check_a.py --selftest", "produces": "reading",
                       "why": "fixture"}],
            "dispositions": {"tasks": {"pipeline": "r_no_route"}, "bugs": {"default": "r_bug"}},
-           "reasons": {"r_no_route": "fixture", "r_bug": "fixture"}, "routing_debt": {"measured": "fixture",
-                                                                                     "unrouted_open_tasks": 1,
-                                                                                     "unrouted_open_bugs": 0}}
+           "reasons": {"r_no_route": "fixture", "r_bug": "fixture"},
+           "routing_debt": ceiling_fixture(tasks=1, bugs=0)}
     cfg.update(over.pop("cfg", {}))
     w = World(cfg=cfg, recipes={"lane_a": "    python3 scripts/check_a.py --selftest"}, governed=("health",),
               exists=lambda p: p in {"scripts/check_a.py", "temp", "temp/receipt.json"},
               executable=lambda p: p == "scripts/check_a.py", tiers={"T0", "T1", "T2"},
-              items=[Item("T-X", "task", "pipeline", "no artifact here")], edges=(0, 0))
+              items=[Item("T-X", "task", "pipeline", "no artifact here")], edges=(0, 0),
+              decisions=lambda: {"D-0001"})
     return dataclasses.replace(w, **over) if over else w
 
 
@@ -710,7 +1024,7 @@ def selftest() -> int:
     # BUG-855: the assertion is on the IDS, never on the fault's existence - a fault that names nothing passed the
     # control above, which is why nothing caught this. A world of two unrouted BUGS against a ceiling of one.
     wb = synthetic(items=[Item("B-1", "bug", "", "x"), Item("B-2", "bug", "", "y")],
-                   cfg={"routing_debt": {"measured": "fixture", "unrouted_open_tasks": 1, "unrouted_open_bugs": 1}})
+                   cfg={"routing_debt": ceiling_fixture(tasks=1, bugs=1)})
     fb, _ = check_world(wb)
     control("debt_grew_names_the_bugs_it_is_about",
           len([x for x in fb if "DEBT GREW" in x and "B-1" in x and "B-2" in x]), 1,
@@ -728,6 +1042,96 @@ def selftest() -> int:
     control("reason_not_declared", len([x for x in f if "not declared" in x]), 2,
           "a disposition or an unrouted override naming an undeclared reason is refused")
 
+    # ── BUG-1097: the ceiling itself is a value a reader can be wrong about, in the OTHER direction ──────────
+    # The red loop this file's own fault (viii) exists for: the declared number and the record that explains it
+    # disagree, i.e. the ceiling MOVED by an edit. MEASURED 2026-10-28 before the guard: 172 -> 173 by a bare
+    # edit, rail rc 0. The control drives the same shape on a fixture.
+    moved = ceiling_fixture(tasks=1, bugs=1)
+    moved["unrouted_open_bugs"] = 2
+    control("ceiling_moved_by_an_edit", len([x for x in ceiling_faults(moved, lambda: {"D-0001"})
+                                             if "UNANCHORED" in x]), 1,
+            "a ceiling that is not the number its own record ENDS at is refused - the raise limb (BUG-1097)")
+
+    unsigned = ceiling_fixture(tasks=1, bugs=1)
+    unsigned[HISTORY_KEY] = unsigned[HISTORY_KEY][:1] + [
+        {"date": "2026-01-02", "target": "unrouted_open_bugs", "frm": 1, "to": 2, "decision": None,
+         "why": "raised for no stated reason"}]
+    unsigned["unrouted_open_bugs"] = 2
+    control("raise_with_no_decision", len([x for x in ceiling_faults(unsigned, lambda: {"D-0001"})
+                                           if "UNSIGNED RAISE" in x]), 1,
+            "a RAISE that cites no decision is refused - a raise is a decision, not an edit (D-2644)")
+
+    absent = ceiling_fixture(tasks=1, bugs=1)
+    absent[HISTORY_KEY] = absent[HISTORY_KEY][:1] + [
+        {"date": "2026-01-02", "target": "unrouted_open_bugs", "frm": 1, "to": 2, "decision": "D-9999",
+         "why": "cited a record that does not exist"}]
+    absent["unrouted_open_bugs"] = 2
+    control("raise_citing_an_absent_decision", len([x for x in ceiling_faults(absent, lambda: {"D-0001"})
+                                                    if "UNSIGNED RAISE" in x]), 1,
+            "a raise citing an id that is not in config/decisions.yaml is refused (D-2660)")
+
+    signed = ceiling_fixture(tasks=1, bugs=1)
+    signed[HISTORY_KEY] = signed[HISTORY_KEY][:1] + [
+        {"date": "2026-01-01", "target": "unrouted_open_bugs", "frm": 1, "to": 2, "decision": "D-0001",
+         "why": "the OTHER direction: a cited, chained raise, dated the day of the measurement it rests on"}]
+    signed["unrouted_open_bugs"] = 2
+    control("signed_raise_is_accepted", ceiling_faults(signed, lambda: {"D-0001"}), 0,
+            "a raise that cites a decision WHICH EXISTS and chains onto the record is silent - the guard refuses "
+            "the act it cannot justify, never the act it can (note the row must ALSO be dated no later than "
+            "`measured`: a raise recorded after the reading is the stale shape)")
+
+    stale = ceiling_fixture(tasks=1, bugs=0)
+    stale["measured"] = "2025-12-31"
+    control("measurement_predating_the_act", len([x for x in ceiling_faults(stale, lambda: set())
+                                                 if "STALE MEASUREMENT" in x]), 2,
+            "`measured` is READ, once per class: a reading older than the last recorded act is refused, which is "
+            "the consumer D-3034 required and nothing had (BUG-1097)")
+
+    unquoted = ceiling_fixture()
+    unquoted["measured"] = datetime.date(2026, 1, 1)     # the SAME declaration, spelled without quotes
+    control("measurement_as_a_yaml_date", [x for x in ceiling_faults(unquoted, lambda: set())
+                                           if "STALE MEASUREMENT" in x], 0,
+            "`measured: 2026-10-28` unquoted arrives as a datetime.date and is ACCEPTED - one reader for one fact, "
+            "so a valid registry can never be refused for its quoting")
+
+    undated = ceiling_fixture()
+    undated["measured"] = "fixture"
+    control("measurement_is_not_a_date", len([x for x in ceiling_faults(undated, lambda: set())
+                                             if "STALE MEASUREMENT" in x]), 1,
+            "a `measured` that is not an ISO date is refused - a reading nobody can date cannot be re-taken")
+
+    # THE WRITE ACT, proved as a transform before any byte is committed: the fixture carries ONE history row (bugs
+    # 3 -> 3) and the act must re-record the number, APPEND the row that chains onto it, re-date `measured` and
+    # leave the OTHER class untouched - a scope guard, because an act that rewrites a neighbouring number is the
+    # defect it was meant to prevent.
+    fixture = ("x: 1\n"
+               "routing_debt:\n"
+               "  measured: '2026-01-01'\n"
+               "  unrouted_open_tasks: 2\n"
+               "  unrouted_open_bugs: 3\n"
+               f"  {HISTORY_KEY}:\n"
+               "    - {date: '2026-01-01', target: unrouted_open_bugs, frm: 3, to: 3, decision: null, why: 'o'}\n"
+               "tail: 9\n")
+    try:
+        after = yaml.safe_load(apply_ceiling(fixture, "bugs", 5, decision="D-0001", why="fixture raise",
+                                             date="2026-02-02")) or {}
+        block = after.get("routing_debt") or {}
+        rows = block.get(HISTORY_KEY) or []
+        bad = [why for why, ok in (
+            ("bugs not re-recorded", block.get("unrouted_open_bugs") == 5),
+            ("the appended row does not END at the new value",
+             bool(rows) and rows[-1].get("to") == 5 and rows[-1].get("frm") == 3),
+            ("the row does not carry its decision", bool(rows) and rows[-1].get("decision") == "D-0001"),
+            ("measured was not re-dated", block.get("measured") == "2026-02-02"),
+            ("the OTHER class was touched", block.get("unrouted_open_tasks") == 2),
+            ("the row was appended outside its block", after.get("tail") == 9),
+        ) if not ok]
+    except SystemExit as exc:                                   # fail closed is a PASS for the control only if named
+        bad = [f"the act refused a well-formed fixture: {exc}"]
+    control("rebaseline_writes_the_number_and_the_row", bad, 0,
+            "the one act that moves a ceiling re-records the number, APPENDS the chained row that justifies it and "
+            "re-dates `measured` - and touches nothing else (C6/D-401)")
+
     print(f"resolve-route controls: {ok}/{ok + fail} known-answer control(s) fire")
     return 1 if fail else 0
 
@@ -744,10 +1148,19 @@ def main() -> int:
     ap.add_argument("--route", metavar="ITEM_ID", help="resolve ONE open item to the capabilities that own it")
     ap.add_argument("--census", action="store_true", help="T-156's own instrument: how many files are named")
     ap.add_argument("--propose", metavar="FILE", help="validate a PROPOSAL from temp/ (never apply it, D-2941)")
+    ap.add_argument("--rebaseline", action="store_true",
+                    help="THE ONE ACT that moves a routing-debt ceiling (D-2644/BUG-1097): re-record it, re-date "
+                         "`measured`, append the history row. Needs --set <tasks|bugs>=<n>; a RAISE also needs "
+                         "--because <D-id>, and that id must exist in config/decisions.yaml")
+    ap.add_argument("--set", dest="set_to", metavar="CLASS=N",
+                    help="the ceiling to re-record, e.g. --set bugs=172 (lowering needs no --because)")
+    ap.add_argument("--because", metavar="D-xxxx", help="the decision that justifies a RAISE (D-2644/D-2660)")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls over synthetic graphs")
     a = ap.parse_args()
     if a.selftest:
         return selftest()
+    if a.rebaseline:
+        return rebaseline(a.set_to, a.because)
     if a.census:
         print(census_report())
         return 0

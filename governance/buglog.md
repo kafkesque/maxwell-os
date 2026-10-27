@@ -23504,3 +23504,15 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    three numbers, only wording added. `--selftest` 3/3 green; `--json` usable_gb 43.0 equals the printed 43.0. The
    change ADDS a disclosure and moves no threshold, so no role assignment can cascade from it (D-2642). R5 review:
    gemma-4-E4B-it-MLX-4bit VERDICT APPROVE, sha256_16 8c4474abd4238160.
+
+## BUG-1063 (HIGH, FIXING 2026-10-27) - the gate lookup is keyed by MODEL alone and the PREDICTED pool bypasses eligibility + gates entirely, so ONE gate artifact can satisfy ANOTHER role's gate and `--allow-predicted` can seat a model that declares NO roles
+
+Found by reading `scripts/hardware_calibrate.py` before adding the `plan_quality` gate (D-3189 limb b), i.e. before the defect could bite. Two INDEPENDENT limbs, each decidable from the source alone:
+
+1. `gates(cfg)` (lines 205-219) returns `latest[model] = row` - the LATEST row per MODEL, whatever gate produced it. `resolve()` then asks `(gate_rows.get(name) or {}).get("pass")`. `config/hardware_profile.yaml` is about to have TWO gates (`r5_review` for `review`, `plan_quality` for `plan`/`analyze`) landing in ONE artifact (`gate_bench: governance/r5_review_gate_bench.jsonl`), so the moment the second gate exists a `plan_quality` PASS can grant the `review` role and an `r5_review` PASS can grant `plan`. That is a declaration with no referent: the row does not say WHICH gate it resolved.
+
+2. In the `elif allow_predicted:` branch (lines 311-316) the pool is `[r for r in table if r["fits"] and r.get("prediction")]` - NO `role in r["roles"]` filter and NO `need_gate` check, although the MEASURED branch above applies both. Consequence, measured against the register as it stands: `Qwen3.8-27B-MLX-4bit` carries `roles: []` yet `fits` and gets a `prediction`, so `hardware_calibrate.py --allow-predicted` can fill any role with a model that declares NO role - precisely the failure the file's own comment says the file exists to prevent ("Ranking by speed alone put a 2B tool-driver in the brain seat on the first run of this resolver").
+
+WHY HIGH, not cosmetic: limb 1 silently WEAKENS a fail-closed gate (the only `require_gate` in the register today is `r5_review` for `review`, and a PASS from a wholly different instrument would satisfy it); limb 2 re-opens role eligibility only on the `--allow-predicted` path, which is the path a human reaches for when receipts are thin. Neither is reachable today (one gate exists, `--allow-predicted` is opt-in) - which is exactly why both must be closed BEFORE the second gate is added rather than after.
+
+FIX (this sitting, D-3191): rows carry their gate identity (`gate:` on every new receipt row; the legacy r5 rows resolve to `r5_review` by a DECLARED default in `config/r5_review_gate.yaml`, never by a guess), `gates()` keys on `(gate, model)`, `resolve()` asks for the gate the ROLE declares, and the predicted pool applies the same two filters the measured pool applies.

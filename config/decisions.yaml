@@ -34063,7 +34063,7 @@ decisions:
   - config/hardware_profile.yaml
   supersedes: []
 - id: D-3188
-  state: ACTIVE
+  state: RESOLVED
   category: DISK HYGIENE / MEASUREMENT CORRECTION / OWNER LANE
   title: 'The roleless Qwen3.8-27B pair is 15.6 GiB of REAL bytes, not 30.2 GB (the figure in D-3185 was the symlink-farm double count BUG-1050 forbids), and its base cannot be deleted alone: it is D-3177 control arm and the payload 13 of MTP4 links resolve to'
   decision: |
@@ -34179,4 +34179,49 @@ decisions:
   files:
   - config/hardware_profile.yaml
   - scripts/hardware_calibrate.py
+  supersedes: []
+- id: D-3190
+  state: RESOLVED
+  category: OWNER WORD / DISK HYGIENE / MODEL PORTFOLIO
+  title: 'OWNER WORD RECEIVED 2026-10-27: option A = KEEP the Qwen3.8-27B pair, and the BUG-1055 ruling is ACCEPTED — the gate, not disk pressure, decides plan/analyze'
+  decision: |
+    THE OWNER'S WORD, verbatim in substance: "I accept your recommendation KEEP (A) also for BUG 1055."
+
+    1. D-3188's owner row is CLOSED by that word, and the closure is a DECISION TRANSITION, not a prose note:
+       D-3188 moves ACTIVE -> RESOLVED with this record as its licence (scripts/recompute_decision_summary.py
+       --set-state, D-3035/M2). What RESOLVES it is the owner's named choice between two PRICED options, not a
+       restatement of the recommendation.
+    2. WHAT IS KEPT, priced as measured in D-3188 (never re-derived here): the base
+       `~/.omlx/models/Qwen3.8-27B-MLX-4bit` 16,081,501,977 B, the farm `~/.omlx/models_staged/Qwen3.8-27B-MTP4`
+       239,146,670 B of its own bytes, and `~/.omlx/models_staged/_heads` 477,868,591 B - 16,798,517,238 B =
+       15.6 GiB held, 0 bytes reclaimed. Nothing is deleted by this record; the deletion rail was never engaged
+       beyond its read-only check.
+    3. WHAT THE KEEP BUYS, stated as the reason rather than as sentiment: (a) MTP4 keeps a WORKING PAYLOAD - its
+       13 symlinks into the base resolve, so the candidate the register names for brain/plan/analyze is loadable;
+       (b) D-3177's MEASURED 1.54x MTP claim keeps its CONTROL arm, so the claim stays re-measurable instead of
+       becoming folklore (D-2642's shape); (c) the plan_quality fixture (D-3189 limb b, executed as D-3191) can
+       compare MTP4 against Ornith-1.5-35B-A3B-REAP-19B and gpt-oss on evidence instead of on speed.
+    4. WHAT THE KEEP COSTS, named so it cannot be discovered later as a surprise: 15.6 GiB stays occupied on a host
+       reading 120.8 GiB free (measured 2026-10-27), and the base model remains SERVED and ADVERTISED, so it stays
+       an ELIGIBLE target for a future deletion request that the rail must refuse again for the same two axes.
+       The cost is paid knowingly and the register now carries it.
+    5. STILL OWED, and unchanged by the owner word: the KV working set at the declared `min_ctx: 131072` has never
+       been measured (BUG-1055 limb 4 - the 3.0 GiB reserve declares no context basis), and the roles that carry
+       `require_gate: null` must each declare `ungated_accepted: {date, reason}` (limb c) or be reported as a fault.
+       The owner word settles the DISK question only; it does not settle either measurement.
+    6. BUG-1055's RULING (D-3189 limb b) is ACCEPTED: `plan` and `analyze` are to be gated by a `plan_quality`
+       fixture in the shape the `r5_review` gate already uses, and the resolver's existing fail-closed path does the
+       rest. Recorded as D-3191 with its receipt; the acceptance of the RULING is not the same act as the ruling
+       having been MEASURED, and D-3191 carries that distinction.
+  measured: |
+    Owner message, 2026-10-27: "Ok I accept your recommendation KEEP (A) also for BUG 1055".
+    Register state before this record: D-3188 ACTIVE (owner row open, two priced options), D-3189 ACTIVE (ruling,
+    three limbs, limb b not yet built). Disk: 120.8 GiB free (scripts/hardware_calibrate.py, 2026-10-27).
+    Engine: 17 ids advertised, containing BOTH `Qwen3.8-27B-MLX-4bit` and `Qwen3.8-27B-MTP4`.
+  bugs:
+  - BUG-1050
+  - BUG-1059
+  files:
+  - config/hardware_profile.yaml
+  - config/decisions.yaml
   supersedes: []

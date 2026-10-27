@@ -29,6 +29,19 @@ result):
                    and the parser refuses the header. Declared as a third axis because a fixture that tests
                    only the unproven trigger would report clean on the proven one, and because the two SYMPTOMS
                    of BUG-951 do not co-occur: replay produces corrupted NAMES, parallel produces PARSER DROPS.
+  --mode blank-echo  THE ATTRIBUTION SPLIT OF THE SEEDED PAIR (T-215 limb 1, 2026-10-27). `replay` seeds TWO
+                   things at once - the corrupted assistant `tool_call` AND the harness's
+                   `error: tool '<corrupted>' does not exist` echo - so a copy rate of 14-in-30 says the PAIR
+                   teaches, and production cannot fix a pair it cannot name. This axis holds the seeded
+                   assistant turn BYTE-IDENTICAL and changes exactly ONE string: the echoed error carries no
+                   name (`error: tool not found`). The tool message still EXISTS, so the transcript stays legal
+                   and a transport refusal cannot masquerade as a reading; and the same name-free echo is used
+                   for every DEFECT the loop itself provokes, so the axis tests the mitigation for the whole
+                   run rather than only at the seed. Outcome decides WHICH mitigation is entitled to be built:
+                   copy rate COLLAPSES -> the verbatim name in the echo is the teaching event, so the harness
+                   must stop quoting raw names back (no model change, no retry); copy rate HOLDS -> the
+                   assistant turn alone suffices, and sanitising the echo buys nothing, so the fix belongs at
+                   emission/retry instead (T-215 limb 2).
 
 THE THREE COUNTERS (counted SEPARATELY, never summed into one number):
   malformed_names  a tool call ARRIVED, but its `function.name` is not a declared tool - either harmony-
@@ -110,6 +123,22 @@ TURN_HEADROOM = 2
 # turn and earns one nudge, and a model that answers nothing more than this many times is not being measured.
 # (R5 review 2026-10-27: this was a bare `+ 2` in the loop condition - the one real C20 finding of that pass.)
 TOOL_NAME = "read_index"
+RETRY_CEILING = 2
+# T-215 limb 2: how many times ONE owed call may be re-issued after the engine's own parser ate it. Two, because
+# a loss is ~1 in 5 and two consecutive losses is ~1 in 25: a third retry buys almost nothing and would let a
+# guard paper over a model that cannot emit the header at all. Counted PER OWED CALL (the streak resets the
+# moment a call arrives), so the bound is on the repair, never on the run.
+RETRY_BUDGET = 12
+# The total retries a run may spend. At the measured ~1-in-5 loss over 30 calls the expectation is <= 6, so 12 is
+# two-fold headroom: a run that needs more is not being measured by this guard, it is being rescued by it, and
+# the receipt must say so rather than quietly keep going.
+RETRY_NUDGE = ("Your previous tool call did not arrive - it was lost, not declined. Re-issue the call for the next "
+               "index with {tool}; do not answer in words.")
+# The re-issue's BODY, and it is load-bearing rather than polite: at temperature=0.0 an identical prompt is an
+# identical replay, so a retry that repeats the request byte-for-byte recovers NOTHING (measured 2026-10-27: 0 of 6
+# re-issues recovered 0 of 3 lost calls for 100.9 s). The nudge is the smallest prompt change that can change the
+# generation, and it NAMES the failure so the model does not have to re-derive it - the blank-echo axis showed what
+# an error carrying no name costs.
 CORRUPT_TAILS = ("commentary", "json", "analysis")
 # BUG-951 measured these three tails glued onto REAL tool names: `shell<|channel|>commentary`,
 # `shell<|channel|>json`, `tree<|channel|>analysis`. One tail per run (--replay-tail) so the run has ONE axis.
@@ -117,6 +146,14 @@ HARMONY_MARKERS = ("<|channel|>", "<|start|>", "<|message|>", "<|constrain|>", "
 # Any of these inside a `function.name` means a SPECIAL TOKEN leaked into an identifier field. The tuple is the
 # harmony vocabulary seen in the bug's own log lines, not a general tokenizer list.
 REPLAY_ID = "replay-corrupt-1"
+ECHO_QUOTED = "quoted"
+ECHO_BLANK = "blank"
+# WHICH ERROR THE HARNESS RETURNS FOR AN UNKNOWN TOOL (T-215 limb 1). `quoted` is what production does today and
+# what `replay` has always seeded: `error: tool 'read_index<|channel|>commentary' does not exist` - the corrupted
+# identifier, repeated back, in the position the model conditions on next. `blank` is the SAME message with the
+# name removed: same role, same count, same position, one string fewer. Declared as a closed vocabulary because a
+# free-form echo would make the axis unreproducible, and a THIRD spelling would be a different experiment.
+ECHO_BLANK_TEXT = "error: tool not found"
 
 RECEIPT_SCHEMA_VERSION = "1.0"
 
@@ -176,6 +213,23 @@ def exec_read_index(args: Any, total: int) -> str:
     return f"registered {index} of {total}. NEXT: call {TOOL_NAME} with index={index + 1}."
 
 
+def may_retry(kind: str, streak: int, guard_on: bool, retries_used: int) -> bool:
+    """PURE: T-215 limb 2's guard decision - may THIS turn be re-issued?
+
+    Only a LOST CALL is retryable, and only a lost call is attributable: `engine_parse_error` means the engine's own
+    log refused the header inside this turn's byte window, i.e. the model emitted a call and the parser ate it
+    (BUG-1079's attribution, and the reason the guard is not a guess). Everything else is REFUSED, deliberately:
+      allowance    the model spent the allowance the ROLE grants - retrying re-buys the same wall, and calling that
+                   a lost call is exactly the misattribution BUG-1079 fixed one layer up;
+      silent_stop / answered   the model did not emit a call and the engine did not eat one: that is a DECLINED
+                   call, and a guard that retried it would inflate the call count with calls the model never made.
+    Both ceilings are checked here so the bound cannot be forgotten at the call site, and `guard_on` is a parameter
+    rather than a global so the same function answers both sides of the control."""
+    if not guard_on or kind != "engine_parse_error":
+        return False
+    return streak < RETRY_CEILING and retries_used < RETRY_BUDGET
+
+
 def verdict(state: dict[str, Any], target: int) -> tuple[str, str]:
     """PURE: the three-verdict rule from T-213's gate, plus the attribution guard. No PASS exists here.
 
@@ -183,18 +237,27 @@ def verdict(state: dict[str, Any], target: int) -> tuple[str, str]:
                        engine's parser refused a header in the window (the symptom without the loss).
     UNMEASURED         the instrument could not see: a transport refusal, a spent allowance, N below the gate's
                        30, or a drop that coincides with an engine eviction (BUG-950 mechanism A is a second,
-                       sufficient cause - the pool must not be charged to the model).
+                       sufficient cause - the pool must not be charged to the model). Only reachable when
+                       NOTHING was observed: a malformed name is read off the response body and outranks it.
     UNMEASURED_WITH_BOUND  both counts zero over >= 30 calls: the rate is bounded at <= 1 in target/3, which does
                        NOT retire a defect seen at 1 in 5, so it may never be reported as "fixed".
     """
     malformed = len(state["contaminated"]) + len(state["undeclared"])
     drops = state["drops"]
-    if state["unmeasured_reason"]:
-        return "UNMEASURED", state["unmeasured_reason"]
+    # A MALFORMED NAME OUTRANKS AN UNMEASURED RUN (T-215 limb 1, 2026-10-27 - found by its own first receipt).
+    # A malformed name is read off the RESPONSE BODY, so no attribution question can touch it: it does not depend
+    # on the engine log, on an eviction, or on a foreign client. A run that OBSERVED the defect and then could not
+    # continue has therefore still observed the defect, and reporting it as UNMEASURED would delete a positive
+    # reading on the strength of a later limit - "changing what counts", the inverted BUG-1079 shape. The detail
+    # keeps the truncation, because a rate computed from a short run is a FLOOR and must be read as one.
     if malformed:
+        tail = (f" [run then stopped early at {state['attempts']} call(s): {state['unmeasured_reason']} - so this "
+                f"rate is a FLOOR, not a measured rate]") if state["unmeasured_reason"] else ""
         return "RED", (f"{malformed} MALFORMED NAME(S) in {state['attempts']} call(s): "
                        f"contaminated={state['contaminated'][:3]} undeclared={state['undeclared'][:3]} "
-                       f"- a call to a tool that does not exist (BUG-951 symptom 1)")
+                       f"- a call to a tool that does not exist (BUG-951 symptom 1){tail}")
+    if state["unmeasured_reason"]:
+        return "UNMEASURED", state["unmeasured_reason"]
     if drops and state["evictions"]:
         return "UNMEASURED", (f"{len(drops)} call(s) went unanswered AND {state['evictions']} engine eviction(s) "
                               f"fired in the same window (BUG-950 mechanism A) - two sufficient causes, so no "
@@ -204,6 +267,15 @@ def verdict(state: dict[str, Any], target: int) -> tuple[str, str]:
         return "RED", (f"{len(drops)} DROPPED CALL(S) in {state['attempts']} call(s); first at turn {first['turn']} "
                        f"({first['kind']}: {first['detail']}) - BUG-951 symptom 2")
     if state["parse_errors"]:
+        # A REPAIR IS NOT HEALTH (T-215 limb 2). The parser still refused the header; what changed is that the
+        # caller no longer loses the call. The detail must say WHICH of the two happened, because "every call
+        # arrived" is true both for a lucky run and for a guarded one, and only one of them is fixed.
+        if state.get("retry_guard") and state.get("retries"):
+            retry_wall = sum(step["wall_s"] for step in state["steps"] if step.get("retried"))
+            return "RED", (f"the engine's parser refused {state['parse_errors']} tool header(s) in this run's "
+                           f"windows; {state['retries']} re-issue(s) recovered {state['recovered']} of them "
+                           f"at {retry_wall:.1f}s of extra wall time - the DEFECT still fires, so this is a "
+                           f"REPAIR, not health (D-3200 clause 1)")
         return "RED", (f"the engine's parser refused {state['parse_errors']} tool header(s) in this run's windows "
                        f"and every call still arrived - symptom without loss (it is luck, not health)")
     if state["attempts"] < target:
@@ -230,7 +302,19 @@ def default_subject() -> str:
     return model
 
 
-def seed_history(total: int, tail: str, seed: bool) -> list[dict[str, Any]]:
+def echo_for(name: str, echo_variant: str) -> str:
+    """PURE: the harness's reply to a tool call it cannot execute, in the declared variant. This is the ONE place
+    the echo's wording is decided, so the seed and the loop's own defect path cannot disagree - a fixture half of
+    whose echoes quote the name would be measuring the mitigation with the mitigation switched off."""
+    if echo_variant == ECHO_QUOTED:
+        return f"error: tool {name!r} does not exist"
+    if echo_variant == ECHO_BLANK:
+        return ECHO_BLANK_TEXT
+    raise SystemExit(f"FATAL: echo_variant {echo_variant!r} is not in the declared vocabulary "
+                     f"({ECHO_QUOTED!r}, {ECHO_BLANK!r}) - refusing to guess what the harness would have said (C16)")
+
+
+def seed_history(total: int, tail: str, seed: bool, echo_variant: str = ECHO_QUOTED) -> list[dict[str, Any]]:
     """The prompt, plus - when `seed` - the SEEDED CORRUPTION: one assistant tool call whose name is a real tool
     with a harmony channel tail glued on (BUG-951's verbatim shape), and the error payload a harness would return
     for it. Nothing here warns the model that the name is corrupted: the axis under test is whether a corrupted
@@ -238,7 +322,11 @@ def seed_history(total: int, tail: str, seed: bool) -> list[dict[str, Any]]:
 
     `seed=False` is the CONTROL, and it exists because of the build_argname lesson (a trap that fails EVERYONE
     measures nothing): two runs that differ ONLY by these two messages separate "this model corrupts names on
-    its own" from "the transcript taught it to". Without that pair the 14-in-30 reading has no attribution."""
+    its own" from "the transcript taught it to". Without that pair the 14-in-30 reading has no attribution.
+
+    `echo_variant` is T-215 limb 1's SECOND split of the same pair: the assistant turn is byte-identical in both
+    variants and only the tool echo's content differs, so the difference between `quoted` and `blank` is the
+    attribution of the copy to the verbatim name rather than to the seeded turn (which both variants carry)."""
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": "You are a sub-agent. You MUST use the provided tool; never guess a value."},
         {"role": "user", "content": (f"Call {TOOL_NAME} once per assistant message, for index 1 up to {total}, in "
@@ -252,20 +340,21 @@ def seed_history(total: int, tail: str, seed: bool) -> list[dict[str, Any]]:
         {"role": "assistant", "content": "", "tool_calls": [{
             "id": REPLAY_ID, "type": "function",
             "function": {"name": corrupted, "arguments": json.dumps({"index": "1"})}}]},
-        {"role": "tool", "tool_call_id": REPLAY_ID,
-         "content": f"error: tool {corrupted!r} does not exist"},
+        {"role": "tool", "tool_call_id": REPLAY_ID, "content": echo_for(corrupted, echo_variant)},
     ]
     return messages
 
 
 def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str,
-              facts: dict[str, Any]) -> dict[str, Any]:
+              facts: dict[str, Any], echo_variant: str = ECHO_QUOTED,
+              retry_guard: bool = False) -> dict[str, Any]:
     """Drive the red loop against ONE model and return its receipt row. The receipt carries the ENGINE identity
     (D-3152 limb 2: a verdict is a statement about a BUILD), the exact malformed names, and every turn's window."""
     url = str(decl["base_url"]).rstrip("/") + "/chat/completions"
     key = str((decl.get("headers") or {}).get("Authorization", ""))
     markers = facts["markers"]
-    messages = (seed_history(total, tail, mode == "replay") if mode in ("replay", "clean") else
+    messages = (seed_history(total, tail, mode in ("replay", "blank-echo"), echo_variant)
+                if mode in ("replay", "clean", "blank-echo") else
                 [{"role": "system", "content": "You are a sub-agent. You MUST use the provided tool; never "
                                                "guess a value."},
                  {"role": "user", "content": (f"In EACH assistant message call {TOOL_NAME} TWICE, two tool calls "
@@ -276,9 +365,10 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
     state: dict[str, Any] = {"attempts": 0, "clean": 0, "contaminated": [], "undeclared": [], "drops": [],
                              "evictions": 0, "parse_errors": 0, "args_unparsable": 0, "turns": 0,
                              "nudges": 0, "parallel_max": 0, "walls": [], "steps": [],
+                             "retries": 0, "retry_streak": 0, "recovered": 0, "retry_guard": retry_guard,
                              "unmeasured_reason": "", "stop_reason": ""}
     while state["attempts"] < total and len(state["drops"]) < DROP_CEILING:
-        if state["turns"] >= total + DROP_CEILING + TURN_HEADROOM:
+        if state["turns"] >= total + DROP_CEILING + TURN_HEADROOM + (RETRY_BUDGET if retry_guard else 0):
             state["stop_reason"] = "turn ceiling reached (a loop that spends turns without issuing calls)"
             break
         offset = log_offset(facts["log"])
@@ -321,11 +411,28 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             if kind == "allowance":
                 state["unmeasured_reason"] = detail
                 break
+            if may_retry(kind, state["retry_streak"], retry_guard, state["retries"]):
+                # THE GUARD (T-215 limb 2), AND THE SHAPE ITS FIRST RECEIPT FORCED. MEASURED 2026-10-27 19:04: SIX
+                # byte-identical re-issues recovered ZERO of 3 lost calls and cost 100.9 s - because R7 makes every
+                # generation temperature=0.0, so re-sending the same messages is a DETERMINISTIC REPLAY of the same
+                # refused header, not a retry. A retry can only differ if the PROMPT differs, so the re-issue carries
+                # a nudge naming what went missing (the same lever the drop path already uses, and the reason the
+                # replay run reached N with two losses). Recorded as a REPAIR, never as a silent success.
+                state["retries"] += 1
+                state["retry_streak"] += 1
+                state["steps"][-1]["retried"] = True
+                state["steps"][-1]["retry_detail"] = detail
+                messages.append({"role": "user", "content": RETRY_NUDGE.format(tool=TOOL_NAME)})
+                continue
+            state["retry_streak"] = 0
             state["drops"].append({"turn": state["turns"], "kind": kind, "detail": detail})
             state["nudges"] += 1
             messages.append({"role": "user", "content": (f"Continue: call {TOOL_NAME} with the next index. Use the "
                                                          f"tool, do not answer in words.")})
             continue
+        if state["retry_streak"]:
+            state["recovered"] += 1          # the retried turn finally produced the call it owed
+            state["retry_streak"] = 0
         state["parallel_max"] = max(state["parallel_max"], len(tool_calls))
         state["steps"][-1]["names"] = [str((call.get("function") or {}).get("name") or "")
                                        for call in tool_calls]
@@ -348,14 +455,20 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
                 state["undeclared"].append(name)
             else:
                 state["clean"] += 1
-            payload = (f"error: tool {name!r} does not exist" if defect else exec_read_index(args, total))
+            payload = (echo_for(name, echo_variant) if defect else exec_read_index(args, total))
             messages.append({"role": "tool", "tool_call_id": call.get("id", ""), "content": payload})
     if not state["stop_reason"]:
+        # THE STOP REASON MUST NAME THE EXIT THAT ACTUALLY HAPPENED (T-215 limb 1, 2026-10-27): the first
+        # blank-echo run ended on a SPENT ALLOWANCE and this line still claimed "stopped after 0 dropped call(s)
+        # (the verdict is already RED)" - a receipt whose own account of why it stopped is false is drift, because
+        # an auditor reads the stop line before the verdict.
         state["stop_reason"] = ("reached N" if state["attempts"] >= total else
-                                f"stopped after {len(state['drops'])} dropped call(s) (the verdict is already RED "
-                                f"and cannot change)")
+                                (f"stopped early: {state['unmeasured_reason']}" if state["unmeasured_reason"] else
+                                 f"stopped after {len(state['drops'])} dropped call(s) (the verdict is already RED "
+                                 f"and cannot change)"))
     got, detail = verdict(state, total)
-    return {"model": model, "mode": mode, "replay_tail": tail if mode == "replay" else None,
+    return {"model": model, "mode": mode, "replay_tail": tail if mode in ("replay", "blank-echo") else None,
+            "echo_variant": echo_variant,
             "calls_target": total, "attempts": state["attempts"], "clean_calls": state["clean"],
             "malformed_names": len(state["contaminated"]) + len(state["undeclared"]),
             "contaminated": state["contaminated"], "undeclared": state["undeclared"],
@@ -363,6 +476,8 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             "engine_parse_errors": state["parse_errors"], "evictions": state["evictions"],
             "args_unparsable": state["args_unparsable"], "parallel_max": state["parallel_max"],
             "turns": state["turns"], "nudges": state["nudges"], "stop_reason": state["stop_reason"],
+            "retry_guard": retry_guard, "retries": state["retries"], "recovered_calls": state["recovered"],
+            "retry_wall_s": round(sum(s["wall_s"] for s in state["steps"] if s.get("retried")), 1),
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
             "verdict": got, "detail": detail, "steps": state["steps"]}
 
@@ -430,11 +545,27 @@ def selftest() -> int:
         (fresh(unmeasured_reason="HTTP 400: bad history"), "UNMEASURED",
          "an engine refusal must be UNMEASURED, never RED"),
         (fresh(attempts=3, clean=3), "UNMEASURED", "a loop that stopped short with no defect is not a bound"),
+        (fresh(attempts=2, contaminated=["read_index<|channel|>commentary"], unmeasured_reason="an allowance ran out"),
+         "RED", "an OBSERVED malformed name outranks a later allowance: a body-side fact cannot be un-observed"),
+        (fresh(attempts=2, unmeasured_reason="an allowance ran out"), "UNMEASURED",
+         "the same truncation with NOTHING observed stays UNMEASURED (the ordering must be two-sided)"),
     ]
     for state, want, label in verdict_cases:
         got = verdict(state, MIN_BOUND_CALLS)[0]
         if got != want:
             bad.append(f"{label}: got {got!r}")
+
+    # ── A REPAIR MUST READ AS A REPAIR, NOT AS LUCK (T-215 limb 2, 2026-10-27) ────────────────────────
+    # MEASURED shape of the guard's first successful run: 2 headers refused, 2 recovered, 0 lost. The receipt
+    # printed "it is luck, not health" because verdict() read a state key run_model never set - so the branch is
+    # now asserted BOTH WAYS, and the count of controls is what makes the assertion visible.
+    repaired = fresh(parse_errors=2, retry_guard=True, retries=2, recovered=2,
+                     steps=[{"wall_s": 12.4, "retried": True}, {"wall_s": 12.4, "retried": True}])
+    word, detail = verdict(repaired, MIN_BOUND_CALLS)
+    if word != "RED" or "REPAIR" not in detail:
+        bad.append(f"a guarded run that recovered its losses must read RED and say REPAIR, got {word!r}: {detail[:70]!r}")
+    if "luck" not in verdict(fresh(parse_errors=2), MIN_BOUND_CALLS)[1]:
+        bad.append("the SAME counters with NO guard must read 'luck' (the control for the branch above)")
 
     tool_cases = [
         ({"index": "1"}, 2, "NEXT: call read_index with index=2.", "a mid-run index must name the next one"),
@@ -478,7 +609,48 @@ def selftest() -> int:
     if len(unseeded) != 2 or any(message["role"] == "tool" for message in unseeded):
         bad.append("the CONTROL history must be the two prompt messages alone (the pair's only difference)")
 
-    total = len(name_cases) + len(turn_cases) + len(verdict_cases) + len(tool_cases) + 7
+    # ── T-215 limb 1: the echo axis must change ONE string and nothing else ──────────────────────────
+    quoted = seed_history(5, "commentary", True, ECHO_QUOTED)
+    blank = seed_history(5, "commentary", True, ECHO_BLANK)
+    corrupted = f"{TOOL_NAME}<|channel|>commentary"
+    if len(quoted) != len(blank):
+        bad.append(f"the echo variant must not change the transcript's LENGTH ({len(quoted)} vs {len(blank)}): a "
+                   f"structural change would confound the axis with the seeded turn")
+    if quoted[2] != blank[2]:
+        bad.append("the seeded assistant turn must be BYTE-IDENTICAL across echo variants - it is the half held "
+                   "constant, and a difference there would make the axis unreadable")
+    if corrupted not in quoted[3]["content"]:
+        bad.append("the QUOTED echo must repeat the corrupted name verbatim (that is production's shape)")
+    if corrupted in blank[3]["content"] or "commentary" in blank[3]["content"]:
+        bad.append(f"the BLANK echo must not carry the name or its tail, got {blank[3]['content']!r}")
+    if quoted[3]["role"] != blank[3]["role"] or quoted[3]["tool_call_id"] != blank[3]["tool_call_id"]:
+        bad.append("both variants must keep the echo's role and call id (same message, different content)")
+    if len(seed_history(5, "commentary", False, ECHO_BLANK)) != 2:
+        bad.append("the CONTROL must be untouched by the echo variant (no seed, no echo, either way)")
+    if echo_for(TOOL_NAME, ECHO_QUOTED) == echo_for(TOOL_NAME, ECHO_BLANK):
+        bad.append("echo_for must differ between variants, or the axis is cosmetic")
+    try:
+        echo_for(TOOL_NAME, "invented")
+        bad.append("an undeclared echo variant must be refused, never guessed (C16)")
+    except SystemExit:
+        pass
+
+    # ── T-215 limb 2: the guard may retry ONE shape and no other (both sides asked) ──────────────────
+    retry_cases = [
+        ("engine_parse_error", 0, True, 0, True, "a LOST call with the guard on must be re-issued"),
+        ("engine_parse_error", 0, False, 0, False, "the guard OFF must never retry - that is the BEFORE reading"),
+        ("allowance", 0, True, 0, False,
+         "a spent allowance must NEVER be retried (it re-buys the same wall; BUG-1079's misattribution)"),
+        ("silent_stop", 0, True, 0, False, "a declined call must never be retried (that would invent calls)"),
+        ("answered", 0, True, 0, False, "words where a call was owed must never be retried"),
+        ("engine_parse_error", RETRY_CEILING, True, 0, False, "the per-call ceiling must bind"),
+        ("engine_parse_error", 0, True, RETRY_BUDGET, False, "the run budget must bind"),
+    ]
+    for kind, streak, guard_on, used, want, label in retry_cases:
+        if may_retry(kind, streak, guard_on, used) != want:
+            bad.append(f"may_retry: {label}")
+
+    total = len(name_cases) + len(turn_cases) + len(verdict_cases) + len(tool_cases) + len(retry_cases) + 17
     for problem in bad:
         print(f"  FAIL control: {problem}")
     print(f"{'OK' if not bad else 'FAILED'} harmony-red-loop --selftest: {total - len(bad)}/{total} "
@@ -490,10 +662,12 @@ def main() -> int:
     """Run the red loop against ONE model (or a named model), print the counters, write the receipt."""
     parser = argparse.ArgumentParser(description="T-213/BUG-951 harmony red loop")
     parser.add_argument("--selftest", action="store_true")
-    parser.add_argument("--mode", choices=("replay", "clean", "parallel"), default="replay")
+    parser.add_argument("--mode", choices=("replay", "clean", "parallel", "blank-echo"), default="replay")
     parser.add_argument("--calls", type=int, default=MIN_BOUND_CALLS)
     parser.add_argument("--only", default="")
     parser.add_argument("--replay-tail", choices=CORRUPT_TAILS, default=CORRUPT_TAILS[0])
+    parser.add_argument("--retry-guard", action="store_true",
+                        help="T-215 limb 2: re-issue a turn whose owed call the engine's parser ate (bounded)")
     parser.add_argument("--out", default="")
     args = parser.parse_args()
     if args.selftest:
@@ -512,25 +686,37 @@ def main() -> int:
     out = pathlib.Path(args.out or f"temp/harmony_red_loop_receipt_{time.strftime('%Y%m%d')}.json")
     # floor of one call: a zero target would make every run "reached N" without issuing anything, so this is a
     # guard, not a tunable.
-    row = run_model(decl, model, max(1, args.calls), args.mode, args.replay_tail, facts)
+    row = run_model(decl, model, max(1, args.calls), args.mode, args.replay_tail, facts,
+                    ECHO_BLANK if args.mode == "blank-echo" else ECHO_QUOTED, args.retry_guard)
     receipt = {"schema_version": RECEIPT_SCHEMA_VERSION,
                "measured_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "fixture": "T-213 harmony red loop",
                "fixture_script": "scripts/harmony_red_loop.py", "script_sha256": script_digest(),
                "axis": {"replay": "a corrupted name seeded into history, then N real calls",
                         "clean": "the CONTROL: the same N calls with NO seeded corruption (the pair attributes "
                                  "a defect to the transcript rather than to the model's own habit)",
-                        "parallel": "two tool calls demanded in ONE assistant message"}[args.mode],
+                        "parallel": "two tool calls demanded in ONE assistant message",
+                        "blank-echo": "T-215 limb 1: the `replay` seed with the echoed error stripped of the "
+                                      "name (`error: tool not found`, same message, same position) and the same "
+                                      "name-free echo used for every defect the loop provokes - so the "
+                                      "difference against `replay` is the verbatim NAME in the echo, not the "
+                                      "presence of an echo and not the seeded assistant turn (both carry it)"
+                        }[args.mode],
                "engine": engine_block(), "engine_log": str(facts["log"]),
                "per_turn_budget_s": budget, "declared_served": served,
                "min_bound_calls": MIN_BOUND_CALLS, "drop_ceiling": DROP_CEILING,
+               "retry_guard": {"on": args.retry_guard, "per_call_ceiling": RETRY_CEILING,
+                               "run_budget": RETRY_BUDGET,
+                               "rule": "a turn whose owed call the engine's parser ate is RE-ISSUED byte-identically; "
+                                       "an allowance, a silent stop or a declined call is NEVER retried"},
                "not_tested": ["enable_thinking=False on a harmony model that emits an analysis channel anyway "
                               "(a server-side setting this fixture never changes)",
                               "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is "
                               "REPLAYED as a name tail, never produced by the model under observation",
-                              "which HALF of the seeded pair teaches the copy: the corrupted assistant tool_call "
-                              "AND the harness's `error: tool '<name>' does not exist` echo are seeded together "
-                              "(as production does), so a run that removed the echo is a further axis, not a "
-                              "reading this fixture already has"],
+                              "which HALF of the seeded pair teaches the copy: `blank-echo` now separates the "
+                              "verbatim NAME in the echo from the seeded assistant turn, but the FULLY "
+                              "UNBALANCED transcript (an assistant tool_call with NO tool response at all) is a "
+                              "different axis - it changes structure as well as content, and an engine that "
+                              "refuses it would return a transport error, not a reading"],
                "rows": [row]}
     out.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     print(f"T-213 harmony red loop | axis {args.mode} | engine {receipt['engine'].get('app_version')} "
@@ -539,6 +725,9 @@ def main() -> int:
           f"dropped={row['dropped_calls']} engine_parse_errors={row['engine_parse_errors']} "
           f"evictions={row['evictions']} turns={row['turns']} slowest={row['slowest_turn_s']}s")
     print(f"  stop: {row['stop_reason']}")
+    if row["retry_guard"]:
+        print(f"  guard: retries={row['retries']} recovered={row['recovered_calls']} "
+              f"retry_wall={row['retry_wall_s']}s")
     for item in row["drops"]:
         print(f"  DROP turn {item['turn']}: {item['kind']} - {item['detail']}")
     for name in row["contaminated"] + row["undeclared"]:

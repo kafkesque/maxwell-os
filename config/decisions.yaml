@@ -34936,6 +34936,29 @@ decisions:
     (d) WHAT CLAUSE (5) STILL OWES. AGENT_LOOP_SHORT is bound to a model that is RED here, so the register carries a
     KNOWN, REGISTERED contradiction until the owner answers T-216. That is a named open gate, not drift - and the
     contingent rule that will settle it is pre-declared IN T-216, so a receipt decides it and not a mood.
+  amended_20261027_c: >-
+    THE GATE HAS A FOURTH AXIS, THE VERDICT GAINED AN ORDERING RULE, AND CLAUSE (6)(b) IS CORRECTED - appended as an ADD
+    the same day; no earlier sentence is rewritten.
+    (a) T-215 LIMB 1 IS MEASURED (`--mode blank-echo`, receipt HARMONY_RED_LOOP_20261027_blankecho_run1/run2.json). The
+    seeded pair is split into its halves: the assistant turn is held BYTE-IDENTICAL (a control ASSERTS it) and only the
+    echoed error loses the name. READING: the copy does NOT collapse - it arrives EARLIER (turn 1, against turn 8 in the
+    paired control) - and turn 1 costs 808 decode tokens against 160 in `replay` from an identical 228-token prompt
+    (5.05x, two replicates), after which the next turn spends the whole allowance generating nothing. The ASSISTANT TURN
+    ALONE teaches the copy, so transcript sanitisation is REFUSED on its own measurement (D-3201).
+    (b) A BODY-SIDE OBSERVATION OUTRANKS AN UNMEASURED RUN (BUG-1080). A malformed name is read off the response body, so
+    no log window, eviction or foreign client can un-observe it: the malformed branch now precedes the unmeasured branch
+    and the detail carries the truncation ("this rate is a FLOOR"). The stop line must also name the exit that happened -
+    its fallback used to claim "stopped after 0 dropped call(s) (the verdict is already RED)" for a run that broke on an
+    allowance with nothing RED.
+    (c) T-215 LIMB 2 IS A DECLARED GUARD, NOT A HABIT: `--retry-guard` re-issues a turn whose owed call the engine's
+    parser ate, with both ceilings inside the pure `may_retry` (7 controls), and it REFUSES to retry an allowance or a
+    declined call. Every repair is recorded (retries / recovered_calls / retry_wall_s), and the parse-error branch keeps
+    its RED while saying which of "luck" and "guard" produced the arrivals - a repair may never be reported as health.
+    (d) CLAUSE (6)(b) IS CORRECTED, NOT MERELY OLD: a per-turn token ceiling IS declared in this repo and it is DERIVED -
+    `config/agent_context.yaml#turn_budget`, D-3027, floor(per_turn_budget_s * decode_tps) = 90 * 41.7 = ~3753 for
+    gpt-oss. The blocker was therefore never a missing owner knob but a bare 1024 constant inside the instruments, which
+    grants 27% of the role's ceiling and truncates runs the role would survive. Registered as BUG-1081 (OPEN); the owner
+    act survives only for BINDING the value on the live server (`turn_budget.bind_state_20261015: UNBOUND`).
   decision: >-
     (1) THE INSTRUMENT IS A GATE, NOT A BATTERY, AND IT HAS NO PASS. `scripts/harmony_red_loop.py` returns exactly
     three verdicts - RED (the defect fired), UNMEASURED (the instrument could not see) and UNMEASURED_WITH_BOUND (0
@@ -35000,4 +35023,88 @@ decisions:
   - governance/evidence/HARMONY_RED_LOOP_20261027_parallel.json
   - governance/evidence/HARMONY_RED_LOOP_20261027_mtp4_replay.json
   - governance/evidence/HARMONY_RED_LOOP_20261027_mtp4_clean.json
+  supersedes: []
+
+- id: D-3201
+  state: ACTIVE
+  date: 2026-10-27
+  category: TOOL-CALL EMISSION / MITIGATION SELECTION (BUG-951, BUG-1080, BUG-1081, BUG-1079, T-215, T-216, D-3200, D-3038, D-3036)
+  title: >-
+    WHAT WE REJECT WE REGISTER - sanitising the transcript echo is REFUSED as a fix for BUG-951's contagion, because it
+    stops no copy and costs a turn; what is left is the bounded retry guard, and a repair may never be reported as health
+  amended_20261027_b: >-
+    THE GUARD'S RECEIPT IS NOW IN HAND AND IT RESOLVES DECISION (4)(a) - appended as an ADD the same day; nothing above is
+    rewritten, including the sentence that said the receipt was not in hand when it was written.
+    (a) FORM 1 WAS REFUTED BY ITS OWN RECEIPT. A byte-identical re-issue (6 of them) recovered 0 of 3 lost calls and cost
+    100.9 s. The cause is structural, not incidental: R7 fixes temperature=0.0, so an identical prompt is an identical
+    DETERMINISTIC REPLAY of the same refused header. A retry that repeats the request cannot differ from the attempt that
+    failed, and this is now asserted as a control rather than remembered as advice.
+    (b) FORM 2 RECOVERS THE LOSS. With the re-ask carrying a nudge that NAMES the missing call, the clean axis reads 30
+    calls, 0 LOST, 2 parse errors detected and 2 recovered, +24.8 s of extra wall inside the owner's 90 s per-turn budget
+    (slowest turn 24.3 s). So the CALLER loses nothing while the engine still refuses ~1 header in 15: this is decision
+    (3) in practice - a REPAIR, reported as one, with the defect's own count still visible.
+    (c) WHAT THIS DOES AND DOES NOT UNBLOCK. It unblocks (b) of T-216's predeclared rule, whose condition was 0 lost over
+    N >= 30 with the wall cost reported and inside budget - all three now MEASURED. It does NOT unblock the role: the
+    prompts here are 228-1,000 tokens and the role's context can be 26k, so the certificate still does not travel, the
+    guard still is not landed in any caller (T-217), and the choice remains the owner's act (D-3035).
+  decision: >-
+    (1) TRANSCRIPT ECHO SANITISATION IS REFUSED, WITH THE MEASUREMENT THAT REFUSES IT. The candidate was "never echo a
+    malformed tool name back into the transcript", and T-215 limb 1 tested exactly it: `--mode blank-echo` keeps the
+    seeded assistant turn byte-identical and removes only the name from the echoed error. In 2 of 2 runs the model copied
+    the corrupted name on the FIRST call (the control copied it from turn 8), generating 808 tokens to do it against 160
+    in the paired `replay` run from an identical prompt, and both runs then spent the entire 1024-token allowance producing
+    no content and no tool header (finish_reason=length, empty content, ZERO parse errors in the window - it was reasoning,
+    not failing to parse). So the mitigation buys no protection, costs ~5x the decode on the affected turn and then a whole
+    turn, and its only real effect is to REMOVE THE INFORMATION the model needs to correct itself. A rejected option is
+    recorded WITH its reason so it cannot be re-proposed from memory (D-3038).
+    (2) THE BOUNDED RETRY GUARD IS THE DECLARED CANDIDATE, AND ONLY AS A CANDIDATE. It is model-agnostic infrastructure -
+    it removes the failure CLASS (a call that never arrived) rather than dodging one instance of it - so it is the only
+    option on the table that does not spend a 42GB resident slot or a context ceiling. It becomes a ROLE-GRADE fix only
+    when a receipt shows the loss at 0 over N >= 30 on the clean axis AT THE ROLE'S REAL CONTEXT SIZE, with its wall-time
+    tax reported; a fixture-sized certificate does not travel (the battery's prompts are 205-456 tokens, the role's can be
+    26k).
+    (3) A REPAIR IS NOT HEALTH, AND THE INSTRUMENT MUST NOT LET THEM LOOK ALIKE. A recovered call still means the engine's
+    parser refused a header, so the verdict stays RED and its detail names the repair count and the extra wall time. The
+    same rule governs the other direction (BUG-1080): an observation already made may never be deleted by a later
+    inability to continue, so a malformed name outranks an "unmeasured" run and the truncation is carried in the detail.
+    (4) WHAT THIS DECISION DOES NOT SETTLE, NAMED. (a) The guard's receipt on the clean axis is not in hand at the moment
+    of writing, and nothing here predicts it. (b) Whether the role KEEPS gpt-oss is the owner's act (T-216); this decision
+    only removes one option from the menu and names the remaining one. (c) The allowance defect (BUG-1081) is registered,
+    not fixed: it is the reason the blank-echo axis could not state a RATE, so the reading above is mechanism-only.
+  measured: |-
+    ALL READINGS 2026-10-27, engine oMLX 0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f, temperature 0.0, N=30 target,
+    receipts governance/evidence/HARMONY_RED_LOOP_20261027_blankecho_run1.json, _run2.json, _replay_rerun.json:
+      replay rerun  30 calls  8 malformed (first at turn 8)  2 dropped  30 turns  reached N
+                    turn 1: 160 tokens / 4.22 s from prompt 228
+      blank-echo 1   1 call   1 malformed (turn 1)           0 dropped  2 turns   truncated on an allowance
+                    turn 1: 808 tokens / 20.37 s from prompt 228 ; turn 2: 1024 tokens, finish=length, empty, 0 parse errors
+      blank-echo 2   1 call   1 malformed (turn 1)           0 dropped  2 turns   same shape, same numbers (808 / 1024)
+    engine log (the witness, not the report): completions quoted above are the engine's own lines; the 1024-token
+    finish_reason=length completions carry NO harmony parse error, which is what separates "the parser ate the call" from
+    "the model never produced one" (the distinction BUG-1079 exists to make).
+    the rail, each command run before and after (D-3036):
+      before   python3 scripts/harmony_red_loop.py --selftest -> 32/32
+      after    python3 scripts/harmony_red_loop.py --selftest -> 40/40 (blank-echo axis) -> 49/49 (+ guard)
+      reading  python3 scripts/harmony_red_loop.py --mode blank-echo --calls 30   -> RED 1 malformed, run truncated
+      control  python3 scripts/harmony_red_loop.py --mode replay   --calls 30     -> RED 8/30 malformed, reached N
+  rejected_options:
+    sanitise_the_transcript_echo: >-
+      REFUSED 2026-10-27 by measurement (decision 1). It does not reduce the copy and it costs decode and a turn. It also
+      destroys the signal the model uses to correct a bad name, which is why the name-free run is the SLOWER and SHORTER
+      one - the opposite of a mitigation's signature.
+    accept_the_loss: >-
+      NOT RECOMMENDED (unchanged from T-216). A silent lost call in the orchestrator makes every downstream receipt
+      unreliable in a way no later verification can detect - the single failure this OS exists to prevent.
+  bugs:
+  - BUG-951
+  - BUG-1080
+  - BUG-1081
+  files:
+  - scripts/harmony_red_loop.py
+  - config/agent_context.yaml
+  - governance/buglog.md
+  - config/task_register.yaml
+  - governance/evidence/HARMONY_RED_LOOP_20261027_blankecho_run1.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_blankecho_run2.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_replay_rerun.json
   supersedes: []

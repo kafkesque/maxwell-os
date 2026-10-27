@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "measured_at": "2026-10-27T18:45:25",
+  "fixture": "T-213 harmony red loop",
+  "fixture_script": "scripts/harmony_red_loop.py",
+  "script_sha256": "3d9bfa4cd86323f1",
+  "axis": "T-215 limb 1: the `replay` seed with the echoed error stripped of the name (`error: tool not found`, same message, same position) and the same name-free echo used for every defect the loop provokes - so the difference against `replay` is the verbatim NAME in the echo, not the presence of an echo and not the seeded assistant turn (both carry it)",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation",
+    "which HALF of the seeded pair teaches the copy: `blank-echo` now separates the verbatim NAME in the echo from the seeded assistant turn, but the FULLY UNBALANCED transcript (an assistant tool_call with NO tool response at all) is a different axis - it changes structure as well as content, and an engine that refuses it would return a transport error, not a reading"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "blank-echo",
+      "replay_tail": "commentary",
+      "echo_variant": "blank",
+      "calls_target": 30,
+      "attempts": 1,
+      "clean_calls": 0,
+      "malformed_names": 1,
+      "contaminated": [
+        "read_index<|channel|>commentary"
+      ],
+      "undeclared": [],
+      "dropped_calls": 0,
+      "drops": [],
+      "engine_parse_errors": 0,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 2,
+      "nudges": 0,
+      "stop_reason": "stopped early: the turn spent its whole token allowance (finish_reason=length) and returned no content - the instrument cannot see this model at this allowance, so this is UNMEASURED, not a FAIL",
+      "slowest_turn_s": 24.9,
+      "verdict": "RED",
+      "detail": "1 MALFORMED NAME(S) in 1 call(s): contaminated=['read_index<|channel|>commentary'] undeclared=[] - a call to a tool that does not exist (BUG-951 symptom 1) [run then stopped early at 1 call(s): the turn spent its whole token allowance (finish_reason=length) and returned no content - the instrument cannot see this model at this allowance, so this is UNMEASURED, not a FAIL - so this rate is a FLOOR, not a measured rate]",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 19.74,
+          "ttft_s": 1.03,
+          "decode_tps": 43.28,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index<|channel|>commentary"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 24.87,
+          "ttft_s": 1.08,
+          "decode_tps": 43.07,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "drop": "allowance"
+        }
+      ]
+    }
+  ]
+}

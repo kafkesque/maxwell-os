@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1326 decisions (census stamp 1bef6331c7f0a999, 2026-10-27) · 843 bugs (265 open / 578 closed; highest OPEN = BUG-1077) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1327 decisions (census stamp e009a777c170e2df, 2026-10-27) · 847 bugs (267 open / 580 closed; highest OPEN = BUG-1083) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1326 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 667 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1326, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1327 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 668 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1327, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -33,7 +33,7 @@
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
 > | T-214 | 🔴 MUST | 🔴 open | BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since  | READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gp |
-> | T-215 | 🔴 MUST | 🔴 open | MAKE A LOST CALL IMPOSSIBLE TO MISTAKE FOR A DECLINED ONE - measure the one mitigation with a mechanism behind | READ 2026-10-27: `scripts/harmony_red_loop.py` already isolates the pair - `seed_history(t |
+> | T-217 | 🔴 MUST | 🔴 open | LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture an | READ 2026-10-27: `governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json` (0 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
@@ -24052,3 +24052,151 @@ would too).** These five receipts are NOT one generation, and the difference is 
   THE RULE THIS LEAVES: identify an instrument's GENERATION by its ROW-level fields, never by a receipt field's
   absence — the same D-3034 shape as a register that declares a thing it never resolves. No receipt was edited to
   make this tidy: a receipt is a record of a build, and rewriting one to look uniform is how two receipts start lying.
+
+## BUG-951 (HIGH, OPEN 2026-10-20 — STATUS EVENT 2026-10-27b) — T-215 LIMB 1 HAS ITS READING: the echoed NAME is not what teaches the copy, and stripping it costs a turn
+
+**What was built (one axis, one string).** `scripts/harmony_red_loop.py` gained a fourth mode, `--mode blank-echo`:
+the `replay` seed with the harness's echo stripped of the name (`error: tool not found` — same message, same role,
+same position, same call id, one string fewer) and the SAME name-free echo used for every defect the loop itself
+provokes. The seeded assistant turn is byte-identical across the two variants, and the selftest ASSERTS that
+(`quoted[2] != blank[2]` fails the control) — so the difference between `replay` and `blank-echo` is the verbatim
+name in the echo, not the presence of an echo and not the seeded turn. Controls 32 -> 40, green.
+
+**The paired reading (one engine build, warm model, identical 228-token turn-1 prompt).**
+
+| run | seeded echo | turn 1 decode | first malformed name | calls | malformed | drops | ended |
+|---|---|---|---|---|---|---|---|
+| `replay` rerun 18:48 | quotes the name | **160 tokens / 4.2 s** | turn 8 | 30 | 8 | 2 | reached N |
+| `blank-echo` run1 18:42 | name-free | **808 tokens / 20.4 s** | **turn 1** | 1 | 1 | 0 | turn 2 ate the 1024 allowance, 0 content |
+| `blank-echo` run2 18:45 | name-free | **808 tokens / 19.7 s** | **turn 1** | 1 | 1 | 0 | same turn, same shape — 2 of 2 |
+
+**The reading.** The copy does **not** collapse when the echo stops quoting the name. It arrives **earlier** (turn 1
+vs turn 8) and costs **5.05x the decode** on the first call, and then a whole turn: both blank-echo runs spent the
+full 1024-token allowance generating NOTHING (`finish_reason=length`, empty content, **no parse error in the window**,
+so the model was not even attempting a refused header — it was reasoning). Conclusion: **the assistant turn alone
+suffices to teach the copy**, and "sanitise the transcript before reuse" buys no protection while spending decode and
+a turn. The mitigation is REFUSED on its own measurement (D-3201).
+
+**What this entry does NOT claim.** 1. It states **no copy RATE** for the `blank-echo` axis: both runs truncated at
+1 of 30 calls, so the only honest figure is the turn-1 pairing (808 vs 160 tokens from an identical prompt, 2
+replicates against 1 control). 2. It does not say the echo is harmless in production — it says removing the name does
+not stop the copy, which is a different claim. 3. It does not touch symptom 2 (parser drops): the `replay` rerun's own
+turn 30 was an `engine_parse_error` at 1024 tokens, i.e. the loss is still live and still T-215 limb 2's business.
+
+## BUG-1080 (MED, FIXED 2026-10-27) — the red loop's TWO self-accounts could contradict its own counters
+
+**Found by the first `blank-echo` receipt, not by reading the code.** That run emitted ONE malformed name and the tool
+then reported **UNMEASURED**, and its stop line read `stopped after 0 dropped call(s) (the verdict is already RED)`
+— a false verdict AND a false reason, in one receipt, about a run whose counters said otherwise.
+
+1. **VERDICT SHADOWING.** `verdict()` tested `unmeasured_reason` BEFORE the counters, so a later inability to continue
+   (here: a spent allowance on turn 2) DELETED an observation already made. A malformed name is read off the
+   RESPONSE BODY: no eviction, no foreign client and no log window can un-observe it. This is the inverted BUG-1079
+   shape — "changing what counts" — and it is exactly what T-215's own limb 3 forbids. **Fix:** the malformed branch
+   now precedes the unmeasured branch and appends the truncation to its own detail (`… so this rate is a FLOOR, not a
+   measured rate`), so the repair cannot hide the short run either.
+2. **A STOP LINE THAT NAMED A CAUSE THAT DID NOT HAPPEN.** The end-of-run fallback always said "stopped after N
+   dropped call(s) (the verdict is already RED)" whenever it was not `reached N`, even when the loop had broken on an
+   allowance with nothing RED. An auditor reads the stop line BEFORE the verdict, so a false stop line corrupts the
+   reading of a correct verdict. **Fix:** the fallback names the real exit (`stopped early: <unmeasured reason>`).
+
+**Red loop, both defects two-sided.** BEFORE: receipt `HARMONY_RED_LOOP_20261027_blankecho_run1.json` (malformed=1,
+verdict UNMEASURED, stop line naming 0 drops). FIX. AFTER: `…_run2.json` reads **RED** with the truncation attached
+and `stopped early: the turn spent its whole token allowance`. Controls: two verdict cases added (observed-malformed +
+allowance → RED; allowance alone → UNMEASURED) and the printed control count rose 40 → 42, all green — a one-sided
+fix would have passed for a `verdict()` that always says RED.
+
+## BUG-1081 (MED, OPEN 2026-10-27) — three loop instruments grant a bare 1024-token allowance while the repo DERIVES it
+
+`BATTERY_MAX_TOKENS = 1024` is a bare constant consumed by the T-199 battery AND by the T-213 gate, and it is what
+truncated both `blank-echo` runs. Measured today: `config/agent_context.yaml#turn_budget` **already declares**
+`max_tokens_per_turn(model) = floor(per_turn_budget_s * decode_tps(model))` (D-3027), with
+`decode_tps(gpt-oss-20b-MXFP4-Q8) = 41.7` (2026-10-15, REPRODUCED) and `per_turn_budget_s = 90` (ratified) — so the
+role's ceiling is **~3753 tokens** and the fixture grants **1024, i.e. 27% of it**. The engine log corroborates the
+model's speed (32.2–37.6 tok/s across today's completions against the declared 41.7).
+
+**This CORRECTS BUG-1079's non-claim (2),** which said the allowance "is not a ratified knob, so … is an OWNER ACT".
+The half that stands: there is no `max_tokens_per_turn` entry in `ratified.knobs`. The half that does not: the value
+is **not a free choice** — it is derived from the owner's ratified `per_turn_budget_s` by a formula this repo already
+declares. So the fix is a PIPELINE act (consume the derivation, record the value and its provenance per receipt), and
+only BINDING it on the live server stays an owner act (`turn_budget.bind_state_20261015: UNBOUND`).
+
+**Why it is not fixed in this turn.** It changes the geometry of three instruments at once and every receipt written
+before it used 1024, so it needs its own red loop and a receipt field carrying the allowance + provenance. **Not
+worked around silently:** every run in this session records `max_tokens` in the engine log line, so the 1024 runs stay
+identifiable after the change. Registered, not patched.
+
+## BUG-951 (HIGH, OPEN 2026-10-20 — STATUS EVENT 2026-10-27c) — T-215 LIMB 2 IS MEASURED, AND ITS FIRST FORM WAS REFUTED BY ITS OWN RECEIPT
+
+**The guard exists** (`--retry-guard`): a turn that OWED a call, returned none, and has an `engine_parse_error` in its
+byte window is re-issued, bounded by `RETRY_CEILING = 2` per owed call and `RETRY_BUDGET = 12` per run, decided by the
+pure `may_retry` (7 controls, both sides). It refuses an allowance and refuses a declined call on purpose: retrying
+those would re-buy the same wall and would inflate the call count with calls the model never made.
+
+**FORM 1 - BYTE-IDENTICAL RE-ISSUE: REFUTED.** `--mode clean --retry-guard --calls 30`, receipt
+`…_clean_guard_IDENTICAL_RETRY.json`: **6 re-issues recovered 0 of 3 lost calls, and cost 100.9 s.** The cause is R7
+and it is not a bug in the guard: every generation here runs `temperature=0.0`, so an identical prompt is an
+**identical deterministic replay** of the same refused header. A retry that repeats the request byte-for-byte cannot
+differ from the attempt that failed. The receipt that refutes it is kept unelevated rather than deleted.
+
+**FORM 2 - NUDGED RE-ASK: THE LOSS GOES TO ZERO.** The re-issue now carries a nudge that NAMES what went missing
+(`RETRY_NUDGE`) — the smallest prompt change that can change a greedy generation. `--mode clean --retry-guard
+--calls 30`, receipt `…_clean_guard_NUDGE.json`:
+
+| reading | calls | lost | repaired | parse errors | turns | extra wall | verdict |
+|---|---|---|---|---|---|---|---|
+| no guard (`clean_a`/`clean_b`, 18:02) | 16 | **3** | 0 | 3 | 19 | — | RED (stopped on the drop ceiling) |
+| guard, identical re-issue (19:04) | 16 | **3** | 0 of 6 | 9 | 25 | +100.9 s | RED |
+| guard, nudged re-ask (19:12) | **30** | **0** | **2 of 2** | 2 | 32 | **+24.8 s** | RED — repair, not health |
+
+**The reading.** Over 30 calls the CALLER LOST NOTHING: the engine's parser still refused 2 headers (rate unchanged in
+kind, ~1 in 15 here) and both recovered on the first nudged re-issue, for 24.8 s of extra wall — inside the owner's
+90 s per-turn budget (slowest single turn 24.3 s). So the mitigation works, and it works as a REPAIR: the defect still
+fires, and the verdict stays RED. That distinction is enforced in code, not in prose (see below).
+
+**A defect this entry's own receipt exposed, and did NOT hide.** The nudged run PRINTED
+`… every call still arrived - symptom without loss (it is luck, not health)`, because `verdict()` read a
+`state["retry_guard"]` key that `run_model` never set — the branch was dead and the "luck" wording survived. Fixed
+(`state` now carries the flag), and the receipt was **NOT rewritten**: its recorded counters were re-derived through
+the fixed `verdict()` and read `RED — 2 re-issue(s) recovered 2 of them at 24.8s of extra wall time … this is a
+REPAIR, not health`. The lesson is the BUG-1080 shape again: a receipt is a record of a BUILD, so the corrected
+reading is registered next to it, never written over it. Controls: 49 -> **51**, both directions (guarded+recovered
+must say REPAIR; the same counters unguarded must say luck).
+
+**What this entry does NOT claim.** 1. It does not claim the engine is fixed: 2 headers were still refused, and
+attribution is unchanged (the parser ate them, the model emitted them). 2. It does not claim the role is safe: these
+prompts are 228–1,000 tokens and the AGENT_LOOP role's context can be 26k, so T-216's own instruction stands — the
+chosen option must be re-checked on this gate AT THE ROLE'S REAL CONTEXT SIZE. 3. It does not claim n=1 is a rate:
+2 repairs in 2 detections is a mechanism reading, not a repair-rate certificate (rule of three bounds it at <= 1 in
+10 false-negative-free). 4. It does not claim the guard is LANDED anywhere a caller uses it — it lives in the fixture;
+taking it to a production caller is T-217, and that caller must consume the SAME shared witness (D-3200 clause 2).
+
+## BUG-1082 (LOW, FIXED 2026-10-27) — a governance register amended by a RAW write is UNATTRIBUTABLE, and the rail that says so is the handoff control
+
+**Found by the rail, on me, minutes after the act.** `config/decisions.yaml` was amended this session with a plain
+`Path.write_text` (the ADD-only `amended_20261027_c` on D-3200 and the new D-3201). The bytes were correct and the
+census re-derived cleanly, but `scripts/lib/handoff.py --selftest` went RED: *"a governed write that IS the current
+bytes is attributed … the probe did not answer as declared"* — because the attribution join resolves a governed path
+by asking the mutation journal for the LAST recorded write of those bytes, and a raw write records nothing. A register
+whose current bytes belong to no writer is exactly the state D-401/I1 forbids, and the failure mode is quiet: every
+command still exits 0, the file still parses, and only this control can see it.
+**Fix:** the same bytes were re-written through the ONE legal whole-document writer —
+`write_guard.write_document(path, text, writer="assistant/D-3201-add-amendment", owned_keys={OWNED_ANY})` — which
+journalled a record with `pre_sha16 == post_sha16 == 71399c83865b871e` (a NO-OP on content, an ADD on attribution).
+The control went green on the next run and the file's bytes did not change by one character.
+**The rule this leaves:** an EDIT to a governed register is not complete until the writer is named in the journal;
+`git diff --stat` proving the intended lines changed is not the same claim as `handoff --selftest` proving who
+changed them.
+
+## BUG-1083 (MED, OPEN 2026-10-27) — the SUITE rail is RED on a census receipt mismatch, and the ladder's own comment still declares three reds that no longer exist
+
+`scripts/check_tests.py --check` reads `1 NEW failure(s) outside the declared red set` and `declared red = 0`:
+`tests/test_config_defaults_census_spec.py::test_the_receipt_equals_the_measurement`. The test compares the live
+census (583 sites / 308 shadowed-declared / 4 undeclared) against `config/config_defaults_census.json`, and they
+disagree. **PROVEN NOT TO BE THIS SESSION'S**: the same 583/308 numbers are measured with this session's only
+instrument change stashed, and neither the receipt nor `check_config_defaults.py` is in this session's diff.
+TWO faults, not one: (a) the receipt is stale against a measurement whose `shadowed_declared` ceiling may only be
+LOWERED (D-2644) — so regenerating the receipt is a DECISION about 8 sites, never a refresh; (b) the ladder line for
+this rail still says "3 failures are DECLARED red and SHRINK-ONLY", which was true when it was written and is now
+false, so the two faces of one rail disagree. Registered rather than papered over: neither fixing a receipt to make a
+test green nor editing the comment to match a red is allowed here.

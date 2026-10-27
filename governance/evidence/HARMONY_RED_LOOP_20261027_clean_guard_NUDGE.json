@@ -1,0 +1,491 @@
+{
+  "schema_version": "1.0",
+  "measured_at": "2026-10-27T19:04:31",
+  "fixture": "T-213 harmony red loop",
+  "fixture_script": "scripts/harmony_red_loop.py",
+  "script_sha256": "265f0319f36b3116",
+  "axis": "the CONTROL: the same N calls with NO seeded corruption (the pair attributes a defect to the transcript rather than to the model's own habit)",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "retry_guard": {
+    "on": true,
+    "per_call_ceiling": 2,
+    "run_budget": 12,
+    "rule": "a turn whose owed call the engine's parser ate is RE-ISSUED byte-identically; an allowance, a silent stop or a declined call is NEVER retried"
+  },
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation",
+    "which HALF of the seeded pair teaches the copy: `blank-echo` now separates the verbatim NAME in the echo from the seeded assistant turn, but the FULLY UNBALANCED transcript (an assistant tool_call with NO tool response at all) is a different axis - it changes structure as well as content, and an engine that refuses it would return a transport error, not a reading"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "clean",
+      "replay_tail": null,
+      "echo_variant": "quoted",
+      "calls_target": 30,
+      "attempts": 30,
+      "clean_calls": 30,
+      "malformed_names": 0,
+      "contaminated": [],
+      "undeclared": [],
+      "dropped_calls": 0,
+      "drops": [],
+      "engine_parse_errors": 2,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 32,
+      "nudges": 0,
+      "stop_reason": "reached N",
+      "retry_guard": true,
+      "retries": 2,
+      "recovered_calls": 2,
+      "retry_wall_s": 24.8,
+      "slowest_turn_s": 24.3,
+      "verdict": "RED",
+      "detail": "the engine's parser refused 2 tool header(s) in this run's windows and every call still arrived - symptom without loss (it is luck, not health)",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 15.83,
+          "ttft_s": 0.82,
+          "decode_tps": 42.64,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 3.68,
+          "ttft_s": 0.06,
+          "decode_tps": 45.21,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 3,
+          "wall_s": 1.4,
+          "ttft_s": 0.07,
+          "decode_tps": 45.45,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 4,
+          "wall_s": 1.29,
+          "ttft_s": 0.07,
+          "decode_tps": 41.08,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 5,
+          "wall_s": 1.95,
+          "ttft_s": 0.4,
+          "decode_tps": 42.73,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 6,
+          "wall_s": 2.15,
+          "ttft_s": 0.53,
+          "decode_tps": 45.4,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 7,
+          "wall_s": 2.29,
+          "ttft_s": 0.69,
+          "decode_tps": 45.71,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 8,
+          "wall_s": 1.9,
+          "ttft_s": 0.27,
+          "decode_tps": 44.78,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 9,
+          "wall_s": 0.44,
+          "ttft_s": 0.11,
+          "decode_tps": 49.18,
+          "parse_errors": 1,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [
+            "2026-10-27 19:03:09,382 - omlx.adapter.harmony - WARNING - [-] - Error parsing tool calls from tokens: unexpected tokens remaining in message header: Some(\"<|start|>assistant\")"
+          ],
+          "drop": "engine_parse_error",
+          "retried": true,
+          "retry_detail": "the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined"
+        },
+        {
+          "turn": 10,
+          "wall_s": 1.97,
+          "ttft_s": 0.36,
+          "decode_tps": 44.19,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 11,
+          "wall_s": 2.07,
+          "ttft_s": 0.38,
+          "decode_tps": 44.65,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 12,
+          "wall_s": 1.37,
+          "ttft_s": 0.38,
+          "decode_tps": 44.57,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 13,
+          "wall_s": 2.68,
+          "ttft_s": 0.4,
+          "decode_tps": 44.89,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 14,
+          "wall_s": 3.36,
+          "ttft_s": 0.39,
+          "decode_tps": 43.86,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 15,
+          "wall_s": 2.68,
+          "ttft_s": 0.39,
+          "decode_tps": 44.77,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 16,
+          "wall_s": 2.66,
+          "ttft_s": 0.4,
+          "decode_tps": 43.06,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 17,
+          "wall_s": 2.82,
+          "ttft_s": 0.44,
+          "decode_tps": 40.9,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 18,
+          "wall_s": 4.57,
+          "ttft_s": 0.54,
+          "decode_tps": 43.45,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 19,
+          "wall_s": 4.29,
+          "ttft_s": 0.94,
+          "decode_tps": 43.37,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 20,
+          "wall_s": 3.56,
+          "ttft_s": 0.42,
+          "decode_tps": 44.3,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 21,
+          "wall_s": 3.04,
+          "ttft_s": 0.42,
+          "decode_tps": 43.58,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 22,
+          "wall_s": 3.77,
+          "ttft_s": 0.4,
+          "decode_tps": 43.47,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 23,
+          "wall_s": 24.31,
+          "ttft_s": 0.41,
+          "decode_tps": 42.87,
+          "parse_errors": 1,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [
+            "2026-10-27 19:04:12,529 - omlx.adapter.harmony - WARNING - [-] - Error parsing tool calls from tokens: Unexpected EOS while waiting for message header to complete"
+          ],
+          "drop": "engine_parse_error",
+          "retried": true,
+          "retry_detail": "the engine's own log refused a tool header in this turn's window (1 line(s)); the call was LOST, not declined"
+        },
+        {
+          "turn": 24,
+          "wall_s": 2.14,
+          "ttft_s": 0.5,
+          "decode_tps": 41.73,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 25,
+          "wall_s": 1.44,
+          "ttft_s": 0.43,
+          "decode_tps": 42.94,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 26,
+          "wall_s": 2.63,
+          "ttft_s": 0.43,
+          "decode_tps": 41.87,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 27,
+          "wall_s": 1.87,
+          "ttft_s": 0.43,
+          "decode_tps": 43.96,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 28,
+          "wall_s": 1.83,
+          "ttft_s": 0.4,
+          "decode_tps": 42.2,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 29,
+          "wall_s": 1.86,
+          "ttft_s": 0.56,
+          "decode_tps": 44.23,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 30,
+          "wall_s": 2.26,
+          "ttft_s": 0.88,
+          "decode_tps": 41.78,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 31,
+          "wall_s": 3.41,
+          "ttft_s": 0.45,
+          "decode_tps": 42.75,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 32,
+          "wall_s": 1.89,
+          "ttft_s": 0.42,
+          "decode_tps": 43.86,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        }
+      ]
+    }
+  ]
+}

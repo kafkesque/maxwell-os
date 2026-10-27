@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 843,
-  "open_n": 265,
-  "closed_n": 578,
+  "total_ids": 847,
+  "open_n": 267,
+  "closed_n": 580,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1173,7 +1173,7 @@
     {
       "id": "BUG-951",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS",
-      "events": 2
+      "events": 4
     },
     {
       "id": "BUG-964",
@@ -1333,6 +1333,16 @@
     {
       "id": "BUG-1077",
       "title": "(MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on",
+      "events": 1
+    },
+    {
+      "id": "BUG-1081",
+      "title": "(MED, OPEN 2026-10-27) \u2014 three loop instruments grant a bare 1024-token allowance while the repo DERIVES it",
+      "events": 1
+    },
+    {
+      "id": "BUG-1083",
+      "title": "(MED, OPEN 2026-10-27) \u2014 the SUITE rail is RED on a census receipt mismatch, and the ladder's own comment still declares three reds that no",
       "events": 1
     }
   ],
@@ -1914,6 +1924,8 @@
     "BUG-1073",
     "BUG-1075",
     "BUG-1078",
-    "BUG-1079"
+    "BUG-1079",
+    "BUG-1080",
+    "BUG-1082"
   ]
 }

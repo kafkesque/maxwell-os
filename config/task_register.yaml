@@ -3154,7 +3154,8 @@ tasks:
 
 - id: T-215
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-27
   mover: pipeline
   title: >-
     MAKE A LOST CALL IMPOSSIBLE TO MISTAKE FOR A DECLINED ONE - measure the one mitigation with a mechanism behind
@@ -3189,6 +3190,30 @@ tasks:
        guard that "fixes" things by changing what counts is refused (BUG-1079's shape inverted).
     Receipts name the engine build and the script digest; nothing here may be reported as "fixed" from a bounded
     zero (D-3200 clause 1).
+  measured_20261027: >-
+    ALL THREE LIMBS ANSWERED, each by a receipt that names the engine build (oMLX 0.7.3rc1) and the script digest.
+    (1) ECHO ISOLATION -> `--mode blank-echo`, receipts …_blankecho_run1/run2.json. The copy does NOT collapse without
+    the name in the echo: it arrives EARLIER (turn 1, against turn 8 in the paired replay control), on 808 decode
+    tokens against 160 from an identical 228-token prompt (5.05x, 2 replicates), and then the next turn spends the
+    whole allowance producing nothing. The ASSISTANT TURN ALONE teaches the copy, so "sanitise the transcript" is
+    REFUSED on its own measurement (D-3201 decision 1).
+    (2) RETRY RECOVERS A LOST CALL -> `--retry-guard`, receipt …_clean_guard_NUDGE.json: 30 calls, **0 lost**, 2 parse
+    errors DETECTED and 2 RECOVERED on the first nudged re-issue, for +24.8 s of extra wall inside the owner's 90 s
+    per-turn budget (slowest turn 24.3 s). Against the no-guard reading (3 lost in 16 calls) the count falls to 0, so
+    the limb's own condition is MET. The FIRST form of the guard - a byte-identical re-issue - was REFUTED by its own
+    receipt (6 re-issues, 0 recovered, +100.9 s) because R7's temperature=0.0 makes an identical prompt a
+    deterministic replay; the refuted receipt is kept (…_clean_guard_IDENTICAL_RETRY.json) rather than deleted (D-3038).
+    (3) THE CONTROL DOES NOT MOVE -> discharged by CONSTRUCTION AND CONTROL rather than by a new run, and that is
+    stated as such: `may_retry` is false for every kind except `engine_parse_error`, so on MTP4 (0 parse errors in
+    70 calls across both axes) the guard cannot fire at all, and a selftest control asserts the false side for
+    allowance / silent_stop / answered. MTP4's earlier clean 30/30 stands untouched.
+    ALSO RECORDED, because it was found by these receipts: BUG-1080 (the instrument's verdict and stop line could
+    contradict its own counters, FIXED) and BUG-1081 (the instruments grant a bare 1024-token allowance while the repo
+    DERIVES ~3753 for this model, OPEN).
+  landing: >-
+    T-217. A guard that lives only in a fixture protects nobody: the caller that issues the turns must run the same
+    detection and the same bounded re-ask. It must consume the SAME shared witness (D-3200 clause 2) rather than
+    re-implementing the log window.
 
 - id: T-216
   priority: MUST
@@ -3240,3 +3265,50 @@ tasks:
          the single failure this OS exists to prevent.
       WHICHEVER IS CHOSEN: re-check it on the emission gate at the role's REAL context size. The battery's prompts
       are 205-456 tokens; the role's can be 26k, and a fixture-sized certificate does not travel.
+  reading_20261027: >-
+    THE PREDECLARED RULE NOW HAS ITS INPUT, AND IT FIRES (b). T-215 limb 2 measured 0 lost calls over 30 on the clean
+    axis with the nudged retry guard, +24.8 s total wall, inside the declared per-turn budget - which is exactly the
+    condition recorded here BEFORE that receipt existed. So (b) is the mechanically indicated option: the role keeps
+    gpt-oss-20b-MXFP4-Q8 with the guard as a PRECONDITION of the role rather than as a hope, and the guard is
+    model-agnostic infrastructure that removes the failure CLASS.
+    WHAT (b) DOES NOT BUY, stated so the owner is not surprised later: the engine still refuses ~1 header in 15 (2 of
+    30 today), so the defect is REPAIRED, not gone, and every repair costs about one extra turn (12.4 s mean). The
+    measurement is at fixture prompt sizes (228-1,000 tokens), NOT the role's 26k class context, so this task's own
+    instruction stands - whichever option is chosen must be re-checked on the emission gate AT THE ROLE'S REAL
+    CONTEXT SIZE before the certificate travels.
+    THIS ROW IS STILL AN OWNER-LANE PROPOSAL (D-3035): `mover: owner` + `state: open` means registered and awaiting
+    your word, and the pipeline may not flip it. The two other options keep their registered reasons: (a) MTP4 with
+    a permanently warm 42GB slot and a 26k prefill of 611.2 s against a 90 s budget; (c) refused as a default.
+  next_step_for_owner: >-
+    Say which of (a)/(b)/(c) you choose, with its reason, and (b) then becomes: bind the guard into the caller (T-217)
+    and re-run this gate at class context.
+
+- id: T-217
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: >-
+    LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture and
+    into the turn-issuing path, consuming the SHARED engine witness, so a lost call costs one extra turn instead of
+    one silently missing action
+  why: >-
+    T-215 limb 2 measured the mitigation (30 calls, 0 lost, 2 detected and recovered, +24.8 s) and the FIRST form of
+    it was refuted by its own receipt (byte-identical re-issue recovers nothing at temperature=0.0, because an
+    identical prompt at greedy decoding is an identical replay). A guard that exists only inside
+    `scripts/harmony_red_loop.py` protects nobody: the defect's cost is paid by whoever issues the turns, and today
+    that caller learns nothing when a call is eaten.
+  source: T-215 / D-3200 / D-3201 / BUG-951 / BUG-1079 / BUG-1080 / R7 / D-3036
+  evidence: >-
+    READ 2026-10-27: `governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json` (0 lost / 2 recovered /
+    +24.8 s) against `…_clean_guard_IDENTICAL_RETRY.json` (0 of 6 recovered / +100.9 s) and the no-guard baseline
+    `…_clean_a/clean_b.json` (3 lost in 16 calls). The detection half ALREADY EXISTS as a shared helper
+    (`engine_facts` / `log_offset` / `log_since` / `window` / `classify_turn` / `no_call_verdict` in
+    `scripts/measure_subagent_loop.py`), so this is wiring, not invention.
+  gate: >-
+    THREE conditions, all on the same command: (1) the caller must DETECT a lost call from the engine's own byte
+    window - never by guessing from an empty response - and must record the repair (a repair reported as a clean turn
+    is the drift D-3201 decision 3 forbids); (2) the retry must be BOUNDED, and the bound must be declared in config,
+    not in a constant (C12): the fixture's RETRY_CEILING/RETRY_BUDGET are the shape, not the home; (3) the re-ask must
+    differ from the failed attempt (R7 makes an identical one a deterministic replay) and must state its wall cost
+    against the ratified per_turn_budget_s. Receipts name the engine build and the script digest; a green here may
+    never be reported as "the engine is fixed" - the parser still refuses headers.

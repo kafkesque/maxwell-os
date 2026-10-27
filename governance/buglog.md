@@ -23158,3 +23158,11 @@ explicit column list when there is one: columns == placeholders, and every named
 comparison. MEASURED after the fix: 20/20 rails PASS, `rc=0`, and check [8] now PRINTS what it verified
 (`not inserted: ['borp_score']`) instead of a bare count. Reviewed cross-family per R5
 (`governance/r5_review_integrity_rails_20261027.json`).
+
+**BUG-1043 UPDATE (2026-10-27, same sitting) — the cross-family review REJECTED the fixed file, then APPROVED it.**
+The REJECT was not about the rail fix: `pipeline/integrity_check.py`'s header said "17 automated checks" while its
+`CHECKS` table held **18** (check 18, D2478 canonical-promotion drift, had been added without the header) — a
+docstring that miscounts its own body, the same D-3034 defect one level up. Header corrected to 18 with the item
+listed, and the rail re-checked (18/18 PASS, rc=0). Re-review on the corrected bytes:
+`governance/r5_review_integrity_rails_v2_20261027.json` → **APPROVE**. The REJECT artifact is kept beside it rather
+than deleted: a review that only keeps its approvals is a review nobody can audit.

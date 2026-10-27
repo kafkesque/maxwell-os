@@ -109,3 +109,49 @@ a *download order*, not a promotion.
 5. **A larger reviewer is not free at the call site.** Even a passing 12B reviewer pays ~1.6× gpt-oss's per-token
    weight reads on decode and is dense, so its prefill on a 2k-token script will be far worse than gpt-oss's MoE
    prefill. G3 (≤8.9 s/item) is therefore the gate most likely to reject it, and it must be measured, not assumed.
+
+## 7. CLARIFICATION (owner question, 2026-10-27) — nothing gemma is in the R5 seat, and this register never applied one
+
+**Q: "have we used gemma-4-12B-it so far for the R5 reviewer, or not?" — NO, on all three readings.**
+1. The `mlx-community/gemma-4-12B-it-qat-4bit` and `lmstudio-community/gemma-4-12B-it-MLX-4bit` rows in §3 are
+   **ADAPT**, i.e. registered with a reason and left unpromoted. Neither is downloaded, neither is registered in
+   `~/.omlx/model_settings.json`, neither has a `reviewing_verdict_gate` run. `ls ~/.omlx/models/` at 2026-10-27 has
+   exactly one gemma: `gemma-4-E4B-it-MLX-4bit`.
+2. The **E4B** that IS on disk was measured and REFUSED: `pass=False n=24 acc=0.7083 margin=+0.2083
+   false_approve=0.1250` — reason `false_approve=0.1250 > 0.10`. It is not in the seat either.
+3. The seat is `gpt-oss-20b-MXFP4-Q8`: `pass=True n=24 acc=0.9167 margin=+0.4167 false_approve=0.0000
+   false_reject=0.0833`. It is the only model that has ever passed the gate on the current fixture.
+
+**So "don't advise what we already applied" is answered: nothing gemma was applied.** What follows is the full
+in-family sweep with the classification rule of D-3038 (a rejected candidate is recorded WITH its reason).
+
+### 7.1 Every gemma that could conceivably take the seat, classified
+| candidate | footprint (MEASURED from repo blobs) | gate status | class | reason |
+|---|---|---|---|---|
+| `google/gemma-4-12B-it` (base) → `mlx-community/gemma-4-12B-it-qat-4bit` | 10.99 GB | not run | **ADAPT** | only in-14 GB gemma claiming a material step over the refused E4B (+7.8 MMLU-Pro, +20.2 GPQA-D, +20.0 LiveCodeBench, vendor CLAIMS); arch `gemma4_unified` |
+| `lmstudio-community/gemma-4-12B-it-MLX-4bit` | 6.74 GB | not run | **ADAPT** | same model, 4.25 GB cheaper quant → the cheaper way to run the SAME gate test; try this one FIRST |
+| `google/gemma-4-12B-it-qat-w4a16-ct` | not measured this sitting | not run | **WATCH** | w4a16 weights-only quant of the same 12B; a second format to test only if the first two fail |
+| `google/gemma-4-12B-it-qat-q4_0-gguf` | not measured this sitting | not run | **SKIP (runtime)** | a GGUF — needs llama.cpp; this host measured GGUF losing to MLX on every axis (5.31 vs 9.3 t/s) |
+| `google/gemma-4-26B-A4B-it` (MoE, 26B total / 4B active) | 15.61 GB | not run | **SKIP** | over the 14 GB owner bound AND over the MEASURED pool headroom (41.0 GB in use of 55.9 GB ceiling = 14.9 GB); the right *shape* for prefill-bound work, the wrong size for this pool |
+| `google/gemma-4-31B-it` | ~62 GB bf16 class | not run | **SKIP** | over the bound by 4x; wrong (dense-large) prefill shape |
+| `gemma-3-27b-it` + AWQ/int4 derivatives | 15+ GB | not run | **SKIP** | over the bound, dense 27B = the shape that made the 27B reviewer wrong by construction, and AWQ is not MLX-loadable |
+| `google/gemma-4-E2B-it` | ~2.9 GB | not run | **SKIP** | strictly weaker than the E4B this OS REFUSES on every vendor row |
+| NVFP4 / FP8 / AWQ / GPTQ gemma derivatives (`nvidia/Gemma-4-26B-A4B-NVFP4`, `RedHatAI/…-FP8-dynamic`, `QuantTrio/…-AWQ`) | n/a | not run | **SKIP** | runtime-locked to Blackwell/Hopper (NVFP4) or unloadable by MLX (AWQ/GPTQ) — high download counts, zero applicability here |
+| `google/gemma-4-E4B-it` (on disk) | 6.4 GB | **REFUSED** | **SKIP** | `false_approve=0.1250 > 0.10` on the current fixture; not revisitable without a new fixture |
+| `mlx-community/gemma-3-12b-it-qat-4bit` | not measured this sitting | not run | **WATCH** | older family; only worth a run if the 12B-4 fails and a *cheaper* candidate is needed |
+| ADOPT | — | — | **NONE** | a gemma may only be promoted by a PASSING `reviewing_verdict_gate` run on this device |
+
+### 7.2 The honest bottom line on "better than gpt-oss"
+There is **no published evidence that any gemma beats gpt-oss-20b at THIS gate**, because this gate is local, small
+(n=24) and source-scoped: it measures a specific failure mode (`false_approve`) on a specific fixture. Vendor
+benchmark tables are CLAIMS (D-3161) and the only gemma in that table inside the 14 GB bound that claims a material
+step is the 12B Unified. So the correct statement is not "gemma is better" or "gpt-oss is better" — it is:
+
+- **UNMEASURED**: the 6.74 GB `gemma-4-12B-it-MLX-4bit`. It is the single highest-value open measurement in the
+  reviewer question, it costs one download and one gate run, and it MUST be run through the serving engine (the
+  `gemma4_unified` mapping exists in the engine's mlx_lm 0.32.3.dev8 + mlx_vlm 0.7.10 and NOT in the repo's 0.31.3,
+  so an in-process run fails as "Model type gemma4_unified not supported" — a harness artifact, not a model fact).
+- **BLOCKED**: promoting ANY second reviewer needs a held-out fixture (the fixture-author confound in §6.3) and a
+  re-measure channel (BUG-1041). Both are open, and neither is resolved by finding a better model.
+- **A LARGER REVIEWER IS NOT FREE AT THE CALL SITE**: G3 (<= 8.9 s/item, gpt-oss's MEASURED rate) is the gate a 12B
+  is most likely to fail, because prefill on this chip is ~52 t/s and a cold reviewer call is ~75% prefill.

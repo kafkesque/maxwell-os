@@ -76,3 +76,18 @@ bench:
 report:
   fields: [name, mode, rep, prompt_tokens, prompt_tps, prefill_verdict, generation_tokens, decode_context_tokens,
            generation_tps, draft_share, peak_memory_gb, pool_residency]
+
+# D-3177 (MEASURED 2026-10-27): the MTP head that makes native speculative decoding legal on this chip.
+# Qwen/Qwen3.8-27B ships 15 `mtp.*` tensors and `mtp_num_hidden_layers: 1`; every MLX 4-bit conversion
+# strips them (mlx_lm qwen3_5.sanitize deletes `mtp.` weights). mlx-community publishes the head ALONE as
+# 238 MB / 31 already-4-bit tensors, but nothing attaches it to a base checkpoint -- and an INDEX-only
+# rename is silently ignored because mlx_lm globs `model*.safetensors` and trusts the FILE headers.
+mtp_head:
+  head_repo: mlx-community/Qwen3.8-27B-MTP-4bit
+  head_filename: model.safetensors
+  head_cache_file: ~/.omlx/models_staged/_heads/Qwen3.8-27B-MTP-4bit.safetensors
+  base_model: ~/.omlx/models/Qwen3.8-27B-MLX-4bit
+  out_dir: ~/.omlx/models_staged/Qwen3.8-27B-MTP4
+  weight_prefix: "mtp."
+  # the shard is named model-<N>-of-<N>.safetensors because load_model() globs `model*.safetensors`;
+  # a shard called `mtp-head.safetensors` is never read, and the run then reports "no MTP tensors".

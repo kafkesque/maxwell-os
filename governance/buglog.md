@@ -23166,3 +23166,77 @@ docstring that miscounts its own body, the same D-3034 defect one level up. Head
 listed, and the rail re-checked (18/18 PASS, rc=0). Re-review on the corrected bytes:
 `governance/r5_review_integrity_rails_v2_20261027.json` → **APPROVE**. The REJECT artifact is kept beside it rather
 than deleted: a review that only keeps its approvals is a review nobody can audit.
+
+## BUG-1044 (HIGH, FIXED 2026-10-27) - the "cold-prefill" instrument was not cold: two identical runs measured 39.22 s and 0.54 s for the same 2060-token prompt
+1. DISCOVERED while establishing a baseline for the ANE-prefill experiment (D-3174). `scripts/measure_prefill.py`
+   built its prompt deterministically from a declared filler, so consecutive runs were BYTE-IDENTICAL and the
+   engine answered the second one from its prefix cache.
+2. MEASURED, same command twice, same process: `prompt_tokens=2060`, `time_to_first_token=39.22 s`
+   (`prompt_tokens_per_second=52.52`) then `time_to_first_token=0.54 s` (`prompt_tokens_per_second=12.97`).
+   A naive A/B on this instrument reports a ~72x speedup that is entirely cache.
+3. The server DOES report the discriminator and the script ignored it: `usage.prompt_tokens_details.cached_tokens`
+   was `0` on the cold call and non-zero on the cached one.
+4. FIX (by rule, not by a hand-run): every call now prepends a declared uniqueness tag
+   (`nonce_chars: 32`, `config/agent_context.yaml#prefill_budget.ab_probe`), `cached_tokens` is printed with every
+   reading, and a reading whose `cached_tokens > 0` is **UNMEASURED (exit 2)** rather than a rate. `--no-cold` and
+   `--allow-cached` keep the old behaviour reachable deliberately. Selftest 5/5 (adds a tag-uniqueness control).
+5. REVIEWED cross-family per R5: `scripts/measure_prefill.py` sha256_16=8600960545049ab1 → APPROVE by both
+   gpt-oss-20b-MXFP4-Q8 and gemma-4-E4B-it-MLX-4bit (`governance/r5_reviews.jsonl`).
+6. WHY THIS IS HIGH: this instrument is the acceptance test for every prefill claim in the OS (D-332/BUG-793). A
+   cache hit silently passing as a cold prefill would have "proven" a 72x ANE speedup, or hidden a real regression.
+
+## BUG-1045 (HIGH, FIXED 2026-10-27) - `qwen35_ane_prefill_enabled` is INOPERABLE on this M1 Max: 112 of 112 modules fail ANE warmup, and the attempt costs a 733 s model load
+1. OWNER-REQUESTED experiment (the manual task from the previous sitting), executed end to end with a dated backup
+   (`~/.omlx/model_settings.json.bak-before-ane-20261027-1100`), the flag set for `Qwen3.8-27B-MLX-4bit` ONLY, and
+   oMLX restarted. Verified afterwards: exactly one model carried `qwen35_ane_prefill_enabled: true`.
+2. COLD-PREFILL A/B (BUG-1044-fixed instrument, 2048-token prompts, `cached_tokens=0` on every run):
+   flag OFF 53.18 / 53.09 / 52.77 t/s (TTFT 39.24-39.59 s); flag ON **53.16 t/s** (TTFT 39.35 s) — ratio 1.001x.
+3. THE FLAG DID ENGAGE, so "no change" is not "nothing happened": the log shows
+   `Eagerly compiled 64 MLP and 48 GDN procedures into 2 instance-pinned ANE programs (sequence_length=2048)`,
+   then **112 x** `ANE evaluation failed ... Code=47 "processRequest:model:...: Inference failed — request aborted
+   (underlying=0x15)"` on `_enable_dual_procedure_banks`, and finally
+   `Disabled ANE on 112 of 112 modules after warmup failures; they fall back to GPU`.
+4. COST OF THE ATTEMPT: `model_load_duration = 733.26 s` against **7.09 s** on the same model with the flag off
+   (103x) — a cold start of over twelve minutes for zero prefill gain.
+5. RESTORED per the owner's own rule (unchanged -> restore): settings restored byte-identically from the backup,
+   oMLX restarted, and a fresh-boot confirmation reading gave 52.57 t/s with `cached_tokens=0` (load 7.09 s).
+6. READING OF THE CAUSE: the patch's own docstring targets dense Qwen3.5/3.6/3.8 MLPs and names an M3 Ultra as the
+   reference runtime; the private ANE path here compiles and then refuses every program on Apple M1-class silicon.
+   This is a RECORDED NEGATIVE (D-3038), not a TODO: a future re-proposal must bring a NEW device receipt.
+
+## BUG-1046 (MEDIUM, FIXED 2026-10-27) - an index-only rename of MTP weights is silently ignored, and the resulting 1.00x reads exactly like "MTP does not help"
+1. FOUND while attaching the published MTP head to a local checkpoint: `mlx_lm.utils.load_model` collects shards
+   with `glob(model_path / "model*.safetensors")` and takes tensor NAMES from the safetensors FILE HEADERS. The
+   `weight_map` in `model.safetensors.index.json` is not consulted for naming.
+2. CONSEQUENCE, MEASURED TWICE: a fixture whose index renamed 31 tensors to `mtp.*` while the shard still held
+   `fc.weight` / `layers.0.*` loaded with
+   `UserWarning: Checkpoint configuration declares an MTP head, but no MTP tensors were found. MTP has been
+   disabled` — and `--mtp` measured 8.489 t/s against a 8.647 t/s baseline, i.e. **0.98x**, which an unwary
+   reader records as "native MTP does not help on this chip".
+3. A shard named `mtp-head.safetensors` is never read at all: the glob is `model*.safetensors`, so the head must be
+   written as `model-<N+1>-of-<N+1>.safetensors`.
+4. FIX: `scripts/stage_mtp_head.py` rewrites the SAFETENSORS HEADER (offsets preserved, data byte-identical) and
+   names the shard to match the loader's glob, then `--check` proves 31 `mtp.*` tensors are reachable through that
+   glob without loading mlx. Re-measured after the fix: `has mtp: True`, `mtp params: 66,381,312`,
+   `mtp caches: 1`, and a real speedup (D-3175).
+5. REVIEWED cross-family per R5: sha256_16=c59e6813c10a0a49 → APPROVE by gpt-oss-20b-MXFP4-Q8 and by
+   gemma-4-E4B-it-MLX-4bit (`governance/r5_reviews.jsonl`).
+6. WHY IT MATTERS BEYOND MTP: any "attach the missing head / adapter / nextn layer" experiment in this repo hits
+   the same trap. The rule is now: a weight is attached when a FILE HEADER carries it, never when an INDEX says so.
+
+## BUG-1047 (MEDIUM, FIXED 2026-10-27) - a commit asserted D-3173 as a governance decision; the register never contained it
+1. FOUND by resolving the claim instead of trusting it (D-3034): commit `ad58f01` is titled "... register the gemma
+   reviewer market (D-3172), un-red two integrity rails (D-3173)", and the sitting's own summary carried a D-3173
+   record. `grep -n "D-3173" config/decisions.yaml` returns NOTHING; the registry's last record was D-3172, and its
+   count (1298) is exactly the count after D-3172. The rail WORK is real and in the tree (18/18 PASS, docstring
+   corrected, two review artifacts kept); the DECISION that records it was never written.
+2. CAUSE: the mint of D-3173 was refused twice in that sitting (unregistered bug, then a not-yet-existing citation
+   file) and the retry was never confirmed. A refusal was silently carried forward as a success in the narrative.
+3. WHY IT IS A BUG AND NOT A TYPO: a decision id cited from a commit message is the only pointer a future reader has
+   from the code to the reasoning. An unresolvable id is a dangling reference that reads as "this was decided" while
+   nothing was decided - the exact drift the census exists to prevent.
+4. FIX: D-3173 minted through the validated route in THIS sitting (see config/decisions.yaml), and the mint's own
+   refusal text is the check that would have caught it - a mint is done when `--check` counts it, never when the
+   invocation was attempted.
+5. STANDING RULE RESTATED: a decision id may not appear in a commit message, a docstring or a handoff until
+   `recompute_decision_summary.py --check` counts it. (Same shape as BUG-1040: a route recorded as a capability.)

@@ -177,3 +177,66 @@ The only remaining route that could make draft+verify legal here is **engineerin
 hybrid state** (save the `ArraysCache` arrays before each draft round, restore on partial acceptance) guarded by a
 hard correctness test — greedy output must be **token-identical** to baseline. That is a real experiment with a real
 risk and it is NOT claimed here; it is registered as an owner decision (D-3171) rather than a promise.
+
+## 8. THE ANSWER (2026-10-27, later the same day) — native MTP DOES work on this M1 Max: 7.99 -> 12.34 t/s (1.54x), prefill unchanged
+
+§7 closed the `mlx_lm` draft+verify route by measurement and called the block "structural". It is structural in
+the SHIPPED loader, and it is now LIFTED for the mechanism this model family was built for. Three mechanisms were
+measured on this device in one sitting; none of them was argued.
+
+### 8.1 Mechanism A — draft-model speculative decoding (upstream PR 1821, `RecurrentCache`): RUNS, and is 1.7-3.8x SLOWER
+The open PR `ml-explore/mlx-lm#1821` replaces `ArraysCache` with a trimmable `RecurrentCache`, so the refusal in §3
+disappears. Built from the branch in an isolated venv (mlx 0.32.4) and run against the local 27B + the local
+1.0B-A0.6B 4-bit draft (543 MB, built in §2):
+
+| condition (same prompt, 128 greedy tokens) | decode t/s | vs baseline |
+|---|---|---|
+| baseline, branch 1821, mlx 0.31.2 | 6.763 | — |
+| baseline, branch 1821, mlx 0.32.4 | 7.606 | 1.00x |
+| draft=1 token | 4.582 | 0.60x |
+| draft=2 tokens | 3.204 | 0.42x |
+| draft=4 tokens | 2.021 | 0.27x |
+
+Monotonic degradation from n=1 proves the cost is the **RecurrentCache bookkeeping itself**, not acceptance rate:
+even at depth 1 (essentially no speculation) the hybrid cache path is 40% slower than the plain KV path, and the
+PR's own text warns that per-token recurrent state is "much larger than traditional KV cache". A better draft
+cannot rescue a cost that is paid before any draft is accepted. RECORDED NEGATIVE.
+
+### 8.2 Mechanism B — native MTP (upstream PR 990, vendored in oMLX)**: WORKS, 1.54x
+`Qwen/Qwen3.8-27B` ships the head — 15 `mtp.*` tensors, `mtp_num_hidden_layers: 1` — and every MLX 4-bit
+conversion strips it (`mlx_lm/models/qwen3_5.py#sanitize` deletes every `mtp.` weight). `mlx-community` publishes
+the head ALONE as **`mlx-community/Qwen3.8-27B-MTP-4bit`, 238 MB, 31 already-4-bit tensors**; nothing attaches it
+to a base. `scripts/stage_mtp_head.py` does, in a staging dir whose base shards are symlinked (the artifact stays
+byte-identical).
+
+| condition (2048-token cold prompt, 128 generated tokens) | prefill t/s | decode t/s | load s |
+|---|---|---|---|
+| `Qwen3.8-27B-MLX-4bit` (no MTP weights) | 52.23 / 51.48 | 7.98 / 8.00 | 7.19 |
+| `Qwen3.8-27B-MTP4` (staged head, `mtp_enabled: true`) | 51.57 / 51.50 | **12.34** / 11.62 | 6.53 |
+
+- **decode 1.54x** (7.99 -> 12.34), and the engine's own MTP line reports the mechanism:
+  `cycles=45 tok/cycle=2.84 accept=66/86 (76.7%) depth[d1=24/32,d2=19/23,d3=13/18,d4=10/13]
+  timing[backbone=10516.3ms mtp=220.3ms]` — the head costs 2% of the round.
+- **prefill UNCHANGED** (51.6 vs 51.5): speculative decoding accelerates decode only. The prefill lever is still
+  prompt-cache reuse (§7), and the ANE experiment closed the other one (§8.3).
+- **OUTPUT IS IDENTICAL**: greedy 432-byte generation byte-identical with and without `--mtp` in-process, and the
+  engine verifies rows exactly (`_row_exact_verify`). A speed win that changes output is not a win.
+- **FIRST CALL IS NOT A READING**: run 1 after a load reads 6.51 t/s (and 2.60 t/s on the first attempt) because
+  warmup lands inside the sample. Only steady-state runs are reported above (BUG-1042's rule).
+
+### 8.3 Mechanism C — the ANE prefill flag (`qwen35_ane_prefill_enabled`): INOPERABLE on this chip (BUG-1045)
+Owner-requested experiment, executed with a dated backup and the flag set for this model only. The path ENGAGES and
+then fails on the hardware: `Eagerly compiled 64 MLP and 48 GDN procedures into 2 instance-pinned ANE programs`,
+**112 x** `ANE evaluation failed ... Code=47 "Inference failed — request aborted (underlying=0x15)"`, then
+`Disabled ANE on 112 of 112 modules after warmup failures; they fall back to GPU`.
+Cold prefill with the flag ON: **53.16 t/s** against 53.18 / 53.09 / 52.77 with it off (ratio 1.001x), and
+`model_load_duration` **733.26 s** against **7.09 s** — 103x slower start for no gain. Restored from the backup;
+fresh-boot confirmation 52.57 t/s. RECORDED NEGATIVE (D-3038).
+
+### 8.4 What is left unmeasured, and why (stated, not hidden)
+`llama.cpp` b9430 (homebrew) DOES expose MTP and `ggml-org/Qwen3.8-27B-GGUF` publishes the matching sidecars
+(`mtp-Qwen3.8-27B-Q4_0.gguf` 1.68 GB, `mtp-…-BF16` 5.95 GB, `dflash-Qwen3.8-27B-Q4_0.gguf` 1.09 GB). It is NOT
+pursued because the same host already measured GGUF slower on this model than MLX (`governance/GGUF_MLX_AB_20261027.md`:
+5.31 t/s ggml vs ~9.3 t/s MLX), so llama.cpp would have to more than double to reach the MLX+MTP reading of 12.34.
+Open upstream: `mlx-lm#990` (MTP, this mechanism, still OPEN), `mlx-lm#1821` (RecurrentCache, OPEN),
+`mlx-lm#1462` (a `qwen3_5_mtp` checkpoint is not registered by `mlx_lm.server`). None of them is needed now.

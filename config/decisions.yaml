@@ -33214,7 +33214,7 @@ decisions:
   - governance/SPECULATIVE_DECODING_M1_20261027.md
   created: '2026-10-27'
 - id: D-3171
-  state: RESOLVED
+  state: SUPERSEDED
   category: MODEL PORTFOLIO / DECODE ACCELERATION
   title: 'Speculative decoding for Qwen3.8-27B on M1 Max is REFUTED by measurement (BUG-1040): the hybrid ArraysCache
     cannot be rewound, so no draft+verify; the measured lever is prompt-cache reuse and the real bottleneck is PREFILL'
@@ -33285,4 +33285,148 @@ decisions:
   files:
   - governance/REVIEWER_MARKET_RESEARCH_20261027.md
   - config/r5_review_gate.yaml
+  created: '2026-10-27'
+- id: D-3173
+  state: RESOLVED
+  category: INTEGRITY RAILS / C11-C12
+  title: 'Two integrity rails were RED on CORRECT code and are fixed by RULE, not by exemption: a module that resolves
+    on the pipeline sys.path is local, and a named-column INSERT is checked by its column list'
+  decision: 'BUG-1043 recorded two always-RED rails. Check [4] reported `model_store_sweep.py: imports `lib` - not
+    in stdlib, local, or known deps` although that file inserts ROOT/scripts on sys.path and scripts/lib/__init__.py
+    exists: a bare name that RESOLVES is local by resolution (D-3034), so IMPORT_ROOTS + `_resolves_locally()` replaces
+    the hand-list. Check [8] reported `INSERT has 78 placeholders but fbs table has 79 columns` although pipeline/stage6_commit.py
+    names 78 columns explicitly and `borp_score` simply takes its default: the check now parses the explicit column
+    list, requires columns == placeholders, requires every named column to EXIST (which also catches a wrong column
+    NAME, which the old check could not), and keeps the table-width test only for a positional INSERT. Result 18/18
+    PASS, rc=0, and check [8] PRINTS what it verified. The cross-family review REJECTED the first version for a
+    docstring that claimed 17 checks while the body held 18 (D-3034 one level up); header corrected and re-reviewed
+    to APPROVE, and the REJECT artifact is kept beside the approval because a review that keeps only its approvals
+    cannot be audited. NOTE: this record repairs BUG-1047 - the id was cited by commit ad58f01 but was never written
+    to the register because its mint had been refused twice and the refusal was carried forward as a success.'
+  bugs:
+  - BUG-1043
+  - BUG-1047
+  files:
+  - pipeline/integrity_check.py
+  - governance/r5_review_integrity_rails_20261027.json
+  - governance/r5_review_integrity_rails_v2_20261027.json
+  created: '2026-10-27'
+- id: D-3174
+  state: RESOLVED
+  category: PREFILL / HARDWARE ACCELERATION
+  title: 'The ANE prefill flag is INOPERABLE on this M1 Max (BUG-1045): 112 of 112 modules fail ANE warmup, prefill
+    is unchanged at 53.16 vs 53.09 t/s, and the attempt costs a 733 s model load - restored and recorded as a negative'
+  decision: 'The owner asked for the manual experiment from the previous sitting and delegated it. Executed end
+    to end: dated backup `~/.omlx/model_settings.json.bak-before-ane-20261027-1100`; `qwen35_ane_prefill_enabled:
+    true` for `Qwen3.8-27B-MLX-4bit` ONLY (verified: exactly one model carried it); app quit, server killed, app
+    relaunched, health checked. MEASURED with the BUG-1044-fixed cold instrument (2048-token prompts, every reading
+    `cached_tokens=0`): flag OFF 53.18 / 53.09 / 52.77 t/s (TTFT 39.24-39.59 s); flag ON 53.16 t/s (TTFT 39.35 s)
+    = ratio 1.001x. The flag DID engage - the log shows `Eagerly compiled 64 MLP and 48 GDN procedures into 2 instance-pinned
+    ANE programs`, then 112 x `ANE evaluation failed ... Code=47 "Inference failed - request aborted (underlying=0x15)"`,
+    then `Disabled ANE on 112 of 112 modules after warmup failures; they fall back to GPU`. Cost of the attempt:
+    `model_load_duration=733.26 s` against 7.09 s with the flag off (103x). Restored byte-identically from the backup
+    and re-confirmed cold at 52.57 t/s / load 7.09 s. VERDICT: the owner''s own rule applied (''unchanged -> restore'')
+    and this is a RECORDED NEGATIVE (D-3038) - the private ANE path compiles and then refuses every program on M1-class
+    silicon, while the patch''s own docstring names an M3 Ultra as its reference runtime. A future re-proposal must
+    bring a NEW device receipt, not an argument from the flag-name. CONSEQUENCE FOR THE PORTFOLIO: prefill has exactly
+    ONE measured lever left on this chip - prompt-cache reuse (47.60 s -> 12.04 s, 3.95x) - so reviewer-shaped work
+    must be engineered around reuse and around MoE shape, not around ANE.'
+  bugs:
+  - BUG-1045
+  - BUG-1044
+  files:
+  - scripts/measure_prefill.py
+  - config/agent_context.yaml
+  - governance/SPECULATIVE_DECODING_M1_20261027.md
+  created: '2026-10-27'
+- id: D-3175
+  state: RESOLVED
+  category: DECODE ACCELERATION / MARKET RESEARCH
+  title: 'The three speculative-decoding mechanisms measured on THIS M1 Max: draft-model spec-dec runs under upstream
+    PR 1821 and is 1.7-3.8x SLOWER, native MTP works at 1.54x, and GGUF/llama.cpp MTP is SKIPped on an already-measured
+    1.7x decode deficit'
+  decision: 'Market research answered as measurements, not as claims (D-3161/D-3036). (A) DRAFT-MODEL spec-dec:
+    `ml-explore/mlx-lm#1821` (RecurrentCache, a trimmable ArraysCache) removes the refusal measured in D-3171; built
+    from the branch in an isolated venv (mlx 0.32.4) and run against the local 27B plus the local 1.0B-A0.6B draft:
+    baseline 7.606 t/s, draft=1 4.582, draft=2 3.204, draft=4 2.021 (0.60x / 0.42x / 0.27x). Monotonic degradation
+    from n=1 proves the cost is the recurrent-cache bookkeeping itself, not acceptance - a better draft cannot rescue
+    a cost paid before any draft is accepted. RECORDED NEGATIVE. (B) NATIVE MTP: works - see D-3177 (7.99 -> 12.34
+    t/s, 1.54x, prefill unchanged, greedy output byte-identical). (C) llama.cpp/GGUF: `ggml-org/Qwen3.8-27B-GGUF`
+    publishes purpose-built sidecars (`mtp-Qwen3.8-27B-Q4_0.gguf` 1.68 GB, `mtp-...-BF16` 5.95 GB, `dflash-...-Q4_0`
+    1.09 GB) and homebrew llama.cpp b9430 exposes `--spec-draft-*`, but this host ALREADY measured GGUF at 5.31
+    t/s against MLX''s ~9.3 on this exact model, so llama.cpp would have to more than double to reach MLX+MTP''s
+    12.34 - SKIP on a measured deficit, not on taste. UPSTREAM STATE RECORDED: #990 (MTP) OPEN, #1821 (RecurrentCache)
+    OPEN, #1462 (a `qwen3_5_mtp` checkpoint is not registered by `mlx_lm.server`) OPEN; the four PRs previously
+    believed to have landed (#1111, #1468, #1486, #1923) are all CLOSED-unmerged, which is precisely why the shipped
+    mlx_lm 0.31.3/0.32.3.dev8 still refuses. THE GENERAL RULE: speculative decoding accelerates DECODE ONLY - prefill
+    is untouched (51.6 vs 51.5 t/s), so it is not an answer to the prefill bottleneck, and D-3171''s ''structural''
+    verdict is corrected to ''structural in the shipped loader, lifted by BUG-1046''s fix for the MTP mechanism''.'
+  bugs:
+  - BUG-1040
+  - BUG-1041
+  - BUG-1046
+  files:
+  - governance/SPECULATIVE_DECODING_M1_20261027.md
+  - governance/GGUF_MLX_AB_20261027.md
+  - governance/buglog.md
+  created: '2026-10-27'
+- id: D-3176
+  state: RESOLVED
+  category: VERIFIER GATE / MODEL PORTFOLIO
+  title: 'Reviewer clarification: NO gemma is in the R5 seat - the E4B on disk was MEASURED and REFUSED (false_approve
+    0.1250), the 12B was only ever ADAPTed, and the gate-passing reviewer is gpt-oss-20b; the 6.74 GB gemma-4-12B-it
+    is the one high-value UNMEASURED candidate'
+  decision: 'The owner asked whether gemma-4-12B-it had been used as the R5 reviewer and asked for a sweep of every
+    gemma that could beat gpt-oss, without re-advising what was already applied. Answered by resolution, three readings:
+    (1) `ls ~/.omlx/models/` contains exactly one gemma - `gemma-4-E4B-it-MLX-4bit`; the two 12B rows in the market
+    register are ADAPT (registered with a reason, no download, no model_settings entry, no gate run); (2) the E4B
+    on disk was measured and REFUSED - `pass=False n=24 acc=0.7083 margin=+0.2083 false_approve=0.1250`, reason
+    `false_approve=0.1250 > 0.10`; (3) the seat is `gpt-oss-20b-MXFP4-Q8` - `pass=True n=24 acc=0.9167 margin=+0.4167
+    false_approve=0.0000 false_reject=0.0833`, the only model that has ever passed on the current fixture. So NOTHING
+    gemma was applied. The full in-family sweep is classified in the register (ADAPT: 12B-4bit 6.74 GB and 12B QAT
+    10.99 GB; SKIP: 26B-A4B 15.61 GB on the measured 14.9 GB pool headroom, 31B, gemma-3-27b, E2B, every GGUF and
+    every NVFP4/FP8/AWQ/GPTQ derivative as runtime-locked; WATCH: gemma-4-12B-it-qat-w4a16-ct and gemma-3-12b-it-qat-4bit).
+    ADOPT: NONE - a gemma may only be promoted by a passing `reviewing_verdict_gate` run on THIS device. STATED
+    HONESTLY: there is no published evidence that any gemma beats gpt-oss at this gate, because the gate is local,
+    small (n=24) and source-scoped; vendor tables are CLAIMS (D-3161). The single highest-value open measurement
+    is the 6.74 GB `lmstudio-community/gemma-4-12B-it-MLX-4bit`, run THROUGH the serving engine (the `gemma4_unified`
+    mapping exists in the engine''s mlx_lm 0.32.3.dev8 + mlx_vlm 0.7.10 and not in the repo''s 0.31.3, so an in-process
+    run fails as ''Model type gemma4_unified not supported'' - a harness artifact, not a model fact), and it is
+    BLOCKED from promotion by the fixture-author confound and by BUG-1041''s missing re-measure channel.'
+  bugs:
+  - BUG-1041
+  files:
+  - governance/REVIEWER_MARKET_RESEARCH_20261027.md
+  - config/r5_review_gate.yaml
+  created: '2026-10-27'
+- id: D-3177
+  state: RESOLVED
+  category: MODEL PORTFOLIO / DECODE ACCELERATION
+  title: 'Native MTP is the ONE verified decode lever on this M1 Max: attaching the published 238 MB Qwen3.8-27B
+    MTP head gives 7.99 -> 12.34 t/s (1.54x) at 76.7% draft acceptance with prefill unchanged and greedy output
+    byte-identical'
+  decision: 'Qwen/Qwen3.8-27B ships the MTP head - 15 `mtp.*` tensors, `mtp_num_hidden_layers: 1` - and every MLX
+    4-bit conversion strips it (`mlx_lm/models/qwen3_5.py#sanitize` deletes every `mtp.` weight); `mlx-community/Qwen3.8-27B-MTP-4bit`
+    publishes the head ALONE (238 MB, 31 already-4-bit tensors). `scripts/stage_mtp_head.py` attaches it in a staging
+    checkpoint whose base shards are SYMLINKED (the base artifact stays byte-identical, D-3034), and the running
+    engine needs only `mtp_enabled: true` for that model. MEASURED through oMLX on this host, 2048-token cold prompt,
+    128 generated tokens, steady state (first call after a load is not a reading - BUG-1042): base `Qwen3.8-27B-MLX-4bit`
+    decode 7.98 / 8.00 t/s and prefill 52.23 / 51.48; `Qwen3.8-27B-MTP4` decode 12.34 / 11.62 t/s and prefill 51.57
+    / 51.50 = 1.54x decode, prefill UNCHANGED. The engine''s own MTP line states the mechanism: `cycles=45 tok/cycle=2.84
+    accept=66/86 (76.7%) depth[d1=24/32,d2=19/23,d3=13/18,d4=10/13] timing[backbone=10516.3ms mtp=220.3ms]` - the
+    head costs 2% of the round. QUALITY: greedy 432-byte output is byte-identical with and without --mtp in-process,
+    and the engine verifies rows exactly. WHY IT ALMOST DID NOT LAND (BUG-1046): an index-only rename of the head
+    is silently ignored - `mlx_lm.utils.load_model` globs `model*.safetensors` and takes tensor names from the FILE
+    HEADERS - so the first fixture loaded with ''no MTP tensors were found'' and measured 0.98x, which reads exactly
+    like ''MTP does not help on this chip''. The script writes the prefix into the safetensors HEADER, names the
+    shard `model-<N+1>-of-<N+1>.safetensors`, and `--check` proves 31 `mtp.*` tensors are reachable through the
+    loader''s glob without loading mlx. SCOPE HONESTLY STATED: this accelerates DECODE only; prefill remains the
+    bottleneck and its only measured lever is prompt-cache reuse (D-3174).'
+  bugs:
+  - BUG-1046
+  - BUG-1045
+  files:
+  - scripts/stage_mtp_head.py
+  - config/specdec_m1.yaml
+  - governance/SPECULATIVE_DECODING_M1_20261027.md
   created: '2026-10-27'

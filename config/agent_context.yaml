@@ -407,6 +407,10 @@ prefill_budget:
     ladder: false               # declared OFF the ladder: a rail that needs the network must not gate a build
     why: 'the only certification of REUSE is two calls on one cold process with one identical prefix'
     filler: 'the quick brown fox jumps over the lazy dog. '
+    # BUG-1044 (MEASURED 2026-10-27): the cold-prefill probe's prompt was byte-identical between
+    # runs, and the engine's prefix cache served the second call in 0.54 s against 39.22 s cold for
+    # the same 2060-token prompt -- a ~70x phantom speedup. Every call now prepends this tag.
+    nonce_chars: 32
     filler_tokens_measured: 10          # MEASURED: the unit above is EXACTLY ten tokens
     chars_per_token_measured: 4.5       # 45 chars / 10 tokens. The first draft assumed 4.0, published a
                                         # truncation that did not exist, and was retracted the same day (BUG-794)

@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1324 decisions (census stamp 4a82ef2ee6cf1251, 2026-10-27) · 840 bugs (265 open / 575 closed; highest OPEN = BUG-1076) · 60 open tasks (MUST 9 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1325 decisions (census stamp a1c6d6aa304c1d9c, 2026-10-27) · 842 bugs (265 open / 577 closed; highest OPEN = BUG-1077) · 61 open tasks (MUST 10 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 60; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1324 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 665 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1324, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1325 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 666 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1325, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
 >
@@ -18,9 +18,9 @@
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-208 | 🟠 SHOULD | ONE DELETION AWAITS THE OWNER WORD - ~/.omlx/drafts/Qwen3.8-0.6B (1.1 GB) is named by NO declaration and its d | THE PROCEDURE IS THE GATE (D-3100: numbered, copy-paste-able, no inlin |
+> | T-212 | 🔴 MUST | THE agent_loop CLASS IS BILLABLE BY NO SERVED MODEL - 26,214 tokens inside 60s needs 437 tok/s and the best cl | A DECLARED SECOND POINT, derived from a number the OWNER picks - not o |
 >
-> **PIPELINE LANE (59) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (60) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -32,12 +32,12 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
-> | T-209 | 🔴 MUST | 🔴 open | GIVE THE plan ROLE'S MODEL A ROUTE, A DECLARATION AND A LOOP RECEIPT - MTP4 holds the only plan_quality gate P | MEASURED 2026-10-27. `python3 scripts/agent_context_probe.py` -> rc 2, "Qwen3.8-27B-MTP4:  |
+> | T-213 | 🔴 MUST | 🔴 open | BUILD THE RED LOOP BUG-951 OWES - a fixture that replays one corrupted tool name into the message history and  | READ 2026-10-27: `grep -rl harmony scripts/*.py` -> only scripts/arm4_omlx.py; no repeated |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 59 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 60 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -23781,7 +23781,7 @@ verdict journal and the DECLARATION is in this one - they disagree.
 4. NOT FIXED BY RE-DECLARING CORRECTLY NEXT TIME. The fix is the rail, not the habit - "record the slip in the note"
    is what this sitting did, and a note is not a control (the BUG-1016 shape).
 
-## BUG-1075 (MED, OPEN 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the `plan` role's model cannot be reached, ranked or delegated to
+## BUG-1075 (MED, FIXED 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the `plan` role's model cannot be reached, ranked or delegated to
 MEASURED, three readings, same model.
 1. `scripts/agent_context_probe.py#measured_prefill` reads ONE key - `config/agent_context.yaml#measured_20261014
    .prefill` - and nothing else. There is no other live writer of that block (the only writers found are one-off
@@ -23804,6 +23804,23 @@ a date is a declaration, not a reading, D-3034). Then MTP4's row lands under its
 being the schema. Then the harness declaration, then the battery under MTP4's own id (D-3192: an id-keyed receipt
 never transfers).
 
+**FIXED 2026-10-27 (T-209).** The remedy above is what landed, in the order the entry named. The reader
+(`scripts/agent_context_probe.py#measured_prefill`) no longer names a key: it walks every top-level block matching
+`config/agent_context.yaml#measurements.block_pattern`, requires each row to carry its own `measured_at`, resolves
+LATEST-WINS per model so a newer reading supersedes an older one without any block being rewritten (D-2642), and
+REFUSES an undated row rather than inheriting the block's date.
+THREE POINTS, ONE COMMAND (D-3036): `python3 scripts/agent_context_probe.py` read 9 declared faults with
+"Qwen3.8-27B-MTP4: unverifiable" and "UNMEASURED throughput -> NO route, fail-closed" BEFORE, and reads 8 faults
+with "ok Qwen3.8-27B-MTP4 served=262144" and a priced route AFTER; `--selftest` reads 20/20, the three new controls
+being `a_reading_row_that_names_no_measured_at_is_refused`,
+`a_newer_dated_block_supersedes_an_older_one_without_rewriting_it`,
+`a_reading_below_the_class_working_set_is_a_reading_not_a_bill`.
+WHAT THE FIX IMMEDIATELY EXPOSED, and why the class was worth a bug: the four rows that were already inside the
+2026-10-14 block had been measured on THREE different days (10-14, 10-16, 10-21) and the only record of that was
+prose in a free-text `note`. The schema change made the difference legible, and the same change let a bill print
+its BASIS for the first time - which is how the only `agent_loop` route in the table was found to rest on a
+4,468-token reading (BUG-1078, D-3199 limb 2).
+
 ## BUG-1076 (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing ledgers the count as it grows
 MEASURED 2026-10-27: `python3 scripts/agent_context_probe.py` -> `FAIL agent-context: 9 declared fault(s)`, rc 2. The
 nine are EIGHT hub-cache shadow ids (`lmstudio-community--*`, `mlx-community--*`, `openbmb--*`, `ornith-ai--*`) plus
@@ -23821,3 +23838,55 @@ ONE role model (`Qwen3.8-27B-MTP4`). The same probe reported SIX drifts on 2026-
    arrival is a DIFF a reader can see, not a number that was always 9.
 4. NOT A REASON TO SILENCE IT: the same probe is what named the window truncation of 2026-10-21 that silently dropped
    five long-context models to 32768. The class is valuable; the vocabulary is the defect.
+
+## BUG-1077 (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on somebody remembering to append, and the instrument that produces a reading files nothing
+
+MEASURED 2026-10-27 (T-209). `config/hardware_profile.yaml#receipts` declares
+`governance/calibration_receipts.jsonl` as "append-only; one row per measured run", and `config/model_roles.yaml`
+cites it SIX times as the `decided_by` of a role. `grep -rln calibration_receipts --include='*.py'` returns
+`scripts/hardware_calibrate.py` alone, and there the string appears only as a `decided_by` FIELD VALUE (line 454) -
+nothing in this tree APPENDS a row. `scripts/measure_prefill.py`, the instrument that produced every prefill figure
+the routing is built on, has no `--receipt` and no ledger write at all (`grep -n receipt scripts/measure_prefill.py`
+returns prose in its docstring and help text only).
+1. THE CONSEQUENCE, MEASURED THE SAME DAY: the two class-context readings this sitting needed (MTP4 42.89 tok/s,
+   gemma 417.67 tok/s) were appended BY HAND, and the first attempt carried `bytes: null` for gemma because no prior
+   row for that model existed to inherit the figure from - the field had to be completed from `du -skL` seconds later.
+   A human-shaped gap, in the one artifact every role decision cites.
+2. THE FUTURE TAX: a role's `decided_by` names a ledger whose provenance is a habit. The moment a reading is taken and
+   not typed in, the register is SILENTLY incomplete - and a missing row is indistinguishable from a reading that was
+   never taken, which is the same failure the probe was just cured of (BUG-1075) one layer out.
+3. REMEDY (cheap, do not over-build): `measure_prefill.py --json` already emits the whole receipt; give it
+   `--append-receipt` that writes that same object, plus `instrument`, `engine`, `pool state` and `measured_at`, through
+   `pipeline.io_guard.safe_write_jsonl`, and have it REFUSE a receipt missing any declared field rather than writing a
+   null (the two rows of 2026-10-27 are the schema to check against). Then run `--append-receipt` once against an
+   already-recorded reading to prove idempotence or to prove it duplicates loudly - the choice must be DECLARED, not
+   discovered.
+4. NOT A REASON TO STOP CITING IT: the ledger is the right home and the rows are good. The defect is that the last
+   step is manual and undeclared.
+
+## BUG-1078 (MED, FIXED 2026-10-27) - THE PREFILL BILL COULD NOT SAY WHAT SIZE ITS NUMBER WAS MEASURED AT, so a route extrapolated from a 4,468-token reading printed identically to a route measured at class context - and the one `agent_loop` pass in the whole table was the extrapolation
+
+MEASURED 2026-10-27, two readings of ONE model, both cold, both from the server's own counters, engine 0.7.3rc1:
+`gemma-4-E4B-it-MLX-4bit` reads **455 tok/s at 4,468 prompt tokens** (2026-10-14) -> a 26,214-token turn priced at
+**57.6s** against a 60s budget -> **routable**; and **417.67 tok/s at 26,254 prompt tokens** -> **62.8s** ->
+**prefill_bill**. The under-floor reading was 8.9% optimistic and it flipped the verdict. Every prior run of the
+probe printed that model as `455.0 tok/s best=agent_loop routable=['agent_loop', ...]` with nothing on the line
+saying the number had been taken at one sixth of the size the class divides.
+1. WHY NOBODY COULD SEE IT: the declaration had already recorded the mechanism - FINDING_2 (2026-10-17) measured the
+   SAME model at 71.3 tok/s at 2,677 prompt tokens and 210 tok/s at 50,082 and concluded a floor reading is not
+   comparable to a class bill. The rule existed as PROSE; the reader had no field to carry it, so the report could
+   not say which of its own routes were extrapolated (D-3034: a value that merely MENTIONS a thing declares nothing).
+2. FIXED BY MAKING THE BASIS PART OF THE OUTPUT, not by changing a verdict: `prefill_bill` now takes the reading's
+   own `prompt_tokens` and stamps each class row `basis=class_context` when the reading reaches that class's
+   `working_set`, otherwise the DECLARED verdict `reading_only_not_a_bill` (declared in
+   `config/agent_context.yaml#measurements`, never a code literal). Control:
+   `a_reading_below_the_class_working_set_is_a_reading_not_a_bill`. The route was then REFUTED by measurement, not by
+   a rule change - the class-context reading of 417.67 is what retired it (D-3199 limb 2).
+3. STILL OWED, AND SEPARATELY REGISTERED: two served models are routed from under-floor readings today -
+   Phi-4-mini-instruct-8bit (394.0 @ 4,466) and Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (84.4 @ 2,616). Both are
+   `prefill_bill` verdicts already, so no route is currently WRONG; they are UNPRICED, and T-211 is the measurement
+   that prices them.
+4. THE PATTERN THIS BELONGS TO, stated so it is not re-learned: an instrument that reports a number without the
+   CONDITIONS of its measurement invites arithmetic to be read as evidence. The same shape sits in BUG-803 (pool
+   state), BUG-805 (decode is a function of context length) and BUG-1064 (a reasoning model measured at a budget it
+   cannot answer within).

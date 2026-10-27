@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**265 open** / 575 closed of 840 ids.
+**265 open** / 577 closed of 842 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -274,5 +274,5 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1064 | (MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget: | 1 |
 | BUG-1069 | (MED, OPEN 2026-10-27) - the store census partitions the HUB, so a store the engine also writes is outside every class it can report - and | 1 |
 | BUG-1074 | (LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work, | 1 |
-| BUG-1075 | (MED, OPEN 2026-10-27) - the throughput census is keyed by a DATE, so a model measured AFTER that date is invisible and gets NO ROUTE: the | 1 |
 | BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |
+| BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |

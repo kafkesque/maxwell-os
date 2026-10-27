@@ -2864,7 +2864,8 @@ tasks:
     each step; the five couplings are DISCHARGED, not papered over.
 - id: T-208
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-27'
   mover: owner
   title: ONE DELETION AWAITS THE OWNER WORD - ~/.omlx/drafts/Qwen3.8-0.6B (1.1 GB) is named by NO declaration and its draft was REFUSED for a tokenizer mismatch, and the store census cannot even report the bytes
   why: >-
@@ -2893,9 +2894,20 @@ tasks:
     5) du -sh ~/.omlx/drafts                   expect ~2.4G, was 3.5G.
     IF STEP 1 SAYS No such file or directory, STOP - it is already gone and the free-space delta is unknowable
     without step 2 having run, which is BUG-1058's whole point. Record the five readings in the closing note.
+  closure_evidence: >-
+    THE OWNER RAN THE PROCEDURE AND IT WORKED, read back on the filesystem and not taken on report (D-336: an
+    agent's measurement claim is not evidence, and a human's report is read the same way). MEASURED 2026-10-27
+    16:23 by the closing act: `du -sh ~/.omlx/drafts/Qwen3.8-0.6B` -> "No such file or directory" (the step-1 STOP
+    branch did NOT fire, so the delete was real, not a no-op); `du -sh ~/.omlx/drafts` -> 2.4G, against the 3.5G
+    recorded in this row's own evidence; the three surviving entries are Qwen3.8-1.0B-A0.6B, its -mlx4 sibling and
+    the .staging- directory. WHAT IS NOT CLAIMED: the free-space delta (~1.1Gi in the gate) is NOT asserted here,
+    because the before-reading of `df` was not captured in this session's log and a delta nobody read is a guess.
+    WHAT STAYS OPEN: BUG-1069 - the store census still cannot REPORT these bytes, so the deletion was made without
+    the instrument that should have priced it; closing that bug is not part of this row.
 - id: T-209
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-27'
   mover: pipeline
   title: GIVE THE plan ROLE'S MODEL A ROUTE, A DECLARATION AND A LOOP RECEIPT - MTP4 holds the only plan_quality gate PASS and is currently unreachable because the throughput census is keyed by a DATE
   why: >-
@@ -2926,6 +2938,29 @@ tasks:
     4) Run the battery under MTP4's OWN id and archive the receipt in governance/evidence/. D-3192 forbids
        transferring the base 27B's 4/4 row: an id-keyed receipt never certifies another id.
     ONLY THEN may D-3198's orchestrator limb be re-decided, and only from that receipt.
+  closure_evidence: >-
+    ALL FOUR GATE STEPS SATISFIED BY READING, in the declared order, 2026-10-27 16:27-16:41.
+    (1) READER: `scripts/agent_context_probe.py#measured_prefill` now walks every top-level block matching
+    config/agent_context.yaml#measurements.block_pattern, requires each row to carry its own `measured_at`, and
+    resolves LATEST-WINS per model; a row with no moment is REFUSED (not defaulted). The refusal is a control, not
+    a claim: `python3 scripts/agent_context_probe.py --selftest` -> 20/20 green, the three new controls being
+    a_reading_row_that_names_no_measured_at_is_refused, a_newer_dated_block_supersedes_an_older_one_without_rewriting_it,
+    a_reading_below_the_class_working_set_is_a_reading_not_a_bill.
+    (2) FAULT COUNT: 9 -> 8, exactly one, and the one removed is the right one - the probe now reads
+    "ok Qwen3.8-27B-MTP4 served=262144" where it read "unverifiable", and the remaining 8 are the hub-cache shadow
+    ids BUG-1076 owns. rc is still 2, deliberately (BUG-457 tri-state).
+    (3) DECLARATION: ~/.config/goose/custom_providers/maxwell_omlx.json 8 -> 9 models, backup beside itself
+    (maxwell_omlx.json.bak.20261027162701), written through pipeline.io_guard.safe_write, read back byte-identical.
+    (4) LOOP RECEIPT: `measure_subagent_loop.py --battery --only Qwen3.8-27B-MTP4` -> 4/4 (distractor, parallel,
+    argname, enum all PASS), warm turn 13.6s, load paid 14.3s; archived as
+    governance/evidence/LOOP_BATTERY_20261027_MTP4.json (3,446 B, sha256_16 ecab1bb3f93305f6), naming its engine
+    (app 0.7.3rc1, mlx_lm 0.32.3.dev8+g0d4d3d04f) per D-3152 limb 2.
+    THE OUTCOME IS NOT THE ONE THE TITLE ASSUMED, and it is recorded as a refusal rather than a win: MTP4 has a
+    route, and the route is pipeline_batch (764.0s against a 3,600s budget). Its agent_loop bill is 611.2s against
+    60s, from a NEW class-context reading (42.89 tok/s at 26,254 prompt tokens, TTFT 612.1s, load 37.7s, cold),
+    appended as row 35 of governance/calibration_receipts.jsonl. So the plan role's model is REACHABLE and NOT a
+    loop model - see D-3199 limbs 1 and 3. The same act priced gemma at class context (417.67 tok/s, 62.8s) and
+    thereby REFUTED the only agent_loop route in the table.
 - id: T-210
   priority: SHOULD
   state: open
@@ -2951,3 +2986,93 @@ tasks:
     IS OVERWRITTEN (a receipt is history, D-3192's discipline applied to the instrument itself). If the higher point
     changes a verdict, that change is a NEW decision citing both receipts - never an edit to the ranking that was
     already committed (D-3148 clause 5: the instrument's own defects belong in its record).
+
+- id: T-211
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: MEASURE THE TWO REMAINING UNDER-FLOOR BILLS AT CLASS CONTEXT - Phi-4-mini and Qwen3-Coder are still routed from 4,466- and 2,616-token readings, and one afternoon's gemma reading shows how far that can move a verdict
+  why: >-
+    The probe can now SAY which bills rest on an under-floor reading (`basis=reading_only_not_a_bill`) and it says so
+    for exactly two served models. The gemma case is the proof that this is not cosmetic: 455 tok/s at 4,468 prompt
+    tokens priced a 26,214-token turn at 57.6s and called it routable; the SAME model at class context reads 417.67
+    and prices it at 62.8s, which is a prefill_bill. An 8.9% optimistic reading flipped a verdict, so a route granted
+    from 2,616 tokens (Qwen3-Coder, 310.6s - already a refusal) or 4,466 (Phi-4-mini, 66.5s) is unpriced rather than
+    decided. Left open, every future reader of the table inherits two numbers that look like measurements and are
+    extrapolations (FINDING_2, 2026-10-17).
+  source: 'D-3199 limb 2 / BUG-1075 / T-209 closure / FINDING_2 (config/agent_context.yaml)'
+  evidence: >-
+    MEASURED 2026-10-27. `python3 scripts/agent_context_probe.py` prints basis=reading_only_not_a_bill for
+    Phi-4-mini-instruct-8bit (394.0 tok/s at 4,466 tokens) and Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (84.4 tok/s at
+    2,616). The gemma pair, measured the same day, is 455.0@4,468 -> 57.6s routable versus 417.67@26,254 -> 62.8s
+    prefill_bill.
+  gate: >-
+    One measurement per model, then the same bookkeeping the MTP4 reading used, in this order:
+    1) python3 scripts/measure_prefill.py --model <model> --tokens 26214 --max-tokens 128 --json
+    2) append the receipt to governance/calibration_receipts.jsonl (instrument, engine, pool state, prompt size)
+    3) add the row to config/agent_context.yaml#measured_YYYYMMDD.prefill WITH its measured_at - never by editing an
+       older block's number
+    4) re-run the probe and QUOTE both readings side by side in the task's closure.
+    If a verdict flips, that change is recorded as a new decision citing both receipts; no existing ranking is
+    edited (D-3192, D-3148 clause 5). Note the cost before starting: Qwen3-Coder prefills at ~84 tok/s, so its
+    class-context call is ~5 minutes of wall clock.
+- id: T-212
+  priority: MUST
+  state: open
+  mover: owner
+  title: THE agent_loop CLASS IS BILLABLE BY NO SERVED MODEL - 26,214 tokens inside 60s needs 437 tok/s and the best class-context reading on this machine is 417.67, so the class needs a SECOND POINT declared from a measured latency target the OWNER sets
+  why: >-
+    MEASURED 2026-10-27, every model, class-context: MiniCPM5 88.8s, Ornith-REAP-19B 90.7s, Ornith-9B 185.4s,
+    gemma 62.8s, gpt-oss 124.8s, Qwen3.8-27B 672.2s, MTP4 611.2s - all against a 60s budget. Not one passes, and
+    the closest misses by 4.7%. The single "routable" agent_loop verdict the table ever printed came from a
+    4,468-token reading that the class-context measurement refutes. So the class as DECLARED is a budget nobody
+    meets, while the T-199 battery proves the same models complete real loop turns in 1.5-13.6s at fixture-sized
+    prompts: a local agent loop is affordable at SMALL CONTEXT and expensive at 26k, and the declaration currently
+    says only the second thing. That is the whole reason a session compacts, and it is why every delegation plan
+    written against a 26k working set is priced wrong.
+  source: 'D-3199 limbs 2-3 / T-209 closure / D-3148 / BUG-803 / BUG-805 / config/agent_context.yaml#classes'
+  evidence: >-
+    MEASURED 2026-10-27 (this sitting): `python3 scripts/agent_context_probe.py` LAYER 5, one row per served model
+    with basis=class_context where a class-context reading exists; governance/calibration_receipts.jsonl rows 35
+    (MTP4 42.89@26,254) and 36 (gemma 417.67@26,254); governance/evidence/LOOP_BATTERY_20261025.json for the
+    small-prompt turn times. The declared class is `classes.agent_loop` = working_set 26,214, prefill_budget_s 60.
+  gate: >-
+    A DECLARED SECOND POINT, derived from a number the OWNER picks - not one this repo invents, because acceptable
+    turn latency is a value and not a measurement:
+    1) THE OWNER STATES ONE NUMBER: the longest prefill a single agent-loop turn may spend, in seconds. Reply
+       'T-212: <seconds>' and the row moves to the pipeline with that number as its declared input - nothing below
+       step 2 can run before it, which is why this row's mover is owner and not pipeline;
+    2) the class is ADDED beside the existing one in config/agent_context.yaml#classes with its own working_set and
+       budget, and the old class is NOT deleted, re-pointed or re-budgeted (a declaration that quietly moves is the
+       class of defect this repo keeps finding);
+    3) a selftest control proves the new class is priced by the SAME predicate (prefill_bill) and that the working
+       set, not the window, is what gets divided;
+    4) re-run the probe and show which served models the new point admits, with their basis - the point is admitted
+       by a READING, never by an assumption about prompt size.
+- id: T-213
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: BUILD THE RED LOOP BUG-951 OWES - a fixture that replays one corrupted tool name into the message history and reports whether the NEXT call is clean, because the only instrument that ever tested it lived in /tmp and is gone
+  why: >-
+    BUG-951 (HIGH, OPEN 2026-10-20) is the only blocker in the delegation plan with a PRODUCTION failure mode: the
+    model bound as GOOSE_PLANNER_MODEL and AGENT_LOOP_SHORT sent `"name":"shell<|channel|>commentary"` in 6 of about
+    30 calls and had four consecutive tool calls dropped before the harness saw them. It was never reproduced in
+    isolation - /tmp/toolcall_probe2.py was 6/6 clean - and that probe is NOT IN THE TREE, so the claim cannot be
+    re-tested by anyone (the BUG-406 sweep class). D-3036 forbids forming a theory without a fixture that goes RED
+    on the defect, so the fix cannot be scheduled before the instrument exists.
+  source: 'BUG-951 / D-3036 / D-3198 limb 6 / D-3199 limb 5 / BUG-406'
+  evidence: >-
+    READ 2026-10-27: `grep -rl harmony scripts/*.py` -> only scripts/arm4_omlx.py; no repeated-call tool-emission
+    fixture exists anywhere under scripts/ or pipeline/. The bug's own entry records the two symptom classes
+    (corrupted NAME in 6 of ~30 calls; four consecutive dropped CALLS, finish_reason=stop, 28 tokens) and names the
+    untested candidate triggers, including a prior corrupted name echoed back in history.
+  gate: >-
+    An in-repo fixture, and THREE verdicts it must be able to return:
+    1) it replays a malformed `name<|channel|>channel` into the assistant history and then issues N >= 30 real tool
+       calls against the live engine, counting malformed names and dropped calls separately;
+    2) RED if either count is above zero on Qwen3.8-27B-MTP4's engine build (0.7.3rc1) - the receipt names the
+       engine, per D-3152 limb 2;
+    3) if BOTH counts are zero it returns UNMEASURED-with-a-bound, NOT "fixed": 0 of 30 bounds the rate at roughly
+       1 in 10 (rule of three), which cannot retire a defect observed at 1 in 5 in production. A green tick from a
+       fixture that cannot fail is the BUG-797 class.

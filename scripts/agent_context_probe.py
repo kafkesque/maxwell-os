@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sqlite3
 import sys
 import time
@@ -232,22 +233,68 @@ def prefill_seconds(prompt_tokens: int, tps: float | None) -> float | None:
 
 
 def measured_prefill(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Layer 5's measured rows: one per model, each proved by the token count the SERVER echoed."""
+    """Layer 5's measured rows, resolved across EVERY dated readings block (BUG-1075).
+
+    The first form of this reader named ONE literal key (`measured_20261014`), so a model measured on any later
+    day was invisible and received NO route at all - fail-closed, and silently, because "no route" prints as an
+    absence rather than as a defect. A reading is now filed under the MOMENT it was taken: the reader walks every
+    top-level block whose name the declaration's pattern matches, requires each row to carry its own
+    `measured_at`, and resolves NEWEST-FIRST per model so a fresh reading supersedes an older one without any
+    block being rewritten (D-2642). A row with no moment is REFUSED rather than inherited from the block name:
+    an undated number is a claim whose date nobody can check (D-2660), and inheriting it is how a block named
+    for one day came to hold rows measured on three others.
+    """
+    pattern = re.compile(str(declared_value(cfg, "measurements", "block_pattern")))
+    reading_key = str(declared_value(cfg, "measurements", "reading_key"))
+    required = [str(key) for key in (declared_value(cfg, "measurements", "row_requires") or [])]
     rows: dict[str, dict[str, Any]] = {}
-    for model, row in ((cfg.get("measured_20261014") or {}).get("prefill") or {}).items():
-        if not isinstance(row, dict):
-            continue                     # an explicitly unmeasured model is a HOLE, not an error
-        rows[str(model)] = {"prompt_tokens": measured_prompt_tokens(row),
-                            "prefill_tps": row.get("prefill_tps"), "decode_tps": row.get("decode_tps")}
+    for block in sorted(name for name in cfg if pattern.match(str(name))):
+        section = cfg.get(block)
+        table = section.get(reading_key) if isinstance(section, dict) else None
+        for model, row in (table or {}).items():
+            if not isinstance(row, dict):
+                continue                 # an explicitly unmeasured model is a HOLE, not an error
+            absent = [key for key in required if not row.get(key)]
+            if absent:
+                raise ProbeError(f"FAIL-CLOSED (agent-context): {block}.{reading_key}.{model} carries no "
+                                 + ", ".join(absent) + " - a reading is filed under the moment it was taken "
+                                 "(D-2660), and an inherited date is a date nobody measured")
+            moment = str(row["measured_at"])          # ISO-8601: lexical order IS chronological order
+            prior = rows.get(str(model))
+            if prior is None or moment >= str(prior["measured_at"]):
+                rows[str(model)] = {"prompt_tokens": measured_prompt_tokens(row),
+                                    "prefill_tps": row.get("prefill_tps"), "decode_tps": row.get("decode_tps"),
+                                    "measured_at": moment, "block": str(block)}
     return rows
 
 
-def prefill_bill(window: int, tps: float | None, classes: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
+def bill_basis(prompt_tokens: Any, working_set: Any, cfg: dict[str, Any]) -> str:
+    """Whether a reading was taken AT the class's working set: below it, the row is a reading, not a bill.
+
+    MEASURED 2026-10-17 (FINDING_2, config/agent_context.yaml): the SAME model read 71.3 tok/s at 2,677 prompt
+    tokens and 210 tok/s at 50,082 - so a fixed small-prompt floor is not comparable to a class bill, and a
+    route granted from one is arithmetic rather than a measurement. The threshold is the CLASS's own working
+    set, which the declaration already owns; the below-floor verdict is declared too, never a code literal.
+    """
+    if not isinstance(prompt_tokens, (int, float)) or not isinstance(working_set, (int, float)):
+        return "unknown"
+    if float(prompt_tokens) >= float(working_set):
+        return "class_context"
+    return str(declared_value(cfg, "measurements", "under_floor_verdict"))
+
+
+def prefill_bill(window: int, tps: float | None, classes: dict[str, Any], cfg: dict[str, Any],
+                 reading_prompt_tokens: Any = None) -> dict[str, Any]:
     """Layer 5, the TWO-SIDED predicate: a class is satisfied by the WINDOW and by the PREFILL BILL.
 
     The window is the FLOOR a class declares; the bill is what a turn actually costs. A model with a
     large window and a small throughput satisfies the floor and fails the bill - and the class's
     WORKING SET is what gets divided, never the window: a window is not a budget.
+
+    `reading_prompt_tokens` is the size the throughput was MEASURED at, and it decides each class row's
+    `basis`: `class_context` when the reading reaches that class's working set, otherwise the declared
+    below-floor verdict. A route is never hidden - it is LABELLED, so a reader can tell a measured route
+    from an extrapolated one (BUG-1075; FINDING_2).
     """
     policy = str(declared_value(cfg, "prefill_budget", "unknown_tps"))
     evaluated: list[dict[str, Any]] = []
@@ -265,7 +312,8 @@ def prefill_bill(window: int, tps: float | None, classes: dict[str, Any], cfg: d
         else:
             verdict = "prefill_bill"
         evaluated.append({"class": str(name), "min_window": floor, "working_set": working,
-                          "seconds": seconds, "budget_s": allowed, "verdict": verdict})
+                          "seconds": seconds, "budget_s": allowed, "verdict": verdict,
+                          "basis": bill_basis(reading_prompt_tokens, working, cfg)})
     routable = [row for row in evaluated if row["verdict"] == "routable"]
     best = max(routable, key=lambda row: row["min_window"], default=None)
     return {"window": window, "prefill_tps": tps, "unknown_tps_policy": policy, "evaluated": evaluated,
@@ -465,13 +513,16 @@ def build_report(cfg: dict[str, Any]) -> dict[str, Any]:
     prefill_rows = measured_prefill(cfg)
     routes = {}
     for model, window in sorted(served["windows"].items()):
-        tps = (prefill_rows.get(model) or {}).get("prefill_tps")
-        bill = prefill_bill(window, tps, classes, cfg)
+        row = prefill_rows.get(model) or {}
+        tps = row.get("prefill_tps")
+        bill = prefill_bill(window, tps, classes, cfg, reading_prompt_tokens=row.get("prompt_tokens"))
         routes[model] = {
             "window": window,
             "class": window_class(window, classes),
             "trigger": effective_trigger(window, inputs["threshold"]["value"], inputs["cap"]["value"]),
             "prefill_tps": tps,
+            "reading_prompt_tokens": row.get("prompt_tokens"),
+            "measured_at": row.get("measured_at"),
             "evaluated": bill["evaluated"],
             "routable_classes": bill["routable"],
             "best_class": bill["best"],
@@ -528,10 +579,11 @@ def render(report: dict[str, Any], cfg: dict[str, Any]) -> int:
             print(f"   UNMEASURED throughput -> NO route, fail-closed: {model}")
             continue
         print(f"   {float(spec['prefill_tps']):>7.1f} tok/s  best={str(spec['best_class']):13} "
-              f"routable={spec['routable_classes']}  {model}")
+              f"routable={spec['routable_classes']}  {model}   "
+              f"reading={spec['reading_prompt_tokens']} tok @ {spec['measured_at']}")
         for row in spec["evaluated"]:
             print(f"        {row['class']:16} working_set={row['working_set']:>7} seconds={row['seconds']} "
-                  f"budget_s={row['budget_s']} -> {row['verdict']}")
+                  f"budget_s={row['budget_s']} -> {row['verdict']}   basis={row['basis']}")
     for hazard in report["prefix_hazards"]:
         print(f"== PREFIX - {hazard['hazard']}: {hazard['state']} - {hazard['detail']}")
     if faults:
@@ -578,6 +630,9 @@ CONTROL_LABELS = (
     "a_measured_cache_failure_is_disproven_and_never_unknown",
     "an_estimated_prompt_size_is_refused_as_a_measurement",
     "the_prompt_floor_separates_a_prefix_from_a_label",
+    "a_reading_row_that_names_no_measured_at_is_refused",
+    "a_newer_dated_block_supersedes_an_older_one_without_rewriting_it",
+    "a_reading_below_the_class_working_set_is_a_reading_not_a_bill",
 )
 
 
@@ -657,8 +712,16 @@ def selftest(cfg: dict[str, Any]) -> int:
         raise ProbeError("FAIL-CLOSED (agent-context): no measured throughput is declared - the prefill "
                          "bill cannot be controlled, and a control that cannot run is not a control")
     floor = int(declared_value(cfg, "classes", "agent_loop")["min_window"])
-    fast = prefill_bill(floor, max(throughputs), live_classes, cfg)
-    slow = prefill_bill(floor, min(throughputs), live_classes, cfg)
+    # THE BOUNDARY IS DERIVED, NOT BORROWED FROM A MODEL. This control first read "the fastest measured
+    # throughput must route to agent_loop" - and on 2026-10-27 that turned RED the moment the last under-floor
+    # reading was replaced, because the only model that had ever cleared the bill cleared it on a 4,468-token
+    # number (D-3199 limb 2). A control whose verdict depends on which model happens to be fast is not testing
+    # the predicate; it is testing the roster. So the rate a class DEMANDS is computed from the class's own
+    # working set and budget, and the control proves the predicate on both sides of that boundary.
+    loop_class = live_classes["agent_loop"]
+    needed = float(loop_class["working_set"]) / float(loop_class["prefill_budget_s"])
+    fast = prefill_bill(floor, needed * 2, live_classes, cfg)
+    slow = prefill_bill(floor, needed / 2, live_classes, cfg)
     control(CONTROL_LABELS[12], "agent_loop" in fast["routable"] and "agent_loop" not in slow["routable"])
     # the bill divides the WORKING SET: with the window divided instead, this model is refused
     toy = {"c": {"min_window": 1, "working_set": 10, "prefill_budget_s": 100}}
@@ -684,6 +747,27 @@ def selftest(cfg: dict[str, Any]) -> int:
             and [row["name"] for row in fixture_rows["stable"]] == ["SYSTEM_PROMPT"]
             and [row["name"] for row in fixture_rows["volatile"]] == ["SYSTEM_LIVE"]
             and sorted(row["name"] for row in fixture_rows["ignored"]) == ["MAX_SYSTEM_CHARS", "SYSTEM"])
+
+    # ── the reading schema (BUG-1075): a row is filed under its own moment, and a bill states its basis ──
+    schema = {"measurements": declared_value(cfg, "measurements")}
+    undated = dict(schema, **{"measured_20991230": {"prefill": {
+        "m": {"prompt_tokens": 9000, "prefill_tps": 100.0}}}})
+    refused_undated = False
+    try:
+        measured_prefill(undated)
+    except ProbeError:
+        refused_undated = True
+    control(CONTROL_LABELS[17], refused_undated)
+    older = {"prefill": {"m": {"prompt_tokens": 9000, "measured_at": "2026-10-14", "prefill_tps": 100.0}}}
+    newer = {"prefill": {"m": {"prompt_tokens": 9000, "measured_at": "2026-10-27", "prefill_tps": 200.0}}}
+    resolved = measured_prefill(dict(schema, **{"measured_20261014": older, "measured_20261027": newer}))
+    control(CONTROL_LABELS[18], resolved["m"]["prefill_tps"] == 200.0
+            and resolved["m"]["block"] == "measured_20261027")
+    loop_working = live_classes["agent_loop"]["working_set"]
+    control(CONTROL_LABELS[19],
+            bill_basis(int(loop_working) - 1, loop_working, cfg)
+            == str(declared_value(cfg, "measurements", "under_floor_verdict"))
+            and bill_basis(loop_working, loop_working, cfg) == "class_context")
 
     held = passed == total
     print(f"{'ok ' if held else 'FAIL'} agent-context-probe --selftest: {passed}/{total} known-answer control(s) green")

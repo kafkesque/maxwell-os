@@ -34708,6 +34708,25 @@ decisions:
   date: '2026-10-27'
   category: MODEL ASSIGNMENT / TOOL CALLING / ORCHESTRATION (T-187, T-199, T-202, D-3058, D-3104, D-3148, D-3192)
   title: 'Tool-calling is a MEASURED MATRIX and the orchestrator question has NO qualified answer today - four models are proven parallel workers, one is proven incapable, and the plan-gate winner has no route at all'
+  amended_20261027: >-
+    T-209 AMENDMENT, the same day, BY MEASUREMENT - recorded as an ADD so that no earlier sentence is rewritten.
+    (a) THE TWO BLOCKERS LIMB (4) NAMED ARE CLOSED: Qwen3.8-27B-MTP4 is now DECLARED to the harness (9 models, was
+    8) and its parity verdict reads "ok served=262144" where it read "unverifiable"; the probe's declared-fault count
+    fell 9 -> 8, exactly one, and the one removed is MTP4's. It also has a route, derived from a NEW class-context
+    reading rather than an extrapolation: 42.89 tok/s at 26,254 prompt tokens -> pipeline_batch (764.0s against
+    3,600s), and NOT agent_loop (611.2s against 60s). And it clears the loop battery 4/4 (warm 13.6s, load 14.3s),
+    archived as governance/evidence/LOOP_BATTERY_20261027_MTP4.json. So the model this decision called "one
+    declaration, one re-derived reading and one battery run away" arrived by exactly that route.
+    (b) THE REFUSAL STANDS, AND IS RE-GROUNDED RATHER THAN REPEATED. Two grounds survive and one got worse: the
+    plan-gate winner cannot prefill an interactive loop's working set inside the declared budget (cost, not
+    capability - D-3199 limb 1); no DEPENDENT-CHAIN fixture exists, so no model has a receipt for the capability
+    actually in question (D-3148 clause 4); and BUG-951 remains OPEN, HIGH, on the model currently bound to the
+    loop. Nothing in limbs (1), (2), (3), (5) or (6) is retracted, and the four proven parallel workers are
+    unchanged - though D-3199 limb 3 shows the CLASS they are routed by cannot be billed by any of them at 26k,
+    which is a statement about the declaration and not about the models.
+    (c) THE COST LIMB IS NEW, AND IT IS WHY THIS AMENDMENT IS NOT A GREEN TICK: measuring the plan role's model is
+    what revealed that the loop class as declared is billable by NOBODY (D-3199 limb 3). A decision that had only
+    asked "does it have a route" would have called this progress and stopped.
   decision: >-
     THE OWNER'S THREE QUESTIONS (which local models can tool-call, which should be assigned so work runs in
     parallel, which is the most reliable orchestrator besides the deepseek API) are answered from receipts, and
@@ -34777,4 +34796,104 @@ decisions:
   - config/model_assignments.yaml
   - config/task_register.yaml
   - governance/buglog.md
+  supersedes: []
+
+- id: D-3199
+  state: ACTIVE
+  date: '2026-10-27'
+  category: MODEL ROUTING / CAPACITY / THE PLAN ROLE (D-3198, T-209, T-211, T-212, BUG-1075, BUG-1077, BUG-1078)
+  title: 'THE LOCAL LOOP IS A SMALL-CONTEXT INSTRUMENT - no served model bills a 26,214-token agent-loop turn inside 60s on a class-context reading, the plan role''s model is routed to BATCH by measurement, and the one routable loop verdict this table ever printed was an artifact of an under-floor reading'
+  decision: >-
+    (1) THE PLAN ROLE'S MODEL IS DECLARED, MEASURED AND ROUTED - AND THE ROUTE IS BATCH. Qwen3.8-27B-MTP4 was
+    unreachable for two independent reasons (no reading the reader could see, no line in the harness declaration).
+    Both are closed: it is declared (9 models, was 8; the probe reads "ok served=262144"), and it carries a NEW
+    class-context reading of 42.89 tok/s at 26,254 prompt tokens (TTFT 612.1s, load 37.7s, cold, engine 0.7.3rc1,
+    pool 3 resident / 34.07GB of a 57.05GB ceiling - named per BUG-803). Its bills: pipeline_batch 764.0s against
+    3,600s = ROUTABLE; agent_probe 764.0s against 600s = prefill_bill; agent_loop 611.2s against 60s =
+    prefill_bill. And it clears the T-199 battery 4/4 (warm turn 13.6s, load paid 14.3s), which puts it level with
+    Ornith-1.5-9B-MLX-8bit and ahead of the same checkpoint without the head (15.6s). THE MTP HEAD PAYS IN DECODE, NOT
+    PREFILL: 16.17 vs 1.7 tok/s is 9.5x on decode and 1.1x on prefill, so the 1.54x decode figure in
+    config/hardware_profile.yaml is a DECODE claim and must never be quoted as a speed claim for a 26k turn.
+    (2) THE ONE ROUTABLE AGENT_LOOP VERDICT WAS AN ARTIFACT, PROVEN BY MEASURING THE MODEL THAT HELD IT. gemma-4-E4B
+    was the only served model the table ever routed to agent_loop, on a 4,468-token reading of 455 tok/s that priced a
+    26,214-token turn at 57.6s against a 60s budget. Measured at class context (26,254 tokens) the same model reads
+    417.67 tok/s -> 62.8s -> prefill_bill. An 8.9% optimistic reading flipped a verdict, exactly as FINDING_2
+    (2026-10-17) said it would: the SAME model read 71.3 tok/s at 2,677 tokens and 210 tok/s at 50,082, so a
+    small-prompt number is a READING and not a bill. WHAT CHANGED IN THE INSTRUMENT, PERMANENTLY: a reading is filed
+    under its OWN moment (config/agent_context.yaml#measurements - per-row measured_at, newest wins, an undated row
+    REFUSED) and every bill now PRINTS ITS BASIS - class_context or reading_only_not_a_bill - so this class of error
+    cannot be made silently again. Three controls prove it in --selftest (20/20 green). A FOURTH ARRIVED THE
+    HARD WAY, and it is the best evidence that the old reading was load-bearing:
+    `a_model_that_cannot_pay_the_prefill_bill_is_not_routable_to_the_class` asserted that "the FASTEST measured
+    throughput routes to agent_loop", so it passed for exactly as long as gemma's under-floor 455 sat in the table
+    and turned RED the moment the class-context 417.67 replaced it. A control whose verdict depends on WHICH model
+    happens to be fast is testing the roster, not the predicate. It now DERIVES the rate a class demands from that
+    class's own working_set and budget and proves the predicate on both sides of the boundary, so no lucky reading
+    can satisfy it - and the red it threw is recorded here rather than quietly edited away.
+    (3) THE agent_loop CLASS IS BILLABLE BY NO SERVED MODEL, AND THAT IS THE REAL FINDING. The class divides a 26,214
+    working set by a 60s budget, so it DEMANDS >= 437 tok/s of prefill. Every class-context reading on this machine is
+    below that: gemma 417.67 (62.8s, the closest, 4.7% short), MiniCPM5 295.3 (88.8s), Ornith-REAP-19B 289.1 (90.7s),
+    gpt-oss 210.0 (124.8s), Ornith-9B 141.4 (185.4s), MTP4 42.89 (611.2s), Qwen3.8-27B 39.0 (672.2s). Meanwhile the
+    T-199 battery shows the SAME models completing real loop turns in 1.5-13.6s at fixture-sized prompts. Both
+    receipts are true and they answer different questions: a local agent loop is affordable at SMALL CONTEXT and
+    expensive at 26k, and with the prefix cache DISPROVEN (2026-10-14) every turn re-pays its whole prompt. THIS IS
+    NOT A CLAIM THAT THE MODELS ARE SLOW. It is a claim about the DECLARATION: the class asserts a budget no served
+    model meets, so a route verdict under it says more about the number 60 than about the model - and it is the
+    mechanism behind compaction, which this repo has been treating as a setting rather than as a bill.
+    (4) WHAT THIS DOES NOT CHANGE. It does not reverse D-3198's assignment advice: the four proven parallel workers
+    are still the proven ones, and the fan-out advice (MiniCPM5 for parallel workers, Ornith-REAP-19B for the heavy
+    subtask) was measured at small prompts, where it holds. It does not retire gemma from the lanes D-3194 keeps.
+    It does not re-point a single class or budget: WHICH lever moves - the working set, the 60s, or a second class
+    beside the old one - is a policy choice about acceptable turn latency, and acceptable latency is an OWNER value,
+    not a measurement. That is T-212, whose gate forbids this repo from inventing the number.
+    (5) THE ORCHESTRATOR QUESTION, RE-DECIDED ON WHAT NOW RESOLVES. Two of D-3198's four blockers are closed by
+    measurement; the REFUSAL STANDS, on three grounds that are now sharper. (i) COST: the plan-gate winner
+    (0.9167, n=24) prefills at 42.89 tok/s, so a model that wins on JUDGEMENT loses badly on the BILL - judgement and
+    throughput are now measured to point in OPPOSITE directions on this hardware, which is a better-founded answer
+    than "no route". (ii) EVIDENCE: no DEPENDENT-CHAIN fixture exists (D-3148 clause 4), so no served model has a
+    receipt for orchestrating, and a plan gate is not a chain. (iii) RELIABILITY: BUG-951 stays OPEN HIGH on the
+    model currently bound to the loop (GOOSE_PLANNER_MODEL / AGENT_LOOP_SHORT), and no battery can see an emission
+    defect that fires in roughly 1 of 5 calls (D-3198 limb 6). AGENT_LOOP_WORKHORSE stays UNDECLARED.
+    (6) THE INSTRUMENT THAT PRODUCES A READING DOES NOT FILE IT, AND THAT IS NOW A NAMED DEFECT. Every row that made
+    this decision possible was appended to governance/calibration_receipts.jsonl BY HAND - 36 rows, no writer in the
+    tree (BUG-1077). A receipt ledger with no instrument behind it is a register whose provenance rests on somebody
+    remembering, which is the shape D-3034 exists to refuse; the two rows written today name their instrument,
+    engine, pool state and prompt size precisely so a later writer can be checked against them. Until that writer
+    exists, filing a reading is a MANUAL act and must be declared as one (D-3100).
+  measured: |
+    ALL READINGS TAKEN 2026-10-27, engine oMLX 0.7.3rc1 / mlx_lm 0.32.3.dev8+g0d4d3d04f, temperature 0.0.
+    class-context prefill (scripts/measure_prefill.py --tokens 26214 --max-tokens 128), working set 26,214, budget 60s:
+      gemma-4-E4B-it-MLX-4bit        417.67 tok/s @ 26,254  ->  62.8s  prefill_bill   (was 455 @ 4,468 -> 57.6s routable)
+      Qwen3.8-27B-MTP4                42.89 tok/s @ 26,254  -> 611.2s  prefill_bill   (NEW; decode 16.17, TTFT 612.1s)
+      MiniCPM5-2B-MLX                295.30 tok/s @ 26,226  ->  88.8s  prefill_bill
+      Ornith-1.5-35B-A3B-REAP-19B    289.14 tok/s @ 26,224  ->  90.7s  prefill_bill
+      Ornith-1.5-9B-MLX-8bit         141.40 tok/s @ 26,224  -> 185.4s  prefill_bill
+      gpt-oss-20b-MXFP4-Q8           210.00 tok/s @ 50,082  -> 124.8s  prefill_bill
+      Qwen3.8-27B-MLX-4bit            39.00 tok/s @ 32,026  -> 672.2s  prefill_bill
+      Phi-4-mini-instruct-8bit       394.00 tok/s @  4,466  ->  66.5s  prefill_bill  (basis: under-floor reading)
+      Qwen3-Coder-30B-A3B-Instruct    84.40 tok/s @  2,616  -> 310.6s  prefill_bill  (basis: under-floor reading)
+      => served models routable to agent_loop on a class-context reading: ZERO. Rate required: 437 tok/s.
+    the plan role's model, whole profile:
+      plan_quality gate   0.9167 PASS (n=24, baseline 0.5) - the only PASS among the gate's three candidates
+      T-199 battery       4/4 (distractor, parallel, argname, enum), warm 13.6s, load paid 14.3s
+      prefill             42.89 tok/s @ 26,254 (1.1x the same checkpoint without the MTP head: 39.0 @ 32,026)
+      decode              16.17 tok/s (9.5x the same checkpoint: 1.7) - where the head pays
+      route               pipeline_batch 764.0s/3,600s ROUTABLE; agent_loop 611.2s/60s refused
+    the rail, three points (D-3036 - a named command, red then green, with its controls):
+      before   python3 scripts/agent_context_probe.py            -> 9 declared faults; "Qwen3.8-27B-MTP4: unverifiable";
+                                                                    "UNMEASURED throughput -> NO route, fail-closed"
+      after    python3 scripts/agent_context_probe.py            -> 8 declared faults; "ok Qwen3.8-27B-MTP4 served=262144";
+                                                                    every bill printed WITH its basis
+      controls python3 scripts/agent_context_probe.py --selftest -> 20/20 (three of them are the new schema's)
+  bugs:
+  - BUG-1075
+  - BUG-1077
+  - BUG-1078
+  - BUG-951
+  files:
+  - governance/evidence/LOOP_BATTERY_20261027_MTP4.json
+  - governance/calibration_receipts.jsonl
+  - config/agent_context.yaml
+  - scripts/agent_context_probe.py
+  - config/task_register.yaml
   supersedes: []

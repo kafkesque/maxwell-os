@@ -523,11 +523,18 @@ routing:
     small throughput satisfies the floor and fails the bill. The decision is routable_classes().
   #: MEASURED 2026-10-14 against the declared 60-second per-turn budget: ONE model qualifies for a loop.
   measured_routable_20261014:
-    agent_loop: [gemma-4-E4B-it-MLX-4bit]                      # 26214 / 455 = 58 s
+    superseded_20261027: >-
+      BOTH LISTS BELOW ARE HISTORY AND THE agent_loop LINE IS REFUTED, not merely old. gemma-4-E4B was routed
+      here on a 4,468-token reading of 455 tok/s (26214 / 455 = 58 s, under the 60 s budget). Measured at CLASS
+      CONTEXT on 2026-10-27 the same model reads 417.67 tok/s at 26,254 prompt tokens -> 62.8 s -> prefill_bill
+      (governance/calibration_receipts.jsonl row 36; D-3199 limb 2). The live route table is LAYER 5 of
+      `python3 scripts/agent_context_probe.py`, which prints every bill WITH its basis; this block is kept as the
+      record of what was known on 2026-10-14 (D-2642) and must not be quoted as the current routing.
+    agent_loop: [gemma-4-E4B-it-MLX-4bit]                      # 26214 / 455 = 58 s  [REFUTED 2026-10-27: 62.8 s at class context]
     agent_probe: [gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit, gpt-oss-20b-MXFP4-Q8]
     pipeline_batch: [gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit, gpt-oss-20b-MXFP4-Q8,
                      Qwen3.8-27B-MLX-4bit]
-  refused_for_a_loop_20261014:
+  refused_for_a_loop_20261014:          # every line here still holds: D-3199 adds that NO served model passes
     Phi-4-mini-instruct-8bit: '26214 / 394 = 66 s — SIX SECONDS over the budget, and the budget is the owner''s knob'
     gpt-oss-20b-MXFP4-Q8: '26214 / 210 = 125 s — a usable PROBE, an unusable loop'
     Qwen3.8-27B-MLX-4bit: '26214 / 39 = 672 s — eleven minutes per turn; no budget makes this a loop'
@@ -662,6 +669,24 @@ measured_prefill_20261016:
     reading at the floor is still climbing and is NOT comparable to a 26,214-token class bill. These rows
     are therefore recorded as READINGS, not as bills: no class route is changed by them (BUG-874).
 
+#: ── THE READING SCHEMA (BUG-1075, 2026-10-27). A throughput reading is filed under the MOMENT it was taken,
+#: and the READER resolves the newest one per model. The first form of that reader named ONE key - a literal
+#: date - so a model measured on any later day was INVISIBLE and got NO route at all: fail-closed, and silently,
+#: because "no route" prints as an absence rather than as a defect. Nothing below is a code default; every value
+#: is read by scripts/agent_context_probe.py#measured_prefill (C12).
+measurements:
+  block_pattern: '^measured_[0-9]{8}$'   # a top-level block whose NAME is a date is a readings block
+  reading_key: prefill                   # the nested mapping holding one row per model
+  row_requires: [measured_at, prompt_tokens]   # a row with no moment and no measured size is REFUSED
+  resolution: latest_measured_at_wins    # a newer reading supersedes an older one; NOTHING is rewritten (D-2642)
+  comparable_rule: >-
+    A row may decide a CLASS BILL only when its own prompt_tokens REACHES that class's working_set. Below the
+    working set the row is a READING - reported with its basis, never hidden and never silently promoted to a
+    bill - because a small-prompt reading is still climbing: MEASURED 2026-10-17 (FINDING_2 below), the SAME
+    model read 71.3 tok/s at 2,677 prompt tokens and 210 tok/s at 50,082, a 2.9x spread ABOVE the old fixed
+    2,000-token floor. That floor is DISPROVEN; the class's own working set is the threshold that resolves.
+  under_floor_verdict: reading_only_not_a_bill
+
 #: ── MEASURED 2026-10-17 (the BUG-874 act). The parity is now TRUE BY MEASUREMENT rather than a
 #: coincidence of two hand-edited files in two directories. Kept as a READING of that day, exactly as the
 #: 2026-10-14 block below is kept: the LIVE parity is re-derived by the probe on every run, never read from here.
@@ -705,14 +730,16 @@ measured_20261014:
                  Qwen3.8-27B-MLX-4bit: '32026 prompt tokens accepted (declared 262144)'}
   derived_trigger_local_32k: 26214
   prefill:                       # MEASURED from the server's own counters, one real call per row
-    gemma-4-E4B-it-MLX-4bit: {prompt_tokens: 4468, prefill_tps: 455, decode_tps: 27}
-    Phi-4-mini-instruct-8bit: {prompt_tokens: 4466, prefill_tps: 394, decode_tps: 40}
-    gpt-oss-20b-MXFP4-Q8: {prompt_tokens: 50082, prefill_tps: 210, decode_tps: 33}
-    Qwen3.8-27B-MLX-4bit: {prompt_tokens: 32026, prefill_tps: 39, decode_tps: 1.7}
-    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {prompt_tokens: 2616, prefill_tps: 84.4, note: 'MEASURED 2026-10-16; previously null/UNMEASURED'}
-    MiniCPM5-2B-MLX: {prompt_tokens: 26226, prefill_tps: 295.3, decode_tps: 41.76, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
-    Ornith-1.5-35B-A3B-REAP-19B: {prompt_tokens: 26224, prefill_tps: 289.14, decode_tps: 36.1, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
-    Ornith-1.5-9B-MLX-8bit: {prompt_tokens: 26224, prefill_tps: 141.4, decode_tps: 17.12, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
+    # measured_at is the row's OWN moment, never inherited from the block's name (BUG-1075, D-2660): the four
+    # original rows below were taken on the block's own day; the four with a `note` carry the day their note names.
+    gemma-4-E4B-it-MLX-4bit: {measured_at: '2026-10-14', prompt_tokens: 4468, prefill_tps: 455, decode_tps: 27}
+    Phi-4-mini-instruct-8bit: {measured_at: '2026-10-14', prompt_tokens: 4466, prefill_tps: 394, decode_tps: 40}
+    gpt-oss-20b-MXFP4-Q8: {measured_at: '2026-10-14', prompt_tokens: 50082, prefill_tps: 210, decode_tps: 33}
+    Qwen3.8-27B-MLX-4bit: {measured_at: '2026-10-14', prompt_tokens: 32026, prefill_tps: 39, decode_tps: 1.7}
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {measured_at: '2026-10-16', prompt_tokens: 2616, prefill_tps: 84.4, note: 'MEASURED 2026-10-16; previously null/UNMEASURED'}
+    MiniCPM5-2B-MLX: {measured_at: '2026-10-21', prompt_tokens: 26226, prefill_tps: 295.3, decode_tps: 41.76, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
+    Ornith-1.5-35B-A3B-REAP-19B: {measured_at: '2026-10-21', prompt_tokens: 26224, prefill_tps: 289.14, decode_tps: 36.1, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
+    Ornith-1.5-9B-MLX-8bit: {measured_at: '2026-10-21', prompt_tokens: 26224, prefill_tps: 141.4, decode_tps: 17.12, note: 'MEASURED 2026-10-21 at class context (26214, T-153); previously UNMEASURED'}
   # ── MEASURED 2026-10-16 (BUG-874). Six rows that had NO reading. Every row declares the prompt size it
   # ── was taken at, because a prefill figure without one is INCOMPARABLE (the rule above).
   prefill_reading: 'prompt_tokens is the number the SERVER echoed; a row without it is refused rather than estimated'
@@ -726,6 +753,40 @@ measured_20261014:
   session_store_bytes: 906100736
   sessions: 380
   messages: 163147
+
+#: ── MEASURED 2026-10-27 (T-209). The first reading for the plan role's model that can DECIDE a class bill.
+#: Filed under its OWN day, which is the whole point of the schema above: no block is renamed, no row is
+#: rewritten, and the reader resolves this row because it carries the moment it was taken.
+measured_20261027:
+  rail: >-
+    /Users/barn/miniforge3/bin/python3 scripts/measure_prefill.py --model Qwen3.8-27B-MTP4 --tokens 26214
+    --max-tokens 128 --json  ->  the receipt above is also row 35 of governance/calibration_receipts.jsonl
+    (instrument, engine 0.7.3rc1, pool state and prompt size recorded there; this block is the READER's view)
+  prefill:
+    Qwen3.8-27B-MTP4: {measured_at: '2026-10-27T16:38:57', prompt_tokens: 26254, prefill_tps: 42.89,
+                       decode_tps: 16.17, instrument: 'scripts/measure_prefill.py',
+                       note: 'CLASS CONTEXT (26214 requested, 26254 echoed). Load 37.7s, TTFT 612.1s, cold (cached_tokens 0).
+                              Pool state named per BUG-803: 3 models resident, 34.07GB of a 57.05GB ceiling.'}
+    gemma-4-E4B-it-MLX-4bit: {measured_at: '2026-10-27T16:42:18', prompt_tokens: 26254, prefill_tps: 417.67,
+                              decode_tps: 22.03, instrument: 'scripts/measure_prefill.py',
+                              note: 'CLASS CONTEXT. Supersedes the 2026-10-14 under-floor reading (455 tok/s at 4,468 tokens)
+                                     because it is the same model measured at the size the bill divides. Load 9.0s, TTFT 62.9s.'}
+  what_it_settles: >-
+    THE PLAN ROLE'S MODEL NOW HAS A ROUTE, and the route is BATCH, not loop. At 42.89 tok/s a 26,214-token
+    agent_loop working set costs 611s against a declared 60s budget - measured, not extrapolated - so
+    Qwen3.8-27B-MTP4 is routable to pipeline_batch (764s against 3,600s) and NOT to the agent loop. Its
+    advantage over the same checkpoint without the head is DECODE (16.17 vs 1.7 tok/s on the 2026-10-14 row),
+    which is where the MTP head pays; its PREFILL is 42.89, i.e. 1.1x, not the 1.54x decode figure carried in
+    hardware_profile. Both numbers are real and they answer DIFFERENT questions.
+  the_prior_that_was_wrong: >-
+    UNTIL THIS ROW the only readings for this model sat at ~2,090 prompt tokens (5 rows in the receipt ledger),
+    and the declaration's own FINDING_2 says a small-prompt reading is still climbing and cannot decide a
+    26,214-token bill. So the plan role was assigned by the plan_quality gate (0.9167, n=24) and had NO
+    prefill route of any kind - a declared role whose model could not be routed anywhere (D-3034).
+  what_it_does_NOT_settle: >-
+    whether MTP4 can ORCHESTRATE. A plan gate is a judgement reading, a prefill bill is a cost reading, and
+    neither is a dependent-chain measurement: the instrument that decides orchestration is the DEPENDENT-CHAIN
+    fixture (D-3148 clause 4), which does not exist yet. AGENT_LOOP_WORKHORSE stays UNDECLARED (D-3198 limb 2).
 
 #: THE SELF-SCAN's fixtures. The probe proves by reading its OWN BYTES that the report path names no
 #: path, no host and no baseline number - and these lists belong here rather than in the script (C12),

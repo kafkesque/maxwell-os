@@ -100,9 +100,12 @@ from measure_subagent_loop import (  # noqa: E402  (path is set above, deliberat
     declaration,
     engine_block,
     engine_facts,
+    TransportWallExceeded,
+    call_timeout_s,
     instrument_allowance,
     log_offset,
     log_since,
+    warmup,
     window,
 )
 
@@ -362,6 +365,16 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
                                               f"in one reply, walking indices 1..{total} in order. After index "
                                               f"{total} has been registered, answer with the single word "
                                               f"FINISHED.")}])
+    #: BUG-1085: the COLD LOAD is paid outside every measured turn and is never graded. Without it the derived
+    #: per-turn wall would DELETE a row for a reason that is not a fact about the model (33.5 s MiniCPM5-2B /
+    #: 14.3 s MTP4 inside turn 1, measured on this box) - which is why the wall stayed a literal 180 s.
+    cold, cold_error = None, ""
+    try:
+        cold = warmup(url, key, model)
+    except TransportWallExceeded as exc:
+        cold_error = str(exc)
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        cold_error = f"{type(exc).__name__}: {exc}"
     declared = {TOOL_NAME}
     state: dict[str, Any] = {"attempts": 0, "clean": 0, "contaminated": [], "undeclared": [], "drops": [],
                              "evictions": 0, "parse_errors": 0, "args_unparsable": 0, "turns": 0,
@@ -385,6 +398,15 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
                 body = "<unreadable>"
             state["unmeasured_reason"] = (f"the ENGINE refused the request (HTTP {exc.code}: {body}) - a "
                                           f"transport refusal is not a fact about the model")
+            break
+        except TransportWallExceeded as exc:
+            # BUG-1085: the wall is now ENFORCED at the call site, so this is the register a 2x-budget turn lands in
+            # instead of being read as a turn. A timeout is NO READING - never a FAIL about the model, and never a
+            # retry (re-sending does not make a model faster; it re-buys the same wall).
+            state["unmeasured_reason"] = (f"the turn did not complete inside the DECLARED transport wall ({exc}) - "
+                                          f"no reading exists, and a timeout is not a verdict about the model "
+                                          f"(BUG-1085)")
+            state["stop_reason"] = "transport wall"
             break
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
             state["unmeasured_reason"] = f"the turn did not complete ({type(exc).__name__}: {exc})"
@@ -495,6 +517,11 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
             "allowance": int(grant["max_tokens"]), "allowance_provenance": grant["provenance"],
             "allowance_reason": grant["reason"],
+            #: BUG-1085: the wall the reading was taken under travels WITH the reading, and the cold load is named
+            #: apart from the turns so nobody can read it as one.
+            "transport_timeout_s": round(call_timeout_s(), 2),
+            "cold_load_s": round(cold, 2) if cold is not None else None,
+            "cold_load_error": cold_error,
             "verdict": got, "detail": detail, "steps": state["steps"]}
 
 
@@ -719,6 +746,13 @@ def main() -> int:
                         }[args.mode],
                "engine": engine_block(), "engine_log": str(facts["log"]),
                "per_turn_budget_s": budget, "declared_served": served,
+               "transport_wall": {"timeout_s": row["transport_timeout_s"], "per_turn_budget_s": budget,
+                                  "cold_load_s": row["cold_load_s"], "cold_load_error": row["cold_load_error"],
+                                  "rule": "BUG-1085/D-3203 clause 5: call_timeout_s() = per_turn_budget_s + "
+                                          "transport_slack_s with 0 < slack < budget - so an overshooting turn is "
+                                          "READ and NAMED OVER_BUDGET instead of absorbed, 2x the wall is refused "
+                                          "at read time, and the cold load is paid by a 1-token warm-up that is "
+                                          "NEVER graded"},
                "instrument_allowance": {"max_tokens": row["allowance"], "provenance": row["allowance_provenance"],
                                         "rule": "BUG-1081/D-3203: floor(per_turn_budget_s * decode_tps(model)) from "
                                                 "config/agent_context.yaml#turn_budget - never a literal",
@@ -730,7 +764,7 @@ def main() -> int:
                                        "NAMES the missing call - never byte-identically, because R7 pins temperature "
                                        "0.0 and an identical prompt is a deterministic replay of the same refused "
                                        "header (measured 2026-10-27: 6 identical re-issues recovered 0 of 3); an "
-                                       "allowance, a silent stop or a declined call is NEVER retried"},
+                                       "allowance, a silent stop, a declined call or a turn past the transport wall is NEVER retried"},
                "not_tested": ["enable_thinking=False on a harmony model that emits an analysis channel anyway "
                               "(a server-side setting this fixture never changes)",
                               "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is "

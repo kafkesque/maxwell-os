@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 851,
-  "open_n": 269,
-  "closed_n": 582,
+  "total_ids": 853,
+  "open_n": 268,
+  "closed_n": 585,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1346,13 +1346,8 @@
       "events": 1
     },
     {
-      "id": "BUG-1085",
-      "title": "(MED, OPEN 2026-10-27) \u2014 THE WALL IS ENFORCED BY A LITERAL 180s, TWICE THE DECLARED 90s PER-TURN BUDGET, SO THE ONE KNOB THAT ACTUALLY",
-      "events": 1
-    },
-    {
-      "id": "BUG-1087",
-      "title": "(MED, OPEN 2026-10-27) \u2014 FOUR OF NINE SERVED MODELS HAVE NO MEASURED DECODE RATE, SO THEIR ALLOWANCE IS AN UPPER BOUND THAT OVER-GRANTS THE",
+      "id": "BUG-1088",
+      "title": "(MED, OPEN 2026-10-27) \u2014 THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`",
       "events": 1
     }
   ],
@@ -1938,6 +1933,9 @@
     "BUG-1080",
     "BUG-1081",
     "BUG-1082",
-    "BUG-1086"
+    "BUG-1085",
+    "BUG-1086",
+    "BUG-1087",
+    "BUG-1089"
   ]
 }

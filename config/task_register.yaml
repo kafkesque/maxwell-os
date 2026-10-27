@@ -3309,6 +3309,14 @@ tasks:
     transport wall is a literal 180 s, twice the declared 90 s, so a turn can cost 2x the budget) and BUG-1087 (four of
     nine served models have no measured decode rate, so the bound this guard enforces is PROVISIONAL for exactly the
     models the role uses).
+  narrowed_20261027: >-
+    BOTH ITEMS FOLDED INTO THIS TASK LANDED SEPARATELY AND ARE CLOSED the same day, so this task is narrower than the
+    text above describes: BUG-1085 (the transport wall is DERIVED - 90 s budget + 15 s declared slack = 105 s, with a
+    three-way INSIDE/OVER_BUDGET/EXCEEDED reading and a warm-up that pays the cold load outside every measured turn) and
+    BUG-1087 (all four missing decode rates MEASURED, every harness role now DERIVED, and the measurement exposed
+    BUG-1089 - a grant priced on a reading the register disowns). What remains here and NOTHING else may substitute for
+    it: the guard must live in a caller that ISSUES TURNS, and D-3205 makes the 26k real-context gate (its G4) a
+    condition of ever declaring local-only. A fixture-sized certificate does not travel.
   title: >-
     LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture and
     into the turn-issuing path, consuming the SHARED engine witness, so a lost call costs one extra turn instead of

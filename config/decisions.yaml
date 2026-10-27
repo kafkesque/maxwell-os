@@ -35287,3 +35287,147 @@ decisions:
   - config/agent_context.yaml
   - config/model_assignments.yaml
   supersedes: []
+
+- id: D-3205
+  state: ACTIVE
+  by: assistant
+  category: READINESS / SOVEREIGNTY GATE (C1, C3, C22, D-3023, D-3104, D-3204, BUG-222, BUG-1083, BUG-1084,
+    BUG-1085, BUG-1087, BUG-1088, BUG-951, T-217)
+  title: "LOCAL-ONLY IS A NAMED GATE, NOT A BUG COUNT - the switch is judged on whether this lane's failure modes are
+    DETECTED and BOUNDED at the real context size, never on whether the whole OS is bug-free"
+  decision: >-
+    The owner asked when it is safe to switch to maxwell_omlx, having counted ~269 open bugs and having just watched
+    three hidden conflicts surface in one turn. The answer has two halves and both are refusals.
+
+    (1) "WAIT UNTIL MAXWELL OS IS FULLY FIXED" IS REFUSED AS UNFALSIFIABLE (D-3038: registered with its reason). A
+    register with 851 bugs and 269 open will never reach zero - every turn that fixes one demonstrably opens others
+    (this one opened BUG-1088 and BUG-1089 while closing three) - so "zero open bugs" is a condition that can only
+    ever be deferred, and a deferral dressed as a criterion. It is also not the question: the OS's bug count has no
+    causal path to whether a loop role on this box emits a correct tool call.
+
+    (2) THE BUG COUNT IS NOT EVEN A TRUSTWORTHY NUMBER. BUG-757 (MED, OPEN) records that 125 open bugs carry NO
+    severity token, so the open register cannot be ordered by criticality; a readiness rule keyed on a count that
+    cannot be ordered is a rule that cannot be applied. Severity is not the metric either: 269 open bugs of which
+    0 are silent is safer than 5 open bugs of which 3 are silent.
+
+    (3) WHAT REPLACES IT - SEVEN CONDITIONS, EACH A RECEIPT, NOT A FEELING. Local-only may be DECLARED when every
+    one of these holds. Each names the reading that resolves it, so none can be asserted from memory (D-3109):
+      G1 SUITE HAS NO UNDECLARED RED ............. currently FAILS: BUG-1083 (300 vs 308 shadowed) is the suite's
+                                                   one red and is not declared red anywhere.
+      G2 EVERY ROLE'S ALLOWANCE IS MEASURED ...... PASSES as of 2026-10-27T20:40 - the last four PROVISIONAL cells
+                                                   were measured and AGENT_EDIT_LONG_CONTEXT was found priced on a
+                                                   DISOWNED reading (BUG-1089). All six harness roles DERIVED.
+      G3 THE WALL IS ENFORCED WHERE THE CALL IS MADE  PASSES for the two loop instruments (BUG-1085) and FAILS for
+                                                   pipeline/oneshot_ask.py (BUG-1088: a typed +20 s slack).
+      G4 THE EMISSION GATE HAS RUN AT THE ROLE'S REAL CONTEXT SIZE (26k), not a 228-1000 token fixture: FAILS - never
+                                                   run. T-216's own instruction, and a fixture-sized certificate
+                                                   does not travel.
+      G5 THE ROLE-TO-MODEL BINDING RESOLVES ....... FAILS: BUG-1084 (a 24-entry second home no Python reader
+                                                   resolves, whose ORCHESTRATOR names the model measured 0/4 at
+                                                   tool calling) and D-3198 (orchestrator unanswered by measurement).
+      G6 ESCALATION IS ONE WORD AWAY .............. PASSES: providers.custom_deepseek.enabled true and BOUND as
+                                                   escalation_provider_reachable (check_harness_homes: 5/5), and
+                                                   D-3204 keeps it out of every role.
+      G7 EVERY VERDICT IS ATTRIBUTABLE TO THE ENGINE'S OWN WITNESS  PASSES for maxwell_omlx (D-3200 clause 2) and
+                                                   is IMPOSSIBLE for a cloud provider - which is the whole reason
+                                                   D-3204 exists.
+
+    (4) SO THE HONEST ANSWER TODAY IS "ALREADY SWITCHED, WITH A LIVE FALLBACK - NOT YET SOVEREIGN-ONLY". The harness
+    surface IS on maxwell_omlx (active_provider, GOOSE_PLANNER_PROVIDER, and all six harness roles), the fallback is
+    reachable, and TWO of the five open conditions (G1, G3-as-it-applies-to-the-oneshot) are cheap. What must NOT be
+    done is removing the escalation path, or claiming the lane is healthy while G4 and G5 are unproven.
+
+    (5) THE ORDER OF THE REMAINING WORK IS SET BY THIS DECISION: G1 (BUG-1083, a decision about 8 shadowed sites),
+    then G4 (the 26k gate), then G5 (the BUG-1084 owner word), then G3's tail (BUG-1088). Nothing else outranks them
+    for the switch, and a fix outside this list is not progress toward it - which is what stops the lane mutating.
+  reason: >-
+    Two concrete losses are prevented. First, the owner was about to make the decision on a quantity (bug count) that
+    this register cannot even order, which invites either premature confidence or indefinite deferral - both are
+    drift. Second, an unnamed gate means every future turn re-answers "is it safe yet" from mood; a named gate with
+    receipts is answered by running the readings.
+  rejected:
+  - option: wait until the OS is fully fixed, then switch
+    why: 'unfalsifiable - zero open bugs is unreachable while fixing bugs opens bugs (this turn: 3 fixed, 2 opened),
+      so the criterion is a deferral. Also causally disconnected from whether a loop role emits a correct tool call.'
+  - option: count open bugs and pick a threshold (eg "fewer than 50")
+    why: 'a threshold over a number the register cannot order (BUG-757: 125 open bugs carry no severity token), and
+      it measures the wrong population - the OS is not the lane.'
+  - option: declare the lane healthy because the last measurement passed
+    why: 'D-3201 clause 3 / BUG-951: a repair is not health, and the verdict on a guarded run stays RED.'
+  metrics:
+  - 'harness roles DERIVED (not PROVISIONAL): 6/6 as of 2026-10-27T20:40 (was 2/6 DERIVED, 4/9 served unmeasured)'
+  - 'transport wall derived: yes for both loop instruments (105 s = 90 + 15, receipt
+    HARMONY_RED_LOOP_20261027_TRANSPORT_WALL_105_REPLAY.json); no for pipeline/oneshot_ask.py (BUG-1088)'
+  - 'active_provider: maxwell_omlx; GOOSE_PLANNER_PROVIDER: maxwell_omlx; custom_deepseek enabled and reachable as
+    escalation only (D-3204)'
+  bugs:
+  - BUG-222
+  - BUG-1083
+  - BUG-1084
+  - BUG-1085
+  - BUG-1087
+  - BUG-1088
+  - BUG-951
+  files:
+  - config/model_assignments.yaml
+  - config/agent_context.yaml
+  - .config/goose/config.yaml
+  supersedes: []
+
+- id: D-3206
+  state: ACTIVE
+  by: assistant
+  category: INSTRUMENT ALLOWANCE / READINGS (D-3203, D-3199, D-3034, D-3109, BUG-1081, BUG-1087, BUG-1089)
+  title: "A READING THE REGISTER DISOWNS MAY BE CITED, NEVER PRICED - D-3203 clause 2 is NARROWED: the conservative
+    rate is the slowest LIVE reading, not the slowest number in the cell"
+  decision: >-
+    (1) D-3203 clause 2 said the grant is priced on the CONSERVATIVE reading, min(decode_tps, previous). MEASURED
+    2026-10-27T20:38 against the table that rule reads, it is WRONG in two cells, in both directions, and it produced
+    exactly the defect the clause was written to prevent: a truncation with a conservative label on it.
+      Qwen3.8-27B-MLX-4bit: cell says agreement DRIFTED and its own note proves the earlier figure was an ARTIFACT
+      ("a cold/pressured state, not the model", BUG-793). min() priced on 1.7 and granted 153 tokens where the live
+      reading allows 675 - a 4.4x under-grant.
+      Phi-4-mini-instruct-8bit: cell says verdict REFUSED on its own 35.0 reading ("the implied prefill was negative,
+      so the two calls disagree"). min() priced on the refused 35.0 and granted 3150 where the reading that STANDS
+      (40.0, 2026-10-14) allows 3600.
+    (2) THE RULE. A number in measured_decode_20261015.decode_tps is either a LIVE reading or a REGISTERED ARTIFACT,
+    and only a live reading may PRICE a grant (D-3034: only what resolves confers). A cell declares non-live
+    readings TWO ways, both already in the register: `invalid_readings: [<key>]` with its reason, and
+    `verdict: REFUSED ...` (which withdraws the cell's own decode_tps). The instrument reads those declarations -
+    it does not guess with min().
+    (3) THE CONSERVATIVE RULE SURVIVES WHERE IT IS TRUE: among LIVE readings the SLOWEST still prices the grant
+    (gpt-oss 41.7/33 -> 33 -> 2970; gemma 36.3/27 -> 27 -> 2430). Conservative is a choice about which LIVE reading
+    to trust least, never a licence to price an artifact.
+    (4) REGISTER DISCIPLINE IS ENFORCED, because the fix is only structural if the table cannot omit it: a cell whose
+    agreement is DRIFTED MUST declare which reading it disowns, and a declared key the cell does not carry is a
+    declaration with no referent (D-3034) - both are --selftest controls, not conventions.
+    (5) THE PROVISIONAL FALLBACK IS GRADED ON THE SAME RULE, so a disowned reading cannot inflate an upper bound
+    either (the fallback is the ceiling of the LIVE readings).
+  reason: >-
+    The grant is the number a role's whole turn is shaped by. Pricing it on a number the register has already
+    withdrawn converts a measured artifact into a silent ceiling, and the failure is invisible in the row: provenance
+    reads DERIVED in both the 153 and the 675 case. Only the resolution - slowest LIVE reading - makes the row able
+    to catch itself.
+  rejected:
+  - option: keep min() over all numbers and rely on readers to notice the note
+    why: 'measured cost 4.4x truncation on a live role and a grant priced on a refused reading; a note is prose and
+      the instrument cannot read prose, which is why the declaration is machine-readable instead (D-3034).'
+  - option: drop the older reading whenever a newer one exists
+    why: 'that is the fast-rate error D-3203 clause 2 was measured against - 3753 tokens ran 96.00 s against a 90 s
+      wall. The older reading is often the honest conservative one (gpt-oss 33 of 41.7/33).'
+  - option: publish a per-model hand-tuned rate
+    why: 'a preference wearing a reading''s clothes - the 1024 literal''s failure mode (BUG-1081) with extra steps.'
+  metrics:
+  - 'Qwen3.8-27B-MLX-4bit: 153 -> 675 tokens (rate 1.7 -> 7.5, the live reading)'
+  - 'Phi-4-mini-instruct-8bit: 3150 -> 3600 tokens (rate 35.0 refused -> 40.0 live)'
+  - 'MiniCPM5-2B-MLX: 4455 PROVISIONAL -> 8010 DERIVED (first measurement, 89.0 tok/s; the 110.1 in its role basis
+    was a CLAIM, 19% higher than the reading)'
+  - 'control count: 61 -> 71 known-answer controls green after BUG-1085 + BUG-1089 together'
+  bugs:
+  - BUG-1081
+  - BUG-1087
+  - BUG-1089
+  files:
+  - config/agent_context.yaml
+  - scripts/measure_subagent_loop.py
+  supersedes: []

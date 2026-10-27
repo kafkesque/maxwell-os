@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "measured_at": "2026-10-27T20:35:59",
+  "fixture": "T-213 harmony red loop",
+  "fixture_script": "scripts/harmony_red_loop.py",
+  "script_sha256": "0ed3f73ef55538a3",
+  "axis": "a corrupted name seeded into history, then N real calls",
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "engine_log": "/Users/barn/.omlx/logs/server.log",
+  "per_turn_budget_s": 90.0,
+  "declared_served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "transport_wall": {
+    "timeout_s": 105.0,
+    "per_turn_budget_s": 90.0,
+    "cold_load_s": 1.03,
+    "cold_load_error": "",
+    "rule": "BUG-1085/D-3203 clause 5: call_timeout_s() = per_turn_budget_s + transport_slack_s with 0 < slack < budget - so an overshooting turn is READ and NAMED OVER_BUDGET instead of absorbed, 2x the wall is refused at read time, and the cold load is paid by a 1-token warm-up that is NEVER graded"
+  },
+  "instrument_allowance": {
+    "max_tokens": 2970,
+    "provenance": "DERIVED",
+    "rule": "BUG-1081/D-3203: floor(per_turn_budget_s * decode_tps(model)) from config/agent_context.yaml#turn_budget - never a literal",
+    "reason": ""
+  },
+  "min_bound_calls": 30,
+  "drop_ceiling": 3,
+  "retry_guard": {
+    "on": true,
+    "per_call_ceiling": 2,
+    "run_budget": 12,
+    "rule": "a turn whose owed call the engine's parser ate is RE-ASKED with a nudge that NAMES the missing call - never byte-identically, because R7 pins temperature 0.0 and an identical prompt is a deterministic replay of the same refused header (measured 2026-10-27: 6 identical re-issues recovered 0 of 3); an allowance, a silent stop, a declined call or a turn past the transport wall is NEVER retried"
+  },
+  "not_tested": [
+    "enable_thinking=False on a harmony model that emits an analysis channel anyway (a server-side setting this fixture never changes)",
+    "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is REPLAYED as a name tail, never produced by the model under observation",
+    "which HALF of the seeded pair teaches the copy: `blank-echo` now separates the verbatim NAME in the echo from the seeded assistant turn, but the FULLY UNBALANCED transcript (an assistant tool_call with NO tool response at all) is a different axis - it changes structure as well as content, and an engine that refuses it would return a transport error, not a reading"
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "mode": "replay",
+      "replay_tail": "commentary",
+      "echo_variant": "quoted",
+      "calls_target": 3,
+      "attempts": 3,
+      "clean_calls": 3,
+      "malformed_names": 0,
+      "contaminated": [],
+      "undeclared": [],
+      "dropped_calls": 0,
+      "drops": [],
+      "engine_parse_errors": 0,
+      "evictions": 0,
+      "args_unparsable": 0,
+      "parallel_max": 1,
+      "turns": 3,
+      "nudges": 0,
+      "stop_reason": "reached N",
+      "retry_guard": true,
+      "retries": 0,
+      "recovered_calls": 0,
+      "retry_bound_hits": 0,
+      "retry_wall_s": 0,
+      "slowest_turn_s": 9.8,
+      "allowance": 2970,
+      "allowance_provenance": "DERIVED",
+      "allowance_reason": "",
+      "transport_timeout_s": 105.0,
+      "cold_load_s": 1.03,
+      "cold_load_error": "",
+      "verdict": "UNMEASURED",
+      "detail": "3 call(s) is below the gate's 30 - no bound may be claimed from it (T-213 clause 3)",
+      "steps": [
+        {
+          "turn": 1,
+          "wall_s": 9.78,
+          "ttft_s": 0.98,
+          "decode_tps": 40.69,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 2,
+          "wall_s": 2.77,
+          "ttft_s": 1.11,
+          "decode_tps": 42.45,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        },
+        {
+          "turn": 3,
+          "wall_s": 2.21,
+          "ttft_s": 1.25,
+          "decode_tps": 42.95,
+          "parse_errors": 0,
+          "evictions": 0,
+          "foreign_completions": 0,
+          "evidence": [],
+          "names": [
+            "read_index"
+          ]
+        }
+      ]
+    }
+  ]
+}

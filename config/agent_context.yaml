@@ -546,6 +546,28 @@ turn_budget:
     A served model with NO reading in decode_source is granted the LARGEST derived ceiling the table can pay,
     labelled PROVISIONAL_CEILING in its row and its receipt with a named reason - never a default (C16). A PASS at
     such a grant is safe; a FAIL at it is never a reading about the model. Its cost is BUG-1087.
+  #: ── THE TRANSPORT WALL (BUG-1085, D-3203 clause 5) ──────────────────────────────────────────────────
+  #: The client waited a LITERAL `timeout=180` here - and 180 is exactly TWICE the ratified 90 s - so a turn that
+  #: ran 96.00 s was READ as a turn and only the TOKEN allowance stopped it. A typed wall is a second opinion about
+  #: how long a turn may take; this one is DERIVED, and the derivation refuses the fault by inequality.
+  transport_slack_s: 15            # the READ window, never an allowance: enough to read an overshooting turn
+  transport_wall: 'call_timeout_s() = per_turn_budget_s + transport_slack_s, with 0 < transport_slack_s < per_turn_budget_s'
+  #: WHY 15 AND NOT A ROUND NUMBER OF CONVENIENCE: the largest overshoot MEASURED on this box is 6.0 s (96.00 s at
+  #: grant 3753 against the 90 s wall; receipt HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json). The slack
+  #: exists so such a turn is READ and NAMED OVER_BUDGET instead of becoming an exception with no reading (D-3203:
+  #: no reading, no invented number). It is 2.5x the largest measured overshoot AND it is bounded by the invariant,
+  #: so no config edit can restore 2x the wall: a slack >= the budget is FATAL at read time.
+  transport_consumed_by:
+  - 'scripts/measure_subagent_loop.py#wall_from / call_timeout_s / ask / wall_reading'
+  - 'scripts/harmony_red_loop.py#run_model (inherits it through ask, and names it in its receipt)'
+  warmup:                          # the cold load is paid OUTSIDE a measured turn, and it is never graded
+    max_tokens: 1                  # ONE token: this buys a RESIDENT model, not an answer
+    judged: false                  # a warm-up graded as a turn is a cold load reported as a measurement
+    recorded_as: 'cold_load_s in the row and in the receipt'
+    reason: >-
+      MEASURED on this box: a cold model pays 33.5 s (MiniCPM5-2B) / 14.3 s (MTP4) inside turn 1. Enforcing the
+      per-turn wall without a warm-up would DELETE rows for a reason that is not a fact about the model - which is
+      exactly why the wall stayed a literal 180 s. Its cost is one ~1-token completion per model per run.
   stall_rule: 'stall_s(class) > longest_turn_measured_s(class) * stall_margin'
   stall_margin: 2.0
   wall_rule: 'guards[timeout_guard] >= max_turns * per_turn_budget_s'
@@ -616,8 +638,31 @@ measured_decode_20261015:
     Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {decode_tps: 49.5, previous: null, agreement: 'NEW (first reading)'}
     gemma-4-12B-it-qat-OptiQ-4bit: {decode_tps: 13.4, previous: null, agreement: 'NEW (first reading)'}
     Qwen3.8-27B-MLX-4bit: {decode_tps: 7.5, previous: 1.7, ratio: 4.41, agreement: DRIFTED,
+                           invalid_readings: [previous],   # BUG-1089: `previous` is a REGISTERED ARTIFACT, not a
+                           #: bound. The note beside it says so in words and BUG-793 proved it: 1.7 was a cold /
+                           #: pressured state, 4.4x worse than the model. Leaving it priceable let min() grant 153
+                           #: tokens (floor(90 x 1.7)) instead of 675 (floor(90 x 7.5)) - a 4.4x truncation with a
+                           #: conservative label on it. A reading the register disowns may be CITED, never PRICED.
                            note: 'BUG-793: 4.4x BETTER than the 2026-10-14 reading — the earlier figure was
                                   a cold/pressured state, not the model. Still the worst of the eight by 6.6x.'}
+    #: ── MEASURED 2026-10-27 (BUG-1087): the FOUR SERVED MODELS THAT HAD NO READING, so this table could not pay
+    #: them a derived grant. Same instrument, same method (two-point slope, warm-up FIRST so the cold load is never
+    #: priced as decode); MTP4 at (16, 80) instead of (64, 320) to fit its own clock. Receipt:
+    #: governance/evidence/DECODE_RATES_20261027_BUG1087_FOUR_MODELS.json. With these four cells NO served model in
+    #: the harness roster needs the PROVISIONAL_CEILING fallback any more.
+    MiniCPM5-2B-MLX: {decode_tps: 89.0, previous: null, agreement: 'NEW (first reading)',
+                      declared_claim: 110.1, measured_over_claim: 0.81,
+                      note: 'the 110.1 quoted in model_assignments.yaml#harness_roles.AGENT_LOOP_FAST.basis is a
+                             CLAIM, never a reading (D-3109) - the first MEASUREMENT is 19% lower. Consequence:
+                             AGENT_LOOP_FAST was being granted the PROVISIONAL 4455 while its own ceiling is
+                             floor(90 x 89.0) = 8010, i.e. the fastest role was silently truncated at 56% of the
+                             budget it is allowed to spend (BUG-1087, under-grant half)'}
+    Ornith-1.5-9B-MLX-8bit: {decode_tps: 18.4, previous: null, agreement: 'NEW (first reading)'}
+    Ornith-1.5-35B-A3B-REAP-19B: {decode_tps: 49.8, previous: null, agreement: 'NEW (first reading)'}
+    Qwen3.8-27B-MTP4: {decode_tps: 15.5, previous: 16.17, ratio: 0.96, agreement: REPRODUCED,
+                       note: 'measured at (16, 80) to fit its clock; the 16.17 in the BUG-1087 text is REPRODUCED
+                              within 4% - and it CONFIRMS the over-grant half: the PROVISIONAL 4455 was 3.19x this
+                              ceiling of floor(90 x 15.5) = 1395, i.e. 287 s of decode bought with a 90 s wall'}
   the_conclusion_this_axis_settles: >-
     DECODE IS NOT THE BINDING CONSTRAINT. Every served model decodes the answer in 2-13 s at 320 tokens,
     and the small ACTIVE-parameter MoE (30B-A3B) decodes FASTER than the 4B dense (49.5 vs 36.3) because it

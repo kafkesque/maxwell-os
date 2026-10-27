@@ -29,6 +29,7 @@ import json
 import math
 import pathlib
 import re
+import socket
 import sys
 import time
 import urllib.error
@@ -186,6 +187,10 @@ def _yaml(path: pathlib.Path) -> dict[str, Any]:
 
 MAX_TURNS = 5
 FIXTURE_LINES = (3, 4, 5)
+#: The fixed 3-call fixture's ANSWER allowance. It caps an answer that is ONE integer ("12"), so it can never
+#: truncate a correct answer - which is why it is NOT BUG-1081's defect (that literal capped the ROLE's DECODE and
+#: therefore disagreed with the budget). Named so the distinction is declared rather than left as a bare number.
+FIXTURE_ANSWER_TOKENS = 256
 
 
 def declaration() -> dict[str, Any]:
@@ -227,18 +232,106 @@ TOOL = {
 }
 
 
+class TransportWallExceeded(TimeoutError):
+    """BUG-1085: the client stopped waiting before the turn produced a reply.
+
+    A timeout is NOT a fact about the model and it is NEVER a FAIL: it is the absence of a reading. It subclasses
+    TimeoutError so an existing generic handler still catches it, but every caller is expected to catch it FIRST and
+    name it, because "the turn did not complete" and "the turn answered badly" are different registers.
+    """
+
+    def __init__(self, elapsed_s: float, wall_s: float) -> None:
+        super().__init__(f"no reply inside the declared transport wall {wall_s:g}s (waited {elapsed_s:.1f}s)")
+        self.elapsed_s = elapsed_s
+        self.wall_s = wall_s
+
+
+def wall_from(budget: float, slack: float) -> float:
+    """BUG-1085/D-3203: the transport wall DERIVED from the ratified per-turn budget plus a DECLARED slack.
+
+    The fault it replaces was `timeout=180` against a ratified 90 s budget: TWICE the wall, so a turn that ran
+    96.00 s was READ as a turn and only the TOKEN allowance stopped it (receipt
+    HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json; engine log line 9641). The rule is an inequality, so
+    the fault cannot return through config INSTEAD of a literal: 0 < slack < budget, i.e. budget < wall < 2*budget.
+    A slack at or above the budget would let a turn be 100% over its budget and still be read as a turn.
+    """
+    if not (0 < slack < budget):
+        raise SystemExit(f"FATAL: transport slack {slack:g}s is not inside (0, {budget:g}) - a slack that is not "
+                         f"smaller than the budget reproduces BUG-1085's 180 s wall: a transport wall at 2x the "
+                         f"budget means a turn can be 100% over its budget and still be READ as a turn")
+    return budget + slack
+
+
+def call_timeout_s() -> float:
+    """The ONE transport wall for a single completion, read from its declared home (C12: never a literal)."""
+    slack = (_yaml(CONFIG).get("turn_budget") or {}).get("transport_slack_s")
+    if not isinstance(slack, (int, float)):
+        raise SystemExit("FATAL: config/agent_context.yaml#turn_budget.transport_slack_s is absent - refusing to "
+                         "invent a transport wall (C16/C12)")
+    return wall_from(budget_s(), float(slack))
+
+
+def wall_reading(elapsed_s: float, budget: float, wall_s: float) -> str:
+    """Three-way, because the boundaries are the point.
+
+    INSIDE      - the turn completed inside its budget: a reading.
+    OVER_BUDGET - the turn COMPLETED but overshot: a FAILED turn, never a PASS (this is what the 96.00 s turn was).
+    EXCEEDED    - the client gave up: NO reading exists, and it is never a verdict about the model.
+    """
+    if elapsed_s >= wall_s:
+        return "EXCEEDED"
+    if elapsed_s > budget:
+        return "OVER_BUDGET"
+    return "INSIDE"
+
+
 def ask(url: str, key: str, model: str, messages: list[dict[str, Any]], max_tokens: int,
-        tools: list[dict[str, Any]] | None = None) -> tuple[dict, float, dict]:
+        tools: list[dict[str, Any]] | None = None, timeout_s: float | None = None) -> tuple[dict, float, dict]:
     """ONE chat completion with the tools declared. Returns (reply, wall_seconds, usage).
-    usage carries the engine's own counters (TTFT, decode rate) for the T-187 per-step receipt. R7."""
-    body = json.dumps({"model": model, "messages": messages, "tools": tools or [TOOL],
-                       "temperature": 0.0, "max_tokens": max_tokens, "stream": False}).encode()
+    usage carries the engine's own counters (TTFT, decode rate) for the T-187 per-step receipt. R7.
+
+    BUG-1085: the socket wall is DERIVED (`call_timeout_s()`), never typed. `tools=[]` sends no tools at all (the
+    warm-up uses it); omitting `tools` declares the fixture's ONE tool.
+    """
+    body_obj: dict[str, Any] = {"model": model, "messages": messages, "temperature": 0.0,
+                                "max_tokens": max_tokens, "stream": False}
+    if tools is None:
+        body_obj["tools"] = [TOOL]
+    elif tools:
+        body_obj["tools"] = tools
+    body = json.dumps(body_obj).encode()
     request = urllib.request.Request(url, data=body, headers={
         "Content-Type": "application/json", "Authorization": key})
+    wall_timeout = call_timeout_s() if timeout_s is None else float(timeout_s)
     started = time.monotonic()
-    with urllib.request.urlopen(request, timeout=180) as response:
-        reply = json.loads(response.read())
+    try:
+        with urllib.request.urlopen(request, timeout=wall_timeout) as response:
+            reply = json.loads(response.read())
+    except OSError as exc:
+        elapsed = time.monotonic() - started
+        if isinstance(exc, (TimeoutError, socket.timeout)) or "timed out" in str(exc).lower():
+            raise TransportWallExceeded(elapsed, wall_timeout) from exc
+        raise
     return reply, time.monotonic() - started, reply.get("usage") or {}
+
+
+def warmup(url: str, key: str, model: str) -> float:
+    """BUG-1085: pay the COLD LOAD outside a measured turn and return it as `cold_load_s`.
+
+    MEASURED on this box: a cold model pays 33.5 s (MiniCPM5-2B) / 14.3 s (MTP4) inside turn 1, so enforcing the
+    per-turn wall WITHOUT this step would DELETE battery rows for a reason that is not a fact about the model - the
+    reason the wall was left as a literal 180 s. The allowance is declared in `turn_budget.warmup` and the call is
+    NEVER graded: a cold load reported as a turn is the "repair reported as a clean turn" defect one layer down
+    (D-3201 clause 3).
+    """
+    declared = ((_yaml(CONFIG).get("turn_budget") or {}).get("warmup") or {})
+    max_tokens = declared.get("max_tokens")
+    if not isinstance(max_tokens, int) or declared.get("judged") is not False:
+        raise SystemExit("FATAL: config/agent_context.yaml#turn_budget.warmup must declare an integer max_tokens "
+                         "and judged: false - a warm-up that is not declared as unjudged is a measurement nobody "
+                         "can read (C16/BUG-1085)")
+    _reply, wall, _usage = ask(url, key, model, [{"role": "user", "content": "warmup"}], max_tokens, tools=[])
+    return wall
 
 
 def grade(calls: int, answer: str, expected: int, walls: list[float], budget: float) -> tuple[str, str]:
@@ -247,9 +340,10 @@ def grade(calls: int, answer: str, expected: int, walls: list[float], budget: fl
         return "FAIL", f"called the tool {calls}x, wanted >= {len(FIXTURE_LINES)} (an agent loop must USE a tool)"
     if str(expected) not in answer:
         return "FAIL", f"final answer does not carry {expected}: {answer.strip()[:80]!r}"
-    over = [round(w, 1) for w in walls if w > budget]
+    over = [round(w, 1) for w in walls if wall_reading(w, budget, call_timeout_s()) == "OVER_BUDGET"]
     if over:
-        return "FAIL", f"turn(s) over the declared budget {budget:g}s: {over}"
+        return "FAIL", (f"turn(s) COMPLETED over the declared budget {budget:g}s - OVER_BUDGET is a failed turn, "
+                        f"never a PASS: {over}")
     return "PASS", f"{calls} tool call(s), answer carries {expected}, slowest turn {max(walls):.1f}s"
 
 
@@ -263,10 +357,23 @@ def run_model(decl: dict[str, Any], model: str, budget: float, workdir: pathlib.
         {"role": "user", "content": "Call read_lines once for each of a.txt, b.txt and c.txt in "
                                     f"{fixture}. Then answer with the TOTAL number of lines as a single integer."},
     ]
-    calls, walls, answer, error = 0, [], "", ""
+    calls, walls, answer, error, unmeasured = 0, [], "", "", ""
+    #: BUG-1085: the COLD LOAD is paid here, outside every measured turn, and it is never graded. Without this the
+    #: derived wall would delete rows for a reason that is not a fact about the model (33.5 s / 14.3 s, measured).
+    cold, cold_error = None, ""
+    try:
+        cold = warmup(url, key, model)
+    except TransportWallExceeded as exc:
+        cold_error = str(exc)
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        cold_error = f"{type(exc).__name__}: {exc}"
     for _ in range(MAX_TURNS):
         try:
-            reply, wall, _ = ask(url, key, model, messages, 256)
+            reply, wall, _ = ask(url, key, model, messages, FIXTURE_ANSWER_TOKENS)
+        except TransportWallExceeded as exc:
+            unmeasured = (f"the turn did not complete inside the declared transport wall ({exc}) - a timeout is NO "
+                          f"READING, never a FAIL about the model (BUG-1085)")
+            break
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
             error = f"{type(exc).__name__}: {exc}"
             break
@@ -286,13 +393,20 @@ def run_model(decl: dict[str, Any], model: str, budget: float, workdir: pathlib.
             except (ValueError, OSError, KeyError) as exc:
                 payload = f"error: {type(exc).__name__}"
             messages.append({"role": "tool", "tool_call_id": call.get("id", ""), "content": payload})
-    if error:
+    if unmeasured:
+        verdict, detail = "UNMEASURED", unmeasured
+    elif error:
         verdict, detail = "FAIL", error
     else:
         verdict, detail = grade(calls, answer, expected, walls, budget)
     return {"model": model, "verdict": verdict, "detail": detail, "tool_calls": calls,
             "slowest_turn_s": round(max(walls), 1) if walls else None,
-            "turns": len(walls), "answer": answer.strip()[:60]}
+            "turns": len(walls), "answer": answer.strip()[:60],
+            #: BUG-1085: the wall the reading was taken under travels with the reading, and the cold load is named
+            #: separately so nobody can mistake it for a turn.
+            "transport_timeout_s": round(call_timeout_s(), 2),
+            "cold_load_s": round(cold, 2) if cold is not None else None,
+            "cold_load_error": cold_error}
 
 
 # ── T-187: THE TWO-STEP / TWO-TOOL FIXTURE ──────────────────────────────────────────────────────────
@@ -443,13 +557,44 @@ def run_two_step_model(decl: dict[str, Any], model: str, budget: float, workdir:
 # grants a CEILING (conservative = no model is truncated). Same table, opposite direction, both deliberate - do not
 # "unify" them.
 
+def cell_readings(cell: dict[str, Any]) -> tuple[list[float], list[str], list[str]]:
+    """BUG-1089: the readings a cell still STANDS BEHIND - (rates, live keys, disowned keys).
+
+    A number in this table is either a LIVE reading or a REGISTERED ARTIFACT, and only a live reading may price a
+    grant (D-3034: only what resolves confers). Two declarations mark a reading as not-live, and both are already in
+    the register, so the instrument reads them instead of guessing with min():
+      - `invalid_readings: [<key>]` - the cell says in words why that reading is not the model (eg BUG-793: a
+        cold/pressured state, 4.4x worse than the model);
+      - `verdict: REFUSED ...`          - the cell's own reading failed its controls, so the figure beside it was
+        never published.
+    MEASURED 2026-10-27: min() over the raw pair priced Qwen3.8-27B-MLX-4bit on the 1.7 tok/s artifact it disowns
+    and granted 153 tokens (52x under its own 675 ceiling), and priced Phi-4-mini on the 35.0 tok/s reading the
+    register REFUSES. A conservative bound over a disowned reading is not caution; it is a truncation with a label.
+    """
+    disowned = {str(x) for x in (cell.get("invalid_readings") or [])}
+    if str(cell.get("verdict") or "").strip().upper().startswith("REFUSED"):
+        disowned.add("decode_tps")   # a REFUSED verdict labels THIS cell's reading, never the previous one
+    rates: list[float] = []
+    live: list[str] = []
+    dead: list[str] = []
+    for key in ("decode_tps", "previous"):
+        value = cell.get(key)
+        if not isinstance(value, (int, float)) or not value or value <= 0:
+            continue
+        if key in disowned:
+            dead.append(key)
+        else:
+            live.append(key)
+            rates.append(float(value))
+    return rates, live, dead
+
+
 def instrument_allowance(model: str) -> dict[str, Any]:
     """BUG-1081: the completion allowance an instrument grants, its provenance, and why it is underived if it is."""
     table = ((_yaml(CONFIG).get("measured_decode_20261015") or {}).get("decode_tps")) or {}
     budget = budget_s()
     cell = table.get(model) or {}
-    rates = [float(cell[k]) for k in ("decode_tps", "previous")
-             if isinstance(cell.get(k), (int, float)) and cell.get(k) and cell[k] > 0]
+    rates, live, dead = cell_readings(cell)
     if rates:
         #: THE RATE IS THE CONSERVATIVE ONE, and this is measured, not cautious-by-temperament. MEASURED
         #: 2026-10-27 20:10 (engine log, receipt temp/redloop_allowance_20261027.json): the grant computed at the
@@ -461,14 +606,17 @@ def instrument_allowance(model: str) -> dict[str, Any]:
         rate = min(rates)
         return {"max_tokens": int(math.floor(budget * rate)), "provenance": "DERIVED",
                 "rule": "floor(per_turn_budget_s * conservative_decode_tps(model))",
-                "rate_basis": "conservative: the SLOWEST declared reading in the cell",
+                "rate_basis": ("conservative: the SLOWEST LIVE reading in the cell (live: "
+                               + ", ".join(live) + ("; DISOWNED by the register and not priced: "
+                                                    + ", ".join(dead) if dead else "") + ")"),
                 "per_turn_budget_s": budget, "decode_tps": rate,
                 "rates_declared": sorted(rates, reverse=True),
+                "readings_live": live, "readings_disowned": dead,
                 "agreement": cell.get("agreement"), "reason": ""}
-    bound = [int(math.floor(budget * min(float(c[k]) for k in ("decode_tps", "previous")
-                                         if isinstance(c.get(k), (int, float)) and c.get(k) and c[k] > 0)))
+    #: the fallback is graded on the SAME rule (BUG-1089): a disowned reading cannot inflate an upper bound either.
+    bound = [int(math.floor(budget * min(cell_readings(c)[0])))
              for c in table.values()
-             if isinstance(c, dict) and isinstance(c.get("decode_tps"), (int, float)) and c["decode_tps"] > 0]
+             if isinstance(c, dict) and cell_readings(c)[0]]
     if not bound:
         raise SystemExit("FATAL: config/agent_context.yaml#measured_decode_20261015.decode_tps carries no usable "
                          "reading - no allowance can be derived and none will be invented (C16/BUG-1081)")
@@ -1092,6 +1240,101 @@ def selftest() -> int:
         if needle in (ROOT / source).read_text(encoding="utf-8"):
             bad.append(f"BUG-1081: {source} still names the literal allowance constant - re-hardcoding guard")
 
+    # ── BUG-1085: THE TRANSPORT WALL IS DERIVED FROM THE BUDGET, AND THE 180 s FAULT CANNOT COME BACK ──────
+    # MEASURED 2026-10-27 20:10: the client waited `timeout=180` - TWICE the ratified 90 s - so a turn that ran
+    # 96.00 s was READ as a turn, and the only thing that stopped it was the TOKEN allowance (BUG-1081). A
+    # transport wall that is not derived from the budget is a SECOND OPINION about how long a turn may take.
+    bug1085 = 1
+    wall_fn, call_fn = globals().get("wall_from"), globals().get("call_timeout_s")
+    reading_fn = globals().get("wall_reading")
+    if not (wall_fn and call_fn and reading_fn):
+        bad.append("BUG-1085: no derived transport wall (wall_from / call_timeout_s / wall_reading) - the client "
+                   "still waits a literal, so a turn at 2x its budget is read as a turn")
+    else:
+        bug1085 += 3
+        budget_now = budget_s()
+        wall_now = call_fn()
+        if not (budget_now < wall_now < 2 * budget_now):
+            bad.append(f"BUG-1085: the transport wall {wall_now:g}s is not inside ({budget_now:g}, "
+                       f"{2 * budget_now:g}) - the 180 s fault is back, by derivation or by config")
+        #: TWO-SIDED and THROUGH CONFIG: a slack that is not smaller than the budget must be REFUSED, so the 180 s
+        #: wall cannot be restored by editing a YAML key instead of a literal (C12's own loophole).
+        try:
+            wall_fn(budget_now, budget_now)
+            bad.append("BUG-1085: a transport slack equal to the budget was ACCEPTED - that IS the 180 s wall "
+                       "wearing a config key")
+        except SystemExit:
+            pass
+        #: THREE-WAY known answers, because the boundaries are the whole point: a turn that COMPLETED over budget is
+        #: a FAILED turn, and a turn the client ABANDONED is NO READING at all.
+        for elapsed, want in ((9.8, "INSIDE"), (96.0, "OVER_BUDGET"), (wall_now + 1.0, "EXCEEDED")):
+            got = reading_fn(elapsed, budget_now, wall_now)
+            if got != want:
+                bad.append(f"BUG-1085: a {elapsed:.1f}s turn against {budget_now:g}s budget / {wall_now:g}s wall "
+                           f"read {got}, wanted {want}")
+    #: the check is TOKEN-LEVEL, not line-level, and that distinction is the whole control. A COMMENT or DOCSTRING
+    #: may CITE the wall it documents (D-3038: what we reject we register), while CODE may never PASS a literal
+    #: wall - so prose is verified by the tokenizer rather than by a `#` prefix.
+    bug1085 += 1
+    import io as _io
+    import tokenize as _tokenize
+    prose = {_tokenize.COMMENT, _tokenize.NL, _tokenize.NEWLINE, _tokenize.INDENT, _tokenize.DEDENT,
+             _tokenize.STRING}
+    for source in ("scripts/measure_subagent_loop.py", "scripts/harmony_red_loop.py"):
+        toks = [tk for tk in _tokenize.generate_tokens(
+            _io.StringIO((ROOT / source).read_text(encoding="utf-8")).readline) if tk.type not in prose]
+        for i in range(len(toks) - 2):
+            name, assign, value = toks[i], toks[i + 1], toks[i + 2]
+            if (name.type == _tokenize.NAME and name.string.endswith("timeout") and assign.string == "="
+                    and value.type == _tokenize.NUMBER):
+                bad.append(f"BUG-1085: {source}:{name.start[0]} assigns a LITERAL to '{name.string}' - a wall that "
+                           f"is typed is a wall that disagrees with the budget")
+    #: the cold load is paid OUTSIDE a measured turn. A cold load counted as a turn deletes a row for a reason that
+    #: is not a fact about the model (33.5 s MiniCPM5-2B / 14.3 s MTP4, measured on this box) - which is why the
+    #: wall was not enforced before the warm-up existed.
+    bug1085 += 1
+    if (((_yaml(CONFIG).get("turn_budget") or {}).get("warmup") or {}).get("judged")) is not False:
+        bad.append("BUG-1085: turn_budget.warmup.judged is not false - a warm-up graded as a turn is a cold load "
+                   "reported as a measurement")
+
+    # ── BUG-1089: A READING THE REGISTER DISOWNS MAY BE CITED, NEVER PRICED ───────────────────────────────────
+    # MEASURED 2026-10-27 on this table: `min()` over the raw pair priced Qwen3.8-27B-MLX-4bit on the 1.7 tok/s
+    # artifact its own note disowns (grant 153 tokens, 4.4x under its 675 ceiling) and priced Phi-4-mini on the 35.0
+    # tok/s reading its own `verdict: REFUSED` withdraws. A conservative bound over a disowned reading is a
+    # truncation with a label, so the instrument reads the register's OWN two declarations instead of guessing.
+    bug1089 = 2
+    refused_cell = {"decode_tps": 35.0, "previous": 40.0, "verdict": "REFUSED - the two calls disagree"}
+    if cell_readings(refused_cell)[0] != [40.0]:
+        bad.append("BUG-1089: a cell whose own verdict is REFUSED is still priced on that reading - the register "
+                   "withdrew it and the instrument re-adopted it")
+    disowned_cell = {"decode_tps": 7.5, "previous": 1.7, "invalid_readings": ["previous"]}
+    if cell_readings(disowned_cell)[0] != [7.5]:
+        bad.append("BUG-1089: `invalid_readings` was declared and the instrument priced on the disowned reading "
+                   "anyway")
+    bug1089 += 1
+    for name, c in table.items():
+        rates_live, live, dead = cell_readings(c)
+        if not rates_live:
+            continue
+        grant = instrument_allowance(name)
+        if abs(grant["decode_tps"] - min(rates_live)) > 1e-9:
+            bad.append(f"BUG-1089: {name} is priced at {grant['decode_tps']} tok/s but its slowest LIVE reading is "
+                       f"{min(rates_live)} - a grant that does not resolve to a live reading (D-3034)")
+    #: REGISTER DISCIPLINE, and it is the half that stops this recurring: a cell that disowns a reading must SAY so
+    #: where the instrument can read it, and may only name keys it actually carries.
+    bug1089 += 1
+    for name, c in table.items():
+        if not isinstance(c, dict):
+            continue
+        declared = {str(x) for x in (c.get("invalid_readings") or [])}
+        if str(c.get("agreement") or "").strip().upper() == "DRIFTED" and not declared:
+            bad.append(f"BUG-1089: {name} is DRIFTED and declares no `invalid_readings` - the instrument is left to "
+                       f"guess which of the two readings the register no longer stands behind")
+        for key in declared:
+            if not isinstance(c.get(key), (int, float)):
+                bad.append(f"BUG-1089: {name} disowns '{key}', which it does not carry - a declaration with no "
+                           f"referent (D-3034)")
+
     for problem in bad:
         print(f"  FAIL control: {problem}")
     total = (len(cases) + 1 + len(ts_cases) + 1 + len(battery_cases) + 4 + 6 + len(bug1079_cases)
@@ -1103,7 +1346,9 @@ def selftest() -> int:
              + 1       # BUG-1081: an unmeasured model is labelled PROVISIONAL_CEILING and carries a reason
              + 1       # BUG-1081: the PROVISIONAL bound never binds tighter than a derived grant
              + 1       # BUG-1081: every derived grant fits the wall at its own conservative rate (the invariant)
-             + 1)      # BUG-1081: no instrument still names the literal allowance constant
+             + 1       # BUG-1081: no instrument still names the literal allowance constant
+             + bug1085   # BUG-1085: the wall is derived+invariant, three-way read, no literal, warm-up unjudged
+             + bug1089)  # BUG-1089: a disowned reading may be cited, never priced
     print(f"{'OK' if not bad else 'FAILED'} subagent-loop controls: {total - len(bad)}/{total} known-answer")
     return 1 if bad else 0
 

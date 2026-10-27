@@ -1,0 +1,173 @@
+{
+ "generated": "2026-10-27",
+ "purpose": "BUG-1087: retire four PROVISIONAL_CEILING cells - the four served models with no decode reading",
+ "method": "two-point slope (same prompt, two max_tokens), warm-up FIRST so the cold load is not priced as decode",
+ "instrument": "temp/decode_measure_20261015.py#measure (reused, not re-implemented)",
+ "transport_wall_note": "these are CALIBRATION calls, not turns: each carries its own declared budget",
+ "rows": [
+  {
+   "model": "MiniCPM5-2B-MLX",
+   "warmup": {
+    "max_tokens": 4,
+    "seconds": 3.225,
+    "prompt_tokens": 37,
+    "completion_tokens": 4,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 0
+   },
+   "low": {
+    "max_tokens": 64,
+    "seconds": 0.828,
+    "prompt_tokens": 37,
+    "completion_tokens": 64,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 0
+   },
+   "high": {
+    "max_tokens": 320,
+    "seconds": 3.705,
+    "prompt_tokens": 37,
+    "completion_tokens": 320,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 287
+   },
+   "decode_tps": 89.0,
+   "decode_seconds_for_100_tokens": 1.1,
+   "prompt_tokens": 37,
+   "prefill_s": 0.11,
+   "prefill_tps": 340.2,
+   "cached_tokens_both_calls": [
+    0,
+    0
+   ],
+   "time_to_first_token_s_implied": 0.11,
+   "verdict": "MEASURED"
+  },
+  {
+   "model": "Ornith-1.5-9B-MLX-8bit",
+   "warmup": {
+    "max_tokens": 4,
+    "seconds": 19.153,
+    "prompt_tokens": 37,
+    "completion_tokens": 4,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 0
+   },
+   "low": {
+    "max_tokens": 64,
+    "seconds": 3.627,
+    "prompt_tokens": 37,
+    "completion_tokens": 64,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 9
+   },
+   "high": {
+    "max_tokens": 320,
+    "seconds": 17.568,
+    "prompt_tokens": 37,
+    "completion_tokens": 320,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 265
+   },
+   "decode_tps": 18.4,
+   "decode_seconds_for_100_tokens": 5.4,
+   "prompt_tokens": 37,
+   "prefill_s": 0.14,
+   "prefill_tps": 261.0,
+   "cached_tokens_both_calls": [
+    32,
+    32
+   ],
+   "time_to_first_token_s_implied": 0.14,
+   "verdict": "MEASURED"
+  },
+  {
+   "model": "Ornith-1.5-35B-A3B-REAP-19B",
+   "warmup": {
+    "max_tokens": 4,
+    "seconds": 26.038,
+    "prompt_tokens": 37,
+    "completion_tokens": 4,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 0
+   },
+   "low": {
+    "max_tokens": 64,
+    "seconds": 1.461,
+    "prompt_tokens": 37,
+    "completion_tokens": 64,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 23
+   },
+   "high": {
+    "max_tokens": 320,
+    "seconds": 6.602,
+    "prompt_tokens": 37,
+    "completion_tokens": 320,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 278
+   },
+   "decode_tps": 49.8,
+   "decode_seconds_for_100_tokens": 2.0,
+   "prompt_tokens": 37,
+   "prefill_s": 0.18,
+   "prefill_tps": 210.5,
+   "cached_tokens_both_calls": [
+    32,
+    32
+   ],
+   "time_to_first_token_s_implied": 0.18,
+   "verdict": "MEASURED"
+  },
+  {
+   "model": "Qwen3.8-27B-MTP4",
+   "warmup": {
+    "max_tokens": 4,
+    "seconds": 46.199,
+    "prompt_tokens": 39,
+    "completion_tokens": 4,
+    "cached_tokens": 0,
+    "finish_reason": "length",
+    "content_chars": 3
+   },
+   "low": {
+    "max_tokens": 16,
+    "seconds": 1.298,
+    "prompt_tokens": 39,
+    "completion_tokens": 16,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 15
+   },
+   "high": {
+    "max_tokens": 80,
+    "seconds": 5.422,
+    "prompt_tokens": 39,
+    "completion_tokens": 80,
+    "cached_tokens": 32,
+    "finish_reason": "length",
+    "content_chars": 80
+   },
+   "decode_tps": 15.5,
+   "decode_seconds_for_100_tokens": 6.4,
+   "prompt_tokens": 39,
+   "prefill_s": 0.27,
+   "prefill_tps": 146.1,
+   "cached_tokens_both_calls": [
+    32,
+    32
+   ],
+   "time_to_first_token_s_implied": 0.27,
+   "verdict": "MEASURED"
+  }
+ ]
+}

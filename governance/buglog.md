@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1330 decisions (census stamp 1872302adc85f274, 2026-10-27) · 851 bugs (269 open / 582 closed; highest OPEN = BUG-1087) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1332 decisions (census stamp 464ff800767b7ada, 2026-10-27) · 853 bugs (268 open / 585 closed; highest OPEN = BUG-1088) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1330 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 671 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1330, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1332 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 673 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1332, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 138 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 269 open.
+> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 268 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24353,3 +24353,117 @@ attention, and it retires four PROVISIONAL cells.
 **Not fixed here** because a measurement is a run, and this session's engine time went to the red loops this register
 names. It is folded into T-217, whose landing must otherwise ship a guard whose bound is provisional for the exact models
 the role uses.
+
+## BUG-1085 (MED, FIXED 2026-10-27) — THE TRANSPORT WALL IS DERIVED FROM THE BUDGET, AND A TURN THAT OVERSHOOTS IS NAMED RATHER THAN ABSORBED
+
+BEFORE: `urllib.request.urlopen(request, timeout=180)` — a bare literal, and 180 is exactly TWICE the ratified 90 s.
+AFTER: `call_timeout_s()` = `per_turn_budget_s` + `transport_slack_s` = 90 + 15 = **105 s**, provenance declared in
+`config/agent_context.yaml#turn_budget.transport_slack_s`. Receipt:
+`governance/evidence/HARMONY_RED_LOOP_20261027_TRANSPORT_WALL_105_REPLAY.json` (`transport_wall.timeout_s 105.0`,
+`cold_load_s 1.03`, 3 calls, 0 malformed, 0 dropped, slowest 9.8 s).
+
+**Red loop first (D-3036).** The command was already run once and went RED before the fix:
+`python3 scripts/measure_subagent_loop.py --selftest` → `FAILED subagent-loop controls: 60/64` with four named
+failures (no derived wall, a literal socket timeout, a second literal, and a warm-up graded as a turn). AFTER:
+`OK subagent-loop controls: 71/71`, `OK harmony-red-loop --selftest: 51/51`.
+
+**What the fault actually was.** Not "180 is too big". It was that the wall was a SECOND OPINION about how long a turn
+may take, held by the client, disagreeing with the register — so a turn that ran 96.00 s against a 90 s budget was
+READ as a turn, and the only thing that stopped it was the TOKEN allowance (BUG-1081). Tokens do not enforce seconds.
+
+**The fix has three parts, and the third is why it was not shipped before.**
+1. `wall_from(budget, slack)` REFUSES by inequality: `0 < slack < budget`, i.e. `budget < wall < 2*budget`. The
+   180 s wall cannot return through a YAML key, because a slack ≥ the budget is FATAL at read time. `--selftest`
+   asserts both directions.
+2. `wall_reading(elapsed, budget, wall)` is THREE-WAY, because the boundaries carry the meaning: `INSIDE` (a reading),
+   `OVER_BUDGET` (the turn COMPLETED and overshot — a FAILED turn, never a PASS; the 96.00 s turn is now this), and
+   `EXCEEDED` (the client gave up — NO reading exists, and `TransportWallExceeded` is raised so no caller can mistake
+   it for a verdict about the model; both instruments catch it FIRST and record UNMEASURED with the wall named).
+3. THE WARM-UP, declared in `turn_budget.warmup` (`max_tokens: 1`, `judged: false`, `recorded_as: cold_load_s`). A cold
+   model pays 33.5 s (MiniCPM5-2B) / 14.3 s (MTP4) inside turn 1, so enforcing the wall without paying that OUTSIDE a
+   turn would DELETE battery rows for a reason that is not a fact about the model. That is precisely why the literal
+   survived: it was a working guard against a self-inflicted false negative. The engine log shows the warm-up as its own
+   1-token completion line — visibly not a turn.
+
+**Two design notes that are DECLARED, not accidents.** (a) The literal-scan is TOKEN-LEVEL, so a comment or docstring
+may CITE `timeout=180` while code may never PASS it — the first version scanned lines and failed on its own forensic
+citation, which is a false positive a reader would have "fixed" by deleting the evidence. (b) `FIXTURE_ANSWER_TOKENS =
+256` in the 3-call fixture is NOT BUG-1081's defect and is named rather than bare: it caps an answer that is ONE integer,
+so it can never truncate a correct answer — the 1024 literal capped the ROLE's DECODE and therefore disagreed with the
+budget.
+
+**NOT fixed here.** `pipeline/oneshot_ask.py:54` carries the same class of fault — `timeout=timeout + 20`, a typed slack
+with no declared provenance → registered as BUG-1088. And a wall at the call site is not the guard LANDING in the
+turn-issuing path: that remains T-217, with D-3202's precondition attached to it.
+
+## BUG-1087 (MED, FIXED 2026-10-27) — THE FOUR MODELS WITH NO DECODE RATE ARE MEASURED, AND THE FIRST MEASUREMENT FOUND BOTH HALVES OF THE FAULT
+
+Receipt: `governance/evidence/DECODE_RATES_20261027_BUG1087_FOUR_MODELS.json`. Same declared method (two-point slope,
+one prompt, two `max_tokens`), warm-up FIRST so the cold load is never priced as decode, `temp/decode_measure_20261015.py`
+REUSED rather than re-implemented (no new repo artifact, therefore no new routing debt).
+
+| model | measured decode | grant now | was | direction of the old error |
+|---|---|---|---|---|
+| MiniCPM5-2B-MLX | **89.0 tok/s** | 8010 DERIVED | 4455 PROVISIONAL | UNDER-granted 44 % — the FASTEST role was truncated at 56 % of its budget |
+| Ornith-1.5-9B-MLX-8bit | **18.4 tok/s** | 1656 DERIVED | 4455 PROVISIONAL | over-granted 2.7x |
+| Ornith-1.5-35B-A3B-REAP-19B | **49.8 tok/s** | 4482 DERIVED | 4455 PROVISIONAL | within 1 % — the A3B MoE shape decodes like the 30B-A3B |
+| Qwen3.8-27B-MTP4 | **15.5 tok/s** | 1395 DERIVED | 4455 PROVISIONAL | over-granted 3.19x = 287 s of decode bought with a 90 s wall |
+
+**The over-grant half is confirmed as registered** (MTP4 3.06x predicted, 3.19x measured). The UNDER-grant half was worse
+than registered: `AGENT_LOOP_FAST`/`LIGHTWEIGHT_PROBE` is bound to MiniCPM5-2B-MLX, whose role basis quotes **110.1
+tok/s** — a CLAIM, not a reading (D-3109). The first measurement is 89.0, i.e. 19 % lower, so the PROVISIONAL ceiling was
+4455 against a live ceiling of 8010. A fast small model given half its budget does not fail loudly; it stops mid-answer.
+
+**No served model in the harness roster now needs the PROVISIONAL_CEILING fallback** — all six roles resolve to DERIVED.
+The fallback stays for a candidate that is served before it is measured, still labelled, still with a named reason.
+
+**This measurement then broke its own rule, which is BUG-1089 below** — the same turn, found by reading the grants rather
+than by a test.
+
+## BUG-1088 (MED, OPEN 2026-10-27) — THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`
+
+`pipeline/oneshot_ask.py:54`: `subprocess.run(cmd, capture_output=True, text=True, timeout=timeout + 20)` while the same
+function passes `-m <timeout>` to curl. So the real wall is `declared + 20`, a slack that is TYPED, has no declared
+provenance, and is invisible to a caller reasoning about `--timeout`. Same class as BUG-1085 — a wall term that is not
+derived from a declared budget — and the fix is the same shape: one declared key (`transport_slack_s` already exists in
+`turn_budget`) plus the inequality that refuses a slack ≥ its budget.
+
+**Found by the token-level literal scan, and deliberately NOT fixed here** (D-3038, scope discipline): it was outside the
+change under review, the fix belongs with whatever reads that path's budget, and bundling it would ship an unreviewed
+edit to a second call path in the same commit as the first. It is registered so it cannot be lost, and it is a G3
+condition of D-3205.
+
+## BUG-1089 (MED, FIXED 2026-10-27) — A READING THE REGISTER DISOWNS MAY BE CITED, NEVER PRICED: `min()` GRANTED 153 TOKENS FROM AN ARTIFACT THE CELL ITSELF CALLS AN ARTIFACT
+
+Found in this turn's own output, by reading the six grants instead of trusting the 71/71 controls — which is the point:
+the controls tested the RULE, and the rule was wrong.
+
+BEFORE (measured 20:38): `AGENT_EDIT_LONG_CONTEXT` → `Qwen3.8-27B-MLX-4bit` granted **153 tokens**
+(`floor(90 x 1.7)`), and `PROBE_S2` → `Phi-4-mini` granted 3150 (`floor(90 x 35.0)`).
+AFTER: **675** tokens (rate 7.5) and **3600** (rate 40.0). Both DERIVED, both priced on a LIVE reading.
+
+**Why the rule broke.** D-3203 clause 2 said "price on the CONSERVATIVE reading, `min(decode_tps, previous)`". Two cells in
+the table it reads contradict that:
+- `Qwen3.8-27B-MLX-4bit` declares `agreement: DRIFTED` and its own note proves the older figure is an ARTIFACT — "the
+  earlier figure was a cold/pressured state, not the model" (BUG-793, 4.4x). `min()` priced on the artifact.
+- `Phi-4-mini-instruct-8bit` declares `verdict: REFUSED` on its own 35.0 reading ("the implied prefill was negative, so
+  the two calls disagree"), and `min()` re-adopted the withdrawn number.
+
+So a "conservative" bound over a disowned reading is not caution — it is a TRUNCATION WITH A CONSERVATIVE LABEL, which is
+the exact defect BUG-1081 removed one layer up (a silent ceiling on a role's turn). `provenance` read DERIVED in both the
+153 and the 675 case, so the row could not catch itself.
+
+**The fix (D-3206).** `cell_readings(cell)` returns only readings the cell still STANDS BEHIND, honouring the register's own
+two declarations: `invalid_readings: [<key>]` and `verdict: REFUSED` (which withdraws the cell's own `decode_tps`). Among
+LIVE readings the slowest still prices the grant — the D-3203 rule survives exactly where it was true (gpt-oss 41.7/33 →
+33 → 2970; gemma 36.3/27 → 27 → 2430). The PROVISIONAL fallback is graded on the same rule, so an artifact cannot inflate an
+upper bound either.
+
+**Register discipline is now enforced, not convention** — three new controls: a cell whose agreement is DRIFTED MUST
+declare which reading it disowns (the instrument may not be left to guess), a declared key the cell does not carry is a
+declaration with no referent (D-3034), and EVERY derived grant's rate must equal the slowest LIVE reading of its cell.
+`Qwen3.8-27B-MLX-4bit` now declares `invalid_readings: [previous]` WITH the BUG-793 reason beside it.
+
+**What this does not fix.** Pricing on a live reading is not the same as pricing on a RECENT one: `Phi-4-mini` is now
+priced on a 2026-10-14 reading (40.0) because the newer reading was refused by its own control. That is the honest
+register — a refused reading may not be resurrected — and the debt it leaves is a re-measurement, not a rule change.

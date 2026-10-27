@@ -462,6 +462,12 @@ classes:
       owner_number_s: 120             # T-212: the OWNER's ONE number (approved 2026-10-27), never a measurement
       required_prefill_tps: 218.45    # DERIVED: working_set / budget = 26214 / 120 - the rate a model must beat
       admits_at_class_context: [gemma-4-E4B-it-MLX-4bit, MiniCPM5-2B-MLX, Ornith-1.5-35B-A3B-REAP-19B]
+      # ⚠️ THIS LIST IS A PREFILL READING AND NOTHING ELSE (D-3200 clause 5, added 2026-10-27). It answers ONE
+      # question - can this model pay a 26,214-token turn inside 120s - and it says NOTHING about whether its tool
+      # calls ARRIVE. MEASURED the same day: gpt-oss-20b passes every capability gate it was given and still loses
+      # 3 of 16 calls to a harmony parse failure, so an admission here must never be read as "may drive a loop".
+      # The emission axis is `scripts/harmony_red_loop.py`, and a model RED there may not hold an AGENT_LOOP_* role.
+      emission_axis: 'scripts/harmony_red_loop.py (T-213/D-3200) - a model RED there is not admitted by this list'
       source: 'D-3199 / T-209 closure / calibration_receipts.jsonl rows 35-36'
     why: >-
       THE SECOND POINT T-212 OWED. The 60s point above is a budget no served model pays at 26,214 tokens

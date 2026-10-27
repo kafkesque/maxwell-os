@@ -3123,6 +3123,11 @@ tasks:
        UNMEASURED, never FAIL (D-3148 clause 3, BUG-375's shape one layer in).
     Only then may AGENT_LOOP_WORKHORSE be declared, and only from a receipt naming the model, engine, temperature
     (0.0) and the arguments it sent.
+    6) AND THE DECLARATION IS REFUSED WHILE THE MODEL IS RED ON `scripts/harmony_red_loop.py` (D-3200 clause 5).
+       A chain of dependent steps is worthless if a call in the chain never arrives: the T-213 fixture measured
+       3 of 16 calls LOST on the model holding AGENT_LOOP_SHORT, so this gate must be asked AFTER that one, not
+       instead of it. MEASURED 2026-10-27: Qwen3.8-27B-MTP4 is 30/30 clean on both of its axes and is therefore
+       the only served model currently eligible to be CONSIDERED here - eligibility is not a declaration.
   closure_evidence: >-
     THE INSTRUMENT EXISTS, IN THE TREE, AND IT GOES RED ON DEMAND - all three verdicts of the gate are exercised by
     a receipt, not by an argument. `scripts/harmony_red_loop.py` (32/32 known-answer controls) reuses the loop

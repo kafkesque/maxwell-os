@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1327 decisions (census stamp e009a777c170e2df, 2026-10-27) · 847 bugs (267 open / 580 closed; highest OPEN = BUG-1083) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1327 decisions (census stamp e009a777c170e2df, 2026-10-27) · 847 bugs (267 open / 580 closed; highest OPEN = BUG-1083) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 1, pipeline-moved 62; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1327 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 668 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1327, D-2987/BUG-765)
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-216 | 🔴 MUST | YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose g | A decision row, not a measurement: ONE of three, written with its reas |
 >
-> **PIPELINE LANE (61) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (62) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 61 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 62 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -24200,3 +24200,28 @@ LOWERED (D-2644) — so regenerating the receipt is a DECISION about 8 sites, ne
 this rail still says "3 failures are DECLARED red and SHRINK-ONLY", which was true when it was written and is now
 false, so the two faces of one rail disagree. Registered rather than papered over: neither fixing a receipt to make a
 test green nor editing the comment to match a red is allowed here.
+
+## BUG-951 (HIGH, OPEN 2026-10-20 — STATUS EVENT 2026-10-27d) — THE ENGINE NAMES THE CORRUPTED RECIPIENT ITSELF, 37 TIMES TODAY, SO SYMPTOM 1 HAS A FIX LOCUS AND IT IS NOT THE CLIENT
+
+**Reading, not theory** (`~/.omlx/logs/server.log`, 2026-10-27, engine oMLX 0.7.3rc1): the harmony adapter logs every
+parsed message, and today's log carries
+
+    37 ×  Message 1: channel=commentary, recipient=functions.read_index<|channel|>commentary, content_count=1
+   147 ×  Message 1: channel=commentary, recipient=functions.read_index, content_count=1
+
+plus 23 `Error parsing tool calls from tokens` lines in TWO distinct spellings — `unexpected tokens remaining in
+message header` and `Unexpected EOS while waiting for message header to complete` (both covered by the declared marker,
+which is the shared PREFIX `Error parsing tool calls from tokens`, so `window()` counts both: checked, not assumed).
+
+**Why this matters more than it looks.** Symptom 1 is not a client-side surprise: the parser has the corrupted
+recipient IN HAND, prints it verbatim as a diagnostic, and then HANDS IT THROUGH as the tool name. So the two symptoms
+are two different decisions inside ONE adapter — refusal (symptom 2, 23 today) and passthrough-with-the-corruption
+(symptom 1, 37 today). That makes a parse-layer REPAIR (`functions.read_index<|channel|>commentary` -> `read_index`,
+a trailing marker stripped from a recipient) the only candidate seen so far that removes SYMPTOM 1 for every model and
+every caller at once, instead of repairing its consequence one turn at a time. It is registered as T-218, including the
+condition that makes it admissible: a repair must COUNT itself, because a silent server-side fix is the same drift as a
+silent client-side one (D-3201 decision 3), and the adapter is engine code, so patching vs upstreaming is a DECISION
+and not an edit.
+**Not claimed:** that the engine is at fault for symptom 2 (it refuses correctly — the model emitted a malformed
+header), and that 37 is a rate (the denominator is every harmony message today across every caller, not this fixture's
+30 calls).

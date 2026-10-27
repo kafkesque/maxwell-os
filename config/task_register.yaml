@@ -3312,3 +3312,32 @@ tasks:
     differ from the failed attempt (R7 makes an identical one a deterministic replay) and must state its wall cost
     against the ratified per_turn_budget_s. Receipts name the engine build and the script digest; a green here may
     never be reported as "the engine is fixed" - the parser still refuses headers.
+
+- id: T-218
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    ASK THE PARSER TO REPAIR WHAT IT ALREADY NAMES - the harmony adapter prints the corrupted recipient 37 times in one
+    day and then hands it through, so a declared, COUNTING strip-of-the-trailing-marker at the parse layer is the only
+    candidate that removes symptom 1 for every model and every caller at once
+  why: >-
+    Both client-side mitigations have now been measured and neither removes the defect: transcript sanitisation is
+    refused by its own receipt (T-215 limb 1, D-3201) and the retry guard repairs the LOSS while leaving the corrupted
+    NAME in place (it only ever fires on a parse error, and a contaminated name does not raise one). The engine's log
+    shows the corruption is visible to the parser before it is passed through, which is the one place a fix can remove
+    the class instead of its consequence.
+  source: BUG-951 / T-215 / D-3201 / D-3200 / D-3038 / D-3161 / C21
+  evidence: >-
+    READ 2026-10-27 from ~/.omlx/logs/server.log (oMLX 0.7.3rc1): 37 lines naming
+    `recipient=functions.read_index<|channel|>commentary` against 147 naming the clean recipient, and 23
+    `Error parsing tool calls from tokens` lines in two spellings. The instrument side is already built and needs no
+    new fixture: `scripts/harmony_red_loop.py --mode replay` reproduces symptom 1 on demand (8 malformed in 30 today).
+  gate: >-
+    TWO halves, neither optional. (1) MARKET: name the best measured implementation of tool-call parse RECOVERY on
+    comparable hardware - vLLM, SGLang and mlx-lm's harmony paths - and state for each whether it REPAIRS, REFUSES or
+    PASSES THROUGH, with a claimed/measured label on every cell (D-3161: a vendor README line is a hypothesis, never
+    evidence). (2) LOCAL: if a repair is declared, it must COUNT itself (a receipt field per repair, the D-3201
+    decision 3 shape), it must be a DECLARED transformation rather than a silent strip, and it must be re-measured on
+    this gate - `--mode replay` must go from 8 malformed to 0 with the repair count visible. The adapter is engine
+    code: patching it locally vs upstreaming is a DECISION with its own row, never an edit (C21/C22).

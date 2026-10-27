@@ -1173,7 +1173,7 @@
     {
       "id": "BUG-951",
       "title": "(HIGH, OPEN 2026-10-20) \u2014 gpt-oss-20b-MXFP4-Q8 (`GOOSE_PLANNER_MODEL`) EMITS A MALFORMED HARMONY HEADER, SO TOOL NAMES ARRIVE AS",
-      "events": 4
+      "events": 5
     },
     {
       "id": "BUG-964",

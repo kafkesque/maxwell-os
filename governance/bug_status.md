@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**250 open** / 563 closed of 813 ids.
+**251 open** / 563 closed of 814 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -261,3 +261,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1041 | (MED, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel | 1 |
 | BUG-1048 | (MED, OPEN 2026-10-27) - R5 review coverage silently depends on FILE LENGTH: gpt-oss returns UNPARSED on a 26 KB script at both output | 1 |
 | BUG-1049 | (LOW, OPEN 2026-10-27) - the severity vocabulary is DECLARED as MED and WRITTEN as MEDIUM: 20 headings use the undeclared word, and a bug | 1 |
+| BUG-1050 | (HIGH, OPEN 2026-10-27) - `hf cache prune` names the SERVED snapshot of a live model as "detached", and `du -shL` reports 48G for a 16G | 1 |

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1306 decisions (census stamp 075bcb3eaec118e5, 2026-10-27) · 813 bugs (250 open / 563 closed; highest OPEN = BUG-1049) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1307 decisions (census stamp 5072bcdf2b54b15b, 2026-10-27) · 814 bugs (251 open / 563 closed; highest OPEN = BUG-1050) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **83** of 1306 — 🔴 open 33 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 370 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1306, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **83** of 1307 — 🔴 open 33 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 371 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1307, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 250 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 58 · 🟨 MED 122 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 250 open.
+> Open BUGS by severity (population = the census's 251 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 59 · 🟨 MED 122 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 251 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23280,3 +23280,28 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    the matcher extended to accept the long form - so the next author who writes MEDIUM is COUNTED instead of
    corrected. That is a rail change and needs its own red loop (a MEDIUM heading that is invisible now and
    bucketed after), which is why it is not bundled into this sitting.
+
+## BUG-1050 (HIGH, OPEN 2026-10-27) - `hf cache prune` names the SERVED snapshot of a live model as "detached", and `du -shL` reports 48G for a 16G model: the two numbers that would have driven the deletion were both artefacts
+1. FOUND while turning the owner's "which copy should be deleted" into a copy-paste procedure instead of an opinion. Three
+   readings on ONE model directory (`~/.cache/huggingface/hub/models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit`):
+   - `du -shL` = **48G**; `du -sh` = **32G**; `du -sh blobs` = **16G**; `du -sh snapshots/main` = **16G**; `du -sh snapshots/<hash>` = **0B**
+   - `snapshots/main` holds REAL files (`model-00001..00004.safetensors`, 5.0+5.0+4.9+1.1 GB); `snapshots/bbecedef…` is a
+     SYMLINK FARM into `blobs` (`added_tokens.json -> ../../blobs/b54f91…`).
+   - `~/.omlx/models/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit -> .../snapshots/main` — so **`main` is the copy the engine serves**.
+2. THE TOOL DISAGREES WITH THE DISK: `hf cache prune --dry-run` proposes `main [(detached)] 17.2G` for deletion, i.e. it
+   would delete **the bytes that produce the `code` role** and leave the symlink farm. Cause: an LM-Studio-style snapshot
+   directory literally NAMED `main` has no hash identity, so the cache scanner classifies it as detached and the
+   HF-style revision as the live one — the exact inversion of how this host actually serves the model. It also printed
+   "About to delete 3 unreferenced revision(s) (6.9G total)" while listing 846.2M + 6.9G + 17.2G = 24.9G, so its own
+   TOTAL is wrong by 3.6x.
+3. THE OTHER HALF: `du -shL` FOLLOWS the symlink farm, so it counts each shared blob once per snapshot pointer - 48G for
+   16G+16G of real bytes. Both error directions have BUG-804's shape (a census that measured symlinks), and they
+   disagree with each other, so neither may be quoted as "the size".
+4. THE REAL FACT, once resolved: this repo genuinely holds TWO copies of one 16 GB model — the LM-Studio-materialised
+   `snapshots/main` (served) and a full HF blob set (`blobs` + hash snapshot). `hf cache rm bbecedefd8… --dry-run` =
+   **17.2G** and leaves `snapshots/main` intact, which is the correct direction.
+5. INTERIM RULE (binding): **`hf cache prune` is FORBIDDEN on this host** until it stops naming a served snapshot as
+   detached. Deletion is by NAMED path or by `hf cache rm <hash>` of the revision that is NOT the served one, and every
+   deletion is preceded by `readlink -f ~/.omlx/models/<model>` to prove which copy the engine reads.
+6. OWED: a pre-delete rail (`scripts/check_delete_target.py`) that refuses a delete target that any `~/.omlx/models`
+   symlink resolves into, and that reports size as `du -sh` (no -L) beside the blob total.

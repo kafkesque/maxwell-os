@@ -33568,3 +33568,41 @@ decisions:
   - governance/GGUF_MLX_AB_20261027.md
   - governance/CALIBRATION_ROLE_MARKET_20261027.md
   - config/hardware_profile.yaml
+- id: D-3181
+  state: RESOLVED
+  category: MODEL PORTFOLIO / DISK HYGIENE / INSTRUMENT TRUST
+  title: 'The deletion plan in D-3180 is CORRECTED before anyone ran it: no "duplicate revision" is pruned and `hf
+    cache prune` is FORBIDDEN on this host — it proposes deleting the SERVED snapshot of the live Qwen3-Coder; the
+    safe reclaim is 43.9 GB by NAMED path or by `hf cache rm <hash>` of the copy the engine does NOT read'
+  decision: "D-3180 (minted earlier the same sitting) said \"prune the stale revision of Qwen3-Coder (32.0 GiB for\
+    \ a 16 GB model)\nand of gemma-4-E4B (12.8 GiB for a 6.4 GB model), ~22 GiB recovered\". That limb is CORRECTED\
+    \ here, because the\nmoment it was turned into a command it resolved differently on disk (D-3034):\n\n  - `du\
+    \ -shL` reads 48G for the Qwen3-Coder repo, `du -sh` 32G, `blobs` 16G, `snapshots/main` 16G and\n    `snapshots/<hash>`\
+    \ 0B. The 48G is a SYMLINK DOUBLE COUNT (BUG-804's shape); the 32G is real and means TWO\n    full copies of\
+    \ a 16 GB model: an LM-Studio-materialised `snapshots/main` with real weight files, plus a\n    complete HF\
+    \ blob set behind a symlink farm.\n  - `~/.omlx/models/Qwen3-Coder-...` resolves to `snapshots/main` - i.e.\
+    \ the copy the ENGINE SERVES.\n  - `hf cache prune --dry-run` proposes to delete exactly that: `main [(detached)]\
+    \ 17.2G`. Its scanner treats a\n    snapshot directory literally named `main` as detached and the HF-style revision\
+    \ as live, which is the\n    inversion of how this host serves the model. Running it would break the `code`\
+    \ role and leave the symlink\n    farm. Its own total line is also wrong (says 6.9G while listing 24.9G).\n\n\
+    RULING:\n  1. `hf cache prune` is FORBIDDEN on this host until it stops naming a served snapshot as detached\
+    \ (BUG-1050).\n  2. Deletion is by NAMED path, or by `hf cache rm <hash>` of the revision the engine does NOT\
+    \ read, and every\n     deletion is preceded by `readlink -f ~/.omlx/models/<model>` to prove which copy is\
+    \ served.\n  3. The safe reclaim, measured with --dry-run and NOT executed (a deletion is an owner act):\n \
+    \      hf cache rm bbecedefd8... ce713a00...   -> 24.1G (the HF blob copies; snapshots/main untouched)\n   \
+    \    rm -rf the two temp-only repos          -> 19.8G (pplx-decider-v1.1-27b-4bit 14G, clef-flash-4bit 5.8G)\n\
+    \     total ~43.9 GB, and no served model is touched.\n  4. Everything D-3180 said about \"0 B / unreferenced\
+    \ is not deletable\" STANDS and is strengthened: the pipeline\n     embedders/rerankers stay, and `~/.omlx/models_staged/Qwen3.8-27B-MTP4`\
+    \ (a symlink farm that reads 0 B)\n     produces the `plan` role.\n\nWHY THIS IS RECORDED AS A DECISION AND\
+    \ NOT A FOOTNOTE: a deletion order that names the wrong copy is the most\nexpensive class of error this OS can\
+    \ make - it is irreversible and it removes a MEASURED capability. The\ncorrection arrived from executing the\
+    \ check, not from re-reading the plan, which is the argument for making every\ndeletion instruction carry its\
+    \ own resolution first.\n"
+  bugs:
+  - BUG-1050
+  - BUG-804
+  - BUG-1046
+  files:
+  - governance/buglog.md
+  - governance/CALIBRATION_ROLE_MARKET_20261027.md
+  - config/hardware_profile.yaml

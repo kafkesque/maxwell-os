@@ -35108,3 +35108,182 @@ decisions:
   - governance/evidence/HARMONY_RED_LOOP_20261027_blankecho_run2.json
   - governance/evidence/HARMONY_RED_LOOP_20261027_replay_rerun.json
   supersedes: []
+- id: D-3202
+  state: ACTIVE
+  date: '2026-10-27'
+  by: owner
+  category: TOOL-CALL EMISSION / ROLE BINDING (T-216, T-215, T-217, D-3201, D-3200, D-3104, BUG-951, BUG-1081)
+  title: T-216 ANSWERED (b) at last - AGENT_LOOP_SHORT keeps gpt-oss-20b-MXFP4-Q8 and the bounded retry guard
+    becomes a PRECONDITION of the role rather than a mitigation to consider later
+  decision: |-
+    THE OWNER'S WORD (2026-10-27, T-216): option (b). Recorded with its reason, because D-3038 says a choice that keeps
+    the option it rejects must carry the reason.
+
+    (1) THE PREDECLARED RULE FIRED, and it was recorded BEFORE T-215 ran so it could not be fitted to its result: "(b)
+    if T-215 limb 2 drives the clean-axis loss to 0 over N>=30 with wall cost inside the declared per-turn budget". The
+    receipt that satisfies it is governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json - 30 calls, 0
+    lost, 2 detected, 2 recovered, +24.8 s of extra wall, slowest turn 24.3 s inside the ratified 90 s.
+
+    (2) WHAT IT BINDS. The guard is a PRECONDITION of the role, not a suggested improvement: AGENT_LOOP_SHORT is
+    admissible only where the caller re-asks a call the engine's parser ate. Until T-217 lands that shape in a caller,
+    the precondition is satisfied INSIDE the instrument only, so no working agent loop is protected by it yet. The
+    binding is therefore declared as "admissible, with a NAMED landing" - never as "healthy".
+
+    (3) THE ROLE IS NOT HEALTHY AND THIS DECISION DOES NOT CLAIM IT IS. BUG-951 stays OPEN: in the measured run the
+    parser still refused 2 of 30 headers, and the same engine still passes a corrupted recipient through (37 times in
+    one day). Under D-3201 clause 3 the verdict on a guarded run stays RED and the recovery is reported as a REPAIR.
+    What (b) buys is a role whose failure is DETECTED AND REPAIRED, not a role whose failure is gone.
+
+    (4) WHY (a) AND (c) LOSE, unchanged and on the record. (a) move the role to Qwen3.8-27B-MTP4 costs two declared
+    things - a permanently warm 42 GB engine slot, and a 611.2 s prefill at the 26,254-token class context against the
+    90 s budget (D-3199) - and its battery row is PROVISIONAL for lack of a measured decode rate (BUG-1087). (c)
+    accept ~1-in-5 loss explicitly is refused because a silently lost orchestrator call makes every downstream receipt
+    unreliable in a way no later verification can detect - the single failure this OS exists to prevent.
+
+    (5) THE REGISTERED CONTRADICTION IS CLEARED BY DECLARATION, NOT BY SILENCE. Until now AGENT_LOOP_SHORT was bound to
+    a model that is RED on its own gate with nothing said about it in the binding. It is now bound WITH its precondition
+    named and its landing task named, which is exactly what a declared contradiction requires (D-3035: a register may
+    hold an open question, it may not hold an unexplained one).
+
+    (6) WHAT THIS DOES NOT SETTLE, NAMED. The orchestrator question of D-3198 is NOT answered: MTP4 is still the only
+    model that passes the plan-quality gate and still has no route (BUG-1075). (b) says which model drives the SHORT
+    loop; it says nothing about which model PLANS.
+  measured:
+  - 'HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json: attempts=30 clean=30 malformed=0 dropped=0 engine_parse_errors=2
+    evictions=0 turns=32 slowest=24.3s, guard retries=2 recovered=2 retry_wall=24.8s - inside the ratified 90s per-turn
+    budget'
+  - 'HARMONY_RED_LOOP_20261027_clean_guard_IDENTICAL_RETRY.json (the refuted form, kept per D-3038): 6 retries, 0
+    recovered, +100.9s, 3 calls still lost - R7 pins temperature 0.0 so an identical re-issue replays the same refused
+    header'
+  bugs:
+  - BUG-951
+  - BUG-1081
+  tasks:
+  - T-216
+  - T-217
+  files:
+  - config/task_register.yaml
+  - config/decisions.yaml
+  - governance/buglog.md
+  supersedes: []
+
+- id: D-3203
+  state: ACTIVE
+  date: '2026-10-27'
+  by: assistant
+  category: INSTRUMENT ALLOWANCE / BUDGET DERIVATION (BUG-1081, BUG-1085, BUG-1087, D-3027, D-3199, D-3023, C12, C16)
+  title: THE TOKEN ALLOWANCE IS A DERIVED CEILING WITH NO INTERIOR OPTIMUM - priced on the CONSERVATIVE decode
+    reading, granted as PROVISIONAL_CEILING when no reading exists, and protected by one testable invariant
+  decision: |-
+    (1) NO SWEET SPOT EXISTS, AND THE QUESTION IS ANSWERED BY REFUSING ITS PREMISE. A token allowance cannot make a
+    turn faster; a smaller allowance can only CUT A TURN SHORT. So there is no interior optimum between the literal
+    1024 and the derived ceiling: those numbers are not a dial, they are a PROJECTION OF THE WALL. The only tunable is
+    per_turn_budget_s, whose one home is config/agent_context.yaml#ratified.knobs; the allowance is whatever that knob
+    buys at the model's decode rate, and nothing else. A value chosen between them would be a preference wearing a
+    derivation's clothes - which is exactly what 1024 was.
+
+    (2) THE RATE IS THE CONSERVATIVE READING, AND A RECEIPT BOUGHT THAT, NOT CAUTION. At the point estimate (41.7
+    tok/s) the grant for gpt-oss-20b-MXFP4-Q8 is 3753 tokens, and MEASURED 2026-10-27 20:10 that grant ran 96.00 s
+    against the ratified 90 s - 6.7% OVER - because the turn actually decoded at 39.1 tok/s (engine log line 9641).
+    Priced at the SLOWEST reading declared in the same cell (decode_tps 41.7, previous 33 -> 33) the grant is 2970 and
+    fits the wall by construction. D-3199's lesson one layer down: a rate is a READING, and a grant must be priced on
+    the reading that does not overshoot.
+
+    (3) NO READING, NO INVENTED NUMBER (C16). A served model with no decode rate receives the LARGEST derived grant the
+    table can pay, LABELLED PROVISIONAL_CEILING in the row and in the receipt with a named reason - so a PASS at it is
+    safe (the model had more room than any measured role) and a FAIL at it is never a reading about the model. Its cost
+    is registered, not hidden: BUG-1087 (over-grants Qwen3.8-27B-MTP4 3.06x its own ceiling, under-grants
+    MiniCPM5-2B-MLX to under half).
+
+    (4) THE INVARIANT THAT MAKES IT A DERIVATION AND NOT A PICK. For every derived grant, grant/rate <=
+    per_turn_budget_s, asserted in --selftest. If the derivation and the budget ever drift apart the control goes RED
+    instead of the number silently becoming a preference - the only way a "derived" value can be caught lying.
+
+    (5) TOKENS DO NOT ENFORCE SECONDS. The wall itself is still a literal 180 s in scripts/measure_subagent_loop.py#ask
+    - twice the declared budget (BUG-1085) - so this decision is not complete until the call site enforces the declared
+    wall. That change is deliberately NOT bundled here: a model's FIRST fixture pays the engine LOAD inside the turn
+    (MEASURED 33.5 s MiniCPM5-2B, 14.3 s MTP4), so tightening the wall can DELETE battery rows while looking tidy. It
+    needs its own red loop and a warm-up call that is not itself a turn; it is folded into T-217, which already owns the
+    caller and the wall.
+
+    (6) REJECTED, AND REGISTERED SO IT CANNOT RETURN (D-3038): picking a number between 1024 and 3753 (arbitrary - and
+    the 96.0 s receipt shows it is unbounded in the wrong direction anyway); re-introducing a prefill term into the
+    derivation (drafted and RETRACTED in config/agent_context.yaml#turn_budget before this decision - the retraction
+    stands, because a class's working_set is the prompt it must be able to pay for, not the prompt it sends); and
+    granting a bare default to an unmeasured model (C16).
+  measured:
+  - 'engine log ~/.omlx/logs/server.log:9641, 2026-10-27 20:10:24 - gpt-oss-20b-MXFP4-Q8, 3753 tokens in 96.00s (39.1
+    tok/s), prompt: 228, finish_reason=length, max_tokens=3753 -> the point-estimate grant does NOT fit the 90s wall'
+  - 'grants after the fix: gpt-oss 2970 (DERIVED, rate 33.0 of 41.7/33), Qwen3-Coder-30B 4455 (DERIVED, 49.5),
+    Phi-4-mini 3150 (DERIVED, 35.0 of 40/35), Qwen3.8-27B-MTP4 4455 (PROVISIONAL_CEILING, no reading)'
+  - 'subagent-loop --selftest 53 -> 61 known-answer controls, rc 0; harmony-red-loop --selftest 51/51, rc 0'
+  bugs:
+  - BUG-1081
+  - BUG-1085
+  - BUG-1087
+  tasks:
+  - T-217
+  files:
+  - config/agent_context.yaml
+  - scripts/measure_subagent_loop.py
+  - scripts/harmony_red_loop.py
+  - governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json
+  - governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_2970_REPLAY.json
+  supersedes: []
+
+- id: D-3204
+  state: ACTIVE
+  date: '2026-10-27'
+  by: assistant
+  category: PROVIDER ROUTING / SOVEREIGNTY (C1, C3, C21, C22, D-3023, D-3044, D-3104, D-3157, DELEGATE-001, BUG-222, BUG-1084)
+  title: EVERY ROLE THAT DRIVES A LOOP RUNS ON maxwell_omlx - custom_deepseek is ESCALATION-ONLY and never a role,
+    because a cloud completion leaves no engine witness and the whole evidence stack reads one
+  decision: |-
+    (1) THE ANSWER. Orchestrator, planner, tool-caller and coding roles all delegate through provider maxwell_omlx with
+    an EXPLICIT model. custom_deepseek stays declared, enabled and reachable as the escalation provider (D-3023/D-3044,
+    the harness fact `escalation_provider_reachable` is BOUND and must stay BOUND), and is used only by an
+    owner-triggered escalation: never by a role, never silently, never as a default.
+
+    (2) THE DECISIVE REASON IS NOT COST, IT IS WITNESS. Every verdict this OS records about a loop is read from the
+    engine's OWN log through the SHARED witness - engine_facts / log_offset / log_since / window / classify_turn
+    (D-3200 clause 2). A cloud completion writes no such log, so a subagent routed to custom_deepseek can be RECORDED
+    but never ATTRIBUTED: a dropped call, a malformed tool name and an eviction all become invisible, and the row
+    returns UNMEASURED for a reason that has nothing to do with the model. Routing a role there does not merely spend
+    money - it makes that role UNMEASURABLE BY CONSTRUCTION, which is the one thing this OS cannot afford in the role
+    that decides what every other role does.
+
+    (3) THE OTHER REASONS, ON THE RECORD. C1 ($0 marginal cost, all generation on local hardware) and C3 (sovereignty).
+    BUG-222: a previous drift in which active_provider HAD become custom_deepseek, fixed by owner decision. D-3157's
+    reading: session 20261026_1 held provider_name custom_deepseek and 20,515,807 accumulated tokens while the
+    config-side sovereignty rail printed BOUND - i.e. "declared and reachable" costs real money the moment it becomes
+    active, and a config-only reader cannot see it.
+
+    (4) DELEGATE-001 IS CARRIED AS A REGISTERED REFUSAL AND LABELLED UN-RE-VERIFIED. The reasoning_content passthrough
+    bug has not been re-measured since 2026-07, and it cannot be re-tested without spending money on a cloud call, so
+    it is stated as history rather than as a current measurement (D-3036). It is NOT the reason for this decision;
+    clause 2 is. A reader who needs it demoted to "unverified" should treat this clause as that demotion.
+
+    (5) WHAT MUST STAY TRUE, AND WHAT MUST NOT BE CLEANED UP. `providers.custom_deepseek.enabled: true` is CORRECT: the
+    escalation door must stay reachable and must never be the active provider, and `scripts/check_harness_homes.py`
+    reads exactly that fact (5 BOUND / 0 conflicting, 2026-10-27). What must be enforced instead is that no ROLE names
+    it: a delegate profile naming custom_deepseek is a declaration with no referent (D-3034) and
+    scripts/goose_profile.py --check reports it OWNER-OWED rather than silently provisioning it.
+
+    (6) THE ROLE-TO-MODEL BINDING IS NOT SETTLED HERE. This decision fixes WHICH PROVIDER a role may use, not which
+    MODEL wins a role. Orchestrator remains unanswered by measurement (D-3198: MTP4 is blocked by BUG-1075 and is now
+    also PROVISIONAL on its allowance), the plan role's MTP4 routes to BATCH at class context (D-3199), and BUG-1084
+    records that config/model_assignments.yaml#roles - including an ORCHESTRATOR entry naming the one served model
+    measured 0/4 at tool calling - is a 24-entry second home that no Python reader resolves.
+  measured:
+  - 'scripts/check_harness_homes.py 2026-10-27: 5 declared fact(s) | bound 5 | conflicting 0 | waiting 0 | unreadable 0
+    - escalation_provider_reachable BOUND via providers.custom_deepseek.enabled'
+  - 'sessions.db#sessions (read-only, 2026-10-27): newest rows are sub_agent/maxwell_omlx; 20261027_1 sub_agent
+    maxwell_omlx 13990 tokens - no user session on a cloud provider is present since the D-3157 reading'
+  bugs:
+  - BUG-222
+  - BUG-1084
+  files:
+  - config/engine.yaml
+  - config/agent_context.yaml
+  - config/model_assignments.yaml
+  supersedes: []

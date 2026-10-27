@@ -525,8 +525,27 @@ workstreams:
 #: below is a named SOURCE plus a FORMULA: no number here is chosen, and the checker recomputes each one.
 turn_budget:
   budget_home: 'ratified.knobs.per_turn_budget_s'      # the owner's knob - the ONE home for the budget
-  formula: 'max_tokens_per_turn(model) = floor(per_turn_budget_s * decode_tps(model))'
+  formula: 'max_tokens_per_turn(model) = floor(per_turn_budget_s * conservative_decode_tps(model))'
+  #: AMENDED 2026-10-27 (D-3203 / BUG-1081). The formula used to say `decode_tps(model)` - the cell's POINT
+  #: ESTIMATE - and MEASURED 20:10 that grant (3753 tokens for gpt-oss) ran 96.00 s against the ratified 90 s,
+  #: 6.7% OVER, because the turn actually decoded at 39.1 tok/s (engine log line 9641; receipt
+  #: governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json). The rate is therefore the
+  #: CONSERVATIVE reading declared in the same cell - min(decode_tps, previous), 41.7/33 -> 33, ceiling 2970 - which
+  #: fits the wall by construction. A rate is a READING (D-3199); a grant must be priced on the one that cannot
+  #: overshoot.
+  conservative_rate: 'min(decode_tps, previous) where both are declared in the cell; the point estimate when only
+                     one is'
   decode_source: 'measured_decode_20261015.decode_tps'  # measured, size-declared where it matters
+  #: WHO CONSUMES THE DERIVATION - named, because a formula with no reader is a comment (D-3034). Both loop
+  #: instruments read it through measure_subagent_loop.instrument_allowance(model); neither may hold a literal
+  #: (BUG-1081, and both --selftest suites assert the literal can never come back).
+  consumed_by:
+  - 'scripts/measure_subagent_loop.py#instrument_allowance / instrument_max_tokens'
+  - 'scripts/harmony_red_loop.py#run_model (the T-213 gate)'
+  unmeasured_model: >-
+    A served model with NO reading in decode_source is granted the LARGEST derived ceiling the table can pay,
+    labelled PROVISIONAL_CEILING in its row and its receipt with a named reason - never a default (C16). A PASS at
+    such a grant is safe; a FAIL at it is never a reading about the model. Its cost is BUG-1087.
   stall_rule: 'stall_s(class) > longest_turn_measured_s(class) * stall_margin'
   stall_margin: 2.0
   wall_rule: 'guards[timeout_guard] >= max_turns * per_turn_budget_s'

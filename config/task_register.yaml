@@ -3217,8 +3217,23 @@ tasks:
 
 - id: T-216
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-27
   mover: owner
+  owner_word_20261027: >-
+    "(b)" - the owner answered on 2026-10-27 and the answer is recorded as D-3202, with the reason D-3038 requires.
+    AGENT_LOOP_SHORT keeps gpt-oss-20b-MXFP4-Q8 and the bounded retry guard becomes a PRECONDITION of the role, not a
+    mitigation to consider later.
+  outcome_20261027: >-
+    The predeclared rule - recorded here BEFORE T-215 ran, so it could not be fitted to its result - was "(b) if T-215
+    limb 2 drives the clean-axis loss to 0 over N>=30 with wall cost inside the declared per-turn budget", and the
+    receipt that satisfies it exists: HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json, 30 calls / 0 lost / 2 detected /
+    2 recovered / +24.8 s / slowest turn 24.3 s inside the ratified 90 s. (a) was refused on two declared costs (a
+    permanently warm 42 GB slot and a 611.2 s prefill at the 26,254-token class context against a 90 s budget) and (c)
+    on the ground that a silently lost orchestrator call makes every downstream receipt unreliable in a way no later
+    verification can detect. The role is declared ADMISSIBLE WITH ITS PRECONDITION NAMED - never healthy: BUG-951 stays
+    OPEN and the verdict on a guarded run stays RED.
+  unblocks: T-217
   title: >-
     YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose
     gpt-oss-20b for CAPABILITY and it is now RED on EMISSION, so either the short-loop role moves to a model measured
@@ -3280,13 +3295,20 @@ tasks:
     your word, and the pipeline may not flip it. The two other options keep their registered reasons: (a) MTP4 with
     a permanently warm 42GB slot and a 26k prefill of 611.2 s against a 90 s budget; (c) refused as a default.
   next_step_for_owner: >-
-    Say which of (a)/(b)/(c) you choose, with its reason, and (b) then becomes: bind the guard into the caller (T-217)
-    and re-run this gate at class context.
+    ANSWERED 2026-10-27: (b). The answer is D-3202 and this row now closes with that word recorded. Nothing further is
+    owed here; the work it unblocks is T-217 (land the guard in a caller) and the allowance debt registered as
+    BUG-1085 (the wall is still a literal 180 s) and BUG-1087 (four served models have no measured decode rate).
 
 - id: T-217
   priority: MUST
   state: open
   mover: pipeline
+  unblocked_by_20261027: >-
+    D-3202 - the owner answered T-216 with (b), which makes this the landing task rather than a proposal. Scope widened
+    the same day by two readings this task now owns, because it owns the CALLER and therefore the wall: BUG-1085 (the
+    transport wall is a literal 180 s, twice the declared 90 s, so a turn can cost 2x the budget) and BUG-1087 (four of
+    nine served models have no measured decode rate, so the bound this guard enforces is PROVISIONAL for exactly the
+    models the role uses).
   title: >-
     LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture and
     into the turn-issuing path, consuming the SHARED engine witness, so a lost call costs one extra turn instead of

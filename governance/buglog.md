@@ -8,17 +8,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1327 decisions (census stamp e009a777c170e2df, 2026-10-27) · 847 bugs (267 open / 580 closed; highest OPEN = BUG-1083) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 1, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1330 decisions (census stamp 1872302adc85f274, 2026-10-27) · 851 bugs (269 open / 582 closed; highest OPEN = BUG-1087) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1327 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 668 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1327, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1330 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 671 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1330, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
+> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 138 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 269 open.
 >
-> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-216 | 🔴 MUST | YOUR CALL: the model you bound to the SHORT loop loses about one call in five on its own axis - D-3104 chose g | A decision row, not a measurement: ONE of three, written with its reas |
 >
 > **PIPELINE LANE (62) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -24225,3 +24224,132 @@ and not an edit.
 **Not claimed:** that the engine is at fault for symptom 2 (it refuses correctly — the model emitted a malformed
 header), and that 37 is a rate (the denominator is every harmony message today across every caller, not this fixture's
 30 calls).
+
+## BUG-1084 (MED, OPEN 2026-10-27) — `config/model_assignments.yaml#roles` IS A 24-ENTRY SECOND HOME THAT NO CODE RESOLVES, AND ONE OF ITS ENTRIES NAMES THE MODEL MEASURED UNABLE TO CALL A TOOL
+
+**Reading, not theory.** `config/model_assignments.yaml` carries two role tables: `roles` (24 entries, including
+`ORCHESTRATOR`, `PLANNER`, `CODING_CLEAN`, `HIGH_CAPABILITY`) and `harness_roles` (9 entries). Every Python reader in
+this repo resolves `harness_roles`: `pipeline/subagent_recipe.py:64` and `scripts/harmony_red_loop.py:297` are the only
+two, and both take `.get("harness_roles")`. `grep -rn "pipeline_roles"` returns NOTHING, and a grep for the role NAMES
+themselves across `*.py|*.just|*.sh|*.toml|*.json` returns exactly one file — `scripts/arm4_capabilities.py` — where
+`ORCHESTRATOR / CODING_DRAFT / gates` appears in a COMMENT beside a model path, not a read. So the `roles` block is
+declared, looks authoritative, and is resolved by nothing (D-3034: a declaration must RESOLVE).
+
+**The landmine inside it.** `roles.ORCHESTRATOR.model` is `Phi-4-mini-instruct-8bit`, the ONE served model measured at
+**0/4** on the T-199 battery (D-3198/N, receipt `governance/evidence/LOOP_BATTERY_20261025.json`), whose failure shape is
+BUG-053's: it answers from memory instead of calling a tool. A role literally named ORCHESTRATOR naming that model is a
+sentence a future reader will act on, and nothing today contradicts it at runtime because nothing reads it.
+
+**Why this is MED and not LOW.** A dead table is clutter; a dead table that (a) contradicts the live one and (b) names a
+measured-incapable model for the orchestrator role is a decision waiting to be made by accident. The header of the same
+file says "CANONICAL SOURCE for pipeline models: config/pipeline_config.yaml" — which carries NO `ORCHESTRATOR` role at
+all — so the file also states, in prose, a precedence its own body does not follow.
+
+**Not fixed here on purpose.** Deleting a 24-entry registry is a DECISION about what superseded it, not a cleanup (C19:
+archive, never delete; D-3038: what we reject stays registered with its reason). The fix is one owner word: either
+`roles` is REMOVED to `archive/` with the reason recorded, or it is WIRED and its `ORCHESTRATOR` re-pointed by
+measurement. Until then no script may name it.
+
+**Not claimed:** that any live run used `roles.ORCHESTRATOR` — the reading says nothing reads the block at all.
+
+## BUG-1081 (MED, FIXED 2026-10-27) — THE INSTRUMENTS NOW GRANT THE ROLE'S DERIVED CEILING, PRICED AT THE CONSERVATIVE RATE, AND THE PROVENANCE TRAVELS IN THE RECEIPT
+
+**Red loop first (D-3036).** Named command, run once RED and once GREEN, no theory before it:
+`/Users/barn/miniforge3/bin/python3 -c "import sys;sys.path.insert(0,'scripts');import measure_subagent_loop as m;print(m.BATTERY_MAX_TOKENS, m.instrument_max_tokens('gpt-oss-20b-MXFP4-Q8'))"`.
+BEFORE: `1024` then `AttributeError: module 'measure_subagent_loop' has no attribute 'instrument_max_tokens'` — the
+literal existed and no reader of the repo's own derivation did. AFTER: `2970`, provenance `DERIVED`.
+
+**What the fix is.** `scripts/measure_subagent_loop.py` loses the constant and gains `instrument_allowance(model)` /
+`instrument_max_tokens(model)`, which read ONLY declared facts: `ratified.knobs.per_turn_budget_s` (90) and
+`measured_decode_20261015.decode_tps`. `scripts/harmony_red_loop.py` imports the reader instead of the constant and both
+instruments now carry `allowance`, `allowance_provenance`, `allowance_reason` in every row and the gate's receipt.
+
+**The refinement that a receipt bought, not a preference.** MEASURED 2026-10-27 20:10 (`~/.omlx/logs/server.log` line
+9641: `3753 tokens in 96.00s (39.1 tok/s), prompt: 228, finish_reason=length, max_tokens=3753`) — a grant computed at the
+POINT ESTIMATE (41.7 tok/s -> 3753) ran **96.00s against a 90s budget, 6.7% OVER**, because the turn actually decoded at
+39.1. So the rate is now the CONSERVATIVE reading in the cell (min of `decode_tps` and `previous`: 41.7/33 -> 33), giving
+floor(90 x 33) = **2970** for gpt-oss, which fits the wall by construction. D-3199's lesson one layer down: a rate is a
+READING, and a grant must be priced on the reading that does not overshoot.
+
+| model | grant now | was | rates declared | basis |
+|---|---|---|---|---|
+| gpt-oss-20b-MXFP4-Q8 | 2970 | 1024 | 41.7 / 33 | DERIVED (conservative) |
+| Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | 4455 | 1024 | 49.5 | DERIVED |
+| Phi-4-mini-instruct-8bit | 3150 | 1024 | 40 / 35 | DERIVED |
+| Qwen3.8-27B-MTP4 | 4455 | 1024 | none | PROVISIONAL_CEILING (see BUG-1087) |
+
+**Controls, two-sided, 53 -> 61 known-answer** (`--selftest`, rc 0): the grant equals floor(budget x the CONSERVATIVE
+rate); it is priced on the slowest declared reading; it EXCEEDS the 1024 it replaced (a cosmetic fix would fail this);
+two different rates give two different grants (a constant in disguise would fail this); an unmeasured model is
+LABELLED `PROVISIONAL_CEILING` with a named reason; that bound never binds tighter than a derived grant; **the
+invariant** — every derived grant fits the wall at its own conservative rate; and neither instrument may name the
+literal again (the needle is concatenated so the control does not match its own source).
+
+**Evidence (never edited).** `governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json` — the
+96.0s overshoot, and the receipt that ended the "instrument truncates at 1024" reading: at the FULL 3753 the blank-echo
+turn still produced no content, so that axis is now honestly UNMEASURED at the role's ceiling rather than truncated by
+a literal. `governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_2970_REPLAY.json` — a live replay at the new grant
+(3 calls, 0 malformed, 0 dropped, slowest 9.8s, UNMEASURED below N=30 as declared).
+
+**What this does NOT fix.** The tokens cannot enforce SECONDS: `ask()` still waits a literal 180s (BUG-1085), so a turn
+can still cost 2x the declared budget; and four served models have no decode reading, so their grant is an upper bound
+(BUG-1087). Both are registered, neither is papered over. BUG-951 remains OPEN — this made the instrument honest, it did
+not make the parser repair anything.
+
+## BUG-1085 (MED, OPEN 2026-10-27) — THE WALL IS ENFORCED BY A LITERAL 180s, TWICE THE DECLARED 90s PER-TURN BUDGET, SO THE ONE KNOB THAT ACTUALLY BOUNDS A TURN IS UNDECLARED
+
+**Reading.** `scripts/measure_subagent_loop.py#ask()` opens the request with `timeout=180` — a bare literal (C12/C16),
+2x `ratified.knobs.per_turn_budget_s` (90). MEASURED 2026-10-27 20:10: a single turn ran **96.00s** and was accepted as
+a turn; the only reason it stopped at 96s was the token allowance running out, not the wall. At the 2970 grant the same
+turn would have run ~75-90s; at 3753 it ran 96s; nothing in the instrument would have stopped it before 180s.
+
+**Why it matters more than a magic number.** Every verdict in this instrument family is "per turn, against the declared
+budget" (D-3023/D-3027). An allowance in TOKENS is derived from that budget, but tokens do not enforce time — the
+transport wall does, and it is the one number that is neither derived nor declared. A turn that reasons for 179s is
+recorded as a turn and only fails the grader if the grader happens to compare `slowest_turn_s > budget`.
+
+**Not fixed in this turn, deliberately.** Replacing 180 with the declared 90 is a ONE-LINE change with a COVERAGE COST:
+a model's FIRST fixture pays the engine LOAD inside the turn (MEASURED: MiniCPM5-2B 33.5s, MTP4 14.3s warm-up), so a
+90s wall can cut a cold turn that a 180s wall let complete — i.e. the fix can DELETE battery rows while looking tidy.
+It therefore needs its own red loop (a cold-load turn recorded as a wall event rather than as a model failure) and a
+warm-up call that is not itself a turn. Folded into T-217, which already lands the guard in a caller and therefore owns
+the wall.
+
+## BUG-1086 (LOW, FIXED 2026-10-27) — THE GATE'S OWN RECEIPT DESCRIBED A RETRY RULE THE CODE NO LONGER RUNS
+
+**Reading.** `scripts/harmony_red_loop.py` wrote `"rule": "a turn whose owed call the engine's parser ate is RE-ISSUED
+byte-identically"` into every receipt after the implementation had changed to a NUDGED re-ask (T-215 limb 2 form 2,
+`RETRY_NUDGE`). The receipts of record — `..._clean_guard_IDENTICAL_RETRY.json` (6 identical re-issues, 0 recovered,
++100.9s) and `..._clean_guard_NUDGE.json` (30 calls, 0 lost, 2 recovered, +24.8s) — prove the two forms differ, so the
+sentence was not a harmless paraphrase: it described the form that was REFUTED. A receipt that misdescribes the rule its
+row was produced under is a small lie inside the one artifact the whole method rests on.
+
+**Fixed** in the same edit as BUG-1081: the receipt now states the nudge, names why a byte-identical re-issue cannot
+work (R7 pins temperature 0.0, so an identical prompt replays the same refused header), and carries the measured
+comparison that refuted form 1. No verdict, row or counter was changed.
+
+## BUG-1087 (MED, OPEN 2026-10-27) — FOUR OF NINE SERVED MODELS HAVE NO MEASURED DECODE RATE, SO THEIR ALLOWANCE IS AN UPPER BOUND THAT OVER-GRANTS THE SLOWEST AND UNDER-GRANTS THE FASTEST
+
+**Reading.** `config/agent_context.yaml#measured_decode_20261015.decode_tps` carries SIX readings. The harness declares
+NINE served models. Missing: `MiniCPM5-2B-MLX`, `Ornith-1.5-35B-A3B-REAP-19B`, `Ornith-1.5-9B-MLX-8bit`,
+`Qwen3.8-27B-MTP4`. BUG-1081's fix cannot invent a rate for them (C16), so they receive `PROVISIONAL_CEILING` = the
+LARGEST derived grant in the table (4455), labelled as such in every receipt.
+
+**Why an upper bound is the wrong shape in BOTH directions.**
+- OVER-GRANT: `Qwen3.8-27B-MTP4` has a measured decode of ~16.17 tok/s (D-3199), i.e. its own ceiling is ~1455. It is
+  being granted 4455 — **3.06x its own ceiling**, which at its own rate is **275s of decode against a 90s budget**. That
+  is not a truncation risk, it is a wall breach waiting for the first fixture that reasons to the limit.
+- UNDER-GRANT: `MiniCPM5-2B-MLX` declares 110.1 tok/s decode in `config/model_assignments.yaml#harness_roles.
+  AGENT_LOOP_FAST.basis`, i.e. a ceiling near 9909. It is being capped at 4455 — **under half its ceiling**, which is
+  exactly the BUG-1081 truncation reappearing on the fastest model in the portfolio.
+
+**The remedy is one cheap measurement per model, not a config edit.** Moving 110.1 into `decode_tps` from a `basis:`
+string would be a number changing homes without being re-measured (C16/BUG-794). The declared method already exists
+(`config/agent_context.yaml#measured_decode_20261015.method`: two calls, ONE prompt, two `max_tokens` (64/320),
+`decode_tps = (c2-c1)/(t2-t1)`, no streamed tokens), the script exists in `temp/decode_measure_20261015.py`, and a
+reading costs ~1 minute of engine time per model at 0 GB downloaded. Four models = a quarter hour of the engine's
+attention, and it retires four PROVISIONAL cells.
+
+**Not fixed here** because a measurement is a run, and this session's engine time went to the red loops this register
+names. It is folded into T-217, whose landing must otherwise ship a guard whose bound is provisional for the exact models
+the role uses.

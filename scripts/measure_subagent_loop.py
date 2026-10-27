@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import pathlib
 import re
 import sys
@@ -423,14 +424,67 @@ def run_two_step_model(decl: dict[str, Any], model: str, budget: float, workdir:
 # and carries a two-sided known-answer control in --selftest. Nothing is downloaded: the population is
 # the roster that is ALREADY served (0 GB), and every call is temperature 0 (R7).
 
-# MEASURED 2026-10-25: at the 256-token allowance the older fixtures use, gpt-oss-20b-MXFP4-Q8 spent 897 of 900
-# completion tokens on `reasoning_content` and returned NO content at all - so a 256-token battery would have read
-# "never called a tool" for a model whose loop the T-187 fixture PASSED. The allowance is raised for the battery
-# ONLY, and the driver below reports UNMEASURED when even this is consumed, because an instrument that blames the
-# model for its own allowance is the BUG-375 shape one layer in (fix direction: the allowance belongs in a
-# ratified knob, which is an owner act - config/agent_context.yaml#ratified.knobs holds per_turn_budget_s and no
-# token allowance yet).
-BATTERY_MAX_TOKENS = 1024
+# ── BUG-1081 / D-3203: THE ALLOWANCE IS THE ROLE'S DERIVED CEILING, NEVER A LITERAL (C12, D-3027) ────────────
+# WHAT WAS MEASURED, and why the literal is gone. MEASURED 2026-10-25: at a 256-token allowance gpt-oss-20b spent
+# 897 of 900 completion tokens on `reasoning_content` and returned NO content, so the battery would have read
+# "never called a tool" for a model whose loop the T-187 fixture PASSED - and the fix applied then was to RAISE THE
+# LITERAL to 1024. MEASURED 2026-10-27: 1024 truncates the same model again (blank-echo turn 2: tokens=1024,
+# finish_reason=length, EMPTY content, ZERO parse errors - it was reasoning, not failing), while the repo ALREADY
+# derived the per-turn ceiling as floor(per_turn_budget_s x decode_tps(model)) = 3753 for gpt-oss against the
+# ratified 90 s (D-3027). So the instruments were granting 27% of the ceiling the role actually owns.
+# THERE IS NO INTERIOR OPTIMUM TO PICK: a smaller allowance cannot make a turn faster - it can only CUT IT SHORT -
+# so the allowance IS the ceiling and the only tunable is the owner's wall budget (D-3023 one home).
+#
+# A MODEL WITH NO MEASURED DECODE RATE IS NOT GIVEN AN INVENTED NUMBER (C16). Four of the nine served models had no
+# reading when this landed, so the fallback is a DECLARED UPPER BOUND - the largest ceiling the table can pay, i.e.
+# what the FASTEST measured model can emit inside the same budget - labelled PROVISIONAL_CEILING so that no receipt
+# built on it can be mistaken for a certified one. READER BEWARE: pipeline/research_run.py takes the MINIMUM decode
+# rate from this same table because it prices a BILL (conservative = slowest); this takes the MAXIMUM because it
+# grants a CEILING (conservative = no model is truncated). Same table, opposite direction, both deliberate - do not
+# "unify" them.
+
+def instrument_allowance(model: str) -> dict[str, Any]:
+    """BUG-1081: the completion allowance an instrument grants, its provenance, and why it is underived if it is."""
+    table = ((_yaml(CONFIG).get("measured_decode_20261015") or {}).get("decode_tps")) or {}
+    budget = budget_s()
+    cell = table.get(model) or {}
+    rates = [float(cell[k]) for k in ("decode_tps", "previous")
+             if isinstance(cell.get(k), (int, float)) and cell.get(k) and cell[k] > 0]
+    if rates:
+        #: THE RATE IS THE CONSERVATIVE ONE, and this is measured, not cautious-by-temperament. MEASURED
+        #: 2026-10-27 20:10 (engine log, receipt temp/redloop_allowance_20261027.json): the grant computed at the
+        #: POINT ESTIMATE (41.7 tok/s -> 3753 tokens) took 96.00s of a 90s budget, i.e. 6.7% OVER - because the
+        #: turn actually decoded at 39.1 tok/s. A grant priced at the fastest rate we ever saw does not fit the
+        #: wall; a grant priced at the SLOWEST declared reading (41.7 measured, 33 previous -> 33) fits it by
+        #: construction: floor(90 x 33) = 2970 tokens, 90.0s at 33 tok/s. D-3199's own lesson one layer down: a
+        #: rate is a READING, and a grant must be priced on the reading that does not overshoot.
+        rate = min(rates)
+        return {"max_tokens": int(math.floor(budget * rate)), "provenance": "DERIVED",
+                "rule": "floor(per_turn_budget_s * conservative_decode_tps(model))",
+                "rate_basis": "conservative: the SLOWEST declared reading in the cell",
+                "per_turn_budget_s": budget, "decode_tps": rate,
+                "rates_declared": sorted(rates, reverse=True),
+                "agreement": cell.get("agreement"), "reason": ""}
+    bound = [int(math.floor(budget * min(float(c[k]) for k in ("decode_tps", "previous")
+                                         if isinstance(c.get(k), (int, float)) and c.get(k) and c[k] > 0)))
+             for c in table.values()
+             if isinstance(c, dict) and isinstance(c.get("decode_tps"), (int, float)) and c["decode_tps"] > 0]
+    if not bound:
+        raise SystemExit("FATAL: config/agent_context.yaml#measured_decode_20261015.decode_tps carries no usable "
+                         "reading - no allowance can be derived and none will be invented (C16/BUG-1081)")
+    return {"max_tokens": max(bound), "provenance": "PROVISIONAL_CEILING",
+            "rule": "max over the measured table of floor(per_turn_budget_s * decode_tps) - an UPPER BOUND",
+            "rate_basis": "none: the model has no declared reading",
+            "per_turn_budget_s": budget, "decode_tps": None, "rates_declared": [],
+            "agreement": None,
+            "reason": f"no measured decode rate for {model!r} in measured_decode_20261015.decode_tps - the grant is "
+                      f"the largest ceiling the table can pay, so a PASS at it is safe and a FAIL at it is NOT a "
+                      f"reading about the model (BUG-1081's named debt: measure the rate)"}
+
+
+def instrument_max_tokens(model: str) -> int:
+    """The one number a caller needs; the provenance travels beside it through instrument_allowance() (BUG-1081)."""
+    return int(instrument_allowance(model)["max_tokens"])
 
 BATTERY_GEOMETRY = {
     "manifest": (2, 3, 4),                      # files the manifest NAMES -> expected 9
@@ -730,6 +784,7 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
     url = str(decl["base_url"]).rstrip("/") + "/chat/completions"
     key = str((decl.get("headers") or {}).get("Authorization", ""))
     facts = engine_facts()          # FATAL if the engine's witness is undeclared: a blind battery is worse (C16)
+    grant = instrument_allowance(model)   # BUG-1081: the ceiling the ROLE owns, and the provenance of the grant
     derived = fixture["build"](workdir)
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": fixture["system"]},
@@ -742,7 +797,7 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
     for _ in range(MAX_TURNS):
         offset = log_offset(facts["log"])          # everything written after this belongs to THIS turn
         try:
-            reply, wall, _usage = ask(url, key, model, messages, BATTERY_MAX_TOKENS, tools=fixture["tools"])
+            reply, wall, _usage = ask(url, key, model, messages, int(grant["max_tokens"]), tools=fixture["tools"])
         except TimeoutError as exc:
             error = f"{type(exc).__name__}: {exc}"
             break
@@ -806,6 +861,8 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
             "foreign_completions": sum(one["foreign_completions"] for one in state["windows"]),
             "turn_calls": state["parallel_max"], "turns": len(state["walls"]),
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
+            "allowance": int(grant["max_tokens"]), "allowance_provenance": grant["provenance"],
+            "allowance_reason": grant["reason"],
             "answer": state["answer"].strip()[:200]}
 
 
@@ -989,10 +1046,64 @@ def selftest() -> int:
     for got, want, label in bug1079_cases:
         if got != want:
             bad.append(f"{label}: got {got!r}")
+
+    # ── BUG-1081 / D-3203 controls: the allowance is DERIVED, MODEL-DEPENDENT, and never a literal.
+    table = ((_yaml(CONFIG).get("measured_decode_20261015") or {}).get("decode_tps")) or {}
+    budget = budget_s()
+    fast, slow = "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "Phi-4-mini-instruct-8bit"
+    want_fast = int(math.floor(budget * min(float(table[fast][k]) for k in ("decode_tps", "previous")
+                                            if isinstance(table[fast].get(k), (int, float)))))
+    got_fast = instrument_allowance(fast)
+    if got_fast["max_tokens"] != want_fast or got_fast["provenance"] != "DERIVED":
+        bad.append(f"BUG-1081: a measured model must be granted floor(budget x its CONSERVATIVE rate) = "
+                   f"{want_fast}, got {got_fast['max_tokens']} ({got_fast['provenance']})")
+    if got_fast["decode_tps"] > max(v for v in (table[fast].get("decode_tps"), table[fast].get("previous"))
+                                    if isinstance(v, (int, float))):
+        bad.append("BUG-1081: the grant must be priced on the SLOWEST declared reading, never the fastest")
+    if got_fast["max_tokens"] <= 1024:
+        bad.append(f"BUG-1081: the derived grant {got_fast['max_tokens']} does not exceed the literal 1024 it "
+                   f"replaced - the fix would be cosmetic")
+    if instrument_allowance(fast)["max_tokens"] == instrument_allowance(slow)["max_tokens"]:
+        bad.append("BUG-1081: two DIFFERENT decode rates must produce two DIFFERENT grants - an equal grant is a "
+                   "constant wearing a derivation's clothes")
+    underived = instrument_allowance("a-model-with-no-reading")
+    bound = max(int(math.floor(budget * min(float(c[k]) for k in ("decode_tps", "previous")
+                                           if isinstance(c.get(k), (int, float)) and c.get(k))))
+                for c in table.values() if isinstance(c.get("decode_tps"), (int, float)))
+    if underived["provenance"] != "PROVISIONAL_CEILING" or underived["max_tokens"] != bound:
+        bad.append(f"BUG-1081: an unmeasured model must receive the table's largest ceiling ({bound}) LABELLED "
+                   f"PROVISIONAL_CEILING, got {underived['max_tokens']} ({underived['provenance']})")
+    if underived["max_tokens"] < got_fast["max_tokens"]:
+        bad.append("BUG-1081: the PROVISIONAL grant must not be SMALLER than a derived one - an upper bound that "
+                   "binds tighter than a measurement is a truncation with a label on it")
+    if not underived["reason"] or "decode rate" not in underived["reason"]:
+        bad.append("BUG-1081: a provisional grant with no NAMED reason is a silent default (C16)")
+    #: THE INVARIANT that makes the grant defensible: priced at the slowest declared rate, the whole grant fits
+    #: the wall by construction. If this ever fails, the derivation and the budget have drifted apart.
+    for model_name, cell in table.items():
+        g = instrument_allowance(model_name)
+        if g["provenance"] == "DERIVED" and g["max_tokens"] / g["decode_tps"] > budget + 1e-6:
+            bad.append(f"BUG-1081: the grant for {model_name} ({g['max_tokens']} tokens at {g['decode_tps']} "
+                       f"tok/s) does not fit the {budget:g}s wall - the derivation has drifted from the budget")
+    #: the needle is CONCATENATED so this control does not match its own source (a self-matching guard is a
+    #: guard that always fails - it would have proven nothing about the instruments)
+    needle = "BATTERY_" + "MAX_TOKENS"
+    for source in ("scripts/measure_subagent_loop.py", "scripts/harmony_red_loop.py"):
+        if needle in (ROOT / source).read_text(encoding="utf-8"):
+            bad.append(f"BUG-1081: {source} still names the literal allowance constant - re-hardcoding guard")
+
     for problem in bad:
         print(f"  FAIL control: {problem}")
     total = (len(cases) + 1 + len(ts_cases) + 1 + len(battery_cases) + 4 + 6 + len(bug1079_cases)
-             + 2)   # + 2 = the rotation guard's own two-sided pair (raises on a shrunk log, reads normally)
+             + 2       # the rotation guard's own two-sided pair (raises on a shrunk log, reads normally)
+             + 1       # BUG-1081: the grant is floor(budget x the CONSERVATIVE rate), labelled DERIVED
+             + 1       # BUG-1081: the grant is priced on the slowest declared reading, never the fastest
+             + 1       # BUG-1081: the grant exceeds the 1024 literal it replaced (a cosmetic fix would pass this)
+             + 1       # BUG-1081: two different rates give two different grants (not a constant in disguise)
+             + 1       # BUG-1081: an unmeasured model is labelled PROVISIONAL_CEILING and carries a reason
+             + 1       # BUG-1081: the PROVISIONAL bound never binds tighter than a derived grant
+             + 1       # BUG-1081: every derived grant fits the wall at its own conservative rate (the invariant)
+             + 1)      # BUG-1081: no instrument still names the literal allowance constant
     print(f"{'OK' if not bad else 'FAILED'} subagent-loop controls: {total - len(bad)}/{total} known-answer")
     return 1 if bad else 0
 

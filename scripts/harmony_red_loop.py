@@ -93,7 +93,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 # identity already exist in the loop instrument, and a second copy of any of them is how two receipts start
 # disagreeing about one machine. `_yaml` is imported with its underscore because it IS this repo's one loader.
 from measure_subagent_loop import (  # noqa: E402  (path is set above, deliberately)
-    BATTERY_MAX_TOKENS,
     _yaml,
     ask,
     budget_s,
@@ -101,6 +100,7 @@ from measure_subagent_loop import (  # noqa: E402  (path is set above, deliberat
     declaration,
     engine_block,
     engine_facts,
+    instrument_allowance,
     log_offset,
     log_since,
     window,
@@ -353,6 +353,7 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
     url = str(decl["base_url"]).rstrip("/") + "/chat/completions"
     key = str((decl.get("headers") or {}).get("Authorization", ""))
     markers = facts["markers"]
+    grant = instrument_allowance(model)   # BUG-1081: the ceiling the ROLE owns, and the provenance of the grant
     messages = (seed_history(total, tail, mode in ("replay", "blank-echo"), echo_variant)
                 if mode in ("replay", "clean", "blank-echo") else
                 [{"role": "system", "content": "You are a sub-agent. You MUST use the provided tool; never "
@@ -374,7 +375,8 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             break
         offset = log_offset(facts["log"])
         try:
-            reply, wall, usage = ask(url, key, model, messages, BATTERY_MAX_TOKENS, tools=[READ_INDEX_SPEC])
+            reply, wall, usage = ask(url, key, model, messages, int(grant["max_tokens"]),
+                                     tools=[READ_INDEX_SPEC])
         except urllib.error.HTTPError as exc:
             body = ""
             try:
@@ -491,6 +493,8 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             "retry_bound_hits": state["retry_bound_hits"],
             "retry_wall_s": round(sum(s["wall_s"] for s in state["steps"] if s.get("retried")), 1),
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
+            "allowance": int(grant["max_tokens"]), "allowance_provenance": grant["provenance"],
+            "allowance_reason": grant["reason"],
             "verdict": got, "detail": detail, "steps": state["steps"]}
 
 
@@ -715,11 +719,18 @@ def main() -> int:
                         }[args.mode],
                "engine": engine_block(), "engine_log": str(facts["log"]),
                "per_turn_budget_s": budget, "declared_served": served,
+               "instrument_allowance": {"max_tokens": row["allowance"], "provenance": row["allowance_provenance"],
+                                        "rule": "BUG-1081/D-3203: floor(per_turn_budget_s * decode_tps(model)) from "
+                                                "config/agent_context.yaml#turn_budget - never a literal",
+                                        "reason": row["allowance_reason"]},
                "min_bound_calls": MIN_BOUND_CALLS, "drop_ceiling": DROP_CEILING,
                "retry_guard": {"on": args.retry_guard, "per_call_ceiling": RETRY_CEILING,
                                "run_budget": RETRY_BUDGET,
-                               "rule": "a turn whose owed call the engine's parser ate is RE-ISSUED byte-identically; "
-                                       "an allowance, a silent stop or a declined call is NEVER retried"},
+                               "rule": "a turn whose owed call the engine's parser ate is RE-ASKED with a nudge that "
+                                       "NAMES the missing call - never byte-identically, because R7 pins temperature "
+                                       "0.0 and an identical prompt is a deterministic replay of the same refused "
+                                       "header (measured 2026-10-27: 6 identical re-issues recovered 0 of 3); an "
+                                       "allowance, a silent stop or a declined call is NEVER retried"},
                "not_tested": ["enable_thinking=False on a harmony model that emits an analysis channel anyway "
                               "(a server-side setting this fixture never changes)",
                               "the <|channel|>json where <|constrain|>json belongs token confusion: the marker is "

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**267 open** / 580 closed of 847 ids.
+**269 open** / 582 closed of 851 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -276,5 +276,7 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1074 | (LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work, | 1 |
 | BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |
 | BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |
-| BUG-1081 | (MED, OPEN 2026-10-27) — three loop instruments grant a bare 1024-token allowance while the repo DERIVES it | 1 |
 | BUG-1083 | (MED, OPEN 2026-10-27) — the SUITE rail is RED on a census receipt mismatch, and the ladder's own comment still declares three reds that no | 1 |
+| BUG-1084 | (MED, OPEN 2026-10-27) — `config/model_assignments.yaml#roles` IS A 24-ENTRY SECOND HOME THAT NO CODE RESOLVES, AND ONE OF ITS ENTRIES | 1 |
+| BUG-1085 | (MED, OPEN 2026-10-27) — THE WALL IS ENFORCED BY A LITERAL 180s, TWICE THE DECLARED 90s PER-TURN BUDGET, SO THE ONE KNOB THAT ACTUALLY | 1 |
+| BUG-1087 | (MED, OPEN 2026-10-27) — FOUR OF NINE SERVED MODELS HAVE NO MEASURED DECODE RATE, SO THEIR ALLOWANCE IS AN UPPER BOUND THAT OVER-GRANTS THE | 1 |

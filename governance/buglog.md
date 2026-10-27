@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1332 decisions (census stamp 464ff800767b7ada, 2026-10-27) · 854 bugs (269 open / 585 closed; highest OPEN = BUG-1090) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1335 decisions (census stamp 2e898d15d93a15d2, 2026-10-27) · 857 bugs (272 open / 585 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1332 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 673 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1332, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1335 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1335, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 138 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 269 open.
+> Open BUGS by severity (population = the census's 272 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 61 · 🟨 MED 138 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 272 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24520,3 +24520,113 @@ measured rate are now two facts that contradict each other, and nothing in the r
 
 **Not fixed here** because a role binding is an owner-lane act (D-3035) and because doing it silently would be the
 "second home" fault BUG-1084 already registers. Related: BUG-1084, D-3198, BUG-1075, D-3104.
+
+## BUG-1091 (HIGH, OPEN 2026-10-27) - THE ALLOWANCE IS PRICED FOR A FIXTURE TURN: decode is paid out of the WHOLE budget and the PREFILL BILL is deducted nowhere - so at the role's real 26,214-token context SIX of SEVEN served models are UNPAYABLE and the seventh is granted 3.3x what is left
+
+**Found by auditing the arithmetic of the green ribbon, not by a failing test.** `instrument_max_tokens(model)` returns
+`floor(per_turn_budget_s x decode_tps(model))` - decode is handed 100% of the 90 s. But `wall_reading()` calls a turn
+OVER_BUDGET when the elapsed time of the WHOLE HTTP call exceeds the same 90 s, and the budget's own note computes
+usability as `26214/210 = 125 s` (`config/agent_context.yaml:221`). **Two readers of one knob disagree about what the
+knob covers**, and the register says both things in the same file.
+
+**Why the green ribbon could not see it.** The battery's fixture prompt is 69 tokens (the engine log in
+`governance/evidence/HARMONY_RED_LOOP_20261027_TRANSPORT_WALL_105_REPLAY.json` records `prompt: 69`), so prefill is
+~0.2 s and "decode time" and "turn time" are the same number. T-217 already said *a fixture-sized certificate does not
+travel*; this is that sentence with the arithmetic attached.
+
+**MEASURED (register's own rows, 90 s budget, 26,214-token context).** `payable = floor(max(0, 90 - 26214/prefill_tps) x decode_tps)`:
+
+| role model | prefill tok/s (read at) | prefill bill | decode tok/s (read at) | left | PAYABLE | granted today | over-grant |
+|---|---|---|---|---|---|---|---|
+| gemma-4-E4B-it-MLX-4bit | 417.67 (26,254) | 62.76 s | 27.0 (4,468 - PROXY) | 27.24 s | **735** | 2430 | **3.31x** |
+| MiniCPM5-2B-MLX | 295.30 (26,226) | 88.77 s | 41.76 (26,226) | 1.23 s | **51** | 3758 | **73.7x** |
+| Ornith-1.5-35B-A3B-REAP-19B | 289.14 (26,224) | 90.66 s | 36.1 (26,224) | -0.66 s | **0 UNPAYABLE** | 3249 | n/a |
+| Ornith-1.5-9B-MLX-8bit | 141.40 (26,224) | 185.39 s | 17.12 (26,224) | -95.39 s | **0 UNPAYABLE** | 1540 | n/a |
+| gpt-oss-20b-MXFP4-Q8 (**AGENT_LOOP_SHORT**) | 210.00 (50,082) | 124.83 s | 33.0 (50,082) | -34.83 s | **0 UNPAYABLE** | 2970 | n/a |
+| Qwen3.8-27B-MLX-4bit (**AGENT_EDIT_LONG_CONTEXT**) | 39.00 (32,026) | 672.15 s | 7.5 (36) | -582.15 s | **0 UNPAYABLE** | 675 | n/a |
+| Qwen3.8-27B-MTP4 | 42.89 (26,254) | 611.19 s | 15.5 (short) | -521.19 s | **0 UNPAYABLE** | 1395 | n/a |
+
+Derivation reproducible from `config/agent_context.yaml` alone (measured_20261014.prefill + measured_decode_20261015 +
+measured_prefill 2026-10-27); no artifact needed, the register IS the receipt.
+
+**THE OPERATIONAL CONSEQUENCE, and it is a cascade.** `GOOSE_AUTO_COMPACT_THRESHOLD 0.94 x GOOSE_CONTEXT_LIMIT 32768`
+= the harness is allowed to fill **30,800 tokens** of context before it compacts, while gpt-oss's payable context at a
+90 s budget with a 20 s decode reserve is `240 x 70 = 16,800`. **The context contract permits a context every turn
+cannot pay for**, so the turns that blow the 105 s transport wall are not exceptional - they are the steady state the
+configuration asks for. This is the same defect class as BUG-1085 (a client-side second opinion about how long a turn
+may take), one layer up: here it is the ALLOWANCE that disagrees with the WALL.
+
+**WHY THIS MUST LAND BEFORE G4, not after.** T-217's remaining item is to run the emission gate at the role's real
+context (D-3205 G4). Run with today's allowance, every row returns EXCEEDED/OVER_BUDGET and is DELETED as UNMEASURED
+(BUG-1085's three-way reading is doing exactly its job). The honest use of the instrument would destroy its own
+evidence, and the deletion would be read as "the model failed at 26k" when it is the PRICING that failed. Sequencing is
+a correctness property, not project management.
+
+**Three fictions retired together:** (1) the budget is answer time; (2) a rate read at 36 tokens is the rate at 26k
+(the register states this rule for PREFILL - "a prefill reading that does not declare the prompt size it was taken at
+is INCOMPARABLE, not merely imprecise" - and applies it to decode NOWHERE, a rule enforced on one axis and not its
+twin, the D-2949/BUG-729 shape); (3) a 3.3x-74x over-grant is "conservative" - a bound computed under the wrong
+conditions is not a bound.
+
+**FIX SHAPE (registered, NOT bundled - D-3038 scope discipline).** `instrument_max_tokens(model, prompt_tokens)`:
+`floor(max(0, budget - prefill_bill(prompt_tokens)) x decode_tps_read_at(prompt_tokens))`, returning
+`provenance: UNPAYABLE` with a named reason when the bill meets or exceeds the budget, and refusing to price a
+decode rate that declares no prompt size. The knobs (`GOOSE_CONTEXT_LIMIT`, compaction threshold, `per_turn_budget_s`)
+then derive from ONE equation instead of three decisions. RED LOOP (D-3036) is pre-registered with this entry: the
+control must return 735 for gemma-E4B and 0 for gpt-oss at 26,214, and must REFUSE a rate with no declared prompt
+size - it cannot exist against today's signature, which is the bug.
+
+## BUG-1092 (LOW, OPEN 2026-10-27) - 34 of the 269 OPEN ids have no section in the append-only register: a COUNT with no evidence BODY
+
+MEASURED 2026-10-27 by parsing `governance/buglog.md` for `^## BUG-<id>` headings against
+`governance/bug_status.json#open` (269): **235 have a section; 34 do not** (`BUG-426`, `BUG-427`, `BUG-431`,
+`BUG-432`, `BUG-433` ... - the early-id era). They appear ONLY as cross-references inside other entries (`grep -c
+"BUG-426" governance/buglog.md` = 7, all of them mentions). Their defining text lives in a `.bak` or an older
+document, which the live register does not point at.
+
+WHY IT MATTERS (D-3034): a declaration must RESOLVE. An open id whose body is not in the register declares an
+obligation nobody can read, and it is counted in the 269 that D-3205 measures. This is NOT BUG-757 (which is a
+missing SEVERITY token); this is a missing BODY, and the two together mean the register cannot be ordered OR read at
+those ids.
+
+REMEDY (cheap, deterministic): for each of the 34, either restore the section from the backup with a pointer, or
+re-close it with a reason. Never delete the count silently - that is the "fix by changing what counts" shape this
+register refuses (BUG-1079 inverted).
+
+## BUG-1093 (LOW, OPEN 2026-10-27) - A SUPERLATIVE OVER A COMPLEMENT SET READS AS A GLOBAL CLAIM: "worst measured non-27B decode (13.4 tok/s)" produced a fair owner question
+
+The owner asked how Qwen3.8-27B can be "the slowest model" when 13 t/s was on the record. **Nothing is wrong with the
+numbers.** `13.4 tok/s` is `gemma-4-12B-it-qat-OptiQ-4bit`, retired 2026-10-15 (T-139/D-3013), and the sentence says
+"worst measured **non-27B** decode" - the qualifier excludes 27B precisely BECAUSE 27B is worse. The fault is the
+WELD: a comparator set hidden inside an adjective, so the phrase reads as a global superlative and the reader supplies
+the wrong comparator. Three distinct rates were then in one reader's head as one number (llmrun's ~16 CLAIM, the 9.3
+A/B pure-decode READING, the harness's 7.5 in-loop READING).
+
+RULE (recorded here so the next writer inherits it): a superlative must name its comparator set explicitly - "the
+slowest of the four non-27B models" - or be struck; and a rate is quoted WITH the prompt size it was read at
+(BUG-1091). Zero behaviour change; this entry exists because the sentence was accurate and still misled, which is the
+drift this OS is trying to be immune to.
+
+### BUG-1091 — R5 UPDATE (gemma-4-E4B-it-MLX-4bit, subagent 20261027_3, temperature 0.0, same day)
+
+**The verifier answered NOT DETERMINABLE to all three questions, and on the first one it was RIGHT ABOUT MY WORDING.**
+Its reason: Sources B and C do not say explicitly that the budget covers prefill; C only shows a prefill/comparison
+arithmetic. That is a true reading of the two documents I sent, and it means my entry asserted the wall's semantics from
+an INFERENCE (the wall wraps the request, therefore it wraps prefill) rather than from a reading.
+
+**The third source settles it and was not in the pack sent for review: the ENGINE'S OWN COUNTER.** BUG-793 records, for
+the 32,026-token prompt: `time_to_first_token = 715.7 s`, `prompt_tokens_per_second = 39.02`,
+`generation_tokens_per_second = 1.68`, all on ONE call. A first token that took 715.7 s INSIDE the request means prefill
+is inside the request, and `wall_reading()` times exactly that request (`elapsed_s = time.monotonic() - started` around
+one `urllib.request.urlopen`). So prefill is inside the turn by MEASUREMENT, not by inference: the same call that
+reports 39.02 tok/s of prefill reports it under one wall clock, and the budget note computes usability as
+`26214/210 = 125 s`, which is prefill arithmetic against a per-TURN budget.
+
+**Its Q2 and Q3 arithmetic AGREED with the entry**, which is the part a source-grounded reviewer can check:
+26214/210 = 124.8 s > 90 s; 0.94 x 32768 = 30,799 tokens needing 146.7 s of prefill at 210 tok/s.
+
+**What R5 changed:** the entry's evidence line is now the engine counter, not the YAML's silence. What it did NOT change:
+the finding, the table, or the sequencing rule (D-3207 clause 4). This is the second consecutive session in which the
+useful contribution of the local verifier was a flaw in MY wording found by making me state the evidence — recorded here
+because "the verifier said NOT DETERMINABLE" is not a refutation, and a reader must be able to tell which of the two
+happened.

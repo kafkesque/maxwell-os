@@ -35431,3 +35431,194 @@ decisions:
   - config/agent_context.yaml
   - scripts/measure_subagent_loop.py
   supersedes: []
+
+- id: D-3207
+  state: ACTIVE
+  date: '2026-10-27'
+  by: assistant
+  category: PRICING / BUDGET COHERENCE (C12, C16, D-3027, D-3109, D-3203, D-3205, D-3206, BUG-1081, BUG-1085, BUG-1091)
+  title: "A RATE WITHOUT ITS PROMPT SIZE IS INCOMPARABLE, AND AN ALLOWANCE THAT DOES NOT DEDUCT PREFILL IS A FIXTURE
+    PRICE - the allowance is net of the prefill bill, UNPAYABLE is a legitimate verdict, and the context contract, the
+    compaction trigger and the per-turn budget are ONE equation"
+  decision: |-
+    (1) THE RULE THE REGISTER ALREADY WROTE, APPLIED TO THE AXIS IT WAS NEVER APPLIED TO. `config/agent_context.yaml`
+    states it for prefill - "a prefill reading that does not declare the prompt size it was taken at is INCOMPARABLE,
+    not merely imprecise" - and applies it to PREFILL ONLY. Every decode rate in `measured_decode_20261015` was read on
+    a ~36-token prompt, and `instrument_max_tokens` prices a grant with no prompt-size argument at all. The rule is
+    therefore BINDING ON DECODE as well: a decode rate is quoted and consumed WITH the prompt size it was read at.
+
+    (2) THE ALLOWANCE IS NET OF PREFILL, and this is forced by the wall's own semantics rather than chosen:
+    `wall_reading()` marks OVER_BUDGET when the WHOLE HTTP turn exceeds `per_turn_budget_s`, and the budget's own note
+    already computes usability as `26214/210 = 125 s` against the same budget. Two readings of one knob disagreed about
+    what the knob covers. The single coherent form is
+      allowance = floor(max(0, per_turn_budget_s - prefill_bill(context_tokens)) x decode_tps_read_at(context_tokens))
+    with `provenance: UNPAYABLE` and a named reason when the bill meets or exceeds the budget. UNPAYABLE is a VERDICT,
+    not a failure: it says the role cannot be run at that context inside that budget, which is information the register
+    currently hides by granting 675-3758 tokens to models whose prefill alone takes 125-672 s (BUG-1091).
+
+    (3) THREE KNOBS, ONE EQUATION. `GOOSE_CONTEXT_LIMIT`, the compaction threshold and `per_turn_budget_s` are not three
+    independent decisions: payable_context_tokens = prefill_tps x (budget - declared_decode_reserve_s). MEASURED
+    consequence today: gpt-oss-20b at 240 tok/s with a 20 s reserve pays 16,800 tokens, while the compaction trigger
+    permits 30,800 - the configuration asks for a context every turn cannot pay for, so wall-breaching turns are the
+    steady state, not an exception.
+
+    (4) SEQUENCING IS A CORRECTNESS PROPERTY. T-217's remaining item is D-3205's G4 - run the emission gate at the
+    role's real 26,214-token context. With today's allowance EVERY row would return EXCEEDED/OVER_BUDGET and be deleted
+    as UNMEASURED: the honest use of the instrument would destroy its own evidence, and the deletion would be read as
+    "the model failed at 26k" when it is the pricing that failed. BUG-1091 therefore lands BEFORE G4, never after.
+
+    (5) WHAT IS NOT DECIDED HERE. The budget VALUE stays the owner's knob (D-3203); whether the harness's declared
+    window should be re-scoped is an owner-lane act (D-3035); and no model is re-bound by this decision.
+
+    (6) THE ACCEPTANCE FIXTURE IS THE MEASURED TABLE, not a preference: at 26,214 tokens and 90 s, gemma-4-E4B pays 735
+    tokens after a 62.76 s bill; MiniCPM5-2B pays 51 after 88.77 s; Ornith-REAP-19B, Ornith-9B, gpt-oss-20b,
+    Qwen3.8-27B-MLX and Qwen3.8-27B-MTP4 are UNPAYABLE. A fix that does not reproduce those seven numbers is not the fix.
+  rejected:
+  - option: raise per_turn_budget_s until the models fit
+    why: 'that moves the owner''s knob to hide a pricing error, and the note beside the knob already says no budget
+      makes Qwen3.8-27B a loop (26214/39 = 672 s). The defect is the FORMULA, not the number.'
+  - option: keep granting today''s numbers and document the caveat in prose
+    why: 'the caveat cannot be read by the instrument (D-3034), and the failure it hides is silent: a grant 3.3x-74x
+      larger than what fits is spent as UNMEASURED rows, which is the one outcome this measurement stack exists to avoid.'
+  measured:
+  - 'BUG-1091 table (reproducible from config/agent_context.yaml alone): gemma-4-E4B payable 735 / naive 2430 = 3.31x;
+    MiniCPM5-2B payable 51 / naive 3758 = 73.7x; five models UNPAYABLE at 26,214 tokens against a 90 s budget'
+  - 'the register''s own two readings of one knob: wall_reading() OVER_BUDGET at elapsed > budget (whole turn) vs
+    instrument_max_tokens() granting decode 100% of the budget'
+  bugs:
+  - BUG-1091
+  - BUG-1085
+  files:
+  - config/agent_context.yaml
+  - scripts/measure_subagent_loop.py
+  supersedes: []
+
+- id: D-3208
+  state: ACTIVE
+  date: '2026-10-27'
+  by: assistant
+  category: WORK METHOD / FIXER LOOP (C16, C21, D-3036, D-3038, D-3200, D-3204, D-3245, BUG-757, BUG-1092)
+  title: "A LOOP MAY FIX ONLY WHAT A NAMED COMMAND CAN REFUTE - 54 of 269 open bugs are loop-admissible today, 154 are
+    prose, 34 are counts with no body, and 'each fix opens a bug' is a property of fixing WITHOUT an instrument, not of
+    fixing"
+  decision: |-
+    (1) THE MEASUREMENT, so the answer is a number and not a mood. Census over `governance/bug_status.json#open` (269)
+    against each id's LAST section in `governance/buglog.md`: **54 name a runnable command** (37 command-only + 17
+    command+receipt), **27 name a receipt but no command**, **154 are prose-only** (no command, no receipt), and **34
+    have no section at all** (BUG-1092). Method: `^## BUG-<id>` headings, section = text up to the next heading;
+    command = `python3 <script>` / `--selftest` / `pytest` / `--check` / `--apply` / `sqlite3` / `bash <script>` /
+    `just <recipe>`; receipt = `receipt`/`RED LOOP`.
+
+    (2) THE ADMISSION GATE FOR AN AUTONOMOUS FIXER LOOP - four conditions, all required, none substitutable:
+      (i)  a NAMED command exists that goes RED on this bug, run at least once (D-3036 - a theory without a red loop is
+           a hypothesis, and a fix without one is a mutation);
+      (ii) the SAME command goes GREEN after the change, and the receipt is recorded (never a prose claim);
+      (iii) the loop declares the files it MAY write before it starts, and a change outside that set is a NAMED fault
+           (the harness facts on delegated runs are the same rule, and `delegate_journal` is the instrument);
+      (iv) R5: a DIFFERENT model family reviews the diff (gemma-4-E4B for a Qwen generator), and its findings are
+           AUDITED, not applied - the recorded history is that a small verifier is worth dispatching and not worth
+           trusting.
+    A bug failing (i) is NOT loop-admissible, whatever its severity. Applying a loop there is exactly how a fix opens a
+    new bug: the change has no reader, so nothing can disagree with it until a human notices later.
+
+    (3) WHY THE COUNT KEEPS GROWING, MEASURED. Across the two sessions that landed BUG-1085/1087/1089 and BUG-1090:
+    closed 3 / opened 3 per session, and **every one of the newly opened bugs was found by READING A REGISTER (grants,
+    bindings, arithmetic), not by a test going red.** That is not a paradox: it is an instrument gap. A change verified
+    by an instrument cannot silently open a bug on the surface that instrument reads; it opens one on an UNINSTRUMENTED
+    surface, which is the 154. Therefore the highest-yield act is not fixing more bugs, it is CONVERTING a prose bug
+    into an instrumented one - cheaper than the blind fix it replaces, and it makes every future fix on that surface
+    refutable.
+
+    (4) "FIX EVERYTHING WITHOUT CREATING NEW BUGS" IS REFUSED AS A TARGET (D-3038). No method can verify a behaviour
+    change on a surface with no instrument; the honest substitute is to instrument FIRST, then change. What IS
+    achievable, and is what this decision adopts: a fixer loop over the 54, in severity order where severity exists
+    (BUG-757: 125 open bugs carry no severity token, so the order is by instrument-availability and blast radius until
+    that register gap is closed).
+
+    (5) HOW THE LOOP RUNS. Provider `maxwell_omlx` with an EXPLICIT model (D-3204) - a cloud completion writes no engine
+    log and is UNMEASURABLE BY CONSTRUCTION; SERIAL, one model resident (single-flight, BUG-950 mechanism A); one bug
+    per loop instance; the journal declared before it starts and closed with its artifact (D-3036/BUG-844).
+  rejected:
+  - option: run the loop over all 269 open bugs and let it propose fixes
+    why: '154 are prose and 34 have no body, so the loop would be MUTATING uninstrumented surfaces and calling the
+      result a fix - measured to be exactly the mechanism by which a fix opens a bug (clause 3).'
+  - option: use a cloud provider to raise throughput and save local sessions
+    why: 'D-3204 clause 2 - a cloud completion is unmeasurable against the shared witness, so a fixer loop on a cloud
+      provider cannot distinguish a repaired bug from a hallucinated one, and it spends money to lose the receipt.'
+  measured:
+  - 'census 2026-10-27: 269 open | 54 command (37 command-only + 17 command+receipt) | 27 receipt-only | 154 prose-only |
+    34 no section (BUG-1092)'
+  - 'opened-bug provenance across the two most recent fix sessions: 100% found by reading a register, 0% by a red test'
+  bugs:
+  - BUG-757
+  - BUG-1092
+  files:
+  - governance/buglog.md
+  - governance/bug_status.json
+  supersedes: []
+
+- id: D-3209
+  state: ACTIVE
+  date: '2026-10-27'
+  by: assistant
+  category: ROLE BINDING / OWNER-LANE RECOMMENDATION (D-3035, D-3109, D-3198, D-3204, D-3205, BUG-1084, BUG-1090, BUG-1091)
+  title: "G5, TWO LIMBS, RECOMMENDED AND UNCHANGED UNTIL THE OWNER'S WORD - archive the legacy roles registry (do NOT
+    wire it), and re-bind AGENT_EDIT_LONG_CONTEXT (re-scoping cannot work: the prefill bill is not an output-length
+    problem)"
+  decision: |-
+    (1) BUG-1084 - RECOMMENDATION: **ARCHIVE `config/model_assignments.yaml#roles`, do not wire it.** Three receipts, not
+    a preference:
+      (a) it is a STALE MIRROR of pipeline-stage bindings, not a second home for agent roles: 16 of its 24 entries name
+          pipeline stages (`S3A_CONVERGENCE`, `S5_GENERATOR`, `S6_VALIDATOR`, `T2_GATE`, `T3_GATE`, `CONTEXT_CLASS` ...)
+          whose live home is `config/pipeline_config.yaml`, and the file's own header says so ("CANONICAL SOURCE for
+          pipeline models: config/pipeline_config.yaml ... If a model appears in BOTH files, pipeline_config.yaml takes
+          precedence");
+      (b) wiring it would IMPORT two ratified contradictions: `S5_VERIFIER` and `S5_FB_VERIFIER` both name
+          Phi-4-mini-instruct-8bit while D2298/D2340 make S5 DeBERTa-only and D2319 makes Phi the S2 probe, and the
+          entries carry inline "D2340: STALE" comments saying exactly that;
+      (c) the block is ANNOTATION-BY-EXCEPTION - some entries carry a stale marker and `ORCHESTRATOR` (Phi-4-mini, the
+          one served model measured 0/4 at tool calling) carries NONE - so the ABSENCE of a marker is ambiguous by
+          construction: a reader cannot tell "live" from "forgotten". Adding `state:` to 24 entries with no reader is
+          more prose; two resolution paths for one fact is the drift engine C12 exists to prevent.
+    The per-role agent registry ALREADY EXISTS and has a reader: `harness_roles` (9 entries, resolved by
+    `pipeline/subagent_recipe.py` and `scripts/harmony_red_loop.py`). Archiving is therefore a DELETION OF A DUPLICATE,
+    not a loss of capability - with a per-entry disposition table written beside the archive so nothing is lost silently.
+
+    (2) BUG-1090 - RECOMMENDATION: **RE-BIND (option a). Option (b) re-scope DOES NOT WORK, and this is measured, not
+    judged:** the role's declared 26,214-token input costs `26214/39 = 672 s` of PREFILL on Qwen3.8-27B, so shortening
+    the OUTPUT does not shorten the TURN - the wall is breached before the first token is emitted. Re-scoping addresses
+    the axis (decode) that is not binding.
+
+    (3) AND RE-BINDING ALONE IS ALSO INSUFFICIENT - the second order finding, stated so it is not discovered later as a
+    cascade: at 26,214 tokens and a 90 s budget, after the prefill bill only ONE served model leaves any budget at all
+    (gemma-E4B: 62.76 s bill, 735 payable tokens; BUG-1091/D-3207). So the role needs BOTH a model whose bill fits AND a
+    DECLARED CONTEXT the budget can pay, or it belongs in batch (`BATCH_ONLY_DO_NOT_INTERACTIVE`), not in the harness.
+    The three admissible shapes, each with its receipt:
+      (i)  keep the 26k context, bind gemma-4-E4B-it-MLX-4bit, accept a ~735-token answer (the only payable row);
+      (ii) keep a long-form role and DECLARE a smaller context (e.g. 8k), where Ornith-REAP-19B pays
+           `floor((90 - 8000/289.14) x 36.1)` = 2249 tokens;
+      (iii) move the role to batch, where the budget is 3,600 s and 27B's 672 s bill is affordable.
+    (4) NEITHER LIMB IS EXECUTED HERE. Both are owner-lane acts (D-3035): an approval flips the binding IN THE REGISTER,
+    and a silent re-bind would repeat exactly the fault BUG-1084 records. The recommendation is recorded with its
+    receipts so the word, when it comes, has one admissible answer per limb instead of a debate.
+  rejected:
+  - option: wire `roles:` into a reader and refresh its values
+    why: 'it imports D2298/D2340 violations into a live path and creates a second resolution path for one fact; the
+      capability it would provide already exists in harness_roles with a reader (C12/D-3034).'
+  - option: (BUG-1090 b) re-scope the role to long-INPUT / short-OUTPUT and keep the 27B
+    why: 'measured - the 26,214-token input costs 672 s of prefill at 39 tok/s, so the turn is lost before any output
+      is produced; the axis being re-scoped is not the axis that binds.'
+  measured:
+  - 'roles block: 24 entries | 16 name pipeline stages | 2 carry an inline D2340 STALE marker (S5_VERIFIER, S5_FB_VERIFIER)
+    | ORCHESTRATOR carries none and names the model measured 0/4 at tool calling'
+  - 'harness_roles readers: pipeline/subagent_recipe.py + scripts/harmony_red_loop.py (both resolve harness_roles, neither
+    resolves roles)'
+  - 'BUG-1091: at 26,214 tokens only gemma-4-E4B leaves budget (735 payable); Qwen3.8-27B-MLX prefill bill 672.15 s'
+  bugs:
+  - BUG-1084
+  - BUG-1090
+  - BUG-1091
+  files:
+  - config/model_assignments.yaml
+  - config/agent_context.yaml
+  supersedes: []

@@ -305,7 +305,12 @@ capabilities:
     check: python3 scripts/harmony_red_loop.py --selftest
     receipt: governance/evidence/HARMONY_RED_LOOP_20261027_ALLOWANCE_2970_REPLAY.json
     cost_tier: T1
-    owns: [scripts/harmony_red_loop.py, scripts/measure_subagent_loop.py, config/model_assignments.yaml]
+    owns: [scripts/harmony_red_loop.py, scripts/measure_subagent_loop.py, config/model_assignments.yaml,
+           config/agent_context.yaml]
+    # BUG-1091/D-3207: the turn budget, the transport slack and the measured decode/prefill readings are THIS
+    # capability's subject matter, and NO capability owned agent_context.yaml - so every bug whose evidence
+    # cites it was unroutable by construction. Declared here rather than in a new capability: one subject, and
+    # the allowance is the thing this capability's own instrument prices.
     note: 'the T-213 emission gate and the T-199 loop battery share ONE engine witness (D-3200 clause 2); the role registry is owned here because the gate adjudicates the ROLE it names (D-3202) and BUG-1084 is about that registry holding a second home'
   - id: bug_recall
     kind: script
@@ -524,6 +529,17 @@ unrouted:
   #: override is a DECISION and not a shrug; the debt ceiling was NOT touched (223 before and after).
   BUG-950: bug_is_a_finding   # the harness's request-abort and its error TEXT are measurements about two subsystems meeting (oMLX's prefill-headroom guard, goose's stream reader) - the title names no owned artefact. The FIX does have an owner: the planner pin belongs to agent/adapters/goose/apply_provider_flip.py (capability harness_adapter), which is why this override is not a route waiver for the work, only for the reading
   BUG-951: bug_is_a_finding   # a malformed harmony header is a finding about gpt-oss-20b's OUTPUT FORMAT, not about a file this repo owns. Its red loop WILL name scripts/toolcall_probe2.py when that probe is promoted out of /tmp
+  #: BUG-1091/1092/1093 appended 2026-10-27 by the audit that measured them. THE STRUCTURAL FACT THEY EXPOSE, stated
+  #: here because this block is where the route graph's own honesty is recorded: `load_items()` reads a BUG as
+  #: "id + title" ONLY (governance/bug_status.json), while the thing that names an artifact is the bug's EVIDENCE BODY
+  #: in governance/buglog.md. MEASURED consequence on these three: every one of them names an artifact that an owning
+  #: capability already holds (config/agent_context.yaml, governance/buglog.md) and all three are still counted
+  #: unrouted, because their TITLES do not. That is why the bugs-side debt cannot shrink below 221 while the tasks-side
+  #: can: the rail asks the wrong surface for a bug. Widening the reader is a DECISION (it changes what the rail
+  #: counts), not an edit - recorded, not taken.
+  BUG-1091: bug_is_a_finding   # prefill is not deducted from the allowance: a finding about the FORMULA, not a file's route. The repair's owner EXISTS and is named: capability loop_emission, which now owns config/agent_context.yaml (the budget and the readings) and scripts/measure_subagent_loop.py (the pricing function)
+  BUG-1092: bug_is_a_finding   # 34 open ids with no section in the append-only register: a finding about the register's own body coverage. The owner is capability governance_faces (it owns governance/buglog.md)
+  BUG-1093: bug_is_a_finding   # a superlative over a complement set ("worst measured non-27B decode"): a finding about a SENTENCE, not a route. Owner: governance_faces (the register's prose)
   #: BUG-952 RETIRED FROM THIS BLOCK 2026-10-21 (D-3038: what we reject we REGISTER, we do not silently delete).
   #: The entry read `BUG-952: route_graph_incomplete` and was correct while BUG-952 was open. BUG-952 is now CLOSED
   #: (2026-10-20: pipeline/unloader.py calls the real POST /v1/models/{model}/unload endpoint with a red-loop

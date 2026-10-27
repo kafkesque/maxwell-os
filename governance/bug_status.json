@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 854,
-  "open_n": 269,
+  "total_ids": 857,
+  "open_n": 272,
   "closed_n": 585,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1353,6 +1353,21 @@
     {
       "id": "BUG-1090",
       "title": "(MED, OPEN 2026-10-27) \u2014 A ROLE WHOSE NAME PROMISES LONG-FORM OUTPUT IS BOUND TO THE SLOWEST SERVED MODEL, AND ITS HONEST GRANT IS 675",
+      "events": 1
+    },
+    {
+      "id": "BUG-1091",
+      "title": "(HIGH, OPEN 2026-10-27) - THE ALLOWANCE IS PRICED FOR A FIXTURE TURN: decode is paid out of the WHOLE budget and the PREFILL BILL is",
+      "events": 2
+    },
+    {
+      "id": "BUG-1092",
+      "title": "(LOW, OPEN 2026-10-27) - 34 of the 269 OPEN ids have no section in the append-only register: a COUNT with no evidence BODY",
+      "events": 1
+    },
+    {
+      "id": "BUG-1093",
+      "title": "(LOW, OPEN 2026-10-27) - A SUPERLATIVE OVER A COMPLEMENT SET READS AS A GLOBAL CLAIM: \"worst measured non-27B decode (13.4 tok/s)\" produced",
       "events": 1
     }
   ],

@@ -449,6 +449,23 @@ may_touch:
 - governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.csv
 - governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.html
 - governance/EXTRACTION_RECALL_TIER_B_OWNER_REVIEW_*.md
+#: D-3171/D-3172/D-3173 (2026-10-27) — the spec-dec probe + reviewer-market register + the two rail fixes. The
+#: probe is ONE instrument (a script, its config and its append-only receipt) and the receipts are DATED DERIVED
+#: families (`governance/r5_review_*.json`, the bench jsonl), so they are granted as prefixes for the same reason as
+#: D-3078/D-3137: a per-file grant turns every re-derivation into a new red line (BUG-563). Nothing outside these
+#: names becomes committable.
+- scripts/specdec_probe.py
+- config/specdec_m1.yaml
+- scripts/list_model_phantoms.py
+- tools/r5_reviewer_fixture.py
+- governance/specdec_probe_receipt.jsonl
+- governance/r5_review_gate_bench.jsonl
+- governance/r5_review_*.json
+- governance/R5_VERDICT_BENCH_20261026.jsonl
+- governance/SPECULATIVE_DECODING_M1_20261027.md
+- governance/REVIEWER_MARKET_RESEARCH_20261027.md
+- governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md
+- governance/GGUF_MLX_AB_20261027.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1518,3 +1535,64 @@ widening_log:
   why: >-
     The widened set is EXACTLY tools/*.py — the encoding campaign's third code family, mirroring the already-granted
     scripts/*.py and pipeline/**. No will_not_touch family, no pinned artifact, no pipeline/** crossing.
+- date: '2026-10-27'
+  actor: assistant
+  reason: >-
+    D-3171/D-3172/D-3173 — this sitting measured a previously DECLARED-but-unmeasured claim and had to WRITE while
+    doing it. The writes are: the probe and its config (scripts/specdec_probe.py, config/specdec_m1.yaml), the two
+    artifacts the probe and the phantom rule are re-derived into (governance/specdec_probe_receipt.jsonl,
+    governance/r5_review_gate_bench.jsonl), the dated receipts this arc cites so no decision points at a file absent
+    from the tree (SPECULATIVE_DECODING_M1, REVIEWER_MARKET_RESEARCH, LLMRUN_16TPS_ROOTCAUSE, GGUF_MLX_AB,
+    R5_VERDICT_BENCH), and the R5 review artifacts, which are a DATED DERIVED FAMILY re-cut on every review
+    (`governance/r5_review_*.json`) rather than a hand-named file.
+  owner_ack: >-
+    the owner's instruction that opened this sitting: "find ultimate 100% verified working speculative decoding
+    solution either model, configuration or inference engine that guarantee faster decoding and prefill" plus "check
+    if there are better model for reviewer than gpt oss in gemma family" — both required running instruments and
+    recording their readings, and a reading that cannot be committed is not a record (D-342).
+  additions:
+  - pattern: scripts/specdec_probe.py
+    why: >-
+      the instrument that paid D-3170's OWED measurement; verify/convert/bench, config-driven (C12), reviewed
+      cross-family per R5 (APPROVE, governance/r5_review_specdec_probe_v2.json).
+  - pattern: config/specdec_m1.yaml
+    why: >-
+      every value the probe uses lives here (C12/C20): paths, alias reason, prompts, floors, receipt location.
+  - pattern: scripts/list_model_phantoms.py
+    why: >-
+      the single resolution rule for a registered model id; the probe ASKS it rather than re-deriving (D-3034).
+  - pattern: tools/r5_reviewer_fixture.py
+    why: >-
+      the rvv3 whole-script fixture the mechanical reviewer gate grades; already stamped D-3168.
+  - pattern: governance/specdec_probe_receipt.jsonl
+    why: >-
+      append-only receipt of every probe reading, INCLUDING the refusal row and the INVALIDATION marker (BUG-1042).
+  - pattern: governance/r5_review_gate_bench.jsonl
+    why: >-
+      append-only receipt of every gate verdict; the promotion cannot be claimed without a row here.
+  - pattern: governance/r5_review_*.json
+    why: >-
+      DATED DERIVED family: scripts/r5_code_review.py writes one artifact per review, so a per-file grant turns each
+      re-cut into a new red line (BUG-563 shape). This sitting produced four (two REJECT-side, one APPROVE, one
+      re-review).
+  - pattern: governance/R5_VERDICT_BENCH_20261026.jsonl
+    why: >-
+      the rvv2 bench receipt cited by the register; committed so the citation resolves.
+  - pattern: governance/SPECULATIVE_DECODING_M1_20261027.md
+    why: >-
+      the receipt whose section 7 CORRECTS section 3 by measurement (append-only correction, D-3171).
+  - pattern: governance/REVIEWER_MARKET_RESEARCH_20261027.md
+    why: >-
+      the D-3161 market register that answers the gemma question with classifications and reasons (D-3038/D-3172).
+  - pattern: governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md
+    why: >-
+      the bandwidth/root-cause receipt this arc's arithmetic rests on (D-3166 lineage); cited twice by the register.
+  - pattern: governance/GGUF_MLX_AB_20261027.md
+    why: >-
+      the GGUF-vs-MLX A/B receipt that establishes the 5.1 t/s figure as the GGUF path, not the model's limit.
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: >-
+    The widened set is EXACTLY the probe + its two append-only receipts + the dated receipts this arc cites + the
+    derived R5 review family. No will_not_touch family, no pinned artifact, no pipeline/** or config/** crossing
+    beyond the probe's own config/specdec_m1.yaml.

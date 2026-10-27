@@ -652,3 +652,42 @@ pool scarcity. The number was never load-bearing, and the record should not make
 Filed as an **addendum to BUG-811** (lie 6 named this very number as not-a-measurement the same day it was
 published as one) with the closure condition registered as **T-203** — a doc cites the receipt that owns a count,
 or a network-free limb reports the doc.
+
+## THE REVIEWER CANDIDATE SET — GEMMA FAMILY UNDER 14 GB (2026-10-27, D-3109/D-3161)
+
+WHY THIS BLOCK EXISTS: "is there a better reviewer than gpt-oss in the gemma family, under 14 GB, as fast or faster,
+more accurate" has been asked in at least three sessions and answered from memory each time. It is answerable from two
+readings, so it is written down here instead.
+
+**WHAT IS MEASURED (this host, rvv3 gate, governance/r5_review_gate_bench.jsonl — thresholds min_n 20,
+min_margin_over_baseline 0.15, false_approve_ceiling 0.10):**
+
+| reviewer | bytes | verdict | acc | false_approve | note |
+|---|---|---|---|---|---|
+| gpt-oss-20b-MXFP4-Q8 | 11 GB | **PASS** | 0.9167 | 0.0 | the incumbent; `review` role QUALIFIED, 0.353 s/item |
+| gemma-4-E4B-it-MLX-4bit | 6.86 GB | **FAIL** | 0.7083 | 0.125 | over the false-approve ceiling, and 1 unparsed answer |
+
+**WHAT IS NOT MEASURED — exact repo sizes from the Hub manifest, not from memory:**
+
+| candidate | bytes | status |
+|---|---|---|
+| lmstudio-community/gemma-4-12B-it-MLX-4bit | **6.77 GB** | bytes arriving (download started 2026-10-27); the ONE open cell |
+| lmstudio-community/gemma-4-E4B-it-MLX-8bit | **8.97 GB** | metadata only, never downloaded; highest precision that stays under budget |
+| lmstudio-community/gemma-4-12B-it-MLX-8bit | **12.75 GB** | metadata only, never downloaded |
+| lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit | **15.64 GB** | **EXCLUDED by the budget**: over 14 GB |
+
+**THE FACT THAT REORDERS THE QUESTION: the 12B-4bit candidate (6.77 GB) is SMALLER than the gemma that failed
+(6.86 GB).** So "a better gemma reviewer" is not a size upgrade and not a memory trade — it is the same footprint.
+An earlier reading in this file's siblings called these models "12-40 K metadata stubs, never downloaded"; that was
+true of the FILE SIZES ON DISK, not of the models, and the distinction matters: the candidate was never testable,
+not tested-and-rejected.
+
+**HYPOTHESIS, EXPLICITLY NOT EVIDENCE (D-3036):** the E4B failure has two limbs — one unparsed answer and a
+false-approve rate above the ceiling. Both are quantisation-sensitive failure modes, so `gemma-4-E4B-it-MLX-8bit`
+(8.97 GB) is the direct test of "is it the quantisation or the model". Nothing is promoted on that reasoning; the
+rvv3 gate decides, and a gemma may only be promoted if `tools/model_eval_suite.py` reproduces the artifact.
+
+**THE ROUTE (either candidate):** the model must be measured THROUGH oMLX (`gemma4_unified` is mapped only in the
+engine's mlx_lm/mlx_vlm), never in-process, and the result recorded into `governance/r5_review_gate_bench.jsonl`
+plus `governance/r5_reviews.jsonl`. Until then the answer stands as it is: **on measured evidence, nothing beats
+gpt-oss-20b-MXFP4-Q8 as the reviewer, and the only cheap way that changes is the 6.77 GB candidate now downloading.**

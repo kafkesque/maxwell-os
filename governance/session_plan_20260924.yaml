@@ -468,6 +468,10 @@ may_touch:
 - governance/REVIEWER_MARKET_RESEARCH_20261027.md
 - governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md
 - governance/GGUF_MLX_AB_20261027.md
+#: D-3178 (the personal-calibration feature): its append-only receipt journal and its ONE research home. Named
+#: paths, not a family - governance/*.jsonl and governance/*.md stay deliberately un-patterned (BUG-548).
+- governance/calibration_receipts.jsonl
+- governance/CALIBRATION_ROLE_MARKET_20261027.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1619,3 +1623,38 @@ widening_log:
   - pattern: scripts/measure_prefill.py
     why: the cold-prefill receipt was not cold - a deterministic prompt let the engine answer the second run from its
       prefix cache (BUG-1044); the fix adds the declared nonce and refuses a cached reading as UNMEASURED
+
+- date: '2026-10-27'
+  actor: assistant
+  reason: "D-3178/D-3179/D-3180 - the personal-calibration feature: the owner asked for a feature that stops a
+    future user repeating a day-long search for the best engine and the best local model per ROLE. Built and proven
+    on this host in one pass (scripts/hardware_calibrate.py, its declaration config/hardware_profile.yaml, its
+    generated output config/model_roles.yaml, its append-only receipt journal governance/calibration_receipts.jsonl)
+    and answered the three side-questions in ONE research home (governance/CALIBRATION_ROLE_MARKET_20261027.md:
+    the market scan with an ADAPT/REFERENCE/SKIP reason per candidate, the oMLX 0.7.3rc1 ruling per item, and the
+    GGUF-vs-MLX verdict with the delete-by-NAME list). R5 cross-family review obtained BEFORE commit:
+    gemma-4-E4B-it-MLX-4bit APPROVE on the script (sha256_16=94cc1334250f98da), gpt-oss-20b-MXFP4-Q8 APPROVE on
+    the declaration (sha256_16=9a4f1a6c492717d3); gpt-oss returned UNPARSED twice on the 26 KB script at two output
+    budgets, recorded as BUG-1048 rather than retried until it agreed."
+  owner_ack: "the owner's instruction that opened this sitting: a feature to prevent going in circles to find the
+    most suitable local models for brain/review/code/plan/analyze on ANY hardware and OS, calibrated automatically
+    at first use; plus is oMLX 0.7.3rc1 worth upgrading to; plus which won, GGUF or MLX, and which copy to delete.
+    The owner also restated the standing rule that a manual step must be handed over as instructions, so the rc1
+    re-baseline is written as a numbered copy-paste procedure (section 7.1 of the research note)."
+  additions:
+  - pattern: governance/calibration_receipts.jsonl
+    why: the append-only receipt journal the calibration feature verifies against - one fsync'd row per measured
+      (model, engine, chip) reading. governance/*.jsonl is deliberately NOT a pattern, so this is a NAMED grant;
+      without it the feature could only run, never record, and a measurement that cannot be recorded is not a
+      record (D-342)
+  - pattern: governance/CALIBRATION_ROLE_MARKET_20261027.md
+    why: the ONE research home for this arc (market scan + rc1 ruling + GGUF/MLX deletion ruling). governance/*.md
+      is deliberately not a pattern, so a new note needs a NAMED grant
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: >-
+    Everything else touched this act already sits inside existing grants: config/hardware_profile.yaml and
+    config/model_roles.yaml (config/*.yaml), scripts/hardware_calibrate.py (scripts/*.py), config/decisions.yaml
+    (config/*.yaml), governance/buglog.md, governance/bug_status.json|md, governance/r5_reviews.jsonl,
+    governance/session_plan_20260924.yaml and the four derived faces. No pipeline/** crossing, no pinned artifact
+    staged, no glob asked for. The two new paths are granted by NAME, not by widening a family.

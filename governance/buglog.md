@@ -24038,3 +24038,17 @@ gpt-oss fixture rows were silently RED". The log says **one**:
   3. It does not claim the roster battery is unchanged. The eviction branch is NEW and can downgrade a row to UNMEASURED
      on this machine (already observed once). A full-roster run should measure with the target resident and the rest
      parked, and report evictions per row rather than a bare score.
+
+**ARTIFACT NOTE (appended the same day, because the first verification pass inferred this WRONG and a future reader
+would too).** These five receipts are NOT one generation, and the difference is RESOLVABLE per file rather than guessed:
+  * `LOOP_BATTERY_20261027_BUG1079_BEFORE.json` — **PRE-fix**. No window field at ROW level and no `engine_log` at
+    RECEIPT level. This is the artifact the defect is visible in.
+  * `…_GPTOSS.json` (18:14) and `…_MTP4.json` (18:16) — **FIRST POST-fix runs.** Their ROWS carry
+    `no_call_class` / `engine_parse_errors` / `engine_evictions`; their RECEIPTS predate the receipt-level
+    `engine_log` + `attribution` fields, which were added minutes later. The MTP4 one is the run whose `enum` row read
+    UNMEASURED-by-eviction, which is only possible on the new code — so it is post-fix by behaviour, not by a field.
+  * `…_GPTOSS_run2.json` (18:31) and `…_MTP4_rerun.json` (18:35) — **POST-fix, full receipt** (row fields AND the
+    receipt's own reading statement).
+  THE RULE THIS LEAVES: identify an instrument's GENERATION by its ROW-level fields, never by a receipt field's
+  absence — the same D-3034 shape as a register that declares a thing it never resolves. No receipt was edited to
+  make this tidy: a receipt is a record of a build, and rewriting one to look uniform is how two receipts start lying.

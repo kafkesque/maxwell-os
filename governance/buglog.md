@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 860 bugs (266 open / 594 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 861 bugs (267 open / 594 closed; highest OPEN = BUG-1097) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1338 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 390 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1338, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24840,3 +24840,44 @@ re-derivation; `check_config_defaults --check` 574 sites / 660 modules within ce
 through `--record`, D-2989 - never hand-edited). Files: `scripts/bug_status.py`, `scripts/resolve_route.py`,
 `scripts/lib/artifact_tokens.py`, `config/capability_registry.yaml`, `config/config_defaults_census.json`,
 `governance/bug_status.json`.
+## BUG-1097 (MED, OPEN 2026-10-28) — THE ROUTING-DEBT CEILING HAS NO RAISE-GUARD, SO THE FLOOR SET BY D-3212 IS A PROMISE AND NOT AN INVARIANT
+
+FOUND WHILE TAKING D-3212 (the sitting that lowered the ceilings to their reading, tasks 31 -> 26 and bugs 221 ->
+172). Registered rather than bundled, and BORN ROUTED - a finding is not growth when it is born into a capability
+(D-3212 limb 1): this block names `config/capability_registry.yaml` and `scripts/resolve_route.py`, both owned by
+`route_graph`, so the debt reading stays at 172/172 and the ladder stays green. That is the demonstration the
+decision needed, taken on its own first case.
+
+THE DEFECT. `scripts/resolve_route.py#check()` compares in ONE direction only:
+`if isinstance(ceiling, int) and debt[cls] > ceiling` - a measurement ABOVE the ceiling is a fault, and NOTHING
+looks at the ceiling itself. So the number can be edited upward in the registry and the rail reports the new
+reading as within it: the shrink-only rule would rest entirely on a human remembering D-2644. MEASURED 2026-10-28:
+`routing_debt.measured` is READ BY NO CODE AT ALL (grepped: the only reads of `routing_debt` are REQUIRED_KEYS, the
+fixture, and the `ceilings.get(...)` above), so the field that states WHEN the number was taken is a declaration
+with no consumer (D-3034) - and the ceiling it annotates has no history and no refusal.
+
+WHY THIS IS NOT A COSMETIC GAP. The register already carries the receipt of the last time it happened: the comment
+above `unrouted_open_bugs` records "RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080", and a raise of exactly this
+kind is what put the ceiling 49 items above its own reading, which is why ONE more untriaged observation cost
+nothing for ten days. D-3212 removed the 49-item slack; without a raise-guard the next raise restores it silently,
+and the act that set the floor becomes decoration.
+
+THE ASYMMETRY, STATED BECAUSE IT IS THE SAME SHAPE AS BUG-1096. The census rail ALREADY has the machinery the
+route graph lacks: `scripts/check_config_defaults.py` refuses a raise in either direction unless it is taken as
+`--rebaseline --because D-xxxx`, and the cited decision id must EXIST in `config/decisions.yaml` -
+`config/derivations.yaml#config_reads` carries `direction: shrink_only` plus a `ceiling_changed` history. One rail
+was built with the guard; the other was built with the number. That is a missing INVARIANT, not a missing feature.
+
+RED LOOP (D-3036 - named before any fix, already run once). The command is
+`python3 scripts/resolve_route.py --check`, and the control is a TWO-SIDED edit of
+`config/capability_registry.yaml#routing_debt.unrouted_open_bugs`:
+  (i)  172 -> 173 with no declaration   -> must be REFUSED. TODAY IT IS SILENT: rc 0, the reading re-reads as
+       "within its shrink-only ceiling" because 172 >= 172 and the ceiling is whatever the file says.
+  (ii) 172 -> 173 WITH `--rebaseline --because D-3212` (an id that exists) must be ACCEPTED and must APPEND a
+       history line (from/to/why/decision), so a lawful raise is visible and an unlawful one is impossible.
+The fix must also give `measured` a consumer (the pair (ceiling, measured-on) is the fact; one without the other is
+half a declaration), and it must NOT raise the ceiling to make the control pass.
+
+GATE. One condition, and it must be SEEN to fire on both sides: the two-sided edit above goes RED-then-GREEN, and
+`--selftest` gains the two known-answer controls (raise refused without a decision; raise accepted with one, and
+the history line names both numbers). The fix must not touch `unrouted_open_tasks`/`unrouted_open_bugs` values.

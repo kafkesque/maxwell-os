@@ -1,0 +1,78 @@
+# config/specdec_m1.yaml — speculative-decoding probe for MLX on Apple Silicon (M1 Max, 64 GB)
+#
+# WHY THIS FILE EXISTS (D-3170 / BUG-1040).
+#   The owner asked for a VERIFIED speculative-decoding configuration that makes decode faster on THIS machine.
+#   governance/SPECULATIVE_DECODING_M1_20261027.md declared `mlx_lm` draft+verify as the only M1-eligible route
+#   and left the measurement OWED. The first attempt to honour that command FAILED:
+#       ValueError: Model type qwen3_5_moe_text not supported.
+#   Read, not assumed (2026-10-27): mlx_lm 0.31.3 ships models/qwen3_5_moe.py but its MODEL_REMAPPING has no
+#   alias for qwen3_5_moe_text; mlx_lm 0.32.2 (latest on PyPI) does not add one either. The weight layout,
+#   however, matches qwen3_5_moe.sanitize EXACTLY (mlp.experts.gate_up_proj, mlp.experts.down_proj, `model.`
+#   prefix). MEASURED: the draft loads strict=True after the alias — every tensor consumed, every parameter set,
+#   966.1 M params. So this is a NAME mismatch, not an architecture gap, and the fix belongs in DATA (here),
+#   never in a patched site-packages.
+#
+# C12/C20: every value the probe uses lives here; scripts/specdec_probe.py hardcodes none.
+version: 1
+
+target:
+  model_id: Qwen3.8-27B-MLX-4bit     # resolved by scripts/list_model_phantoms.py::_engine_paths (single rule)
+  expect_model_type: qwen3_5          # reading: config.json#model_type, 2026-10-27
+  expect_vocab: 248320                # reading: config.json#text_config.vocab_size, 2026-10-27
+
+draft:
+  source_dir: ~/.omlx/drafts/Qwen3.8-1.0B-A0.6B
+  staging_dir: ~/.omlx/drafts/.staging-Qwen3.8-1.0B-A0.6B
+  mlx_out_dir: ~/.omlx/drafts/Qwen3.8-1.0B-A0.6B-mlx4
+  q_bits: 4
+  group_size: 64
+  q_mode: affine
+  # A draft is only a draft when its token->id map IS the target's map. MEASURED 2026-10-27, and the reason two
+  # candidates are already REFUSED in the receipt: piskle/Qwen3.8-0.6B declares vocab 151643 and its FP8 sibling
+  # 151936, against this target's 248320 — acceptance would collapse to ~0 and decode would be SLOWER than
+  # baseline. This file's draft (inference-optimization/Qwen3.8-1.0B-A0.6B) has an identical vocab, merge table
+  # and added-token set.
+  tokenizer_files: [tokenizer.json, tokenizer_config.json, chat_template.jinja, generation_config.json]
+  weight_glob: "*.safetensors"
+  normalisation:
+    model_type:
+      from: qwen3_5_moe_text
+      to: qwen3_5_moe
+      reason: >-
+        mlx_lm 0.31.3 and 0.32.2 both register qwen3_5_moe and neither maps qwen3_5_moe_text. The artifact's
+        tensors match qwen3_5_moe's sanitize contract exactly and load strict=True under the alias, which is the
+        measurement that licences the rewrite; a name-only change would NOT load if the architecture differed.
+
+bench:
+  # Both prompts are measured because decode is a function of CONTEXT LENGTH (BUG-805), so one reading is not
+  # comparable to another unless the context is declared. `short_code` is the best case; `long_context` is the
+  # reviewer-shaped case (a source file's worth of prompt).
+  prompts:
+    - name: short_code
+      kind: literal
+      text: >-
+        Write a Python function that returns the SHA-256 hex digest of a file's bytes, and explain the one
+        mistake most implementations make.
+    # A reviewer-shaped prompt: the model is asked to ACT on the file, not to continue it. MEASURED 2026-10-27:
+    # feeding a bare source-file head made the model emit EOS at token 1, which made stream_generate report
+    # 41889 t/s — a harness artifact that would have been read as a decode fact (BUG-257's shape).
+    - name: review_long
+      kind: file_head
+      path: scripts/r5_code_review.py
+      target_tokens: 2000
+      prefix: "Review this Python script and list its three most serious defects:\n\n"
+      suffix: "\n\nDefects:\n"
+  max_tokens: 128
+  warmup_tokens: 8          # discarded warm-up per (prompt, mode): first call pays kernel autotune, not decode
+  repeats: 2                # median taken; 1 reading is an anecdote (D-3036)
+  num_draft_tokens: 2       # mlx_lm default; raised only when a receipt shows the acceptance rate supports it
+  seen_floor: 2000          # config/bench_preflight.yaml#prefill_bill.size_scale_guard: below this the PREFILL
+                            # rate is reported INCOMPARABLE rather than compared
+  min_decode_tokens: 24     # below this the run ended early (EOS), so generation_tps is NOT a decode rate:
+                            # it is reported null + INSUFFICIENT. MEASURED 2026-10-27: a 1-token generation
+                            # produced 'decode 41889 t/s', which is arithmetic on an empty sample.
+  receipt: governance/specdec_probe_receipt.jsonl
+
+report:
+  fields: [name, mode, rep, prompt_tokens, prompt_tps, prefill_verdict, generation_tokens, decode_context_tokens,
+           generation_tps, draft_share, peak_memory_gb, pool_residency]

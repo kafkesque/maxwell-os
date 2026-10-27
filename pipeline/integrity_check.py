@@ -2,8 +2,13 @@
 """
 integrity_check.py — Maxwell OS System Integrity Validator
 
-D2203: 17 automated checks that turn the CONSTITUTION.md from prose into
+D2203: 18 automated checks that turn the CONSTITUTION.md from prose into
 an executable specification. Run via `just integrity`.
+
+WHY THE COUNT IS DERIVED, NOT REMEMBERED: this header said "17" while CHECKS below held 18 entries (check 18,
+D2478 canonical-promotion drift, was added without the header), and a cross-family R5 review REJECTED the file for
+that alone — a docstring that miscounts its own body is a declaration that does not resolve (D-3034). If you add a
+check to CHECKS, change this list in the same edit.
 
 Checks:
   1.  All YAML configs parse without error
@@ -23,6 +28,7 @@ Checks:
  15.  No silent exception (C16 compliance)
  16.  No zero-vector fallback (D2196 compliance)
  17.  No FAILED state can become PASS (monotonic trust)
+ 18.  No canonical-promotion drift (D2478)
 
 Usage:
     python3 pipeline/integrity_check.py              # Full check
@@ -229,6 +235,7 @@ KNOWN_PACKAGES = {
     "huggingface_hub", # test_mlx_integration: test-only dependency
     "fastembed",       # stage1_5_fastembed: alternative embedding backend
     "dspy",            # dspy_trainer: MIPROv2 optimization harness (optional, post-T1.1)
+    "mobi",            # stage0_convert: Kindle container (.mobi/.azw) converter (optional, imported inline)
 }
 LOCAL_MODULES = {"pipeline", "config", "tools", "tests", "providers", "storage", "sync", "memory", "pipeline_paths",
                  "scripts", "audit_evidence_cleanliness"}  # audit_evidence_cleanliness: deferred standalone scripts/ import (stage5_verify.py)
@@ -263,9 +270,28 @@ def check_import_dependencies() -> tuple[bool, str]:
     return True, f"All imports in {len(py_files)} files have declared dependencies"
 
 
+# The directories the pipeline actually puts on sys.path (pipeline scripts insert ROOT, pipeline/ and scripts/
+# before importing siblings). A bare module name that RESOLVES inside one of these is LOCAL BY RESOLUTION, and does
+# not need a hand-list entry. WHY this exists (BUG-1043): `pipeline/model_store_sweep.py` does
+# `sys.path.insert(0, ROOT / "scripts")` then `from lib import handoff, write_guard`, and `scripts/lib/__init__.py`
+# exists — but the rail only consulted the hand-maintained LOCAL_MODULES set, so it reported a real local package
+# as an undeclared dependency and stayed RED on every run. D-3034: a name must RESOLVE, and the resolution is the
+# filesystem, not a list somebody remembers to update.
+IMPORT_ROOTS: tuple[Path, ...] = (REPO_ROOT, PIPELINE_DIR, PIPELINE_DIR / "providers", REPO_ROOT / "scripts")
+
+
+def _resolves_locally(mod: str) -> bool:
+    """True when `mod` names a package or module that exists under one of the import roots."""
+    for root in IMPORT_ROOTS:
+        if (root / mod / "__init__.py").is_file() or (root / (mod + ".py")).is_file():
+            return True
+    return False
+
+
 def _check_module(mod: str, filename: str, issues: list[str]) -> None:
     """Classify ONE imported module name; the stdlib test is the INTERPRETER's, not a hand list (BUG-739)."""
-    if mod in _STDLIB_NAMES or mod in LOCAL_MODULES or mod in KNOWN_PACKAGES or _resolves_to_stdlib(mod):
+    if (mod in _STDLIB_NAMES or mod in LOCAL_MODULES or mod in KNOWN_PACKAGES
+            or _resolves_to_stdlib(mod) or _resolves_locally(mod)):
         return
     issues.append(f"  {filename}: imports `{mod}` — not in stdlib, local, or known deps")
 
@@ -684,7 +710,8 @@ def check_sqlite_insert_placeholders() -> tuple[bool, str]:
     conn = sqlite3.connect(str(db_path))
     cursor = conn.cursor()
     cursor.execute("PRAGMA table_info(fbs)")
-    col_count = len(cursor.fetchall())
+    table_columns = [row[1] for row in cursor.fetchall()]
+    col_count = len(table_columns)
     conn.close()
 
     with open(commit_file, encoding='utf-8') as f:
@@ -697,8 +724,34 @@ def check_sqlite_insert_placeholders() -> tuple[bool, str]:
     # `[^;]*` tail matched `fbs_fts` (prefix) and spanned past the SQL string into
     # Python code, over-counting. Anchor to the VALUES (...) clause and use \b so
     # `fbs_fts` is excluded.
+    #
+    # BUG-1043: the check compared the placeholder count against the TABLE's column count, which is only the right
+    # question for a POSITIONAL `INSERT INTO fbs VALUES (...)`. stage6_commit.py names 78 columns explicitly against
+    # a 79-column table (the 79th, `borp_score`, takes its default), so the rail reported a mismatch on a statement
+    # that is internally consistent and every column of which exists — an always-RED rail on correct code, which is
+    # how a rail teaches people to ignore rails. An explicit column list must be checked against ITSELF (columns ==
+    # placeholders) and against the table (every named column must EXIST); only a positional INSERT is checked
+    # against the table's width.
+    named = re.search(
+        r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+fbs\s*\(([^)]*)\)\s*VALUES\s*\(([^)]*)\)",
+        commit_code,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if named:
+        columns = [c.strip() for c in named.group(1).split(",") if c.strip()]
+        placeholder_count = named.group(2).count("?")
+        unknown = [c for c in columns if c not in table_columns]
+        if unknown:
+            return False, f"INSERT names {len(unknown)} column(s) the fbs table does not have: {unknown[:6]}"
+        if placeholder_count != len(columns):
+            return False, (f"INSERT names {len(columns)} columns but has {placeholder_count} placeholders "
+                           f"(positional drift inside one statement)")
+        omitted = [c for c in table_columns if c not in columns]
+        return True, (f"INSERT names {len(columns)} columns / {placeholder_count} placeholders, all present in the "
+                      f"{col_count}-column fbs table; not inserted: {omitted or 'none'}")
+
     m = re.search(
-        r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+fbs\b.*?VALUES\s*\(([^)]*)\)",
+        r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+fbs\b\s*VALUES\s*\(([^)]*)\)",
         commit_code,
         re.IGNORECASE | re.DOTALL,
     )

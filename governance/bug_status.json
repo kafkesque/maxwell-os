@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 800,
-  "open_n": 247,
-  "closed_n": 553,
+  "total_ids": 807,
+  "open_n": 248,
+  "closed_n": 559,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1244,6 +1244,11 @@
       "id": "BUG-1036",
       "title": "(MED, OPEN 2026-10-26) - DECISION-LOG's tier tables lag the register by 22 records and NO rail can tell that from curation: the face",
       "events": 1
+    },
+    {
+      "id": "BUG-1041",
+      "title": "(MEDIUM, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel",
+      "events": 1
     }
   ],
   "closed": [
@@ -1799,6 +1804,12 @@
     "BUG-1027",
     "BUG-1029",
     "BUG-1031",
-    "BUG-1032"
+    "BUG-1032",
+    "BUG-1037",
+    "BUG-1038",
+    "BUG-1039",
+    "BUG-1040",
+    "BUG-1042",
+    "BUG-1043"
   ]
 }

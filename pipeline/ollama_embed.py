@@ -11,7 +11,7 @@ Usage:
     # Chromadb-compatible (one doc at a time):
     chroma_collection.add(embeddings=OllamaEmbeddingFunction(), ...)
     # Batch mode (N docs in one API call):
-    embeddings = batch_embed(texts, model="nomic-embed-text")
+    embeddings = batch_embed(texts, model="bge-m3")  # D2007: nomic → bge-m3
 """
 
 # ── Type aliases (replaces chromadb imports) ──────────────────────────────
@@ -66,7 +66,7 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
 
     Args:
         texts: List of text strings to embed.
-        model: Embedding model name (default: nomic-embed-text).
+        model: Embedding model name (default: bge-m3 via EMBED_MODEL; nomic retired D2007).
 
     Returns:
         List of embedding vectors (list[float] each), same order as input.

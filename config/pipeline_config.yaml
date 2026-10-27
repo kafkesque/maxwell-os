@@ -257,7 +257,6 @@ models:
   embeddings:
     model: bge-m3
     provider: ollama
-    alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ
   nli_large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
 label_vote:
   # D2577/D2580 3-model label vote. Three INDEPENDENT (cross-family) voters that

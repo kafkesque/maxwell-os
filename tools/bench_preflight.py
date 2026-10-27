@@ -165,6 +165,30 @@ def fingerprint(cfg: dict[str, Any], models: list[str], suites: list[str], budge
     return hashlib.sha256(blob).hexdigest()[:16]
 
 
+def _phantom_check() -> dict[str, Any]:
+    """BUG-1037: every registered model id's bytes must resolve on disk (D-3034).
+
+    The portfolio check above compares NAMES against the live list; it never asks whether an
+    id's bytes exist, so subset mode passed while phantom ids stayed registered. This is the
+    instrument that would have caught BUG-410's 6 phantoms. The resolution rule is reused from
+    scripts/list_model_phantoms.py (single source, no duplicate implementation - C21).
+    """
+    scripts = str(REPO / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    try:
+        from list_model_phantoms import list_phantoms, _engine_paths  # noqa: PLC0415
+
+        model_dir, settings = _engine_paths()
+        hub = Path.home() / ".cache" / "huggingface" / "hub"
+        phantoms = list_phantoms(model_dir, settings, hub)
+    except Exception as exc:  # C16: a missing/unreadable registry must not pass silently
+        return {"check": "phantom_models", "ok": False,
+                "detail": "registry unusable: " + type(exc).__name__ + " " + str(exc)[:120]}
+    return {"check": "phantom_models", "ok": not phantoms,
+            "detail": "0 phantoms" if not phantoms else "UNRESOLVED: " + ", ".join(sorted(phantoms))}
+
+
 def check_environment(cfg: dict[str, Any], models: list[str], full: bool) -> tuple[list[dict[str, Any]], bool]:
     """Run every non-model environment check. Returns (findings, unsafe)."""
     findings: list[dict[str, Any]] = []
@@ -187,6 +211,10 @@ def check_environment(cfg: dict[str, Any], models: list[str], full: bool) -> tup
         detail = "all present" if ok else "missing=" + str(missing)
     findings.append({"check": "portfolio_" + mode, "ok": ok, "detail": detail})
     unsafe = unsafe or not ok
+
+    phantom = _phantom_check()
+    findings.append(phantom)
+    unsafe = unsafe or not phantom["ok"]
 
     want = {m for m in models}
     unseen = [m for m in want if m not in live]

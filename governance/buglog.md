@@ -22801,6 +22801,23 @@ instrument is the solo-load A/B (llama.cpp Q4_K_M vs MLX affine q4-g64 vs mxfp4 
 residency recorded), which ALSO decides whether the fix is routing or the MLX decode path. Filed rather than fixed
 so the absence of a reference comparison is a NAMED defect (D-3038), not a silence.
 
+**MEASURED UPDATE 2026-10-26 (memory lever applied: iogpu.wired_limit_mb 0 -> 57344).** The solo-load A/B is
+BLOCKED on model residency, not on the lever. Of BUG-1033's three legs, ONE is on disk complete:
+- `mlx-community/gpt-oss-20b-MXFP4-Q8` — COMPLETE (11 G, 3 shards). Post-lever standalone `mlx_lm.generate`
+  (max-tokens 128, temp 0.0, HF_HUB_OFFLINE=1): **49.45 t/s decode**, 9.59 t/s prefill, peak footprint 12.85 GB.
+  Pre-lever it read ~42 t/s; a single 41-token generation is INDICATIVE, not yet the A/B verdict.
+- `lmstudio-community/Qwen3.8-27B-MLX-4bit` — INCOMPLETE: 9 `.incomplete` blobs (~6.3 G of a ~16.08 G model),
+  zero weight shards in the snapshot (the one `.safetensors` symlink is the INDEX json). 5/6/8-bit repos are
+  12 K placeholders. The 8.2 t/s this entry cites (BUG-793) is therefore NOT re-measurable from the current
+  cache — `mlx_lm` stalls at `Fetching 13 files: 0%` while resuming the download.
+- llama.cpp Q4_K_M GGUF reference legs (gpt-oss ~13 G, Qwen3.8 ~18 G) — NOT on disk; the only local GGUF is
+  DigUp's embedding-gemma.
+
+**Consequence.** Executing BUG-1033's A/B now requires ~47 GB of downloads (16 G MLX Qwen3.8-4bit + 13 G GGUF
+gpt-oss + 18 G GGUF Qwen3.8): $0 marginal cost but real wall-clock + bandwidth, and an OWNER decision (C1/C3
+sovereignty permits it; it must be deliberate, not incidental). Nothing above contradicts the 2x-gap finding —
+it means the reference-class receipt BUG-1033 demands does not yet exist locally for the Qwen3.8 leg.
+
 ## BUG-1034 (HIGH, OPEN 2026-10-26) - the execute_javascript bridge ran each tools.call TWICE, so one append landed TWO identical blocks in AGENTS.md
 
 **Measured, not suspected.** A single `docguard__safe_append` call issued through the JS tool bridge returned its
@@ -22880,3 +22897,264 @@ coverage criterion is unstated.
       that changes a rail, a face or a register layout"), in which case the header states it and a rail asserts
       only that the declared class is covered - and the 22-record tail is then correct by declaration.
 Until one is chosen, the honest reading of the face is: the INDEX is current, the NARRATIVE is dated 2026-10-07.
+
+## BUG-1037 (HIGH, OPEN 2026-10-26) - the benchmark preflight gate is STRUCTURALLY unable to pass: `portfolio_exact` compares a 17-id INVENTORY against an 8-name PORTFOLIO, which is why the reviewer bench stayed OWED for a week
+
+**Measured 2026-10-26, read not recalled.** `tools/model_eval_suite.py` refuses to start unless
+`bench_preflight.check_environment(full=True)` returns safe. On the live server
+(`GET 127.0.0.1:11435/v1/models`) that check returned:
+
+    PREFLIGHT ENV FAIL portfolio_exact:
+      registry=17 ids   expected=8 ids   ->  refusing to run: environment unsafe
+
+The 17 `registry` ids are TWO DIFFERENT KINDS of thing in one list:
+  * **8 canonical served models** (the names in `~/.omlx/models`, each a resolving symlink or real dir);
+  * **9 HF-cache aliases** (`lmstudio-community--…`, `mlx-community--…`, `openbmb--…`, `ornith-ai--…`)
+    which exist because `settings.json#huggingface.hf_cache_enabled: true` makes oMLX also expose the
+    HF hub snapshot dirs — including `mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ`, whose weights were
+    deleted today (D-3162), so the server is still ADVERTISING a model that cannot resolve (D-3034).
+
+**Why it cannot pass, and why that is the defect.** `expected_models_mode: exact` requires
+`live == sorted(expected)`. `live` is an INVENTORY (aliases + non-chat models: an embedding model, a
+classifier, an advisory decider). `expected_models` is a CHAT PORTFOLIO. Those sets can only be equal in a
+perfectly pruned store, so the gate is RED by construction, and EVERY benchmark invocation — including the
+R5 reviewer bench `config/r5_review_gate.yaml` declares as OWED — is refused before a single call. The
+"bench OWED" state was therefore read as missing effort when it was an unsatisfiable gate.
+
+**Two obvious remedies are BOTH wrong, measured:**
+  * switching `hf_cache_enabled: false` would remove the aliases but BREAK live code —
+    `scripts/d2884b_decider_ab.py` addresses `mlx-community--pplx-decider-v1.1-27b-4bit` and
+    `mlx-community--clef-flash-4bit` BY ALIAS NAME; those two have no canonical `~/.omlx/models` entry,
+    so disabling the cache makes two retained models unreachable;
+  * adding the 9 aliases to `expected_models` would declare duplicates as the portfolio and entrench them.
+
+**REMEDY OWED (owner word: `config/bench_preflight.yaml` is a protected file).** One-line semantic fix plus a
+phantom check, both keeping BUG-259's intent:
+  1. `expected_models_mode: exact` -> `subset`  (every declared portfolio model must be present and
+     servable — a DISAPPEARANCE still fails, which is what BUG-259 was catching);
+  2. add a PHANTOM check to `check_environment`: any inventory id whose bytes do not resolve is UNSAFE
+     (`~/.omlx/models/<name>` for canonical names, the HF snapshot dir for aliased ones). This is what
+     catches DWQ today and would have caught it at deletion time.
+No manual step is required beyond approving the delta; the code half lands in `tools/bench_preflight.py`.
+
+## BUG-1038 (HIGH, OPEN 2026-10-26) - R5 deep-tier reviewer promotion is REFUSED by measurement: gemma misses 25% of unambiguous seeded defects, gpt-oss rejects 83% of CLEAN code, and the rubric clause they disagree on is undecidable
+
+**The instrument did not exist; it does now.** `config/r5_review_gate.yaml` declares the deep-tier gate as
+`harness: tools/model_eval_suite.py, suite: reviewing, min_n: 20, baseline: constant-answer,
+min_margin_over_baseline: 0.15`. Measured: `suite_reviewing` grades by SUBSTRING match
+(`any(w in pred.lower() for w in want)`) over 10 bug-spotting prompts and contains ZERO verdict tokens
+(`grep -c "APPROVE|REJECT" tools/model_eval_suite.py` = 0), while the reviewer's actual contract
+(`scripts/r5_code_review.py`) is `{"verdict": APPROVE|REJECT|INSUFFICIENT}`. Running the DECLARED bench and
+reporting green would have been a **fake unblock**: a deep-tier promotion on evidence that never tested a verdict.
+Its numbers also could not rank anything — five of seven models tie at exactly 0.833 in
+`governance/model_eval_report.md` (Ornith-REAP, Ornith-9B, Phi-4-mini, Qwen3-Coder, gemma, gpt-oss).
+
+**New instrument:** `tools/r5_reviewer_fixture.py` (`suite: reviewing_verdict`), 24 items, 12 seeded-defect /
+12 clean, graded by the PRODUCTION parser `extract_verdict` (no second parser to drift), prompted with the
+production system prompt and the gate's own declared `task`. Balanced: the `constant-answer` baseline is
+exactly 0.5000, computed not assumed.
+
+**Measured 2026-10-26** (`governance/R5_VERDICT_BENCH_20261026.jsonl`, temp 0.0, deep-tier budget 2600 tok,
+memory lever `iogpu.wired_limit_mb=57344`, 0 transport errors):
+
+    model                     acc      margin  false_approve(on defects)  false_reject(on clean)  unparsed  med lat
+    gemma-4-E4B-it-MLX-4bit   0.8333   +0.3333  0.2500                      0.0000                  0.0417    3.55 s
+    gpt-oss-20b-MXFP4-Q8      0.5833   +0.0833  0.0000                      0.8333                  0.0000   10.99 s
+
+**Neither passes the declared gate** (margin >= 0.15): gemma 0.3333 passes the MARGIN but approves 3 of 12
+unambiguous defects (a hardcoded absolute path — the C12 iron rule — a missing `return`, an unclosed file
+handle); gpt-oss clears every seeded defect but rejects 10 of 12 CLEAN scripts. Promoting gpt-oss as planned
+would have swapped a rubber stamp for a gate that blocks correct work, which on a gate that fronts every
+`scripts/*` review is worse.
+
+**Mechanism of the gpt-oss false rejects (read from its own concerns, not inferred):** it applies the rubric
+clause *"does it verify its own work"* to every FUNCTION — "The function does not verify its own work; it
+merely counts non-empty lines". That clause is a property of a whole script that acts on the world; at function
+granularity it is unanswerable, so a literal reviewer must reject everything and a lenient one learns to ignore
+the rubric. This is BUG-738's own finding restated (pass #10: same model, same file, same budget, only the
+QUESTION changed, verdict INSUFFICIENT -> APPROVE): the uninformative band is a prompt artefact.
+One adjudication correction was applied to the fixture on this evidence: `rvv-ok-atomic-write` was leaking its
+temp file on the exception path, so its gold was wrong until the code was fixed (gpt-oss was right about it).
+
+**REMEDY OWED (not a model swap).** (1) Fixture v2 at the unit the gate actually reviews — a whole script with
+a `main()` — so the rubric clause becomes decidable; (2) scope the "verify its own work" clause in the gate's
+declared `task` to scripts that act on the world; (3) then re-run `reviewing_verdict` and promote only on
+margin >= 0.15 with `false_approve` <= 0.10 as an additional floor. Deep tier stays `gemma` until then.
+
+**BUG-1038 UPDATE (same day): the finding is NOT fixture-sensitive.** After correcting the one impure gold
+(`rvv-ok-atomic-write` leaked its temp file on the exception path) and replacing the C12 case's `/Users/...`
+literal with `/srv/maxwell/...` (so the C12 detector no longer mistakes fixture DATA for real code — it now
+reports "752 files scanned, 2 explicit synthetic-fixture exemptions, C12 compliant"), the re-run reproduced the
+rates EXACTLY: gemma acc 0.8333 / false_approve 0.2500 / unparsed 0.0417 / 3.48 s; gpt-oss acc 0.5833 /
+false_approve 0.0000 / false_reject 0.8333 / 9.81 s. Two conclusions follow from the stability rather than from
+one run: gemma's miss of the hardcoded-path case survives the literal being made less conspicuous, and gpt-oss
+rejects the now-genuinely-clean atomic-write case too — which is the rubric-clause mechanism, not a residue
+defect. Receipt rows in `governance/R5_VERDICT_BENCH_20261026.jsonl` are v1.1 (they match the shipped fixture).
+
+**BUG-1038 v2 UPDATE (2026-10-27, D-3167): the whole-script fixture ran, and BOTH reviewers are near CHANCE at
+the unit the gate actually reviews — the defect is not the question, it is the model.** Fixture v2
+(`tools/r5_reviewer_fixture.py`, suite `reviewing_verdict`) is 24 whole scripts with a `main()`: 12 APPROVE-gold /
+12 REJECT-gold, graded by the production parser `extract_verdict` (no second parser), balanced so the
+`constant-answer` baseline is exactly 0.5000. Measured 2026-10-27 at temp 0.0, deep budget 2600 tok, 0 transport
+errors, 48 new rows in `governance/model_eval_checkpoint.jsonl` (id prefix `rvv2`):
+
+    model                     acc      margin  false_approve  false_reject  unparsed
+    gemma-4-E4B-it-MLX-4bit   0.6250   +0.1250  0.0417         0.2917        1
+    gpt-oss-20b-MXFP4-Q8      0.5833   +0.0833  0.0000         0.4167        0
+
+Neither passes the declared gate (margin >= 0.15): gemma +0.1250, gpt-oss +0.0833. The failure MODE shifted
+vs v1 but the conclusion is worse, not better: gemma's false_approve fell from 0.2500 -> 0.0417 (good) but it
+now false-REJECTS 7 of 12 clean scripts; gpt-oss's false_reject fell from 0.8333 -> 0.4167 but it still rejects
+10 of 12 clean scripts. At the whole-script unit D-3163 prescribed, BOTH collapse toward a serial-REJECT bias
+that is barely above the 0.50 constant-answer baseline. So the remedy is NOT another fixture: it is a different
+reviewer. The gate is now mechanically enforced (`tools/model_eval_suite.py`: `reviewing_verdict_gate` +
+`_report_reviewer_gate`) — promotion requires min_n >= 20 AND margin >= 0.15 AND false_approve <= 0.10, read
+from `config/r5_review_gate.yaml`, and a REFUSED verdict is printed and appended to
+`governance/r5_review_gate_bench.jsonl`. Deep tier STAYS gemma; the open leg is market research (D-3161) for a
+cross-family reviewer that actually beats chance on this task.
+
+## BUG-1039 (LOW, OPEN 2026-10-26) - the C11 pre-commit check fails on a DELIBERATELY optional, lazily-imported dependency, so the gate is red before every commit and red is normalised
+
+**Measured 2026-10-26** (`python3 scripts/pre_commit_gate.py --file tools/r5_reviewer_fixture.py`): C12 passes;
+C11 reports `stage0_convert.py: imports 'mobi' — not in stdlib, local, or known deps`.
+
+**The import is intentional and guarded** — `pipeline/stage0_convert.py:354` imports `mobi` INSIDE the Kindle
+branch, with a comment saying so ("imported here so the stage runs without it installed") and a raised message
+naming the package when it is absent. That is the correct shape for an optional converter dependency; it is
+simply not declared anywhere `check_import_dependencies` can see.
+
+**Why it matters despite being LOW:** `config/r5_review_gate.yaml` runs the C11/C12 layer as a NON-FATAL
+observation on every review, so this row prints as a failure on every single review and every pre-commit run.
+A rail that is always red is a rail nobody reads — the BUG-588 shape applied to an instrument, and precisely
+the mechanism that lets a REAL undeclared import through unnoticed. Remedy owed: declare the optional extra in
+the dependency manifest (or teach the C11 check to accept a declared optional-import list), then the layer is
+green and any future red is meaningful. No code change is needed in `stage0_convert.py`.
+
+**BUG-1033 UPDATE (2026-10-27): the solo-load A/B is now MEASURED, and the 2x-gap is REFUTED.** The downloads
+completed (sha256-verified) and the runtime was available all along (llama.cpp 0.7.0 Metal via Homebrew, not absent).
+Device-matched receipts under iogpu.wired_limit_mb=57344 (governance/GGUF_MLX_AB_20261027.md): gpt-oss-20b GGUF
+Q4_K_M tg128 45.81 t/s vs MLX MXFP4-Q8 ~47 t/s (WASH); Qwen3.8-27B GGUF UD-Q4_K_M tg128 5.31 t/s vs MLX 4bit
+~9.3 t/s (MLX WINS ~1.75x). The llmrun.dev page that seeded this bug (gpt-oss 71.2 t/s, Qwen3.8 16.1 t/s) does NOT
+reproduce on this device: those were HYPOTHESES (D-3036), and the device-matched receipt refutes them, so there is
+NO 2x gap to a rival runtime. llama.cpp/GGUF wins NO axis (speed or residency) on either model, so the routing fix
+is NOT llama.cpp: MLX/OMLX stays the decode runtime and pipeline/providers/llama_cpp_provider.py is NOT written
+(D-3164). Two GGUF-capable runtimes exist (llama.cpp 0.7.0, Ollama 0.40.11); if a GGUF model is ever needed for
+portfolio coverage, Ollama (already the embedding runtime) is the lower-tax route. Remaining BUG-1033 leg: the
+(model, runtime, quant, context, residency) instrument row is still OWED - the receipts above are the data, not
+yet the instrument.
+
+**BUG-1033 ROOT-CAUSE NOTE (2026-10-27, D-3165) - the "16.1 t/s" is NOT a measurement; it is the page's own
+formula.** The page states `tok/s = (bandwidth GB/s ÷ model GB) × efficiency` (example: B200 → 8000 ÷ 17.4 × 0.65
+= ~299). For M1 Max the page uses bandwidth=400 (theoretical peak) and the SAME 0.65, with the IQ4_XS footprint
+16.1 GB: `400 ÷ 16.1 × 0.65 = 16.15 ≈ 16 t/s`. So the ~16 t/s IS attributed to the M1 Max (64 GB) - the earlier
+"16.1 is GB, not t/s" framing was the wrong half; both the 16.1 GB model size and the ~16 t/s estimate are on the
+page, causally linked by the formula. The gap to this host's measured 9.3 t/s is because 400 GB/s is theoretical
+(M1 Max sustains ~240-260) and 0.65 is datacenter-HBM efficiency (real MLX dense-27B decode is ~0.35). No hardware
+or config fault exists. Full receipt: governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md. (The "Q4_K_M, 17.9 GB"
+parenthetical above was imprecise: 16.1 t/s corresponds to the IQ4_XS 16.1 GB footprint; Q4_K_M 17.9 GB yields
+400 ÷ 17.9 × 0.65 = 14.5 t/s.)
+
+
+## BUG-1037 (HIGH, FIXED 2026-10-27) - the phantom check is now INSIDE tools/bench_preflight.py check_environment, so subset mode can no longer pass while an inventory id's bytes are gone
+
+**Fix.** `check_environment` now runs `_phantom_check()`, which reuses `scripts/list_model_phantoms.list_phantoms` (single source, C21) to verify every registered model id's bytes resolve on disk (canonical dir or HF alias). A phantom is a finding with `ok: false` and `unsafe: true`; a missing/unreadable registry is a named fault (`registry unusable: ...`), never silently green (C16). Measured `python3 tools/bench_preflight.py --static` -> `[OK] phantom_models 0 phantoms`. This is the instrument that would have caught BUG-410's 6 phantoms; the portfolio check compared NAMES and never asked whether the bytes existed.
+
+## BUG-1039 (LOW, FIXED 2026-10-27) - the optional `mobi` import is DECLARED, so the C11 rail is green and any future red is meaningful
+
+**Fix.** `pipeline/integrity_check.KNOWN_PACKAGES` already carries a "Conditional/optional dependencies (not in requirements.txt, imported inline)" section; `mobi` (stage0_convert.py's guarded Kindle-container import, imported inside the branch so the stage runs without it) is now declared there. Measured `python3 scripts/pre_commit_gate.py` -> `C11 import subset requirements: All imports in 130 files have declared dependencies`, `C12 no hardcoded paths: ... compliant`. The always-red shape (BUG-588 applied to an instrument) is gone; no code change was needed in stage0_convert.py.
+
+## BUG-1038 (HIGH, FIXED 2026-10-27) - fixture v3 with the SCOPED reviewer clause PASSES gpt-oss and REFUSES gemma: the clause, not the model, was the defect
+
+**Fix + measurement.** Fixture v3 (`tools/r5_reviewer_fixture.py`, ids `rvv3-*`) is 24 whole scripts (12 APPROVE-gold / 12 REJECT-gold), graded by the production parser `extract_verdict`, and the reviewer `task` in config/r5_review_gate.yaml was SCOPED: "verify its own work" now applies ONLY to scripts that ACT ON THE WORLD (write/delete/commit), never to pure-transform functions (the audit finding: that clause is unanswerable at function granularity and produced gpt-oss's 10/12 false rejects). Measured 2026-10-27 at temp 0.0, deep budget 2600 tok, 48 new rows (`governance/model_eval_checkpoint.jsonl`, prefix rvv3):
+
+    model                     acc      margin  false_approve  false_reject  unparsed  gate
+    gemma-4-E4B-it-MLX-4bit   0.7083   +0.2083  0.1250         0.1250        1        REFUSED (false_approve 0.1250 > 0.10)
+    gpt-oss-20b-MXFP4-Q8      0.9167   +0.4167  0.0000         0.0833        0        PASS
+
+**Outcome.** gpt-oss-20b PASSES the declared gate (margin >= 0.15 AND false_approve <= 0.10) and is PROMOTED to the deep tier (D-3168); gemma stays fast-tier and is REFUSED for deep (it approves 3 of 12 unambiguous defects). The v2 finding (both near chance) was a fixture/clause artifact, not a model ceiling; scoping the clause moved gpt-oss from 0.5833 to 0.9167. The gate is mechanically enforced and now uses ONLY the current fixture's ids (a version-pooling bug found and fixed the same day, D-3168).
+
+## BUG-1040 (HIGH, FIXED 2026-10-27) - D-3170's declared spec-dec command had NEVER run, and cannot run on this model: the receipt asserted an unmeasured route
+
+**Discovered by running it.** `governance/SPECULATIVE_DECODING_M1_20261027.md` §3 declared `mlx_lm` draft+verify
+"the ONLY M1-eligible path" and §4 gave the command. Run for the first time on 2026-10-27, it failed TWICE, in
+sequence, and the second failure is not a configuration error:
+
+1. `ValueError: Model type qwen3_5_moe_text not supported.` — the draft declares `qwen3_5_moe_text`; mlx_lm 0.31.3
+   **and** 0.32.2 register only `qwen3_5_moe`. Read at the source (`mlx_lm/models/qwen3_5_moe.py`), the artifact's
+   tensors match that class's `sanitize` contract exactly, and it loads **`strict=True`** under the alias (966.1 M
+   params, every tensor consumed) — so this leg was a NAME mismatch and is FIXED in data
+   (`config/specdec_m1.yaml#draft.normalisation`), never by patching site-packages.
+2. `ValueError: Speculative decoding requires a trimmable prompt cache (got {'ArraysCache'})`. Qwen3.8-27B is a
+   HYBRID model (3 `linear_attention` + 1 `full_attention` per 4 layers) and `ArraysCache` (`cache.py:594`) declares
+   no `is_trimmable`, unlike `KVCache`. Draft+verify must UN-CONSUME rejected draft tokens; recurrent state cannot be
+   trimmed back. **This leg is structural** — no draft model, no `--num-draft-tokens` value and no engine upgrade
+   changes it.
+
+**Fix.** The claim is corrected in place, append-only, as §7 of the same receipt: no 100%-verified speculative
+decoding exists on this machine for this model (mtplx MTP = M5-only; oMLX `mtp_enabled` = the same M5 gate;
+`mlx_lm` draft+verify = non-trimmable cache), and the same instrument MEASURED what does work — prompt-cache reuse
+took a repeated 1.7k-token reviewer call from 47.60 s to 12.04 s (3.95×), and prefill (~40–49 t/s) is ~75% of a cold
+reviewer call. Instrument: `scripts/specdec_probe.py` (`verify` / `convert` / `bench`), config
+`config/specdec_m1.yaml`, receipt `governance/specdec_probe_receipt.jsonl`. D-3170 is moved to SUPERSEDED by D-3171.
+
+**The lesson is not "spec-dec is bad" — it is that a route recorded as an OWED measurement must not be written as a
+capability.** §3 and §4 read as fact before anything ran; the first execution refuted them. D-3036's red loop exists
+precisely to prevent this: the command that goes RED on the defect had to exist before the claim did.
+
+## BUG-1041 (MEDIUM, OPEN) - a reviewer's stability cannot be re-measured: model_eval_suite has no re-run channel
+
+**Reading.** `tools/model_eval_suite.py` accepts only `--models/--models-file/--suites/--limit`, and `_done_keys()`
+skips any `(model, suite, id)` already present without an error. So a second identical run reports "0 new results" and
+**looks like a pass while measuring nothing** — the same *shape* as the stale-row guards it was built to protect
+(BUG-262/BUG-265), but with the opposite consequence: instead of re-scoring a poisoned row, it refuses to score at all.
+
+**Why it matters now.** gpt-oss-20b was promoted on a single 24-item measurement (D-3168) and the follow-up question
+("is 0.9167 a lucky split?") has no mechanical route. The rule-of-three bound on 0 false approvals in 24 items is
+≤11% at 95% confidence, which is a statistical statement, not a second measurement.
+
+**Not worked around.** Deliberately NOT fixed by re-running the fixture under a second model id or a new id namespace
+(rvv4): that would create a second truth for the same items and break the gate's "current fixture only" rule
+(fixed earlier the same day). The fix belongs in the harness as an explicit, recorded re-measure channel (e.g.
+`--rerun-tag NAME` with tag-aware `_done_keys`), so a repeat is visibly a repeat in the checkpoint.
+
+## BUG-1042 (LOW, FIXED 2026-10-27) - an instrument with no decode floor reported 41,889 t/s from a 1-token sample
+
+**Reading.** The first `specdec_probe.py bench` run reported, for a 1,705-token prompt, `decode 41889.694 t/s`. Cause:
+a bare source-file prompt made the model emit EOS at token 1, and `generation_tps = (n+1)/elapsed` on n=1 is
+arithmetic on an empty sample. The value was already written to the receipt before anyone read it — BUG-257's shape
+exactly (a harness artifact that would be quoted as a model fact).
+
+**Fix.** `config/specdec_m1.yaml#bench.min_decode_tokens` (24) + a `status` column: a generation below the floor is
+reported `generation_tps: null` and `INSUFFICIENT: generation ended at N tokens`, never a number. The prompt was also
+made reviewer-shaped (prefix/suffix) so a chat model is asked to ACT on the file rather than continue it. Rows written
+before the guard are void on their face (no `status` field) and are superseded by the guarded run.
+
+## BUG-1043 (MEDIUM, FIXED 2026-10-27) - two C11/C12 rails were RED on CORRECT code: a hand-list for local packages, and a positional-INSERT assumption
+
+**Reading.** `pipeline/integrity_check.py` failed checks [4] and [8] on every run of this session:
+
+    [ 4] Import dependencies   ❌ FAIL  model_store_sweep.py: imports `lib` — not in stdlib, local, or known deps
+    [ 8] SQLite INSERT placeholders ❌ FAIL  INSERT has 78 placeholders but fbs table has 79 columns
+
+Both were the RAIL's fault, measured before touching any code:
+
+* `[4]`: `pipeline/model_store_sweep.py` inserts `ROOT / "scripts"` on `sys.path` and then does
+  `from lib import handoff, write_guard`; `scripts/lib/__init__.py` EXISTS. The rail consulted a hand-maintained
+  `LOCAL_MODULES` set instead of resolving the name, so a real local package read as an undeclared dependency.
+* `[8]`: `stage6_commit.py` names **78 columns explicitly** with **78 placeholders**, and every named column exists
+  in the live 79-column table (`borp_score` is simply not inserted and takes its default). The rail compared the
+  placeholder count against the TABLE width, which is only the right question for a positional
+  `INSERT INTO fbs VALUES (...)`.
+
+**Why this is worse than a nuisance.** An always-RED rail on correct code is how an operator learns to skip rails —
+the exact failure the BUG-1039 `mobi` fix addressed one rail over. A rail that cannot be green on correct code
+conveys no information in either direction.
+
+**Fix (by RULE, not by exemption).** (1) `_resolves_locally()` resolves a bare module name against `IMPORT_ROOTS`
+(`REPO_ROOT`, `pipeline/`, `pipeline/providers/`, `scripts/`) — a name that EXISTS there is local by resolution
+(D-3034), so the next `from <sibling> import ...` needs no hand-list edit. (2) The INSERT check now parses the
+explicit column list when there is one: columns == placeholders, and every named column must EXIST in the table
+(a wrong column name is now caught, which the old check could not do); positional INSERTs keep the table-width
+comparison. MEASURED after the fix: 20/20 rails PASS, `rc=0`, and check [8] now PRINTS what it verified
+(`not inserted: ['borp_score']`) instead of a bare count. Reviewed cross-family per R5
+(`governance/r5_review_integrity_rails_20261027.json`).

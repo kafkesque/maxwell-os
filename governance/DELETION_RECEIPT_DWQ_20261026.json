@@ -1,0 +1,12 @@
+{
+  "receipt_id": "DELETION_RECEIPT_DWQ_20261026",
+  "date": "2026-10-26T22:40:00+01:00",
+  "method": "rm -rf (weights leave by receipt, D-3013 copy_policy none-for-weights; owner word = D-3162)",
+  "target": "mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ",
+  "path": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ",
+  "size_before_delete": "335M (du -sh, resolved 2026-10-26)",
+  "reason": "Owner DECIDE ruling (2026-10-26): delete ONLY this model. It was already dead code (D-2105: 'Qwen3-Embedding dead code removed') and only a config 'alternative:', never the active embedder (active = bge-m3 / provider ollama).",
+  "decision_ref": "D-3162",
+  "post_delete_verify": "directory absent; grep 'Qwen3-Embedding-0.6B' across pipeline/, scripts/, tools/ = empty (no live code ref).",
+  "config_reference_cleanup": "removed dangling 'alternative:' line from config/pipeline_config.yaml embeddings block (bytes gone, reference removed so no D-3034 declaration-with-no-referent remains)."
+}

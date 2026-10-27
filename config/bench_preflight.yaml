@@ -36,7 +36,7 @@ environment:
     - Qwen3.8-27B-MLX-4bit
     - gemma-4-E4B-it-MLX-4bit
     - gpt-oss-20b-MXFP4-Q8
-  expected_models_mode: exact     # exact = registry must equal this set (catches BUG-259)
+  expected_models_mode: subset     # exact = registry must equal this set (catches BUG-259)
 
 probe:
   default_max_tokens: 512

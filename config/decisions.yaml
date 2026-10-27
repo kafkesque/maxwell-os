@@ -33006,3 +33006,283 @@ decisions:
   - feed.opml
   - AGENTS.md
   - governance/buglog.md
+
+- id: D-3162
+  state: RESOLVED
+  category: MODEL PORTFOLIO / GOVERNANCE
+  title: 'DECIDE-tier ruling (owner, 2026-10-26): delete Qwen3-Embedding-0.6B-4bit-DWQ (335M MLX); keep all other DECIDE models for evaluation'
+  decision: 'Owner word on the DECIDE tier. DELETE only mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ (335M, HF hub; already dead code per D-2105, only a config alternative, never the active embedder - active is bge-m3/ollama). KEEP for evaluation everything else in the DECIDE tier: clef-flash-4bit and clef-4bit (zero-shot classifier, parked D-2788/2789), pplx-decider-v1.1-27b-4bit (advisory best-arm, routing stays gpt-oss D2249), Ornith-1.5-35B-A3B-REAP-19B and Ornith-1.5-9B-MLX-8bit (agent-loop candidates), laya (benchmark-only), ModernBERT-base (embedder A/B candidate), qwen3-embedding Ollama 4.7G (embedder A/B candidate), potion-base-32M (test placeholder). Bytes deleted by rm (weights leave by receipt, D-3013); receipt governance/DELETION_RECEIPT_DWQ_20261026.json. Dangling alternative: line removed from config/pipeline_config.yaml.'
+  bugs:
+  - BUG-1033
+  - BUG-410
+  files:
+  - governance/DELETION_RECEIPT_DWQ_20261026.json
+  - config/pipeline_config.yaml
+  created: '2026-10-26'
+
+- id: D-3163
+  state: REJECTED
+  category: MODEL PORTFOLIO / VERIFIER GATE
+  title: 'R5 deep-tier reviewer promotion REJECTED on measurement: gpt-oss-20b rejects 83% of CLEAN code, gemma misses 25% of unambiguous seeded defects, and the reviewer QUESTION - not the model - is the defect'
+  decision: 'The declared deep-tier gate (config/r5_review_gate.yaml: suite reviewing, min_n 20, baseline constant-answer, min_margin_over_baseline 0.15) could not be satisfied because its declared suite measures the WRONG CONSTRUCT: suite_reviewing grades by substring match over bug-spotting prose and contains no verdict tokens, while the reviewer contract is {verdict: APPROVE|REJECT|INSUFFICIENT}. A new instrument was built (tools/r5_reviewer_fixture.py, suite reviewing_verdict: 24 items, 12 seeded-defect / 12 clean, graded by the production parser extract_verdict, balanced so the constant-answer baseline is exactly 0.5000). MEASURED 2026-10-26 at temp 0.0, deep budget 2600 tok, iogpu.wired_limit_mb=57344, 0 transport errors (governance/R5_VERDICT_BENCH_20261026.jsonl): gemma acc 0.8333, margin +0.3333, false_approve on seeded defects 0.2500, unparsed 0.0417, 3.55 s median; gpt-oss acc 0.5833, margin +0.0833, false_approve 0.0000, false_reject on clean code 0.8333, 10.99 s median. NEITHER passes the declared margin. gpt-oss as deep-tier reviewer is REJECTED: it clears every seeded defect but rejects 10 of 12 clean scripts, citing the rubric clause verify its own work - a property of a whole script that is undecidable at function granularity, which is BUG-738 pass 10 restated (only the QUESTION changed and the verdict flipped INSUFFICIENT to APPROVE). Deep tier STAYS gemma until a fixture at whole-script granularity and a scoped reviewer question exist; promotion then requires margin >= 0.15 AND false_approve <= 0.10.'
+  bugs:
+  - BUG-1038
+  - BUG-1037
+  - BUG-738
+  files:
+  - tools/r5_reviewer_fixture.py
+  - tools/model_eval_suite.py
+  - governance/R5_VERDICT_BENCH_20261026.jsonl
+  - config/r5_review_gate.yaml
+  created: '2026-10-26'
+- id: D-3164
+  state: REJECTED
+  category: MODEL PORTFOLIO / RUNTIME
+  title: 'BUG-1033 solo-load A/B RESOLVED: llama.cpp/GGUF wins NO axis vs MLX on this device, and the llmrun.dev
+    2x-gap numbers do NOT reproduce - so no llama_cpp_provider is written'
+  decision: 'The D-3161 solo-load A/B completed 2026-10-27 (governance/GGUF_MLX_AB_20261027.md) with sha256-verified
+    GGUF downloads and llama.cpp 0.7.0 (Metal) vs OMLX (MLX), both under iogpu.wired_limit_mb=57344. gpt-oss-20b:
+    GGUF Q4_K_M tg128 45.81 t/s vs MLX MXFP4-Q8 ~47 t/s (WASH; residency 10.81 vs 11 GiB). Qwen3.8-27B: GGUF UD-Q4_K_M
+    tg128 5.31 t/s vs MLX 4bit ~9.3 t/s (MLX WINS ~1.75x; residency 15.32 vs 15 GiB). The llmrun.dev page that seeded
+    BUG-1033 (gpt-oss 71.2 t/s, Qwen3.8 16.1 t/s) does NOT reproduce on this device: the vendor number was a HYPOTHESIS
+    (D-3036) and the device-matched receipt REFUTES it, so there is no 2x gap to close by switching runtime. MLX/OMLX
+    remains the decode runtime; pipeline/providers/llama_cpp_provider.py is NOT written (D-3038 accepted negative:
+    a future re-proposal must cite a NEW measurement that beats these numbers). If a GGUF model is ever needed for
+    portfolio coverage, Ollama (already the embedding runtime) is the lower-tax route. The (model,runtime,quant,context,residency)
+    instrument row BUG-1033 still owes is a separate task.'
+  bugs:
+  - BUG-1033
+  files:
+  - governance/GGUF_MLX_AB_20261027.md
+  created: '2026-10-27'
+- id: D-3165
+  state: RESOLVED
+  category: MODEL PORTFOLIO / RUNTIME
+  title: 'ROOT CAUSE of the llmrun.dev "16 t/s" vs local 9 t/s for Qwen3.8-27B: the vendor number is
+    bandwidth-arithmetic (400 GB/s ÷ 16.1 GB × 0.65), an ESTIMATE, not a measurement - and it is attributed
+    to the M1 Max, correcting the earlier "16.1 is GB, not t/s" mis-framing'
+  decision: 'The page states its formula verbatim: tok/s = (bandwidth GB/s ÷ model GB) × efficiency, with the
+    example NVIDIA B200 → 8000 ÷ 17.4 × 0.65 = ~299. For M1 Max (bandwidth 400 GB/s theoretical) and Qwen3.8-27B
+    at IQ4_XS (needGb 16.1, fileSizeGb 14.93, vramRequiredGb 15.68): 400 ÷ 16.1 × 0.65 = 16.15 ≈ 16 t/s. So the
+    page DOES claim ~16 t/s for the MacBook Pro 16" M1 Max (64 GB) - the user was right and the prior "16.1 is GB,
+    not t/s" framing was WRONG. The truth is both: 16.1 GB is the model size AND ~16 t/s is what the formula
+    derives FROM it. But it is an ESTIMATE resting on two constants that fail on Apple Silicon: 400 GB/s is the
+    theoretical peak (M1 Max sustains ~240-260 GB/s), and 0.65 is a datacenter-HBM efficiency (real MLX/Metal decode
+    of a dense 27B is ~0.35). This host measured 9.3 t/s (MLX 4-bit) = 140 GB/s effective = 0.35 efficiency, and
+    5.31 t/s (GGUF Q4_K_M) = 0.20 efficiency. So there is NO hardware/config fault: 9.3 t/s is correct, and the 16
+    vs 9 gap is a theoretical-vs-measured gap, ~1.7× optimistic. Supersedes the mis-framing; extends (does not
+    contradict) D-3164, which already recorded "16.1 t/s does not reproduce" but did not name the mechanism.'
+  bugs:
+  - BUG-1033
+  files:
+  - governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md
+  - governance/GGUF_MLX_AB_20261027.md
+  created: '2026-10-27'
+- id: D-3166
+  state: RESOLVED
+  category: MODEL PORTFOLIO / RUNTIME
+  title: 'Decode-efficiency root cause: 400 GB/s is an unreachable pin rate (measured 340), and LLM
+    decode extracts 36-41% of it (123-140 GB/s) - so this host is at the TOP of the range, not throttled'
+  decision: 'A device-matched study on identical hardware (rajeeja/local-llm-bench-m1max: M1 Max 64GB,
+    32-core GPU, 512-bit bus) measured the streaming ceiling at 340 GB/s (vs the 400 GB/s pin rate) and
+    found 4-model Q4 decode extracts 36-41% of it (123.6-139.8 GB/s), giving the shorthand
+    tok/s ~= bandwidth x 0.36 / model_GB. This host MLX 4-bit 9.3 t/s = 140 GB/s = 41% of 340, the TOP of
+    the measured band: (340 x 0.41)/15 = 9.3 t/s exact. Efficiency cannot be 1.0 because (1) the pin rate is
+    unreachable (85% max for a pure stream), (2) decode adds dequant+attention+KV+embedding-row reads that
+    drop 85% to ~40%, (3) ~40% is a stable hardware constant across architectures and runtimes. No throttle,
+    no config fault, nothing "taming" it. Levers that DO raise tokens/s: speculative decoding (2-3x),
+    smaller quant / MoE (fewer bytes per token, linear), batch decode (throughput only). A kernel tweak will
+    NOT close 9.3 -> 16 t/s: 16 t/s needs 260 GB/s effective (0.65 x 400), above the 340 ceiling and 1.6x the
+    real 0.40 efficiency. Also explains the low GGUF 5.31 t/s: UD-Q4_K_M is a slow quant (receipt caveat);
+    standard Q4_K_M should reach ~9 t/s, matching MLX.'
+  bugs:
+  - BUG-1033
+  files:
+  - governance/LLMRUN_16TPS_ROOTCAUSE_20261027.md
+  - governance/GGUF_MLX_AB_20261027.md
+  created: '2026-10-27'
+- id: D-3167
+  state: RESOLVED
+  category: MODEL PORTFOLIO / VERIFIER GATE
+  title: 'R5 deep-tier reviewer promotion REFUSED on the v2 whole-script fixture: both reviewers are near CHANCE
+    at the unit the gate actually reviews, and the gate is now mechanically enforced (margin >= 0.15 AND false_approve
+    <= 0.10)'
+  decision: 'The remedy D-3163 prescribed (fixture v2 at whole-script granularity + a scoped reviewer question)
+    was built and RUN. tools/r5_reviewer_fixture.py suite reviewing_verdict is 24 whole scripts with a main(): 12
+    APPROVE-gold / 12 REJECT-gold, graded by the production parser extract_verdict (no second parser), balanced
+    so the constant-answer baseline is exactly 0.5000. Measured 2026-10-27 at temp 0.0, deep budget 2600 tok, 0
+    transport errors, 48 new rows in governance/model_eval_checkpoint.jsonl (prefix rvv2): gemma-4-E4B acc 0.6250
+    margin +0.1250 false_approve 0.0417 false_reject 0.2917 unparsed 1; gpt-oss-20b acc 0.5833 margin +0.0833 false_approve
+    0.0000 false_reject 0.4167 unparsed 0. NEITHER passes the declared gate (margin >= 0.15): the failure MODE shifted
+    vs v1 (gemma false_approve 0.2500->0.0417, gpt-oss false_reject 0.8333->0.4167) but the conclusion is worse:
+    at the whole-script unit the gate reviews, BOTH collapse toward a serial-REJECT bias barely above the 0.50 baseline.
+    This is BUG-1038 confirmed as a MODEL defect, not a question/fixture defect (BUG-738''s uninformative band restated
+    at whole-script granularity). The gate is now MECHANICALLY enforced in tools/model_eval_suite.py (reviewing_verdict_gate
+    + _report_reviewer_gate): promotion requires min_n >= 20 AND margin >= 0.15 AND false_approve <= 0.10, read
+    from config/r5_review_gate.yaml, and a REFUSED verdict is printed and appended to governance/r5_review_gate_bench.jsonl
+    so no promotion can be claimed without a passing measurement. Deep tier STAYS gemma; the open leg is market
+    research (D-3161) for a cross-family reviewer that actually beats chance.'
+  bugs:
+  - BUG-1038
+  - BUG-738
+  files:
+  - tools/model_eval_suite.py
+  - tools/r5_reviewer_fixture.py
+  - governance/model_eval_checkpoint.jsonl
+  - config/r5_review_gate.yaml
+  - governance/r5_review_gate_bench.jsonl
+  created: '2026-10-27'
+- id: D-3168
+  state: RESOLVED
+  category: MODEL PORTFOLIO / VERIFIER GATE
+  title: 'R5 deep-tier reviewer PROMOTED to gpt-oss-20b on measurement: scoping the ''verify its own work'' clause
+    to world-acting scripts lifted it from 0.5833 to 0.9167 (false_approve 0.0), while gemma is REFUSED on the false_approve
+    ceiling'
+  decision: 'The remedy D-3163/D-3167 owed was discharged in two moves, both grounded in measurement. (1) The reviewer
+    task in config/r5_review_gate.yaml was SCOPED: ''verify its own work'' now applies ONLY to scripts that ACT
+    ON THE WORLD (write/delete/commit), never to pure-transform functions - the clause is unanswerable at function
+    granularity and produced gpt-oss''s 10/12 false rejects (the BUG-1038 audit finding). (2) Fixture v3 (tools/r5_reviewer_fixture.py,
+    ids rvv3-*) re-ran: 24 whole scripts, 12 APPROVE-gold / 12 REJECT-gold, graded by the production parser extract_verdict,
+    temp 0.0, deep budget 2600 tok. Measured 2026-10-27 on governance/model_eval_checkpoint.jsonl (prefix rvv3):
+    gemma-4-E4B acc 0.7083, margin +0.2083, false_approve 0.1250, false_reject 0.1250, unparsed 1 - REFUSED on the
+    false_approve ceiling (0.1250 > 0.10; it approves 3 of 12 unambiguous defects); gpt-oss-20b acc 0.9167, margin
+    +0.4167, false_approve 0.0000, false_reject 0.0833, unparsed 0 - PASSES margin >= 0.15 AND false_approve <=
+    0.10. gpt-oss is therefore PROMOTED to the deep tier of config/r5_review_gate.yaml (it is a different family
+    from the Qwen3-Coder generator and was already the declared candidate), and gemma remains fast-tier only. The
+    gate is mechanically enforced by tools/model_eval_suite.py reviewing_verdict_gate + _report_reviewer_gate, and
+    a version-pooling bug (it pooled rvv2 unscoped rows with rvv3 scoped rows) was found from the data and fixed:
+    the gate now uses ONLY the ids the CURRENT fixture builds. The v2 finding (both near chance) was a clause artifact,
+    not a model ceiling.'
+  bugs:
+  - BUG-1038
+  files:
+  - config/r5_review_gate.yaml
+  - tools/r5_reviewer_fixture.py
+  - tools/model_eval_suite.py
+  - governance/model_eval_checkpoint.jsonl
+  - governance/r5_review_gate_bench.jsonl
+  created: '2026-10-27'
+- id: D-3169
+  state: RESOLVED
+  category: GOVERNANCE / RAILS
+  title: 'Two rails repaired in one pass: the BUG-1037 phantom check now lives inside bench_preflight.check_environment,
+    and the BUG-1039 optional mobi import is declared so C11 is green'
+  decision: 'BUG-1037: tools/bench_preflight.py check_environment now runs _phantom_check(), which reuses scripts/list_model_phantoms.list_phantoms
+    (single source, C21) to verify every registered model id''s bytes resolve (canonical dir or HF alias); a phantom
+    is a finding with ok=False and unsafe=True, and a missing/unreadable registry is a named fault (C16). Measured:
+    ''python3 tools/bench_preflight.py --static'' -> [OK] phantom_models 0 phantoms. This is the instrument that
+    would have caught BUG-410''s 6 phantoms. BUG-1039: pipeline/integrity_check.KNOWN_PACKAGES already carries a
+    declared optional-dependency section, and ''mobi'' (stage0_convert.py''s guarded Kindle-container import) is
+    now declared there; measured ''python3 scripts/pre_commit_gate.py'' -> C11 all imports declared (130 files),
+    C12 compliant, so the always-red rail (BUG-588 shape) is gone and any future red is meaningful. No change was
+    needed in stage0_convert.py.'
+  bugs:
+  - BUG-1037
+  - BUG-1039
+  files:
+  - tools/bench_preflight.py
+  - scripts/list_model_phantoms.py
+  - pipeline/integrity_check.py
+  - pipeline/stage0_convert.py
+  created: '2026-10-27'
+- id: D-3170
+  state: SUPERSEDED
+  category: MODEL PORTFOLIO / DECODE ACCELERATION
+  title: 'Speculative decoding on M1 Max: native MTP is M5-TensorOps-only and REFUSED here; the M1-eligible path
+    is mlx_lm draft+verify with a tokenizer-IDENTICAL draft (Qwen3.8-1.0B-A0.6B), and speculative decoding does
+    NOT speed prefill'
+  decision: 'The owner asked for a verified speculative-decoding solution for Qwen3.8-27B on the M1 Max. Three mechanisms
+    were measured separately (governance/SPECULATIVE_DECODING_M1_20261027.md, BUG-1033 lineage). (1) Native MTP
+    via mtplx 1.0.4 REFUSED: ''mtplx hardware'' on this device reads ''M5 TensorOps eligible: false / hardware acceleration
+    confirmed: false'' - the MTPLX benchmark (AR 32.42 -> D2 71.70 t/s, acceptance 90%/81%) is on an M5 Pro, so
+    it is a hypothesis for this device, and the engine''s own gate refutes it (D-3036/D-3038: the rejection is recorded
+    with its reason). (2) The oMLX model_settings flags (mtp_enabled, specprefill_enabled, qwen35_ane_prefill_enabled)
+    exist but are all False for this model, and mtp_enabled is the same M5-gated path; qwen35_ane_prefill (Neural-Engine
+    prefill) is a real lever M1 might support but its eligibility is UNVERIFIED. (3) mlx_lm 0.31.3 standard speculative
+    decoding (--draft-model, --num-draft-tokens) is plain MLX and IS eligible on M1 Max; it requires a draft that
+    shares the target TOKENIZER. Measured: piskle/Qwen3.8-0.6B (vocab 151643) and its FP8 sibling are REFUSED (tokenizer
+    151643 != target 248044, so acceptance collapses); inference-optimization/Qwen3.8-1.0B-A0.6B (qwen3_5_moe, vocab
+    248044) has an IDENTICAL tokenizer to the target (vocab, merges 247587, added_tokens 33 all equal) and is the
+    VALID draft. The exact commands are in the receipt; the device-matched t/s measurement is OWED (the speedup
+    is a hypothesis until measured). Prefill is stated plainly: speculative decoding drafts/verifies OUTPUT tokens
+    and also prefills the draft, so it does not speed prefill - the prefill levers are prompt caching for repeated
+    prefixes and the (unverified-on-M1) ANE prefill flag. This extends D-3166: decode remains bandwidth-bound, and
+    speculative decoding is the one lever that beats a bandwidth bound by verifying several tokens per weight-read.'
+  bugs:
+  - BUG-1033
+  files:
+  - governance/SPECULATIVE_DECODING_M1_20261027.md
+  created: '2026-10-27'
+- id: D-3171
+  state: RESOLVED
+  category: MODEL PORTFOLIO / DECODE ACCELERATION
+  title: 'Speculative decoding for Qwen3.8-27B on M1 Max is REFUTED by measurement (BUG-1040): the hybrid ArraysCache
+    cannot be rewound, so no draft+verify; the measured lever is prompt-cache reuse and the real bottleneck is PREFILL'
+  decision: 'BUG-1040 records that D-3170 declared mlx_lm draft+verify as the M1-eligible route, and gave a command,
+    before that command had ever run. It has now run. Two failures, both on THIS device (M1 Max 64 GB, MLX 0.31.2,
+    mlx_lm 0.31.3): (1) the draft artifact declares model_type qwen3_5_moe_text while mlx_lm 0.31.3 AND 0.32.2 register
+    only qwen3_5_moe - a NAME mismatch, proven by loading the draft strict=True under that alias (every tensor consumed,
+    966.1 M params), and fixed in DATA via config/specdec_m1.yaml#draft.normalisation applied to a staging copy,
+    never by patching site-packages; (2) speculative_generate_step calls cache.can_trim_prompt_cache and raises
+    "ValueError: Speculative decoding requires a trimmable prompt cache (got {ArraysCache})" - Qwen3.8-27B is hybrid
+    (3 linear_attention + 1 full_attention per 4 layers) and ArraysCache (cache.py:594) declares no is_trimmable,
+    unlike KVCache, so the recurrent state of a rejected draft token cannot be un-consumed. That is STRUCTURAL:
+    no draft model, no --num-draft-tokens value and no engine upgrade changes it. VERDICT: no 100%-verified speculative-decoding
+    solution exists on this machine for this model (mtplx MTP = M5 TensorOps only, its own gate reads hardware acceleration
+    confirmed: false; oMLX mtp_enabled = the same M5 path with the drafter adapter needing absent mlx-vlm; mlx_lm
+    = refused above). WHAT THE SAME INSTRUMENT MEASURED INSTEAD, across TWO runtimes: decode 7.54-7.58 t/s and FLAT
+    from 157 to 1850 tokens of context (weight-read bound, exactly as the bandwidth arithmetic says); prefill only
+    35-40 t/s in-process and ~49 t/s implied through oMLX, i.e. ~75% of the cost of a cold 1.7k-token reviewer call
+    (35.7 s of 47.6 s); and prompt-cache reuse took that identical call from 47.60 s to 12.04 s (3.95x) by skipping
+    prefill entirely. Consequences adopted here: (a) for reviewer-shaped work the cost is PREFILL, not decode, so
+    a dense 27B is the wrong reviewer and a MoE with ~4 B active (gpt-oss-20b) is right by construction; (b) the
+    only "faster prefill" this OS may claim is prompt-cache reuse - qwen35_ane_prefill_enabled remains UNVERIFIED
+    on M1 and is not claimed; (c) the one route that could still legalise draft+verify here is an engineered snapshot/restore
+    cache for the hybrid state, guarded by a token-identical greedy-output test, which is an OWNER decision and
+    not a promise. BUG-1042 is the instrument defect found while building this probe: a 1-token generation (model
+    emitted EOS on a bare file-head prompt) produced a "decode 41889.694 t/s" line in the receipt, so the probe
+    now carries bench.min_decode_tokens and a status column and reports INSUFFICIENT instead of a number. Supersedes
+    D-3170.'
+  bugs:
+  - BUG-1040
+  - BUG-1042
+  - BUG-1033
+  files:
+  - scripts/specdec_probe.py
+  - config/specdec_m1.yaml
+  - governance/specdec_probe_receipt.jsonl
+  - governance/SPECULATIVE_DECODING_M1_20261027.md
+  created: '2026-10-27'
+- id: D-3172
+  state: OPEN
+  category: VERIFIER GATE / MODEL PORTFOLIO
+  title: 'Reviewer market research register (D-3161): gemma-4-12B-it is the only candidate inside the 14 GB bound
+    that claims a material gain over the refused E4B; the 26B-A4B is SKIPped on the measured pool ceiling, and the
+    engine-version skew is a named adoption gate'
+  decision: 'The owner asked whether a gemma-family reviewer exists that is under 14 GB, as fast or faster than
+    gpt-oss-20b, and more accurate. Answered as a register with reasons (D-3038), never as a promotion: DETAILS
+    in governance/REVIEWER_MARKET_RESEARCH_20261027.md. ADAPT candidates: mlx-community/gemma-4-12B-it-qat-4bit
+    (10.99 GB) and lmstudio-community/gemma-4-12B-it-MLX-4bit (6.74 GB), both arch gemma4_unified; the vendor family
+    table puts the 12B Unified 7.8 points of MMLU-Pro, 20.2 of GPQA-Diamond and 20.0 of LiveCodeBench above the
+    E4B this OS already REFUSES on false_approve 0.1250 - i.e. the largest in-budget accuracy step on the vendor
+    own numbers, which remain CLAIMS. SKIP with reasons: gemma-4-26B-A4B-it (15.61 GB measured from repo blob sizes
+    - over the owner bound, and /health reads 41.0 GB in use against a 55.9 GB ceiling = 14.9 GB headroom, so admitting
+    it would evict a working-set model); gemma-4-31B-it and gemma-3-27b-it (over the bound, and the dense 27B prefill
+    shape is what made the 27B reviewer wrong); gemma-4-E2B-it (strictly weaker than E4B on every vendor row); NVFP4/FP8/AWQ/GPTQ
+    gemma derivatives (runtime-locked to Blackwell/Hopper or not loadable by MLX at all - high in download rankings,
+    unusable here). WATCH: mlx-community/gemma-3-12b-it-qat-4bit. ADOPT: none, and none may be adopted without passing
+    reviewing_verdict_gate on THIS device. TWO CONFLICTS NAMED RATHER THAN DISCOVERED LATER: (1) ENGINE VERSION
+    SKEW - the serving engine (oMLX 0.7.0 bundle) is mlx_lm 0.32.3.dev8 + mlx_vlm 0.7.10 and DOES map gemma4_unified,
+    while the repo in-process env is mlx_lm 0.31.3 with no mlx-vlm and does NOT, so gemma-4-12B-it is servable but
+    not loadable in-process and an in-process benchmark would fail as "Model type gemma4_unified not supported"
+    - a harness artifact that would be misread as a bad model; every such measurement MUST go through the server
+    or an aligned env. (2) FIXTURE-AUTHOR CONFOUND - the rvv3 fixture and the scoped clause that passes gpt-oss
+    were authored by the same agent that promotes on them, so a held-out fixture authored from a different source
+    is required before any second promotion; BUG-1041 also stands in the way, because model_eval_suite has no re-measure
+    channel and a stability re-run silently reports 0 new results.'
+  bugs:
+  - BUG-1041
+  files:
+  - governance/REVIEWER_MARKET_RESEARCH_20261027.md
+  - config/r5_review_gate.yaml
+  created: '2026-10-27'

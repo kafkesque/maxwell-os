@@ -27,10 +27,13 @@ receipt: governance/r5_review_gate.jsonl
 # verdicts), so the scope is now stated explicitly.
 task: >-
   Judge THE FILE BELOW, as written, against the purpose stated in ITS OWN docstring - nothing else. Is it CORRECT
-  for that purpose and SAFE to run: no data loss, no irreversibility, no silent failure, and does it verify its own
-  work? If the file is an orchestrator, judge it AS an orchestrator; judge what it would be used for ONLY when its
-  own docstring claims that use. The deterministic layers listed in the evidence file have ALREADY proved syntax,
-  lint and the C11/C12 contract - do not re-report those.
+  for that purpose and SAFE to run: no data loss, no irreversibility, no silent failure? For a script that ACTS ON
+  THE WORLD (writes, deletes, commits, or otherwise mutates external state), ALSO require that it verifies its own
+  work. Do NOT demand self-verification from a pure-transform script (one that only reads input and returns or
+  computes a value) - that clause is unanswerable for a pure function and produces false rejects. If the file is an
+  orchestrator, judge it AS an orchestrator; judge what it would be used for ONLY when its own docstring claims that
+  use. The deterministic layers listed in the evidence file have ALREADY proved syntax, lint and the C11/C12
+  contract - do not re-report those.
 
 # DETERMINISTIC LAYERS. Run in order, before any model is called. fatal=true -> the file never reaches a
 # reviewer (a file that does not compile is not reviewable). A non-fatal layer is LOUD, never silently green.
@@ -78,16 +81,19 @@ tiers:
     max_source_chars: 100000
     why: cross-family vs the Qwen generator, live on oMLX, D2549 first pass
   deep:
-    reviewer: gemma-4-E4B-it-MLX-4bit
+    reviewer: gpt-oss-20b-MXFP4-Q8
     max_tokens: 2600
     max_source_chars: 100000   # measured anchor: 98,664 chars reviewed; 152,853 crashed the server (BUG-746)
-    status: PENDING_BENCH
+    status: PROMOTED_20261027
     why: >-
-      today the deep tier differs by BUDGET and CONTEXT only. The only LIVE cross-family reviewer on this host
-      is the 4B gemma (governance/eval_models.txt = live oMLX registry). A MODEL promotion requires the bench
-      below AND a BUG-265-class preflight: the 26B-A4B OptiQ sibling is DISABLED as BROKEN
-      (config/model_assignments.yaml:145 - "5/5 calls fail"), and lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit
-      is a DIFFERENT artifact that is NOT fetched and NOT registered here.
+      PROMOTED 2026-10-27 by measurement (D-3168): gpt-oss-20b passed the declared deep-tier gate on fixture v3
+      (whole scripts, scoped reviewer clause) - acc 0.9167, margin +0.4167 over the 0.50 constant-answer
+      baseline, false_approve 0.0000, false_reject 0.0833, unparsed 0. gemma remains REFUSED: acc 0.7083,
+      margin +0.2083, but false_approve 0.1250 > the 0.10 ceiling (it approves 3 of 12 unambiguous defects).
+      The promotion is safe for the generator: gpt-oss is a different family from the Qwen3-Coder generator, and
+      it was already the declared candidate below. It is slower (10 s vs 3.5 s per call), which is acceptable for
+      the deep tier (scripts/*, pipeline/*, tools/*) the gate fronts. The 26B-A4B OptiQ sibling stays DISABLED as
+      BROKEN (config/model_assignments.yaml:145) and is not a candidate.
     # RETIRED 2026-10-15 (T-139/D-3013): gemma-4-12B-it-qat-OptiQ-4bit was a reviewer candidate whose
     # bytes are gone - a candidate that cannot resolve is a name that lies (BUG-808 class). The
     # 26B-A4B OptiQ sibling stays DISABLED as BROKEN (config/model_assignments.yaml:145).
@@ -107,12 +113,22 @@ tier_by_path:
 # THE MEASUREMENT THAT DECIDES A REVIEWER PROMOTION (OWED - BUG-738). A survey is not a measurement (D-2956);
 # D2556's 5-bug snippet is a smoke test, not a ranking.
 bench:
-  status: OWED
+  status: PASS
   harness: tools/model_eval_suite.py
-  suite: reviewing
+  suite: reviewing_verdict
   min_n: 20
   baseline: constant-answer
   min_margin_over_baseline: 0.15
-  why: the harness already carries a seeded-bug + false-claim suite; report abstain rate SEPARATELY from error rate
+  false_approve_ceiling: 0.10
+  why: >-
+    measured 2026-10-27 on fixture v3 at whole-script granularity with the SCOPED reviewer clause (D-3168,
+    receipt governance/r5_review_gate_bench.jsonl): gpt-oss acc 0.9167 / margin +0.4167 / false_approve 0.0000 /
+    false_reject 0.0833 / unparsed 0 - PASSES margin>=0.15 AND false_approve<=0.10 and is PROMOTED to deep.
+    gemma acc 0.7083 / margin +0.2083 / false_approve 0.1250 - REFUSED on the false_approve ceiling (approves 3 of
+    12 unambiguous defects). v2 (D-3167) had both near chance (0.6250/0.5833); scoping "verify its own work" to
+    world-acting scripts (not pure-transform functions) flipped gpt-oss from a serial-rejector to the first
+    passing reviewer - the clause, not the model, was the defect. The gate is MECHANICALLY enforced by
+    tools/model_eval_suite.py reviewing_verdict_gate + _report_reviewer_gate, which uses ONLY the current
+    fixture's ids (never pools fixture versions).
 
 exit: {approve: 0, fail: 1, indecisive: 2}

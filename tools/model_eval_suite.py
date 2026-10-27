@@ -1004,12 +1004,27 @@ def suite_abstain() -> list[dict]:
              'grader': lambda pred, r=r: grade_abstain(pred, r['answer'])}
             for r in _load_jsonl('abstain')]
 
+# The verdict fixture lives in its own module so the R5 gate can review it as ONE small file
+# (a 1,000-line harness overflows a reviewer's source cap and gets no verdict at all).
+# Safe at module scope: r5_reviewer_fixture imports NOTHING from this module (its only dependency,
+# scripts/r5_code_review.extract_verdict, is imported lazily inside the grader to avoid the cycle).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from r5_reviewer_fixture import suite_reviewing_verdict as _suite_reviewing_verdict  # noqa: E402
+
 SUITES: dict[str, Callable[[], list[dict]]] = {
     "gsm8k": suite_gsm8k, "math500": suite_math500, "mmlu_pro": suite_mmlu_pro,
     "humaneval": suite_humaneval, "mbpp": suite_mbpp, "ifeval": suite_ifeval,
     "hotpot_qa": suite_hotpot, "niah": suite_niah, "lc_reasoning": suite_lc_reasoning,
     "toolcalling": suite_toolcalling, "planning": suite_planning,
     "hardcode": suite_hardcode, "reviewing": suite_reviewing, "stability": suite_stability,
+    # WHY a second reviewing suite exists (2026-10-26, BUG-738): `reviewing` grades a reviewer by
+    # SUBSTRING match on bug-spotting prose and contains no verdict tokens at all, while the R5
+    # reviewer's declared job is to emit {"verdict": APPROVE|REJECT|INSUFFICIENT}. Benchmarking a
+    # verdict-emitter on a keyword fixture produced a tie at 0.833 across five unrelated models
+    # (governance/model_eval_report.md) that could not rank anything. `reviewing_verdict` asks the
+    # PRODUCTION prompt for a verdict on 12 seeded-defect and 12 clean scripts, so the config's
+    # declared `constant-answer` baseline finally means the rubber stamp it was meant to exclude.
+    "reviewing_verdict": _suite_reviewing_verdict,
     "delegation": suite_delegation, "voting": suite_voting, "abstain": suite_abstain,
     "summ_extractive": suite_summ_extractive,
 }
@@ -1087,6 +1102,132 @@ def _cell_status(model: str, suite: str, items: list[dict]) -> str:
         raise RuntimeError("preflight gate unusable for " + key + ": " + type(exc).__name__ + " " + str(exc)[:120]) from exc
     _CELL_STATUS[key] = status
     return status
+
+
+_GATE_CONFIG = ROOT / "config" / "r5_review_gate.yaml"
+_GATE_RECEIPT = ROOT / "governance" / "r5_review_gate_bench.jsonl"
+
+
+def reviewing_verdict_gate(model: str) -> dict[str, Any]:
+    """Mechanically enforce the reviewer-promotion gate for one model (BUG-738 / D-2962).
+
+    The promotion criteria live in config/r5_review_gate.yaml `bench:` — this function is the ONLY
+    place they are enforced, so a promotion cannot be claimed from config prose alone (D-3034: a
+    value that merely MENTIONS a threshold declares nothing; only a measurement that RESOLVES it
+    confers a pass). It reads the checkpoint (the measurement) and the config (the thresholds),
+    computes false_approve / false_reject / unparsed / accuracy / margin-over-baseline, and returns
+    a hard `pass` boolean: True only when min_n is met AND margin >= min_margin_over_baseline AND
+    false_approve <= false_approve_ceiling.
+    """
+    import yaml  # lazy import: optional dependency, config-first (C12)
+
+    bench = yaml.safe_load(_GATE_CONFIG.read_text(encoding="utf-8")).get("bench", {})
+    min_n = int(bench.get("min_n", 20))
+    min_margin = float(bench.get("min_margin_over_baseline", 0.15))
+    false_approve_ceiling = float(bench.get("false_approve_ceiling", 0.10))
+
+    # The declared baseline is `constant-answer`: a reviewer that emits one verdict for every item.
+    # Its accuracy is the share of items carrying that gold verdict, resolved from the fixture rather
+    # than assumed (D-3034); a balanced 12/12 fixture makes it 0.50.
+    try:
+        from r5_reviewer_fixture import baseline_scores  # noqa: PLC0415 — already imported above
+        _bs = baseline_scores()
+        baseline = max(float(_bs.get("always_APPROVE", 0.5)), float(_bs.get("always_REJECT", 0.5)))
+    except Exception:
+        baseline = 0.50
+
+    # FILTER BY THE CURRENT FIXTURE'S IDS, not by suite alone. rvv2 (unscoped clause) and rvv3
+    # (scoped clause) are DIFFERENT fixtures, and pooling them measures neither: the gate must
+    # resolve the exact ids the fixture on disk builds today (D-3034). Bumping the fixture id
+    # (rvv3 -> rvv4) therefore re-points the gate automatically, with no second declaration.
+    try:
+        from r5_reviewer_fixture import suite_reviewing_verdict as _current_fixture
+
+        current_ids = {str(it["id"]) for it in _current_fixture()}
+    except Exception:
+        current_ids = None  # a fixture that will not build is a named fault, not a silent pool
+
+    rows: list[dict] = []
+    if CKPT.exists():
+        for line in CKPT.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not line.strip():
+                continue
+            try:
+                d = json.loads(line)
+            except Exception:
+                continue
+            if d.get("err"):
+                continue  # transport error = a measurement we never took (mirrors _done_keys)
+            if d.get("model") == model and d.get("suite") == "reviewing_verdict":
+                if current_ids is None or str(d.get("id")) in current_ids:
+                    rows.append(d)
+
+    n = len(rows)
+    ok = sum(1 for r in rows if r.get("ok"))
+    false_approve = false_reject = unparsed = 0
+    for r in rows:
+        detail = str(r.get("detail", ""))
+        if "gold=REJECT" in detail and "got=APPROVE" in detail:
+            false_approve += 1  # approved a script whose gold is REJECT — the dangerous error
+        elif "gold=APPROVE" in detail and "got=REJECT" in detail:
+            false_reject += 1  # rejected a script whose gold is APPROVE
+        elif "UNPARSED" in detail:
+            unparsed += 1
+
+    accuracy = ok / n if n else 0.0
+    margin = accuracy - baseline
+    fa_rate = false_approve / n if n else 0.0
+    fr_rate = false_reject / n if n else 0.0
+
+    reasons: list[str] = []
+    if n < min_n:
+        reasons.append("n=%d < min_n=%d" % (n, min_n))
+    if margin < min_margin:
+        reasons.append("margin=%.4f < %.2f" % (margin, min_margin))
+    if fa_rate > false_approve_ceiling:
+        reasons.append("false_approve=%.4f > %.2f" % (fa_rate, false_approve_ceiling))
+
+    return {
+        "model": model,
+        "pass": not reasons,
+        "n": n,
+        "accuracy": round(accuracy, 4),
+        "baseline": baseline,
+        "margin": round(margin, 4),
+        "false_approve": round(fa_rate, 4),
+        "false_reject": round(fr_rate, 4),
+        "unparsed": unparsed,
+        "min_n": min_n,
+        "min_margin_over_baseline": min_margin,
+        "false_approve_ceiling": false_approve_ceiling,
+        "reasons": reasons,
+    }
+
+
+def _report_reviewer_gate(models: list[str]) -> None:
+    """Print the mechanical promotion verdict for every model and append it to the receipt.
+
+    A REFUSED gate is NOT a harness failure — it is the expected answer for a reviewer that does
+    not beat the constant-answer baseline by the declared margin. The verdict is printed AND
+    written to governance/r5_review_gate_bench.jsonl so a claim cannot be made without a trace
+    (D-3036: an act that leaves no trace did not happen).
+    """
+    print(chr(10) + "=== REVIEWER PROMOTION GATE (config/r5_review_gate.yaml bench) ===", flush=True)
+    for model in models:
+        g = reviewing_verdict_gate(model)
+        verdict = "PASS" if g["pass"] else "REFUSED"
+        print("  " + model[:40].ljust(40) + " " + verdict
+              + "  n=" + str(g["n"])
+              + "  acc=" + str(g["accuracy"])
+              + "  margin=" + ("%+.3f" % g["margin"])
+              + "  false_approve=" + str(g["false_approve"])
+              + "  false_reject=" + str(g["false_reject"])
+              + "  unparsed=" + str(g["unparsed"]), flush=True)
+        for reason in g["reasons"]:
+            print("      FAIL " + reason, flush=True)
+        g["ts"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        with _GATE_RECEIPT.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(g) + chr(10))
 
 
 def main() -> int:
@@ -1192,6 +1333,9 @@ def main() -> int:
             acc = round(passes / max(passes + fails, 1), 3)
             print("  " + model[:40].ljust(40) + " " + suite.ljust(13) + " acc=" + str(acc)
                   + "  n=" + str(passes + fails) + ("  skipped=" + str(skips) if skips else ""), flush=True)
+
+    if "reviewing_verdict" in suites:
+        _report_reviewer_gate(models)
 
     print(chr(10) + "done in " + str(round(time.time() - t0)) + "s, " + str(total) + " new results")
     if build_failures:

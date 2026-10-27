@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 861,
-  "open_n": 266,
-  "closed_n": 595,
+  "open_n": 265,
+  "closed_n": 596,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -2655,14 +2655,6 @@
         "scripts/hardware_calibrate.py",
         "scripts/measure_prefill.py"
       ]
-    },
-    {
-      "id": "BUG-1088",
-      "title": "(MED, OPEN 2026-10-27) \u2014 THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`",
-      "events": 1,
-      "artifacts": [
-        "pipeline/oneshot_ask.py"
-      ]
     }
   ],
   "closed": [
@@ -3252,6 +3244,7 @@
     "BUG-1085",
     "BUG-1086",
     "BUG-1087",
+    "BUG-1088",
     "BUG-1089",
     "BUG-1090",
     "BUG-1091",

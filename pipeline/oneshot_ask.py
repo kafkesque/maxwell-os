@@ -22,6 +22,8 @@ import time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "config" / "engine.yaml"
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib import transport_wall  # noqa: E402  (BUG-1088: the ONE derivation of a transport wall)
 TEMPERATURE = 0.0
 OK, FATAL = 0, 1
 
@@ -43,15 +45,23 @@ def key() -> str:
 
 
 def ask(model: str, prompt: str, max_tokens: int, timeout: int) -> tuple[str, dict]:
-    """POST one chat completion and return (content, usage+timings)."""
-    engine = conf()["engine"]
+    """POST one chat completion and return (content, usage+timings).
+
+    BUG-1088: `subprocess.run(..., timeout=timeout + 20)` carried the same class of fault BUG-1085 removed from the
+    loop instrument - a wall term that is TYPED, has no declared provenance and is invisible to a caller reasoning
+    about `--timeout`. The wall is now DERIVED (`budget + declared slack`, with `0 < slack < budget`) from the ONE
+    home of that rule, so this path cannot drift back to a literal and neither can the next client.
+    """
+    cfg = conf()
+    engine = cfg["engine"]
+    wall_s = transport_wall.read(timeout)
     body = {"model": model, "messages": [{"role": "user", "content": prompt}],
             "max_tokens": max_tokens, "temperature": TEMPERATURE}
     cmd = ["curl", "-sS", "-m", str(timeout), "-X", "POST",
            f"http://{engine['host']}:{engine['port']}/v1/chat/completions",
            "-H", f"Authorization: Bearer {key()}", "-H", "Content-Type: application/json",
            "-d", json.dumps(body)]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout + 20)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=wall_s)
     try:
         doc = json.loads(proc.stdout)
     except Exception:

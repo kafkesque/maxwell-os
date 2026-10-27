@@ -38,6 +38,7 @@ from typing import Any
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from scripts.lib import transport_wall  # noqa: E402  (BUG-1088: the ONE derivation of a transport wall)
 
 CONFIG = ROOT / "config/agent_context.yaml"
 ENGINE = ROOT / "config/engine.yaml"
@@ -254,21 +255,18 @@ def wall_from(budget: float, slack: float) -> float:
     HARMONY_RED_LOOP_20261027_ALLOWANCE_3753_BLANKECHO.json; engine log line 9641). The rule is an inequality, so
     the fault cannot return through config INSTEAD of a literal: 0 < slack < budget, i.e. budget < wall < 2*budget.
     A slack at or above the budget would let a turn be 100% over its budget and still be read as a turn.
+
+    BUG-1088 moved the INEQUALITY to scripts/lib/transport_wall.py and this delegates to it. It did not when this
+    fix first landed, and the class was then paid a SECOND time one file away: `pipeline/oneshot_ask.py` carried a
+    typed `timeout + 20`. A rule that lives inside a rail cannot be shared with the next client (C12/D-2642), and a
+    second copy is the copy that goes stale. The message a caller sees is unchanged; there is one copy of it.
     """
-    if not (0 < slack < budget):
-        raise SystemExit(f"FATAL: transport slack {slack:g}s is not inside (0, {budget:g}) - a slack that is not "
-                         f"smaller than the budget reproduces BUG-1085's 180 s wall: a transport wall at 2x the "
-                         f"budget means a turn can be 100% over its budget and still be READ as a turn")
-    return budget + slack
+    return transport_wall.wall(budget, slack)
 
 
 def call_timeout_s() -> float:
     """The ONE transport wall for a single completion, read from its declared home (C12: never a literal)."""
-    slack = (_yaml(CONFIG).get("turn_budget") or {}).get("transport_slack_s")
-    if not isinstance(slack, (int, float)):
-        raise SystemExit("FATAL: config/agent_context.yaml#turn_budget.transport_slack_s is absent - refusing to "
-                         "invent a transport wall (C16/C12)")
-    return wall_from(budget_s(), float(slack))
+    return transport_wall.read(budget_s())
 
 
 def wall_reading(elapsed_s: float, budget: float, wall_s: float) -> str:

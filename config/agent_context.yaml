@@ -558,8 +558,12 @@ turn_budget:
   #: no reading, no invented number). It is 2.5x the largest measured overshoot AND it is bounded by the invariant,
   #: so no config edit can restore 2x the wall: a slack >= the budget is FATAL at read time.
   transport_consumed_by:
+  - 'scripts/lib/transport_wall.py#wall / read (THE derivation - BUG-1088 moved the inequality out of the rail so
+     the next client can share it; the two entries below DELEGATE to it rather than restating the rule)'
   - 'scripts/measure_subagent_loop.py#wall_from / call_timeout_s / ask / wall_reading'
   - 'scripts/harmony_red_loop.py#run_model (inherits it through ask, and names it in its receipt)'
+  - 'pipeline/oneshot_ask.py#ask (BUG-1088: carried a typed `timeout + 20` until 2026-10-28 - the SAME class as
+     BUG-1085, paid twice because the rule lived inside a rail and the second path could not reach it)'
   warmup:                          # the cold load is paid OUTSIDE a measured turn, and it is never graded
     max_tokens: 1                  # ONE token: this buys a RESIDENT model, not an answer
     judged: false                  # a warm-up graded as a turn is a cold load reported as a measurement

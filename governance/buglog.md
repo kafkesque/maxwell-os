@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 861 bugs (266 open / 595 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1338 decisions (census stamp 10b33437e94780e4, 2026-10-28) · 861 bugs (265 open / 596 closed; highest OPEN = BUG-1077) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1338 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 390 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1338, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
+> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24946,3 +24946,40 @@ this fix; no other capability's files were edited; the ladder's two pre-existing
 UNCHANGED by this work (`check_silent_repair` 14 of ceiling 13, `check_undeclared_encoding` files 2 / sites 5 /
 writes 2 of ceiling 0) and `check_config_defaults` stayed at exactly 300/300 shadowed-declared keys - the new keys
 are read WITHOUT a literal default precisely so the guard does not spend a ceiling it did not earn.
+## BUG-1088 (MED, FIXED 2026-10-28) — THE ONESHOT PATH CARRIED THE SAME TYPED WALL BUG-1085 REMOVED: `timeout + 20` IS GONE AND THE INEQUALITY NOW HAS ONE HOME
+
+CLOSED AS THE CLASS, NOT THE INSTANCE, which is why the fix is not "replace 20 with 15". The rule that decides how
+long a client may wait was living INSIDE the rail that first needed it (`scripts/measure_subagent_loop.py#wall_from`),
+so the next call path could not reach it and typed its own number - and did.
+
+THE RED LOOP, SEEN ON BOTH SIDES (D-3036).
+  BEFORE: `git show HEAD:pipeline/oneshot_ask.py` carries `subprocess.run(..., timeout=timeout + 20)` at line 54,
+          while the same function passes `-m <timeout>` to curl. A caller reasoning about `--timeout=600` was
+          silently granted a 620 s wall, and `--timeout=5` would have run with a 25 s wall - a wall at 5x its
+          budget, the BUG-1085 shape with a different multiplier.
+  AFTER:  `python3 pipeline/oneshot_ask.py --model X --prompt hi --timeout 5 --out /tmp/x.md` prints
+          "FATAL: transport slack 15s is not inside (0, 5) - a slack that is not smaller than the budget
+          reproduces BUG-1085's 180 s wall" and exits BEFORE any curl: a budget that cannot legally host the
+          declared slack is now refused rather than paid at the client's expense.
+
+THE FIX, ONE ACT.
+  1. `scripts/lib/transport_wall.py` (new) owns the derivation and the home: `slack_s()` reads
+     `config/agent_context.yaml#turn_budget.transport_slack_s` (fail-closed), `wall(budget, slack)` enforces
+     `0 < slack < budget`, `read(budget)` is what a client calls. `config()` loads the home ITSELF, because the
+     first version took a caller-supplied dict and `pipeline/oneshot_ask.py` - which loads `config/engine.yaml`
+     for host/port - handed over its ENGINE config, so the fail-closed branch fired for the WRONG reason. A
+     derivation a caller can point at the wrong file is a derivation with a hole in it; `read()` now takes only
+     the budget. That defect was found in the forensic audit of this fix and fixed here, not registered as a new
+     finding (D-3038 distinguishes a flaw IN the change from a separate finding).
+  2. Both existing callers DELEGATE: `measure_subagent_loop.wall_from` -> `transport_wall.wall`;
+     `measure_subagent_loop.call_timeout_s` -> `transport_wall.read(budget_s())`; `pipeline/oneshot_ask.ask` ->
+     `transport_wall.read(timeout)`. The inequality now has ONE copy (C12/D-2642), so the class cannot be paid a
+     third time by a path that cannot see the rule.
+  3. `config/agent_context.yaml#turn_budget.transport_consumed_by` names the new home and the repaired consumer,
+     so the declaration that says "who reads this slack" still RESOLVES (D-3034).
+
+READINGS: `wall(90) = 105.0` (inside (90,180) - the loop budget, unchanged); `wall(600) = 615.0` (inside
+(600,1200)); `scripts/measure_subagent_loop.py --selftest` 72/72 known-answer controls still fire over the SAME
+inequality now that it delegates; `ruff --select F` clean; `lint_gate` 62 <= 62 (unchanged); `check_silent_repair`
+14 of ceiling 13 and `check_undeclared_encoding` 2/5/2 re-measured UNCHANGED - neither growth is attributable to
+this fix. No model was called to prove any of it: the refusal happens before transport, which is the point.

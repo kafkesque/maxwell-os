@@ -8,7 +8,7 @@
     "bf16_native": false,
     "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
     "engine_version": "0.7.3rc1",
-    "disk_free_gb": 111.9
+    "disk_free_gb": 110.7
   },
   "roles": {
     "brain": {
@@ -17,7 +17,7 @@
       "value": 40.47,
       "source": "MEASURED",
       "n_readings": 3,
-      "gate": true,
+      "gate": null,
       "status": "PROVISIONAL",
       "decided_by": "governance/calibration_receipts.jsonl"
     },
@@ -42,23 +42,23 @@
       "decided_by": "governance/calibration_receipts.jsonl"
     },
     "plan": {
-      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "model": "Qwen3.8-27B-MTP4",
       "objective": "decode_tps",
-      "value": 48.54,
+      "value": 16.39,
       "source": "MEASURED",
       "n_readings": 3,
-      "gate": null,
-      "status": "PROVISIONAL",
+      "gate": true,
+      "status": "QUALIFIED",
       "decided_by": "governance/calibration_receipts.jsonl"
     },
     "analyze": {
-      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "model": "gpt-oss-20b-MXFP4-Q8",
       "objective": "prefill_tps",
-      "value": 396.63,
+      "value": 275.88,
       "source": "MEASURED",
       "n_readings": 3,
-      "gate": null,
-      "status": "PROVISIONAL",
+      "gate": true,
+      "status": "QUALIFIED",
       "decided_by": "governance/calibration_receipts.jsonl"
     },
     "classify": {

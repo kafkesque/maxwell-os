@@ -32,6 +32,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import ast
 import json
 import random
@@ -1011,6 +1012,11 @@ def suite_abstain() -> list[dict]:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from r5_reviewer_fixture import suite_reviewing_verdict as _suite_reviewing_verdict  # noqa: E402
 
+# The PLANNING instrument (BUG-1055 / D-3189 limb b), same split and for the same reason: a role gate
+# is reviewed as one small file, and this module stays the harness. Safe at module scope by the same
+# argument as above - plan_quality_fixture imports nothing from here (its parser is lazy).
+from plan_quality_fixture import suite_plan_quality as _suite_plan_quality  # noqa: E402
+
 SUITES: dict[str, Callable[[], list[dict]]] = {
     "gsm8k": suite_gsm8k, "math500": suite_math500, "mmlu_pro": suite_mmlu_pro,
     "humaneval": suite_humaneval, "mbpp": suite_mbpp, "ifeval": suite_ifeval,
@@ -1025,6 +1031,11 @@ SUITES: dict[str, Callable[[], list[dict]]] = {
     # PRODUCTION prompt for a verdict on 12 seeded-defect and 12 clean scripts, so the config's
     # declared `constant-answer` baseline finally means the rubber stamp it was meant to exclude.
     "reviewing_verdict": _suite_reviewing_verdict,
+    # WHY a planning suite exists (2026-10-27, BUG-1055): `planning` above is a prose fixture graded by
+    # substring match, so it measured wording, not judgement. `plan_quality` presents a PROPOSED NEXT STEP
+    # against a MATERIAL and grades a parsed verdict, which is the only shape in which a constant-answer
+    # baseline means what it says and a role gate can be enforced fail-closed (config/plan_quality_gate.yaml).
+    "plan_quality": _suite_plan_quality,
     "delegation": suite_delegation, "voting": suite_voting, "abstain": suite_abstain,
     "summ_extractive": suite_summ_extractive,
 }
@@ -1106,71 +1117,93 @@ def _cell_status(model: str, suite: str, items: list[dict]) -> str:
 
 _GATE_CONFIG = ROOT / "config" / "r5_review_gate.yaml"
 _GATE_RECEIPT = ROOT / "governance" / "r5_review_gate_bench.jsonl"
+_PLAN_GATE_CONFIG = ROOT / "config" / "plan_quality_gate.yaml"
 
 
-def reviewing_verdict_gate(model: str) -> dict[str, Any]:
-    """Mechanically enforce the reviewer-promotion gate for one model (BUG-738 / D-2962).
+def _bench_gate(model: str, *, gate_id: str, suite: str, config_path: Path, receipt_path: Path,
+                fixture_module: str, baseline_kind: str) -> dict[str, Any]:
+    """Enforce ONE role gate's declared promotion criteria against measured rows (D-3034).
 
-    The promotion criteria live in config/r5_review_gate.yaml `bench:` — this function is the ONLY
-    place they are enforced, so a promotion cannot be claimed from config prose alone (D-3034: a
-    value that merely MENTIONS a threshold declares nothing; only a measurement that RESOLVES it
-    confers a pass). It reads the checkpoint (the measurement) and the config (the thresholds),
-    computes false_approve / false_reject / unparsed / accuracy / margin-over-baseline, and returns
-    a hard `pass` boolean: True only when min_n is met AND margin >= min_margin_over_baseline AND
-    false_approve <= false_approve_ceiling.
+    The criteria live in the gate's own config (`bench:`), so this function is the ONLY place they are
+    enforced: a threshold that merely MENTIONS a number declares nothing; only a measurement that
+    RESOLVES it confers a pass. It reads the checkpoint (the measurement) and the config (the
+    thresholds), and returns a hard `pass` boolean.
+
+    Args:
+        model: model id as served by oMLX (the id the register names).
+        gate_id: the gate identity written INTO the receipt row - `r5_review`, `plan_quality` - so a
+            row can never satisfy a different role's gate (BUG-1063 limb 1).
+        suite: harness suite name whose rows are this gate's evidence.
+        config_path: the gate's own config, holding the `bench:` block.
+        receipt_path: the gate's own receipt file (one file per gate).
+        fixture_module: module name to import for `baseline_scores()` and the current fixture ids.
+        baseline_kind: the declared baseline vocabulary; only `constant-answer` is implemented, and any
+            other declared value is a NAMED fault rather than a silent default (C16).
+
+    Returns:
+        The verdict dict, including `pass`, the measured rates, the thresholds it was judged against,
+        and the reasons for a refusal.
+
+    Raises:
+        RuntimeError: the gate is unusable (missing config, unknown baseline). A missing gate must not
+            pass silently.
     """
+    import importlib  # local: keeps this module importable with no side effects
+
+    if not config_path.is_file():
+        raise RuntimeError("role gate " + gate_id + " declares no config at " + str(config_path))
     import yaml  # lazy import: optional dependency, config-first (C12)
 
-    bench = yaml.safe_load(_GATE_CONFIG.read_text(encoding="utf-8")).get("bench", {})
+    bench = (yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}).get("bench", {}) or {}
+    if str(bench.get("baseline") or "constant-answer") != baseline_kind:
+        raise RuntimeError("role gate " + gate_id + " declares baseline " + str(bench.get("baseline"))
+                           + " but only '" + baseline_kind + "' is implemented - refusing to guess")
     min_n = int(bench.get("min_n", 20))
     min_margin = float(bench.get("min_margin_over_baseline", 0.15))
     false_approve_ceiling = float(bench.get("false_approve_ceiling", 0.10))
 
-    # The declared baseline is `constant-answer`: a reviewer that emits one verdict for every item.
-    # Its accuracy is the share of items carrying that gold verdict, resolved from the fixture rather
-    # than assumed (D-3034); a balanced 12/12 fixture makes it 0.50.
-    try:
-        from r5_reviewer_fixture import baseline_scores  # noqa: PLC0415 — already imported above
-        _bs = baseline_scores()
-        baseline = max(float(_bs.get("always_APPROVE", 0.5)), float(_bs.get("always_REJECT", 0.5)))
-    except Exception:
-        baseline = 0.50
+    # The baseline is RESOLVED from the fixture, never assumed (D-3034): a balanced 12/12 fixture makes
+    # a constant answer worth exactly 0.50, and an unbalanced one makes it worth whatever it is.
+    fixture = importlib.import_module(fixture_module)
+    scores = fixture.baseline_scores()
+    baseline = max(float(scores.get("always_APPROVE", 0.5)), float(scores.get("always_REJECT", 0.5)))
 
-    # FILTER BY THE CURRENT FIXTURE'S IDS, not by suite alone. rvv2 (unscoped clause) and rvv3
-    # (scoped clause) are DIFFERENT fixtures, and pooling them measures neither: the gate must
-    # resolve the exact ids the fixture on disk builds today (D-3034). Bumping the fixture id
-    # (rvv3 -> rvv4) therefore re-points the gate automatically, with no second declaration.
-    try:
-        from r5_reviewer_fixture import suite_reviewing_verdict as _current_fixture
+    # FILTER BY THE CURRENT FIXTURE'S IDS, not by suite alone: two versions of a fixture are DIFFERENT
+    # instruments (rvv2 -> rvv3 flipped a model from serial-rejector to passing reviewer), so pooling them
+    # measures neither. Bumping a fixture's ids re-points its gate automatically, with no second declaration.
+    items = getattr(fixture, "suite_" + suite)()
+    current_ids = {str(it["id"]) for it in items}
+    # The fixture's own digest, so a change to a prompt or a material that is NOT accompanied by a VERSION bump
+    # is visible on the record as two different digits rather than as a silently different instrument (_done_keys
+    # cannot see it: a measured (model, suite, id) is never re-measured, BUG-1041).
+    fixture_digest = hashlib.sha256(
+        json.dumps([{k: v for k, v in it.items() if k != "grader"} for it in items],
+                   sort_keys=True, default=str).encode("utf-8")).hexdigest()[:16]
 
-        current_ids = {str(it["id"]) for it in _current_fixture()}
-    except Exception:
-        current_ids = None  # a fixture that will not build is a named fault, not a silent pool
-
-    rows: list[dict] = []
+    rows: list[dict[str, Any]] = []
     if CKPT.exists():
         for line in CKPT.read_text(encoding="utf-8", errors="replace").splitlines():
             if not line.strip():
                 continue
             try:
-                d = json.loads(line)
-            except Exception:
+                record = json.loads(line)
+            except json.JSONDecodeError:
                 continue
-            if d.get("err"):
+            if record.get("err"):
                 continue  # transport error = a measurement we never took (mirrors _done_keys)
-            if d.get("model") == model and d.get("suite") == "reviewing_verdict":
-                if current_ids is None or str(d.get("id")) in current_ids:
-                    rows.append(d)
+            if record.get("model") == model and record.get("suite") == suite:
+                if str(record.get("id")) in current_ids:
+                    rows.append(record)
 
     n = len(rows)
-    ok = sum(1 for r in rows if r.get("ok"))
+    ok = sum(1 for row in rows if row.get("ok"))
     false_approve = false_reject = unparsed = 0
-    for r in rows:
-        detail = str(r.get("detail", ""))
+    for row in rows:
+        detail = str(row.get("detail", ""))
         if "gold=REJECT" in detail and "got=APPROVE" in detail:
-            false_approve += 1  # approved a script whose gold is REJECT — the dangerous error
+            false_approve += 1  # approved a step/script whose gold is REJECT — the dangerous error
         elif "gold=APPROVE" in detail and "got=REJECT" in detail:
-            false_reject += 1  # rejected a script whose gold is APPROVE
+            false_reject += 1
         elif "UNPARSED" in detail:
             unparsed += 1
 
@@ -1188,6 +1221,11 @@ def reviewing_verdict_gate(model: str) -> dict[str, Any]:
         reasons.append("false_approve=%.4f > %.2f" % (fa_rate, false_approve_ceiling))
 
     return {
+        "gate": gate_id,
+        "suite": suite,
+        "fixture": fixture_module,
+        "fixture_n": len(current_ids),
+        "fixture_sha256_16": fixture_digest,
         "model": model,
         "pass": not reasons,
         "n": n,
@@ -1204,30 +1242,73 @@ def reviewing_verdict_gate(model: str) -> dict[str, Any]:
     }
 
 
-def _report_reviewer_gate(models: list[str]) -> None:
-    """Print the mechanical promotion verdict for every model and append it to the receipt.
+def reviewing_verdict_gate(model: str) -> dict[str, Any]:
+    """Enforce the REVIEWER-promotion gate for one model (BUG-738 / D-2962).
 
-    A REFUSED gate is NOT a harness failure — it is the expected answer for a reviewer that does
-    not beat the constant-answer baseline by the declared margin. The verdict is printed AND
-    written to governance/r5_review_gate_bench.jsonl so a claim cannot be made without a trace
-    (D-3036: an act that leaves no trace did not happen).
+    Thin wrapper over `_bench_gate` so the reviewer gate and the planner gate share ONE enforcement
+    implementation (C21) while each keeps its own config, its own fixture and its own receipt.
     """
-    print(chr(10) + "=== REVIEWER PROMOTION GATE (config/r5_review_gate.yaml bench) ===", flush=True)
+    return _bench_gate(model, gate_id="r5_review", suite="reviewing_verdict", config_path=_GATE_CONFIG,
+                       receipt_path=_GATE_RECEIPT, fixture_module="r5_reviewer_fixture",
+                       baseline_kind="constant-answer")
+
+
+def plan_quality_gate(model: str) -> dict[str, Any]:
+    """Enforce the PLANNING gate for one model (BUG-1055 / D-3189 limb b).
+
+    A model that fails here is not ranked lower for `plan`/`analyze`; it leaves the pool. The receipt
+    path is declared in config/plan_quality_gate.yaml (`bench_receipt`), never hardcoded here (C12).
+    """
+    import yaml  # lazy: config-first
+
+    declared = (yaml.safe_load(_PLAN_GATE_CONFIG.read_text(encoding="utf-8")) or {}) if _PLAN_GATE_CONFIG.is_file() else {}
+    receipt = ROOT / str(declared.get("bench_receipt") or "governance/plan_quality_gate_bench.jsonl")
+    return _bench_gate(model, gate_id="plan_quality", suite="plan_quality", config_path=_PLAN_GATE_CONFIG,
+                       receipt_path=receipt, fixture_module="plan_quality_fixture",
+                       baseline_kind="constant-answer")
+
+
+def _report_gate(models: list[str], gate_id: str, gate_fn: Callable[[str], dict[str, Any]],
+                 receipt: Path, banner: str) -> None:
+    """Print every model's mechanical verdict and append it to the gate's own receipt.
+
+    A REFUSED gate is NOT a harness failure - it is the expected answer for a model that does not beat
+    the constant-answer baseline by the declared margin. The verdict is printed AND written to the
+    gate's receipt so a claim cannot be made without a trace (D-3036).
+    """
+    print(chr(10) + "=== " + banner + " ===", flush=True)
     for model in models:
-        g = reviewing_verdict_gate(model)
-        verdict = "PASS" if g["pass"] else "REFUSED"
-        print("  " + model[:40].ljust(40) + " " + verdict
-              + "  n=" + str(g["n"])
-              + "  acc=" + str(g["accuracy"])
-              + "  margin=" + ("%+.3f" % g["margin"])
-              + "  false_approve=" + str(g["false_approve"])
-              + "  false_reject=" + str(g["false_reject"])
-              + "  unparsed=" + str(g["unparsed"]), flush=True)
-        for reason in g["reasons"]:
+        verdict = gate_fn(model)
+        label = "PASS" if verdict["pass"] else "REFUSED"
+        print("  " + model[:40].ljust(40) + " " + label
+              + "  n=" + str(verdict["n"])
+              + "  acc=" + str(verdict["accuracy"])
+              + "  margin=" + f"{verdict['margin']:+.3f}"
+              + "  false_approve=" + str(verdict["false_approve"])
+              + "  false_reject=" + str(verdict["false_reject"])
+              + "  unparsed=" + str(verdict["unparsed"]), flush=True)
+        for reason in verdict["reasons"]:
             print("      FAIL " + reason, flush=True)
-        g["ts"] = time.strftime("%Y-%m-%dT%H:%M:%S")
-        with _GATE_RECEIPT.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(g) + chr(10))
+        verdict["ts"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        receipt.parent.mkdir(parents=True, exist_ok=True)
+        with receipt.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(verdict) + chr(10))
+
+
+def _report_reviewer_gate(models: list[str]) -> None:
+    """Print and record the reviewer-promotion verdict for every model (r5_review gate)."""
+    _report_gate(models, "r5_review", reviewing_verdict_gate, _GATE_RECEIPT,
+                 "REVIEWER PROMOTION GATE (config/r5_review_gate.yaml bench)")
+
+
+def _report_plan_quality_gate(models: list[str]) -> None:
+    """Print and record the planning verdict for every model (plan_quality gate)."""
+    import yaml  # lazy: config-first
+
+    declared = (yaml.safe_load(_PLAN_GATE_CONFIG.read_text(encoding="utf-8")) or {}) if _PLAN_GATE_CONFIG.is_file() else {}
+    receipt = ROOT / str(declared.get("bench_receipt") or "governance/plan_quality_gate_bench.jsonl")
+    _report_gate(models, "plan_quality", plan_quality_gate, receipt,
+                 "PLANNING GATE (config/plan_quality_gate.yaml bench) - BUG-1055 / D-3189 limb b")
 
 
 def main() -> int:
@@ -1336,6 +1417,8 @@ def main() -> int:
 
     if "reviewing_verdict" in suites:
         _report_reviewer_gate(models)
+    if "plan_quality" in suites:
+        _report_plan_quality_gate(models)
 
     print(chr(10) + "done in " + str(round(time.time() - t0)) + "s, " + str(total) + " new results")
     if build_failures:

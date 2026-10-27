@@ -20,7 +20,22 @@ version: 1
 
 # ── layer 3 wiring: where readings and gates are read from ────────────────────────────────────────────────
 receipts: governance/calibration_receipts.jsonl   # append-only; one row per measured run
-gate_bench: governance/r5_review_gate_bench.jsonl # the R5 verdict gate's own artifact
+
+# ── THE GATES a role may name, and the receipt that RESOLVES each one ─────────────────────────────────────
+# A role's `require_gate` is a GATE ID, and a gate id must resolve to exactly one artifact. Before this map a
+# single `gate_bench:` path was keyed by MODEL alone, so the moment a second gate existed one gate's PASS could
+# satisfy another role's gate - a row that does not say which gate it resolved (BUG-1063 limb 1).
+# `row_gate_default` is the declared identity of rows written BEFORE rows carried `gate:`: a declaration, never
+# an inference from the filename.
+gates:
+  r5_review:
+    receipt: governance/r5_review_gate_bench.jsonl
+    row_gate_default: r5_review
+    suite: reviewing_verdict   # the harness suite that produces this gate's evidence
+  plan_quality:
+    receipt: governance/plan_quality_gate_bench.jsonl
+    row_gate_default: plan_quality
+    suite: plan_quality
 out: config/model_roles.yaml                      # the resolver's output (generated, never hand-edited)
 
 # ── layer 1: what to read, and how to name what was read ──────────────────────────────────────────────────
@@ -87,12 +102,56 @@ min_readings_per_candidate: 3
 # prevent. A candidate may only take a role it DECLARES, and a role that names a gate may only be filled by a
 # PASSING gate. `status` in the output is QUALIFIED (gate-backed) or PROVISIONAL (measured, no role gate exists yet).
 roles:
-  brain:      {objective: decode_tps,        require_gate: null,        min_ctx: 32768}
-  review:     {objective: seconds_per_item,  require_gate: r5_review,   min_ctx: 32768}
-  code:       {objective: decode_tps,        require_gate: null,        min_ctx: 32768}
-  plan:       {objective: decode_tps,        require_gate: null,        min_ctx: 131072}
-  analyze:    {objective: prefill_tps,       require_gate: null,        min_ctx: 131072}
-  classify:   {objective: decode_tps,        require_gate: null,        min_ctx: 8192}
+  # `ungated_accepted` is MANDATORY wherever `require_gate` is null (D-3189 limb c): a bare null read as "the
+  # fastest model wins" and looked identical to a deliberate choice. Every entry states WHAT STANDS IN for the
+  # missing gate and is labelled ACCEPTED-NOT-MEASURED; the resolver reports a bare null as a fault.
+  brain:
+    objective: decode_tps
+    require_gate: null
+    min_ctx: 32768
+    ungated_accepted:
+      date: 2026-10-27
+      status: ACCEPTED-NOT-MEASURED
+      reason: >-
+        no generation-quality fixture exists on this host; what stands in for it is downstream verification -
+        every extracted claim is NLI-checked (stage5, DeBERTa, fail-closed) and anything written is R5-reviewed by
+        a different model family. The fixture that would replace this acceptance is a grounded-generation set
+        graded by the production NLI path, not by another model's opinion.
+  review:
+    objective: seconds_per_item
+    require_gate: r5_review
+    min_ctx: 32768
+  code:
+    objective: decode_tps
+    require_gate: null
+    min_ctx: 32768
+    ungated_accepted:
+      date: 2026-10-27
+      status: ACCEPTED-NOT-MEASURED
+      reason: >-
+        the substitute is deterministic and already enforced: generated files are compile-checked and lint-checked
+        by the r5_review_gate layers and then reviewed by a model of a different family, so a broken generator
+        cannot reach a commit. What is NOT measured is code QUALITY beyond correctness - no fixture ranks two
+        passing generators, and none is claimed.
+  plan:
+    objective: decode_tps
+    require_gate: plan_quality
+    min_ctx: 131072
+  analyze:
+    objective: prefill_tps
+    require_gate: plan_quality
+    min_ctx: 131072
+  classify:
+    objective: decode_tps
+    require_gate: null
+    min_ctx: 8192
+    ungated_accepted:
+      date: 2026-10-27
+      status: ACCEPTED-NOT-MEASURED
+      reason: >-
+        classification is checked downstream (config/eval_integrity.yaml floors and the label-distribution gates on
+        the S4 output) rather than by a per-model fixture; no instrument yet isolates a model's labels from the
+        pipeline's. Accepted so the absence is visible, not silent.
 
 # ── the candidate register: what MAY be considered, and the honest footprint of each ──────────────────────
 # `bytes_read_fraction` < 1.0 only for MoE rows, and the reason is recorded with the row (D-3038).

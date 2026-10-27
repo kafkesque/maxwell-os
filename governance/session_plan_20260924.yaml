@@ -290,6 +290,11 @@ may_touch:
 - governance/depth_vote_*
 - governance/joint_vote_*
 - governance/model_eval_*
+#: D-3191 (2026-10-27): the plan_quality gate's own receipt - ONE file per gate, because a single artifact
+#: keyed by MODEL alone let one gate's PASS satisfy another role's gate (BUG-1063). NAMED, not a glob:
+#: governance/*.jsonl is deliberately not a pattern, and the widening_log entry that explains this grant
+#: is a RECORD - BUG-548 says the record is not the rule, so the rule lives here.
+- governance/plan_quality_gate_bench.jsonl
 - governance/r2_definition_nli_*
 - governance/s4_review_queue.*
 - governance/OWNER_GATE_BUG528_20261003.md
@@ -1658,3 +1663,27 @@ widening_log:
     (config/*.yaml), governance/buglog.md, governance/bug_status.json|md, governance/r5_reviews.jsonl,
     governance/session_plan_20260924.yaml and the four derived faces. No pipeline/** crossing, no pinned artifact
     staged, no glob asked for. The two new paths are granted by NAME, not by widening a family.
+- date: '2026-10-27'
+  actor: agent
+  reason: >-
+    D-3189 limb b executed: the planning role gate. A role whose only arbiter was a stopwatch (BUG-1055) now
+    declares `require_gate: plan_quality`, and a gate needs a receipt of its own - one file per gate, because a
+    single artifact keyed by MODEL alone let one gate's PASS satisfy another role's gate (BUG-1063 limb 1).
+  owner_ack: "the owner's instruction that opened this sitting: 'Ok I accept your recommendation KEEP (A) also for
+    BUG 1055 / continue with the next critical step starting with the highest leverage step ... update and sync gov
+    dependencies'. Acceptance of the BUG-1055 ruling IS the licence for the gate it named."
+  additions:
+  - pattern: governance/plan_quality_gate_bench.jsonl
+    why: the plan_quality gate's append-only receipt - one fsync'd row per (model, gate) measurement, carrying the
+      gate identity in the row itself. governance/*.jsonl is deliberately NOT a pattern, so this is a NAMED grant,
+      exactly as governance/calibration_receipts.jsonl was; without it the gate could be measured but never
+      recorded, and an unrecorded measurement cannot gate a role (D-3036).
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: >-
+    Everything else touched by this act already sits inside existing grants: config/plan_quality_gate.yaml and
+    config/hardware_profile.yaml (config/*.yaml), tools/plan_quality_fixture.py and tools/model_eval_suite.py
+    (tools/*.py), scripts/hardware_calibrate.py (scripts/*.py), governance/model_eval_checkpoint.jsonl
+    (governance/model_eval_*), governance/buglog.md, governance/bug_status.json|md, governance/r5_reviews.jsonl,
+    config/decisions.yaml, governance/delegate_journal.jsonl and the four derived faces. No pipeline/** crossing,
+    no pinned artifact staged, no glob asked for.

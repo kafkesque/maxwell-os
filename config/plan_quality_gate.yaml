@@ -1,0 +1,78 @@
+# PLAN-QUALITY GATE - config-first (C12). The planning role's arbiter, in the shape that already works.
+#
+# WHY (BUG-1055, D-3189 limb b). `config/hardware_profile.yaml` ranks `plan` by decode_tps and `analyze` by
+# prefill_tps with `require_gate: null`, so "the best planner" operationally meant "the FASTEST model that
+# DECLARES the plan role". Nothing in this OS had ever asked a model to plan. The `review` role already has the
+# missing instrument - a balanced fixture, a declared constant-answer baseline, thresholds enforced mechanically
+# against a journal artifact - so this gate COPIES that shape instead of inventing a ranking framework. The
+# resolver's own fail-closed path does the exclusion: a role that names this gate may only be filled by a model
+# whose row here RESOLVES to pass.
+#
+# WHAT IT MUST NOT BECOME. It is not a second ranker and it does not re-order roles. It answers ONE question per
+# candidate: does this model beat a constant answer by the declared margin, without approving steps that a
+# measured material contradicts? A model that fails is not ranked lower; it leaves the pool.
+schema_version: 1
+decision: D-3189          # the ruling that mandates this gate (D-3191 records the build + its receipt)
+bug: [BUG-1055, BUG-1063]
+gate: plan_quality
+harness: tools/model_eval_suite.py
+suite: plan_quality
+fixture: tools/plan_quality_fixture.py
+
+# THE PLANNER QUESTION, scoped to the MATERIAL the item supplies. Kept here (never retyped in the fixture or the
+# harness) so the instrument cannot drift from the question the role is gated on - the same reason
+# config/r5_review_gate.yaml holds the reviewer question (C12: one declaration of one fact).
+task: >-
+  Judge one PROPOSED NEXT STEP against the MATERIAL supplied with it. The step may be COMMITTED only if every claim
+  it makes is SUPPORTED by the material AND its ORDER respects the dependencies the material states. It must be
+  REJECTED if it asserts a figure the material contradicts, skips a dependency the material names, violates a rule
+  the material states, or claims a result it could not have verified from the material. Reasoning must be over the
+  material - not over what a plausible-sounding step usually looks like.
+
+# Output budget. A truncated verdict JSON is scored as a model failure (BUG-738), so this is a floor, not a guess:
+# each item's answer is a short JSON object and the material is supplied in the USER turn, so no reasoning budget
+# is needed for the gpt-oss reasoning-off path (pipeline.pipeline_paths applies the prefix in the harness).
+max_tokens: 900
+
+# THE PROMOTION CRITERIA, enforced ONLY by tools/model_eval_suite.py::plan_quality_gate (D-3034: a threshold that
+# merely MENTIONS a number declares nothing; only a measurement that RESOLVES it confers a pass).
+bench:
+  status: DECLARED          # becomes PASS/FAIL per model in bench_receipt; never a claim about the gate itself
+  min_n: 20                 # 24 items are built; the floor is 20 so a single unparsed row cannot void a run
+  baseline: constant-answer # a planner that always answers APPROVE scores exactly 0.5000 on the balanced fixture
+  min_margin_over_baseline: 0.15
+  # THE DANGEROUS ERROR, and the reason this axis exists at all: approving a step a measured material contradicts
+  # means a flawed step gets COMMITTED (delete the payload, mint before the census, pool two fixtures). A planner
+  # with a high margin and a non-zero false_approve rate is refused - exactly the rule that refused gemma-4-E4B on
+  # the reviewer bench (false_approve 0.125).
+  false_approve_ceiling: 0.10
+
+# Where a row is written. One file per gate: the resolver keys rows by (gate, model), so a plan_quality PASS can
+# never satisfy the `review` role's r5_review gate (BUG-1063 limb 1).
+bench_receipt: governance/plan_quality_gate_bench.jsonl
+
+# DECLARED NEGATIVES (D-3038) - what this gate deliberately does NOT do.
+not_done:
+  - what: "add plan_quality to config/bench_preflight.yaml probe.json_suites"
+    why: >-
+      the preflight self-test requires every suite listed there to agree with HISTORY at >= 0.90
+      (selftest_min_json_agreement), and a brand-new suite has no history to agree with. The gap this leaves is
+      covered by the one-item smoke test that precedes every run (tools/model_eval_suite.py --suites plan_quality
+      --limit 1): a cell that cannot produce a parseable verdict is seen BEFORE 24 rows are spent on it, which is
+      the failure mode json_suites exists to prevent (BUG-262). Adding it becomes correct once history exists.
+  - what: "a KV working-set model inside this gate"
+    why: >-
+      BUG-1055 limb 4 is a DIFFERENT defect (a flat 3.0 GiB reserve that declares no context basis) and it is not
+      answerable by a fixture: it needs a device-matched receipt at 131072 tokens. Gating the role cannot repair a
+      reservation figure, and pretending it does would be the slop this OS forbids.
+  - what: "an AUTHORING test - a plan written from scratch"
+    why: >-
+      every item supplies a MATERIAL and asks whether ONE PROPOSED STEP may be committed, so what is measured is
+      the faculty `analyze` needs (reason over evidence, refuse a step the evidence contradicts) and the faculty
+      `plan` needs to CHECK a step. Authoring a multi-step plan from a goal is NOT measured, and the gate must not
+      be read as evidence for it. A second fixture of that shape would be a NEW gate, not a threshold change here.
+  - what: "an LLM judge in the grading path"
+    why: gold is written by the item author and parsed by the production parser (scripts/r5_code_review.extract_verdict);
+      a second model in the grading path is exactly the drift the fixture exists to exclude.
+
+exit: {pass: 0, refused: 1, unusable: 2}

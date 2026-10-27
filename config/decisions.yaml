@@ -34225,3 +34225,162 @@ decisions:
   - config/hardware_profile.yaml
   - config/decisions.yaml
   supersedes: []
+- id: D-3191
+  state: RESOLVED
+  category: MODEL PORTFOLIO / ROLE GATING / MEASUREMENT (BUG-1055 limb 2)
+  title: '`plan` and `analyze` now name the `plan_quality` gate, and the gate MOVED BOTH ROLES: MTP4 takes plan (acc 0.9167) and gpt-oss takes analyze — the REAP-pruned 19B that held both on speed alone is REFUSED, and its refusal is a FORMAT refusal, not a planning one'
+  decision: |
+    1. THE ROLE GATE EXISTS AND IS DECLARED WHERE THE ROLE IS DECLARED. `config/hardware_profile.yaml` now reads
+       `plan: {require_gate: plan_quality}` and `analyze: {require_gate: plan_quality}`; the gate's own declaration
+       is `config/plan_quality_gate.yaml` (fixture, thresholds, task, receipt, declared negatives) and its
+       instrument is `tools/plan_quality_fixture.py` (24 items, 12 APPROVE-gold / 12 REJECT-gold, constant-answer
+       baseline exactly 0.5000, graded by the PRODUCTION parser `scripts/r5_code_review.extract_verdict`). No new
+       ranking code was written: the resolver's existing fail-closed pool exclusion does the work (D-3189 limb b).
+    2. WHAT AN ITEM IS (the T-187 shape, so a keyword matcher cannot pass): a MATERIAL (a measured table, a rail
+       verdict, a config excerpt, a register row) and ONE PROPOSED NEXT STEP. APPROVE is correct only if the step's
+       claims are SUPPORTED by the material AND its order respects every dependency the material states. Every
+       seeded flaw is one this OS actually committed or nearly committed: the symlink double count (BUG-1050), the
+       weights-only fit claim (BUG-1055), a hardcoded figure beside a config value (BUG-1062), promotion on speed
+       alone (BUG-1055), mint-before-census (D-2660), a gate row from ANOTHER gate (BUG-1063), a flag read as birth
+       proof (BUG-873), a fixture-version pool (D-3167/D-3168), absence read as a pass, a journal written after the
+       run (D-3036), and "delete the symlinks to reclaim the bytes" (D-3188).
+    3. THE MEASUREMENT (governance/plan_quality_gate_bench.jsonl, fixture pq2, 2026-10-27, 72 rows, one model
+       resident, HTTP through oMLX — never in-process, because gemma4_unified is mapped only in the engine's
+       mlx_lm/mlx_vlm):
+         model                            pass  n   acc     margin  false_appr  false_rej  unparsed
+         Qwen3.8-27B-MTP4                 PASS  24  0.9167  +0.417  0.0000      0.0833     0
+         gpt-oss-20b-MXFP4-Q8             PASS  24  0.7083  +0.208  0.0833      0.1250     2
+         Ornith-1.5-35B-A3B-REAP-19B      REFUSED 24 0.4167  -0.083  0.0000      0.0000     14
+    4. THE ROLES MOVED, WHICH IS THE WHOLE POINT: `plan` was held by Ornith this morning on decode speed alone
+       (48.54 t/s vs MTP4's 16.39); it is now held by MTP4 on a MEASURED margin over a constant answer, and
+       `analyze` went to gpt-oss on prefill (275.88 vs 50.16) because both are QUALIFIED and the role's declared
+       objective still decides among passing models. This is exactly what the owner's KEEP of the 27B pair bought:
+       the model that had lost both roles on a stopwatch reading is the one that wins them on judgement.
+    5. ORNITH'S REFUSAL IS A FORMAT REFUSAL AND MUST NEVER BE READ AS "IT PLANS BADLY" (BUG-1064). Its
+       false_approve AND false_reject are BOTH 0.0000: of the ten items it answered, it answered all ten correctly.
+       The fourteen losses are UNPARSED — narration first ("Let me analyze this carefully…") after 604-626 of its
+       726 completion tokens went to hidden reasoning, plus one unclosed object that reproduced IDENTICALLY at
+       max_tokens 900 and 1600. The gate refuses it on the CONTRACT because production parses verdicts; the
+       register carries the distinction so a later reader cannot launder it into a quality claim.
+    6. THE INSTRUMENT WAS FIXED ONCE, IN PUBLIC, AND VERSIONED. Fixture v1 (ids pq1-*) was retired the same day it
+       was built: a reasoning model's unclosed JSON was being scored as a planning failure (the BUG-262 shape). v2
+       (ids pq2-*) states the contract — JSON object FIRST, never unclosed — and the same call then returned a
+       complete verdict. The version lives in ONE constant, and the gate counts only the CURRENT ids, so the bump
+       re-pointed the gate automatically and no v1 row can be pooled in.
+    7. WHAT THIS DOES **NOT** SETTLE, stated so no reader over-reads the table: (a) AUTHORING a multi-step plan from
+       a goal is NOT measured — every item judges a PROPOSED step (declared negative in the gate config); (b) the
+       131072-token KV working set is still unmeasured, so BUG-1055 limb 4 remains OPEN; (c) Ornith's format failure
+       has a named HYPOTHESIS (a reasoning-off declaration, or a per-model budget) that would change the instrument
+       for every model and therefore needs a fixture bump and a full re-measure — not a quiet retry of the model
+       that failed.
+  measured: |
+    `python3 tools/model_eval_suite.py --suites plan_quality --models Qwen3.8-27B-MTP4 Ornith-1.5-35B-A3B-REAP-19B
+    gpt-oss-20b-MXFP4-Q8` -> done in 1372s, 72 new results; rows in governance/model_eval_checkpoint.jsonl, verdicts
+    in governance/plan_quality_gate_bench.jsonl (fixture_sha256_16 recorded per row).
+    `python3 tools/plan_quality_fixture.py` -> ok: 24 items (12/12), baseline {'always_APPROVE': 0.5,
+    'always_REJECT': 0.5}, grader green on both known answers and RED on a reply with no verdict.
+    `python3 scripts/hardware_calibrate.py` -> plan Qwen3.8-27B-MTP4 [MEASURED n=3] QUALIFIED gate=True;
+    analyze gpt-oss-20b-MXFP4-Q8 [MEASURED n=3] QUALIFIED gate=True; Ornith row shows plan_quality=FAIL and holds
+    no role; UNGATED line names brain/code/classify as accepted-not-measured.
+    A one-item smoke run preceded the full run, as the gate config declares: a cell that cannot produce a
+    parseable verdict is seen BEFORE 24 rows are spent on it.
+  bugs:
+  - BUG-1055
+  - BUG-1064
+  files:
+  - config/plan_quality_gate.yaml
+  - config/hardware_profile.yaml
+  - tools/plan_quality_fixture.py
+  - tools/model_eval_suite.py
+  - scripts/hardware_calibrate.py
+  - governance/plan_quality_gate_bench.jsonl
+  - config/model_roles.yaml
+  supersedes: []
+
+- id: D-3192
+  state: RESOLVED
+  category: GATE RESOLUTION / ELIGIBILITY (BUG-1063)
+  title: 'A gate row resolves only the gate it NAMES, and a roofline prediction prunes but never confers eligibility — both closed with controls that were SEEN RED on the pre-fix code'
+  decision: |
+    1. THE DEFECT, found by reading the resolver BEFORE the second gate existed (BUG-1063): `gates(cfg)` returned
+       the latest row per MODEL whatever gate produced it, and the PREDICTED pool filtered on `fits` alone — no role
+       membership, no gate. Two consequences, both structural: one gate's PASS could satisfy another role's gate the
+       moment two gates landed in one artifact, and `--allow-predicted` could seat a model that declares NO role
+       (the register's own `Qwen3.8-27B-MLX-4bit` carries `roles: []` and has a prediction), which is precisely the
+       slop the file's comment says it exists to prevent.
+    2. THE RULE NOW: a receipt row carries its `gate:`; a row written before that field existed resolves through
+       the receipt's DECLARED `row_gate_default` in `config/hardware_profile.yaml#gates` — a declaration, never an
+       inference from a filename. `gates()` returns `{gate: {model: row}}`, `resolve()` asks for the gate the ROLE
+       names, and the PREDICTED pool applies the same eligibility + gate filters as the MEASURED pool.
+    3. THE STANDING RULE THIS LEAVES BEHIND (generalise it): **a prediction PRUNES; it never confers eligibility and
+       it never satisfies a gate.** A roofline number can say "this candidate is not worth measuring"; it can never
+       say "this candidate may hold a role".
+    4. BOTH CONTROLS WERE SEEN TO FIRE BEFORE THEY WERE SEEN GREEN (D-3036): with the old code restored, the first
+       fails "a plan_quality row satisfied the r5_review gate" and the second fails "a model that declares NO role
+       must never be seated by a roofline prediction"; restored, `--selftest` is 7/7 green. Each is checked against
+       a temp receipt, so the control cannot become vacuous when a real receipt is absent.
+  measured: |
+    `python3 scripts/hardware_calibrate.py --selftest` -> 7/7 controls green. RED runs recorded before the fix, by
+    reverting one limb at a time in the working tree and restoring it: limb 1 -> AssertionError "a plan_quality row
+    satisfied the r5_review gate"; limb 2 -> AssertionError "a model that declares NO role must never be seated by a
+    roofline prediction". Live evidence after the fix: the report's candidate table prints ONE COLUMN PER GATE
+    (`plan_quality=pass r5_review=-`), and the seven legacy r5 rows (no `gate:` field) still resolve through the
+    declared default — gemma-4-E4B shows r5_review=FAIL, gpt-oss r5_review=pass, unchanged.
+  bugs:
+  - BUG-1063
+  files:
+  - scripts/hardware_calibrate.py
+  - config/hardware_profile.yaml
+  - governance/r5_review_gate_bench.jsonl
+  supersedes: []
+
+- id: D-3193
+  state: RESOLVED
+  category: REVIEW GATE / INTERPRETER RESOLUTION / CRASH-SAFE WRITES (BUG-1065, BUG-1066)
+  title: 'A declared `python3` runs under the interpreter that LOADED the gate, and a writer that acts on the world reads back what it wrote — two rails repaired by the R5 loop, one of them found by the reviewer, not the author'
+  decision: |
+    1. BUG-1065 (FOUND while gating the new fixture): `scripts/r5_review_gate.py` ran its declared layers under the
+       AMBIENT `python3`, so `lint` was SKIPPED ("No module named ruff") and `c11_c12` reported FINDINGS ("No module
+       named 'yaml'") while the gate printed both as if it had evaluated them. The gate that exists to catch the
+       BUG-1000 shape carried it. FIX: `run_layer()` substitutes `sys.executable` for a bare `python3`/`python` —
+       the declared FORM is the form run (BUG-842), and the interpreter that loaded the gate is by construction the
+       one holding its dependencies. After the fix the same file's layers read a REAL finding (UP045, rc=1) and
+       `c11_c12 PASS — all imports in 130 files have declared dependencies`.
+    2. BUG-1066 (FOUND BY THE REVIEWER): gpt-oss-20b-MXFP4-Q8 returned REJECT on `scripts/hardware_calibrate.py`
+       with "writes to external files ... but does not verify that the writes succeeded". Half was wrong (the
+       receipt path already fsyncs) and half was RIGHT: `--write` used a plain `write_text` — no tempfile, no
+       fsync, no os.replace, no read-back — so a crash could leave a half-written `config/model_roles.yaml` that
+       is indistinguishable from a deliberate one. FIX: `write_atomic()` (tempfile in the destination directory ->
+       flush -> fsync -> os.replace) + a READ-BACK that refuses to report a file it cannot read back as written.
+       The rejection was resolved by FIXING THE CODE, never by re-prompting the reviewer.
+    3. R5 DISCIPLINE HELD FOR THIS ACT (generator != verifier, C8), all four changed code files reviewed by a
+       different model family, each verdict keyed to the file's sha256_16:
+         tools/plan_quality_fixture.py    gpt-oss-20b-MXFP4-Q8      APPROVE   sha256_16=53c1d3ffeca9b45e
+         tools/model_eval_suite.py        gpt-oss-20b-MXFP4-Q8      APPROVE   sha256_16=d67eab5a5c3b54ec
+         scripts/hardware_calibrate.py    gpt-oss-20b-MXFP4-Q8      UNPARSED  sha256_16=b5c068fa7f32801a (BUG-1048)
+         scripts/hardware_calibrate.py    gemma-4-E4B-it-MLX-4bit   APPROVE   sha256_16=b5c068fa7f32801a
+         scripts/r5_review_gate.py        gemma-4-E4B-it-MLX-4bit   APPROVE   sha256_16=76d627684fa49cfe
+       The UNPARSED row is RECORDED, not retried until it agreed: it is BUG-1048's coverage-by-length shape
+       returning on a file that grew, and the cross-family verdict that DID resolve carries the approval.
+    4. A CONFIG IS NOT A SCRIPT, AND MUST NOT BE "APPROVED" BY A CODE REVIEWER. `config/plan_quality_gate.yaml`
+       returned INSUFFICIENT from the fast tier, correctly: the reviewer question is scoped to a script's own
+       docstring and a YAML declaration has none. The mechanical answer is the one that counts here —
+       `scripts/lib/yaml_guard.assert_yaml` (clean) and `duplicate_keys` (0) — and the gate's own load is
+       fail-closed on a missing key. Recorded so nobody later reads INSUFFICIENT as a defect in the config.
+  measured: |
+    `python3 scripts/r5_review_gate.py --selftest` -> 15/15 controls, including "a bare `python3` layer runs under
+    the interpreter that loaded the gate (BUG-1065)" PASS `/Users/barn/miniforge3/bin/python3`; with the
+    substitution removed the same control FAILs `/Library/Developer/CommandLineTools/usr/bin/python3` and the suite
+    reports 14/15.
+    `python3 scripts/hardware_calibrate.py --write --json` -> "written": config/model_roles.yaml, after the
+    read-back check; the file's own header still says GENERATED and the assignment matches the resolver output.
+    Verdict rows: governance/r5_reviews.jsonl (5 new lines), receipts: governance/r5_review_gate.jsonl.
+  bugs:
+  - BUG-1065
+  - BUG-1066
+  - BUG-1048
+  files:
+  - scripts/r5_review_gate.py
+  - scripts/hardware_calibrate.py
+  - config/plan_quality_gate.yaml
+  supersedes: []

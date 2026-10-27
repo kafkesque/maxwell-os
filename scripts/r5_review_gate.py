@@ -127,6 +127,14 @@ def run_layer(layer: dict, target: str) -> dict:
     if not any(fnmatch(target, pat) for pat in layer.get("applies") or ["*"]):
         return {"name": name, "status": STATUS_NA, "rc": None, "detail": "not applicable to this path"}
     argv: list = [str(a).replace("{file}", target) for a in layer["argv"]]
+    # THE FORM DECLARED IS THE FORM RUN (BUG-842), and a bare `python3` is the AMBIENT one: measured 2026-10-27, a
+    # gate started by the repo interpreter still ran its layers under /Library/Developer/CommandLineTools/usr/bin/
+    # python3, so `ruff` was absent (layer SKIPPED) and PyYAML was absent (c11_c12 FINDINGS - a repo-wide layer
+    # reporting a defect the reviewed file did not cause). A layer that resolves its own interpreter is the
+    # BUG-1000 shape inside the gate. A model name in argv is substituted with the interpreter that LOADED this
+    # gate, which is by construction the one that has the gate's own dependencies.
+    if argv and argv[0] in ("python3", "python"):
+        argv[0] = sys.executable
     if shutil.which(argv[0]) is None and layer.get("optional"):
         return {"name": name, "status": STATUS_SKIPPED, "rc": None, "detail": argv[0] + " not on PATH"}
     try:
@@ -310,6 +318,12 @@ def selftest() -> int:
     check("the declared cap admits the largest source this host has ever reviewed (98,664 chars, measured)",
           all(int(t["max_source_chars"]) >= 98664 for t in cfg["tiers"].values()),
           {n: t["max_source_chars"] for n, t in cfg["tiers"].items()})
+    # BUG-1065: a declared `python3` layer must run under the interpreter that LOADED the gate, not the ambient
+    # one - measured 2026-10-27, the ambient one had neither ruff nor PyYAML, so two layers were silently degraded.
+    _probe = run_layer({"name": "interpreter", "applies": ["*"], "fatal": True, "optional": False,
+                        "argv": ["python3", "-c", "import sys; print(sys.executable)"]}, "probe.py")
+    check("a bare `python3` layer runs under the interpreter that loaded the gate (BUG-1065)",
+          _probe["status"] == STATUS_PASS and _probe["detail"] == sys.executable, _probe["detail"])
     check("layers are declared with a why (no unexplained control)",
           all(str(layer.get("why") or "").strip() for layer in cfg["layers"]), len(cfg["layers"]))
     shutil.rmtree(tmp, ignore_errors=True)

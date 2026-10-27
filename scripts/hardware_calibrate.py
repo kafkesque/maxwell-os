@@ -39,6 +39,7 @@ import platform
 import statistics
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -202,21 +203,33 @@ def receipts(cfg: dict[str, Any], hardware: dict[str, Any]) -> list[dict[str, An
     return rows
 
 
-def gates(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    """Latest accuracy-gate verdict per model (the gate's own artifact, never a re-derivation)."""
-    path = ROOT / str(cfg["gate_bench"])
-    latest: dict[str, dict[str, Any]] = {}
-    if not path.is_file():
-        return latest
-    for line in path.read_text(encoding="utf-8").splitlines():
-        try:
-            row = json.loads(line)
-        except json.JSONDecodeError:
+def gates(cfg: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
+    """Latest verdict per (GATE, model) - the gate's own artifact, never a re-derivation.
+
+    BUG-1063 limb 1: this used to key on MODEL alone, so with two gates in one artifact a `plan_quality`
+    PASS could satisfy the `review` role's `r5_review` gate. A row's gate identity is now its own
+    `gate:` field, or - for rows written before that field existed - the receipt's DECLARED
+    `row_gate_default` (a declaration, never an inference from a filename).
+    """
+    out: dict[str, dict[str, dict[str, Any]]] = {}
+    for gate_id, spec in (cfg.get("gates") or {}).items():
+        path = ROOT / str(spec.get("receipt") or "")
+        default = str(spec.get("row_gate_default") or gate_id)
+        if not path.is_file():
+            out.setdefault(str(gate_id), {})
             continue
-        model = str(row.get("model") or "")
-        if model and (model not in latest or str(row.get("ts", "")) >= str(latest[model].get("ts", ""))):
-            latest[model] = row
-    return latest
+        latest = out.setdefault(str(gate_id), {})
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if str(row.get("gate") or default) != str(gate_id):
+                continue  # a row that RESOLVES to another gate cannot resolve this one
+            model = str(row.get("model") or "")
+            if model and (model not in latest or str(row.get("ts", "")) >= str(latest[model].get("ts", ""))):
+                latest[model] = row
+    return out
 
 
 def predict_decode(hardware: dict[str, Any], cfg: dict[str, Any], nbytes: int,
@@ -232,7 +245,7 @@ def predict_decode(hardware: dict[str, Any], cfg: dict[str, Any], nbytes: int,
 
 
 def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, bandwidth: Optional[float],
-            rows: list[dict[str, Any]], gate_rows: dict[str, dict[str, Any]],
+            rows: list[dict[str, Any]], gate_rows: dict[str, dict[str, dict[str, Any]]],
             allow_predicted: bool) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     """Assign each role from MEASURED receipts; report UNCALIBRATED where nothing measured qualifies."""
     models_root = Path(os.path.expanduser(str(cfg["detect"]["paths"]["models_root"])))
@@ -257,7 +270,8 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
             "model": name,
             "gb": round(nbytes / 2**30, 1) if nbytes else None,
             "fits": bool(nbytes and nbytes / 2**30 <= usable_gb),
-            "gate": (gate_rows.get(name) or {}).get("pass"),
+            # the candidate's verdict PER GATE: no role may read another role's gate (BUG-1063 limb 1)
+            "gates": {gid: (rows_for.get(name) or {}).get("pass") for gid, rows_for in gate_rows.items()},
             "decode_tps": best_decode,
             "prefill_tps": best_prefill,
             "source": "MEASURED" if usable else "UNMEASURED",
@@ -281,7 +295,7 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
                 continue
             if row["source"] != "MEASURED":
                 continue  # fail-closed: a prediction never fills a role
-            if need_gate and row["gate"] is not True:
+            if need_gate and (row["gates"].get(str(need_gate)) is not True):
                 continue
             if objective == "seconds_per_item":
                 # the reviewer's real cost: a cold call is ~75% prefill, so the objective is total seconds
@@ -303,18 +317,25 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
                 "value": round(value, 3),
                 "source": "MEASURED",
                 "n_readings": winner["n_readings"],
-                "gate": winner["gate"],
+                "gate": winner["gates"].get(str(need_gate)) if need_gate else None,
                 "status": ("UNDER-SAMPLED" if winner["n_readings"] < int(cfg["min_readings_per_candidate"]) else
-                       ("QUALIFIED" if need_gate and winner["gate"] is True else "PROVISIONAL")),
+                       ("QUALIFIED" if need_gate and winner["gates"].get(str(need_gate)) is True
+                        else "PROVISIONAL")),
                 "decided_by": "governance/calibration_receipts.jsonl",
             }
         elif allow_predicted:
-            pred = [r for r in table if r["fits"] and r.get("prediction")]
+            # BUG-1063 limb 2: this pool used to filter on `fits` alone, so a model that declares NO role
+            # (and a model with no gate row) could be seated by a roofline number - the exact slop the
+            # eligibility rule above exists to prevent. A prediction prunes; it never confers eligibility.
+            pred = [r for r in table if r["fits"] and r.get("prediction")
+                    and role in r["roles"]
+                    and (not need_gate or r["gates"].get(str(need_gate)) is True)]
             if pred:
                 pred.sort(key=lambda r: r["prediction"]["predicted_tps"], reverse=True)
                 roles[role] = {"model": pred[0]["model"], "objective": objective,
                                "value": pred[0]["prediction"]["predicted_tps"], "source": "PREDICTED",
-                               "gate": pred[0]["gate"], "decided_by": "roofline (NOT a reading)"}
+                               "gate": pred[0]["gates"].get(str(need_gate)) if need_gate else None,
+                               "decided_by": "roofline (NOT a reading)"}
             else:
                 roles[role] = {"model": None, "source": "UNCALIBRATED",
                                "why": "no candidate fits this budget and none can be predicted"}
@@ -445,6 +466,42 @@ def record(cfg: dict[str, Any], hardware: dict[str, Any], models: list[str], bud
     return written
 
 
+def write_atomic(path: Path, text: str) -> None:
+    """Write a file so a reader never sees a partial one: tempfile -> fsync -> os.replace (C6).
+
+    Args:
+        path: destination; its parent must exist.
+        text: the complete content. Written as UTF-8 with newlines preserved.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle = tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=str(path.parent), delete=False)
+    try:
+        handle.write(text)
+        handle.flush()
+        os.fsync(handle.fileno())
+    finally:
+        handle.close()
+    os.replace(handle.name, path)
+
+
+def ungated_faults(cfg: dict[str, Any]) -> list[str]:
+    """Roles that declare NO gate and record NO acceptance for that absence (D-3189 limb c).
+
+    A bare `require_gate: null` used to be indistinguishable from a deliberate choice: four of six roles
+    carried it, so "the best planner" collapsed to "the fastest model that declares plan" (BUG-1055). The
+    absence is allowed, but it must be a DECLARATION with a referent - a date and what stands in for the
+    gate - and a missing one is reported as a FAULT rather than passing as convention.
+    """
+    faults: list[str] = []
+    for role, spec in cfg["roles"].items():
+        if spec.get("require_gate"):
+            continue
+        accepted = spec.get("ungated_accepted") or {}
+        if not (accepted.get("date") and accepted.get("reason")):
+            faults.append(str(role))
+    return faults
+
+
 def render(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, budget_src: str,
            bandwidth: Optional[float], table: list[dict[str, Any]],
            roles: dict[str, dict[str, Any]]) -> str:
@@ -458,17 +515,19 @@ def render(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, budg
                  f"(= {budget_gb} x {mem['max_resident_fraction']} - {mem['kv_headroom_gb']} KV reserve)")
     lines.append("")
     lines.append("CANDIDATES")
-    lines.append(f"  {'model':<42}{'GB':>7}{'fits':>6}{'gate':>6}{'decode':>9}{'prefill':>9}  source")
+    lines.append(f"  {'model':<42}{'GB':>7}{'fits':>6}{'gates':>19}{'decode':>9}{'prefill':>9}  source")
     for row in table:
-        gate = "pass" if row["gate"] is True else ("FAIL" if row["gate"] is False else "-")
+        # ONE COLUMN PER GATE (BUG-1063 limb 1): a single pass/FAIL column hid WHICH gate was applied.
+        gate = " ".join(f"{gid}={('pass' if v is True else ('FAIL' if v is False else '-'))}"
+                        for gid, v in sorted(row["gates"].items())) or "-"
         lines.append(f"  {row['model']:<42}{row['gb'] if row['gb'] is not None else '-':>7}"
-                     f"{('yes' if row['fits'] else 'NO'):>6}{gate:>6}"
+                     f"{('yes' if row['fits'] else 'NO'):>6}{gate:>19}"
                      f"{row['decode_tps'] if row['decode_tps'] is not None else '-':>9}"
                      f"{row['prefill_tps'] if row['prefill_tps'] is not None else '-':>9}  "
                      f"{row['source']} (n={row['n_readings']}) roles={','.join(row['roles']) or 'none'}")
         pred = row.get("prediction")
         if pred and row["source"] == "UNMEASURED":
-            lines.append(f"  {'':<42}{'':>7}{'':>6}{'':>6}{pred['predicted_tps']:>9}{'-':>9}  PREDICTED "
+            lines.append(f"  {'':<42}{'':>7}{'':>6}{'':>19}{pred['predicted_tps']:>9}{'-':>9}  PREDICTED "
                          f"(roofline {pred['roofline_tps']} at {pred['bandwidth_gbs']} GB/s)")
     lines.append("")
     lines.append(f"ROLE ASSIGNMENT (layer 3 — receipts only; bandwidth {bandwidth} GB/s)")
@@ -478,7 +537,26 @@ def render(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, budg
                          f"[{pick['source']} n={pick.get('n_readings')}] {pick.get('status')} gate={pick['gate']}")
         else:
             lines.append(f"  {role:<10} {'UNCALIBRATED':<42} {pick['why']}")
+            spec = cfg["roles"].get(role) or {}
+            gate = spec.get("require_gate")
+            if gate:
+                # An uncalibrated GATED role must hand over the exact command that produces its evidence: a
+                # fail-closed refusal with no remedy is a dead end disguised as a verdict (D-3100).
+                suite = str(((cfg.get("gates") or {}).get(str(gate)) or {}).get("suite") or gate)
+                declaring = [str(r["model"]) for r in table if role in r["roles"]]
+                lines.append(f"  {'':<10} {'':<42} to produce the evidence ({gate}): python3 "
+                             f"tools/model_eval_suite.py --suites {suite} --models "
+                             f"{' '.join(declaring) or '<candidate>'}")
     lines.append("")
+    faults = ungated_faults(cfg)
+    if faults:
+        lines.append(f"UNGATED    FAULT: role(s) {', '.join(faults)} declare require_gate: null and no "
+                     f"ungated_accepted {{date, reason}} - an ungated role with no stated substitute is a "
+                     f"declaration with no referent (D-3189 limb c)")
+    else:
+        accepted = [r for r, spec in cfg["roles"].items() if not spec.get("require_gate")]
+        lines.append(f"UNGATED    {len(accepted)} role(s) accepted-not-measured ({', '.join(accepted)}), each "
+                     f"naming what stands in for the gate (D-3189 limb c)")
     res = residency(roles, table, usable_gb, mem, declared_min_ctx(cfg))
     lines.append(f"RESIDENCY  {res['total_gb']} GiB of {res['usable_gb']} usable — {res['note']}")
     if res.get("kv_note"):
@@ -499,8 +577,44 @@ def selftest() -> int:
     # fail-closed: with no receipts at all, EVERY role must be UNCALIBRATED
     roles, _ = resolve(cfg, hardware, 55.0, 400.0, [], {}, allow_predicted=False)
     assert all(r.get("model") is None for r in roles.values()), "no receipt must mean no assignment"
-    print("ok hardware-calibrate --selftest: 3/3 controls green "
-          "(roofline arithmetic, efficiency applied, no receipt => no assignment)")
+    # CONTROL (D-3189 limb c): a bare null gate with no recorded acceptance is a FAULT; a declared
+    # acceptance clears it. Both directions, because a control that cannot fire proves nothing.
+    bare = {"roles": {"x": {"objective": "decode_tps", "require_gate": None, "min_ctx": 1}}}
+    assert ungated_faults(bare) == ["x"], "a role with no gate and no acceptance must be reported"
+    accepted = {"roles": {"x": {"require_gate": None,
+                                "ungated_accepted": {"date": "2026-10-27", "reason": "r"}}}}
+    assert ungated_faults(accepted) == [], "a declared acceptance must clear the fault"
+    # CONTROL (BUG-1063 limb 1): a row belonging to ONE gate never resolves ANOTHER gate, whichever way
+    # the receipt is declared - the row carries its gate, and rows without the field fall back to the
+    # receipt's DECLARED identity, never to a guess from the filename.
+    with tempfile.TemporaryDirectory() as tmp:
+        receipt = Path(tmp) / "rows.jsonl"
+        receipt.write_text(json.dumps({"model": "m", "gate": "plan_quality", "pass": True,
+                                       "ts": "2026-10-27T00:00:00"}) + "\n", encoding="utf-8")
+        as_r5 = {"gates": {"r5_review": {"receipt": str(receipt), "row_gate_default": "r5_review"}}}
+        as_pq = {"gates": {"plan_quality": {"receipt": str(receipt),
+                                           "row_gate_default": "plan_quality"}}}
+        assert gates(as_r5).get("r5_review") == {}, "a plan_quality row satisfied the r5_review gate"
+        assert gates(as_pq).get("plan_quality", {}).get("m", {}).get("pass") is True, \
+            "a plan_quality row must resolve its OWN gate"
+        legacy = Path(tmp) / "legacy.jsonl"
+        legacy.write_text(json.dumps({"model": "m", "pass": True}) + "\n", encoding="utf-8")
+        as_legacy = {"gates": {"r5_review": {"receipt": str(legacy), "row_gate_default": "r5_review"}}}
+        assert gates(as_legacy)["r5_review"]["m"]["pass"] is True, \
+            "a row written before gate identity existed must resolve via the DECLARED default"
+    # CONTROL (BUG-1063 limb 2): a prediction prunes, it never confers ELIGIBILITY - with every candidate
+    # declaring no role, the predicted pool must stay empty instead of seating a roleless model.
+    roleless = {"roles": cfg["roles"], "candidates": [dict(c, roles=[]) for c in cfg["candidates"]],
+                "memory": cfg["memory"], "detect": cfg["detect"], "predict": cfg["predict"],
+                "receipts_min_decode_tokens": cfg["receipts_min_decode_tokens"],
+                "min_readings_per_candidate": cfg["min_readings_per_candidate"]}
+    roles_p, _ = resolve(roleless, hardware, 55.0, 400.0, [], {}, allow_predicted=True)
+    assert all(r.get("model") is None for r in roles_p.values()), \
+        "a model that declares NO role must never be seated by a roofline prediction"
+    print("ok hardware-calibrate --selftest: 7/7 controls green (roofline arithmetic, efficiency applied, "
+          "no receipt => no assignment, bare-null gate is a fault, a declared acceptance clears it, a gate "
+          "row never resolves another gate, a legacy row resolves its DECLARED default, a prediction never "
+          "confers eligibility)")
     return OK
 
 
@@ -536,11 +650,20 @@ def main(argv: list[str] | None = None) -> int:
                                               "usable_gb": round(usable_gb, 1)},
               "bandwidth_gbs": bandwidth, "candidates": table, "roles": roles,
               "residency": residency(roles, table, usable_gb, cfg["memory"], declared_min_ctx(cfg)),
+              "ungated_faults": ungated_faults(cfg),
               "receipts_used": len(rows)}
     if args.write:
         out = ROOT / str(cfg["out"])
-        out.write_text("# GENERATED by scripts/hardware_calibrate.py — do not hand-edit (D-3178)\n"
-                       + json.dumps({"hardware": hardware, "roles": roles}, indent=2) + "\n")
+        # C6 CRASH-SAFE, and the reason it is not a plain write_text (raised by the R5 reviewer on
+        # 2026-10-27, verdict REJECT, concern: "writes to external files ... but does not verify that the writes
+        # succeeded"): a reader of config/model_roles.yaml must never see a half-written assignment, and a
+        # truncated JSON file is indistinguishable from a deliberate one. tempfile -> fsync -> os.replace is the
+        # repo's declared pattern, and reading the result BACK is what makes "written" a claim rather than a hope.
+        text = ("# GENERATED by scripts/hardware_calibrate.py — do not hand-edit (D-3178)\n"
+                + json.dumps({"hardware": hardware, "roles": roles}, indent=2) + "\n")
+        write_atomic(out, text)
+        if out.read_text(encoding="utf-8") != text:
+            raise SystemExit("FAIL-CLOSED: " + str(out) + " does not read back as written - refusing to report it")
         report["written"] = str(out)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json
           else render(cfg, hardware, budget_gb, budget_src, bandwidth, table, roles))

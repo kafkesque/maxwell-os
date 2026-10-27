@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**261 open** / 565 closed of 826 ids.
+**262 open** / 568 closed of 830 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -272,3 +272,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1058 | (MED, OPEN 2026-10-27) - `hf cache delete` reported "freed 24.1G" with no measured counterpart: the cache arithmetic accounts for the 14G | 1 |
 | BUG-1059 | (MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's | 1 |
 | BUG-1060 | (MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property | 1 |
+| BUG-1064 | (MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget: | 1 |

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1315 decisions (census stamp 07c6c168616f5147, 2026-10-27) · 826 bugs (261 open / 565 closed; highest OPEN = BUG-1060) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1319 decisions (census stamp 510c12436eadd9f0, 2026-10-27) · 830 bugs (262 open / 568 closed; highest OPEN = BUG-1064) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1315 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 665 · ⚖ ratified 151 | closed: ✅ resolved 378 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1315, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1319 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 664 · ⚖ ratified 151 | closed: ✅ resolved 383 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1319, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 131 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 261 open.
+> Open BUGS by severity (population = the census's 262 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 132 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 262 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23505,7 +23505,7 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    change ADDS a disclosure and moves no threshold, so no role assignment can cascade from it (D-2642). R5 review:
    gemma-4-E4B-it-MLX-4bit VERDICT APPROVE, sha256_16 8c4474abd4238160.
 
-## BUG-1063 (HIGH, FIXING 2026-10-27) - the gate lookup is keyed by MODEL alone and the PREDICTED pool bypasses eligibility + gates entirely, so ONE gate artifact can satisfy ANOTHER role's gate and `--allow-predicted` can seat a model that declares NO roles
+## BUG-1063 (HIGH, FIXED 2026-10-27) - the gate lookup is keyed by MODEL alone and the PREDICTED pool bypasses eligibility + gates entirely, so ONE gate artifact can satisfy ANOTHER role's gate and `--allow-predicted` can seat a model that declares NO roles
 
 Found by reading `scripts/hardware_calibrate.py` before adding the `plan_quality` gate (D-3189 limb b), i.e. before the defect could bite. Two INDEPENDENT limbs, each decidable from the source alone:
 
@@ -23516,3 +23516,37 @@ Found by reading `scripts/hardware_calibrate.py` before adding the `plan_quality
 WHY HIGH, not cosmetic: limb 1 silently WEAKENS a fail-closed gate (the only `require_gate` in the register today is `r5_review` for `review`, and a PASS from a wholly different instrument would satisfy it); limb 2 re-opens role eligibility only on the `--allow-predicted` path, which is the path a human reaches for when receipts are thin. Neither is reachable today (one gate exists, `--allow-predicted` is opt-in) - which is exactly why both must be closed BEFORE the second gate is added rather than after.
 
 FIX (this sitting, D-3191): rows carry their gate identity (`gate:` on every new receipt row; the legacy r5 rows resolve to `r5_review` by a DECLARED default in `config/r5_review_gate.yaml`, never by a guess), `gates()` keys on `(gate, model)`, `resolve()` asks for the gate the ROLE declares, and the predicted pool applies the same two filters the measured pool applies.
+
+## BUG-1064 (MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget: Ornith-1.5-35B-A3B-REAP-19B spent 604-626 of its 726 completion tokens on hidden reasoning and then answered with NARRATION ("Let me analyze this carefully...") or an UNCLOSED object, so 14 of 24 planning items scored UNPARSED
+
+FOUND by the first real run of the new `plan_quality` gate (D-3191), on the model that held BOTH `plan` and `analyze` this morning on speed alone.
+
+WHAT IS MEASURED (governance/model_eval_checkpoint.jsonl, suite plan_quality, fixture pq2):
+- Ornith: n=24, acc 0.4167, false_approve 0.0000, false_reject 0.0000, **unparsed 14**.
+- The two zero rates are the important numbers: of the TEN items it answered, it answered ALL TEN correctly. So its planning JUDGEMENT was 10/10 on the evidence it produced, and every lost item was lost to the OUTPUT CONTRACT. Reading the 0.4167 as "Ornith plans badly" would be exactly the slop this register exists to prevent.
+- The dominant shape is narration-first: "Let me analyze this carefully.\n\nThe MATERIAL states: ..." with the JSON never reached inside the budget. One row (pq1, from the retired v1 fixture) was an UNCLOSED object: 189 chars, 626/726 completion tokens on reasoning, IDENTICAL at max_tokens 900 and 1600 - so the budget was NOT the cause, the model stops mid-object.
+- The fixture's v2 clause ("emit the JSON object FIRST, never leave it unclosed") FIXED the unclosed-object shape on the single item retested (complete parseable verdict) but NOT the narration-first shape across the suite. That is recorded rather than chased: the clause is uniform for every model, and 2 of the 3 models answer inside it (MTP4 unparsed 0/24, gpt-oss 2/24).
+
+WHAT IS NOT CLAIMED (D-3036): that Ornith is a worse planner. The instrument cannot see its plans. The gate refuses it on the CONTRACT, and the receipt says why.
+
+NEXT EXPERIMENT, written as a hypothesis, NOT as a fix: a reasoning-off declaration for Ornith in `pipeline.pipeline_paths` (the gpt-oss Harmony prefix solved BUG-262's identical shape), or a per-model output budget. Either changes the INSTRUMENT for every model, so it requires a fixture VERSION bump and a full re-measure of all three - not a quiet retry of the one model that failed. Until then Ornith is REFUSED for plan/analyze, and `analyze` goes to gpt-oss on prefill.
+
+## BUG-1065 (MED, FIXED 2026-10-27) - the R5 gate ran its declared `python3` layers under the AMBIENT interpreter, so two of its three deterministic layers were silently degraded (ruff "not found", PyYAML "not found") while the gate printed FINDINGS as if it had evaluated them
+
+MEASURED while gating the new fixture: `python3 scripts/r5_review_gate.py --file tools/plan_quality_fixture.py` printed `layer lint SKIPPED /Library/Developer/CommandLineTools/usr/bin/python3: No module named ruff` and `layer c11_c12 FINDINGS ... No module named 'yaml'` - the gate had been STARTED by /Users/barn/miniforge3/bin/python3, the interpreter that has both. The layer argv declares the bare word `python3`, which resolves from PATH: the BUG-1000/BUG-842 shape *inside* the gate that is supposed to catch it.
+
+FIX: `run_layer()` substitutes `sys.executable` for a bare `python3`/`python` in a layer's argv - "the form declared is the form run", and the interpreter that LOADED the gate is by construction the one holding the gate's own dependencies. CONTROL ADDED to `--selftest` and SEEN TO FIRE: with the substitution removed the control reports FAIL `/Library/Developer/CommandLineTools/usr/bin/python3` and the suite goes 14/15; restored it is PASS `/Users/barn/miniforge3/bin/python3` and 15/15. After the fix the SAME file's layers read `lint FINDINGS rc=1` (a real UP045 in that file) and `c11_c12 PASS ✅ All imports in 130 files have declared dependencies` - i.e. the layers now actually run.
+
+## BUG-1066 (MED, FIXED 2026-10-27) - `hardware_calibrate.py --write` wrote config/model_roles.yaml with a plain write_text: no tempfile, no fsync, no os.replace, and no read-back, so a crash could leave a half-written assignment that is indistinguishable from a deliberate one
+
+FOUND BY THE R5 REVIEWER, not by me: gpt-oss-20b-MXFP4-Q8 returned **REJECT** on scripts/hardware_calibrate.py with the concern "writes to external files (receipts and model_roles.yaml) but does not verify that the writes succeeded". Half the concern was wrong (the receipt path at line 460 already fsyncs, C6) and half was RIGHT: the `--write` path had none of the three.
+
+FIX: `write_atomic()` (tempfile in the destination directory -> flush -> fsync -> os.replace) plus a READ-BACK that raises if the file does not return the bytes just written, so "written" is a claim rather than a hope. Re-reviewed: gemma-4-E4B-it-MLX-4bit **APPROVE** at sha256_16=b5c068fa7f32801a (different family from the generator; gpt-oss returned UNPARSED on that same digest, BUG-1048's coverage-by-length shape, recorded and not retried until it agreed).
+NOTE FOR THE REGISTER: this is the R5 loop earning its keep on a rail that was already shipped - the reviewer found a C6 gap the author had not, and the rejection was resolved by fixing the code, never by re-prompting the reviewer.
+
+## BUG-1063 (HIGH, FIXED 2026-10-27) - closed with two controls seen to fire
+
+FIX SHIPPED AND VERIFIED IN BOTH DIRECTIONS (`--selftest` 7/7, each control SEEN RED on the pre-fix code before it was seen green):
+- limb 1: receipts are keyed `(gate, model)`. A row carries its own `gate:`; a row written before that field existed resolves through the receipt's DECLARED `row_gate_default`. Control: a `plan_quality` row declared under an `r5_review` receipt returns `{}` - RED on the old code with "a plan_quality row satisfied the r5_review gate".
+- limb 2: the PREDICTED pool now applies the same eligibility + gate filters as the MEASURED pool. Control: with every candidate declaring no role, no prediction fills any role - RED on the old code with "a model that declares NO role must never be seated by a roofline prediction".
+The standing rule this leaves behind: **a prediction prunes; it never confers eligibility, and it never satisfies a gate.**

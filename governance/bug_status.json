@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 826,
-  "open_n": 261,
-  "closed_n": 565,
+  "total_ids": 830,
+  "open_n": 262,
+  "closed_n": 568,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1314,6 +1314,11 @@
       "id": "BUG-1060",
       "title": "(MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property",
       "events": 1
+    },
+    {
+      "id": "BUG-1064",
+      "title": "(MED, OPEN 2026-10-27, root cause MEASURED and named) - a reasoning model cannot emit a verdict at the declared budget:",
+      "events": 1
     }
   ],
   "closed": [
@@ -1881,6 +1886,9 @@
     "BUG-1046",
     "BUG-1047",
     "BUG-1061",
-    "BUG-1062"
+    "BUG-1062",
+    "BUG-1063",
+    "BUG-1065",
+    "BUG-1066"
   ]
 }

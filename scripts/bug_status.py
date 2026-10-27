@@ -6,7 +6,7 @@ Session 9 found the hand-maintained C15 count wrong: it claimed 17 unresolved wh
 RESOLVED headers, and BUG-311 has since REGRESSED. A count nobody can recompute is a count nobody should
 quote (BUG-342). This script re-derives it from the file itself, in file order.
 
-Status rule: a "## BUG-<id>" header is a status EVENT and the LAST one wins, except that a later CLOSED
+Status rule: a "## or ### BUG-<id>" header is a status EVENT and the LAST one wins, except that a later CLOSED
 event cannot un-close a REOPEN. Keywords: RESOLVED/CLOSED/FIXED/INVALID/RETRACTED -> closed;
 REOPEN/REGRESS/RECURRED -> open; anything else -> open (no closure claim is not a closure).
 

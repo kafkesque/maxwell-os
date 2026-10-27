@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 857,
-  "open_n": 269,
-  "closed_n": 588,
+  "open_n": 267,
+  "closed_n": 590,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1344,16 +1344,6 @@
       "id": "BUG-1088",
       "title": "(MED, OPEN 2026-10-27) \u2014 THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`",
       "events": 1
-    },
-    {
-      "id": "BUG-1092",
-      "title": "(LOW, OPEN 2026-10-27) - 34 of the 269 OPEN ids have no section in the append-only register: a COUNT with no evidence BODY",
-      "events": 1
-    },
-    {
-      "id": "BUG-1093",
-      "title": "(LOW, OPEN 2026-10-27) - A SUPERLATIVE OVER A COMPLEMENT SET READS AS A GLOBAL CLAIM: \"worst measured non-27B decode (13.4 tok/s)\" produced",
-      "events": 1
     }
   ],
   "closed": [
@@ -1944,6 +1934,8 @@
     "BUG-1087",
     "BUG-1089",
     "BUG-1090",
-    "BUG-1091"
+    "BUG-1091",
+    "BUG-1092",
+    "BUG-1093"
   ]
 }

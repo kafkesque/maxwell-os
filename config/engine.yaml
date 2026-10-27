@@ -353,8 +353,8 @@ candidates:
     - gpt-oss-20b-MXFP4-Q8
     - Ornith-1.5-35B-A3B-REAP-19B
     - Ornith-1.5-9B-MLX-8bit
-    # gemma-4-12B-it-qat-OptiQ-4bit RETIRED 2026-10-15 (T-139, D-3013): the worst measured non-27B
-    # decode (13.4 tok/s) and its only live declarations were a REJECTED swap (D-2788) plus one R5
+    # gemma-4-12B-it-qat-OptiQ-4bit RETIRED 2026-10-15 (T-139, D-3013): the slowest measured decode of the
+    # four non-27B served models (13.4 tok/s) and its only live declarations were a REJECTED swap (D-2788) plus one R5
     # candidate slot. Entry and bytes are gone, so the name must not appear here.
 
   # ── THE REFUSAL REGISTER (D-3038 applied to MODELS; D-3151) ────────────────────────────────────────────────

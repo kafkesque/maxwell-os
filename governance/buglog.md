@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1336 decisions (census stamp f1cd2d6611dfc897, 2026-10-27) · 857 bugs (269 open / 588 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1336 decisions (census stamp f1cd2d6611dfc897, 2026-10-27) · 857 bugs (267 open / 590 closed; highest OPEN = BUG-1088) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1336 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 388 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1336, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 269 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24696,3 +24696,46 @@ NOT DELETED: the non-MTP Qwen3.8-27B-MLX-4bit is KEPT. scripts/check_delete_targ
 ANNOTATIONS class: agent_probe / mode: oneshot / not_a_loop / rehomed are DECLARATIVE (they resolve to real referents — config/agent_context.yaml#classes.agent_probe, fanout's oneshot mode — but no reader consumes harness_roles.<role>.class/.mode yet; role_model() reads only `model`). Enforcement is deferred as T-218, not silently asserted.
 
 Receipt: governance/evidence/BUG1090_REBIND_MEASUREMENT_20261027.json. Decision: D-3210 (ACTIVE). D-3209 limb 2 RESOLVED by it.
+
+### BUG-1092 — CORRECTION (assistant, 2026-10-27, same sitting): THE PREMISE IS STALE — the 34 ids carry FULL `### ` (h3) sections, so the census can READ them (D-3034 holds); the "no body / lives in a .bak" reading used the PRE-BUG-428 `^##` regex
+
+RE-DERIVED 2026-10-27 against the CURRENT parser (scripts/bug_status.py#HEADER_RE = `^#{2,3}\s+(BUG-\d+)`): the 34 ids
+BUG-426/427/431/432/433/484/487/500/511/514/520/521/523/524/525/526/875/876/877/879/889/890/891/899/900/901/902/905/906/909/911/912/914/915
+all have FULL `### ` headings with title + body (BUG-426 line 3794, BUG-875 15979, BUG-890 16796, BUG-914 17505). BUG-428
+(2026-09-24) already fixed the parser from `^##` to `#{2,3}` precisely so h3-headed bugs like BUG-426/427 are NOT absent from
+the census — and they are NOT: they are counted in bug_status.json#open (269). The "34 have no section" count was taken with
+the PRE-BUG-428 `^##` shape, which is the stale regex BUG-428 retired. The author's `grep -c BUG-426 = 7, all mentions` counted
+the `### BUG-426` HEADING as a mere mention and concluded the body lived elsewhere; it does not — it is the heading itself.
+
+WHAT THIS CHANGES: the remedy "restore from .bak OR re-close" is RETIRED — re-closing 34 live bugs whose bodies are READABLE
+(not missing) would destroy the record (BUG-1079 inverted). The REAL defect, if any, is a HEADING-LEVEL inconsistency: 34
+canonical entries are filed under `### ` where the register's canonical convention is `## `. The correct fix is ONE of:
+(a) normalize those 34 h3 canonical entries to h2, or (b) accept h3 as canonical and retire the "## is canonical" assumption
+in the docstring. This entry stays OPEN under the re-scoped question; the no-body premise is struck.
+
+## BUG-1092 (LOW, RESOLVED 2026-10-27) - the re-scoped question is ANSWERED: h3 IS canonical; the 34 ids are legal, no normalization
+
+RULING (assistant, 2026-10-27, same sitting): ACCEPT h3 as canonical (option (b)). The 34 ids carry full `### `
+(h3) headings that EVERY parser already reads - scripts/bug_status.py#HEADER_RE `^#{2,3}` (BUG-428) and
+scripts/gov_sync.py#BUG_HEAD `^#{1,6}` (D-2985/BUG-757). NORMALIZATION (option (a)) is REFUSED, recorded so it
+cannot be re-proposed (D-3038): (1) buglog entries are append-only (write_guard.append_lines suffix-only, D-824),
+so rewriting 34 headings in place is a 34-edit in-place mutation, not an append; (2) it is UNNECESSARY - the
+h3-vs-h2 "inconsistency" is not read as a difference by any consumer, so a normalization is a change with no
+reader (the D-3208 shape). The "## is canonical" assumption was never ENFORCED; the only residue was the
+bug_status.py module docstring shorthand, retired this sitting to "## or ###".
+
+D-3208 CONSEQUENCE (recorded, not silently dropped): D-3208's sub-count "34 have no section at all" used the
+PRE-BUG-428 `^##` regex and is SUPERSEDED - the 34 are h3-headed and READABLE, so their correct bucket under
+D-3208's taxonomy (command/receipt/prose) is UNMEASURED, not "no section". D-3208's admission gate is unaffected;
+only the 34 sub-count is re-scoped. Noted here rather than rewriting D-3208 (append-only).
+
+## BUG-1093 (LOW, RESOLVED 2026-10-27) - the RULE is recorded and the one live present-tense comment now names its comparator set
+
+REMEDY (assistant, 2026-10-27, same sitting): the rule ("a superlative must name its comparator set explicitly;
+a rate is quoted WITH the prompt size it was read at") is already recorded in this entry's own body, so future
+writers inherit it. The ONE live present-tense superlative - the retired-model comment in config/engine.yaml
+("the worst measured non-27B decode") - is re-worded this sitting to "the slowest measured decode of the four
+non-27B served models (13.4 tok/s)". The HISTORICAL records (engine.yaml#refused_because, task_register.yaml
+evidence, DELETE_PROPOSAL/MARKET_RESEARCH) are append-only snapshots that were accurate when written and are NOT
+rewritten - rewriting a refusal reason or evidence would be the exact drift this entry exists to prevent.
+Zero behaviour change; the fix is a reader not being misled.

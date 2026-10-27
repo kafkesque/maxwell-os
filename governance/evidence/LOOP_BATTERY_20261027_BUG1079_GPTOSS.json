@@ -1,0 +1,129 @@
+{
+  "measured_at": "2026-10-27T18:14:56",
+  "fixture": "T-199 loop battery",
+  "state": "complete",
+  "per_turn_budget_s": 90.0,
+  "served": [
+    "MiniCPM5-2B-MLX",
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "Qwen3.8-27B-MTP4",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "engine": {
+    "bundle": "/Applications/oMLX.app/Contents",
+    "app_version": "0.7.3rc1",
+    "mlx_lm": "mlx_lm-0.32.3.dev8+g0d4d3d04f.dist-info"
+  },
+  "fixtures": [
+    {
+      "name": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)"
+    },
+    {
+      "name": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message"
+    },
+    {
+      "name": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)"
+    },
+    {
+      "name": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer"
+    }
+  ],
+  "rows": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "distractor",
+      "why": "a valid answer to the WRONG question (a stale summary of files the manifest does not name)",
+      "verdict": "PASS",
+      "detail": "counted 3 manifest file(s), answer carries 9, slowest turn 3.7s",
+      "tools_called": [
+        "read_file",
+        "count_lines",
+        "count_lines",
+        "count_lines"
+      ],
+      "no_call_class": "answered",
+      "engine_parse_errors": 0,
+      "engine_evictions": 0,
+      "foreign_completions": 0,
+      "turn_calls": 1,
+      "turns": 5,
+      "slowest_turn_s": 3.7,
+      "answer": "9"
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "parallel",
+      "why": "parallel-call FORMATTING: two independent reads must be two tool calls in ONE assistant message",
+      "verdict": "UNMEASURED",
+      "detail": "the turn spent its whole token allowance (finish_reason=length) and returned no content - the instrument cannot see this model at this allowance, so this is UNMEASURED, not a FAIL",
+      "tools_called": [],
+      "no_call_class": "allowance",
+      "engine_parse_errors": 0,
+      "engine_evictions": 0,
+      "foreign_completions": 0,
+      "turn_calls": 0,
+      "turns": 1,
+      "slowest_turn_s": 26.0,
+      "answer": ""
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "argname",
+      "why": "argument-NAME trap: the id parameter is `record_id` while a decoy tool takes `id` (R-14's shape)",
+      "verdict": "PASS",
+      "detail": "fetch_field.record_id used, answer carries rec-4, slowest turn 4.1s",
+      "tools_called": [
+        "count_lines",
+        "fetch_field"
+      ],
+      "no_call_class": "answered",
+      "engine_parse_errors": 0,
+      "engine_evictions": 0,
+      "foreign_completions": 0,
+      "turn_calls": 1,
+      "turns": 3,
+      "slowest_turn_s": 4.1,
+      "answer": "rec-4"
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "fixture": "enum",
+      "why": "ENUM-argument trap: mode must be the declared enum value, and 'count' gives a TRUE wrong answer",
+      "verdict": "PASS",
+      "detail": "mode 'distinct', answer carries 4 distinct, slowest turn 11.9s",
+      "tools_called": [
+        "summarize_column"
+      ],
+      "no_call_class": "answered",
+      "engine_parse_errors": 0,
+      "engine_evictions": 0,
+      "foreign_completions": 0,
+      "turn_calls": 1,
+      "turns": 2,
+      "slowest_turn_s": 11.9,
+      "answer": "4"
+    }
+  ],
+  "ranking": [
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "passed": 3,
+      "of": 4,
+      "failed": [],
+      "unmeasured": [
+        "parallel"
+      ],
+      "warm_turn_s": 26.0,
+      "load_paid_s": 3.7
+    }
+  ]
+}

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 843,
-  "open_n": 266,
-  "closed_n": 577,
+  "open_n": 265,
+  "closed_n": 578,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -1334,11 +1334,6 @@
       "id": "BUG-1077",
       "title": "(MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on",
       "events": 1
-    },
-    {
-      "id": "BUG-1079",
-      "title": "(MED, OPEN 2026-10-27) \u2014 THE LOOP BATTERY READS A *LOST CALL* AS AN *ALLOWANCE LIMIT*, so the one instrument that runs on every model",
-      "events": 1
     }
   ],
   "closed": [
@@ -1918,6 +1913,7 @@
     "BUG-1072",
     "BUG-1073",
     "BUG-1075",
-    "BUG-1078"
+    "BUG-1078",
+    "BUG-1079"
   ]
 }

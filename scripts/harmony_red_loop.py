@@ -84,8 +84,13 @@ from measure_subagent_loop import (  # noqa: E402  (path is set above, deliberat
     _yaml,
     ask,
     budget_s,
+    classify_turn,
     declaration,
     engine_block,
+    engine_facts,
+    log_offset,
+    log_since,
+    window,
 )
 
 ENGINE = ROOT / "config/engine.yaml"
@@ -133,49 +138,13 @@ READ_INDEX_SPEC = {
 }
 
 
-# ── THE ENGINE'S OWN WITNESS (path + markers from config, never restated: C12) ──────────────────────────
-def engine_facts() -> dict[str, Any]:
-    """The engine block plus its log path and markers, with a FATAL on a missing key (C16: no invented value)."""
-    conf = _yaml(ENGINE)["engine"]
-    log = pathlib.Path(str(conf.get("log") or "").replace("~", str(pathlib.Path.home())))
-    markers = conf.get("log_markers") or {}
-    missing = [key for key in ("harmony_parse_error", "eviction", "completion") if not markers.get(key)]
-    if not conf.get("log") or missing:
-        raise SystemExit(f"FATAL: config/engine.yaml#engine is missing log/markers ({missing}) - this fixture "
-                         f"cannot attribute a dropped call without the engine's own witness (C16/C12)")
-    return {"conf": conf, "log": log, "markers": markers}
-
-
-def log_offset(path: pathlib.Path) -> int:
-    """Byte offset of the log's end NOW: every line after it belongs to the turn about to be issued."""
-    return path.stat().st_size
-
-
-def log_since(path: pathlib.Path, offset: int) -> list[str]:
-    """The lines written since `offset`. A read failure is LOUD (C16) - an unattributable turn is not a reading."""
-    try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            handle.seek(offset)
-            return handle.read().splitlines()
-    except OSError as exc:                                    # pragma: no cover - preflight proves the log opens
-        raise RuntimeError(f"engine log became unreadable at offset {offset}: {exc}") from exc
-
-
-def window(lines: list[str], markers: dict[str, str], model: str) -> dict[str, Any]:
-    """PURE: what the ENGINE said during one turn's byte window. Foreign-model lines are counted, not ignored:
-    a second client on the engine makes every count in this window unattributable (reported, never hidden)."""
-    parse = [line for line in lines if markers["harmony_parse_error"] in line]
-    stream = [line for line in lines if markers.get("harmony_stream_fallback") and
-              markers["harmony_stream_fallback"] in line]
-    evict = [line for line in lines if markers["eviction"] in line]
-    pressure = [line for line in lines if markers.get("prefill_pressure") and
-                markers["prefill_pressure"] in line]
-    completions = [line for line in lines if markers["completion"] in line]
-    foreign = [line for line in completions if f"model={model}," not in line]
-    return {"parse_errors": len(parse) + len(stream), "evictions": len(evict),
-            "prefill_pressure": len(pressure), "completions": len(completions),
-            "foreign_completions": len(foreign),
-            "evidence": (parse + stream + evict)[:4]}
+# ── THE ENGINE'S OWN WITNESS now lives in the BASE instrument (BUG-1079, 2026-10-27) ─────────────────
+# engine_facts / log_offset / log_since / window / classify_turn are IMPORTED from measure_subagent_loop and
+# never copied: the T-199 battery had to read the same log window under the same attribution rule, and two copies
+# of "what the engine said" is exactly how two receipts start disagreeing about one machine. D-3200 clause 2
+# required the helper to be SHARED when BUG-1079 was fixed - this is that fix. The import direction is unchanged
+# (this file already imported the base instrument), so there is no cycle: measure_subagent_loop knows nothing
+# about this gate.
 
 
 # ── THE PURE CLASSIFIERS (the only place a verdict is decided; --selftest asks each one both ways) ──────
@@ -189,33 +158,6 @@ def classify_name(name: str, declared: set[str]) -> str:
     if name not in declared:
         return "undeclared"
     return ""
-
-
-def classify_turn(message: dict[str, Any], finish_reason: str, win: dict[str, Any]) -> tuple[str, str]:
-    """PURE: a turn that emitted NO tool call is one of FOUR things, and they are not interchangeable.
-
-    'engine_parse_error' - the engine logged a refused tool header in this turn's window: the call was LOST.
-                           This is BUG-951 symptom 2, and the log is the only witness (a lost call and a spent
-                           allowance both arrive as empty content with finish_reason=length).
-    'answered'           - the model answered in words where a call was owed (a drop: the loop cannot proceed).
-    'silent_stop'        - empty content, finish_reason=stop, no parse error: a real non-answer (a drop).
-    'allowance'          - empty content, finish_reason=length, NO parse error anywhere in the window: the turn
-                           spent its whole allowance and the instrument cannot see the model (UNMEASURED).
-
-    The ORDER is the whole point: a parse error is checked FIRST, so the shape that the T-199 battery read as
-    "the instrument cannot see this model" (2026-10-27 16:10, 16:12 - gpt-oss, finish_reason=length, 1024 tokens)
-    is attributed to the parser that failed rather than to an allowance it never reached.
-    """
-    if win["parse_errors"] > 0:
-        return "engine_parse_error", (f"the engine's own log refused a tool header in this turn's window "
-                                      f"({win['parse_errors']} line(s)); the call was LOST, not declined")
-    content = str(message.get("content") or "").strip()
-    if content:
-        return "answered", f"answered in words where a call was owed: {content[:80]!r}"
-    if str(finish_reason or "") == "length":
-        return "allowance", ("spent the whole token allowance with no content and NO parse error in the window - "
-                             "the instrument cannot see this model at this allowance (UNMEASURED, not a verdict)")
-    return "silent_stop", "empty content with finish_reason=stop and no parse error: a real non-answer"
 
 
 def exec_read_index(args: Any, total: int) -> str:

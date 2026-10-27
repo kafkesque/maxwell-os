@@ -32289,6 +32289,17 @@ decisions:
   category: MODELS / LOOP ROLES
   title: a battery RANKS and one fixture only ADMITS — the loop roles are declared from a measured matrix, and a
     role no fixture can discriminate stays UNDECLARED on purpose
+  amended_20261027_b: >-
+    THE CORPUS SENTENCE IS AMENDED BY MEASUREMENT, NOT RETRACTED: "RANKED 2/4 by T-199 with two rows invisible" is
+    still the COUNT; the ATTRIBUTION behind it changes. BUG-1079 was fixed on 2026-10-27, and the engine's own log now
+    says the 2026-10-27 re-measure's `distractor` row was a LOST CALL (a harmony parse error 3-4 ms before its
+    1024-token finish_reason=length completion, at both 16:10:26 and 16:12:04) while its `parallel` row was a genuine
+    allowance limit (prompt 205, 1024 tokens, NO parse error, reproduced in 7 runs across three days). Able to see it,
+    that re-measure would have printed 1/4, not 2/4. THE 2026-10-25 RECEIPT THIS DECISION CITES IS UNTOUCHED: its
+    day's engine log carries ZERO parse-error lines, so the ranking below stands exactly as recorded and the 2/4 in
+    the corpus IS that number. Consequence for how this matrix is read: a battery row reported UNMEASURED before
+    2026-10-27 is not automatically a model limit, and no battery row is an emission certificate (D-3200) - so the
+    gpt-oss row here may be cited neither for nor against it without the gate.
   decision: 'T-199. MEASURED 2026-10-25 by running the new battery over the served roster at temperature 0.0 (8
     models x 4 fixtures = 32 rows, receipt governance/evidence/LOOP_BATTERY_20261025.json, 90s per-turn budget,
     ZERO GB downloaded — the population is what was already served). FOUR fixtures beyond T-187s two-step one, each
@@ -34905,6 +34916,26 @@ decisions:
     A CAPABILITY BATTERY CANNOT ADMIT A MODEL THAT LOSES CALLS - the harmony red loop BUG-951 owed now exists and
     goes RED on demand, its two symptoms are separated by their own axis, and emission integrity becomes a GATE the
     AGENT_LOOP roles must pass before capability is asked about
+  amended_20261027_b: >-
+    CLAUSE (2) IS DISCHARGED, AND HALF OF BUG-1079's PREMISE IS CORRECTED BY MEASUREMENT - appended the same day as an
+    ADD, so no earlier sentence is rewritten.
+    (a) THE HELPER IS SHARED, AS (2) REQUIRED. engine_facts / log_offset / log_since / window / classify_turn moved
+    DOWN into `scripts/measure_subagent_loop.py`, and this gate imports them: the battery now reads the same window
+    under the same rule from ONE definition. The import direction is unchanged (this gate already imported the base
+    instrument) so there is no cycle, and both selftests re-ran green after the move (gate 32/32, battery 53/53).
+    (b) THE BATTERY'S MAP IS DECLARED, NOT IMPLIED (`no_call_verdict`): a parser-refused header is a FAIL that NAMES
+    the parser; an eviction inside the same window is UNMEASURED (clause 3); an allowance with a clean window is
+    UNMEASURED; an unattributable window (the log rotated below the captured offset - the engine rotates daily,
+    measured) is UNMEASURED. Every row now carries engine_parse_errors / engine_evictions / foreign_completions.
+    (c) THE HALF OF BUG-1079 THAT DOES NOT SURVIVE ITS OWN EVIDENCE. Of the two UNMEASURED gpt-oss rows that prompted
+    the bug, ONE was a lost call (distractor: a parse error 3-4 ms before a 1024-token finish_reason=length completion
+    at prompt 410, its 4th turn, at BOTH 16:10:26 and 16:12:04) and ONE was a genuine allowance limit (parallel:
+    prompt 205, 1024 tokens, no parse error, in 7 runs across 3 days). The instrument was BLIND and that is fixed; but
+    "two of four rows were silently RED" was an inference from this gate onto the battery, and the log refutes half
+    of it. Recorded in governance/buglog.md#BUG-1079 (FIXED) rather than quietly dropped (D-3038).
+    (d) WHAT CLAUSE (5) STILL OWES. AGENT_LOOP_SHORT is bound to a model that is RED here, so the register carries a
+    KNOWN, REGISTERED contradiction until the owner answers T-216. That is a named open gate, not drift - and the
+    contingent rule that will settle it is pre-declared IN T-216, so a receipt decides it and not a mood.
   decision: >-
     (1) THE INSTRUMENT IS A GATE, NOT A BATTERY, AND IT HAS NO PASS. `scripts/harmony_red_loop.py` returns exactly
     three verdicts - RED (the defect fired), UNMEASURED (the instrument could not see) and UNMEASURED_WITH_BOUND (0

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1326 decisions (census stamp ed9ab27029803be5, 2026-10-27) · 843 bugs (266 open / 577 closed; highest OPEN = BUG-1079) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1326 decisions (census stamp 1bef6331c7f0a999, 2026-10-27) · 843 bugs (265 open / 578 closed; highest OPEN = BUG-1077) · 62 open tasks (MUST 11 / SHOULD 45 / WORTH 5; OWNER-moved 1, pipeline-moved 61; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1326 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 667 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1326, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
+> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23979,3 +23979,62 @@ shape, and the engine is the only witness that distinguishes them.
    (b) apply the fix; (c) the same command must print those rows as RED naming the harmony parser, and
    (d) the two-sided control: `--only Qwen3.8-27B-MTP4` must stay 4/4 PASS (a fix that reddens every row is not a
    fix - it is the BUG-1079 shape inverted).
+
+## BUG-1079 (MED, FIXED 2026-10-27) — the loop battery now reads the ENGINE'S OWN BYTE WINDOW, and the premise this bug was minted on is corrected by measurement: ONE of its two "invisible" rows was a lost call, the other is a genuine allowance limit reproduced seven times
+
+**What was fixed.** `scripts/measure_subagent_loop.py#run_battery_fixture` captures the engine log's byte offset BEFORE
+every turn and reads the window AFTER it, so a turn that owed a call and emitted none is classified from the engine's own
+witness. `engine_facts / log_offset / log_since / window / classify_turn` MOVED down into the base instrument and
+`scripts/harmony_red_loop.py` now imports them — one definition, two readers, exactly as D-3200 clause 2 required when
+this bug was minted. The import direction is unchanged (the gate already imported the base instrument), so there is no
+cycle; both selftests re-ran green after the move (gate 32/32, battery 53/53).
+
+**The verdict map is declared in one place** (`no_call_verdict`, pure, 4 controls):
+  parser refused a header  -> **FAIL**, and the detail NAMES the parser  (before: UNMEASURED "spent its whole token allowance")
+  eviction in the window   -> UNMEASURED (BUG-950 mechanism A: a second sufficient cause, never charged to the model)
+  allowance, clean window   -> UNMEASURED (the reading this bug must NOT delete — that boundary IS the fix)
+  unattributable window     -> UNMEASURED (see the rotation guard)
+Every row now carries `engine_parse_errors / engine_evictions / foreign_completions / no_call_class`, and the receipt
+carries `engine_log` plus the attribution rule (R14: a receipt names the reading that produced it).
+
+**The guard the fix needed for itself (C16).** The engine ROTATES its log daily (measured: `server.log.2026-10-20`
+…`-26` sit beside `server.log`), so a window read across midnight would return EMPTY rather than UNKNOWN — BUG-1079 one
+layer in, dressed as a clean window. `log_since` now REFUSES a log that shrank below the captured offset and the battery
+marks that turn unattributable instead of reading it as "0 parse errors".
+
+**RED LOOP — four steps, each with the reading that re-takes it.**
+  (a) BEFORE, 18:12: `--battery --only gpt-oss-20b-MXFP4-Q8` printed `parallel=UNMEASURED "spent its whole token
+      allowance … the instrument cannot see this model"`. Preserved as
+      `governance/evidence/LOOP_BATTERY_20261027_BUG1079_BEFORE.json` — it has NO engine-window field at all, which is
+      the defect visible in its own bytes.
+  (b) FIX applied (above).
+  (c) AFTER, 18:14 and 18:31, same command: `parallel` stays UNMEASURED **and the window says why**. This is the
+      TWO-SIDED production control and it is the more valuable half — the fix does not convert an allowance limit into a
+      FAIL, and it now says so from the log instead of from a prior belief.
+  (d) CONTROL MODEL, `--only Qwen3.8-27B-MTP4`: **4/4 PASS** (warm 13.1s, load 11.7s). The first control run read 3/4
+      because a REAL eviction (18:16:55 — gemma-4-E4B evicted for headroom on MTP4, projected 42.10GB > target 42.00GB)
+      fell inside the enum row's window; the fix reported UNMEASURED naming that second cause instead of blaming the
+      model. Both runs committed. That row is also the FIRST production demonstration that the new wiring reads the log.
+  53/53 known-answer controls (12 new: window counting both ways, the four turn classes, the four verdict mappings, the
+  rotation guard's two-sided pair).
+
+**THE PREMISE IS CORRECTED — the register may not keep a count the log refutes.** This bug was minted saying "two of four
+gpt-oss fixture rows were silently RED". The log says **one**:
+  * **distractor — 16:10:26 and 16:12:04:** a parse error 3–4 ms BEFORE a 1024-token `finish_reason=length` completion at
+    prompt 410. Prompt 410 is the distractor's 4th turn (its sequence is 262/318/364/410/456, measured on 2026-10-25 and
+    again today). So that row WAS silently RED, in both runs, at the same turn. Seen, the re-measure would read **1/4**.
+  * **parallel — prompt 205, 1024 tokens out, ~26 s, `finish_reason=length`, NO parse error in its window,** in **7 runs
+    across three days** (2026-10-25 15:21/19:11/19:14/19:15, 2026-10-27 16:10/16:12, 18:14/18:31). gpt-oss spends the whole
+    allowance on `reasoning_content` on this fixture and never emits the two parallel calls. That row was read
+    **correctly** before the fix.
+  * The 2026-10-25 receipt **D-3148 cites carries ZERO parse-error lines in its whole day's log**, so nothing in that
+    reading is retro-tainted and its 2/4 stands exactly as recorded. D-3148's corpus sentence is amended today.
+
+**What this entry does NOT claim.**
+  1. It does not fix BUG-951. The parser still refuses headers; the battery can now SEE it. T-215 owns the fix.
+  2. It does not make the `parallel` row measurable. `BATTERY_MAX_TOKENS = 1024` is not a ratified knob, so the allowance
+     limit that hides gpt-oss's parallel formatting is an OWNER ACT — and that same absent knob is what blocks the T-213
+     gate's `--mode parallel` axis. One missing knob, two blind instruments: registered, not worked around.
+  3. It does not claim the roster battery is unchanged. The eviction branch is NEW and can downgrade a row to UNMEASURED
+     on this machine (already observed once). A full-roster run should measure with the target resident and the rest
+     parked, and report evictions per row rather than a bare score.

@@ -3224,3 +3224,19 @@ tasks:
     (c) ACCEPT the loss explicitly, with the rate (about 1 in 5 calls), the failure mode (a spent turn and a retried
         call) and what it costs inside a pipeline.
     Whatever is chosen, `state` flips from open and the reason is recorded - a deferral is RECORDED as deferred.
+    PREDECLARED RULE (recorded 2026-10-27 by the assistant BEFORE T-215 lands, so the receipt decides the choice
+    instead of the choice being re-argued afterwards - D-3036):
+      -> (b) IF T-215 limb 2 drives the clean-axis loss to 0 over N >= 30 AND the wall-time cost is reported and fits
+         the declared per-turn budget. The guard is model-agnostic infrastructure: it removes the failure CLASS (a
+         call that never arrived) rather than dodging one instance of it, and it keeps the only model measured to
+         PREFILL inside the agent_loop class - MTP4 needs 611.2s at the 26,254-token class context against a 60s
+         agent_loop budget and the 120s patient budget (D-3198 amendment), so it is BATCH by measurement, not by
+         preference.
+      -> (a) IF the guard reduces the loss but does not eliminate it, with TWO costs declared: one permanently warm
+         42GB slot (measured 2026-10-27 18:16:55 - MTP4 evicted gemma at projected 42.10GB against a 42.00GB
+         target) and the context ceiling above, which binds the moment a loop session grows past fixture size.
+      -> (c) NOT RECOMMENDED, and legitimate only as an EXPLICIT tolerance, never a default: a silent lost call in
+         the orchestrator makes every downstream receipt unreliable in a way no later verification can detect -
+         the single failure this OS exists to prevent.
+      WHICHEVER IS CHOSEN: re-check it on the emission gate at the role's REAL context size. The battery's prompts
+      are 205-456 tokens; the role's can be 26k, and a fixture-sized certificate does not travel.

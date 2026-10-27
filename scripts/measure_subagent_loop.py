@@ -66,6 +66,118 @@ def engine_block() -> dict[str, Any]:
     block["mlx_lm"] = dist[0].name if dist else None
     return block
 
+# ── THE ENGINE'S OWN WITNESS: ONE HOME FOR THE BATTERY AND THE EMISSION GATE (BUG-1079, 2026-10-27) ─────
+# A turn that emits NO tool call arrives as empty content with finish_reason=stop|length whether the model
+# DECLINED or the engine's harmony parser ATE the call: the two are byte-identical from outside, so no reading of
+# the API response can separate them and only the engine's own log can. This block was written for the T-213 gate
+# (scripts/harmony_red_loop.py) and MOVED here when BUG-1079 was fixed, because the T-199 battery was reading the
+# parser's failures as "the instrument cannot see this model" - the BUG-375 shape one layer in. One definition,
+# two readers (D-3200 clause 2). Path and markers come from config/engine.yaml, never restated (C12).
+def engine_facts() -> dict[str, Any]:
+    """The engine block plus its log path and markers, with a FATAL on a missing key (C16: no invented value)."""
+    conf = _yaml(ENGINE)["engine"]
+    log = pathlib.Path(str(conf.get("log") or "").replace("~", str(pathlib.Path.home())))
+    markers = conf.get("log_markers") or {}
+    missing = [key for key in ("harmony_parse_error", "eviction", "completion") if not markers.get(key)]
+    if not conf.get("log") or missing:
+        raise SystemExit(f"FATAL: config/engine.yaml#engine is missing log/markers ({missing}) - this instrument "
+                         f"cannot attribute a lost tool call without the engine's own witness (C16/C12)")
+    return {"conf": conf, "log": log, "markers": markers}
+
+
+def log_offset(path: pathlib.Path) -> int:
+    """Byte offset of the log's end NOW: every line after it belongs to the turn about to be issued."""
+    return path.stat().st_size
+
+
+def log_since(path: pathlib.Path, offset: int) -> list[str]:
+    """The lines written since `offset`. A read failure is LOUD (C16) - an unattributable turn is not a reading.
+
+    A log that SHRANK below `offset` was rotated or truncated between the two reads, so the turn's window is not
+    merely empty - it is UNKNOWN, and reading it as "0 parse errors" is BUG-1079 one layer in (a silent
+    mis-attribution dressed as a clean window). This refuses rather than guesses (C16)."""
+    if path.stat().st_size < offset:
+        raise RuntimeError(f"engine log SHRANK below offset {offset} (rotation or truncation): this turn's window "
+                           f"is UNATTRIBUTABLE")
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            handle.seek(offset)
+            return handle.read().splitlines()
+    except OSError as exc:                                    # pragma: no cover - preflight proves the log opens
+        raise RuntimeError(f"engine log became unreadable at offset {offset}: {exc}") from exc
+
+
+def window(lines: list[str], markers: dict[str, str], model: str) -> dict[str, Any]:
+    """PURE: what the ENGINE said during one turn's byte window. Foreign-model lines are counted, not ignored:
+    a second client on the engine makes every count in this window unattributable (reported, never hidden)."""
+    parse = [line for line in lines if markers["harmony_parse_error"] in line]
+    stream = [line for line in lines if markers.get("harmony_stream_fallback") and
+              markers["harmony_stream_fallback"] in line]
+    evict = [line for line in lines if markers["eviction"] in line]
+    pressure = [line for line in lines if markers.get("prefill_pressure") and
+                markers["prefill_pressure"] in line]
+    completions = [line for line in lines if markers["completion"] in line]
+    foreign = [line for line in completions if f"model={model}," not in line]
+    return {"parse_errors": len(parse) + len(stream), "evictions": len(evict),
+            "prefill_pressure": len(pressure), "completions": len(completions),
+            "foreign_completions": len(foreign),
+            "evidence": (parse + stream + evict)[:4]}
+
+
+def classify_turn(message: dict[str, Any], finish_reason: str, win: dict[str, Any]) -> tuple[str, str]:
+    """PURE: a turn that emitted NO tool call is one of FOUR things, and they are not interchangeable.
+
+    'engine_parse_error' - the engine logged a refused tool header in this turn's window: the call was LOST.
+                           This is BUG-951 symptom 2, and the log is the only witness (a lost call and a spent
+                           allowance both arrive as empty content with finish_reason=length).
+    'answered'           - the model answered in words where a call was owed (a drop: the loop cannot proceed).
+    'silent_stop'        - empty content, finish_reason=stop, no parse error: a real non-answer (a drop).
+    'allowance'          - empty content, finish_reason=length, NO parse error anywhere in the window: the turn
+                           spent its whole allowance and the instrument cannot see the model (UNMEASURED).
+
+    The ORDER is the whole point, and it is why this function is shared rather than written twice: a parse error
+    is checked FIRST, so the shape the T-199 battery recorded as "spent its whole token allowance" (2026-10-27
+    16:10, 16:12 - gpt-oss, finish_reason=length, 1024 tokens) is attributed to the parser that failed rather
+    than to an allowance it never reached (BUG-1079). The allowance wording itself is NOT restated here: it comes
+    from turn_unmeasured, so the battery and the gate cannot drift apart on one sentence.
+    """
+    if win["parse_errors"] > 0:
+        return "engine_parse_error", (f"the engine's own log refused a tool header in this turn's window "
+                                      f"({win['parse_errors']} line(s)); the call was LOST, not declined")
+    content = str(message.get("content") or "").strip()
+    if content:
+        return "answered", f"answered in words where a call was owed: {content[:80]!r}"
+    if str(finish_reason or "") == "length":
+        return "allowance", turn_unmeasured(message, finish_reason)
+    return "silent_stop", "empty content with finish_reason=stop and no parse error: a real non-answer"
+
+
+def no_call_verdict(kind: str, why: str, evictions: int) -> tuple[str, str]:
+    """PURE: the BATTERY's verdict for a turn that emitted no tool call - the BUG-1079 mapping, in one place.
+
+    ORDER IS THE READING (D-3200 clause 3, applied to the battery as well as to the gate):
+      a PARSE ERROR means the call was LOST -> FAIL, and the detail names the parser, because a lost call is a
+        failure of the loop the battery exists to measure. Before this fix the same shape read UNMEASURED, i.e.
+        "the instrument cannot see this model" - two of four gpt-oss rows were silently RED.
+      an EVICTION in the same window is a SECOND sufficient cause (BUG-950 mechanism A: two resident models
+        thrash, the engine deep-resets, the stream dies) -> UNMEASURED, never charged to the model. A parse error
+        outranks it: an eviction cannot make a parser refuse a header it was given.
+      a SPENT ALLOWANCE with neither is the instrument's own limit -> UNMEASURED (the reading this bug must not
+        delete: the boundary between the two is the whole point of the fix).
+    ('', why) means the turn was a real answer and the fixture's own grader decides - this function never grades.
+    """
+    if kind == "engine_parse_error":
+        return "FAIL", (f"{why} - BUG-1079: the battery used to report this shape as UNMEASURED (an allowance "
+                        f"limit); the engine's own log says the parser refused the header")
+    if evictions > 0:
+        return "UNMEASURED", (f"an engine EVICTION fell inside this turn's window ({evictions} line(s)) - a second "
+                              f"sufficient cause for a lost call (BUG-950 mechanism A), so this row is not a "
+                              f"verdict about the model")
+    if kind == "allowance":
+        return "UNMEASURED", why
+    return "", why
+
+
 def _yaml(path: pathlib.Path) -> dict[str, Any]:
     """Read one declared YAML file (the repository's own idiom: a local import, no helper invented)."""
     import yaml
@@ -617,15 +729,18 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
     is a spec, not a fifth copy of this loop."""
     url = str(decl["base_url"]).rstrip("/") + "/chat/completions"
     key = str((decl.get("headers") or {}).get("Authorization", ""))
+    facts = engine_facts()          # FATAL if the engine's witness is undeclared: a blind battery is worse (C16)
     derived = fixture["build"](workdir)
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": fixture["system"]},
         {"role": "user", "content": fixture["prompt"](derived, workdir)},
     ]
     state: dict[str, Any] = {"calls": [], "ids": [], "ok": [], "parallel_max": 0, "answer": "",
-                             "walls": [], "unmeasured": ""}
+                             "walls": [], "unmeasured": "", "no_call": "", "no_call_verdict": ("", ""),
+                             "windows": [], "unattributable": ""}
     error, transport = "", ""
     for _ in range(MAX_TURNS):
+        offset = log_offset(facts["log"])          # everything written after this belongs to THIS turn
         try:
             reply, wall, _usage = ask(url, key, model, messages, BATTERY_MAX_TOKENS, tools=fixture["tools"])
         except TimeoutError as exc:
@@ -635,6 +750,12 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
             transport = f"{type(exc).__name__}: {exc}"
             break
         state["walls"].append(wall)
+        try:
+            win = window(log_since(facts["log"], offset), facts["markers"], model)
+        except RuntimeError as exc:                 # rotation/truncation: NOT a clean window (C16)
+            win = {"parse_errors": 0, "evictions": 0, "completions": 0, "foreign_completions": 0, "evidence": []}
+            state["unattributable"] = f"{type(exc).__name__}: {exc}"
+        state["windows"].append(win)
         choices = reply.get("choices") or []
         if not choices:
             error = f"engine returned no choice: {str(reply)[:120]}"
@@ -643,7 +764,13 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
         tool_calls = message.get("tool_calls") or []
         if not tool_calls:
             state["answer"] = str(message.get("content") or "")
-            state["unmeasured"] = turn_unmeasured(message, choices[0].get("finish_reason", ""))
+            kind, why = classify_turn(message, choices[0].get("finish_reason", ""), win)
+            state["no_call"] = kind
+            state["no_call_verdict"] = (("UNMEASURED", f"the engine log window was UNATTRIBUTABLE "
+                                                       f"({state['unattributable']}) - a loss here cannot be charged "
+                                                       f"to the model") if state["unattributable"]
+                                        else no_call_verdict(kind, why, win["evictions"]))
+            state["unmeasured"] = why if state["no_call_verdict"][0] == "UNMEASURED" else ""
             break
         state["parallel_max"] = max(state["parallel_max"], len(tool_calls))
         messages.append(message)
@@ -665,12 +792,18 @@ def run_battery_fixture(decl: dict[str, Any], model: str, budget: float, fixture
     elif transport:
         verdict, detail = "UNMEASURED", (f"the ENGINE refused the turn ({transport}) - a transport failure is "
                                          f"not a fact about the model, so this row is not a verdict")
+    elif state["no_call_verdict"][0]:
+        verdict, detail = state["no_call_verdict"]
     elif state["unmeasured"]:
         verdict, detail = "UNMEASURED", state["unmeasured"]
     else:
         verdict, detail = fixture["grade"](state, derived, budget)
     return {"model": model, "fixture": fixture["name"], "why": fixture["why"], "verdict": verdict,
             "detail": detail, "tools_called": [name for name, _ in state["calls"]],
+            "no_call_class": state["no_call"],
+            "engine_parse_errors": sum(one["parse_errors"] for one in state["windows"]),
+            "engine_evictions": sum(one["evictions"] for one in state["windows"]),
+            "foreign_completions": sum(one["foreign_completions"] for one in state["windows"]),
             "turn_calls": state["parallel_max"], "turns": len(state["walls"]),
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
             "answer": state["answer"].strip()[:200]}
@@ -812,9 +945,54 @@ def selftest() -> int:
         bad.append("a turn that DID answer must not read UNMEASURED (two-sidedness)")
     if turn_unmeasured({"content": ""}, "stop") != "":
         bad.append("an empty content with finish_reason=stop is a real non-answer, never UNMEASURED")
+
+    # ── BUG-1079 controls: the shape the battery MIS-READ (a parser-eaten call reported as an allowance limit).
+    markers = {"harmony_parse_error": "Error parsing tool calls from tokens",
+               "eviction": "Evicting idle model", "completion": "Chat completion: model="}
+    lost_win = window(["- WARNING - Error parsing tool calls from tokens: unexpected tokens remaining"], markers,
+                      "gpt-x")
+    clean_win = window(["- INFO - Chat completion: model=gpt-x, 28 tokens in 2.1s"], markers, "gpt-x")
+    evicted_win = window(["- INFO - Evicting idle model gpt-x"], markers, "gpt-x")
+    bug1079_cases = [
+        (lost_win["parse_errors"], 1, "window() must count the line the engine wrote when it refused a header"),
+        (clean_win["parse_errors"], 0, "window() must NOT invent a parse error the engine never wrote"),
+        (clean_win["foreign_completions"], 0, "a completion line for the MEASURED model is not foreign"),
+        (window(["Chat completion: model=other, 1 tokens"], markers, "gpt-x")["foreign_completions"], 1,
+         "a completion line for ANOTHER model must count as foreign (a second client is not ignorable)"),
+        (classify_turn({"content": ""}, "length", lost_win)[0], "engine_parse_error",
+         "BUG-1079: empty content + finish=length WITH a parse error in the window is a LOST call"),
+        (classify_turn({"content": ""}, "length", clean_win)[0], "allowance",
+         "the SAME shape with a clean window stays the instrument's own limit (two-sidedness)"),
+        (classify_turn({"content": "I cannot."}, "stop", clean_win)[0], "answered",
+         "words where a call was owed must read answered"),
+        (classify_turn({"content": ""}, "stop", clean_win)[0], "silent_stop",
+         "an empty stop with no parse error must read silent_stop"),
+        (no_call_verdict("engine_parse_error", "lost", 0)[0], "FAIL",
+         "BUG-1079: a parser-lost call must be a FAIL naming the parser, never UNMEASURED"),
+        (no_call_verdict("engine_parse_error", "lost", evicted_win["evictions"])[0], "FAIL",
+         "a parse error OUTRANKS an eviction: an eviction cannot make a parser refuse a header it was given"),
+        (no_call_verdict("allowance", "spent", evicted_win["evictions"])[0], "UNMEASURED",
+         "an allowance turn that coincides with an EVICTION must be UNMEASURED (BUG-950 mechanism A)"),
+        (no_call_verdict("answered", "words", 0)[0], "",
+         "a real answer must be left to the fixture's grader, never graded by this function"),
+    ]
+    shrunk = pathlib.Path("temp/_bug1079_log_shrink.log")
+    shrunk.parent.mkdir(parents=True, exist_ok=True)
+    shrunk.write_text("one line\n", encoding="utf-8")
+    try:
+        log_since(shrunk, 4096)
+        bad.append("BUG-1079: a log that SHRANK below the offset must raise, never read as a clean window")
+    except RuntimeError:
+        pass
+    if log_since(shrunk, 0) != ["one line"]:
+        bad.append("a normal log read must return the lines since the offset (two-sidedness of the guard)")
+    for got, want, label in bug1079_cases:
+        if got != want:
+            bad.append(f"{label}: got {got!r}")
     for problem in bad:
         print(f"  FAIL control: {problem}")
-    total = len(cases) + 1 + len(ts_cases) + 1 + len(battery_cases) + 4 + 6
+    total = (len(cases) + 1 + len(ts_cases) + 1 + len(battery_cases) + 4 + 6 + len(bug1079_cases)
+             + 2)   # + 2 = the rotation guard's own two-sided pair (raises on a shrunk log, reads normally)
     print(f"{'OK' if not bad else 'FAILED'} subagent-loop controls: {total - len(bad)}/{total} known-answer")
     return 1 if bad else 0
 
@@ -841,6 +1019,7 @@ def main() -> int:
         raise SystemExit(f"FATAL: {unknown} is not DECLARED to the harness (the parity rail's job, BUG-874)")
     if args.battery:
         out = pathlib.Path(args.out or f"temp/subagent_loop_battery_receipt_{time.strftime('%Y%m%d')}.json")
+        witness = engine_facts()           # resolved ONCE: a battery that cannot read the log must not run (C16)
         rows: list[dict[str, Any]] = []
 
         def flush(reason: str) -> None:
@@ -850,6 +1029,10 @@ def main() -> int:
                 {"measured_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "fixture": "T-199 loop battery",
                  "state": reason, "per_turn_budget_s": budget, "served": served,
                  "engine": engine_block(),
+                 "engine_log": str(witness["log"]),
+                 "attribution": ("every turn reads the ENGINE's byte window (BUG-1079): a parser-refused header "
+                                 "is a FAIL that names the parser, an eviction in the same window is UNMEASURED, "
+                                 "and an unattributable window is UNMEASURED - never a clean reading"),
                  "fixtures": [{"name": f["name"], "why": f["why"]} for f in BATTERY_FIXTURES],
                  "rows": rows, "ranking": rank(rows)}, indent=2) + "\n", encoding="utf-8")
 

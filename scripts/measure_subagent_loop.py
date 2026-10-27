@@ -589,6 +589,24 @@ def cell_readings(cell: dict[str, Any]) -> tuple[list[float], list[str], list[st
     return rates, live, dead
 
 
+def provisional_reason(model: str, cell: dict[str, Any], budget: float) -> str:
+    """WHY this model got an upper bound instead of a derived grant (C16). Two DIFFERENT truths, never merged.
+
+    R5 verifier finding, accepted 2026-10-27: the first wording said "no measured decode rate for <model>" whenever
+    the live list was empty - but a cell can hold a reading the register DISOWNS (`invalid_readings`, `verdict:
+    REFUSED`). Saying "no reading" there is a receipt that misdescribes its own evidence, which is BUG-1086's defect
+    one layer down. A disowned reading is CITED in the reason; it is never silently absent.
+    """
+    _rates, _live, dead = cell_readings(cell)
+    if dead:
+        return (f"every reading in this model's cell is DISOWNED by the register ({', '.join(sorted(dead))}) - the "
+                f"grant is the largest ceiling the table's LIVE readings can pay, so a PASS at it is safe and a FAIL "
+                f"at it is NOT a reading about the model. Retire this cell by MEASURING a live rate (BUG-1087)")
+    return (f"no measured decode rate for {model!r} in measured_decode_20261015.decode_tps - the grant is the "
+            f"largest ceiling the table can pay, so a PASS at it is safe and a FAIL at it is NOT a reading about the "
+            f"model")
+
+
 def instrument_allowance(model: str) -> dict[str, Any]:
     """BUG-1081: the completion allowance an instrument grants, its provenance, and why it is underived if it is."""
     table = ((_yaml(CONFIG).get("measured_decode_20261015") or {}).get("decode_tps")) or {}
@@ -625,9 +643,7 @@ def instrument_allowance(model: str) -> dict[str, Any]:
             "rate_basis": "none: the model has no declared reading",
             "per_turn_budget_s": budget, "decode_tps": None, "rates_declared": [],
             "agreement": None,
-            "reason": f"no measured decode rate for {model!r} in measured_decode_20261015.decode_tps - the grant is "
-                      f"the largest ceiling the table can pay, so a PASS at it is safe and a FAIL at it is NOT a "
-                      f"reading about the model (BUG-1081's named debt: measure the rate)"}
+            "reason": provisional_reason(model, cell, budget)}
 
 
 def instrument_max_tokens(model: str) -> int:
@@ -1334,6 +1350,18 @@ def selftest() -> int:
             if not isinstance(c.get(key), (int, float)):
                 bad.append(f"BUG-1089: {name} disowns '{key}', which it does not carry - a declaration with no "
                            f"referent (D-3034)")
+
+    #: R5 VERIFIER FINDING, ACCEPTED 2026-10-27: an empty LIVE list has TWO causes and the receipt must not merge
+    #: them. A cell whose readings are all DISOWNED must say so, and must not claim the model was never measured -
+    #: a receipt that misdescribes its own evidence is BUG-1086 one layer down.
+    bug1085 += 1
+    _disowned_only = {"decode_tps": 1.7, "previous": 1.7, "invalid_readings": ["decode_tps", "previous"]}
+    said = provisional_reason("a-model-whose-every-reading-is-disowned", _disowned_only, budget)
+    if "DISOWNED" not in said or "no measured decode rate" in said:
+        bad.append(f"BUG-1089/R5: a model whose every reading is DISOWNED gets the reason {said[:80]!r} - it must "
+                   f"CITE the disowned reading, never claim the model has none")
+    if "no measured decode rate" not in provisional_reason("a-model-never-measured", {}, budget):
+        bad.append("BUG-1089/R5: a model that was NEVER measured must say exactly that - two causes, two sentences")
 
     for problem in bad:
         print(f"  FAIL control: {problem}")

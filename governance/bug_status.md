@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**268 open** / 585 closed of 853 ids.
+**269 open** / 585 closed of 854 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -279,3 +279,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1083 | (MED, OPEN 2026-10-27) — the SUITE rail is RED on a census receipt mismatch, and the ladder's own comment still declares three reds that no | 1 |
 | BUG-1084 | (MED, OPEN 2026-10-27) — `config/model_assignments.yaml#roles` IS A 24-ENTRY SECOND HOME THAT NO CODE RESOLVES, AND ONE OF ITS ENTRIES | 1 |
 | BUG-1088 | (MED, OPEN 2026-10-27) — THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20` | 1 |
+| BUG-1090 | (MED, OPEN 2026-10-27) — A ROLE WHOSE NAME PROMISES LONG-FORM OUTPUT IS BOUND TO THE SLOWEST SERVED MODEL, AND ITS HONEST GRANT IS 675 | 1 |

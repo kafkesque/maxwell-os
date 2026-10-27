@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1332 decisions (census stamp 464ff800767b7ada, 2026-10-27) · 853 bugs (268 open / 585 closed; highest OPEN = BUG-1088) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1332 decisions (census stamp 464ff800767b7ada, 2026-10-27) · 854 bugs (269 open / 585 closed; highest OPEN = BUG-1090) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1332 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 673 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1332, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 268 open.
+> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 138 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 269 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24467,3 +24467,56 @@ declaration with no referent (D-3034), and EVERY derived grant's rate must equal
 **What this does not fix.** Pricing on a live reading is not the same as pricing on a RECENT one: `Phi-4-mini` is now
 priced on a 2026-10-14 reading (40.0) because the newer reading was refused by its own control. That is the honest
 register — a refused reading may not be resurrected — and the debt it leaves is a re-measurement, not a rule change.
+
+## BUG-1089 (MED, FIXED 2026-10-27 — R5 UPDATE, same day) — THE VERIFIER'S ONE REAL FINDING: A REASON THAT MISDESCRIBED ITS OWN EVIDENCE
+
+R5 pass on the BUG-1085/BUG-1089 change (generator ≠ verifier: written by one family, reviewed by another;
+`gemma-4-E4B-it-MLX-4bit`, temperature 0.0). The delegate hit its turn ceiling, so the review is recorded from its
+final answer rather than as a clean receipt — that is itself a named limitation, not a clean pass.
+
+**ACCEPTED (fixed, one control).** The PROVISIONAL_CEILING reason said "no measured decode rate for <model>" whenever
+the LIVE list was empty — but an empty live list has TWO causes, and one of them is that the cell HOLDS readings the
+register DISOWNS. Saying "no reading" there is a receipt that misdescribes its own evidence — BUG-1086's defect
+(`the receipt described the REFUTED retry`) one layer down, which is exactly why the finding was taken rather than
+noted. `provisional_reason()` is now pure, returns two DIFFERENT sentences for two different truths, and a control
+asserts both directions: a model whose every reading is disowned CITES them, and a model that was never measured says
+exactly that. `--selftest` 71 → **72/72**.
+
+**REFUTED — the PROVISIONAL fallback is an upper bound BY DECLARATION, not an optimism bug.** The verifier's HIGH
+finding was that grading the fallback on the table's fastest LIVE reading "might use a much less representative
+model's reading". That IS the declared design (`turn_budget.unmeasured_model`): the grant is the LARGEST ceiling the
+table can pay, so a PASS at it is safe and a FAIL at it is never a reading about the model — the alternative (pick a
+plausible middle) is the 1024 literal's failure mode with extra steps. The existing control that the PROVISIONAL
+bound must never bind TIGHTER than a derived grant is the property that matters, and it holds.
+
+**NOTED, no action.** (a) `cell_readings` skips non-numeric or non-positive values without logging — correct here (a
+value that is not a rate is not a reading) and now VISIBLE through `readings_disowned`/`readings_live` in every row
+that it affected. (b) The verifier flagged that `TransportWallExceeded` relies on callers catching it before the
+generic handler — true by design, and both callers do; it subclasses `TimeoutError` so a generic handler still cannot
+mistake it for success.
+
+## BUG-1090 (MED, OPEN 2026-10-27) — A ROLE WHOSE NAME PROMISES LONG-FORM OUTPUT IS BOUND TO THE SLOWEST SERVED MODEL, AND ITS HONEST GRANT IS 675 TOKENS
+
+Found by reading the six grants after BUG-1089 made them honest, i.e. as a consequence of a fix rather than of a test —
+which is the shape D-3109 warns about on the other side: a number nobody looked at.
+
+`config/model_assignments.yaml#harness_roles.AGENT_EDIT_LONG_CONTEXT.model = Qwen3.8-27B-MLX-4bit`, the slowest live
+reading in the whole table (**7.5 tok/s**, BUG-793 having proved its older 1.7 was an artifact). Priced honestly on that
+reading against the ratified 90 s wall the grant is **675 tokens per turn** — while every other harness role is granted
+2 430-8 010. So the one role whose NAME declares long-form editing is the one role that cannot emit a long form: a
+single 675-token turn is ~500 words.
+
+This is not a bug in the derivation (675 is CORRECT: `floor(90 x 7.5)`), and it is not the old PROVISIONAL over-grant
+(4455 tokens = 594 s of decode bought with a 90 s wall). It is a fault in the BINDING: a role's purpose and its model's
+measured rate are now two facts that contradict each other, and nothing in the register compares them.
+
+**Two admissible exits, and the owner's word decides which** (D-3109 requires the recommendation to be grounded):
+1. RE-BIND the role to a model that can pay a long turn — `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` (49.5 tok/s, grant
+   4455) or `Ornith-1.5-35B-A3B-REAP-19B` (49.8 tok/s, grant 4482, measured today). The cost is not zero: the 27B's
+   advantage is long-CONTEXT handling (its prefill at 146 tok/s is 2.9x slower than the A3B shapes), so the choice is
+   long OUTPUT vs long INPUT, and that distinction is exactly what the role name does not say.
+2. KEEP the model and RENAME/RE-SCOPE the role to what it can actually do (a long-INPUT, short-OUTPUT role), so no
+   reader inherits a promise the model cannot keep.
+
+**Not fixed here** because a role binding is an owner-lane act (D-3035) and because doing it silently would be the
+"second home" fault BUG-1084 already registers. Related: BUG-1084, D-3198, BUG-1075, D-3104.

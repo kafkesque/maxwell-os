@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 853,
-  "open_n": 268,
+  "total_ids": 854,
+  "open_n": 269,
   "closed_n": 585,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1348,6 +1348,11 @@
     {
       "id": "BUG-1088",
       "title": "(MED, OPEN 2026-10-27) \u2014 THE ONESHOT PATH CARRIES THE SAME TYPED WALL BUG-1085 JUST REMOVED: `timeout + 20`",
+      "events": 1
+    },
+    {
+      "id": "BUG-1090",
+      "title": "(MED, OPEN 2026-10-27) \u2014 A ROLE WHOSE NAME PROMISES LONG-FORM OUTPUT IS BOUND TO THE SLOWEST SERVED MODEL, AND ITS HONEST GRANT IS 675",
       "events": 1
     }
   ],

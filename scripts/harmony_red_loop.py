@@ -366,6 +366,7 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
                              "evictions": 0, "parse_errors": 0, "args_unparsable": 0, "turns": 0,
                              "nudges": 0, "parallel_max": 0, "walls": [], "steps": [],
                              "retries": 0, "retry_streak": 0, "recovered": 0, "retry_guard": retry_guard,
+                             "retry_bound_hits": 0,
                              "unmeasured_reason": "", "stop_reason": ""}
     while state["attempts"] < total and len(state["drops"]) < DROP_CEILING:
         if state["turns"] >= total + DROP_CEILING + TURN_HEADROOM + (RETRY_BUDGET if retry_guard else 0):
@@ -424,8 +425,18 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
                 state["steps"][-1]["retry_detail"] = detail
                 messages.append({"role": "user", "content": RETRY_NUDGE.format(tool=TOOL_NAME)})
                 continue
-            state["retry_streak"] = 0
-            state["drops"].append({"turn": state["turns"], "kind": kind, "detail": detail})
+            else:
+                state["retry_streak"] = 0
+                if retry_guard and kind == "engine_parse_error":
+                    # R5 FINDING, ACCEPTED (gemma-4-E4B-it-MLX-4bit, 2026-10-27): a lost call that the guard could not
+                    # repair was recorded EXACTLY like a lost call in a run with the guard switched off, so the receipt
+                    # could not answer "did the guard try?" - and a repair that silently became a decline is the same
+                    # drift as a repair reported as health (D-3201 decision 3). Only the CEILING lands here: every
+                    # other reason may_retry says no is the kind test, which is the guard working, not the guard being
+                    # blocked.
+                    state["steps"][-1]["retry_refused"] = "bound reached (per-call ceiling or run budget)"
+                    state["retry_bound_hits"] += 1
+                state["drops"].append({"turn": state["turns"], "kind": kind, "detail": detail})
             state["nudges"] += 1
             messages.append({"role": "user", "content": (f"Continue: call {TOOL_NAME} with the next index. Use the "
                                                          f"tool, do not answer in words.")})
@@ -477,6 +488,7 @@ def run_model(decl: dict[str, Any], model: str, total: int, mode: str, tail: str
             "args_unparsable": state["args_unparsable"], "parallel_max": state["parallel_max"],
             "turns": state["turns"], "nudges": state["nudges"], "stop_reason": state["stop_reason"],
             "retry_guard": retry_guard, "retries": state["retries"], "recovered_calls": state["recovered"],
+            "retry_bound_hits": state["retry_bound_hits"],
             "retry_wall_s": round(sum(s["wall_s"] for s in state["steps"] if s.get("retried")), 1),
             "slowest_turn_s": round(max(state["walls"]), 1) if state["walls"] else None,
             "verdict": got, "detail": detail, "steps": state["steps"]}

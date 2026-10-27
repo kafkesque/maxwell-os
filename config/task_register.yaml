@@ -3076,3 +3076,37 @@ tasks:
     3) if BOTH counts are zero it returns UNMEASURED-with-a-bound, NOT "fixed": 0 of 30 bounds the rate at roughly
        1 in 10 (rule of three), which cannot retire a defect observed at 1 in 5 in production. A green tick from a
        fixture that cannot fail is the BUG-797 class.
+
+- id: T-214
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since D-3148 clause 4, and the reason AGENT_LOOP_WORKHORSE has no name
+  why: >-
+    D-3199 limb 5 leaves the orchestrator question REFUSED on three grounds and two of them are now measurements;
+    the third is an ABSENT INSTRUMENT. A plan-quality gate scores a single plan (MTP4 0.9167, gpt-oss 0.7083), and
+    the T-199 battery scores ONE turn per fixture - neither can see the capability being asked about, which is
+    carrying a result from step 1 into the argument of step 2 and refusing to invent it. D-3148 clause 4 therefore
+    keeps AGENT_LOOP_WORKHORSE UNDECLARED until this exists, and D-3198's refusal cites it by name. Until it is
+    built, every orchestrator assignment on this machine is a preference wearing a role name, and any model that
+    clears a judgement gate will keep being proposed for a job no receipt tests.
+  source: 'D-3148 clause 4 / D-3198 limb 4 / D-3199 limb 5 / T-199 / T-187'
+  evidence: >-
+    READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gpt-oss-20b) and
+    AGENT_LOOP_FAST (MiniCPM5-2B, D-3148 clause 4) and holds NO AGENT_LOOP_WORKHORSE key; scripts/measure_subagent_loop.py
+    ships --two-step (T-187: two steps, two tools, ONE distractor) and --battery (T-199: four independent fixtures)
+    and nothing that makes step 2 DEPEND on step 1's output.
+  gate: >-
+    A fixture whose expected answer only the SECOND tool's output can produce, so a model that answers from
+    plausibility fails it:
+    1) step 1 fetches a value the model cannot guess (a nonce-bearing record id, not a constant in the prompt);
+    2) step 2's tool call must carry THAT value as an argument - the answer is wrong if the argument is invented,
+       and the fixture reports the argument it actually sent;
+    3) a distractor tool is present whose answer is plausible and unrelated, and the receipt reports whether it was
+       called;
+    4) it records TTFT and decode per step, so a pass and a stall are distinguishable - the D-3148 clause 2 lesson
+       (a ranking must not measure the model LOAD);
+    5) an engine refusal, a transport failure, or a turn that spends its whole allowance returning no content is
+       UNMEASURED, never FAIL (D-3148 clause 3, BUG-375's shape one layer in).
+    Only then may AGENT_LOOP_WORKHORSE be declared, and only from a receipt naming the model, engine, temperature
+    (0.0) and the arguments it sent.

@@ -646,9 +646,95 @@ def instrument_allowance(model: str) -> dict[str, Any]:
             "reason": provisional_reason(model, cell, budget)}
 
 
-def instrument_max_tokens(model: str) -> int:
-    """The one number a caller needs; the provenance travels beside it through instrument_allowance() (BUG-1081)."""
-    return int(instrument_allowance(model)["max_tokens"])
+def _prefill_homes() -> dict[str, dict[str, Any]]:
+    """BUG-1091/D-3207: the per-model prefill readings, merged from the two bill blocks that carry a prompt size.
+
+    A prefill rate is a FUNCTION of the prompt size it was taken at (measured_20261014.prefill, and the
+    class-context rows in measured_20261027.prefill). measured_prefill_20261016 is EXCLUDED from pricing: its
+    own FINDING_2 records that a ~2,600-token reading is still climbing and is NOT a bill (BUG-874). The
+    LARGEST-prompt row wins: prefill_tps declines with size, so the row at the biggest measured size is the one
+    that prices a big-context bill.
+    """
+    conf = _yaml(CONFIG)
+    merged: dict[str, dict[str, Any]] = {}
+    for block in ("measured_20261014", "measured_20261027"):
+        for model, cell in ((conf.get(block) or {}).get("prefill") or {}).items():
+            if not isinstance(cell, dict):
+                continue
+            pt = cell.get("prompt_tokens")
+            pf = cell.get("prefill_tps")
+            if not isinstance(pt, (int, float)) or not isinstance(pf, (int, float)) or pt <= 0 or pf <= 0:
+                continue
+            if model not in merged or float(pt) > float(merged[model]["prompt_tokens"]):
+                merged[model] = dict(cell, prompt_tokens=float(pt), prefill_tps=float(pf))
+    return merged
+
+
+def _decode_candidates(model: str) -> tuple[list[float], list[str]]:
+    """BUG-1091/D-3207: the live decode readings a grant may be priced on.
+
+    Two sources: the A/B cell (measured_decode_20261015) and the 20261014 prefill row's decode (the T-153
+    context-matched rows at 26k/50k/32k). measured_20261027.prefill.decode_tps is EXCLUDED: that block is a
+    PREFILL instrument and its single-call decode is a byproduct of the same run, not an A/B reading (the A/B
+    cell is the decode authority). A reading the register DISOWNS (invalid_readings / verdict: REFUSED) is
+    dropped by value, so Qwen3.8-27B-MLX's 1.7 artifact (disowned as `previous`) cannot price its grant.
+    """
+    conf = _yaml(CONFIG)
+    table = ((conf.get("measured_decode_20261015") or {}).get("decode_tps")) or {}
+    rates: list[float] = []
+    live: list[str] = []
+    cell = table.get(model) or {}
+    c_rates, c_live, c_dead = cell_readings(cell)
+    rates += c_rates
+    live += [f"decode_20261015:{k}" for k in c_live]
+    disowned_values = {cell.get(k) for k in c_dead if isinstance(cell.get(k), (int, float))}
+    p14 = ((conf.get("measured_20261014") or {}).get("prefill") or {}).get(model) or {}
+    d14 = p14.get("decode_tps")
+    if isinstance(d14, (int, float)) and d14 > 0 and d14 not in disowned_values:
+        rates.append(float(d14))
+        live.append(f"prefill_20261014:{d14}")
+    return rates, live
+
+
+def instrument_max_tokens(model: str, prompt_tokens: int) -> dict[str, Any]:
+    """BUG-1091/D-3207: the completion allowance NET OF PREFILL.
+
+    The old instrument granted decode the WHOLE budget (floor(budget x decode_tps)); the prefill bill
+    (prompt_tokens / prefill_tps) was deducted nowhere, so a turn at the role's real context granted tokens no
+    turn can afford. This prices what is LEFT after prefill:
+        payable = floor(max(0, per_turn_budget_s - prompt_tokens / prefill_tps) x decode_tps)
+    UNPAYABLE (max_tokens 0, a named reason) is a VERDICT, not a failure: the bill meets or exceeds the budget.
+    A model with no prefill reading that declares a prompt size is REFUSED (C16: a bill priced on nothing is a
+    fiction); a model with no live decode reading is REFUSED, never defaulted.
+    """
+    budget = budget_s()
+    if not isinstance(prompt_tokens, (int, float)) or prompt_tokens <= 0:
+        raise SystemExit(f"FATAL: instrument_max_tokens({model!r}) needs a positive prompt_tokens, got "
+                         f"{prompt_tokens!r} - a prefill bill with no size is a fiction (D-3207/C16)")
+    home = _prefill_homes().get(model)
+    if home is None:
+        raise SystemExit(f"FATAL: no prefill reading declares a prompt size for {model!r} - refusing to price a "
+                         f"bill on nothing (D-3207 clause 1, C16)")
+    prefill_tps = home["prefill_tps"]
+    prefill_bill = float(prompt_tokens) / prefill_tps
+    rates, live = _decode_candidates(model)
+    if not rates:
+        raise SystemExit(f"FATAL: no live decode reading for {model!r} - refusing to grant tokens on a rate that "
+                         f"declares no prompt size (D-3207 clause 1, C16)")
+    decode_tps = min(rates)
+    left = budget - prefill_bill
+    base = {
+        "rule": "floor(max(0, per_turn_budget_s - prompt_tokens/prefill_tps) x decode_tps)",
+        "prefill_tps": prefill_tps, "prefill_bill_s": round(prefill_bill, 2),
+        "prompt_tokens": float(prompt_tokens), "decode_tps": decode_tps,
+        "per_turn_budget_s": budget, "left_after_prefill_s": round(left, 2),
+        "decode_readings_live": live,
+    }
+    if left <= 0:
+        return {**base, "max_tokens": 0, "provenance": "UNPAYABLE",
+                "reason": (f"prefill bill {prefill_bill:.2f}s (={prompt_tokens}/{prefill_tps:.2f}) meets or "
+                           f"exceeds the {budget:g}s budget - the turn is UNPAYABLE at this context")}
+    return {**base, "max_tokens": int(math.floor(left * decode_tps)), "provenance": "DERIVED", "reason": ""}
 
 BATTERY_GEOMETRY = {
     "manifest": (2, 3, 4),                      # files the manifest NAMES -> expected 9
@@ -1255,6 +1341,30 @@ def selftest() -> int:
     for source in ("scripts/measure_subagent_loop.py", "scripts/harmony_red_loop.py"):
         if needle in (ROOT / source).read_text(encoding="utf-8"):
             bad.append(f"BUG-1081: {source} still names the literal allowance constant - re-hardcoding guard")
+
+    # ── BUG-1091 / D-3207: the allowance is NET OF PREFILL; UNPAYABLE is a verdict, not a failure ──────────
+    # Pre-registered red loop (D-3036): the control must return 735 for gemma-E4B and 0 for gpt-oss at 26,214,
+    # and must REFUSE a rate with no declared prompt size. It cannot exist against today's signature (the bug).
+    imt = globals().get("instrument_max_tokens")
+    if callable(imt):
+        want1091 = {"gemma-4-E4B-it-MLX-4bit": 735, "MiniCPM5-2B-MLX": 51,
+                    "gpt-oss-20b-MXFP4-Q8": 0, "Qwen3.8-27B-MLX-4bit": 0, "Qwen3.8-27B-MTP4": 0,
+                    "Ornith-1.5-35B-A3B-REAP-19B": 0, "Ornith-1.5-9B-MLX-8bit": 0}
+        for m1091, w1091 in want1091.items():
+            got1091 = imt(m1091, 26214)
+            if got1091["max_tokens"] != w1091:
+                bad.append(f"BUG-1091: {m1091} pays {got1091['max_tokens']} tokens net-of-prefill, want {w1091} "
+                           f"- the allowance is priced for a fixture turn again")
+            if w1091 == 0 and got1091["provenance"] != "UNPAYABLE":
+                bad.append(f"BUG-1091: {m1091} is UNPAYABLE at 26,214 but read as {got1091['provenance']} - an "
+                           f"unpriced prefill bill was granted a number")
+        try:
+            imt("no-such-model", 26214)
+            bad.append("BUG-1091: a model with no prefill reading was priced instead of REFUSED")
+        except SystemExit:
+            pass
+    else:
+        bad.append("BUG-1091: no instrument_max_tokens - the net-of-prefill allowance does not exist")
 
     # ── BUG-1085: THE TRANSPORT WALL IS DERIVED FROM THE BUDGET, AND THE 180 s FAULT CANNOT COME BACK ──────
     # MEASURED 2026-10-27 20:10: the client waited `timeout=180` - TWICE the ratified 90 s - so a turn that ran

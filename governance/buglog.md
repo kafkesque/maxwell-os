@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1335 decisions (census stamp 5edccacd9b6f345c, 2026-10-27) · 857 bugs (272 open / 585 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1335 decisions (census stamp 5edccacd9b6f345c, 2026-10-27) · 857 bugs (270 open / 587 closed; highest OPEN = BUG-1093) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1335 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 387 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1335, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 272 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 61 · 🟨 MED 138 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 272 open.
+> Open BUGS by severity (population = the census's 270 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 44 · UNLABELLED 0 (BUG-757) of 270 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -24630,3 +24630,56 @@ the finding, the table, or the sequencing rule (D-3207 clause 4). This is the se
 useful contribution of the local verifier was a flaw in MY wording found by making me state the evidence — recorded here
 because "the verifier said NOT DETERMINABLE" is not a refutation, and a reader must be able to tell which of the two
 happened.
+
+
+## BUG-1091 (HIGH, FIXED 2026-10-27) - the allowance is now NET OF PREFILL: instrument_max_tokens(model, prompt_tokens) prices floor(max(0, budget - prompt_tokens/prefill_tps) x decode_tps), returns UNPAYABLE with a named reason, and REFUSES a rate that declares no prompt size
+
+RED LOOP (D-3036, pre-registered in the entry above): all 7 rows reproduce the acceptance table at 26,214 tokens -
+gemma-4-E4B 735 (DERIVED), MiniCPM5-2B 51 (DERIVED), and Ornith-REAP-19B / Ornith-9B / gpt-oss-20b /
+Qwen3.8-27B-MLX-4bit / Qwen3.8-27B-MTP4 all 0 UNPAYABLE. A model with no prefill reading, and a non-positive
+prompt_tokens, are REFUSED (SystemExit, C16). The red loop is now a STANDING selftest control (72/72 known-answer
+still green). Method: prefill is the LARGEST-prompt row across measured_20261014/20261027 (a ~2,600-token reading is
+NOT a bill, BUG-874); decode is min over {measured_20261014.prefill decode, measured_decode_20261015 A/B cell}, with
+disowned readings dropped by VALUE (so Qwen3.8-27B-MLX's 1.7 artifact cannot price its grant). The battery's fixture
+turn (69 tokens) is unchanged - the decode-only instrument_allowance is correct there; T-217 G4 must call the new
+instrument_max_tokens(model, 26214). D-3207 clause 4 held: this landed BEFORE G4.
+
+## BUG-1084 (MED, RESOLVED 2026-10-27) - OWNER APPROVED (D-3209 limb 1): config/model_assignments.yaml#roles archived as archived_roles
+
+The owner's word landed. The 24-entry legacy block was renamed `roles:` -> `archived_roles:` with an inline ARCHIVED
+banner citing BUG-1084/D-3209. No reader resolves it (only `harness_roles` is read by scripts/harmony_red_loop.py and
+pipeline/subagent_recipe.py), so the rename un-wires the second home and retires the D2298/D2340 STALE markers and the
+ORCHESTRATOR->Phi-4-mini entry in one act. History is preserved (append-only, D824); restore by renaming back.
+
+## BUG-1090 (MED, OPEN 2026-10-27 - OWNER APPROVED TEST) - find the best re-bind target by measurement, not by recommendation
+
+The owner approved testing to find the best available option (D-3209 limb 2, previously "await owner's word"). The test
+measures prefill + decode of the candidate long-form models at candidate contexts. Candidate set already on the
+register: Ornith-1.5-35B-A3B-REAP-19B (best large-model prefill 289.14 tok/s + decode 36.1), gpt-oss-20b (210 / 33),
+and the Qwen3.8-27B-MTP4 head (15.5 decode but 42.89 prefill - the MTP head helps DECODE ~2x, NOT prefill ~1.1x, so it
+does NOT cure the 26k prefill bill). D-3209 corrected arithmetic: Ornith-REAP-19B pays 2250 tokens at 8k, 1750 at 12k,
+1251 at 16k. Re-bind, do NOT re-scope (26,214 tokens cost 672 s prefill on the 27B, so shorter output does not shorten
+the turn). Owner-lane act: the re-bind itself waits on the measurement, then the owner's word.
+
+## BUG-1090 MEASUREMENT LANDED 2026-10-27 (owner-approved test) - Ornith-REAP-19B is fastest, but carries a stability-0.2 conflict
+
+Receipt: governance/evidence/BUG1090_REBIND_MEASUREMENT_20261027.json (measure_prefill.py, 90 s budget).
+payable = floor(max(0, 90 - context/prefill_tps) x decode_tps):
+  Ornith-REAP-19B @8k   prefill 371.78  decode 44.23  -> 3028 tokens
+  Ornith-REAP-19B @12k  prefill 348.24  decode 40.51  -> 2249 tokens
+  Ornith-REAP-19B @16k  prefill 337.71  decode 41.89  -> 1785 tokens
+  gpt-oss-20b     @8k   prefill 293.23  decode 35.32  -> 2215 tokens
+
+MEASURED, not recommended: Ornith-REAP-19B wins at EVERY context (3028 > 2215 at 8k; its fresh 8k
+prefill 371.78 exceeds its own 26k reading 289.14, and beats gpt-oss's 293.23 - the D-3209 8k figure of
+2250 was an UNDER-estimate priced on the 26k rate, exactly the 'measure by measurement not recommendation'
+point this test exists for).
+
+HIDDEN CONFLICT the candidate note did not flag: config/model_assignments.yaml#BATCH_ONLY_DO_NOT_INTERACTIVE
+declares Ornith-35B stability 0.2 (a long interactive session on it produces work nobody can reproduce).
+AGENT_EDIT_LONG_CONTEXT is a REPRODUCIBLE long-context reasoning role, so a speed-maximal re-bind to Ornith
+would buy throughput with an unreproducible answer - the re-bind is therefore a SPEED-vs-REPRODUCIBILITY
+decision, not a speed win. The owner-lane options (D-3035, D-3209 limb 2): (i) re-bind to Ornith-REAP-19B
+at a DECLARED 8k-16k context and accept batch semantics; (ii) re-bind to gpt-oss-20b at a reduced context
+(stable, but 2215 < 3028); (iii) hold and keep Qwen3.8-27B-MLX-4bit (UNPAYABLE at 26k, 672 s prefill).
+Awaiting the owner's word. Re-bind, do NOT re-scope (BUG-1090 original).

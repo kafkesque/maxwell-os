@@ -1,0 +1,45 @@
+{
+  "instrument": "scripts/measure_prefill.py",
+  "measured_at": "2026-10-27",
+  "budget_s": 90.0,
+  "rule": "payable = floor(max(0, 90 - context/prefill_tps) x decode_tps)",
+  "rows": [
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "context": 8000,
+      "prompt_tokens": 8037,
+      "prefill_tps": 371.78,
+      "decode_tps": 44.23,
+      "ttft_s": 21.62,
+      "payable_tokens": 3028
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "context": 12000,
+      "prompt_tokens": 12041,
+      "prefill_tps": 348.24,
+      "decode_tps": 40.51,
+      "ttft_s": 34.58,
+      "payable_tokens": 2249
+    },
+    {
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "context": 16000,
+      "prompt_tokens": 16040,
+      "prefill_tps": 337.71,
+      "decode_tps": 41.89,
+      "ttft_s": 47.5,
+      "payable_tokens": 1785
+    },
+    {
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "context": 8000,
+      "prompt_tokens": 8084,
+      "prefill_tps": 293.23,
+      "decode_tps": 35.32,
+      "ttft_s": 27.57,
+      "payable_tokens": 2215
+    }
+  ],
+  "finding": "Ornith-1.5-35B-A3B-REAP-19B is the measured FASTEST at every candidate context (3028 payable @8k vs gpt-oss 2215 @8k), AND its fresh prefill/decode both beat gpt-oss. CONFLICT (D-3109 data-grounded): model_assignments.yaml#BATCH_ONLY_DO_NOT_INTERACTIVE declares Ornith-35B stability 0.2 (a long interactive session is unreproducible), so the re-bind is a SPEED-vs-REPRODUCIBILITY trade, not a speed win. Owner-lane (D-3035)."
+}

@@ -4,7 +4,15 @@
 # If a model appears in BOTH files, pipeline_config.yaml takes precedence.
 # OptiQ variant: experimental — not yet adopted in main pipeline.
 # Updated: 2026-08-06 — D2199: fixed REVIEWER, documented OptiQ/non-OptiQ split.
-roles:
+#
+# ── ARCHIVED 2026-10-27 (BUG-1084, OWNER-APPROVED) ─────────────────────────────────────────────
+# This 24-entry block was a SECOND HOME for role->model assignments that NO code resolves: the only
+# readers of this file are `harness_roles` (scripts/harmony_red_loop.py, pipeline/subagent_recipe.py).
+# Two entries (S5_VERIFIER, S5_FB_VERIFIER) carry inline D2298/D2340 STALE markers, and ORCHESTRATOR
+# names Phi-4-mini-instruct-8bit (measured unable to call a tool, BUG-053). Renamed `roles:` ->
+# `archived_roles:` so a reader that reaches for `roles` finds nothing to wire. Restore by renaming
+# back; do NOT delete (append-only history, D824). Decision: D-3209 limb 1.
+archived_roles:
   S3A_CONVERGENCE:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx

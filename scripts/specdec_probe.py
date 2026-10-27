@@ -291,7 +291,7 @@ def _prompts(cfg: dict[str, Any], tokenizer: Any) -> list[dict[str, Any]]:
             budget = int(spec["target_tokens"])
             while len(tokenizer.encode(body)) > budget and body:
                 body = body[: int(len(body) * 0.95)]
-            text = str(spec.get("prefix", "")) + body + str(spec.get("suffix", ""))
+            text = str(spec["prefix"]) + body + str(spec["suffix"])
         else:
             raise SystemExit("specdec_probe: unknown prompt kind " + str(spec["kind"]))
         out.append({"name": str(spec["name"]), "text": text})

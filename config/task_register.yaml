@@ -3371,3 +3371,36 @@ tasks:
     decision 3 shape), it must be a DECLARED transformation rather than a silent strip, and it must be re-measured on
     this gate - `--mode replay` must go from 8 malformed to 0 with the repair count visible. The adapter is engine
     code: patching it locally vs upstreaming is a DECISION with its own row, never an edit (C21/C22).
+- id: T-219
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    GIVE config/model_assignments.yaml'S harness_roles CLASS AND MODE A READER - `class: agent_probe`, `mode:
+    oneshot` and `not_a_loop` are annotations nothing resolves, so the BUG-1090 re-bind is enforced as a MODEL and
+    unenforced as a BUDGET, and any caller that invokes the role as a loop is silently unpayable
+  why: >-
+    D-3210 clause 2 recorded the gap rather than hiding it: the model binding IS enforced (role_model() returns
+    gpt-oss-20b-MXFP4-Q8) and the annotations beside it are DECLARATIVE (they name real referents -
+    config/agent_context.yaml#classes.agent_probe = 600 s, pipeline/subagent_fanout.py's oneshot mode - but no
+    reader consumes harness_roles.<role>.class/.mode). A declaration whose subject is absent is an assertion, not a
+    control (D-3034), and the consequence here is specific: BUG-1091 measured that a 26,214-token turn cannot be
+    paid by ANY served model inside the 60 s / 120 s loop classes, so the SAME role is payable as a one-shot at
+    600 s and unpayable as a loop - a difference that today lives only in prose. Nothing enforces it, and nothing
+    would refuse a caller that opened a loop on it.
+  source: D-3210 clause 2 / D-3209 limb 2 / BUG-1090 / BUG-1091 / D-3034 / C12
+  evidence: >-
+    READ 2026-10-27: config/model_assignments.yaml#harness_roles.AGENT_EDIT_LONG_CONTEXT carries model, class,
+    mode, not_a_loop and rehomed; pipeline/subagent_recipe.py#role_model (line 62) reads ONLY `spec["model"]`, and
+    its docstring states the role may not name a model of its own - it says nothing about a budget class. The two
+    readers of harness_roles in this repo are pipeline/subagent_recipe.py and scripts/harmony_red_loop.py, and
+    neither takes .class or .mode.
+  gate: >-
+    ONE condition, and it must be seen to FIRE before it is claimed: a reader that takes a role plus the class it is
+    about to run in and REFUSES when harness_roles.<role>.not_a_loop applies to that class. Its known-answer control
+    is the live pair - AGENT_EDIT_LONG_CONTEXT asked for agent_loop must be REFUSED, the same role asked for
+    agent_probe must be ALLOWED from the 600 s class in config/agent_context.yaml - plus the inverse (a role with no
+    annotations is never refused, because a guard that fires on every honest caller is noise and noise is how a rail
+    gets switched off, BUG-492). The refusal must NAME the payable class and the prefill bill that makes the loop
+    unpayable, so the remedy is a route rather than a shrug (D-3100). NOT this task: re-pointing any model, and not
+    the T-187/T-214 fixtures - this is the READER for annotations that already exist.

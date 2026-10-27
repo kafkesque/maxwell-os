@@ -35,6 +35,7 @@ the books/DB paths also resolve under PROJECT_ROOT) - see config/test_isolation.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import subprocess
@@ -53,8 +54,23 @@ EXIT_CLEAN, EXIT_FATAL, EXIT_OWED = 0, 1, 2
 
 
 def _cfg() -> dict:
-    """The declared rail config. An absent or malformed section FAILS CLOSED (C16)."""
-    import yaml
+    """The declared rail config. An absent or malformed section FAILS CLOSED (C16).
+
+    The interpreter refusal is the BUG-1094 half of the BUG-1000 class: this rail reads a YAML config and
+    RUNS the suite, so a bare `python3 scripts/check_tests.py` from a shell whose `python3` has neither PyYAML
+    nor pytest must say so BY ABSOLUTE PATH and name the command that works (D-3100), never raise a bare
+    ModuleNotFoundError from inside a loader - the operator learns nothing about which interpreter to use.
+    """
+    try:
+        import yaml
+    except ModuleNotFoundError:  # C16: not silent, and not an unattributable traceback either (D-3100)
+        raise SystemExit(
+            "FAIL-CLOSED (C16): the interpreter running this rail cannot import PyYAML, so it cannot read its "
+            "own declaration.\n"
+            f"  running as : {sys.executable}\n"
+            f"  needs      : {CFG_PATH.relative_to(REPO)}\n"
+            "  run it as  : just health   (the justfile prepends the repo pin, scripts/resolve_python.sh,\n"
+            "               which PROVES the pin can import what the rails need - BUG-1000/BUG-1094)")
 
     data = yaml.safe_load(CFG_PATH.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or SECTION not in data:
@@ -124,12 +140,38 @@ def classify(text: str, red: list[str], floor: int, strict: bool) -> tuple[int, 
 
 
 def run_suite(sec: dict) -> str:
-    """Run the declared invocation at the repo root and return its combined output."""
+    """Run the declared invocation at the repo root and return its combined output.
+
+    THE SUBJECT IS NOT INHERITED FROM THE SHELL (BUG-1094: the BUG-1000 shape INSIDE a rail). MEASURED
+    2026-10-27: `suite_rail.invocation` names a bare `python3`, which is resolved by PATH ORDER - so under
+    `just` (which prepends the repo pin, scripts/resolve_python.sh) this rail read 580 tests and 1 real
+    failure, while from a shell whose `python3` is /usr/bin/python3 (3.9.6, no PyYAML, no pytest) the VERY
+    SAME rail read NOTHING and reported 'no readable summary' - a FATAL about the SHELL, dressed as a verdict
+    on tests/. A rail that cannot name its own interpreter reports whichever subject PATH hands it.
+
+    TWO ACTS, BOTH HERE. (1) A bare `python3`/`python` in the DECLARED invocation is substituted with the
+    interpreter RUNNING this rail - the same rule scripts/r5_review_gate.py:137 and run_ladder.run_layer()
+    already apply, so there is no second home for it. (2) An interpreter with no pytest is REFUSED loudly
+    and by absolute path, because 'unreadable summary' is not a symptom the operator can act on (D-3100:
+    a handover names the command that works).
+    """
     inv = sec["invocation"]
     if not isinstance(inv, list) or not inv:
         raise SystemExit("FAIL-CLOSED (C16): suite_rail.invocation must be a non-empty list")
+    if importlib.util.find_spec("pytest") is None:
+        raise SystemExit(
+            "FAIL-CLOSED (C16): the interpreter running this rail cannot import pytest, so the suite cannot be "
+            f"read AT ALL - a fact about the INTERPRETER, never a verdict on tests/.\n"
+            f"  running as : {sys.executable}\n"
+            f"  declared   : {inv}\n"
+            "  run it as  : just health   (the justfile prepends the repo pin, scripts/resolve_python.sh,\n"
+            "               which PROVES the pin can import what the rails need - BUG-1000)\n"
+            "  why        : the declared invocation names a bare python3, resolved by PATH ORDER (BUG-1094); "
+            "this rail substitutes sys.executable for it, so the interpreter you launch with is the one that "
+            "must have the dependencies.")
+    argv = [sys.executable if str(part) in ("python3", "python") else str(part) for part in inv]
     try:
-        r = subprocess.run(inv, cwd=str(REPO), capture_output=True, text=True,
+        r = subprocess.run(argv, cwd=str(REPO), capture_output=True, text=True,
                            timeout=int(sec["timeout_seconds"]))
     except subprocess.TimeoutExpired:
         raise SystemExit(f"FAIL-CLOSED (C16): the suite exceeded suite_rail.timeout_seconds="

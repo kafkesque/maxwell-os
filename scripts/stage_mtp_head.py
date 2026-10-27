@@ -137,11 +137,15 @@ def build(cfg: dict[str, Any], force: bool) -> dict[str, Any]:
     index["weight_map"] = weight_map
     (out / "model.safetensors.index.json").write_text(json.dumps(index, indent=1))
 
-    config = json.loads((base / "config.json").read_text())
-    text_cfg = config.get("text_config", config)
+    # NOT named `config` (BUG-1083): the config-defaults census resolves a RECEIVER BY NAME, so a local called
+    # `config` holding a Hugging Face checkpoint's own config.json was counted as a Maxwell config receiver and
+    # its keys (`text_config`, `mtp_num_hidden_layers`) were reported as UNDECLARED config defaults. They are
+    # neither - they belong to the model's own artifact. The name now says which document is being read.
+    model_config = json.loads((base / "config.json").read_text())
+    text_cfg = model_config.get("text_config", model_config)
     if int(text_cfg.get("mtp_num_hidden_layers", 0)) < 1:
         raise SystemExit("stage_mtp_head: base config does not declare an MTP head")
-    (out / "config.json").write_text(json.dumps(config, indent=4))
+    (out / "config.json").write_text(json.dumps(model_config, indent=4))
     return {
         "out_dir": str(out),
         "head_shard": head_shard,

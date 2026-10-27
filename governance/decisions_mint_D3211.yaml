@@ -1,0 +1,113 @@
+# Mint record — D-3211 (G1 of D-3205): PAY the debt, never re-price it
+- id: D-3211
+  date: '2026-10-27'
+  state: RESOLVED
+  category: READINESS / RAIL INTEGRITY (D-3205 clause 5, D-2644, D-2982, D-3036, D-3038, D-3034, BUG-1083, BUG-1094, BUG-1095)
+  title: >-
+    D-3205'S G1 IS DISCHARGED BY PAYING THE DEBT, NOT BY RAISING THE CEILING - and the reading that proved it exposed
+    a WORSE defect underneath: the suite rail's subject was inherited from the shell, so the same rail returned three
+    different verdicts on the same bytes
+  bugs: [BUG-1083, BUG-1094, BUG-1095]
+  decision: >-
+    D-3205 clause 5 set the order for the remaining switch work: G1 (BUG-1083), then G4, then G5, then G3's tail
+    (BUG-1088) - "nothing else outranks them for the switch, and a fix outside this list is not progress toward it".
+    This record takes G1 first, and reports what taking it actually cost.
+
+    (1) THE DEBT WAS PAID, NOT PRICED. BUG-1083 offered two readings of one red: the receipt is stale, or the code
+    grew nine config-default sites. D-2644 settles which act is lawful - a ceiling may only be LOWERED and a raise is
+    a DECISION - so the nine sites were PAID. Nine, not eight: five in scripts/check_delete_target.py (model_roots,
+    storage_roots, id_forms, incomplete_markers, max_examples), two in scripts/specdec_probe.py (prefix, suffix on a
+    file_head prompt), one in scripts/hardware_calibrate.py (moe_active_fraction), and one UNDECLARED key in
+    scripts/stage_mtp_head.py (mtp_num_hidden_layers). After the payment the measurement EQUALS the declaration on
+    both axes (300 shadowed-declared / 3 undeclared), so `--rebaseline --because` was never invoked and no ceiling
+    moved; `--record` was used only for `counts.modules` 650 -> 659, the field the paired contract compares and no
+    hand may edit (D-2989). The measured site count fell 583 -> 574, which is exactly the nine.
+
+    (2) EACH OF THE NINE WAS A REAL FAILURE MODE, NOT HYGIENE, and the delete guard is the one that mattered. An
+    absent root list in scripts/check_delete_target.py walks NOTHING, finds no referrer, and prints SAFE_TO_DELETE -
+    a destructive guard failing OPEN because it could not read its own config. The specdec pair would have re-created
+    the artifact its own docstring records (a bare file_head makes the model emit EOS at token 1, and 41889 t/s was
+    read as a decode fact); the calibrator's default would have priced an 11th candidate as DENSE and filled an
+    unmeasured role with that prediction. The ninth is different in kind and is recorded as such: `mtp_num_hidden_layers`
+    is a HUGGING FACE checkpoint's own config, read through a local named `config`, and the census resolves a receiver
+    BY NAME - an INSTRUMENT FALSE POSITIVE paid by renaming the local to `model_config`, never by editing a count.
+
+    (3) ONE THING WAS DELIBERATELY LEFT PAYABLE. `text_config` @ pipeline/model_loadability_probe.py:304 is the same
+    false positive and stays among the 3 undeclared keys. Paying it would be a legal LOWERING, but it is another
+    file's act and bundling it would have shipped an unmeasured second rename inside the commit that measured the
+    first (D-3038 scope discipline).
+
+    (4) THE READING EXPOSED A WORSE DEFECT, AND IT IS THE REASON THIS RECORD IS NOT ONLY A DEBT PAYMENT. Taking the G1
+    reading meant running the suite rail, and the rail returned THREE verdicts on the SAME bytes: 580 collected with 1
+    real failure under `just` (PATH pinned by scripts/resolve_python.sh); `FAIL tests: pytest printed no readable
+    summary line` under the framework interpreter (the rail ran, the CHILD did not - `suite_rail.invocation` names a
+    bare `python3`, and PATH's python3 has no pytest); and a bare ModuleNotFoundError traceback under /usr/bin/python3.
+    Two of the three verdicts were about the SHELL, not the suite. BUG-1094 is that defect, and its fix makes the rail
+    measure with the interpreter RUNNING it - the rule scripts/r5_review_gate.py:137 and run_ladder.run_layer()
+    already apply, so no second home was invented - plus a refusal BY ABSOLUTE PATH when that interpreter has no
+    pytest (D-3100). G1 is therefore green on a reading that can be retaken from any shell, not on one shell's mood.
+
+    (5) G1'S SECOND FACE WAS A LIE IN A COMMENT. The ladder line still declared "3 failures are DECLARED red and
+    SHRINK-ONLY" - true when written, false since D-2666 emptied the declared red set, so the two faces of ONE rail
+    disagreed and the ladder was the face nobody re-read. Corrected to what config/test_isolation.yaml says, with the
+    correction attributed to BUG-1083.
+
+    (6) A CITATION THAT RESOLVES TO THE WRONG SUBJECT WAS CORRECTED (BUG-1095). D-3210 clause 2 defers the
+    harness_roles annotations reader to "T-218", and T-218 is the PRE-EXISTING open harmony-parser task. The id is not
+    dangling - it resolves, to something else, which no rail can see (check_bug_recall reports citations that resolve
+    against NOTHING). The reader is minted as T-219 with its own gate; D-3210 is append-only and was NOT rewritten.
+    G1 OF D-3205 NOW PASSES: `scripts/check_tests.py --check` reads `580 collected (floor 261), 574 passed, 0 declared
+    red, 0 new, 6 skipped`, rc 0. G4 (the 26k emission gate), G5 (BUG-1084's owner word) and G3's tail (BUG-1088) are
+    untouched and remain the order.
+  reason: >-
+    Two losses are prevented. First, the lawful act was taken instead of the convenient one: raising the census ceiling
+    would have converted nine real fail-open reads into a permanent number nobody would revisit, which is what D-2644's
+    shrink-only rule exists to stop. Second, G1 would otherwise have been "discharged" on a reading that only one kind
+    of shell could reproduce - a green that says more about the operator's PATH than about the repository.
+  rejected:
+    - option: raise shadowed_declared 300 -> 308 and undeclared 3 -> 4 via --rebaseline, citing this decision
+      why: >-
+        lawful only as a DECISION, and the decision is wrong: every one of the nine defaults guarded a value that
+        config already declares, so the raise would price real fail-open reads as permanent debt. Payment cost the
+        same edits and left the ceiling where D-2644 measured it.
+    - option: exempt the nine sites in the census config instead of fixing them
+      why: >-
+        no exemption mechanism exists, and inventing one turns a rail that measures code into a rail that measures
+        its own exceptions - the BUG-492 shape (a guard that can be switched off is not a guard).
+    - option: rewrite D-3210's "T-218" in place so the reference is right
+      why: >-
+        D-3210 is append-only and its prefix is receipted; an in-place edit is the silent rewrite this OS refuses
+        (D-2642/D-2972). The correction lives in BUG-1095, in T-219's own source field, and here.
+  metrics:
+    - 'census: 300 shadowed-declared / 3 undeclared against ceiling 300 / 3 - paid, not raised; sites 583 -> 574'
+    - 'suite: 580 collected (floor 261), 574 passed, 0 declared red, 0 new, 6 skipped - rc 0 (was 1 failed)'
+    - 'the suite rail reads its subject from any interpreter that has pytest, and refuses by absolute path when it does not'
+    - 'D-3205: G1 FAILS -> PASSES; G2 PASSES; G3 loop instruments PASS / oneshot FAILS (BUG-1088); G4 FAILS; G5 FAILS; G6/G7 PASS'
+  evidence: >-
+    RED THEN GREEN, same two commands (D-3036): `python3 -m pytest tests/test_config_defaults_census_spec.py -q` read
+    `1 failed` (assert 300 == 308) before and `10 passed in 56.29s` after; `python3 scripts/check_config_defaults.py
+    --check` read rc 1 with `shadowed_declared: declared 300 -> measured 308` before and rc 0 with
+    `300 distinct SHADOWED-DECLARED key(s), 3 distinct UNDECLARED key(s) ... within the declared shrink-only ceiling`
+    after; `check_config_defaults --selftest` 15/15; `check_tests --selftest` 11/11; `check_delete_target.py` run
+    against a real HF cache path returns ABSENT_ALREADY with the engine's 17 advertised ids (the loud reads did not
+    change its verdicts); `hardware_calibrate --selftest` 13/13; specdec `_prompts()` materialises both declared
+    prompts with their prefix and suffix intact (2040 chars, tail 'Defects:'); `resolve_route.py --check` lost its
+    three (v) STALE-unrouted faults after the retirement; and the FULL LADDER was run twice - once with these changes
+    and once with them STASHED at a075d04 - and the SAME 9 pre-existing faults appear in both, so none of them is
+    this change (harness_env selftest, delegation_economy ceiling 130.65 > 130.00, resolve_route routing debt
+    232/221, check_revoked_references D-3170, check_silent_repair 14/13, check_undeclared_encoding 2/0, reconcile,
+    verify_generator_pins 2 broken model revisions, check_rail_registry).
+  files:
+    - scripts/check_config_defaults.py
+    - scripts/check_tests.py
+    - scripts/check_delete_target.py
+    - scripts/specdec_probe.py
+    - scripts/hardware_calibrate.py
+    - scripts/stage_mtp_head.py
+    - config/config_defaults_census.json
+    - config/capability_registry.yaml
+    - config/task_register.yaml
+    - justfile
+    - governance/buglog.md
+    - governance/bug_status.json
+  supersedes: []

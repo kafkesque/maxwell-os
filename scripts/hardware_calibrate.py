@@ -409,7 +409,7 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
             "bytes_source": bytes_src,
         }
         if nbytes:
-            row["prediction"] = predict_decode(hardware, cfg, nbytes, float(cand.get("moe_active_fraction", 1.0)),
+            row["prediction"] = predict_decode(hardware, cfg, nbytes, float(cand["moe_active_fraction"]),
                                                bandwidth)
         table.append(row)
 

@@ -537,9 +537,19 @@ unrouted:
   #: unrouted, because their TITLES do not. That is why the bugs-side debt cannot shrink below 221 while the tasks-side
   #: can: the rail asks the wrong surface for a bug. Widening the reader is a DECISION (it changes what the rail
   #: counts), not an edit - recorded, not taken.
-  BUG-1091: bug_is_a_finding   # prefill is not deducted from the allowance: a finding about the FORMULA, not a file's route. The repair's owner EXISTS and is named: capability loop_emission, which now owns config/agent_context.yaml (the budget and the readings) and scripts/measure_subagent_loop.py (the pricing function)
-  BUG-1092: bug_is_a_finding   # 34 open ids with no section in the append-only register: a finding about the register's own body coverage. The owner is capability governance_faces (it owns governance/buglog.md)
-  BUG-1093: bug_is_a_finding   # a superlative over a complement set ("worst measured non-27B decode"): a finding about a SENTENCE, not a route. Owner: governance_faces (the register's prose)
+  #: BUG-1091/1092/1093 RETIRED FROM THIS BLOCK 2026-10-27, in the sitting that CLOSED all three (D-3038: what we
+  #: reject we REGISTER, we do not silently delete). The three entries were appended on 2026-10-27 by the audit that
+  #: measured them and read `bug_is_a_finding` with the reason stated. They were correct while the three bugs were
+  #: OPEN; BUG-1091 (prefill not deducted), BUG-1092 (34 ids read as bodiless) and BUG-1093 (a superlative over a
+  #: complement set) are all CLOSED as of commit a075d04, so each reason OUTLIVED its item and this rail refused all
+  #: three at (v) - correctly, and it was the FIRST thing it said on the next run. The keys are gone from the live
+  #: block and the reasons are kept here, which is the convention this block already uses for BUG-952/975/977/920.
+  #: THE STRUCTURAL FACT THEY EXPOSED STANDS and is not fixed by this retirement: `load_items()` reads a BUG as
+  #: "id + title" ONLY (governance/bug_status.json), while the artifact that gives a bug its route is named in its
+  #: EVIDENCE BODY in governance/buglog.md. All three named artifacts an owning capability already held
+  #: (config/agent_context.yaml, governance/buglog.md) and all three were still counted unrouted, because their
+  #: TITLES did not. Widening the reader is a DECISION (it changes what the rail counts), not an edit - recorded,
+  #: still not taken.
   #: BUG-952 RETIRED FROM THIS BLOCK 2026-10-21 (D-3038: what we reject we REGISTER, we do not silently delete).
   #: The entry read `BUG-952: route_graph_incomplete` and was correct while BUG-952 was open. BUG-952 is now CLOSED
   #: (2026-10-20: pipeline/unloader.py calls the real POST /v1/models/{model}/unload endpoint with a red-loop

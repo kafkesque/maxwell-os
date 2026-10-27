@@ -713,7 +713,11 @@ def main(argv: list[str]) -> int:
                 print("  ->  debt PAID since the last receipt (" + str(len(paid)) + " key(s) no longer "
                       "shadowed): " + ", ".join(paid[:24]) + (" ..." if len(paid) > 24 else ""))
             return EXIT_OWED
-        record_ceiling(measured, before)
+        if changed:
+            # A ceiling that did NOT move is not re-recorded: `record_ceiling` appends a history sentence, and
+            # "REMEASURED 300 -> 300" is a history entry for an event that did not happen (D-3036). When only
+            # the KEY SET moved, the receipt below is the whole record - the number is unchanged (BUG-1083).
+            record_ceiling(measured, before)
         write_receipt(measured, shadowed, undeclared, sites, files, coverage, coverage_id)
         print("owner-owed (loud, NOT fatal - BUG-457): the declared ceiling was stale - " + line)
         for key in changed:

@@ -21,7 +21,10 @@ WHAT IT DOES (read-only — it never deletes)
   Exit 0 = every candidate safe, 2 = at least one referenced, 3 = undetermined (engine unreachable:
   fail-closed, no receipt => no deletion), 4 = usage error.
 
-CONFIG: config/delete_safety.yaml declares the roots, the id forms and the engine (C12).
+CONFIG: config/delete_safety.yaml declares the roots, the id forms and the engine (C12). EVERY key
+  this rail needs is read LOUDLY, with no code default (D-2644/BUG-1083): a `.get(key, [])` here FAILS
+  OPEN - an absent root list walks nothing, finds no referrer and prints SAFE_TO_DELETE, so a delete
+  guard would say yes because it could not read its own config. An absent key is an error.
 USAGE:  python3 scripts/check_delete_target.py ~/.cache/huggingface/hub/models--org--name [--json]
 """
 from __future__ import annotations
@@ -37,7 +40,6 @@ from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parent.parent
 CFG_PATH = ROOT / "config" / "delete_safety.yaml"
-BYTES_PER_MIB = 1024 * 1024
 EXIT_SAFE = 0
 EXIT_REFERENCED = 2
 EXIT_UNDETERMINED = 3
@@ -234,13 +236,16 @@ def _extend_capped(reasons: list[str], axis: str, hits: list[str], cap: int) -> 
 def check(candidate_raw: str, cfg: dict[str, Any], advertised: set[str]) -> dict[str, Any]:
     """Judge one candidate path and return a verdict record (never deletes anything)."""
     candidate = _expand(candidate_raw)
-    model_roots = [_expand(raw) for raw in cfg.get("model_roots", [])]
-    storage_roots = [_expand(raw) for raw in cfg.get("storage_roots", [])]
+    # EVERY read below is LOUD (D-2644 / BUG-1083): a `.get(key, default)` here FAILS OPEN, because an absent
+    # root list walks NOTHING, finds no referrer, and reports SAFE_TO_DELETE - a delete guard that says yes
+    # because it could not read its own config. An absent key must be an error, not a smaller search space.
+    model_roots = [_expand(raw) for raw in cfg["model_roots"]]
+    storage_roots = [_expand(raw) for raw in cfg["storage_roots"]]
     roots = model_roots + storage_roots
-    markers = [str(m) for m in cfg.get("incomplete_markers", [])]
-    inode_cfg = cfg.get("inode_check") or {}
-    min_inode = int(inode_cfg.get("min_bytes", BYTES_PER_MIB))
-    forms = [str(f) for f in cfg.get("id_forms", [])]
+    markers = [str(m) for m in cfg["incomplete_markers"]]
+    inode_cfg = cfg["inode_check"]
+    min_inode = int(inode_cfg["min_bytes"])
+    forms = [str(f) for f in cfg["id_forms"]]
     ids = _candidate_ids(candidate, forms)
     live_ids = sorted(ids & advertised)
 
@@ -282,11 +287,11 @@ def check(candidate_raw: str, cfg: dict[str, Any], advertised: set[str]) -> dict
                 record["reasons"].append(f"SERVED: {entry} resolves to {entry_real}")
 
     # 2. IS IT REFERENCED? — the cross-root symlink axis (the MTP4 trap).
-    cap = int(cfg.get("max_examples", 4))
+    cap = int(cfg["max_examples"])
     _extend_capped(record["reasons"], "SYMLINK-REFERENCED", _referrers(real, roots), cap)
 
     # 3. IS IT SHARED? — hardlink axis, large files only.
-    if inode_cfg.get("enabled", True):
+    if inode_cfg["enabled"]:
         _extend_capped(record["reasons"], "INODE-SHARED", _shared_inodes(sizes["big"], real, roots), cap)
 
     # 4. IS IT IN FLIGHT, or still promised by the engine?

@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1336 decisions (census stamp f1cd2d6611dfc897, 2026-10-27) · 857 bugs (267 open / 590 closed; highest OPEN = BUG-1088) · 62 open tasks (MUST 10 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 62; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1337 decisions (census stamp 11caeecb3523511b, 2026-10-27) · 859 bugs (266 open / 593 closed; highest OPEN = BUG-1088) · 63 open tasks (MUST 10 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1336 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 388 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1336, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1337 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 389 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1337, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
+> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (62) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (63) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 >
-> _the face is a VIEW: 12 of 62 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 63 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -24739,3 +24739,51 @@ non-27B served models (13.4 tok/s)". The HISTORICAL records (engine.yaml#refused
 evidence, DELETE_PROPOSAL/MARKET_RESEARCH) are append-only snapshots that were accurate when written and are NOT
 rewritten - rewriting a refusal reason or evidence would be the exact drift this entry exists to prevent.
 Zero behaviour change; the fix is a reader not being misled.
+
+## BUG-1083 (MED, RESOLVED 2026-10-27) — G1 DISCHARGED: the census debt was PAID DOWN to its ceiling (never re-ceilinged), and the ladder comment that disagreed with its own register is corrected
+
+RED LOOP FIRST (D-3036), one named command, run before anything was touched:
+  `python3 -m pytest tests/test_config_defaults_census_spec.py -q` -> `1 failed` (assert 300 == 308)
+  `python3 scripts/check_config_defaults.py --check` -> rc 1, `shadowed_declared: declared 300 -> measured 308`, `undeclared: declared 3 -> measured 4`
+GREEN after the payment, the SAME two commands:
+  `10 passed in 56.29s`; census rc 0 — `300 distinct SHADOWED-DECLARED key(s), 3 distinct UNDECLARED key(s) ... within the declared shrink-only ceiling {'shadowed_declared': 300, 'undeclared': 3}, and the measured KEY SET equals the receipt`
+
+THE DECISION, and why it is NOT a re-baseline. D-2644: a ceiling may only be LOWERED, and a raise is a DECISION. So the nine sites were PAID instead of priced. After the payment the measurement equals the declaration on BOTH axes (300 / 3), so `--rebaseline --because` was never needed and no ceiling moved. `--record` was used only for the field the contract compares and no hand may edit: `counts.modules` 650 -> 659 (D-2989). Measured site count 583 -> 574, which is the nine sites and nothing else.
+
+THE NINE, each with the reason its default was not harmless:
+ (1-5) scripts/check_delete_target.py — model_roots, storage_roots, id_forms, incomplete_markers, max_examples were `cfg.get(key, <default>)` inside a DELETE guard. An absent root list walks NOTHING, finds no referrer, and prints SAFE_TO_DELETE: the guard would have said YES because it could not read its own config. That is FAIL-OPEN on a destructive gate, not untidiness. The same act removed two uncounted siblings in the same function — `inode_cfg.get("min_bytes", BYTES_PER_MIB)` (a magic-number SECOND home for a value config already declared, C20) and `inode_cfg.get("enabled", True)` — and the then-unused BYTES_PER_MIB constant went with them (C19).
+ (6-7) scripts/specdec_probe.py — `spec.get("prefix","")` / `get("suffix","")` on a `file_head` prompt. The file's OWN docstring records MEASURED 2026-10-27: a bare source head makes the model emit EOS at token 1, and 41889 t/s was then read as a decode fact. The empty-string default would re-create exactly that artifact for the first future prompt that forgot the wrapper.
+ (8) scripts/hardware_calibrate.py — `cand.get("moe_active_fraction", 1.0)` silently priced any candidate that omitted it as DENSE. All 10 candidates declare it, so the default was a wrong PREDICTION waiting for the 11th — and a prediction is what fills an unmeasured role.
+ (9, UNDECLARED) scripts/stage_mtp_head.py — NOT a Maxwell config read at all: the receiver named `config` held a Hugging Face checkpoint's own config.json (`text_config`, `mtp_num_hidden_layers`). The census resolves a receiver BY NAME, so the local was renamed `model_config` and the name now says which document is read. Written down explicitly because "the number went down" must never be the whole story: this one is an INSTRUMENT FALSE POSITIVE paid by clarifying the code, never by editing a count.
+
+ONE THING DELIBERATELY NOT DONE. `text_config` @ pipeline/model_loadability_probe.py:304 is the SAME instrument false positive and stays counted (it is one of the 3 undeclared keys). Paying it would drop undeclared to 2 — a LOWERING, so legal — but it is another file's act, and bundling it would have shipped an unmeasured second rename inside the commit that measured the first (D-3038 scope discipline).
+
+ORIGINAL FAULT (b), CLOSED THE SAME WAY. justfile line 217 still declared "3 failures are DECLARED red and SHRINK-ONLY (the depth/domain contract is 'proposed'/owner gate)". TRUE when written, FALSE since D-2666 emptied the declared red set, so the two faces of ONE rail disagreed and the ladder was the face nobody re-read. That line now states what config/test_isolation.yaml#suite_rail actually says — declared red EMPTY since D-2666, the ceiling is a COLLECTION FLOOR and not a tolerance, ANY failure FATAL, an unreadable summary FATAL, a paid red OWNER-OWED — and names this bug as the correction.
+
+G1 OF D-3205 IS GREEN ON A READING, not on a mood: `scripts/check_tests.py --check` -> `ok tests: 580 collected (floor 261), 574 passed, 0 declared red, 0 new, 6 skipped`, rc 0.
+
+## BUG-1094 (MED, FIXED 2026-10-27) — THE SUITE RAIL'S DECLARED INVOCATION IS A BARE `python3`, SO ITS SUBJECT WAS WHATEVER PATH HANDED IT: from a shell without pytest it reported a FATAL about the SHELL
+
+This was found while taking the G1 reading, and it is the BUG-1000 shape one layer INSIDE a rail.
+
+MEASURED, three ways, same tree:
+  - `just` (PATH prepended by scripts/resolve_python.sh, the pinned interpreter): 580 collected, 1 real failure — the true G1 reading.
+  - `/Library/Frameworks/.../3.12/bin/python3 scripts/check_tests.py --check`: `FAIL tests: pytest printed no readable summary line - the rail cannot read its subject`, and its `measured:` line empty. The rail ran fine; the CHILD did not, because `suite_rail.invocation` is `['python3','-m','pytest',...]` and `python3` was /usr/bin/python3, which has no pytest.
+  - `/usr/bin/python3 scripts/check_tests.py --check`: `ModuleNotFoundError: No module named 'yaml'` from inside `_cfg()` — a traceback, not a refusal.
+So the SAME rail reported THREE different verdicts about the SAME bytes, and two of them were about the interpreter. A rail whose subject is inherited from the shell is a witness to the shell (BUG-527's class, BUG-1000's surface, BUG-375's shape).
+
+FIX (two acts, both in scripts/check_tests.py):
+ 1. `run_suite()` substitutes `sys.executable` for a bare `python3`/`python` in the DECLARED invocation — the rule scripts/r5_review_gate.py:137 and run_ladder.run_layer() already apply, so there is no second home for it — and REFUSES loudly, by absolute path, when the running interpreter cannot import pytest, naming `just health` as the route that pins a good one (D-3100).
+ 2. `_cfg()` turns the `import yaml` traceback into the same named refusal, because the first interpreter refusal the operator meets should not be a stack trace.
+
+VERIFIED, both directions: bare PATH now prints the named refusal with `running as : /Library/Developer/CommandLineTools/usr/bin/python3` and `run it as : just health`; the framework 3.12 run (which has pytest, while PATH's python3 does not) now reads the suite and returns `ok tests ... 0 new` rc 0. `check_tests.py --selftest` stays 11/11.
+
+NOT CLAIMED: that the engine or the suite is healthy. This bug is about who was asked.
+
+## BUG-1095 (LOW, FIXED 2026-10-27) — D-3210 CITES `T-218` FOR THE ANNOTATIONS READER, AND T-218 IS THE HARMONY-PARSER TASK: a citation that RESOLVES TO THE WRONG REFERENT is worse than a dangling one
+
+D-3210 clause 2 ends "an enforcement reader is deferred as a named follow-up (T-218), never silently asserted", and the BUG-1090 RESOLVED entry repeats it. `config/task_register.yaml#T-218` is a DIFFERENT, PRE-EXISTING, OPEN task — "ASK THE PARSER TO REPAIR WHAT IT ALREADY NAMES" (the harmony adapter's corrupted recipient, BUG-951). The id is not dangling; it RESOLVES, to the wrong subject, which is the worse failure: `check_bug_recall.py` reports citations that resolve against NOTHING, and no rail can see a citation that resolves against SOMETHING ELSE (D-3034's own limit, stated there).
+
+HOW IT HAPPENED: T-218 was already the highest id and was already open, so the reference was written from memory of "the next id" rather than from the register. That is the exact defect D-3109 names — a fact asserted instead of resolved.
+
+FIX: the reader is now T-219, minted with its own gate (a refusal that must be SEEN to fire on the live pair AGENT_EDIT_LONG_CONTEXT-as-loop vs as-agent_probe, plus an inverse control). D-3210 and the BUG-1090 entry are APPEND-ONLY and were NOT rewritten: a silent edit to a decision record is the drift this OS refuses, so the correction lives where a reader will meet it — here, and in T-219's own source field, which names D-3210 clause 2. This is the BUG-1092 CORRECTION precedent applied to a referent instead of a premise.

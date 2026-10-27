@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1310 decisions (census stamp 464d929b87a06f04, 2026-10-27) · 819 bugs (256 open / 563 closed; highest OPEN = BUG-1055) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1312 decisions (census stamp 23b5d10200255eb4, 2026-10-27) · 824 bugs (261 open / 563 closed; highest OPEN = BUG-1060) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1310 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 375 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1310, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1312 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 377 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1312, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 256 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 126 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 256 open.
+> Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 131 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 261 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23386,3 +23386,76 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    "all fit at once" is true of weights and untested of working set.
 5. OWED: a `plan`/`reasoning` accuracy fixture with a gate (the review gate's shape), and a KV term in the residency
    check at each role's declared `min_ctx`. Until then the plan/analyze assignment is speed-only and must be read as such.
+
+## BUG-1056 (MED, OPEN 2026-10-27) - the handover was UNRUNNABLE AS WRITTEN: interactive zsh does not treat `#` as a comment, so the verification line never ran and its `expect 0` words became filenames
+1. The D-3184 §5 block ran as: `du -sh <repo>     # expect 14G` -> `du -sh <repo> '#' expect 14G`, printing
+   `du: #: No such file or directory` three times; then `curl ... | grep -c pplx   # expect 0` -> `grep -c pplx '#' expect 0`,
+   which printed three more "No such file" errors and **never read stdin at all** (with file arguments grep does not read the pipe).
+2. READING: the prompt is `(base) barn@M1-max maxwell os 2.0 %` = zsh, and interactive zsh leaves `INTERACTIVE_COMMENTS` OFF,
+   so `#` starts a comment in a script but NOT in the pasted line. The comment was inert in the document and live in the shell.
+3. WHY IT MATTERS: the deletion DID happen - the next `du -sh` answers "No such file or directory", so the 14G repo is gone -
+   but its own SUCCESS CRITERION never executed. The operator could not tell pass from fail from the terminal, which is exactly
+   the "something is off" that was reported. D-3100 requires a procedure the owner can actually run; this one only looked runnable.
+4. OWED: a handover carries no inline `#` comment inside a copy-paste block (the comment goes on its own line, or the block ships
+   as a file run by `bash /tmp/x.sh`, where `#` IS a comment). Rail candidate: a docguard pass refusing a fenced shell block that
+   contains ` # ` after a command word.
+
+## BUG-1057 (MED, OPEN 2026-10-27) - after the bytes were deleted the engine still ADVERTISED the model and kept its full flag set: a declaration with no referent, cleared only by an explicit reload
+1. The `rm -rf` of the pplx repo completed, yet `curl -s /v1/models | grep -c pplx` answered **1**. The pool advertised 17 ids
+   while `~/.omlx/models` holds 9 symlinks.
+2. CAUSE (read, not guessed): the pool is IN-PROCESS. `admin/routes.py:_reload_models()` re-reads `model_settings.json`, re-scans
+   the model dirs and re-applies overrides, and it had not been called since the deletion. `model_discovery.py:_missing_weight_shards()`
+   exists and would refuse a shard-incomplete directory - but it only runs DURING discovery, so it never re-examined a live pool.
+3. SECOND LIMB: `~/.omlx/model_settings.json` still carried `mlx-community--pplx-decider-v1.1-27b-4bit` with a full 13-key flag
+   set - a live declaration whose referent is gone (D-3034).
+4. FIXED THIS TURN (owner authorised it): the dead key was removed atomically (tempfile -> fsync -> os.replace; backup
+   `model_settings.json.bak-20261027-phantom`), then `POST /admin/api/reload` answered `Re-discovered 16 models from 2 directories`.
+   Verified after: `/v1/models` = 16 ids, `grep -c pplx` = 0, `grep -c clef` = 1 (clef-flash retained, D-3184).
+5. OWED: a deletion procedure ENDS with reload plus BOTH counts, and `scripts/check_delete_target.py` now reports ADVERTISED as a
+   refusal so an un-reloaded delete cannot pass. Discovery should also prune (or at least report) a settings key with no dir.
+
+## BUG-1058 (MED, OPEN 2026-10-27) - `hf cache delete` reported "freed 24.1G" with no measured counterpart: the cache arithmetic accounts for the 14G `rm -rf` alone
+1. The terminal record reads `Cache deletion done. Saved 24.1G. Deleted 0 repo(s) and 2 revision(s); freed 24.1G.`, and the named
+   blob belongs to `models--lmstudio-community--gemma-4-E4B-it-MLX-4bit`.
+2. READ AFTER: hub `du -sh` = **81G**; the previous full inventory was **94G**; pplx (14G) is gone and the gemma-4-12B download has
+   added **1.6G**, so 94 - 14 + 1.6 = 81.6 ~ 81. Nothing else in the inventory moved. `df -h` reads **126Gi** free on /System/Volumes/Data.
+3. SO the "2 revisions" reclaim was METADATA - dangling revision refs whose blobs the earlier `hf cache rm` had already reclaimed - and
+   the tool's "freed" figure is an ESTIMATE summed from revision manifests. The gemma-4-E4B repo still holds **6.4G of REAL files** in
+   `snapshots/main` (link count 1, `blobs/` empty, 4,280,494,809 + 2,548,805,689 B) and still answers `/v1/chat/completions` (verified).
+4. HONEST LIMIT: no `df` was taken BETWEEN the two acts, so per-act attribution is not fully separable. That is itself the defect - an
+   unbracketed procedure cannot be audited afterwards, and the number that would have settled it was never recorded.
+5. OWED: every deletion is bracketed by `df -h` before and after AND a per-repo `du -sh`; the tool's own "freed" line is never the receipt.
+
+## BUG-1059 (MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's directory
+1. `~/.omlx/models_staged/Qwen3.8-27B-MTP4` is a **symlink farm**: 13 of its 15 entries point into
+   `~/.omlx/models/Qwen3.8-27B-MLX-4bit`, including `model-00001..3-of-00003.safetensors`. Only the MTP head is real
+   (`model-00004-of-00004.safetensors`, 238,934,264 B) - and `models_staged/_heads/` holds a **second identical copy**
+   (`model.safetensors` and `Qwen3.8-27B-MTP-4bit.safetensors`, both 238,934,137 B).
+2. THE TRAP: `Qwen3.8-27B-MLX-4bit` (15.0 GB) holds NO role after the rc1 re-baseline and is the obvious next deletion. Deleting it
+   removes three of MTP4's four weight shards. "Not referenced by ~/.omlx/models" cannot see this: the referrer is a FILE INSIDE
+   another model's directory, not a root entry.
+3. CORRECTS BUG-1054's SECOND LIMB: the pool's 17 ids were never "mystery models beyond models_root". The reload reports **2 effective
+   directories**; the extra ids are 8 ALIAS DUPLICATES of the same weights under repo-derived ids (e.g. both
+   `Ornith-1.5-35B-A3B-REAP-19B` and `mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B`), plus the phantom. One model, two ids:
+   the risk is DOUBLE IDENTITY, not a wider root, and a role measured under an alias spends the same bytes twice.
+4. REMEDY LANDED: `scripts/check_delete_target.py` + `config/delete_safety.yaml` ask four questions per candidate - SERVED (a model
+   root entry), SYMLINK-REFERENCED (any symlink under ALL roots resolving inside it), INODE-SHARED (hardlink axis, large files),
+   IN FLIGHT or ADVERTISED - and refuse on any yes; exit 0/2/3/4 with fail-closed on an unreachable engine. R5-reviewed APPROVE by
+   gemma-4-E4B-it-MLX-4bit (sha256_16 6dd37559aadc0f36, `governance/r5_reviews.jsonl`). Measured verdicts: the 27B base -> REFUSE
+   naming 13 referrers; pplx -> ABSENT_ALREADY (exit 0); clef-flash -> REFUSE (advertised); gemma-4-12B -> REFUSE (in-flight);
+   a 12K metadata stub -> SAFE_TO_DELETE (exit 0).
+5. REMAINS OPEN because the DECISION is open: the 27B pair (30.2 GB) either stays as a SET or goes as a SET. Deleting the base alone
+   is now mechanically impossible to do by accident, which is the point of the rail.
+
+## BUG-1060 (MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property
+1. `final_ceiling` read **58,841,720,848 -> 61,820,040,640 -> 58,304,261,480 -> 56,106,449,680** within one hour on the same host,
+   because it is computed against AVAILABLE memory as models load. `config/model_roles.yaml` records the derived line
+   `RESIDENCY 40.0 GiB of 41.5 usable - all assigned models fit at once`, i.e. 96% utilisation quoted as a standing fact.
+2. MEASURED WORKING SET (this turn, after loading the five distinct role models): `loaded_count 5`,
+   `current_model_memory 43,944,630,390 B` = **43.9 GB / 40.9 GiB** against a ceiling of 56.1 GB. The real resident set is LARGER than
+   the table's weights-only sum and the ceiling is LOWER than the table's denominator - both errors run the same way, so the
+   "1.5 GiB headroom" claim is unsupported in either direction.
+3. WHY IT BITES: "curate 43.7 GiB into 40.4 usable" is the sentence that drove two turns of model selection. A dynamic denominator
+   means that sentence has no stable meaning.
+4. OWED: `hardware_calibrate.py --write` stamps the ceiling WITH its reading time and observed range, and the residency line prints
+   `measured resident` beside the `weights-only sum`; the KV term at each role's declared `min_ctx` stays owed (BUG-1055 limb 4).

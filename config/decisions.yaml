@@ -33847,3 +33847,171 @@ decisions:
   files:
   - config/pipeline_config.yaml
   - governance/buglog.md
+- id: D-3185
+  state: RESOLVED
+  category: DISK HYGIENE / DELETION RECEIPT / ENGINE POOL LIFECYCLE
+  title: 'The 14 GB pplx-decider deletion is EXECUTED and VERIFIED - and the act exposed two steps nobody had built
+    (an engine reload and a dead settings key), both now done: 16 ids, pplx 0, clef retained, and all five role
+    models answer'
+  decision: "THE INSTRUCTION FROM D-3184 §5 WAS RUN BY THE OWNER AND ITS VERIFICATION LINE NEVER EXECUTED (BUG-1056).\
+    \ This record\nis the receipt that was missing, taken by measurement rather than by trusting the terminal transcript.\n\
+    \n1. THE BYTES ARE GONE. `du -sh .../models--mlx-community--pplx-decider-v1.1-27b-4bit` -> \"No such file or\
+    \ directory\";\n   `ls -d` over the hub for `*pplx*` -> no match. `df -h` on /System/Volumes/Data reads 126Gi\
+    \ free; the previous\n   hardware reading was 111.9 GB, so ~14 GiB was returned - the size the repo actually\
+    \ occupied.\n2. THE POOL DID NOT NOTICE. `GET /v1/models` still advertised 17 ids INCLUDING the deleted model,\
+    \ and\n   `~/.omlx/model_settings.json` still held `mlx-community--pplx-decider-v1.1-27b-4bit` with a full 13-key\
+    \ flag set.\n   A deleted model left behind an advertised id and a live declaration with no referent (BUG-1057).\n\
+    3. BOTH WERE FIXED HERE. The dead settings key was removed atomically (tempfile -> fsync -> os.replace, backup\n\
+    \   `model_settings.json.bak-20261027-phantom`), then `POST /admin/api/reload` -> \"Re-discovered 16 models\
+    \ from\n   2 directories\". Verified: /v1/models = 16 ids, `grep -c pplx` = 0, `grep -c clef` = 1. clef-flash\
+    \ is RETAINED\n   (D-3184 §2): it is a decision engine, not an LLM, and no LLM/chat probe can speak for it.\n\
+    4. NOTHING WAS BROKEN BY EITHER ACT - PROVEN, NOT ASSUMED. All nine `~/.omlx/models` entries resolve; every\
+    \ one carries\n   its weight shards and a config.json; and a one-token chat was sent to each distinct role model\
+    \ AFTER the reload:\n   gpt-oss-20b-MXFP4-Q8 ok, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit ok ('ok'), Ornith-1.5-35B-A3B-REAP-19B\
+    \ ok,\n   gemma-4-E4B-it-MLX-4bit ok ('ok'), MiniCPM5-2B-MLX ok. gemma-4-E4B matters most: its `blobs/` directory\
+    \ was emptied\n   by a separate cache command, and it still serves because its snapshot holds REAL files (link\
+    \ count 1), not blob\n   symlinks (BUG-1058).\n5. THE \"Saved 24.1G\" LINE IS NOT A RECEIPT. The hub reads 81G\
+    \ against a previous 94G, pplx contributed 14G and the\n   in-flight gemma-4-12B download contributed 1.6G:\
+    \ 94 - 14 + 1.6 = 81.6. Nothing else moved, so the cache command's\n   two \"revisions\" freed metadata, not\
+    \ bytes (BUG-1058 §2-3). The number an operator would have quoted as the gain is\n   an estimate the tool summed\
+    \ from revision manifests.\n6. WHAT THIS RECORD DOES NOT DECIDE: whether the roleless Qwen3.8-27B pair (30.2\
+    \ GB) goes. It must go as a SET or not\n   at all, because MTP4's shards are symlinks into the base model (BUG-1059);\
+    \ the rail now makes the half-delete\n   mechanically impossible.\nWHAT IT FIXES: BUG-1056 (the handover's verification\
+    \ line could not run), BUG-1057 (a deleted model stayed advertised\nand kept its flag set), BUG-1058 (a tool-reported\
+    \ \"freed\" figure with no measured counterpart).\n"
+  rationale: 'The value of this record is that it separates three acts that the terminal transcript merged into
+    one confusing scroll:
+
+    the bytes were deleted (and that is now measured), the engine did not notice (and that is now measured), and
+    a cache
+
+    tool claimed a saving that the filesystem does not corroborate. An OS that accepts a tool''s own "freed 24.1G"
+    while
+
+    its own `du` says otherwise has outsourced its accounting; one that re-reads the pool after the fact has not.
+
+    '
+  measured: 'Before: hub 94G, df free 111.9 GB, /v1/models 17 ids, pplx advertised 1, `model_settings.json` 15 keys.
+
+    After: hub 81G, df free 126Gi, /v1/models 16 ids, `grep -c pplx` 0, `grep -c clef` 1, `model_settings.json`
+    14 keys,
+
+    reload message "Re-discovered 16 models from 2 directories" (HTTP 200, 7.9 s), health {"status":"healthy",
+
+    "model_count":16,"loaded_count":1} then loaded_count 5 / current_model_memory 43,944,630,390 B after the five
+    probes.
+
+    One-token chats: gpt-oss 6 s, Qwen3-Coder 13 s (returned ''ok''), Ornith-19B 25 s, gemma-4-E4B 12 s (returned
+    ''ok''),
+
+    MiniCPM5 3 s - all post-reload, so each is a cold load plus a real completion, not a cached reply.
+
+    gemma-4-E4B weights read from disk: model-00001-of-00002.safetensors 4,280,494,809 B and model-00002-of-00002
+
+    2,548,805,689 B, `links=1`, blobs/ empty.
+
+    '
+  bugs:
+  - BUG-1056
+  - BUG-1057
+  - BUG-1058
+  - BUG-1059
+  files:
+  - governance/buglog.md
+  - scripts/check_delete_target.py
+  - config/delete_safety.yaml
+- id: D-3186
+  state: RESOLVED
+  category: DISK HYGIENE / DELETION PROTOCOL / RAIL (C12 + D-3034)
+  title: 'A deletion is proven by MEASURED bytes plus a post-reload pool count - never by the tool''s own "freed"
+    line - and the pre-delete rail asks four questions across ALL roots: served, symlink-referenced, inode-shared,
+    in-flight-or-advertised. The alias-id pool is deliberately NOT deduped, with its reason recorded'
+  decision: "THE PROTOCOL (this is the standing rule; the four steps are the whole of it):\n  1. BRACKET THE DISK.\
+    \ `df -h` BEFORE and AFTER. A deletion with no bracket cannot be audited afterwards -\n     that is exactly\
+    \ how a tool's \"freed 24.1G\" survived unchallenged while the filesystem returned 14 (BUG-1058).\n  2. SIZE\
+    \ THE TARGET THE TWO WAYS THAT DISAGREE. `du -sh <repo>` (never `-L`: on a symlink farm `-L` follows\n     the\
+    \ farm and reports the payload twice, BUG-1050), plus the count the rail computes from distinct\n     (device,\
+    \ inode) pairs. If the two disagree, the difference IS the question - not noise.\n  3. ASK THE RAIL. `scripts/check_delete_target.py\
+    \ <path>`. It answers four questions and refuses on any YES:\n       SERVED            a LOADABLE entry (a model\
+    \ root) resolves into the candidate;\n       SYMLINK-REFERENCED some symlink under ANY declared root resolves\
+    \ inside the candidate - the axis that\n                         catches one model's weight shards living inside\
+    \ another model's directory (BUG-1059);\n       INODE-SHARED      a large file shares (device, inode) with a\
+    \ file outside the candidate (hardlink axis);\n       IN FLIGHT / ADVERTISED  an incomplete-download marker\
+    \ is present, or the engine still serves the id.\n     Model roots and STORAGE roots are declared separately\
+    \ on purpose: a directory inside `~/.omlx/models` is a\n     model, while a repo inside the HF cache is storage\
+    \ whose existence confers no servability. Conflating the two\n     made the first draft of the rail report every\
+    \ cache repo as \"SERVED\" by matching the candidate against itself.\n  4. DELETE, THEN RELOAD, THEN COUNT.\
+    \ Delete (an owner act; `pipeline/safe_delete.py` for pipeline artifacts,\n   R-D410). Then reload the engine\
+    \ and print BOTH counts. Bytes gone + id still advertised is NOT a completed\n   deletion - it is a phantom\
+    \ (BUG-1057). `hf cache prune` stays FORBIDDEN (BUG-1050).\nTHE HANDOVER RULE THAT MAKES STEP 3 RUNNABLE: a\
+    \ manual block carries NO inline `#` comment after a command word.\nInteractive zsh leaves `INTERACTIVE_COMMENTS`\
+    \ off, so `du -sh <repo>   # expect 14G` executes as\n`du -sh <repo> '#' expect 14G` and a `| grep -c pplx \
+    \  # expect 0` line never reads stdin at all (BUG-1056). The\nexpected value goes on its own line above the\
+    \ command, or the whole block ships as a file run by an explicit shell.\nTWO ID FORMS, AND THE DELIBERATE NON-FIX:\
+    \ the engine serves one model under two ids - a root entry by its basename\nand an HF-cache entry by its repo-derived\
+    \ slug (`openbmb--MiniCPM5-2B-MLX`) - which is why the pool read 17 against\n9 symlinks and looked like \"wider\
+    \ roots\" (BUG-1054's corrected reading is BUG-1059 §3). Deduping the alias ids is\nREJECTED FOR NOW, and the\
+    \ reason is specific rather than cautious: `mlx-community--clef-flash-4bit` is served ONLY\nunder its repo-derived\
+    \ id (there is no `~/.omlx/models` symlink for it, and it is a decision engine reached through\n`/v1/systemone`),\
+    \ so editing the discovery roots to collapse aliases risks removing a RETAINED, RATIFIED component\nfrom the\
+    \ pool (D-3184 §2). The double identity is registered as a KNOWN state instead, with its consequence named:\n\
+    a role measured under an alias spends the same bytes twice, and `config/model_roles.yaml` must therefore keep\n\
+    assigning roles by CANONICAL name - which it already does for all six.\nWHAT WOULD RE-OPEN IT: a declared alias->canonical\
+    \ map in config, proven to leave clef-flash discoverable, with the\npool count asserted before and after (16\
+    \ -> 8 would be the expected signature).\nCALLERS: `just delete-check <path>` is for humans (non-zero = refusal;\
+    \ `just` reports any failed recipe as 101),\nwhile a SCRIPT must call `scripts/check_delete_target.py` directly\
+    \ to receive the declared 0/2/3 codes.\nWHAT IT FIXES: BUG-1054 (the deletability test was wrong on every axis\
+    \ it had), BUG-1056 (the handover could not\nrun its own verification), BUG-1057 (a deleted model stayed advertised\
+    \ with its flag set), BUG-1058 (a tool's\n\"freed\" figure was accepted as the receipt), BUG-1059 (a cross-root\
+    \ symlink reference that no check followed).\n"
+  rationale: 'Every deletion mistake this OS has made in two days was a NUMBER that measured something other than
+    what it claimed:
+
+    `du -shL` double-counting a symlink farm, `hf cache prune` naming a served snapshot detached, an engine pool
+    that
+
+    counted ids instead of models, and a cache tool summing revision manifests and calling it "freed". The fix is
+    not
+
+    more caution, it is asking each question of the thing that can answer it: the filesystem for bytes, the inode
+    table
+
+    for sharing, the symlink graph for references, the engine for servability. Recording the REJECTED simplification
+
+    (alias dedupe) with its concrete blocker is part of the decision, so it cannot be re-proposed from memory (D-3038).
+
+    '
+  measured: 'Rail verdicts on this host, all five cases: `~/.omlx/models/Qwen3.8-27B-MLX-4bit` -> REFUSE, naming
+    13 symlink
+
+    referrers under `~/.omlx/models_staged/Qwen3.8-27B-MTP4` (du-style 15.0G, apparent 16,081,501,977 B, provisioned
+
+    16,081,543,168 B, engine id advertised); `models--mlx-community--pplx-decider-v1.1-27b-4bit` -> ABSENT_ALREADY,
+
+    exit 0; `models--mlx-community--clef-flash-4bit` -> REFUSE (ADVERTISED); `models--lmstudio-community--gemma-4-12B-it-MLX-4bit`
+
+    -> REFUSE (two `.incomplete` blob markers); `models--lmstudio-community--gemma-4-12B-it-MLX-8bit` -> SAFE_TO_DELETE,
+
+    5,934 B apparent / 12,288 B provisioned (a metadata stub). Exit codes observed: 0 (safe), 2 (refused).
+
+    `just --list` parses the recipe; `just delete-check <served path>` runs the script and returns non-zero.
+
+    R5 review: `scripts/r5_code_review.py --file scripts/check_delete_target.py --reviewer gemma-4-E4B-it-MLX-4bit`
+
+    -> VERDICT APPROVE, digest sha256_16 6dd37559aadc0f36, artifact governance/r5_reviews.jsonl (generator != verifier,
+    C8).
+
+    Engine reading used by the ADVERTISED axis: `GET /v1/models` = 16 ids after the reload recorded in D-3185.
+
+    '
+  bugs:
+  - BUG-1054
+  - BUG-1056
+  - BUG-1057
+  - BUG-1058
+  - BUG-1059
+  files:
+  - scripts/check_delete_target.py
+  - config/delete_safety.yaml
+  - justfile
+  - governance/buglog.md

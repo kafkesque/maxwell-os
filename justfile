@@ -313,10 +313,14 @@ triad:
 
 # ── Delegate Safety Check (DELEGATE-001) ──────────────────────────
 delegate-check:
-    python3 tools/delegate_safe.py
-
-delegate-fix:
+    python3 tools/delegate_safe.pydelegate-fix:
     python3 tools/delegate_safe.py --fix
+
+# ── Delete Safety (BUG-1054/1057/1059) ───────────────────────────
+# Refuses to delete model bytes that something still SERVES, SYMLINKS to (across all roots), SHARES an
+# inode with, or still ADVERTISES. READ-ONLY: the delete itself stays an owner act via pipeline/safe_delete.py.
+delete-check *PATHS:
+    python3 scripts/check_delete_target.py {{PATHS}}
 
 # ── Standardized one-shot local-LLM delegation (BUG-220 / D2543) ──
 # Qwen3-Coder single-shot code gen ONLY — never multi-turn (DELEGATE-002).

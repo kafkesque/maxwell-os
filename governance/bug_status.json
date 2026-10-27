@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 819,
-  "open_n": 256,
+  "total_ids": 824,
+  "open_n": 261,
   "closed_n": 563,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1288,6 +1288,31 @@
     {
       "id": "BUG-1055",
       "title": "(MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing",
+      "events": 1
+    },
+    {
+      "id": "BUG-1056",
+      "title": "(MED, OPEN 2026-10-27) - the handover was UNRUNNABLE AS WRITTEN: interactive zsh does not treat `#` as a comment, so the verification line",
+      "events": 1
+    },
+    {
+      "id": "BUG-1057",
+      "title": "(MED, OPEN 2026-10-27) - after the bytes were deleted the engine still ADVERTISED the model and kept its full flag set: a declaration with",
+      "events": 1
+    },
+    {
+      "id": "BUG-1058",
+      "title": "(MED, OPEN 2026-10-27) - `hf cache delete` reported \"freed 24.1G\" with no measured counterpart: the cache arithmetic accounts for the 14G",
+      "events": 1
+    },
+    {
+      "id": "BUG-1059",
+      "title": "(MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's",
+      "events": 1
+    },
+    {
+      "id": "BUG-1060",
+      "title": "(MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property",
       "events": 1
     }
   ],

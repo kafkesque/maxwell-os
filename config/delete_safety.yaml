@@ -1,0 +1,60 @@
+# config/delete_safety.yaml — what scripts/check_delete_target.py may treat as proof
+# WHY THIS FILE EXISTS
+#   Three deletions were planned in one day and every one of them was described by a number that
+#   measured something else: `hf cache prune` named the SERVED snapshot of a live model "detached"
+#   (BUG-1050); `du -shL` reported 48G for a 16G model (BUG-1050); the engine pool advertised 17 ids
+#   for 9 real models and kept a DELETED model advertised until an explicit reload (BUG-1054/BUG-1057).
+#   And the one trap none of those checks can see: ~/.omlx/models_staged/Qwen3.8-27B-MTP4 is a symlink
+#   farm whose three main weight shards point INTO ~/.omlx/models/Qwen3.8-27B-MLX-4bit — so deleting
+#   the roleless 15 GB base model would silently break a model that is not in the same root.
+#   A "not referenced by my models dir" test cannot see a reference that lives inside ANOTHER model's
+#   directory. This file declares the roots to walk and the engine to ask, so that check is mechanical.
+# RULE: this rail is READ-ONLY. It never deletes. Deletion stays an owner act (D-3184) via
+#       pipeline/safe_delete.py (R-D410). Its exit code is a refusal, not a suggestion.
+version: 1
+
+omlx:
+  base_url: http://127.0.0.1:11435
+  models_path: /v1/models
+  api_key: sk-maxwell-local
+  timeout_s: 30
+
+# Every root that can hold a LOADABLE model: a directory directly inside one of these is served by
+# name, so deleting it is deleting a model, not "unused bytes".
+model_roots:
+  - ~/.omlx/models
+  - ~/.omlx/models_stashed
+  - ~/.omlx/models_staged
+
+# Roots that hold BYTES, not models. A repo here is storage: the engine serves it under an
+# id derived from its name, but its existence in this root confers no servability. Keeping these
+# separate is what stops the rail reporting a cache repo as "SERVED" by matching itself.
+storage_roots:
+  - ~/.cache/huggingface/hub
+
+# A served model is served by its root entry name; HF-cache entries are discovered under a repo-derived
+# id (models--<org>--<name> -> <org>--<name>). Both forms must be matched or a live model reads as unused.
+id_forms: ["basename", "hf_repo_slug"]
+
+# A directory holding any of these is an IN-FLIGHT or BROKEN download and must never be deleted
+# automatically, even when nothing references it yet.
+incomplete_markers: [".incomplete", ".lock", ".part"]
+
+# Same-device identity check (hardlink axis): two paths on different devices cannot share an inode,
+# so the walk is skipped rather than guessed. Only files at least this big are compared, because a
+# hardlink of a weight shard is what actually breaks a model, and a hardlinked 40-byte tokenizer
+# json is not worth a full-tree inode census.
+inode_check:
+  enabled: true
+  min_bytes: 1048576
+
+# Evidence is capped, not exhaustive: a symlink farm produces a dozen identical lines and the
+# operator reads none of them. The cap keeps the refusal token-cheap; the COUNT is never capped
+# (the summary line still says how many referrers exist).
+max_examples: 4
+
+exit_codes:
+  safe: 0
+  referenced: 2
+  undetermined: 3
+  usage: 4

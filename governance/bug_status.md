@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**256 open** / 563 closed of 819 ids.
+**261 open** / 563 closed of 824 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -267,3 +267,8 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1053 | (MED, OPEN 2026-10-27) - the documented §7.1 re-baseline command cannot run on this host: bare `python3` is /usr/bin/python3, which has no | 1 |
 | BUG-1054 | (MED, OPEN 2026-10-27) - the delete-safety test has TWO more holes: the served portfolio spans 3 roots, and the engine's pool (17 ids) is | 1 |
 | BUG-1055 | (MED, OPEN 2026-10-27) - `plan` and `analyze` are assigned on SPEED alone: a REAP-pruned 19B now holds both over a 27B, and nothing | 1 |
+| BUG-1056 | (MED, OPEN 2026-10-27) - the handover was UNRUNNABLE AS WRITTEN: interactive zsh does not treat `#` as a comment, so the verification line | 1 |
+| BUG-1057 | (MED, OPEN 2026-10-27) - after the bytes were deleted the engine still ADVERTISED the model and kept its full flag set: a declaration with | 1 |
+| BUG-1058 | (MED, OPEN 2026-10-27) - `hf cache delete` reported "freed 24.1G" with no measured counterpart: the cache arithmetic accounts for the 14G | 1 |
+| BUG-1059 | (MED, OPEN 2026-10-27) - the inventory has a reference axis no check follows: one model's weight shards are symlinks INTO another model's | 1 |
+| BUG-1060 | (MED, OPEN 2026-10-27) - the residency figure is a point-in-time reading of a DYNAMIC ceiling, printed as if it were a property | 1 |

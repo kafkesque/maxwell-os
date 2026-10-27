@@ -455,6 +455,8 @@ may_touch:
 #: D-3078/D-3137: a per-file grant turns every re-derivation into a new red line (BUG-563). Nothing outside these
 #: names becomes committable.
 - scripts/specdec_probe.py
+- scripts/stage_mtp_head.py
+- scripts/measure_prefill.py
 - config/specdec_m1.yaml
 - scripts/list_model_phantoms.py
 - tools/r5_reviewer_fixture.py
@@ -1596,3 +1598,24 @@ widening_log:
     The widened set is EXACTLY the probe + its two append-only receipts + the dated receipts this arc cites + the
     derived R5 review family. No will_not_touch family, no pinned artifact, no pipeline/** or config/** crossing
     beyond the probe's own config/specdec_m1.yaml.
+
+- date: '2026-10-27'
+  actor: assistant
+  reason: "D-3174/D-3175/D-3176/D-3177 - this sitting MEASURED three speculative-decoding mechanisms and one
+    hardware flag on this host and had to write while doing it: a new stager for the published MTP head
+    (scripts/stage_mtp_head.py, and its declaration block in config/specdec_m1.yaml), and a fix to the
+    cold-prefill instrument (scripts/measure_prefill.py + its nonce_chars declaration in
+    config/agent_context.yaml) without which every prefill reading here - including the ANE A/B - would have
+    compared a cold run against a cached one (BUG-1044, MEASURED 39.22 s vs 0.54 s). Both scripts were reviewed
+    cross-family per R5 (APPROVE by gpt-oss-20b-MXFP4-Q8 and by gemma-4-E4B-it-MLX-4bit)."
+  owner_ack: "the owner's instruction that opened this sitting: do the ANE manual task yourself (backup, set
+    qwen35_ane_prefill_enabled for this model only, restart oMLX, re-run, keep only if >= 1.5x, else restore) and
+    answer whether any Qwen3.8 variant is designed for speculative decoding on this hardware - both are
+    measurements, and a measurement that cannot be committed is not a record (D-342)."
+  additions:
+  - pattern: scripts/stage_mtp_head.py
+    why: attaches the published 238 MB MTP head to a symlinked staging checkpoint; the first fixture renamed keys in
+      the INDEX and was silently ignored by the loader's model*.safetensors glob, measuring a false 0.98x (BUG-1046)
+  - pattern: scripts/measure_prefill.py
+    why: the cold-prefill receipt was not cold - a deterministic prompt let the engine answer the second run from its
+      prefix cache (BUG-1044); the fix adds the declared nonce and refuses a cached reading as UNMEASURED

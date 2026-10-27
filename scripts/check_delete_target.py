@@ -35,8 +35,6 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Iterator
 
-import yaml
-
 ROOT = Path(__file__).resolve().parent.parent
 CFG_PATH = ROOT / "config" / "delete_safety.yaml"
 BYTES_PER_MIB = 1024 * 1024
@@ -44,6 +42,16 @@ EXIT_SAFE = 0
 EXIT_REFERENCED = 2
 EXIT_UNDETERMINED = 3
 EXIT_USAGE = 4
+
+try:
+    import yaml
+except ModuleNotFoundError:  # C16: not silent, and NOT a traceback either — say what to run instead (D-3100)
+    sys.stderr.write(
+        "check_delete_target: PyYAML is not importable from this interpreter.\n"
+        f"  interpreter : {sys.executable}\n"
+        "  it reads config/delete_safety.yaml, so it needs the repo interpreter, not /usr/bin/python3.\n"
+        "  run it as   : just delete-check <path>   (the justfile resolves the interpreter, BUG-1000)\n")
+    raise SystemExit(EXIT_USAGE)
 
 VERDICT_SAFE = "SAFE_TO_DELETE"
 VERDICT_REFUSED = "REFUSE"
@@ -326,7 +334,7 @@ def main(argv: list[str] | None = None) -> int:
             print()
             print(f"[{rec['verdict']}] {rec['candidate']}")
             print(f"  realpath   : {rec['realpath']}")
-            print(f"  engine ids : {rec['candidate_ids']} -> advertised={rec['advertised_ids']}")
+            print(f"  id forms   : candidate={rec['candidate_ids']} -> advertised={rec['advertised_ids']}")
             if rec["apparent"] is not None:
                 print(f"  size       : du-style {rec['du_h']}  (apparent {rec['apparent']} B, "
                       f"provisioned {rec['provisioned']} B)")

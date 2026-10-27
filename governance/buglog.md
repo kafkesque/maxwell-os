@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1312 decisions (census stamp 23b5d10200255eb4, 2026-10-27) · 824 bugs (261 open / 563 closed; highest OPEN = BUG-1060) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1315 decisions (census stamp 07c6c168616f5147, 2026-10-27) · 826 bugs (261 open / 565 closed; highest OPEN = BUG-1060) · 58 open tasks (MUST 8 / SHOULD 44 / WORTH 5; OWNER-moved 0, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1312 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 663 · ⚖ ratified 151 | closed: ✅ resolved 377 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1312, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1315 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 665 · ⚖ ratified 151 | closed: ✅ resolved 378 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1315, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 261 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 131 · 🟩 LOW 41 · UNLABELLED 0 (BUG-757) of 261 open.
 >
@@ -23459,3 +23459,48 @@ than deleted: a review that only keeps its approvals is a review nobody can audi
    means that sentence has no stable meaning.
 4. OWED: `hardware_calibrate.py --write` stamps the ceiling WITH its reading time and observed range, and the residency line prints
    `measured resident` beside the `weights-only sum`; the KV term at each role's declared `min_ctx` stays owed (BUG-1055 limb 4).
+
+## BUG-1061 (MED, FIXED 2026-10-27) - a REFUSE verdict reads as a CRASH: `just` printed "error: Recipe ... failed with exit code 2" and the natural `python3` form died with a traceback, so the owner could not tell a working gate from a broken command
+
+1. FOUND from the owner's own report: "I had followed your instruction but `just delete-check ~/.omlx/models/Qwen3.8-27B-MLX-4bit`
+   there were an error". The rail did return its declared REFUSE (exit 2), naming SERVED + 13 SYMLINK-REFERENCED +
+   ADVERTISED. But the LAST line the human sees is `error: Recipe `delete-check' failed on line 323 with exit code 2`
+   — `just` renders ANY non-zero recipe exit with the word `error`, which is the same word a genuine crash produces.
+   This is D-3100's shape one layer out: it is not enough for a manual step to RUN, its RESULT must be READABLE.
+2. SECOND FORM OF THE SAME DEFECT, measured: `python3 scripts/check_delete_target.py <path>` in a plain shell resolves
+   to `/Library/Developer/CommandLineTools/usr/bin/python3`, which cannot import PyYAML, so the rail died with
+   `ModuleNotFoundError: No module named 'yaml'` + a traceback. Only the justfile's PATH export (resolve_python.sh,
+   BUG-1000) makes `python3` the repo interpreter. So the ONE command that worked was the one the justfile runs, and
+   the form a reader would naturally copy did not.
+3. FIX (both limbs): the recipe carries `[no-exit-message]` and a verdict block — it runs the rail under bash,
+   captures the code, prints an explicit line (`── delete-check VERDICT: REFUSED (2). This is the GATE, not a
+   failure: the reasons above name what still needs the bytes. Nothing was deleted.`) and re-exits with the SAME
+   code 0/2/3/4, so `just` adds no "error:" line and a caller comparing `== 2` still reads the rail's own code
+   rather than just's 101. The rail's yaml import is now guarded: a missing PyYAML prints the interpreter path plus
+   `run it as : just delete-check <path>` and exits 4 — never a traceback (C16: no silent error, no raw trace either).
+4. VERIFIED both directions: 27B base -> verdict line + EXIT=2, no `error:`; the gemma-12B-8bit metadata stub ->
+   SAFE_TO_DELETE + EXIT=0; `/usr/bin/python3 scripts/check_delete_target.py` -> the guard message + EXIT=4;
+   `just --list` parses. R5 re-review of the changed rail: gemma-4-E4B-it-MLX-4bit VERDICT APPROVE,
+   sha256_16 b4a583dd9168c253, artifact governance/r5_reviews.jsonl.
+
+## BUG-1062 (MED, FIXED 2026-10-27) - the printed RESIDENCY figure bypassed config (hardcoded `* 0.8 - 3.0` while the JSON path read the config), and the fit claim it printed was a WEIGHTS-ONLY sum presented without that qualifier
+
+1. TWO SITES, ONE DECLARATION: `render()` computed usable as `round(budget_gb * 0.8 - 3.0, 1)` while `main()`
+   computed it from `memory.max_resident_fraction` and `memory.kv_headroom_gb`. They agree today
+   (57.5 x 0.80 - 3.0 = 43.0), so the defect is LATENT: the first time the KV reserve is tuned, the line a human
+   reads keeps the old number while the machine reports the new one — D-2642's shape (a baseline moved where nobody
+   measured a break is a quiet re-record) waiting for its trigger. It is also a straight C12 breach: the values live
+   in config and the surface re-typed them as literals.
+2. THE CLAIM ITSELF WAS UNQUALIFIED: `40.0 GiB of 43.0 usable — all assigned models fit at once` sums `row["gb"]`,
+   which is WEIGHTS ONLY. The 3.0 GiB reserve is a flat figure and `memory.kv_headroom_ctx` was declared NOWHERE, so
+   it covered no role's working set by any stated basis — while `plan` and `analyze` each declare `min_ctx: 131072`.
+   The line read as a co-residency guarantee and was not one (this is BUG-1055 limb 4, restated as a surface defect).
+3. FIX: one derivation `usable_gb_for(cfg, budget_gb)` now feeds all three sites (resolve, render, report), so the
+   reserve is tunable in exactly one place. The note reads `weights of all assigned models fit at once (KV excluded)`.
+   A new `KV` disclosure line states the reserve, its (absent) context basis, the highest declared min_ctx among
+   assigned roles, and names the roles at that ceiling. `memory.kv_headroom_ctx: null` is now a DECLARED key, so the
+   absence of a basis is a declaration with a referent instead of a silently missing value (D-3034).
+4. VERIFIED numerically IDENTICAL, deliberately: before `40.0 GiB of 43.0 usable` / budget 57.5 GiB; after the same
+   three numbers, only wording added. `--selftest` 3/3 green; `--json` usable_gb 43.0 equals the printed 43.0. The
+   change ADDS a disclosure and moves no threshold, so no role assignment can cascade from it (D-2642). R5 review:
+   gemma-4-E4B-it-MLX-4bit VERDICT APPROVE, sha256_16 8c4474abd4238160.

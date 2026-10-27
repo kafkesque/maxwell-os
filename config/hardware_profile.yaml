@@ -63,6 +63,11 @@ memory:
   max_resident_fraction: 0.80
   # KV cache + prefill activations are not in the weights; a candidate must leave this much of the budget free
   kv_headroom_gb: 3.0
+  # The DECLARED BASIS of that flat reserve. null = NOT DECLARED: the reserve is then derived from no context at all,
+  # so it covers no role's working set, and the report must say so instead of printing "fits at once" unqualified
+  # (BUG-1055 limb 4). Set this to the context the reserve was actually sized at; roles declaring a larger min_ctx
+  # are then named individually as uncovered.
+  kv_headroom_ctx: null
   # below this the machine cannot host a competent 4-bit reviewer at all — a named floor, not a surprise
   min_viable_model_gb: 4.0
   # used ONLY when the engine cannot be reached: physical RAM minus this reserve is the fallback budget

@@ -34015,3 +34015,168 @@ decisions:
   - config/delete_safety.yaml
   - justfile
   - governance/buglog.md
+- id: D-3187
+  state: RESOLVED
+  category: RAIL SURFACES / GATE READABILITY / C12
+  title: 'A surface must state its own referent: a REFUSE must read as a VERDICT rather than a crash, and a fit figure must name its basis (weights only, with KV a flat reserve that declares no context)'
+  decision: |
+    TWO RULES, both about a surface that described the wrong referent.
+    1. A REFUSAL MUST READ AS A REFUSAL. `just` renders every non-zero recipe exit as
+       "error: Recipe ... failed", so a deliberate REFUSE (exit 2) reached the owner as the same word a crash
+       produces; and the natural `python3 scripts/check_delete_target.py <path>` form died on
+       /Library/Developer/CommandLineTools/usr/bin/python3 with a ModuleNotFoundError traceback. The
+       `delete-check` recipe now carries `[no-exit-message]`, prints its OWN verdict line per declared code
+       (0 SAFE_TO_DELETE / 2 REFUSED / 3 UNDETERMINED / 4 USAGE) and re-exits with the SAME code, so a caller
+       reads the rail's decision rather than just's 101. The rail's yaml import fails closed with the interpreter
+       path and the command to run, never a traceback (C16).
+    2. A FIGURE MUST NAME ITS BASIS. The RESIDENCY line was a WEIGHTS-ONLY sum printed as a co-residency
+       guarantee, and its usable budget was hardcoded `* 0.8 - 3.0` at the print site while the JSON path read
+       config - so the number a human reads could not be tuned from the place the value is declared (C12, and
+       D-2642's shape waiting for its trigger). Now ONE derivation `usable_gb_for(cfg, budget_gb)` feeds every
+       site; the claim reads "weights ... (KV excluded)"; and a KV disclosure line names the reserve, states that
+       `memory.kv_headroom_ctx` is null (no declared context basis), and names the roles at the highest declared
+       min_ctx.
+    WHAT IS DELIBERATELY NOT DONE: no threshold moved. The change ADDS a disclosure and alters no assignment, so
+    it cannot cascade into role selection. That is the difference between correcting a surface and re-recording a
+    baseline.
+  measured: |
+    BEFORE: `RESIDENCY  40.0 GiB of 43.0 usable - all assigned models fit at once`; budget 57.5 GiB (engine /health
+    final_ceiling); usable 43.0 (= 57.5 x 0.80 - 3.0).
+    AFTER: the same three numbers - `RESIDENCY  40.0 GiB of 43.0 usable - weights of all assigned models fit at
+    once (KV excluded)` plus `KV  NOT MODELLED: KV is a 3.0 GiB flat reserve that declares NO context basis
+    (memory.kv_headroom_ctx is null), so no role is covered by it; highest declared min_ctx 131072 tokens -
+    analyze, plan (BUG-1055)`. `--selftest` 3/3 green; `--json` usable_gb 43.0 equals the printed 43.0.
+    `just delete-check ~/.omlx/models/Qwen3.8-27B-MLX-4bit` -> verdict line `REFUSED (2) ... Nothing was deleted.`,
+    EXIT=2, and no `error:` line from just. `just delete-check <gemma-12B-8bit metadata stub>` ->
+    `SAFE_TO_DELETE (0)`, EXIT=0. `/usr/bin/python3 scripts/check_delete_target.py <path>` -> the interpreter guard
+    message, EXIT=4. `just --list` parses the recipe.
+    R5 review (generator != verifier, C8), 2026-10-27: gemma-4-E4B-it-MLX-4bit APPROVE on
+    scripts/check_delete_target.py (sha256_16 b4a583dd9168c253) and on scripts/hardware_calibrate.py
+    (sha256_16 8c4474abd4238160); artifact governance/r5_reviews.jsonl (append-only).
+  bugs:
+  - BUG-1061
+  - BUG-1062
+  files:
+  - justfile
+  - scripts/check_delete_target.py
+  - scripts/hardware_calibrate.py
+  - config/hardware_profile.yaml
+  supersedes: []
+- id: D-3188
+  state: ACTIVE
+  category: DISK HYGIENE / MEASUREMENT CORRECTION / OWNER LANE
+  title: 'The roleless Qwen3.8-27B pair is 15.6 GiB of REAL bytes, not 30.2 GB (the figure in D-3185 was the symlink-farm double count BUG-1050 forbids), and its base cannot be deleted alone: it is D-3177 control arm and the payload 13 of MTP4 links resolve to'
+  decision: |
+    1. THE FIGURE IS CORRECTED. D-3185 section 6 describes the roleless Qwen3.8-27B pair as "~30.2 GB". Measured
+       on this host 2026-10-27 the real bytes are 15.6 GiB: `~/.omlx/models/Qwen3.8-27B-MLX-4bit` 15.0G
+       (apparent 16,081,501,977 B / provisioned 16,081,543,168 B), `~/.omlx/models_staged/Qwen3.8-27B-MTP4` 228M
+       of its OWN bytes (239,146,670 B; its remaining 16.08 GB are SYMLINKS INTO the base), and
+       `~/.omlx/models_staged/_heads` 456M (477,868,591 B). 30.2 is the farm counted twice - exactly the
+       `du -shL` artefact BUG-1050 forbids, and the third occurrence of that class in this register. A deletion
+       decision sized on 30.2 GB was therefore weighing twice the disk the deletion would actually reclaim.
+    2. THE BASE CANNOT BE DELETED ALONE, on two INDEPENDENT axes:
+       (a) CONTROL. `Qwen3.8-27B-MLX-4bit` declares `roles: []` and its own `why:` reads "the same checkpoint
+           WITHOUT mtp.* weights; kept as the control, not as a production brain". It is the reference arm of
+           D-3177's MEASURED 1.54x decode claim, so deleting it leaves that claim with no re-measurable control -
+           D-2642's shape (a baseline moved where nobody measured a break).
+       (b) REFERENCE. 13 entries of `models_staged/Qwen3.8-27B-MTP4` are symlinks into the base, including
+           model-00001..3-of-00003.safetensors, tokenizer.json and tokenizer_config.json, and MTP4 IS advertised
+           by the engine. Deleting the base leaves MTP4 with 239 MB of real bytes and ~16 GB of dangling links -
+           a half-delete no reload can repair.
+    3. RECOMMENDATION: KEEP both until a `plan`/`analyze` accuracy gate exists (D-3189). The reason is not
+       caution, it is the next decision's own requirement: MTP4 is the candidate register's brain/plan/analyze
+       row, and BUG-1055 is precisely whether a REAP-pruned 19B may outrank a 27B on speed alone. Deleting the
+       27B pre-empts the fixture that settles it, and costs a 15.0 GB re-download to undo. Disk pressure is not a
+       reason today: 120.8 GiB free, measured 2026-10-27.
+    4. THE OWNER ROW IS STILL OPEN and its options are now priced honestly.
+       A = KEEP (recommended): 15.6 GiB stays held; MTP4 keeps a working payload; D-3177 stays re-measurable.
+       B = DELETE THE SET (base + farm + _heads): 15.6 GiB reclaimed, and D-3177's control plus the
+           plan/analyze candidate go with it.
+       A half-measure is no longer an option: the rail refuses it, and it would break a served model.
+  measured: |
+    `just delete-check ~/.omlx/models/Qwen3.8-27B-MLX-4bit` -> `── delete-check VERDICT: REFUSED (2)`, EXIT=2,
+    with SERVED (a loadable entry in ~/.omlx/models resolves to it), SYMLINK-REFERENCED (13 referrers under
+    models_staged/Qwen3.8-27B-MTP4; examples capped at 4, count complete) and ADVERTISED (engine id
+    `Qwen3.8-27B-MLX-4bit`).
+    Sizes, `du` never `-L`: 15.0G / 228M / 456M. Distinct (device,inode) totals: 16,081,501,977 /
+    239,146,670 / 477,868,591 B -> pair + heads = 16,798,517,238 B = 15.6 GiB. The farm's own
+    with-symlink-targets count is 16,320,425,434 B - the double count that produced "30.2 GB".
+    df -h / : 121Gi avail at the start of the sitting; 120.8 GiB read by scripts/hardware_calibrate.py afterwards.
+    Engine: GET /v1/models = 16 ids, containing BOTH `Qwen3.8-27B-MLX-4bit` and `Qwen3.8-27B-MTP4`;
+    ~/.omlx/model_settings.json carries a key for each (14 keys total).
+    NOT MEASURED, named as such (D-3036): neither 27B is currently loaded, so a cold-load probe (42-134 s TTFT
+    measured on this host) was not taken this sitting. Whether MTP4 still decodes at D-3177's rate after the
+    deletion work is an OPEN reading, and it is the first thing to take if option B is ever chosen.
+  bugs:
+  - BUG-1050
+  - BUG-1059
+  - BUG-1057
+  files:
+  - config/hardware_profile.yaml
+  - scripts/check_delete_target.py
+  - config/delete_safety.yaml
+  supersedes: []
+- id: D-3189
+  state: ACTIVE
+  category: MODEL PORTFOLIO / ROLE GATING / WORKING SET (BUG-1055)
+  title: 'BUG-1055 is structural, not a bad pick: 4 of 6 roles are assigned with no gate, so "best planner" means "fastest model that declares plan". The fix is to make the ABSENCE of a gate visible - reuse the r5_review artifact pattern, NOT a computed KV formula'
+  decision: |
+    1. THE DEFECT IS STRUCTURAL. Four of six roles declare `require_gate: null` (code, plan, analyze, classify);
+       `review` is gated ONLY because a fixture exists. Nothing in the resolver is wrong - it ranks the fastest
+       ELIGIBLE model, and eligibility is declared per candidate. The register simply carries no capability receipt
+       for planning, so "the best planner" is operationally "the fastest model that declares `plan`". The fix is
+       therefore not to argue Ornith-19B vs the 27B; it is to make the absence of a gate as VISIBLE as a failure.
+    2. REJECTED: a COMPUTED KV FORMULA as the answer to limb 4. Resolved per family from each candidate's
+       `text_config` (2026-10-27): Qwen3.8-27B and Ornith carry `layer_types` + `full_attention_interval` + the
+       `linear_*` head dims (KV exists only on full-attention layers), gemma-4 carries
+       `num_global_key_value_heads` + `num_kv_shared_layers` + `sliding_window` + `global_head_dim`, and gpt-oss
+       alternates 12 of 24 layers behind a sliding window. Four of six candidates answer NOTHING at the top level
+       (the keys nest under `text_config`). A one-line `2 x layers x kv_heads x head_dim x dtype` would be wrong
+       for three families and would LOOK precise - worse than the honest flat reserve, because a wrong number
+       invites a decision while a declared gap invites a measurement. Recorded with its reason (D-3038).
+    3. ADOPTED, cheapest first:
+       (a) DISCLOSE NOW - done in D-3187. The report states the reserve is flat with no context basis and names
+           the roles at the highest declared min_ctx, so the weights-only fit claim can no longer be misread as a
+           working-set guarantee.
+       (b) GATE THE ROLE, NOT THE MODEL - reuse the existing pattern rather than build a parallel subsystem:
+           `require_gate: <name>` + an artifact line per measurement + thresholds in config (the r5_review shape:
+           min_n 20, constant-answer baseline, min_margin_over_baseline 0.15, false_approve_ceiling 0.10). The new
+           gate is `plan_quality`, and its items take the shape T-187 established: a task whose expected answer
+           only survives reasoning over the PROVIDED material, so a plausible-but-unread answer cannot pass. Then
+           `plan` and `analyze` declare `require_gate: plan_quality` and the resolver's existing fail-closed path
+           does the rest - no new ranking code.
+       (c) DECLARE THE UNGATED - OWED, NOT DONE: every role with `require_gate: null` must carry an explicit
+           `ungated_accepted: {date, reason}` so a speed-only assignment is a DECLARED bet rather than a default,
+           and the calibrator must report a `null` gate with no acceptance as a fault. Until that lands, every
+           ungated role is speed-only and must be read as such.
+    4. WHAT SETTLES D-3188's OWNER ROW: limb (b) is the instrument. If MTP4 clears plan_quality and Ornith does
+       not, the 27B pair EARNS its 15.6 GiB and the deletion question closes itself; if neither clears, the role
+       stays speed-only and the pair becomes deletable on EVIDENCE instead of on disk pressure.
+  measured: |
+    Role table (scripts/hardware_calibrate.py, 2026-10-27): brain gpt-oss-20b-MXFP4-Q8 decode 40.47 gate=True;
+    review gpt-oss-20b seconds_per_item 0.353 gate=True; code Qwen3-Coder-30B-A3B 44.39 gate=None; plan
+    Ornith-1.5-35B-A3B-REAP-19B 48.54 gate=None; analyze Ornith-1.5-35B-A3B-REAP-19B prefill 396.63 gate=None;
+    classify MiniCPM5-2B-MLX 80.77 gate=None. Four of six roles carry no gate, and plan+analyze both landed on the
+    REAP-pruned 19B.
+    Residency context: `RESIDENCY 40.0 GiB of 43.0 usable - weights of all assigned models fit at once (KV
+    excluded)`; `KV NOT MODELLED: KV is a 3.0 GiB flat reserve that declares NO context basis
+    (memory.kv_headroom_ctx is null), so no role is covered by it; highest declared min_ctx 131072 tokens -
+    analyze, plan`.
+    Attention geometry read from each config.json (2026-10-27): gpt-oss-20b layer_types present, full_attention
+    12 of 24, kv_heads 8, head_dim 64; Qwen3-Coder-30B-A3B 48 layers / 4 kv_heads / 128 head_dim; Phi-4-mini
+    32 / 8 / 128; MiniCPM5-2B 42 / 2 / 128; Qwen3.8-27B (both), Ornith-1.5-35B-A3B-REAP-19B and gemma-4-E4B
+    answer NOTHING at top level - their geometry lives under `text_config`, with `linear_*` +
+    `full_attention_interval` (Qwen3.8/Ornith) and `num_global_key_value_heads` + `num_kv_shared_layers`
+    (gemma-4).
+    Gate precedent, existing and working: governance/r5_review_gate_bench.jsonl (6 rows), thresholds min_n 20 /
+    min_margin_over_baseline 0.15 / false_approve_ceiling 0.10, produced by tools/r5_reviewer_fixture.py
+    (suite reviewing_verdict: 24 items, 12 seeded-defect / 12 clean, constant-answer baseline exactly 0.5000,
+    graded by the production extract_verdict).
+  bugs:
+  - BUG-1055
+  - BUG-1048
+  - BUG-1041
+  files:
+  - config/hardware_profile.yaml
+  - scripts/hardware_calibrate.py
+  supersedes: []

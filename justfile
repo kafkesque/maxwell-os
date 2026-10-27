@@ -319,8 +319,22 @@ delegate-check:
 # ── Delete Safety (BUG-1054/1057/1059) ───────────────────────────
 # Refuses to delete model bytes that something still SERVES, SYMLINKS to (across all roots), SHARES an
 # inode with, or still ADVERTISES. READ-ONLY: the delete itself stays an owner act via pipeline/safe_delete.py.
+[no-exit-message]
 delete-check *PATHS:
+    #!/usr/bin/env bash
+    # A REFUSE is the GATE working, not a crash. Without this block `just` printed "error: Recipe ... failed" for a
+    # deliberate verdict, so a correct refusal was indistinguishable from a broken command (BUG-1061). `just` also
+    # reports any failure as 101, so the verdict is printed here and the rail's own code is propagated unchanged.
     python3 scripts/check_delete_target.py {{PATHS}}
+    rc=$?
+    case $rc in
+      0) echo "── delete-check VERDICT: SAFE_TO_DELETE (0). Nothing was deleted — the deletion stays an owner act (pipeline/safe_delete.py)." ;;
+      2) echo "── delete-check VERDICT: REFUSED (2). This is the GATE, not a failure: the reasons above name what still needs the bytes. Nothing was deleted." ;;
+      3) echo "── delete-check VERDICT: UNDETERMINED (3). The engine could not be reached, so the check FAILED CLOSED. Nothing was deleted." ;;
+      4) echo "── delete-check VERDICT: USAGE or SETUP (4). See the message above. Nothing was deleted." ;;
+      *) echo "── delete-check VERDICT: UNEXPECTED exit $rc. Read the output above before deleting anything." ;;
+    esac
+    exit $rc
 
 # ── Standardized one-shot local-LLM delegation (BUG-220 / D2543) ──
 # Qwen3-Coder single-shot code gen ONLY — never multi-turn (DELEGATE-002).

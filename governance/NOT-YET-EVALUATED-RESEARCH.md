@@ -691,3 +691,41 @@ rvv3 gate decides, and a gemma may only be promoted if `tools/model_eval_suite.p
 engine's mlx_lm/mlx_vlm), never in-process, and the result recorded into `governance/r5_review_gate_bench.jsonl`
 plus `governance/r5_reviews.jsonl`. Until then the answer stands as it is: **on measured evidence, nothing beats
 gpt-oss-20b-MXFP4-Q8 as the reviewer, and the only cheap way that changes is the 6.77 GB candidate now downloading.**
+
+## THE REVIEWER CANDIDATE SET — MEASURED RESOLUTION (2026-10-27, D-3161 classification)
+
+The 12B download completed (6.3 GiB on disk = the 6.77 GB Hub figure) and was gated on the SAME instrument as
+every other row — `tools/model_eval_suite.py --suites reviewing_verdict` (24 items, 12 seeded-defect / 12 clean,
+constant-answer baseline 0.5000, production `extract_verdict` parser), THROUGH oMLX over HTTP at 127.0.0.1:11435
+(never in-process: `gemma4_unified` is mapped only in the engine's mlx_lm/mlx_vlm), temp 0.0. 458 s for 24 items.
+
+| reviewer | bytes | acc | margin | false_approve | false_reject | unparsed | verdict |
+|---|---|---|---|---|---|---|---|
+| gpt-oss-20b-MXFP4-Q8 | 11 GB | **0.9167** | **0.417** | 0.000 | 0.083 | 0 | PASS (incumbent) |
+| gemma-4-12B-it-MLX-4bit | 6.77 GB | 0.7083 | 0.208 | **0.000** | 0.250 | 1 | PASS |
+| gemma-4-E4B-it-MLX-4bit | 6.86 GB | 0.7083 | 0.208 | 0.125 | 0.125 | 1 | FAIL (false_approve > 0.10) |
+| gemma-4-E4B-it-MLX-8bit | 8.97 GB | — | — | — | — | — | NOT MEASURED |
+| gemma-4-12B-it-MLX-8bit | 12.75 GB | — | — | — | — | — | NOT MEASURED |
+| gemma-4-26B-A4B-it-QAT-MLX-4bit | 15.64 GB | — | — | — | — | — | EXCLUDED by the 14 GB budget |
+
+**THE ANSWER TO THE RECURRING QUESTION, with the number that settles it.** There is NO gemma under 14 GB that beats
+gpt-oss on accuracy. The 12B does not improve on the gemma family's accuracy AT ALL — it reproduces E4B's 0.7083
+exactly — and it trails gpt-oss by 0.2084 accuracy and 0.209 margin. What it fixes is ONE axis: false_approve drops
+from 0.125 to 0.000, which is why it clears the gate E4B fails. It buys that by rejecting twice as much clean code
+(0.250 vs 0.125). So the honest classification:
+
+- `gpt-oss-20b-MXFP4-Q8` — **ADOPT** (deep-tier reviewer of record). Highest accuracy, highest margin, zero false
+  approve, fewest unparsed, and 11 GB still under the budget.
+- `gemma-4-12B-it-MLX-4bit` — **ADAPT** (a SAFER SUBSTITUTE FOR E4B, not a successor to gpt-oss). Choose it where a
+  false APPROVE is far more costly than a false reject. Its doubled false_reject is the price, named.
+- `gemma-4-E4B-it-MLX-4bit` — **SKIP for the verdict gate** (false_approve 0.125 > the 0.10 ceiling), but KEEP as the
+  R5 prose partner it is in practice (0.48 s, and it approved two rails on 2026-10-27).
+- `gemma-4-E4B-8bit` (8.97 GB) / `gemma-4-12B-8bit` (12.75 GB) — **WATCH**, unmeasured. The quantisation question is
+  now sharper, not answered: 12B-4bit ties E4B-4bit exactly, so the 12B's extra parameters bought NO accuracy on
+  this construct, and 8-bit is the remaining test of whether the ceiling is precision or the model.
+- `gemma-4-26B-A4B-QAT-4bit` (15.64 GB) — **EXCLUDED** by the declared budget; recorded so it is not re-proposed.
+
+**STILL BLOCKING A PROMOTION (not this row):** BUG-1048 (R5 coverage silently depends on file length) and BUG-1041
+(no re-measure channel / tag-blind `_done_keys`). This table is a BENCH VERDICT; the production deep tier changes
+only when those two are closed. Engine state after the session's work: reload answered `Re-discovered 17 models from
+2 directories` (16 -> 17, the new repo picked up by the HF-cache discovery dir).

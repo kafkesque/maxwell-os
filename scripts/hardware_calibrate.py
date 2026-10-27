@@ -237,7 +237,7 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
     """Assign each role from MEASURED receipts; report UNCALIBRATED where nothing measured qualifies."""
     models_root = Path(os.path.expanduser(str(cfg["detect"]["paths"]["models_root"])))
     mem = cfg["memory"]
-    usable_gb = budget_gb * float(mem["max_resident_fraction"]) - float(mem["kv_headroom_gb"])
+    usable_gb = usable_gb_for(cfg, budget_gb)
     by_model: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         by_model.setdefault(str(row.get("model")), []).append(row)
@@ -324,21 +324,67 @@ def resolve(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, ban
                                   "calibration for a candidate before assigning this role"}
     return roles, table
 
-def residency(roles: dict[str, dict[str, Any]], table: list[dict[str, Any]], usable_gb: float) -> dict[str, Any]:
+def usable_gb_for(cfg: dict[str, Any], budget_gb: float) -> float:
+    """THE one derivation of the usable budget (C12: no literal 0.8 / 3.0 anywhere else in this file).
+
+    Every printed figure must come through here. Before this existed the report hardcoded `budget_gb * 0.8 - 3.0`
+    while the JSON path read the config, so tuning `memory.kv_headroom_gb` moved one figure and not the other —
+    a declaration that could not reach the surface it describes (BUG-1062).
+    """
+    mem = cfg["memory"]
+    return round(budget_gb * float(mem["max_resident_fraction"]) - float(mem["kv_headroom_gb"]), 1)
+
+
+def declared_min_ctx(cfg: dict[str, Any]) -> dict[str, dict[str, int]]:
+    """role -> {model -> min_ctx} exactly as the candidate rows declare it (absent is absent, never inferred)."""
+    out: dict[str, dict[str, int]] = {}
+    for cand in cfg["candidates"]:
+        for role, ctx in (cand.get("min_ctx") or {}).items():
+            out.setdefault(str(role), {})[str(cand["model"])] = int(ctx)
+    return out
+
+
+def residency(roles: dict[str, dict[str, Any]], table: list[dict[str, Any]], usable_gb: float,
+              mem: Optional[dict[str, Any]] = None,
+              min_ctx: Optional[dict[str, dict[str, int]]] = None) -> dict[str, Any]:
     """Can the assigned portfolio be RESIDENT together?
 
     A per-role winner set that cannot co-reside is a plan that thrashes: every request crosses roles and pays a
     cold load (MEASURED 5.8-7.2 s per load on this host), which is exactly the kind of hidden cost a per-role
     table hides. Reported, never silently accepted.
+
+    The sum is WEIGHTS ONLY, and the note now says so. It is also NOT a working-set claim: `kv_headroom_gb` is a
+    flat reserve with no declared context basis, while `plan` and `analyze` declare min_ctx=131072. Until a KV
+    term exists, the uncovered roles are named on every report rather than left to be inferred from a line that
+    reads as a fit guarantee (BUG-1055 limb 4).
     """
     sizes = {row["model"]: (row["gb"] or 0.0) for row in table}
     needed = sorted({pick["model"] for pick in roles.values() if pick.get("model")})
     total = round(sum(sizes.get(name, 0.0) for name in needed), 1)
+    note = ("weights of all assigned models fit at once (KV excluded)" if total <= usable_gb else
+            "the assigned WEIGHTS exceed the budget: the engine evicts between roles, so a call that "
+            "crosses roles pays a cold load")
+    ctx_by_role = min_ctx or {}
+    demanded = [(role, ctx_by_role.get(role, {}).get(str(pick.get("model"))))
+                for role, pick in roles.items() if pick.get("model")]
+    demanded = [(role, int(ctx)) for role, ctx in demanded if ctx]
+    highest = max((ctx for _, ctx in demanded), default=None)
+    kv_note: Optional[str] = None
+    if mem is not None:
+        reserve = float(mem.get("kv_headroom_gb") or 0.0)
+        basis = mem.get("kv_headroom_ctx")
+        if basis is None:
+            at_ceiling = sorted(role for role, ctx in demanded if ctx == highest)
+            kv_note = (f"NOT MODELLED: KV is a {reserve} GiB flat reserve that declares NO context basis "
+                       f"(memory.kv_headroom_ctx is null), so no role is covered by it; highest declared "
+                       f"min_ctx {highest} tokens — {', '.join(at_ceiling) or 'none'} (BUG-1055)")
+        else:
+            uncovered = sorted(role for role, ctx in demanded if ctx > int(basis))
+            kv_note = (f"NOT MODELLED: KV is a {reserve} GiB flat reserve declared at ctx {basis}; "
+                       f"highest assigned min_ctx {highest} tokens; over-basis role(s): "
+                       f"{', '.join(uncovered) or 'none'} (BUG-1055)")
     return {"models": needed, "total_gb": total, "usable_gb": round(usable_gb, 1),
-            "co_resident": total <= usable_gb,
-            "note": ("all assigned models fit at once" if total <= usable_gb else
-                     "the assigned set exceeds the budget: the engine evicts between roles, so a call that "
-                     "crosses roles pays a cold load")}
+            "co_resident": total <= usable_gb, "note": note, "kv_note": kv_note}
 
 
 
@@ -399,14 +445,17 @@ def record(cfg: dict[str, Any], hardware: dict[str, Any], models: list[str], bud
     return written
 
 
-def render(hardware: dict[str, Any], budget_gb: float, budget_src: str, bandwidth: Optional[float],
-           table: list[dict[str, Any]], roles: dict[str, dict[str, Any]]) -> str:
+def render(cfg: dict[str, Any], hardware: dict[str, Any], budget_gb: float, budget_src: str,
+           bandwidth: Optional[float], table: list[dict[str, Any]],
+           roles: dict[str, dict[str, Any]]) -> str:
     """Human report: facts, then candidates, then the assignment with its reason."""
     lines = ["HARDWARE (layer 1 — read, not claimed)"]
     for key in ("chip", "ram_gb", "perf_cores", "wired_limit_gb", "bf16_native", "os", "engine_version", "disk_free_gb"):
         lines.append(f"  {key:<16} {hardware.get(key)}")
-    lines.append(f"  memory budget    {budget_gb} GiB ({budget_src}); usable after gates "
-                 f"{round(budget_gb * 0.8 - 3.0, 1)} GiB")
+    usable_gb = usable_gb_for(cfg, budget_gb)
+    mem = cfg["memory"]
+    lines.append(f"  memory budget    {budget_gb} GiB ({budget_src}); usable after gates {usable_gb} GiB "
+                 f"(= {budget_gb} x {mem['max_resident_fraction']} - {mem['kv_headroom_gb']} KV reserve)")
     lines.append("")
     lines.append("CANDIDATES")
     lines.append(f"  {'model':<42}{'GB':>7}{'fits':>6}{'gate':>6}{'decode':>9}{'prefill':>9}  source")
@@ -430,8 +479,10 @@ def render(hardware: dict[str, Any], budget_gb: float, budget_src: str, bandwidt
         else:
             lines.append(f"  {role:<10} {'UNCALIBRATED':<42} {pick['why']}")
     lines.append("")
-    res = residency(roles, table, round(budget_gb * 0.8 - 3.0, 1))
+    res = residency(roles, table, usable_gb, mem, declared_min_ctx(cfg))
     lines.append(f"RESIDENCY  {res['total_gb']} GiB of {res['usable_gb']} usable — {res['note']}")
+    if res.get("kv_note"):
+        lines.append(f"KV         {res['kv_note']}")
     return "\n".join(lines)
 
 
@@ -480,18 +531,19 @@ def main(argv: list[str] | None = None) -> int:
     rows = receipts(cfg, hardware)
     gate_rows = gates(cfg)
     roles, table = resolve(cfg, hardware, budget_gb, bandwidth, rows, gate_rows, args.allow_predicted)
-    usable_gb = budget_gb * float(cfg["memory"]["max_resident_fraction"]) - float(cfg["memory"]["kv_headroom_gb"])
+    usable_gb = usable_gb_for(cfg, budget_gb)
     report = {"hardware": hardware, "memory": {"budget_gb": budget_gb, "source": budget_src,
                                               "usable_gb": round(usable_gb, 1)},
               "bandwidth_gbs": bandwidth, "candidates": table, "roles": roles,
-              "residency": residency(roles, table, usable_gb), "receipts_used": len(rows)}
+              "residency": residency(roles, table, usable_gb, cfg["memory"], declared_min_ctx(cfg)),
+              "receipts_used": len(rows)}
     if args.write:
         out = ROOT / str(cfg["out"])
         out.write_text("# GENERATED by scripts/hardware_calibrate.py — do not hand-edit (D-3178)\n"
                        + json.dumps({"hardware": hardware, "roles": roles}, indent=2) + "\n")
         report["written"] = str(out)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json
-          else render(hardware, budget_gb, budget_src, bandwidth, table, roles))
+          else render(cfg, hardware, budget_gb, budget_src, bandwidth, table, roles))
     return OK if all(r.get("model") for r in roles.values()) else UNCALIBRATED
 
 

@@ -3404,3 +3404,36 @@ tasks:
     gets switched off, BUG-492). The refusal must NAME the payable class and the prefill bill that makes the loop
     unpayable, so the remedy is a route rather than a shrug (D-3100). NOT this task: re-pointing any model, and not
     the T-187/T-214 fixtures - this is the READER for annotations that already exist.
+
+- id: T-220
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: >-
+    RUN D-3205'S G4 - THE EMISSION GATE AT THE ROLE'S REAL CONTEXT SIZE (26,214 tokens), not at a 228-1000 token
+    fixture: the gate has NEVER been run, it is the last unmeasured clause of the agent-lane decision, and until it
+    has a reading the local-only claim for the loop lane rests on a fixture a hundred times too small
+  why: >-
+    D-3205 names seven gates and ORDERS the remaining work G1 -> G4 -> G5 -> G3's tail. Three of them moved on
+    2026-10-28 and this is the one that did not: G1 PASSES (BUG-1083 CLOSED; suite 580 collected / 568 passed / 0
+    declared red / 0 new), G5's blocker is CLOSED (BUG-1084), G3's oneshot tail is CLOSED (BUG-1088). G4 alone still
+    reads "FAILS - never run", and NO open task carried it: T-212 and T-216 are `done`, so the clause was a
+    declaration with no carrier - the same shape as the T-218 wrong-referent (BUG-1095) one register over. A gate
+    nothing carries is a comment, and a comment cannot fail (D-3034).
+  source: D-3205 clause (4) G4 / clause (5) ordering / BUG-1091 / T-212 / T-216 / D-3161
+  evidence: >-
+    READ 2026-10-28: config/decisions.yaml#D-3205 states 'G4 THE EMISSION GATE HAS RUN AT THE ROLE'S REAL CONTEXT
+    SIZE (26k), not a 228-1000 token fixture: FAILS - never run'; the derived working set is 26,214 tokens
+    (225000 bytes / 8.583), and two ALREADY-SERVED models qualify for the 131072+ class (gpt-oss-20b-MXFP4-Q8 at
+    131072, Qwen3.8-27B-MLX-4bit at 262144). The 26k figure is not a preference: it is derived from the harness's
+    own 225000-byte agent declaration.
+  gate: >-
+    ONE instrumented turn at 26,214 tokens on the model AGENT_LOOP_SHORT resolves to, with the receipt recording
+    TTFT, decode rate, wall clock and the three-way wall reading (INSIDE / OVER_BUDGET / EXCEEDED). A turn that
+    EXCEEDS its wall is UNMEASURED and must be reported as such - never as a FAIL about the model (D-3203). The
+    reading decides local-only for the loop lane; a class that cannot fit its per-turn budget is then a fact about
+    the CLASS, escalated as a decision, never absorbed by shrinking the fixture.
+  blocked_by: >-
+    scripts/harmony_red_loop.py must be GREEN for the model this measures (T-214's rule) - a measurement taken while
+    that fixture is RED would be a claim about the harness, not the model.
+  cost_tier: T1

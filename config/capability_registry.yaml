@@ -661,7 +661,7 @@ routing_debt:
   #: this line is the current number, and it may only go down.
   #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
   #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
-  unrouted_open_bugs: 172
+  unrouted_open_bugs: 171
   #: BUG-1097 (2026-10-28): THE ANCHOR. Until this list existed the ceiling was a number nothing read in the
   #: OTHER direction: `check()` compared `debt > ceiling` and never looked at the ceiling itself, so this register
   #: could carry the receipt of a raise in PROSE ("RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080", above) and
@@ -679,6 +679,7 @@ routing_debt:
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 221, to: 172, decision: D-3212, why: 'lowered to the corrected reading: the reader saw only id + title, so 69 bugs whose EVIDENCE named an owner counted as debt (BUG-1096)'}
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 173, decision: D-3212, why: "RAISED 172 -> 173 under D-3212"}
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 173, to: 172, decision: null, why: "LOWERED 173 -> 172 to the measured reading"}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 171, decision: null, why: "LOWERED 172 -> 171 to the measured reading"}
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

@@ -35921,3 +35921,141 @@ decisions:
   - config/config_defaults_census.json
   - governance/bug_status.json
   - governance/buglog.md
+- id: D-3213
+  date: '2026-10-28'
+  state: RESOLVED
+  category: AGENT-LANE GATES / INSTRUMENT INTEGRITY (D-3205, D-3203, D-2644, D-3034, D-3036, D-2642, BUG-1088, BUG-1097)
+  bugs:
+  - BUG-1088
+  - BUG-1097
+  - BUG-1083
+  - BUG-1084
+  title: 'D-3205''S CLAUSE STATUS IS RESTATED FROM MEASUREMENT - G1, G3 and G5 are CLOSED (not "currently FAILS"),
+    G4 is the one clause still unrun and it now has a CARRIER (T-220) - and the two instrument gaps behind those
+    closures were paid as invariants: the routing-debt ceiling got a raise-guard (BUG-1097) and the transport wall
+    got ONE home (BUG-1088)'
+  decision: '(1) D-3205 REMAINS IN FORCE AND IS NOT SUPERSEDED; its inline CLAUSE STATUS LINES are restated here,
+    because a decision that says "currently FAILS" about a gate that has since been measured is a stale claim in
+    the most load-bearing register this OS has. MEASURED 2026-10-28: G1 PASSES - BUG-1083 is CLOSED and the suite
+    rail reads 580 collected / 568 passed / 0 declared red / 0 NEW; G3 PASSES at BOTH ends - BUG-1085 (the two loop
+    instruments) and BUG-1088 (pipeline/oneshot_ask.py''s typed `timeout + 20`) are CLOSED; G5''s stated blocker
+    BUG-1084 is CLOSED. (2) G4 IS THE ONLY CLAUSE STILL FAILING AND IT WAS CARRYING NOTHING: D-3205 orders the remaining
+    work G1 -> G4 -> G5 -> G3''s tail, and G4''s two predecessor tasks (T-212, T-216) are `done`, so the clause
+    "the emission gate has run at the role''s real context size (26,214 tokens)" had no open carrier at all - a
+    declaration with no referent (D-3034) and the BUG-1095 wrong-referent shape one register over. T-220 is MINTED
+    as that carrier, born ROUTED (decision_mint + loop_emission) so it does not add an unrouted item to a ceiling
+    set at its floor. (3) THE TWO INSTRUMENTS BEHIND THE CLOSURES WERE FIXED AS INVARIANTS, NOT AS INSTANCES: `config/capability_registry.yaml#routing_debt.ceiling_changed`
+    is an append-only, machine-readable record and `scripts/resolve_route.py` now reads the ceiling in the OTHER
+    direction too - an edit that moves the number without a signed row is fault (viii), a raise that cites no existing
+    decision is (ix), an undated or stale reading is (x), and `--rebaseline --set <cls>=<n> [--because D-xxxx]`
+    is the ONLY act that moves it (a LOWERING needs no citation, D-2644; a raise does). The transport wall''s inequality
+    moved to `scripts/lib/transport_wall.py` and BOTH callers now delegate, so the class cannot be paid a third
+    time by a path that cannot see the rule. (4) THE LADDER''S TWO GROWTHS WERE PAID, NOT RE-CEILINGED: `check_undeclared_encoding`
+    2 files / 5 sites / 2 writes -> 0/0/0 (five sites now name a codec that their FORMAT defines - JSON is UTF-8
+    by RFC 8259) and `check_silent_repair` 14-of-13 with 2 unknown -> 13-of-13 with 0 unknown (one debt site paid
+    in code and its entry DELETED rather than left STALE; two foreign-stream sites DECLARED as `allowed`, keyed
+    by content). (5) WHAT THIS DOES NOT CLAIM: G4 is still unrun, so the local-only claim for the loop lane at 26,214
+    tokens remains UNPROVEN and T-220 is a carrier, not a reading. G6/G7 are untouched and still stand as D-3205
+    wrote them.'
+  reason: 'The owner asked for the next highest-leverage step to be taken in consequential order, with the governance
+    dependencies synced so that what is solved is not shown as open and no two decisions disagree. Reading D-3205
+    against the registers showed a decision whose own status lines had gone stale in three places while one of its
+    clauses had lost its carrier entirely - the register-stewardship shape D-3212 named, one register over. The
+    order taken was therefore: pay the floor-guard first (BUG-1097), because every later disposition depends on
+    the ceiling being an invariant rather than a promise; then the cheapest open clause-tail (BUG-1088); then the
+    two ladder growths, because a ladder that aborts at its first red hides every rail below it (BUG-457/BUG-573)
+    and makes every later reading suspect; then give G4 its carrier. Each step was closed only against a red loop
+    seen on both sides (D-3036), and each audit re-measured the neighbouring rails rather than trusting the change.'
+  rejected:
+  - option: Mark D-3205 SUPERSEDED and mint a replacement decision carrying the current gate state.
+    why: 'Wrong in both directions: six of its seven clauses still bind exactly as written (G6 escalation, G7 attribution,
+      the ordering rule) and the one thing that changed is measured STATUS, not the decision. A SUPERSEDED marker
+      would strand those clauses behind an unread record; restating the status while the decision stays in force
+      is the smaller, truer act. Appending rather than rewriting also keeps the register honest about WHAT WAS BELIEVED
+      ON 2026-10-27 - the stale line is the receipt of that belief.'
+  - option: Edit D-3205's inline clause status in place.
+    why: D-3205 is a RESOLVED record; rewriting its prose destroys the evidence that the gate was ever believed
+      failing, which is the only thing that keeps a status line falsifiable. The register's own idiom is a dated
+      status ("PASSES as of 2026-10-27T20:40") and a new record is how a date is added without editing a date away.
+  - option: Leave G4 carrier-less because D-3205 already names it, so "the decision carries it".
+    why: 'MEASURED: D-3205 is cited by no open task for G4 and its two predecessor tasks are `done` - exactly the
+      BUG-1095 shape (a citation that resolves to the wrong referent), and the reason the clause sat unrun for a
+      day. A decision names an obligation; only a TASK prices the work.'
+  - option: Raise the silent-repair debt ceiling from 13 to admit the two undeclared sites.
+    why: 'Both are FOREIGN streams (an engine HTTP error body, the engine''s own runtime log), which is the `debt`
+      register''s opposite classification: `debt` means "this SHOULD be repointed to the decode home", `allowed`
+      means "repair is correct here". Raising the ceiling would have mis-declared two honest sites as repairable
+      debt and spent a shrink-only number on a misclassification.'
+  - option: Pay every remaining `debt`-kind silent-repair site in the same sitting.
+    why: 'Scope discipline (D-3038): the ladder was RED because of GROWTH (2 undeclared sites) and one site over
+      the ceiling, and both are now paid. The remaining 13 are declared, bounded and shrink-only; refactoring 13
+      rails inside a sitting whose subject was the gate register would bundle unreviewed edits into one commit.'
+  metrics:
+    gates_restated: 3
+    gates_passing_before: 4
+    gates_passing_after: 6
+    gates_still_failing: 1
+    g4_carrier_task: T-220
+    suite_collected: 580
+    suite_passed: 568
+    suite_new_failures: 0
+    open_bugs_before: 267
+    open_bugs_after: 265
+    open_tasks_before: 63
+    open_tasks_after: 64
+    routing_debt_tasks: 26
+    routing_debt_ceiling_tasks: 26
+    routing_debt_bugs: 171
+    routing_debt_ceiling_bugs: 172
+    routing_ceiling_acts_recorded: 4
+    resolve_route_controls: 30
+    transport_slack_s: 15
+    transport_wall_at_90s_budget: 105
+    transport_wall_at_600s_budget: 615
+    silent_repair_debt_before: 14
+    silent_repair_debt_after: 13
+    silent_repair_unknown_before: 2
+    silent_repair_unknown_after: 0
+    undeclared_encoding_files_before: 2
+    undeclared_encoding_files_after: 0
+    undeclared_encoding_sites_before: 5
+    undeclared_encoding_sites_after: 0
+    ladder_faults_in_one_pass: 7
+    ladder_pre_existing_faults: 6
+  evidence:
+  - 'BUG-1097 RED before the fix: unrouted_open_bugs 172 -> 173 by a bare edit, scripts/resolve_route.py --check
+    printed "ok ... within its shrink-only ceiling", rc 0; AFTER: "(viii) CEILING UNANCHORED ... RAISED WITHOUT
+    a recorded act", rc 1'
+  - scripts/resolve_route.py --rebaseline --set bugs=173 -> rc 2 (needs --because); --because D-9999 -> rc 2 (not
+    in 1338 decisions); --because D-3212 -> rc 0, row appended, rail green at 172/173; --set bugs=172 -> rc 0 (a
+    LOWERING needs no citation), green at 172/172 with 4 recorded acts
+  - scripts/resolve_route.py --selftest -> 30/30 (was 22/22)
+  - 'pipeline/oneshot_ask.py --timeout 5 -> "FATAL: transport slack 15s is not inside (0, 5)", exits before any
+    curl; transport_wall.read(600) = 615; scripts/measure_subagent_loop.py --selftest 72/72 over the SAME inequality
+    now that it delegates'
+  - scripts/check_undeclared_encoding.py --check -> files 0 of ceiling 0 | sites 0 | writes 0 (was 2 / 5 / 2), rc
+    0
+  - scripts/check_silent_repair.py --check -> OWED, debt 13 of ceiling 13, unknown 0 (was FATAL, debt 14 of 13,
+    unknown 2), selftest 24/24
+  - scripts/run_ladder.py --collect health -> 200 lines, 7 faults in ONE pass; 6 are the pinned pre-existing reds
+    (harness_env, delegation_economy, check_revoked_references, reconcile, verify_generator_pins, check_rail_registry)
+  - scripts/check_tests.py --check -> 580 collected, 568 passed, 0 declared red, 0 new
+  - scripts/check_config_defaults.py --record -> counts.modules 660 -> 661 (the new scripts/lib/transport_wall.py);
+    ceilings unchanged at 300/3
+  - scripts/resolve_route.py --route T-220 -> routed to decision_mint, loop_emission; debt unchanged at 26/26 tasks
+    and 171/172 bugs
+  files:
+  - scripts/resolve_route.py
+  - scripts/lib/transport_wall.py
+  - scripts/lib/artifact_tokens.py
+  - pipeline/oneshot_ask.py
+  - scripts/measure_subagent_loop.py
+  - scripts/check_derivation_homes.py
+  - scripts/check_delete_target.py
+  - scripts/stage_mtp_head.py
+  - config/capability_registry.yaml
+  - config/silent_repair.yaml
+  - config/agent_context.yaml
+  - config/task_register.yaml
+  - config/config_defaults_census.json
+  - governance/buglog.md

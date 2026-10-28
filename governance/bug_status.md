@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**265 open** / 597 closed of 862 ids.
+**266 open** / 597 closed of 863 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -276,3 +276,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1074 | (LOW, OPEN 2026-10-27) - the delegate journal's `--model` is a CALLER'S DECLARATION and nothing compares it to the model that did the work, | 1 |
 | BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |
 | BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |
+| BUG-1099 | (MED, OPEN 2026-10-28) — THE GOVERNED STATE TRANSITION CAN MOVE A RECORD TO `SUPERSEDED` WITHOUT ITS SUCCESSOR, AND IN AN APPEND-ONLY | 1 |

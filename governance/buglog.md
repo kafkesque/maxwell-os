@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1340 decisions (census stamp 89662d732596d36f, 2026-10-28) · 862 bugs (265 open / 597 closed; highest OPEN = BUG-1077) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1340 decisions (census stamp 89662d732596d36f, 2026-10-28) · 863 bugs (266 open / 597 closed; highest OPEN = BUG-1099) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1340 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1340, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 265 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 134 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 265 open.
+> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25020,3 +25020,55 @@ THE FIX, ONE ACT.
 READINGS: `--check` GREEN and byte-stable (DIGEST re-rendered); `--selftest` 33/33; live census moved as stated above
 (13 of the old 63 `no_artifact_named` bugs were bare-name drops now judged against their resolved paths). No model was
 called to prove any of it: the reader is deterministic and the receipt is the `git ls-files` index itself.
+
+## BUG-1099 (MED, OPEN 2026-10-28) — THE GOVERNED STATE TRANSITION CAN MOVE A RECORD TO `SUPERSEDED` WITHOUT ITS SUCCESSOR, AND IN AN APPEND-ONLY REGISTRY NO LATER ACT CAN SUPPLY ONE — two rails are red for one root
+
+THE CLASS, not the instance. `config/decisions.yaml` declares `mutability: append_only`,
+`writer_scope: append_only_new_records`, `writer_of_record: scripts/recompute_decision_summary.py`. Its ONE legal
+in-place act is `--set-state <D-id> <STATE> --because <D-id> --apply`, which splices the `state:` field and NOTHING
+ELSE (MEASURED 2026-10-28, reading `set_state_plan` and the CLI at recompute_decision_summary.py). But
+`scripts/reconcile.py#decision_supersession_complete` requires every record in state `SUPERSEDED` to carry a
+`superseded_by` that RESOLVES, and `config/decisions_policy.yaml#graph` declares the exemption list
+(`pinned_supersession_ids`) as debt that "can only SHRINK" (D-2645). The three facts are jointly unsatisfiable for
+any record superseded AFTER the 2026-09-27 pin measurement: the writer cannot add the link, the append-only
+mutability forbids adding it by hand, and adding the id to the pin list is precisely the "new debt declared by
+silence" the pin rule exists to refuse. So the act PRODUCES permanent red the moment it is used correctly.
+
+MEASURED INSTANCES (the two ids are the whole population, so this is the class in full, not a sample).
+  * `D-3170` — SPECULATIVE DECODING / M1 draft+verify. Superseded by `D-3171`; the move is stated in
+    `governance/buglog.md#BUG-1040` ("D-3170 is moved to SUPERSEDED by D-3171"). The record carries no
+    `superseded_by`.
+  * `D-3171` — "spec-dec for Qwen3.8-27B is REFUTED by measurement". Superseded by `D-3175`, whose own payload
+    re-measures "the three speculative-decoding mechanisms" and CORRECTS D-3171's verdict in terms
+    ("D-3171's 'structural' verdict is corrected to 'structural in the shipped loader'"). The record carries no
+    `superseded_by`.
+  Neither id is in `pinned_supersession_ids`, and neither may be added there.
+
+TWO RED RAILS, ONE ROOT (measured 2026-10-28 by running the ladder's own lines):
+  * `python3 scripts/reconcile.py --check` rc 1 — "supersession: 2 SUPERSEDED record(s) name no RESOLVABLE
+    successor ['D-3170', 'D-3171']".
+  * `python3 scripts/check_revoked_references.py` rc 1 — "D-3170 is SUPERSEDED and is NOT in legacy_debt_ids -
+    new debt may not be declared by silence (D-2645)" (the rail FAILS CLOSED on the first record, so D-3171 is
+    behind it: one fault reported, two present).
+They are 2 of the 7 lines that keep the whole ladder RED, and a permanent red is not neutral: it is how a session
+learns to read red as normal.
+
+WHY THE TWO OBVIOUS REMEDIES ARE BOTH WRONG.
+  1. Adding `D3170`/`D3171` to `pinned_supersession_ids` or `legacy_debt_ids` GROWS a shrink-only declaration.
+     It would turn both rails green by enlarging the debt they measure — the BUG-542 corruption, performed by a
+     tool, to make a light change colour.
+  2. Writing `superseded_by:` into the two records by hand edits an `append_only` document outside its writer of
+     record. Even where the field is factually right (it is, per the two receipts above), the WRITE is illegitimate,
+     and the next `check_register_divergence` pass would have to be taught to tolerate it.
+
+THE FIX THIS BUG PROPOSES (not yet applied — it changes a governed writer's contract, so it is a decision first).
+  A `SUPERSEDED` transition must CARRY its successor: `--set-state <D-id> SUPERSEDED --superseded-by <D-id>
+  --because <D-id>` splices the link in the SAME governed write, refuses when the successor does not exist, refuses
+  when the target state is SUPERSEDED and no successor is named, and refuses a self-link. Then the two live ids are
+  repaired through that path, with the licence naming each target (D-2972/D-3035 - an ordering decision must speak
+  the record it moves), and both rails are re-run as the receipt. The equivalent guard belongs on the
+  `check_revoked_references` side: a record that carries a RESOLVABLE successor and a declared reason is a VOICE,
+  and the rail's own words are "new debt may not be declared by SILENCE".
+
+STATE: OPEN. Nothing was changed to write this entry. The registry, the policy and both rails are exactly as they
+were; this is the discovery, its measurement, and the refused remedies.

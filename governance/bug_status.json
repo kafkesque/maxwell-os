@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 862,
-  "open_n": 265,
+  "total_ids": 863,
+  "open_n": 266,
   "closed_n": 597,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -2654,6 +2654,20 @@
         "measure_prefill.py",
         "scripts/hardware_calibrate.py",
         "scripts/measure_prefill.py"
+      ]
+    },
+    {
+      "id": "BUG-1099",
+      "title": "(MED, OPEN 2026-10-28) \u2014 THE GOVERNED STATE TRANSITION CAN MOVE A RECORD TO `SUPERSEDED` WITHOUT ITS SUCCESSOR, AND IN AN APPEND-ONLY",
+      "events": 1,
+      "artifacts": [
+        "config/decisions.yaml",
+        "config/decisions_policy.yaml",
+        "governance/buglog.md",
+        "recompute_decision_summary.py",
+        "scripts/check_revoked_references.py",
+        "scripts/recompute_decision_summary.py",
+        "scripts/reconcile.py"
       ]
     }
   ],

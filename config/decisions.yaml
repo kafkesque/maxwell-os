@@ -22,7 +22,7 @@ decisions:
 - id: D-2979
   state: RESOLVED
   category: RETRIEVAL / RANKING
-  title: Enable D-2537 fused quality ranking (retire dead borp_score ORDER BY on the
+  title: Enable fused quality ranking (retire dead borp_score ORDER BY on the
     serving path)
   decision: 'ranking.quality_score_enabled flipped false to true. Verified: confidence_score
     100 percent populated (4503/4503, 147 distinct, avg 0.9); is_convergent=1 and
@@ -10595,7 +10595,6 @@ decisions:
   - BUG-387
   - D-354
   - D-357
-  - D-2185
   - BUG-104
   - D-359
 - id: D-361
@@ -35499,7 +35498,7 @@ decisions:
   state: ACTIVE
   date: '2026-10-27'
   by: assistant
-  category: WORK METHOD / FIXER LOOP (C16, C21, D-3036, D-3038, D-3200, D-3204, D-3245, BUG-757, BUG-1092)
+  category: WORK METHOD / FIXER LOOP (C16, C21, D-3036, D-3038, D-3200, D-3204, BUG-757, BUG-1092)
   title: "A LOOP MAY FIX ONLY WHAT A NAMED COMMAND CAN REFUTE - 54 of 269 open bugs are loop-admissible today, 154 are
     prose, 34 are counts with no body, and 'each fix opens a bug' is a property of fixing WITHOUT an instrument, not of
     fixing"

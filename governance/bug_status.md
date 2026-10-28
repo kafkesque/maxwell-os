@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**266 open** / 603 closed of 869 ids.
+**268 open** / 603 closed of 871 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -277,3 +277,5 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |
 | BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |
 | BUG-1103 | (MED, OPEN 2026-10-28) — THE GOVERNED WRITER IS R5-UNREVIEWABLE: `scripts/recompute_decision_summary.py` is 119,095 chars and gpt-oss-20b | 1 |
+| BUG-1106 | (MED, OPEN 2026-10-28) — THE PROMOTED gpt-oss DEEP REVIEWER IS DECLARED BUT NOT MECHANICALLY ENFORCED AT ANY LANDING BOUNDARY | 1 |
+| BUG-1107 | (MED, OPEN 2026-10-28) — harness_policy.yaml L4 STILL ROUTES interactive_edit_loop_short_context TO gemma, A native_two_step_fail MODEL — A | 1 |

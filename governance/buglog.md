@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1348 decisions (census stamp 7a3a697157e9d5f8, 2026-10-28) · 869 bugs (266 open / 603 closed; highest OPEN = BUG-1103) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1348 decisions (census stamp 7a3a697157e9d5f8, 2026-10-28) · 871 bugs (268 open / 603 closed; highest OPEN = BUG-1107) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1348 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 680 · ⚖ ratified 154 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1348, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
+> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 268 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25542,3 +25542,25 @@ code-review ground-truth), AND (d) governance fully fixed. Consequence: the gemm
 gpt-oss long-context score move from BLOCKING to OWED (parked until governance is fixed). The cloud ceiling
 (D-3101, shrink-only per the 2026-10-18 owner word) is now in direct tension with a retained deepseek brain;
 that tension is FLAGGED here for the owner's next word, not resolved by an agent.
+
+## BUG-1106 (MED, OPEN 2026-10-28) — THE PROMOTED gpt-oss DEEP REVIEWER IS DECLARED BUT NOT MECHANICALLY ENFORCED AT ANY LANDING BOUNDARY
+
+**THE AGREEMENT (what was ratified).** `config/r5_review_gate.yaml` declares `deep.reviewer: gpt-oss-20b-MXFP4-Q8`, `status: PROMOTED_20261027` (promoted by measurement, D-3168), and `tier_by_path` maps `scripts/*`, `pipeline/*`, `tools/*` to the deep tier. R5 is an IRON RULE ("Generator ≠ Verifier — different model family for each").
+
+**WHAT IS ENFORCED (receipts).** (1) The gate's known-answer controls run in `just health` — `python3 scripts/r5_review_gate.py --selftest` (justfile:92). That proves the GATE WORKS; it does not prove it FIRES per file. (2) The only live per-file invocation is `config/engine.yaml:175` `draft-then-verify` `done_check: 'python3 scripts/r5_review_gate.py --file {file} --no-llm'` — deterministic layers ONLY (`--no-llm`), and its own note says the LLM verdict "is recorded beside it and is never the decider."
+
+**WHAT IS NOT ENFORCED.** `config/rail_registry.yaml#commit_boundary.must_contain` lists ONLY the four deterministic rails (check_repo_integrity, verify_recalibration_pins, check_declaration_consumers, check_session_plan). The pre-commit hook (installed in the real gitdir `/Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git/hooks/pre-commit`; `install_git_hooks.sh --check` = ok) runs those four and nothing else. There is NO rail that refuses a commit whose staged `scripts/*` / `pipeline/*` / `tools/*` file lacks a recorded cross-family R5 verdict for its current digest. A generated file can therefore land with NO verifier — the iron rule has zero mechanical teeth.
+
+**ROOT CAUSE.** R5 was built as a DISCIPLINE (the agent runs `r5_review_gate.py --file` before landing) plus a known-answer selftest, and D-3168 upgraded the MODEL (gemma→gpt-oss deep) but never the ENFORCEMENT POINT. This is rail_registry class (i) — "a rail NOTHING RUNS" (BUG-492) — the per-file R5 invocation is a control that never fires at the boundary.
+
+**DECISION POINT (surfaced, NOT pre-decided — the owner's "no premature decisions" rule).** WHERE should R5 be mechanically enforced? (a) A new commit rail that REFUSES a staged deep-tier file whose current sha256 has no APPROVE verdict in `governance/r5_reviews.jsonl` — the commit boundary stays deterministic (a digest lookup, no LLM call; the LLM call stays a pre-step the agent runs). (b) A `just` landing recipe agents must run. (c) Declare R5 explicitly a discipline (no mechanical gate) and stop calling it enforced. Option (a) is the only mechanical one that does not put an LLM call in the commit path.
+
+## BUG-1107 (MED, OPEN 2026-10-28) — harness_policy.yaml L4 STILL ROUTES interactive_edit_loop_short_context TO gemma, A native_two_step_fail MODEL — A CONFIG-vs-DECISION CONFLICT D-3103 ALREADY FLAGGED
+
+**THE CONFLICT (receipts).** `config/harness_policy.yaml:19` declares `native_two_step_fail: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit]` (gemma: read_lines=1, lookup_token=0 — no dependent step 2). Yet `config/harness_policy.yaml:68` still routes `interactive_edit_loop_short_context: gemma-4-E4B-it-MLX-4bit` with the comment "the only agent_loop-routable model". An interactive EDIT loop requires the dependent two-step gemma fails, so the routing names a loop-incapable model.
+
+**THE DECISION IS ALREADY MADE (D-3103, RESOLVED 2026-10-19).** D-3103 re-ruled this exact axis: "gemma's latency-routable status is CONTRADICTED by T-187... Re-measure the interactive budget against the native-loop passers before re-routing." The file even carries the correction inline (`d3103_correction`, line 38) while leaving line 68 stale — the correction was acknowledged but never executed.
+
+**WHAT IS OWED (gated, not pre-decidable).** The re-measurement: interactive per-turn budget against the `native_two_step_pass` models at line 18 (Qwen3-Coder-30B, gpt-oss-20b, Qwen3.8-27B, MiniCPM5-2B, Ornith-1.5-35B, Ornith-1.5-9B). Only the measurement decides line 68's replacement. Editing line 68 before that measurement would route to an unmeasured model — the premature move this bug exists to prevent.
+
+**FIX CONDITION.** Run the re-measurement (T-131 interactive budget vs native-loop passers), then update `L4_dev_tooling.model_routing.interactive_edit_loop_short_context` from its receipt. The `latency_agent_loop` axis (lines 36-38) and line 68 must then agree with `native_two_step_pass` / `native_two_step_fail`.

@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 869,
-  "open_n": 266,
+  "total_ids": 871,
+  "open_n": 268,
   "closed_n": 603,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -2669,6 +2669,28 @@
         "r5_review_gate.py",
         "recompute_decision_summary.py",
         "scripts/recompute_decision_summary.py"
+      ]
+    },
+    {
+      "id": "BUG-1106",
+      "title": "(MED, OPEN 2026-10-28) \u2014 THE PROMOTED gpt-oss DEEP REVIEWER IS DECLARED BUT NOT MECHANICALLY ENFORCED AT ANY LANDING BOUNDARY",
+      "events": 1,
+      "artifacts": [
+        "config/engine.yaml",
+        "config/r5_review_gate.yaml",
+        "config/rail_registry.yaml",
+        "governance/r5_reviews.json",
+        "install_git_hooks.sh",
+        "r5_review_gate.py",
+        "scripts/r5_review_gate.py"
+      ]
+    },
+    {
+      "id": "BUG-1107",
+      "title": "(MED, OPEN 2026-10-28) \u2014 harness_policy.yaml L4 STILL ROUTES interactive_edit_loop_short_context TO gemma, A native_two_step_fail MODEL \u2014 A",
+      "events": 1,
+      "artifacts": [
+        "config/harness_policy.yaml"
       ]
     }
   ],

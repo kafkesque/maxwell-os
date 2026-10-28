@@ -2700,6 +2700,7 @@
       "artifacts": [
         "DECISION-LOG.md",
         "config/decisions.yaml",
+        "config/decisions_policy.yaml",
         "config/decisions_summary.json",
         "decisions.yaml",
         "scripts/ab_harness_arm1.py",

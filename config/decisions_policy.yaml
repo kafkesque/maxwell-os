@@ -242,6 +242,9 @@ membership:
 # pattern would fire on those false positives - a loud rail nobody can satisfy is not a rail (BUG-540). So the
 # rail REPORTS every candidate dangling token WITH its citing record, for owner/classifier resolution, and flips
 # to FATAL only after the owner rules each class.
+# FLIPPED TO FATAL 2026-10-28 (BUG-1108 owner ruling, recorded in governance/buglog.md): every dangling D-token
+# now carries an owner-approved action and the live check reports 0 dangling citations, so `report_only` is now
+# false — a NEW dangling D-token fails `just health` (fail-closed, D-2949/D-2951).
 #
 # THE GRAMMAR (measured 2026-10-28). 1348 minted ids: 130 with a 3-digit core, 1186 with 4 digits, plus letter-
 # suffixed families (D271a-g, D272a-g, D273a-h, D274a-h, D275a, D2177a, D2190a). A `D-\d{4}` pattern therefore
@@ -253,7 +256,7 @@ citation:
   # Pinned BY IDENTITY: sentinels (placeholder ids in measured/evidence) and the log's own legacy orphans are
   # known-non-record ids a citation may legitimately rest on. The list may only SHRINK (D-405).
   allow_ids: [D-0000, D-9999, D-271, D-272, D-275, D637]
-  report_only: true
+  report_only: false
   why: >-
     A D-token cited INSIDE a record that names no minted top-level record is a declaration that does not resolve
     (D-3034): a forward-reference the author pre-wrote but never landed, a real decision never minted, or a stale

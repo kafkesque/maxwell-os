@@ -2702,7 +2702,10 @@
         "config/decisions.yaml",
         "config/decisions_summary.json",
         "decisions.yaml",
-        "scripts/check_decision_membership.py"
+        "scripts/ab_harness_arm1.py",
+        "scripts/build_ab_harness.py",
+        "scripts/check_decision_membership.py",
+        "stage4_golden_mined.yaml"
       ]
     }
   ],

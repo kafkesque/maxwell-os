@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1348 decisions (census stamp 7a3a697157e9d5f8, 2026-10-28) · 872 bugs (269 open / 603 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 872 bugs (269 open / 603 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1348 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 680 · ⚖ ratified 154 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1348, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1355 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 683 · ⚖ ratified 154 | closed: ✅ resolved 395 · ⚪ superseded 19 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1355, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 269 open.
 >
@@ -25610,3 +25610,11 @@ Both mints are additive, change no behaviour, and are the ontologically correct 
 - `D-2618` — **NO MINT: already minted** (`id: D2618`) but the record is INCOMPLETE: empty `title`, no `date`, old-schema keys (`description`/`champion`/`target_files`/`created`) instead of `title`/`by`/`date`, and `state: ACTIVE` while BUG-688 records the golden as RETIRED. The fix is record COMPLETION (title + terminal state + schema migration), not a mint.
 
 This correction is itself the proof of the rail: a hand sweep drifted on a hyphen; the machine reader did not. The rail is REPORT-ONLY (D-2949/D-2951) and will flip to FATAL only after the owner rules each of the 9 tokens.
+
+**COMPLETION (2026-10-28, BUG-1108 restore-mints + D-2618 completion).** All nine dangling tokens now carry an owner-approved action, and `scripts/check_decision_membership.py` reports **0 dangling citations / 0 membership faults** on the re-derived registry (1355 decisions).
+
+- Seven restore-mints appended to `config/decisions.yaml` (a real decision that live records cite deserves a record; content reconstructed from the citing records, owner-visible per D-3036/D-3214): `D-492` (RESOLVED, BUG-260), `D-795` (ACTIVE, BUG-257), `D-824` (ACTIVE, BUG-1035), `D-2648` (ACTIVE, BUG-810), `D-3259` (SUPERSEDED, BUG-416), `D-1374` (RESOLVED, BUG-288), `D-1496` (RESOLVED, BUG-290). (`D-1367` in the owner's first list was a TYPO for `D-1374`, confirmed.)
+- `D150` and `D2537` are NOT decisions: the former is a config VALUE (`pipeline_config.max_domains_per_fb=7`) and the latter a meta-description of the class; both were reworded in their citing records (D-2877/78/79 and D-2690/2984/2986) to drop the bare token.
+- `D-2618` COMPLETED to the current schema - `title`/`date`/`by`/`decision`/`files` (old `description`/`champion`/`target_files`/`created` removed; the dead `scripts/build_ab_harness.py` in `target_files` replaced with the real `scripts/ab_harness_arm1.py`). **Terminal state reconciled: `state: ACTIVE` is CORRECT and no transition is owed.** The "RETIRED golden" BUG-688 records is the `stage4_golden_mined.yaml` ARTIFACT - which D-2618's own body archives from eval and D-2883 then declares `status: retired` in the bridge - NOT a state on the D-2618 DECISION (the A/B-gated S4 architecture adoption remains in force; D-2883's body itself preserves "the D-2618 re-adoption path").
+
+The rail remains REPORT-ONLY. The flip to FATAL is a separate owner-gated act (D-2949/D-2951), owed only after the owner signs off on the nine actions above and the report is clean on a fresh run.

@@ -215,9 +215,11 @@ membership:
   # record that holds the decision. The log therefore stops naming D2537, which is exactly the shrink this pin's
   # own note prescribes. CORRECTED 2026-10-13 (D-2986): the note claimed the id "is still cited ONCE" - it was
   # cited in FOUR places, so the note was itself a stale restatement (BUG-588) and is replaced by the measured
-  # truth. What survives, and why each is not repaired here: (a) the register's OWN D-2979 title, which cites
-  # "D-2537" and CANNOT be rewritten - config/decisions.yaml is the append-only registry, so a mint title is a
-  # claim at the moment of mint (D-2660); (b) `specs/retrieval_serving.spec.md`, which now names D-2979 and
+  # truth. REPAIRED 2026-10-28 (BUG-1108): (a) the register's OWN D-2979 title, which had cited "D-2537", was
+  # repaired by owner ruling d069d0c (the phantom token dropped; a title is a claim at the moment of mint, D-2660,
+  # and an owner-gated citation repair drops a dangling pointer without rewriting the decision); the three
+  # record-body mentions (D-2690's orphan list, D-2984, D-2986) were reworded to drop the bare token in the same
+  # act. What still survives, and why each is not repaired here: (b) `specs/retrieval_serving.spec.md`, which now names D-2979 and
   # records the legacy spelling instead of citing the absent id; (c) EIGHT code comments (pipeline/retrieve.py x5,
   # pipeline/query.py x2, pipeline/pipeline_paths.py x1) that name the flag by the spelling the record's title
   # uses - not face claims, and not edited inside a governance act under a pipeline write boundary. An ALIAS key

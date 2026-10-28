@@ -8781,9 +8781,12 @@ decisions:
     governance/phase1_finalize_manifest.jsonl]'
   created: '2026-09-13'
 - id: D2618
-  category: LABEL QUALITY / DATA
+  date: '2026-09-13'
   state: ACTIVE
-  description: 'A/B-GATED S4 ARCHITECTURE ADOPTION (2026-09-13). Three frontier auditors
+  category: LABEL QUALITY / DATA
+  title: A/B-gated S4 architecture adoption
+  by: goose
+  decision: 'A/B-GATED S4 ARCHITECTURE ADOPTION (2026-09-13). Three frontier auditors
     produced three divergent classifier architectures — Claude: hierarchical ModernBERT
     + SetFit rare-leaves + conformal abstention; Qwen: RAC (bge-m3 cosine-to-definitions
     + SetFit) rejecting the brittle _masked_fine_pred hierarchy; GPT: contract-first
@@ -8811,12 +8814,16 @@ decisions:
     field from S2 schema; GPT S5 classification-entailment (does FB entail {discipline}?
     in addition to evidence-NLI). HONEST GUARANTEE: 100% prevention of silent acceptance
     outside the confidence envelope, NOT semantic 100% accuracy.'
-  champion: goose
-  target_files: '[governance/gold_4axis.jsonl, governance/pending_4axis.jsonl, governance/silver_4axis.jsonl,
-    scripts/train_hierarchical_classifier.py, scripts/train_discipline_classifier.py,
-    scripts/train_depth_classifier.py, pipeline/stage5_verify.py, pipeline/stage2_extract.py,
-    scripts/build_ab_harness.py]'
-  created: '2026-09-13'
+  files:
+  - governance/gold_4axis.jsonl
+  - governance/pending_4axis.jsonl
+  - governance/silver_4axis.jsonl
+  - scripts/train_hierarchical_classifier.py
+  - scripts/train_discipline_classifier.py
+  - scripts/train_depth_classifier.py
+  - pipeline/stage5_verify.py
+  - pipeline/stage2_extract.py
+  - scripts/ab_harness_arm1.py
 - id: D271a
   category: LABEL QUALITY / DATA
   state: RESOLVED
@@ -13312,8 +13319,8 @@ decisions:
     must name a TOP-LEVEL record in config/decisions.yaml, with the REVERSE direction
     DECLARED and never asserted, because the log is a TIERED face of the registry
     and an equality join would RED on 631 legitimate records (BUG-540: a rail nobody
-    can satisfy is not a rail). Five ids are PINNED BY IDENTITY as legacy orphans
-    (D-271, D-272, D-275, D2537, D637) in config/decisions_policy.yaml#membership:
+    can satisfy is not a rail). Four ids are PINNED BY IDENTITY as legacy orphans
+    (D-271, D-272, D-275, D637) in config/decisions_policy.yaml#membership:
     a ceiling would let a NEW omission hide inside the list, so the list may only
     SHRINK, and an id that becomes a record or stops being named is a STALE declaration.
     BUG-588 (DECISION-LOG.md line 3 declares 651 decisions while the derived census
@@ -19402,7 +19409,7 @@ decisions:
     on all five axes), so the ruler''s 201/208 coverage is a DECLARATION and not a
     gap. 3 rows (R040, R080, R091) carry discipline=''emerging'' with an empty domain
     cell and were skipped by the ruler: OPEN under BUG-676. R158 carries MORE owner-flagged
-    domains than the D150 cap (pipeline_config.max_domains_per_fb=7) permits: editorial
+    domains than the max_domains_per_fb=7 cap permits: editorial
     & advertising and graphic design are DECLARED cap-drops in the rulings config,
     and the owner owes a swap ruling. Two owner QUESTIONS were deliberately NOT assigned:
     R005 (information architecture) and R113 (systems & frameworks).
@@ -19548,7 +19555,7 @@ decisions:
     (8 abstentions + R158); 15 declared warnings; scripts/apply_owner_domain_review.py
     --check reproduces it
 
-    byte-identically. Invariants verified: no row over the D150 cap of 7, primary_domain
+    byte-identically. Invariants verified: no row over the max_domains_per_fb=7 cap, primary_domain
     == domains[0] on every
 
     row, 0 non-canonical domains, 0 rows left carrying the token.
@@ -19682,7 +19689,7 @@ decisions:
     \ a DECLARATION for that CSV.\n\nRuler re-freeze: sha256 5fcde5619e04fbda... ->\
     \ d867ce5e059ac25d...; 194 rows; 1 row changed (R091) + 8 rows\nREMOVED (the declared\
     \ drops); 22 declared warnings; --check reproduces it byte-identically; --check-faces\n\
-    92/46 within the declared ceiling. Invariants: 0 rows over the D150 cap, primary_domain\
+    92/46 within the declared ceiling. Invariants: 0 rows over the max_domains_per_fb=7 cap, primary_domain\
     \ == domains[0]\neverywhere, 0 non-canonical domains, 0 rows carrying the token,\
     \ and the partition EXACT at 208 = 194 + 14.\n"
   files:
@@ -23844,7 +23851,7 @@ decisions:
     enforced it, so the region made LIVE claims beside the derived block. MEASURED
     2026-10-13: DECISION-LOG.md:195 read `| D2622 | ACTIVE |` and :196 read `| D2621
     | PROPOSED |`, both under a heading reading "OPEN / PENDING - highest priority
-    first", while config/decisions.yaml holds both as RESOLVED; :247 cited `D2537`,
+    first", while config/decisions.yaml holds both as RESOLVED; :247 cited
     an id the register does not carry (the record is D-2979); MASTER-TASK-REGISTER.md:60
     and :77 were headed "CURRENT OPEN INDEX (... the live face ...)" - a SECOND live
     face beside the derived one - and :61 restated the census with a derived field
@@ -24072,7 +24079,7 @@ decisions:
     11). A count restated in prose is stale the moment it is written (BUG-588); a
     count a register owns has ONE home (D-2642) - the derived block, which is re-derived
     on every run. (3) A citation inside such a tier could dangle unnoticed: the register''s
-    own D-2979 title cites "D-2537", an id no record carries (D-405), and config/decisions_policy.yaml''s
+    own D-2979 title then carried a legacy spelling no record carries (D-405), and config/decisions_policy.yaml''s
     note claimed that spelling survived "ONCE" while it survived in four places -
     a stale restatement inside the note that documents the class.
 
@@ -24138,8 +24145,8 @@ decisions:
     history, and is not re-checked - stated because a rule read as covering everything
     covers nothing. (2) The hand index is a SELECTION, not a partition: it lists what
     the author chose to list, and only the derived block and the registers carry the
-    whole population. (3) The eight code comments that spell the ranking decision
-    "D2537" are recorded, not edited: they are not face claims, and they sit under
+    whole population. (3) The eight code comments that spell the ranking decision''s legacy id
+    are recorded, not edited: they are not face claims, and they sit under
     a pipeline write boundary that a governance act should not cross for a comment.
     (4) The register''s long-form prose is still policed only for census-shaped restatements
     (D-2985''s limit, unchanged). (5) The spec was written in the same act as the
@@ -36757,3 +36764,81 @@ decisions:
   - 'the declaration now parses: config/decisions_policy.yaml#state_vocabulary.meanings.RATIFIED loads and reads
     "in force and applied ... never about who applied it", and state_vocabulary keys are canonical, canonicalisation_route,
     transition_route, legacy_non_canonical_ids, canonicalised, why, meanings'
+- id: D-492
+  state: RESOLVED
+  category: CLASSIFIER / MODEL-SWAP
+  title: Mistral-Small-3.1-24B rejected for S4 structured classification (v1.0, 2026-06-14)
+  decision: HISTORICAL MIGRATION (restore an id the registry cites but never minted). The v1.0 project tested Mistral-Small-3.1-24B
+    for S4 structured classification and REJECTED it - no chat template, 0% schema validity, 1-word responses -
+    removing it to free 13GB. D-2783/D-2784/D-2789 cite this finding to drop a redundant download-approval gate
+    for a known-failed candidate; the defect class is the S4 classifier-swap gate (BUG-260).
+  bugs:
+  - BUG-260
+  files:
+  - DECISION-LOG.md
+- id: D-795
+  state: ACTIVE
+  category: GOVERNANCE
+  title: A reading that cannot be taken is reported UNMEASURED, never guessed
+  decision: 'Standing governance rule cited by D-3041 and D-3044: a measurement that cannot be taken is marked UNMEASURED
+    rather than guessed. MEASURED instance: the niah top tier exceeded the oMLX context window, making it unmeasurable
+    rather than misscored (BUG-257).'
+  bugs:
+  - BUG-257
+  files:
+  - AGENTS.md
+- id: D-824
+  state: ACTIVE
+  category: GOVERNANCE
+  title: A protected/append-only artifact is never silently rewritten (AGENTS.md append_only)
+  decision: 'The append-only working rule: AGENTS.md (and other protected artifacts) is append_only, so a correction
+    is APPENDED as a superseding block rather than silently rewritten. Cited by D-3100/D-3109/D-3161. The drift
+    class it kills is an ungoverned append route on a protected artifact (BUG-1035).'
+  bugs:
+  - BUG-1035
+  files:
+  - AGENTS.md
+- id: D-2648
+  state: ACTIVE
+  category: GOVERNANCE / INSTRUMENT
+  title: A registry edit is verified against the parse of its own bytes before it is written
+  decision: 'The writer-path rule cited by D-3214: a record is validated BEFORE the write and the registry shape
+    is re-derived AFTER it, so an in-place YAML surgery that re-parents a mapping and passes every parse check cannot
+    be authored silently (BUG-810). It is the whole licence behind the governed mint route.'
+  bugs:
+  - BUG-810
+  files:
+  - scripts/recompute_decision_summary.py
+- id: D-3259
+  state: SUPERSEDED
+  category: CLASSIFIER / DEPTH
+  title: Depth <0.85 classifier checkpoints superseded by the gpt-oss-20b depth serving path (with D-2549)
+  decision: 'Cited by D-2713: the classifier_* depth <0.85 gate checkpoints are superseded by the gpt-oss-20b depth
+    serving path (with D-2549). The supersession resolves the depth-axis gap the production axis carried - no declared
+    class menu or consistency contract (BUG-416).'
+  bugs:
+  - BUG-416
+  files:
+  - config/pipeline_config.yaml
+- id: D-1374
+  state: RESOLVED
+  category: VERIFICATION / RETRIEVAL
+  title: 'Retrieval A/B finding: the resilient-distributed-systems SRE query loses every A/B'
+  decision: HISTORICAL MIGRATION (restore an id cited by D-2722). The SRE query "resilient-distributed-systems"
+    loses every A/B retrieval leg (0.00 recall across all legs) because the retrieval corpus is a small fraction
+    of the knowledge and source_text is not source (BUG-288).
+  bugs:
+  - BUG-288
+  files:
+  - pipeline/retrieval_benchmark.py
+- id: D-1496
+  state: RESOLVED
+  category: VERIFICATION / RETRIEVAL
+  title: 'Retrieval A/B finding: illegal retrieval facet values (paired with D-1374)'
+  decision: HISTORICAL MIGRATION (restore an id cited by D-2722, paired with D-1374). Two illegal values sit inside
+    the retrieval facets (BUG-290), contributing to the hard-query losses the D-2722 retrieval smoke test reports
+    beside the resilient-distributed-systems query.
+  bugs:
+  - BUG-290
+  files:
+  - pipeline/retrieval_benchmark.py

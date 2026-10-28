@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 874 bugs (268 open / 606 closed; highest OPEN = BUG-1108) · 63 open tasks (MUST 12 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 874 bugs (267 open / 607 closed; highest OPEN = BUG-1108) · 63 open tasks (MUST 12 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1355 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 683 · ⚖ ratified 154 | closed: ✅ resolved 395 · ⚪ superseded 19 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1355, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 268 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25643,4 +25643,9 @@ RESOLUTION: this heading PROMOTES the register's own recorded prose into a resol
 ## BUG-858 (MED — FIXED 2026-10-28) — BUG-492's heading was promoted-as-CLOSED (T-178 discharged), so the 128 citations now resolve against the register's own text and `scripts/check_bug_recall.py` reports no `finding:BUG-492`
 
 **Status:** FIXED (2026-10-28) by the T-178 remedy's PREFERRED branch: the register's own recorded prose was promoted into a `## BUG-492` heading, preserving the original wording and noting the promotion (C12/D-2642, never re-writing history). MEASURED by the same reading that found it: `scripts/check_bug_recall.py` now reads 874 findings and reports no `finding:BUG-492`, and the census carries BUG-492 as CLOSED (the fold no longer skips BUG-491 → BUG-493). 128 citations resolve in one act.
+
+
+## BUG-857 (MED — FIXED 2026-10-28) — the register's recall rail is LANDED (D-3047): `scripts/check_bug_recall.py` + `config/bug_recall.yaml` derive CHRONIC / UNTRACED / UNRESOLVED readings from the register, and the RETRIEVE step names a finding's neighbours
+
+**Status:** FIXED (2026-10-28). The remedy recorded in the OPEN event as LANDED is re-verified live: `python3 scripts/check_bug_recall.py` reads 874 findings and reports `untraced_closed` / `chronic_open` / `unresolved_reference` each against a shrink-only ceiling (row T-177), and the register can now be QUERIED, not just appended to. The heading is flipped to FIXED to match the body's own 'FIX MEASURED AFTER' claim, never re-writing history (C12/D-2642).
 

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 874,
-  "open_n": 268,
-  "closed_n": 606,
+  "open_n": 267,
+  "closed_n": 607,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -2052,17 +2052,6 @@
       ]
     },
     {
-      "id": "BUG-857",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape,",
-      "events": 1,
-      "artifacts": [
-        "config/bug_recall.yaml",
-        "config/goose/config.yaml",
-        "governance/CONTEXT_INDEX.md",
-        "scripts/check_bug_recall.py"
-      ]
-    },
-    {
       "id": "BUG-862",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml",
       "events": 1,
@@ -3123,6 +3112,7 @@
     "BUG-854",
     "BUG-855",
     "BUG-856",
+    "BUG-857",
     "BUG-858",
     "BUG-859",
     "BUG-860",

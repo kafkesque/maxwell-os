@@ -229,6 +229,36 @@ membership:
     decision is invisible. Declared so the rail has ONE home and cannot be satisfied by a restatement.
 
 # -------------------------------------------------------------------------------------------------------------
+# CITATION RESOLUTION (BUG-1108). A D-token CITED INSIDE a record's own fields (category/title/related/decision/
+# verification/measured/evidence/reason, recursively - every string the record carries) must resolve to a MINTED
+# top-level record. The membership join above verifies the LOG's direction; this verifies the REGISTER'S OWN
+# INTERNAL citations, which no rail read before BUG-1108 (D-3208 clause (3): a prose defect must be CONVERTED
+# into an instrumented check, not found by hand).
+#
+# WHY REPORT-ONLY FIRST (D-2949/D-2951). A regex cannot tell a DECISION citation from an IRON-RULE reference
+# (R-D410 safe_delete), a CONFIG VALUE ('the D150 cap'), or a LIST LABEL ('D1/D2/D3'). Enforcing on a naive
+# pattern would fire on those false positives - a loud rail nobody can satisfy is not a rail (BUG-540). So the
+# rail REPORTS every candidate dangling token WITH its citing record, for owner/classifier resolution, and flips
+# to FATAL only after the owner rules each class.
+#
+# THE GRAMMAR (measured 2026-10-28). 1348 minted ids: 130 with a 3-digit core, 1186 with 4 digits, plus letter-
+# suffixed families (D271a-g, D272a-g, D273a-h, D274a-h, D275a, D2177a, D2190a). A `D-\d{4}` pattern therefore
+# MISSES 130 records and every lettered id - the exact "green over a whole class" defect this rail exists to kill.
+# The pattern is `D-?\d{3,4}[a-z]?` with a negative lookbehind for the IRON-RULE prefix R-, so R-D410 is a rule
+# reference, never a citation.
+citation:
+  pattern: '\b(?<!R-)D-?\d{3,4}[a-z]?\b'
+  # Pinned BY IDENTITY: sentinels (placeholder ids in measured/evidence) and the log's own legacy orphans are
+  # known-non-record ids a citation may legitimately rest on. The list may only SHRINK (D-405).
+  allow_ids: [D-0000, D-9999, D-271, D-272, D-275, D637]
+  report_only: true
+  why: >-
+    A D-token cited INSIDE a record that names no minted top-level record is a declaration that does not resolve
+    (D-3034): a forward-reference the author pre-wrote but never landed, a real decision never minted, or a stale
+    restatement. The rail reports the class so the owner can mint / drop / repoint each token; it never silently
+    edits the append-only registry (D-2660).
+
+# -------------------------------------------------------------------------------------------------------------
 # STATE SPELLING (BUG-583). A state is ONE value with ONE spelling.
 #
 # WHY. MEASURED 2026-09-27: the registry carried ACTIVE 515 and `active` 5 (3 bare, 2 quoted).

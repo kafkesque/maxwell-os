@@ -97,6 +97,46 @@ def faults(named: list[str], records: list, pinned: list[str]) -> list[str]:
     return problems
 
 
+def _walk_tokens(value: object, pattern: re.Pattern, out: list[str]) -> None:
+    """BUG-1108: collect every D-token a record's value tree cites, recursively over str/list/dict."""
+    if isinstance(value, str):
+        out.extend(m.group(0) for m in pattern.finditer(value))
+    elif isinstance(value, list):
+        for item in value:
+            _walk_tokens(item, pattern, out)
+    elif isinstance(value, dict):
+        for v in value.values():
+            _walk_tokens(v, pattern, out)
+
+
+def citation_problems(records: list, block: dict) -> list[str]:
+    """BUG-1108: a D-token cited INSIDE a record must resolve to a minted record (or an allowed id).
+
+    This is the register's INTERNAL join - the membership join above verifies the LOG names only minted ids;
+    this verifies the RECORDS cite only minted ids in their own fields. REPORT-ONLY by default (D-2949/D-2951):
+    a regex cannot separate a decision citation from an iron-rule reference (R-D410) or a config value (D150 cap),
+    so it REPORTS candidates for owner resolution rather than firing on false positives (BUG-540).
+    """
+    if not block:
+        return []
+    minted = set(top_level_ids(records))
+    allowed = {normalized_id({"id": str(a)}) for a in (block.get("allow_ids") or [])}
+    pattern = re.compile(str(block.get("pattern") or r"\b(?<!R-)D-?\d{3,4}[a-z]?\b"))
+    problems: list[str] = []
+    for r in records:
+        if not isinstance(r, dict) or not r.get("id"):
+            continue
+        rid = normalized_id(r)
+        tokens: list[str] = []
+        _walk_tokens(r, pattern, tokens)
+        for tok in sorted({t.replace("D-", "D").upper() for t in tokens}):
+            if tok in minted or tok in allowed:
+                continue
+            problems.append(rid + " cites " + tok + ", which names no minted record and is not an allowed id - "
+                            "a declaration that does not resolve (D-3034); owner decides MINT / DROP / REPOINT")
+    return problems
+
+
 def control_slug(name: str) -> str:
     """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
@@ -180,6 +220,26 @@ def controls() -> list[tuple[str, bool]]:
                              {"file": "DECISION-LOG.md", "scan_lines": 5,
                               "census_pointer": "config/decisions_summary.json",
                               "forbidden_count_pattern": r"(\d+)\s+decisions"})),
+        # BUG-1108: the citation join's known-answer controls - a citation to a minted id is quiet, to an unminted
+        # id fires, an allowed id (sentinel/legacy orphan) is quiet, an iron-rule reference (R-D410) is NOT a
+        # citation, and a 3-digit id IS matched (the grammar must not miss the 130 three-digit records).
+        ("a record that cites only minted ids is quiet (BUG-1108)",
+         not citation_problems([{"id": "D-9001", "category": "X (D-9002)"}, {"id": "D-9002"}],
+                               {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": []})),
+        ("a record that cites an unminted id fires (BUG-1108)",
+         bool(citation_problems([{"id": "D-9001", "category": "X (D-9005)"}],
+                                {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": []}))),
+        ("an ALLOWED id (sentinel) is quiet, not a false positive (BUG-1108)",
+         not citation_problems([{"id": "D-9001", "measured": "cap D-9999 sentinel"}],
+                               {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": ["D-9999"]})),
+        ("an IRON-RULE reference (R-D410) is NOT read as a citation (BUG-1108)",
+         not citation_problems([{"id": "D-9001", "decision": "NEVER delete (R-D410)"}],
+                               {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": []})),
+        ("a THREE-digit id is matched by the grammar, never missed (BUG-1108)",
+         bool(citation_problems([{"id": "D-9001", "title": "see D-150 cap"}],
+                                {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": []}))),
+        ("an absent citation block is quiet (the join is report-only and optional), not a crash",
+         not citation_problems([{"id": "D-9001", "title": "cites D-9999"}], {})),
     ]
 
 
@@ -235,10 +295,23 @@ def main(argv: list[str]) -> int:
             print("  - " + problem)
         return 1
     absent = len(top - set(named))
-    print("ok " + NAME + ": " + str(len(named)) + " id(s) NAMED in " + str(block["log"]) + ", " + str(len(top))
-          + " TOP-LEVEL record(s), " + str(len(pinned)) + " pinned legacy orphan(s), 0 fault(s); "
-          + str(absent) + " record(s) carry no log entry (the log is a TIERED face of the registry - its own "
-          "header - so that direction is DECLARED, never asserted)")
+    summary = ("ok " + NAME + ": " + str(len(named)) + " id(s) NAMED in " + str(block["log"]) + ", " + str(len(top))
+               + " TOP-LEVEL record(s), " + str(len(pinned)) + " pinned legacy orphan(s), 0 fault(s); "
+               + str(absent) + " record(s) carry no log entry (the log is a TIERED face of the registry - its own "
+               "header - so that direction is DECLARED, never asserted)")
+    # BUG-1108: the register's INTERNAL citation join (report-only first - see citation_problems).
+    citation = (yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}).get("citation") or {}
+    cited = citation_problems(records, citation)
+    if cited:
+        report_only = bool(citation.get("report_only", True))
+        label = "REPORT" if report_only else "FAIL"
+        print(label + " " + NAME + " citation: " + str(len(cited)) + " dangling D-token(s) inside record fields:")
+        for problem in cited:
+            print("  - " + problem)
+        if not report_only:
+            return 1
+        summary += "; " + str(len(cited)) + " dangling citation(s) REPORTED (report-only, owner-gated)"
+    print(summary)
     return 0
 
 

@@ -1325,3 +1325,29 @@ mutations:
       (2026-10-26): the rail was 500.63 s over 525 artifacts of which 522 are DISTINCT byte streams, so the saving is
       across runs, and a memo that cannot be seen to refuse is a memo that will one day certify a repository it
       never read.
+
+  # D-3218 / BUG-1100 - THE LICENCE MUST SPEAK THE PIN IT REMOVES. The pin-shrink route is the third in-place
+  # route in scripts/recompute_decision_summary.py and the ONLY one that may move a list in
+  # config/decisions_policy.yaml, so its licence limb is the difference between "an order moved this pin" and "a
+  # session moved it because it needed the rail green". The control asserts BOTH directions on a known record
+  # (D-3217 names D2100 and does not name D2999), so a licence reader that has stopped reading reds on the
+  # NEGATIVE direction while the positive one keeps passing - the differential is real and not an accident of the
+  # fixture.
+  - id: the_pin_shrink_licence_is_load_bearing
+    subject: scripts/recompute_decision_summary.py
+    op: replace
+    find: '    return [t for t in tokens if t not in payload]'
+    replace: '    return []  # MUTATION (D-2676): an unnamed subject stops being read'
+    runner: scripts/recompute_decision_summary.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/the_licence_must_name_each_token_it_drops'
+    why: >-
+      BUG-1100/D-3218. Every in-place route in this repo must NAME the decision that ordered it, and (D-2972
+      generalised) that decision must SPEAK the subject it moves - otherwise one order covers any pin, which is the
+      laundering door the shrink-only direction exists to close. The mutation makes the licence reader answer "every
+      token is named" unconditionally, which is invisible in a green run: the route still resolves the licence, still
+      proves the splice, still reads the list back, and still prints its obligation. The ONLY thing that changes is
+      that an unnamed pin has become movable, and the control that catches it is the one that asserts the NEGATIVE
+      direction on a record whose payload really does not name the token.

@@ -36402,3 +36402,107 @@ decisions:
     the missing-declaration fault at D-3170 short-circuited the stale-pin scan that would have reported these four'
   - 'no other reader consumes legacy_debt_ids: measured by grepping the tree - only scripts/check_revoked_references.py
     reads it, and the "24" in governance/SESSION-HANDOFF-2026-09-26.md is a dated handoff, not a live declaration'
+- id: D-3218
+  date: '2026-10-28'
+  state: ACTIVE
+  category: GOVERNANCE / OWNERSHIP (BUG-1100, D-401, D-2642, D-2645, D-2941, D-2972, D-3034, D-3214, D-3216)
+  bugs:
+  - BUG-1100
+  title: THE RULES FILE THAT ORDERS EVERY IN-PLACE EDIT NOW DECLARES ITS OWN WRITER - config/decisions_policy.yaml
+    gets a mutability, a writer of record and ONE route that may move a pin list, and the shrink direction stops
+    being prose a machine cannot read
+  decision: '(1) THE DEFECT, MEASURED. BUG-1100 established that config/decisions_policy.yaml - the file that declares
+    the revocation ontology, the succession rules, the five pin lists, the state vocabulary AND the routes that
+    may edit an append_only registry - carried NO artifact_ownership entry, NO mutability and NO writer of record,
+    while its siblings config/decisions.yaml and config/decisions_summary.json both did. Three consequences, each
+    read rather than argued: write_guard --audit could not join the file to any declared writer, so no guard debt
+    was owed and none was checked; the --canonicalise-states route PRINTS an obligation to shrink state_vocabulary.legacy_non_canonical_ids
+    and there was no hand to do it (the BUG-376 shape - an obligation discharged in prose, by nobody); and the one
+    act that DID have to change the file (24 -> 20 pins, D-3217) was performed by temp/shrink_legacy_pins_D3217.py,
+    a scratch script that temp/''s own rule makes non-re-runnable. But the deepest measurement is not the missing
+    entry: this file states the SHRINK-ONLY direction of its pins in PROSE ("the list may only shrink"), so the
+    direction of the ONE mutation it needs was a rule no machine could read - and a rule only prose can state is
+    a rule the next hand invents its own version of. A governed rules file with no declared writer is not "unowned";
+    it is owned by whoever needed it last. (2) WHY NO OWNER WORD IS OWED, AND WHY THIS RECORD IS ACTIVE AND NOT
+    RATIFIED. BUG-1100 closed its fix with "this adds a declared writer, which is an ownership statement and not
+    an agent''s to make", and that sentence is TOO BROAD - corrected here, in the open, by the append-only discipline
+    rather than by editing the bug (D-3034/D-3214). Three measurements settle it under D-2941 clause 4 (derived
+    data is applied by a verified script): (a) the OWNERSHIP already exists and is already declared - config/capability_registry.yaml#decision_mint
+    carries "owns: [config/decisions.yaml, config/decisions_summary.json, config/decisions_policy.yaml]", so an
+    entry in config/artifact_ownership.yaml is the ENFORCEMENT PROJECTION of that ownership, which is precisely
+    what that file''s own header says it is; (b) the file''s OWN two routes already name this script as the hand
+    - state_vocabulary.canonicalisation_route and state_vocabulary.transition_route both read "scripts/recompute_decision_summary.py
+    --...", so the writer is derived from the file itself and not chosen by an agent; (c) the writer already passes
+    write_guard --audit as guarded, so the declaration adds no guard debt and relaxes no ceiling. What an owner
+    gate MAY decide (D-2941 clause 2, POLICY) is what the state word RATIFIED means - and that is recorded separately
+    as BUG-1101 rather than absorbed here, because a state''s meaning is not this act''s subject. So this record
+    is ACTIVE: a ruling this sitting made and applied, on a writer the register had already named. It is NOT RATIFIED,
+    because in this register RATIFIED carries the owner''s own word (D-2879/D-2880 read "Owner review ROUND n ...
+    ratified") and no owner ratified this. Say the words and it is a one-command transition (the D-3216 route) -
+    the state is derived from the evidence, so it may be moved by the evidence. (3) THE DECLARATION, in three parts,
+    each with one home. (a) config/decisions_policy.yaml#pin_lists DECLARES which lists may only shrink - revocation.legacy_debt_ids,
+    graph.pinned_supersession_ids, graph.pinned_forward_citations, membership.legacy_orphan_ids, state_vocabulary.legacy_non_canonical_ids
+    - plus the rails that READ them and the route command, as DATA. (b) scripts/recompute_decision_summary.py --shrink-pins
+    <dotted.key> --drop <token> [--drop <token>]... --because <D-id> [--apply] is the ONE route that may move a
+    pin, and it is the third route of the same family in the same declared writer, not a new tool. (c) config/artifact_ownership.yaml
+    gains the entry: mutability append_only, writer_of_record scripts/recompute_decision_summary.py, and the named
+    exception - because append_only''s own definition is "cells may be ADDED; an existing cell may never be edited
+    or blanked", and one declared route may replace a pin list, exactly as --canonicalise-states is the declared
+    exception for config/decisions.yaml. (4) WHY THE SUBJECTS ARE DATA AND NOT A CONVENTION. graph.in_force_states
+    is ALSO a list, and removing a member of it would make a citation rail accept LESS while every declaration still
+    read as satisfied - a route that could shrink ANY list could shrink a PERMISSION instead of a PIN. So the subject
+    set is declared, and a key outside it is REFUSED rather than guessed. The same reasoning makes the READERS declared:
+    the printed obligation ("re-run every declared reader") may not be a hand-typed literal, or it becomes the second
+    home of a fact whose absence is what BUG-376 was. (5) THE PROOF THE ROUTE CARRIES, measured on the code and
+    not asserted. The splice removes WHOLE ITEM LINES of the named list in EITHER style the file uses (block and
+    flow), and proves: the item lines it sees EQUAL the list YAML parses from them (so quoting cannot hide an item
+    from the proof); the remaining list is exactly the list minus the dropped tokens in order; the arithmetic closes
+    (n - drops == remaining); the document parsed afterwards equals the document before with ONLY that key restored
+    (so no other key of any block moved by any value); no TOP-LEVEL key moved; the bytes ON DISK are the bytes it
+    proved; and the list READS BACK from disk. The LICENCE is checked first, must RESOLVE, and must NAME every token
+    it drops - one reader (licence_names) now answers "does the decision speak its subject" for BOTH in-place routes,
+    so a state transition and a pin shrink cannot hold two opinions about it (D-2642). A token that is NOT in the
+    list is refused as an ADDITION, never added: a route that could ADD a pin could declare debt to turn a rail
+    green, which is the act D-2645 forbids by silence and this route forbids by tool. Seven known-answer controls
+    cover both list styles, the addition refusal, the undeclared-key refusal, the empty shrink, the duplicate, and
+    the licence''s two directions; the suite is 40/40. (6) THE ONE THING THIS ACT CANNOT DO FOR ITSELF, stated instead
+    of hidden. The FIRST declaration of the route cannot be made BY the route - it does not exist yet - so the pin_lists
+    block was written once through scripts/lib/write_guard.py with a backup, a journal receipt and a byte-exact
+    post-verification, and that fact is recorded here rather than dressed up. It is the LAST scatter-edit of this
+    file: from now on a pin movement that does not go through the route is an act nobody can re-run, which is exactly
+    what made BUG-1100 a bug. (7) WHAT THIS ACT DOES NOT DO. It does not GROW a pin (refused), does not RE-POINT
+    one (a re-point is a drop plus an add, and the add is refused - a re-pointable pin is a laundering door); it
+    does not touch a MEASURED note (only item lines move, so the dated measurements stay as measured and the correction
+    lives beside them, the D-3214/D-3217 idiom); it does not introduce a SECOND ruler (the two rails stay the readers
+    - this route only moves bytes); it does not decide what RATIFIED means (BUG-1101, an owner POLICY word); and
+    it does not shrink anything today - the five pin lists are untouched by this act.'
+  reason: 'This record came first because it changes what a GOVERNED RULES FILE may be edited by, and a contract
+    change smuggled in as a bugfix is the drift this registry exists to refuse (D-3038). It was forced by a measurement
+    the previous sitting could not avoid: the honest fix for BUG-1099 needed a pin shrink, the only honest way to
+    perform one was a scratch script, and a scratch script editing the file that declares every editing rule is
+    exactly the folklore that file exists to prevent. The alternatives were both refusals - leave the file undeclared
+    and every future pin movement re-invents a splice (the state BUG-1100 measured), or grow a pin list to avoid
+    the shrink (corruption by tool, refused twice in BUG-1099''s own sitting). So the declaration is made at the
+    granularity the file actually needs: WHICH lists are pins, WHO writes them, and WHAT proof one edit carries.'
+  files:
+  - config/decisions_policy.yaml
+  - config/artifact_ownership.yaml
+  - scripts/recompute_decision_summary.py
+  - scripts/check_revoked_references.py
+  - config/capability_registry.yaml
+  evidence:
+  - 'BUG-1100 as measured: config/artifact_ownership.yaml declares config/decisions.yaml (append_only, scripts/recompute_decision_summary.py)
+    and config/decisions_summary.json (derived_regenerable, same writer) and NOT config/decisions_policy.yaml -
+    so write_guard --audit had no writer to join, and none was owed'
+  - 'the ownership that already existed: config/capability_registry.yaml#decision_mint -> owns [config/decisions.yaml,
+    config/decisions_summary.json, config/decisions_policy.yaml] (the projection, not a new claim)'
+  - 'the routes the file already declared, both naming this writer: state_vocabulary.canonicalisation_route and
+    state_vocabulary.transition_route'
+  - 'the shrink-only direction stated in PROSE and readable by no machine before this act: revocation.legacy_debt_ids
+    ("The list may only shrink"), graph.pinned_supersession_ids / pinned_forward_citations ("Both pin lists are
+    SHRINK-ONLY"), membership.legacy_orphan_ids, state_vocabulary.legacy_non_canonical_ids'
+  - 'the route, measured by its own controls: 40/40 known-answer controls fire, including both list styles, the
+    addition refusal, the undeclared-key refusal and the licence naming each token it drops'
+  - 'no receipt caches these bytes: config/handoffs.yaml declares no artifact for config/decisions_policy.yaml,
+    so the receipt of a pin shrink is write_guard''s mutation journal row plus the two declared readers, and the
+    route PRINTS both instead of promising them in prose'

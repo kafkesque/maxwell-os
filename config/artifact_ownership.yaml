@@ -318,3 +318,39 @@ artifacts:
     unreconciled_reason: >
       It is the closed menu the answer-space sha is computed OVER, so it is checked by verify_anchor_manifest.py
       and verify_menu_policy.py; duplicating that here would create two rulers for one fact.
+
+  config/decisions_policy.yaml:
+    mutability: append_only
+    writer_of_record: scripts/recompute_decision_summary.py
+    guard_note: >-
+      DECLARED 2026-10-28 by D-3218 (closes BUG-1100), and the debt this entry retires is the reason it is a
+      guard_note rather than a guard_exemption: the writer was ALREADY guarded (write_guard --audit reports
+      "scripts/recompute_decision_summary.py (calls write_document)"), so nothing is owed and no ceiling moves.
+      MEASURED before this entry: the file that declares the revocation ontology, the succession rules, the five
+      pin lists, the state vocabulary AND the routes that may edit an append_only registry had NO artifact_ownership
+      entry, NO mutability and NO writer of record, while its two siblings (config/decisions.yaml,
+      config/decisions_summary.json) had all three - so write_guard --audit could not join it to any writer, no
+      guard debt was owed for it, and none was checked. The one act that DID have to change it was performed by a
+      scratch script in temp/ that named itself as the writer: honest, and not a tool anyone can re-run. The
+      ownership itself was never missing - config/capability_registry.yaml#decision_mint already declares "owns:
+      [... config/decisions_policy.yaml]" - so this entry is the ENFORCEMENT PROJECTION of an existing ownership,
+      which is what this file's own header says it is (D-2941 clause 4: derived data is applied by a verified
+      script; no owner word is owed where the writer is the one the register and the file's own routes already
+      name). ONE named exception to append_only, and it is a ROUTE rather than a permission, exactly as
+      --canonicalise-states is for config/decisions.yaml: `--shrink-pins <dotted.key> --drop <token>... --because
+      <D-id>` may REPLACE a list declared in #pin_lists.keys, and only after proving that whole ITEM LINES of that
+      one list left the bytes, that the list that remains is the list minus the dropped tokens, that the
+      arithmetic closes, that no other key of the document moved, and that the bytes ON DISK are the bytes it
+      proved. It can only SHRINK: a token absent from the list is refused as an addition, so a route can never
+      declare debt to turn a rail green. Not a second ruler: the RAILS remain the readers (pin_lists#readers) and
+      this route only moves bytes.
+    unreconciled_reason: >-
+      The cover rule asks for a reconciliation entry or a reason, and the reason is that the pins ARE reconciled -
+      twice, by the rails that read them. Every pin list in this file carries a STALENESS rule with teeth: a
+      revocation pin whose record now names a resolvable successor fails check_revoked_references, a supersession
+      pin whose record now names a successor fails reconcile#supersession_stale_pins, a forward citation whose site
+      is gone fails reconcile#decision_citations_in_force, and the membership and spelling pins fail their own
+      rails the same way. A reconciliation entry here would have to compare the pin list against the pin list -
+      self-certifying evidence, which is the BUG-467 defect this repo keeps re-finding. What is NOT self-certified
+      is the DIRECTION of the list (shrink-only), and that is now a declaration the route enforces rather than a
+      sentence a reader has to trust.

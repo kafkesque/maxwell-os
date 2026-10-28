@@ -286,3 +286,50 @@ log_header:
     scripts/check_decision_membership.py#header_problems() reads this block. It is the same rail that joins the
     log's IDs to the registry: one file, one header, one rule - the file's claims about the registry are checked
     where the file is read, never by a human remembering to re-type the count.
+
+# -------------------------------------------------------------------------------------------------------------
+# PIN LISTS - which of the lists above may only SHRINK, declared as DATA (D-3218, closes BUG-1100).
+#
+# WHY THIS BLOCK EXISTS. Every pin list in this file states its direction in PROSE ("the list may only shrink",
+# "Both pin lists are SHRINK-ONLY") and MEASURED 2026-10-28 no machine could READ that sentence - so the ONE
+# mutation this file needs had no route, and the act that performed it (24 -> 20, D-3217) was a scratch script in
+# temp/. A rule only prose can state is a rule the next hand invents its own version of. The subjects are
+# therefore declared here, the ONE route reads them, and a key outside this list is REFUSED rather than guessed:
+# graph.in_force_states is ALSO a list, and removing a member of it would make a citation rail accept LESS while
+# every declaration still read as satisfied - a route that can shrink any list can shrink a PERMISSION instead of
+# a PIN.
+#
+# A PIN IS REMOVED, NEVER RE-POINTED. A re-point is a drop plus an add, and the ADD is refused: a re-pointable pin
+# is a laundering door, since any session could re-point a debt at nothing. What retires a pin is the RECORD's own
+# state - a link that now RESOLVES, a citation site that is gone, a state that is canonical - never a new
+# declaration invented to make a rail green (D-2645/D-3217).
+#
+# NO RECEIPT CACHES THESE BYTES (MEASURED 2026-10-28): config/handoffs.yaml declares no artifact for this path, so
+# the receipt of a pin shrink is write_guard's mutation-journal row PLUS the READERS below - which is why the route
+# PRINTS them instead of promising the act in prose (the BUG-376 shape: an obligation discharged by nobody).
+pin_lists:
+  # The ONLY sanctioned mutation of this file, named as a command so a reader can JOIN it to a writer - the same
+  # idiom as state_vocabulary.canonicalisation_route / transition_route above (D-3218).
+  route: 'scripts/recompute_decision_summary.py --shrink-pins <dotted.key> --drop <token> [--drop <token>]... --because <D-id> [--apply]'
+  direction: shrink_only
+  why: >-
+    Every in-place edit here carries the same three obligations (D-2972): a licence (--because) that must RESOLVE
+    and must NAME each token it drops - a licence naming no subject would let one order cover any pin - exactly
+    ONE proved splice (whole item lines of the named list, in either list style this file uses, with the remaining
+    list, the arithmetic and the WHOLE document compared afterwards), and the obligation printed with the readers
+    it comes from. The route refuses any subject not listed here, refuses a token that is absent from the list (an
+    addition), refuses an empty shrink and a duplicate, and reads the shrunk list back from the bytes ON DISK.
+  keys:
+  - revocation.legacy_debt_ids
+  - graph.pinned_supersession_ids
+  - graph.pinned_forward_citations
+  - membership.legacy_orphan_ids
+  - state_vocabulary.legacy_non_canonical_ids
+  # The rails that READ these pins, declared so the printed obligation is not a hand-typed literal (D-2642).
+  # File-granular on purpose: each of these reads at least one of the keys above, and the state pin is read by
+  # the writer ITSELF (spelling_problems -> legacy_spelling_ids), so a separate re-run of it is already implied
+  # by --check.
+  readers:
+  - scripts/check_revoked_references.py
+  - scripts/reconcile.py
+  - scripts/check_decision_membership.py

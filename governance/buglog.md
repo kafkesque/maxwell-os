@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1343 decisions (census stamp 12c956463e15a3ee, 2026-10-28) · 864 bugs (266 open / 598 closed; highest OPEN = BUG-1100) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1344 decisions (census stamp 09ae8ad3705efa9b, 2026-10-28) · 865 bugs (266 open / 599 closed; highest OPEN = BUG-1101) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1343 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1343, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1344 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 677 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1344, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
@@ -25198,3 +25198,132 @@ whoever needs it, which is how a rules file quietly becomes folklore.
 pin-shrink route exists as a script in `scripts/`; the next pin shrink after that is performed through it.
 
 STATE: OPEN.
+
+## BUG-1100 (MED — CLOSED 2026-10-28) — THE RULES FILE THAT ORDERS EVERY IN-PLACE EDIT NOW DECLARES ITS OWN WRITER: `config/decisions_policy.yaml` has a mutability, a writer of record and ONE route that may move a pin — and the shrink direction stopped being prose
+
+**FOUND BY:** the D-3217 pin shrink, which had to stop and ask who owns `config/decisions_policy.yaml`. The
+answer, measured: nobody was declared.
+
+**1. THE DEFECT, AS MEASURED (not as argued).** `config/artifact_ownership.yaml` declared
+`config/decisions.yaml` (`append_only`, `scripts/recompute_decision_summary.py`) and
+`config/decisions_summary.json` (`derived_regenerable`, same writer) and declared **nothing** for the policy file —
+the file that holds the revocation ontology, the succession rules, the five pin lists, the state vocabulary AND
+the routes that may edit an append-only registry. Three consequences, each read:
+(a) `write_guard --audit` could not join the file to any declared writer, so no guard debt was owed and none was
+checked; (b) `--canonicalise-states` PRINTS "OWED (same sitting): shrink
+`state_vocabulary.legacy_non_canonical_ids`" and there was no hand to do it — a printed obligation with no route,
+the BUG-376 shape waiting to recur; (c) the one act that did have to change the file (24 → 20 pins, D-3217) was
+performed by `temp/shrink_legacy_pins_D3217.py` — honest, guarded, receipted, and **not a tool anyone can re-run**.
+But the deepest measurement is not the missing entry: every pin list in that file states its direction in PROSE
+("the list may only shrink", "Both pin lists are SHRINK-ONLY") and **no machine could read that sentence**, so the
+direction of the one mutation the file needs was folklore — a rule only prose can state is a rule the next hand
+invents its own version of.
+
+**2. THE FIX, in three parts, each with one home (D-3218).**
+(a) `config/decisions_policy.yaml#pin_lists` now DECLARES, as data: the five shrink-only keys
+(`revocation.legacy_debt_ids`, `graph.pinned_supersession_ids`, `graph.pinned_forward_citations`,
+`membership.legacy_orphan_ids`, `state_vocabulary.legacy_non_canonical_ids`), the rails that READ them, the route
+command and the direction.
+(b) `scripts/recompute_decision_summary.py --shrink-pins <dotted.key> --drop <token>… --because <D-id> [--apply]`
+is that route — the third route of the same family, in the same declared writer, not a new tool.
+(c) `config/artifact_ownership.yaml` gains the entry: `mutability: append_only`, `writer_of_record:
+scripts/recompute_decision_summary.py`, one NAMED exception (the route) and a `guard_note` rather than an
+exemption — the writer was already guarded, so nothing is owed and no ceiling moves.
+WHY THE SUBJECTS ARE DATA: `graph.in_force_states` is ALSO a list, and removing a member would make a citation rail
+accept LESS while every declaration still read as satisfied. A route that can shrink ANY list can shrink a
+PERMISSION instead of a PIN, so a key outside the declaration is REFUSED, never guessed.
+
+**3. THE PROOF, MEASURED ON LIVE BYTES AND NOT ON A FIXTURE ALONE.** The splice removes WHOLE ITEM LINES of the
+named list in BOTH styles the file uses, and proves: the item lines it sees EQUAL the list YAML parses from them
+(quoting cannot hide an item); the remaining list is the list minus the dropped tokens, in order; the arithmetic
+closes; the document parsed afterwards EQUALS the document before with only that key restored (no other key moved
+by any value); no top-level key moved; the bytes ON DISK are the bytes it proved; the list READS BACK from disk;
+the licence RESOLVES and NAMES every token it drops. Read-only acceptance run against the live file, one token per
+list, nothing written: `legacy_debt_ids` 20 → 19 (−10 B), `pinned_supersession_ids` 12 → 11 (−10 B),
+`pinned_forward_citations` 3 → 2 (−46 B), `legacy_orphan_ids` 4 → 3 (−6 B) — in every case exactly ONE line left
+and the order was preserved. The refusals fire on the live file too: an undeclared key
+(`graph.in_force_states`) and a licence that does not name its token (`D-3218 does not NAME D2413`) both exit
+FAIL-CLOSED. Known-answer controls: **40/40** (seven new, covering both list styles, the addition refusal, the
+undeclared-key refusal, the empty shrink, the duplicate and the licence's two directions). Mutation teeth
+(D-2676): `config/rail_mutations.yaml#the_pin_shrink_licence_is_load_bearing` neuters the licence reader and the
+control reds through its own named marker. `write_guard --audit` is unchanged at 11/14 guarded, ceiling 3 — the
+declaration adds no debt.
+
+**4. THE ONE EDIT THIS ACT COULD NOT MAKE THROUGH ITSELF, named rather than hidden.** The FIRST declaration of a
+route cannot be made BY that route — it does not exist yet. So the `pin_lists` block and the ownership entry were
+written once by `temp/write_D3218_declarations.py` through `scripts/lib/write_guard.py`
+(`decisions_policy` 1824fc5a78301789 → 9387b54ddce04ec7; `artifact_ownership` ebcae62bf2868ebb → 19b0b1bd6d5c6498;
+backups under `backups/`), each append structurally refusing to change any key it did not add. That is the LAST
+scatter-edit of this file: from now on a pin movement that does not go through the route is an act nobody can
+re-run, which is exactly what made this a bug.
+
+**5. BUG-1100'S OWN CLOSING SENTENCE WAS OVER-BROAD, AND IS CORRECTED HERE IN THE OPEN.** It said the fix "adds a
+declared writer, which is an ownership statement and not an agent's to make". Three measurements retire that
+reading (D-2941 clause 4 — derived data is applied by a verified script): the OWNERSHIP already existed and was
+already declared in `config/capability_registry.yaml#decision_mint` (`owns: [… config/decisions_policy.yaml]`), so
+the entry is the ENFORCEMENT PROJECTION of an existing ownership, which is what that file's own header says it is;
+the file's OWN two routes already name this script as the hand; and the writer already passed the audit as
+guarded. What IS an owner gate is what the state word `RATIFIED` MEANS — separated as BUG-1101 rather than
+absorbed here.
+
+**6. THE DELEGATED R5 REVIEW FAILED AGAIN, AND THAT IS RECORDED AS A MEASUREMENT.** Delegated to
+`gemma-4-E4B-it-MLX-4bit` (journal `DJ-20261028T113306Z-0912`, wall 99.7 s, declared may-write none) with a
+195-line excerpt and six closed questions: it returned **no verdict at all** — the reply restated the six
+questions and announced a `final_output` call it never made, then hit `max turns reached`. That is the SECOND
+consecutive non-substantive result on this shape (the first, `DJ-20261028T105434Z-d589`, returned 3 PASS/1 FAIL
+whose own sentences inverted the code). Recorded as a FAILED sample: no defect found, **no approval given**. The
+verification that stands is mechanical — the 40 controls, the four live-byte acceptance runs and the mutation
+entry. The routing consequence is named, not hidden: "gemma for code review" is confirmed on a SHORT script and
+measured NOT to work on a long excerpt, so a review that must actually bite needs a longer-context reviewer (T-187
+is the instrument that ranks them) — not a third identical attempt.
+
+**7. TWO NAMED LIMITATIONS, so the next session inherits constraints instead of surprises.** (a) The route moves
+whole ITEM LINES and nothing else: a pin list that someday holds a mapping or a multi-line item is REFUSED rather
+than supported — the honest boundary, and the refusal is a message, not a silent partial edit. (b) The declared
+`pin_lists.route` string is read by humans and by this buglog and is EXECUTED by no rail: the script exists and its
+flags are parsed, but nothing asserts that the strings in the policy still match the script's actual options. That
+is a small, real gap and it is written down rather than closed by a rail nobody asked for.
+
+**RE-OPEN/CLOSE CONDITION:** closed — the policy file declares a mutability and a writer of record, and the
+pin-shrink route exists as a script in `scripts/` with refusal teeth and mutation teeth. The next pin shrink after
+this is performed THROUGH it (that is the test that keeps it true); a pin shrink that appears without a
+`--shrink-pins` row in `MUTATION_JOURNAL.jsonl` re-opens this bug.
+
+STATE: CLOSED.
+
+## BUG-1101 (MED, OPEN 2026-10-28) — `RATIFIED` IS A DECISION STATE WHOSE MEANING NO FILE DECLARES: 38 of its 153 records carry the word "owner" nowhere, so a face that prints "⚖ ratified 153" states an owner act the owner may never have made
+
+**FOUND BY:** the state classification of D-3218, which had to stop and ask whether a structural ruling made by a
+sitting is `ACTIVE` or `RATIFIED`.
+
+**THE MEASUREMENT.** `config/decisions_policy.yaml#state_vocabulary` declares WHICH spellings are canonical and
+`config/gov_sync.yaml#state_glyphs` declares which SIGN each state prints, and NEITHER declares what the word
+MEANS — the BUG-483 class one level up (a state whose vocabulary is declared and whose semantics are not). Measured
+on the register today: **153** records are `RATIFIED`; **38** of them contain the string "owner" NOWHERE in their
+payload; and where the word is used with its plain meaning the record says so explicitly — D-2879 and D-2880 read
+"Owner review ROUND 3 / ROUND 4 … ratified". So the same state token is carrying at least two different facts: *the
+owner ratified this* and *this sitting ruled it and applied it*. The face prints them as one bucket
+("in effect: 🟢 active 676 · ⚖ ratified 153"), so a reader — the owner first — cannot tell which of the 153 are his
+own acts. Nothing is RED: every rail reads the token correctly and the census is exact. What is false is the
+INFERENCE the word invites, which is why this is a declaration bug and not a checker bug.
+
+**THE TWO WAYS OUT (the owner's POLICY word, D-2941 clause 2, so it is not an agent's to pick).**
+(A) `RATIFIED` means ONLY the owner's word. Then the 38 are re-classified to `ACTIVE` through the existing governed
+route (`--set-state <D> ACTIVE --because <D>`, one proved splice each, D-3216), and the face's ratified count
+becomes a statement about the owner that is true by construction. Cost: 38 transitions, one decision to order them.
+(B) `RATIFIED` means "in force and applied", and the OWNER's own acts get a distinguishing marker (a field or a
+fourth in-force state) so the two senses are countable separately. Cost: a new declared value plus its sign, its
+bucket, its glyph and its census key — a bigger change to the faces.
+A THIRD OPTION — leave it — is recorded as REJECTED in advance: a state word that two readers would translate
+differently is the drift this register exists to refuse, and `D-3216`/`D-3217` (minted `RATIFIED` by an agent
+sitting with no owner word, self-reported here because this session minted them) are themselves instances of the
+ambiguity, not exceptions to it.
+
+**WHY IT IS MED AND NOT HIGH:** no rail is wrong, no artifact is unowned and no byte is at risk. **WHY IT IS NOT
+LOW:** it is the one bucket on the owner-facing face that claims an owner act, and 25% of it does not carry that
+claim.
+
+**RE-OPEN/CLOSE CONDITION:** closed when `config/decisions_policy.yaml#state_vocabulary` declares what `RATIFIED`
+means in one sentence AND the register agrees with that declaration in both directions (no record carries it that
+the declared meaning excludes; no record the declared meaning includes lacks it). The measurement above is the
+baseline the close is checked against.

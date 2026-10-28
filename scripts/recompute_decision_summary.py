@@ -236,6 +236,14 @@ SET_STATE_FLAG: str = "--set-state"
 #: were jointly unsatisfiable for any record retired after the 2026-09-27 pin measurement, and an append_only
 #: registry cannot be repaired by a later act. So the link moves in the SAME governed write as the state.
 SUPERSEDOR_FLAG: str = "--superseded-by"
+#: The ONE route that may move a SHRINK-ONLY pin list in config/decisions_policy.yaml, and the flag naming each
+#: token it drops (D-3218/BUG-1100). MEASURED before it existed: that file declared its pins and its own edit
+#: routes in PROSE, carried NO artifact_ownership entry and NO writer of record, and the one act that had to move
+#: a pin (24 -> 20, D-3217) was performed by a scratch script in temp/ - a governed rules file written by a tool
+#: nobody can re-run, and a printed obligation (`--canonicalise-states` asks for a pin shrink) with no hand.
+#: The SUBJECTS stay declared in the policy (#pin_lists.keys), never re-typed here (C12/D-2642).
+PINS_FLAG: str = "--shrink-pins"
+DROP_FLAG: str = "--drop"
 ID_LINE_RE = re.compile(r"^- id: (D-?\d+[a-z]?)$")
 
 
@@ -616,18 +624,28 @@ def state_target_problems(decisions: list, target: str, state: str, successor: s
     return problems
 
 
-def licence_names_target(because: str, target: str) -> bool:
-    """True when the ORDERING decision's own payload NAMES the record it moves.
+def licence_names(because: str, tokens: list[str]) -> list[str]:
+    """Every token the ORDERING decision does NOT speak in its own payload (D-2972 generalised).
 
     WHY (D-2972 generalised): a licence proves an act is ATTRIBUTABLE; it does not prove the act is the one the
     decision ordered. A licence naming no target would let one order cover any record, so the ordering record
     must SPEAK the id it orders - the discipline the mint gate already applies to a decision and its bugs.
+    ONE reader answers this for every in-place route (D-2642): a state transition and a pin shrink cannot hold
+    two different opinions about what "the decision names its subject" means.
     """
     decisions = [r for r in ((yaml.safe_load(DECISIONS_YAML.read_text(encoding="utf-8")) or {})
                              .get("decisions") or []) if isinstance(r, dict)]
     index = {normalized_id(r): r for r in decisions}
     record = index.get(normalized_id({"id": because}))
-    return bool(record) and target in payload_text(record)
+    if not record:
+        return list(tokens)
+    payload = payload_text(record)
+    return [t for t in tokens if t not in payload]
+
+
+def licence_names_target(because: str, target: str) -> bool:
+    """True when the ORDERING decision's own payload NAMES the record it moves (the one-token case)."""
+    return not licence_names(because, [target])
 
 
 def set_state_plan(text: str, target: str, state: str, successor: str = "") -> tuple:
@@ -817,6 +835,255 @@ def set_state_main(argv: list) -> int:
     write_census(census_document(disk_data, d_total, d_summary, d_digest, disk))
     print("ok " + str(d_total) + " record(s), stamp " + d_digest + ", census re-derived from the bytes ON DISK")
     print_obligation(because)
+    return 0
+
+
+def pin_block() -> dict:
+    """config/decisions_policy.yaml#pin_lists - the ONE home of "which lists may only SHRINK" (C12/D-2642).
+
+    WHY A DECLARATION AND NOT A CONVENTION. Every pin list in that file is shrink-only in PROSE ("the list may
+    only shrink") and MEASURED before D-3218 no machine could read the rule: a route that accepted ANY dotted key
+    as its subject could shrink a PERMISSION instead of a PIN - `graph.in_force_states` is a list, and removing a
+    member of it would make a citation rail accept less while every declaration still read as satisfied. So the
+    subjects are DATA, the route reads them, and a key that is not in this block is refused rather than guessed.
+    """
+    return dict((yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}).get("pin_lists") or {})
+
+
+def pin_lists() -> list[str]:
+    """The dotted keys the policy DECLARES as shrink-only pin lists, read from its one home (C12/D-2642)."""
+    return [str(k) for k in (pin_block().get("keys") or [])]
+
+
+def pin_readers() -> list[str]:
+    """The rails that READ these pins, read from the same block - so the route's obligation is not a literal.
+
+    A route that printed a hand-typed list of readers would be a second home for the question "who consumes this
+    file", and the printed obligation is exactly where BUG-376's unowned promise started (prose, and by nobody).
+    """
+    return [str(r) for r in (pin_block().get("readers") or [])]
+
+
+def _dotted(doc: object, key: str) -> object:
+    """Resolve a dotted key ('graph.pinned_supersession_ids') to its value, or None when it does not resolve."""
+    node: object = doc
+    for part in str(key).split("."):
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node
+
+
+def _set_dotted(doc: dict, key: str, value: object) -> None:
+    """Write a dotted key in place, so a plan can build the ONE document it expects to see afterwards."""
+    parts = str(key).split(".")
+    node: dict = doc
+    for part in parts[:-1]:
+        node = node[part]
+    node[parts[-1]] = value
+
+
+def _unquote(value: str) -> str:
+    """The scalar a YAML list item denotes, for the quoting styles a rules file actually uses."""
+    out = str(value).strip()
+    if len(out) >= 2 and out[0] == out[-1] and out[0] in ("'", '"'):
+        out = out[1:-1]
+    return out
+
+
+def pin_plan(text: str, key: str, drops: list[str], declared: list[str] | None = None) -> tuple:
+    """Return (would-be policy text, problems): ONE pin list SHRUNK by whole listed items, by BYTE SPLICE.
+
+    THE DIFF IS THE PROOF, the same reasoning as --canonicalise-states and --set-state: the policy is 288 lines of
+    comments, so re-emitting it would destroy the only explanation of WHY each rule exists - every value here has
+    a paragraph saying what breaks without it. What this plan proves instead is (1) ONLY item lines of the NAMED
+    list left the bytes, in EITHER list style the file uses (block and flow); (2) the list that remains is exactly
+    the list minus the dropped tokens, in order; (3) the ARITHMETIC closes (n - drops == remaining); (4) no other
+    key of the document moved by any value, and no top-level key moved at all.
+
+    A token that is NOT in the list is a REFUSAL and never an addition (D-2645/D-3218): a route that could ADD a
+    pin could declare debt to turn a rail green, which is the act the shrink-only direction exists to prevent. A
+    list shape this route cannot PROVE (a quoted-vs-parsed mismatch, a multi-line item, a flow list carrying a
+    comment) is also a refusal - a splice that guesses is the corruption this file's own notes keep naming.
+    """
+    lines = text.splitlines(keepends=True)
+    declared_keys = pin_lists() if declared is None else list(declared)
+    if key not in declared_keys:
+        return text, [key + " is not a declared SHRINK-ONLY pin list in "
+                      + POLICY_YAML.relative_to(ROOT).as_posix() + "#pin_lists.keys (" + ", ".join(declared_keys)
+                      + ") - a route that could move ANY list could shrink a PERMISSION instead of a PIN"]
+    if not drops:
+        return text, ["no " + DROP_FLAG + " token - a shrink that removes nothing is a no-op declaration (D-405)"]
+    dupes = sorted({d for d in drops if drops.count(d) > 1})
+    if dupes:
+        return text, ["dropped twice: " + ", ".join(dupes)]
+    doc = yaml.safe_load(text) or {}
+    current = _dotted(doc, key)
+    if not isinstance(current, list):
+        return text, [key + " does not resolve to a LIST in the bytes handed to this route"]
+    drop_set = {str(d) for d in drops}
+    absent = [d for d in drops if str(d) not in {str(v) for v in current}]
+    if absent:
+        return text, ["REFUSED as an ADDITION: " + ", ".join(absent) + " is not in " + key + " - this route may "
+                      "only SHRINK a pin list (D-2645/D-3218), and declaring new debt is a decision, never a "
+                      "repair"]
+    leaf = key.split(".")[-1]
+    pattern = re.compile(r"^(\s*)" + re.escape(leaf) + r":(\s*)(.*)$")
+    hits = [i for i, line in enumerate(lines) if pattern.match(line)]
+    if len(hits) != 1:
+        return text, ["this route needs " + leaf + " to appear EXACTLY once in the file and it appears "
+                      + str(len(hits)) + " time(s) - a shape it cannot prove is a shape it refuses"]
+    at = hits[0]
+    match = pattern.match(lines[at])
+    lead, gap, tail = match.group(1), match.group(2), match.group(3)
+    new_lines: list[str] = []
+    if tail.strip().startswith("["):
+        inner = tail.strip()
+        if "#" in inner or not inner.endswith("]"):
+            return text, ["the flow list on line " + str(at + 1) + " carries a comment or is unterminated - a "
+                          "shape this route refuses rather than guesses"]
+        raw_items = [x.strip() for x in inner[1:-1].split(",") if x.strip()]
+        if [_unquote(x) for x in raw_items] != [str(v) for v in current]:
+            return text, ["the items on line " + str(at + 1) + " do not equal the list YAML parses from them - "
+                          "this route will not splice a shape it cannot prove"]
+        kept = [x for x in raw_items if _unquote(x) not in drop_set]
+        ending = lines[at][len(lines[at].rstrip("\r\n")):]
+        new_lines = lines[:at] + [lead + leaf + ":" + gap + "[" + ", ".join(kept) + "]" + ending] + lines[at + 1:]
+    elif not tail.strip() or tail.strip().startswith("#"):
+        item_re = re.compile(r"^(\s*)-\s+(\S.*?)\s*$")
+        base: str | None = None
+        items: list[tuple[int, str]] = []
+        i = at + 1
+        while i < len(lines):
+            item = item_re.match(lines[i])
+            if not item:
+                break
+            if base is None:
+                base = item.group(1)
+            if item.group(1) != base:
+                break
+            items.append((i, _unquote(item.group(2))))
+            i += 1
+        if [v for _i, v in items] != [str(v) for v in current]:
+            return text, ["the item LINES of " + key + " (" + str(len(items)) + ") do not equal the list YAML "
+                          "parses from them (" + str(len(current)) + ") - a quoted or multi-line item is a shape "
+                          "this route refuses rather than guesses"]
+        removed = {i for i, v in items if v in drop_set}
+        if len(removed) != len(drop_set):
+            return text, ["internal: " + str(len(removed)) + " line(s) carry " + str(len(drop_set)) + " token(s)"]
+        new_lines = [line for j, line in enumerate(lines) if j not in removed]
+    else:
+        return text, [key + " is neither a block list nor a flow list - this route only moves a list it can prove"]
+    new_text = "".join(new_lines)
+    expected = yaml.safe_load(text) or {}
+    _set_dotted(expected, key, [v for v in current if str(v) not in drop_set])
+    post = yaml.safe_load(new_text) or {}
+    if post != expected:
+        return text, ["the splice changed something OTHER than " + key + " - refusing"]
+    if [str(k) for k in post] != [str(k) for k in doc]:
+        return text, ["a TOP-LEVEL key moved - refusing"]
+    remaining = _dotted(post, key)
+    if not isinstance(remaining, list) or len(remaining) != len(current) - len(drops):
+        return text, ["the arithmetic does not close: " + str(len(current)) + " - " + str(len(drops)) + " is not "
+                      + str(len(remaining) if isinstance(remaining, list) else "a list")]
+    return new_text, []
+
+
+def shrink_args(argv: list[str]) -> tuple[str, list[str], str, bool]:
+    """Parse `--shrink-pins <dotted.key> (--drop <token>)+ --because <D-id> [--apply]`; refuse anything else.
+
+    The licence is NOT optional and the refusal comes FIRST (the in_place_licence ordering, D-2972): "there is
+    nothing to do" may never be the door a licence walks past, and an act with no owner is a favour.
+    """
+    usage = ("usage: " + PINS_FLAG + " <dotted.key> " + DROP_FLAG + " <token> [" + DROP_FLAG + " <token>]... "
+             + LICENCE_FLAG + " <D-id> [" + APPLY_FLAG + "]")
+    tokens = list(argv[2:])
+    key = ""
+    drops: list[str] = []
+    because = ""
+    apply_now = False
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok == DROP_FLAG and i + 1 < len(tokens):
+            drops.append(tokens[i + 1])
+            i += 2
+            continue
+        if tok == LICENCE_FLAG and i + 1 < len(tokens) and not because:
+            because = tokens[i + 1]
+            i += 2
+            continue
+        if tok == APPLY_FLAG and not apply_now:
+            apply_now = True
+            i += 1
+            continue
+        if tok.startswith("-") or key:
+            raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + usage + " - got " + repr(tok))
+        key = tok
+        i += 1
+    if not key:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + usage + " - no subject key")
+    if not because:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + PINS_FLAG + " requires " + LICENCE_FLAG + " <D-id>: it "
+                         "moves bytes INSIDE a governed rules file, and an act with no owner is a favour "
+                         "(C12/D-2972/D-3218)")
+    return key, drops, because, apply_now
+
+
+def shrink_main(argv: list[str]) -> int:
+    """`--shrink-pins <dotted.key> --drop <token>... --because <D-id> [--apply]`: ONE proved pin shrink.
+
+    THE THREE OBLIGATIONS every in-place route carries (D-2972), applied to the file that DECLARES them: the
+    splice is PROVED (pin_plan), the licence must RESOLVE and must NAME each token it drops (a licence naming no
+    subject would let one order cover any pin), and the obligation is PRINTED with the readers it comes from. The
+    act is attributed by CONTENT from the mutation journal, so an unrecorded write downstream reads UNATTRIBUTED
+    instead of borrowing this route's name.
+    """
+    key, drops, because, apply_now = shrink_args(argv)
+    if because not in handoff.decision_ids():
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + LICENCE_FLAG + " " + because + " names no record in "
+                         + DECISIONS_YAML.relative_to(ROOT).as_posix() + " - the edit would be attributable to a "
+                         "decision that does not exist")
+    unnamed = licence_names(because, drops)
+    if unnamed:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + because + " does not NAME " + ", ".join(unnamed)
+                         + " in its own payload - an ordering decision must speak the pin it removes, or one "
+                         "order would cover any pin (D-2972/D-3218)")
+    text = POLICY_YAML.read_text(encoding="utf-8")
+    new_text, problems = pin_plan(text, key, drops)
+    if problems:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): refusing to shrink " + key + ": " + "; ".join(problems))
+    pre = _dotted(yaml.safe_load(text) or {}, key)
+    post = _dotted(yaml.safe_load(new_text) or {}, key)
+    print("PRE  " + POLICY_YAML.relative_to(ROOT).as_posix() + " " + str(len(text.encode("utf-8"))) + " B, " + key
+          + " = " + str(len(pre)) + " pin(s)")
+    print("SHRINK " + ", ".join(drops) + " (licence " + because + ")")
+    print("POST " + str(len(new_text.encode("utf-8"))) + " B (" + str(len(new_text.encode("utf-8"))
+          - len(text.encode("utf-8"))) + " B), " + key + " = " + str(len(post)) + " pin(s)")
+    if not apply_now:
+        print("PREVIEW (nothing written): re-run with " + APPLY_FLAG)
+        return 0
+    yaml_guard.assert_yaml(new_text, POLICY_YAML.relative_to(ROOT).as_posix(), WRITER)
+    write_document(POLICY_YAML, new_text, writer=WRITER, owned_keys={OWNED_ANY}, backup=True, journal=True)
+    disk = POLICY_YAML.read_text(encoding="utf-8")
+    if disk != new_text:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the bytes ON DISK are not the bytes this route proved - "
+                         "the write is untrustworthy, so the pin list is not declared shrunk")
+    readback = _dotted(yaml.safe_load(disk) or {}, key)
+    if [str(x) for x in (readback or [])] != [str(x) for x in (post or [])]:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + key + " does not read back as planned from the bytes "
+                         "ON DISK")
+    print("ok " + key + " reads back " + str(len(readback or [])) + " pin(s) from the bytes ON DISK")
+    print("     " + handoff.attribution_line(POLICY_YAML.relative_to(ROOT).as_posix()))
+    readers = pin_readers()
+    absent = [r for r in readers if not (ROOT / r).exists()]
+    if absent:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + POLICY_YAML.relative_to(ROOT).as_posix()
+                         + "#pin_lists.readers declares " + ", ".join(absent) + ", which does not EXIST - a reader "
+                         "that resolves to nothing is a declaration with no referent (D-3034)")
+    print("     OWED (same sitting): re-run every declared reader and commit - "
+          + ", ".join("python3 " + r for r in readers)
+          + " (nothing caches these bytes: the receipt of the write itself is the mutation journal row above)")
     return 0
 
 
@@ -1403,9 +1670,83 @@ def state_controls() -> list[tuple[str, bool]]:
     ]
 
 
+def pin_controls() -> list[tuple[str, bool]]:
+    """Known-answer controls for the PIN-SHRINK route (D-3218/BUG-1100); each is SEEN to accept or refuse.
+
+    The fixture is a MINIATURE of the two list styles the live policy uses - a BLOCK list and a FLOW list -
+    because this route's proof is SHAPE-specific: a control that only ever saw one style would leave the other
+    unproven, and the flow style is exactly where a naive splice rewrites a line into something YAML reads
+    differently. The DECLARED subjects are passed in explicitly (the live policy's own keys) so the fixture
+    cannot authorise itself; a control whose subject came out of its own input would prove nothing.
+    """
+    fixture = ("schema_version: '1'\n"
+               "revocation:\n"
+               "  legacy_debt_ids:\n"
+               "  - D-9001\n"
+               "  - D-9002\n"
+               "  - D-9003\n"
+               "  measured: kept\n"
+               "graph:\n"
+               "  pinned_forward_citations: [config/a.yaml:decided=D-9004, config/b.yaml:decided=D-9005]\n")
+    declared = ["revocation.legacy_debt_ids", "graph.pinned_forward_citations"]
+
+    def refuses(problems) -> bool:
+        return bool(problems)
+
+    def block_shrink_moves_exactly_its_item() -> bool:
+        new_text, problems = pin_plan(fixture, "revocation.legacy_debt_ids", ["D-9002"], declared)
+        if problems:
+            return False
+        post = yaml.safe_load(new_text) or {}
+        lines_before = fixture.split(chr(10))
+        lines_after = new_text.split(chr(10))
+        return (len(lines_before) - len(lines_after) == 1
+                and (post.get("revocation") or {}).get("legacy_debt_ids") == ["D-9001", "D-9003"]
+                and (post.get("revocation") or {}).get("measured") == "kept"
+                and (post.get("graph") or {}).get("pinned_forward_citations")
+                == ["config/a.yaml:decided=D-9004", "config/b.yaml:decided=D-9005"])
+
+    def flow_shrink_stays_a_flow_list() -> bool:
+        new_text, problems = pin_plan(fixture, "graph.pinned_forward_citations", ["config/a.yaml:decided=D-9004"],
+                                      declared)
+        if problems:
+            return False
+        post = yaml.safe_load(new_text) or {}
+        return ((post.get("graph") or {}).get("pinned_forward_citations") == ["config/b.yaml:decided=D-9005"]
+                and "  pinned_forward_citations: [config/b.yaml:decided=D-9005]" in new_text
+                and len(fixture.split(chr(10))) == len(new_text.split(chr(10))))
+
+    def addition_is_refused() -> bool:
+        return refuses(pin_plan(fixture, "revocation.legacy_debt_ids", ["D-9999"], declared)[1])
+
+    def undeclared_key_is_refused() -> bool:
+        return refuses(pin_plan(fixture, "graph.in_force_states", ["ACTIVE"], declared)[1])
+
+    def empty_shrink_is_refused() -> bool:
+        return refuses(pin_plan(fixture, "revocation.legacy_debt_ids", [], declared)[1])
+
+    def the_same_token_twice_is_refused() -> bool:
+        return refuses(pin_plan(fixture, "revocation.legacy_debt_ids", ["D-9002", "D-9002"], declared)[1])
+
+    def the_licence_must_name_the_token_it_drops() -> bool:
+        # D-3217 is the decision that ORDERED the last real shrink and its payload speaks the tokens it dropped
+        # (D2100 -> D2094 etc.); it speaks no other pin, so both directions are known answers, not assumptions.
+        return licence_names("D-3217", ["D2100"]) == [] and licence_names("D-3217", ["D2999"]) == ["D2999"]
+
+    return [
+        ("a_block_list_shrink_removes_EXACTLY_the_dropped_item_line", block_shrink_moves_exactly_its_item()),
+        ("a_flow_list_shrink_stays_a_FLOW_list_on_one_line", flow_shrink_stays_a_flow_list()),
+        ("a_token_NOT_in_the_list_is_REFUSED_as_an_ADDITION", addition_is_refused()),
+        ("a_key_that_is_NOT_a_declared_pin_list_is_REFUSED", undeclared_key_is_refused()),
+        ("an_EMPTY_shrink_is_REFUSED_as_a_no_op_declaration", empty_shrink_is_refused()),
+        ("the_same_token_dropped_TWICE_is_REFUSED", the_same_token_twice_is_refused()),
+        ("the_LICENCE_must_NAME_each_token_it_drops", the_licence_must_name_the_token_it_drops()),
+    ]
+
+
 def mint_selftest() -> int:
     """Run the mint gate's known-answer controls; return 1 if any control did NOT fire."""
-    rows = mint_controls() + state_controls()
+    rows = mint_controls() + state_controls() + pin_controls()
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
     failed = [n for n, ok in rows if not ok]
@@ -1590,6 +1931,8 @@ def main(argv: list[str]) -> int:
         return canonicalise_main(argv)
     if SET_STATE_FLAG in argv:
         return set_state_main(argv)
+    if PINS_FLAG in argv:
+        return shrink_main(argv)
     check_only = "--check" in argv
     text = DECISIONS_YAML.read_text(encoding="utf-8")
     data = yaml.safe_load(text) or {}

@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1339 decisions (census stamp 364cba76791368a6, 2026-10-28) · 861 bugs (265 open / 596 closed; highest OPEN = BUG-1077) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1339 decisions (census stamp 364cba76791368a6, 2026-10-28) · 862 bugs (265 open / 597 closed; highest OPEN = BUG-1077) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1339 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 391 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1339, D-2987/BUG-765)
 >
@@ -24983,3 +24983,40 @@ READINGS: `wall(90) = 105.0` (inside (90,180) - the loop budget, unchanged); `wa
 inequality now that it delegates; `ruff --select F` clean; `lint_gate` 62 <= 62 (unchanged); `check_silent_repair`
 14 of ceiling 13 and `check_undeclared_encoding` 2/5/2 re-measured UNCHANGED - neither growth is attributable to
 this fix. No model was called to prove any of it: the refusal happens before transport, which is the point.
+
+## BUG-1098 (MED, FIXED 2026-10-28) — THE ROUTE GRAPH DROPPED EVERY BARE BASENAME, SO 13 BUGS THAT ACTUALLY NAME REAL FILES WERE MISCLASSIFIED AS `no_artifact_named`
+
+THE CLASS, NOT THE INSTANCE. `resolve_route.py#outcome()` built its path set with `[t for t in tokens if '/' in t]`,
+so any artifact token WITHOUT a slash — a bare basename like `stage0_5_extract_metadata.py` or `feedback.py` — was
+wholly invisible to ownership judgement. A bug whose evidence names a real file by basename alone was therefore read
+as `no_artifact_named` ("names no artifact"), when in fact it names an artifact the reader simply refused to look up.
+`scripts/lib/artifact_tokens.py` already accepts bare basenames on purpose (the ONE shared `ARTIFACT` regex), so the
+drop was a defect in the CONSUMER, not the tokeniser — a fact confirmed by the regex, not assumed (D-3034).
+
+THE RED LOOP, SEEN ON BOTH SIDES (D-3036).
+  BEFORE: the live `--check` census read `no_artifact_named` 63 (bugs) and 4 (tasks). BUG-967's own evidence names
+          `stage0_5_extract_metadata.py` and `stage2_extract.py` (bare), and yet it sat in the `unrouted:` override
+          as `bug_is_a_finding` — a declaration that could only have been correct while the reader was blind to bare
+          tokens. Thirteen of the 63 `no_artifact_named` bugs name a bare basename that `git ls-files` resolves to
+          exactly ONE tracked path.
+  AFTER:  bare tokens are resolved through a `git ls-files` basename index built once per run. ONE tracked path
+          resolves to that path and is judged for ownership; ZERO or MANY paths is reported as the named `bare` fact
+          and NEVER guessed (D-3034). The live census moved to: bugs routed 99 / unowned_artifact 102 / absent_path
+          12 / no_artifact_named 52; tasks routed 38 / unowned_artifact 21 / no_artifact_named 4. Debt facts now
+          carry three facts — exists_unowned 123, absent 36, bare 20 — and the report prints all three.
+
+THE FIX, ONE ACT.
+  1. `scripts/resolve_route.py`: add `_basename_index()` (a `git ls-files` -> basename -> [paths] map, empty on any
+     subprocess failure so a broken git never fabricates an answer); in `outcome()`, resolve bare tokens through it
+     before ownership judgement, and record the `bare` fact in `facts_census` and the report lines. Three new
+     known-answer controls pin the contract: bare_basename_routes_to_a_dir_owner, bare_basename_resolving_to_an
+     _unowned_file, bare_basename_ambiguous_is_named. Selftest 33/33.
+  2. `config/capability_registry.yaml#unrouted`: retire `BUG-967: bug_is_a_finding` (its bare evidence now resolves
+     to pipeline/stage0_5_extract_metadata.py owned by pipeline_ingest and pipeline/stage2_extract.py owned by
+     pipeline_extract) with a D-3038 historical comment — the reason outlived the defect it excused (fault vii).
+  3. Rebaseline the routing-debt ceilings DOWN to the new measured readings (bugs 171 -> 162, tasks 26 -> 25); a
+     shrink needs no citation (D-2644).
+
+READINGS: `--check` GREEN and byte-stable (DIGEST re-rendered); `--selftest` 33/33; live census moved as stated above
+(13 of the old 63 `no_artifact_named` bugs were bare-name drops now judged against their resolved paths). No model was
+called to prove any of it: the reader is deterministic and the receipt is the `git ls-files` index itself.

@@ -621,7 +621,12 @@ unrouted:
   #: (D-3038). None of the three titles names an artifact owned by a declared capability, so they are the
   #: per-item escape the BUG-913 fix made real. Stated separately so the debt count SUBTRACTS them.
   BUG-964: bug_is_a_finding   # gpt-oss-20b same-row verdict flip (NONE->MATCH, 1/40=2.5%) is a finding about model-output determinism: the title names the model and a row id, no owned artifact. The determinism question belongs to the eval harness (a later task), not to a file's route
-  BUG-967: bug_is_a_finding   # the Phase 0 receipt reporting S0.5 "identical" over two EMPTY sets is a finding about a vacuous comparison, not a file's route; the fix is a guard in the receipt writer (a later task)
+  #: BUG-967 RETIRED FROM THIS BLOCK 2026-10-28 (BUG-1098; D-3038: what we reject we REGISTER, we do not
+  #: silently delete). It read `BUG-967: bug_is_a_finding`. Its bare evidence `stage0_5_extract_metadata.py`
+  #: and `stage2_extract.py` now RESOLVES (BUG-1098 bare-basename resolution) to
+  #: pipeline/stage0_5_extract_metadata.py (owned by pipeline_ingest) and pipeline/stage2_extract.py (owned
+  #: by pipeline_extract) - so the graph ROUTES it, and the reason outlived the defect it excused (D-3034).
+  #: [historical comment] the Phase 0 receipt reporting S0.5 "identical" over two EMPTY sets is a finding about a vacuous comparison, not a file's route; the fix is a guard in the receipt writer (a later task)
   BUG-972: route_graph_incomplete   # scripts/r5_code_review.py EXISTS and is owned by NO declared capability; its `--out <path outside repo>` writes-then-dies is real work with no owner, so the honest class is a missing ROUTE, not a shrug
   #: BUG-992 appended 2026-10-24 (the T-122 classification_status REPAIR residual). The title names "the S4 writer"
   #: (prose, no owned path), so it does NOT route; its WORK is T-198, which names pipeline/stage4_merge.py and
@@ -646,7 +651,7 @@ routing_debt:
   #: dispositioned, because one unrouted item is over a ceiling set at today's reading. That is the whole
   #: closure mechanism - the register stops being a pool of observations with no owner (D-3212).
   measured: '2026-10-28'
-  unrouted_open_tasks: 26
+  unrouted_open_tasks: 25
   #: RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080, and the raise is DISCLOSED rather than smuggled: two bugs
   #: (BUG-911, BUG-912) were appended to a register that is APPEND-ONLY, so their TITLES could not be made to name
   #: an artifact owned by `acquisition_lane` — and this file's own reason `bug_is_a_finding` says a bug routes only
@@ -661,7 +666,7 @@ routing_debt:
   #: this line is the current number, and it may only go down.
   #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
   #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
-  unrouted_open_bugs: 171
+  unrouted_open_bugs: 162
   #: BUG-1097 (2026-10-28): THE ANCHOR. Until this list existed the ceiling was a number nothing read in the
   #: OTHER direction: `check()` compared `debt > ceiling` and never looked at the ceiling itself, so this register
   #: could carry the receipt of a raise in PROSE ("RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080", above) and
@@ -680,6 +685,8 @@ routing_debt:
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 173, decision: D-3212, why: "RAISED 172 -> 173 under D-3212"}
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 173, to: 172, decision: null, why: "LOWERED 173 -> 172 to the measured reading"}
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 171, decision: null, why: "LOWERED 172 -> 171 to the measured reading"}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 171, to: 162, decision: null, why: "LOWERED 171 -> 162 to the measured reading"}
+    - {date: '2026-10-28', target: unrouted_open_tasks, frm: 26, to: 25, decision: null, why: "LOWERED 26 -> 25 to the measured reading"}
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

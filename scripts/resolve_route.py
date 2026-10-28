@@ -47,6 +47,7 @@ import json
 import pathlib
 import re
 import shlex
+import subprocess
 import sys
 from typing import Callable
 
@@ -190,6 +191,10 @@ class World:
     governed: tuple[str, ...]                                # the recipes the RAIL REGISTRY governs
     exists: Callable[[str], bool]
     executable: Callable[[str], bool]                        # is this repo-relative file runnable by path
+    #: A bare basename (no `/`) -> the TRACKED repo paths that carry it (0, 1, or many). A bare citation is
+    #: legitimate evidence (artifact_tokens), and a reader that drops it because it has no `/` mis-reads a bug that
+    #: names a real file as "names no artifact at all" (BUG-1098, the D-3212 shape a second time).
+    resolve: Callable[[str], list[str]]
     tiers: set[str]
     items: list[Item]
     edges: tuple[int, int]                                   # (declaration edges, flag edges)
@@ -247,6 +252,20 @@ def load_items() -> list[Item]:
     return sorted(items, key=lambda i: (i.cls, i.id))
 
 
+def _basename_index() -> dict[str, list[str]]:
+    """A BARE basename -> the TRACKED repo paths that carry it, from `git ls-files` (the same set the repo-integrity
+    rail reads). A bare citation like `feedback.py` is legitimate evidence (artifact_tokens), and a reader that
+    drops it because it has no `/` mis-reads a bug that names a real file as "names no artifact at all". A reader
+    that cannot build the index resolves NOTHING - the `bare` fact then reports the token, never a guess (D-3034)."""
+    out: dict[str, list[str]] = {}
+    proc = subprocess.run(["git", "ls-files"], capture_output=True, text=True, cwd=str(REPO))
+    if proc.returncode != 0:
+        return out
+    for rel in proc.stdout.splitlines():
+        out.setdefault(pathlib.PurePosixPath(rel).name, []).append(rel)
+    return out
+
+
 def world() -> World:
     """The LIVE world: the registry, the ladder's own bytes, the two composed joins and the open population."""
     rail = yaml.safe_load(RAIL.read_text(encoding="utf-8")) or {}
@@ -255,9 +274,11 @@ def world() -> World:
     flags = yaml.safe_load(FLAGS.read_text(encoding="utf-8")) or {}
     edges = (sum(len(d.get("consumers") or []) for d in decl.get("declarations") or []),
              sum(len(f.get("consumers") or []) for f in flags.get("flags") or []))
+    index = _basename_index()
     return World(cfg=load_cfg(), recipes=recipe_bodies(ladder.read_text(encoding="utf-8")),
                  governed=tuple(str(r) for r in (rail.get("recipes") or [])),
                  exists=lambda p: (REPO / p).exists(), executable=_executable,
+                 resolve=lambda t: index.get(t, []),
                  tiers=set(TIER.findall(ECON.read_text(encoding="utf-8"))),
                  items=load_items(), edges=edges, decisions=handoff.decision_ids)
 
@@ -381,12 +402,34 @@ def outcome(item: Item, caps: list[dict], w: World) -> tuple[str, list[str], dic
     declares config/row_lifecycle.yaml in its own gate), or because the home is OUTSIDE the repo (T-157 cites the
     session's ~/.config/goose/config.yaml). The reader cannot tell which and does not claim to: it reports the fact
     and leaves the judgement, which is why the category is 'absent_path' and not 'stale_citation'.
+
+    THE BARE FACT (BUG-1098): a token with no `/` is a legitimate artifact citation (artifact_tokens - evidence
+    prose cites a bare basename like `feedback.py`), and the first version of this reader DROPPED it in the
+    `"/" in t` filter, so a bug that names a real file read as `no_artifact_named` - the D-3212 shape a second
+    time. A bare token now RESOLVES to its tracked repo path(s): ONE path feeds the same exists/owning judgement,
+    and ZERO or MANY paths is NAMED as the `bare` fact (never guessed which, D-3034).
     """
     tokens = sorted(set(ARTIFACT.findall(item.text)))
-    hits = sorted({cid for tok in tokens for cid in owning(caps, tok)})
-    paths = [t for t in tokens if "/" in t]
+    resolved: list[str] = []
+    bare: list[str] = []
+    for t in tokens:
+        if "/" in t:
+            resolved.append(t)
+            continue
+        rs = sorted(set(w.resolve(t)))
+        if len(rs) == 1:
+            resolved.append(rs[0])
+        else:
+            bare.append(t)
+    # Ownership is judged over BOTH the raw citation (a capability may own the exact bare basename, e.g. `justfile`)
+    # and the resolved path (a capability may own it under a directory). The union keeps a bare-exact owner routing
+    # while a dir-prefix owner routes the resolved path.
+    judged = sorted(set(resolved) | set(tokens))
+    hits = sorted({cid for tok in judged for cid in owning(caps, tok)})
+    paths = sorted(set(resolved))
     facts = {"exists_unowned": sorted(t for t in paths if w.exists(t) and not owning(caps, t)),
-             "absent": sorted(t for t in paths if not w.exists(t))}
+             "absent": sorted(t for t in paths if not w.exists(t)),
+             "bare": sorted(set(bare))}
     if hits:
         return "routed", hits, facts
     if facts["exists_unowned"]:
@@ -458,7 +501,7 @@ def facts_census(w: World, caps: list[dict]) -> dict:
     named path that does not exist is a STALE CITATION (BUG-488). Kept SEPARATE from the category counts on
     purpose: a category picks the more actionable fact, and a report that silently dropped the other one would be
     the very defect this registry exists to refuse (R5 review, run t156r5b)."""
-    out = {"exists_unowned": [], "absent": []}
+    out = {"exists_unowned": [], "absent": [], "bare": []}
     for item in w.items:
         _, hits, facts = outcome(item, caps, w)
         if hits:
@@ -796,7 +839,8 @@ def route_lines(census: dict, w: World) -> list[str]:
     lines.append(f"debt facts: {len(census['facts']['exists_unowned'])} item(s) name an artifact that EXISTS "
                  f"and NO capability owns (a missing ROUTE); {len(census['facts']['absent'])} item(s) name a path that "
                  f"does not exist in the repo (a proposal, an out-of-repo home, or a stale citation - the reader "
-                 f"reports the FACT and does not claim which)")
+                 f"reports the FACT and does not claim which); {len(census['facts']['bare'])} item(s) name a bare "
+                 f"basename that resolves to zero or many files (named, never guessed - BUG-1098)")
     lines.append(f"routing debt: tasks {census['debt']['tasks']}/{census['ceiling']['tasks']} "
                  f"bugs {census['debt']['bugs']}/{census['ceiling']['bugs']} (measured/ceiling, SHRINK-ONLY; a bug "
                  f"is read by id + title + the artifacts its OWN evidence names, D-3212 - before that correction "
@@ -878,7 +922,8 @@ def synthetic(**over) -> World:
     cfg.update(over.pop("cfg", {}))
     w = World(cfg=cfg, recipes={"lane_a": "    python3 scripts/check_a.py --selftest"}, governed=("health",),
               exists=lambda p: p in {"scripts/check_a.py", "temp", "temp/receipt.json"},
-              executable=lambda p: p == "scripts/check_a.py", tiers={"T0", "T1", "T2"},
+              executable=lambda p: p == "scripts/check_a.py", resolve=lambda t: [],
+              tiers={"T0", "T1", "T2"},
               items=[Item("T-X", "task", "pipeline", "no artifact here")], edges=(0, 0),
               decisions=lambda: {"D-0001"})
     return dataclasses.replace(w, **over) if over else w
@@ -1131,6 +1176,38 @@ def selftest() -> int:
     control("rebaseline_writes_the_number_and_the_row", bad, 0,
             "the one act that moves a ceiling re-records the number, APPENDS the chained row that justifies it and "
             "re-dates `measured` - and touches nothing else (C6/D-401)")
+
+    # --- BUG-1098: a BARE basename is a legitimate citation and must RESOLVE, never be dropped ---
+    def classify(text: str, resolve: "Callable[[str], list[str]]", owned=()) -> "tuple[str, dict]":
+        w = synthetic()
+        w.cfg["capabilities"][0]["owns"] = list(owned)
+        w = dataclasses.replace(w, items=[Item("B-X", "bug", "", text)],
+                                exists=lambda p: p in {"pipeline/feedback.py", "scripts/check_a.py"},
+                                resolve=resolve)
+        cat, _hits, facts = outcome(w.items[0], list(w.cfg["capabilities"] or []), w)
+        return cat, facts
+
+    def cat_control(name: str, cat: str, facts: dict, want: str, want_bare: "list[str]", why: str) -> None:
+        nonlocal ok, fail
+        if cat == want and sorted(facts.get("bare", [])) == sorted(want_bare):
+            ok += 1
+            print(f"  ok   selftest/{name}: {why}")
+        else:
+            fail += 1
+            print(f"  FAIL selftest/{name}: {why} (got {cat!r} + bare {sorted(facts.get('bare', []))!r}, "
+                  f"want {want!r} + bare {want_bare!r})")
+
+    cat, facts = classify("cites feedback.py", lambda t: {"feedback.py": ["pipeline/feedback.py"]}.get(t, []),
+                          owned=["pipeline/"])
+    cat_control("bare_basename_routes_to_a_dir_owner", cat, facts, "routed", [],
+                "a bare `feedback.py` that resolves to a file a `pipeline/` owner holds is ROUTED, not dropped")
+    cat, facts = classify("cites feedback.py", lambda t: {"feedback.py": ["pipeline/feedback.py"]}.get(t, []))
+    cat_control("bare_basename_resolving_to_an_unowned_file", cat, facts, "unowned_artifact", [],
+                "a bare basename resolving to an EXISTING file NO capability owns is unowned_artifact - a real "
+                "engineering item, never 'names no artifact'")
+    cat, facts = classify("cites config.json", lambda t: {"config.json": ["a/x.json", "b/x.json"]}.get(t, []))
+    cat_control("bare_basename_ambiguous_is_named", cat, facts, "no_artifact_named", ["config.json"],
+                "a bare basename resolving to MANY files is NAMED in the `bare` fact, never guessed (D-3034)")
 
     print(f"resolve-route controls: {ok}/{ok + fail} known-answer control(s) fire")
     return 1 if fail else 0

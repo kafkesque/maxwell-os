@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-25'
+updated: '2026-10-28'
 tasks:
 - id: T-101
   priority: MUST
@@ -3448,3 +3448,28 @@ tasks:
     scripts/harmony_red_loop.py must be GREEN for the model this measures (T-214's rule) - a measurement taken while
     that fixture is RED would be a claim about the harness, not the model.
   cost_tier: T1
+- id: T-221
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    SPLIT THE GOVERNED WRITER INTO R5-REVIEWABLE MODULES - scripts/recompute_decision_summary.py is past the
+    deep-tier source cap, so every future change to it lands deterministic-only, never an R5 verdict
+  why: >-
+    BUG-1103 option C, recorded. The file is the writer of record for config/decisions.yaml,
+    config/decisions_summary.json AND config/decisions_policy.yaml (D-3218), yet it is past the deep-tier source
+    cap and gpt-oss-20b returns UNPARSED on it at any tested budget, so the R5 drift check (D-2962) can never run
+    on the most load-bearing governed file. The size guard is kept (it refuses a verdict that would never exist),
+    the gap is recorded in BUG-1103, and the split is BUG-1103's close condition: break the orchestrator (--mint,
+    --check, --canonicalise-states, --set-state, --shrink-pins, --selftest) into modules each under the deep-tier
+    cap, then update writer_of_record in config/artifact_ownership.yaml to the new entrypoint.
+  source: BUG-1103 / D-3218 / D-3220 / D-2962
+  evidence: >-
+    READ 2026-10-28: scripts/recompute_decision_summary.py is 119,095 chars;
+    config/r5_review_gate.yaml#tiers.deep.max_source_chars is 100,000; governance/r5_reviews.jsonl holds two
+    gpt-oss-20b-MXFP4-Q8 UNPARSED verdicts on this file; the deep-tier reviewer is gpt-oss-20b-MXFP4-Q8 (promoted
+    D-3168), not gemma. D-3220's lineage clause (BUG-1104) landed deterministic-only for this reason (48/48 selftest).
+  gate: >-
+    Each split module sits under the deep-tier source cap AND passes scripts/r5_review_gate.py (deep tier,
+    gpt-oss-20b-MXFP4-Q8); writer_of_record in config/artifact_ownership.yaml is then updated to the new
+    entrypoint. The split is its own sitting (BUG-1103), never a rush.

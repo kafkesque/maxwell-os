@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-28 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1348 decisions (82 needing action) / 871 bugs (268 open) / 64 open tasks (0 OWNER-moved, 64 pipeline). YOURS: nothing. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
+  status: '2026-10-28 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1348 decisions (82 needing action) / 872 bugs (269 open) / 64 open tasks (0 OWNER-moved, 64 pipeline). YOURS: nothing. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

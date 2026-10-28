@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 871,
-  "open_n": 268,
+  "total_ids": 872,
+  "open_n": 269,
   "closed_n": 603,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -2691,6 +2691,18 @@
       "events": 1,
       "artifacts": [
         "config/harness_policy.yaml"
+      ]
+    },
+    {
+      "id": "BUG-1108",
+      "title": "(LOW, OPEN 2026-10-28) \u2014 FIVE `D-` TOKENS CITED INSIDE DECISION RECORDS RESOLVE TO NO MINTED ID, AND NO RAIL CATCHES THE CLASS (first",
+      "events": 1,
+      "artifacts": [
+        "DECISION-LOG.md",
+        "config/decisions.yaml",
+        "config/decisions_summary.json",
+        "decisions.yaml",
+        "scripts/check_decision_membership.py"
       ]
     }
   ],

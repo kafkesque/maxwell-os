@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1348 decisions (census stamp 7a3a697157e9d5f8, 2026-10-28) · 871 bugs (268 open / 603 closed; highest OPEN = BUG-1107) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1348 decisions (census stamp 7a3a697157e9d5f8, 2026-10-28) · 872 bugs (269 open / 603 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1348 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 680 · ⚖ ratified 154 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1348, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 268 open.
+> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 269 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25564,3 +25564,25 @@ that tension is FLAGGED here for the owner's next word, not resolved by an agent
 **WHAT IS OWED (gated, not pre-decidable).** The re-measurement: interactive per-turn budget against the `native_two_step_pass` models at line 18 (Qwen3-Coder-30B, gpt-oss-20b, Qwen3.8-27B, MiniCPM5-2B, Ornith-1.5-35B, Ornith-1.5-9B). Only the measurement decides line 68's replacement. Editing line 68 before that measurement would route to an unmeasured model — the premature move this bug exists to prevent.
 
 **FIX CONDITION.** Run the re-measurement (T-131 interactive budget vs native-loop passers), then update `L4_dev_tooling.model_routing.interactive_edit_loop_short_context` from its receipt. The `latency_agent_loop` axis (lines 36-38) and line 68 must then agree with `native_two_step_pass` / `native_two_step_fail`.
+
+## BUG-1108 (LOW, OPEN 2026-10-28) — FIVE `D-` TOKENS CITED INSIDE DECISION RECORDS RESOLVE TO NO MINTED ID, AND NO RAIL CATCHES THE CLASS (first instance: D-3245 in D-3208's `category`)
+
+**THE DEFECT (receipts).** `config/decisions.yaml:35502` (record D-3208, state ACTIVE) carries the category string `WORK METHOD / FIXER LOOP (C16, C21, D-3036, D-3038, D-3200, D-3204, D-3245, BUG-757, BUG-1092)`. Every other token resolves: C16/C21 are iron rules, D-3036/D-3038/D-3200/D-3204 all have top-level records, BUG-757/BUG-1092 both exist. **D-3245 does not** — `grep 'id: D-3245' config/decisions.yaml` returns nothing, and the highest minted id is D-3222. The phantom also propagates into the DERIVED census: `config/decisions_summary.json:482` carries the same category string as a key (count 1). It is a forward-reference the author pre-wrote (D-3208 minted 2026-10-27) but never landed — a declaration that does not resolve (D-3034).
+
+**THE CLASS IS FIVE WIDE, NOT ONE (forensic sweep 2026-10-28).** A full sweep of `D-\d{4}` tokens cited inside record fields (`category`/`title`/`supersedes`/`superseded_by`/`bugs`/`decisions`/`related`) against the minted id set (`- id:` lines in decisions.yaml) returns FIVE that resolve to no record:
+
+| cited token | cited in (record · field · state) | sub-class | tracked? |
+|---|---|---|---|
+| `D-3245` | D-3208 · category · ACTIVE | pure phantom — no prose, no record | this bug |
+| `D-2185` | D-359 · related · PROPOSED | pure phantom — no prose, no record anywhere | untracked |
+| `D-2537` | D-2979 · title · RESOLVED | dangling; D-2979 prose claims "filed as BUG-761", but BUG-761 is the unrelated index-heading bug, so the tracking claim is itself stale | untracked |
+| `D-2298` | D-2822 · title · RATIFIED | real decision in prose (S5 fail-closed NLI; superseded by D-2863) but no `- id:` record | untracked |
+| `D-2618` | D-2883 · title · RATIFIED | real decision in prose (retire gpt-oss silver golden to train-only) but no `- id:` record | untracked |
+
+Three sub-classes, one defect: a cited `D-` token inside a record has no minted `- id:` body. Remediation differs by sub-class (mint vs drop vs fix the tracking claim) and is owner-gated per record, but the DETECTION is one instrument.
+
+**WHY NO RAIL CAUGHT IT (the systematic gap).** `scripts/check_decision_membership.py` (F3) joins DECISION-LOG.md headings against `config/decisions.yaml` TOP-LEVEL records — it verifies a record named in the log has a body, never that a `D-\d+` token cited INSIDE a record's `category` / `supersedes` / `superseded_by` / `bugs` / `decisions` / `related` fields resolves to a minted id. A forward-reference inside a record is therefore invisible to every current rail — the same class as the D-3245 in the `category` of D-3208, and the same shape as BUG-1106/1107 (a rule exists in prose, no machine reads it).
+
+**RESOLUTION IS OWNER-GATED (two options, neither is mine to pick).** (a) MINT D-3245 — but its intended content is NOT recoverable from any record (it appears only in this one citation); reconstructing it would fabricate a decision, which is the corruption the register exists to prevent (D-3036/D-3214). (b) TOMBSTONE — register that D-3245 is a phantom (no record, never minted) and either drop the token from the category string via a correction decision, or add it to a declared phantom-id set a rail then refuses. Option (a) needs the owner to state what D-3245 was meant to rule (if anything); option (b) is mechanical but edits an append-only record, so it too is a correction-by-decision, not a silent rewrite. The owner's word decides which; this bug is the tracked surface for that word.
+
+**WHY IT MATTERS NOW.** This is a THIRD instance of the same "agreed/declared but not enforced" class the owner asked about (alongside BUG-1106, now fixed, and BUG-1107, gated on T-131): a decision-level citation with no mechanical reader. Closing the class — a rail that refuses a `D-\d+`/`BUG-\d+`/`T-\d+` token inside a record that does not resolve — would have caught D-3245 the day it was written, and is the same instrument gap D-3208 clause (3) names (prose defects must be CONVERTED into instrumented checks, not found by hand).

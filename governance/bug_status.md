@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**268 open** / 603 closed of 871 ids.
+**269 open** / 603 closed of 872 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -279,3 +279,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1103 | (MED, OPEN 2026-10-28) — THE GOVERNED WRITER IS R5-UNREVIEWABLE: `scripts/recompute_decision_summary.py` is 119,095 chars and gpt-oss-20b | 1 |
 | BUG-1106 | (MED, OPEN 2026-10-28) — THE PROMOTED gpt-oss DEEP REVIEWER IS DECLARED BUT NOT MECHANICALLY ENFORCED AT ANY LANDING BOUNDARY | 1 |
 | BUG-1107 | (MED, OPEN 2026-10-28) — harness_policy.yaml L4 STILL ROUTES interactive_edit_loop_short_context TO gemma, A native_two_step_fail MODEL — A | 1 |
+| BUG-1108 | (LOW, OPEN 2026-10-28) — FIVE `D-` TOKENS CITED INSIDE DECISION RECORDS RESOLVE TO NO MINTED ID, AND NO RAIL CATCHES THE CLASS (first | 1 |

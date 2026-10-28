@@ -57,6 +57,18 @@ dormant:
   scripts/check_suite_coverage.py:
     exercised_by: ['governance/p0_p1_criteria.yaml']
     reason: 'a CRITERION of drift_monitor.py, declared as an args/cmd line in governance/p0_p1_criteria.yaml (measured 2026-09-26)'
+  # MEASURED 2026-10-28 (this rail's own (i) fault named it): scripts/check_delete_target.py is invoked by the
+  # `delete-check *PATHS` recipe in justfile and by nothing else. It CANNOT be a ladder member and this is the
+  # measured reason rather than a preference: its subject is a LIST OF CANDIDATE PATHS supplied by the caller, so
+  # a ladder line cannot name one - a ladder invocation would have to guess the question before asking it. What
+  # exercises it is therefore a command, and the command is declared here by the file that carries it. Declaring
+  # the dormancy retires a false red (the rail's (i) rule reads "not ladder-invoked" as "nothing runs it", which
+  # is not the same claim); it does NOT assert that the pairing is enforced. MEASURED the same day and logged as
+  # BUG-1102: pipeline/safe_delete.py does not consult this rail, so "check, then delete" is an operator sequence,
+  # not a gate - and whether it should become a gate is the owner's word, not this registry's.
+  scripts/check_delete_target.py:
+    exercised_by: ['justfile']
+    reason: 'the `delete-check *PATHS` recipe in justfile (justfile:328) is its only invoker; needs caller-supplied paths, so it cannot be a ladder line (measured 2026-10-28)'
 #: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
 #: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.
 writers:

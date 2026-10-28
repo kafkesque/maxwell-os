@@ -2,8 +2,8 @@
   "schema_version": "1.1",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 865,
-  "open_n": 266,
+  "total_ids": 866,
+  "open_n": 267,
   "closed_n": 599,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -2663,6 +2663,19 @@
       "artifacts": [
         "config/decisions_policy.yaml",
         "config/gov_sync.yaml"
+      ]
+    },
+    {
+      "id": "BUG-1102",
+      "title": "(HIGH, OPEN 2026-10-28) \u2014 THE ONLY THING THAT KNOWS WHICH MODEL BYTES ARE STILL SERVED IS A RAIL `pipeline/safe_delete.py` NEVER CONSULTS:",
+      "events": 1,
+      "artifacts": [
+        "config/delete_safety.yaml",
+        "config/rail_registry.yaml",
+        "pipeline/safe_delete.py",
+        "safe_delete.py",
+        "scripts/check_delete_target.py",
+        "scripts/check_rail_registry.py"
       ]
     }
   ],

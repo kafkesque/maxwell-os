@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1344 decisions (census stamp 09ae8ad3705efa9b, 2026-10-28) · 865 bugs (266 open / 599 closed; highest OPEN = BUG-1101) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1344 decisions (census stamp 09ae8ad3705efa9b, 2026-10-28) · 866 bugs (267 open / 599 closed; highest OPEN = BUG-1102) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1344 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 677 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1344, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 61 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25327,3 +25327,56 @@ claim.
 means in one sentence AND the register agrees with that declaration in both directions (no record carries it that
 the declared meaning excludes; no record the declared meaning includes lacks it). The measurement above is the
 baseline the close is checked against.
+
+## BUG-1102 (HIGH, OPEN 2026-10-28) — THE ONLY THING THAT KNOWS WHICH MODEL BYTES ARE STILL SERVED IS A RAIL `pipeline/safe_delete.py` NEVER CONSULTS: "check, then delete" is an operator sequence, not a gate
+
+**FOUND BY:** retiring `scripts/check_rail_registry.py`'s (i) fault — "a rail NOTHING RUNS:
+`scripts/check_delete_target.py` is invoked by no declared ladder recipe and is declared dormant nowhere". Asking
+WHY turned up a bigger question than the dormancy.
+
+**THE MEASUREMENT (three facts, each read).**
+1. `scripts/check_delete_target.py` answers FOUR questions about a candidate path, in order, refusing on any YES:
+   *is it SERVED* (its realpath is a root entry's realpath), *is it REFERENCED* (a symlink anywhere under the model
+   roots resolves inside it), *is it SHARED* (a file in it shares device+inode with a file outside it), *is it IN
+   FLIGHT* (an incomplete-download marker, or the engine still advertises it). Its own header says what forced it:
+   `hf cache prune` named the SERVED snapshot "detached", `du -shL` reported 48 G for a 16 G model, and after a real
+   14 G delete the engine still advertised a model that no longer existed (BUG-1050, BUG-1057).
+2. `pipeline/safe_delete.py` asks ONE question, and it is a different one: `is_protected()` resolves the path and
+   tests whether it lies under a prefix in `PROTECTED_TREES` — **pipeline output**. A model path under
+   `~/.omlx/models`, `~/.cache/huggingface`, `models_staged` or a symlink farm is outside those trees, so it passes
+   that test, and the delete proceeds with no served/referenced/shared/in-flight question ever asked.
+3. Nothing in the tree invokes the rail except one recipe: `justfile:328` (`delete-check *PATHS`). Measured by grep
+   over `scripts/`, `pipeline/`, `tools/`, `justfile`: no import, no subprocess call, no hook line.
+
+**WHY THAT IS A BUG AND NOT A DESIGN NOTE.** `R-D410` declares "NEVER delete pipeline output — use
+`pipeline/safe_delete.py`", and the four-axis rail is the instrument built FROM two real incidents to answer the
+question the deleter cannot answer from a prefix test. So the OS holds a measured protection, prints it as a rail,
+and the one mechanism that actually removes bytes never asks it. That is the declared-vs-ENFORCED gap this repo's
+own `BUG-478`/`D-401` class exists to close — with a difference that makes it worse than the others: the failure it
+permits is **irreversible**. Bytes that leave are gone, and the second incident in the rail's own history (the
+engine still ADVERTISING a deleted model) means even a "successful" delete can leave the system claiming something
+that is not there.
+
+**THE TWO WAYS OUT (the owner's word — `pipeline/**` is owner-gated, and whether deletion stays a pure operator act
+is a POLICY question, D-2941 clause 2).**
+(A) **THE GATE.** `pipeline/safe_delete.py` runs the rail as a read-only subprocess on the path it is about to
+    remove and refuses unless it answers SAFE_TO_DELETE (the rail is already tri-state: 0 safe, 2 refused, 3
+    undetermined/fail-closed, 4 usage). Cost: one owner-authorized pipeline edit. Benefit: the four axes become
+    unreachable-by-accident, and `--maxwell-confirmed` keeps its meaning for the protected trees.
+(B) **THE SEQUENCE, WITH A RECEIPT.** The delete stays a human-order act, and `safe_delete.py` refuses to write its
+    delete receipt without a fresh verdict attached (the verdict and its age travel INTO the receipt). Weaker than
+    (A) — it proves the pairing happened rather than forcing it — and it still edits `pipeline/**`.
+(C) **LEAVE IT.** Recorded as REJECTED in advance: a protection no mechanism enforces, whose own history is two
+    incidents, is exactly the state `BUG-478` destroyed 148 owner cells in. Declaring a rail "dormant" in
+    `config/rail_registry.yaml` (done today, truthfully — the recipe in `justfile` IS what exercises it) answers
+    the narrower question *does something run it*; it does NOT answer *does the deleter consult it*, and this bug
+    is the second question.
+
+**WHY HIGH AND NOT MED:** the exposure is small (no deletion is scheduled today) but the consequence is
+irreversible and already realised twice, and the fix is a bounded, already-designed subprocess call. **WHY NOT
+CRITICAL:** nothing in the pipeline deletes model bytes without a human naming the path.
+
+**RE-OPEN/CLOSE CONDITION:** closed when `pipeline/safe_delete.py` either (A) refuses to remove a path under
+`config/delete_safety.yaml#roots` without a verdict from `scripts/check_delete_target.py` in the same invocation, or
+(B) records that verdict inside the delete receipt and refuses when it is absent — with a decision naming which of
+the two the owner chose. A model-store sweep that deletes bytes with NO verdict row beside it re-opens this bug.

@@ -157,9 +157,13 @@ debt:
   # sibling load_artifact() already stated below the offending site. Debt 14 -> 13 = back at its shrink-only
   # ceiling with zero headroom; nothing was raised.
   - path: scripts/check_revoked_references.py
-    lines: [100, 134]
+    lines: [107, 141]
     mode: replace
-    why: the anti-resurrection rail reads source text; its verdict must never rest on repaired bytes.
+    why: >-
+      the anti-resurrection rail reads source text; its verdict must never rest on repaired bytes. RE-PINNED
+      2026-10-28 by D-3216 - the same two `errors="replace"` reads, moved by the seven lines that decision
+      inserted above them; check_silent_repair reported them STALE (100/134 declared, not measured) plus two
+      DRIFT sites at the new lines, and asked for exactly this correction rather than a raised ceiling.
   - path: scripts/f11_anchor_review.py
     lines: [81]
     mode: replace

@@ -38,7 +38,11 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from recompute_decision_summary import DECISIONS_YAML, normalized_id  # noqa: E402 - one spelling rule, one home
+# one bug-heading grammar, one home (BUG-428)
+from bug_status import HEADER_RE as BUG_HEADER_RE  # noqa: E402
+
+# one spelling rule, one home (D-2646/C21)
+from recompute_decision_summary import DECISIONS_YAML, normalized_id  # noqa: E402
 
 POLICY_YAML = ROOT / "config" / "decisions_policy.yaml"
 NAME = "decision-membership"
@@ -137,6 +141,63 @@ def citation_problems(records: list, block: dict) -> list[str]:
     return problems
 
 
+def _registry_citation_problems(records: list, pattern: object, registry: set, label: str) -> list[str]:
+    """BUG-1108 follow-on: a token of ONE family cited inside a record must resolve in that family's registry.
+
+    The D- family resolves through `citation_problems` against the minted decision set; this generalises the SAME
+    walk (`_walk_tokens`) to the BUG- and T- families, whose tokens resolve against their OWN source registries -
+    the buglog's `#{2,3}` headings and task_register.yaml's `- id:` entries. The caller applies report-vs-fatal
+    semantics (D-2949/D-2951); this function only names the dangling tokens.
+    """
+    if not pattern:
+        return []
+    p = re.compile(str(pattern))
+    problems: list[str] = []
+    for r in records:
+        if not isinstance(r, dict) or not r.get("id"):
+            continue
+        rid = normalized_id(r)
+        tokens: list[str] = []
+        _walk_tokens(r, p, tokens)
+        for tok in sorted({t.upper() for t in tokens}):
+            if tok in registry:
+                continue
+            problems.append(rid + " cites " + tok + ", which names no " + label + " - a declaration that does not "
+                            "resolve (D-3034); owner decides MINT / DROP / REPOINT")
+    return problems
+
+
+def bug_citation_problems(records: list, block: dict) -> list[str]:
+    """BUG-1108 follow-on: a BUG- token cited inside a record must resolve to a buglog heading.
+
+    The canonical bug-id set is the buglog's own `#{2,3}` headings (one heading grammar, one home: BUG-428), read
+    through BUG_HEADER_RE per line exactly as scripts/bug_status.py scans it - never a derived census that could
+    drift (D-2646: one fact, one home).
+    """
+    path = str(block.get("bug_register") or "")
+    if not path:
+        return []
+    p = ROOT / path
+    if not p.exists():
+        return [path + ": absent - the BUG- registry the citation join reads is a path, and this one is not on disk"]
+    text = p.read_text(encoding="utf-8")
+    registry = {m.group(1) for line in text.splitlines() if (m := BUG_HEADER_RE.match(line))}
+    return _registry_citation_problems(records, block.get("bug_pattern"), registry, "bug heading")
+
+
+def task_citation_problems(records: list, block: dict) -> list[str]:
+    """BUG-1108 follow-on: a T- token cited inside a record must resolve to a task_register id (authority D-2981)."""
+    path = str(block.get("task_register") or "")
+    if not path:
+        return []
+    p = ROOT / path
+    if not p.exists():
+        return [path + ": absent - the T- registry the citation join reads is a path, and this one is not on disk"]
+    doc = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    registry = {t.get("id") for t in (doc.get("tasks") or []) if isinstance(t, dict) and t.get("id")}
+    return _registry_citation_problems(records, block.get("task_pattern"), registry, "task id")
+
+
 def control_slug(name: str) -> str:
     """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
     return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
@@ -192,7 +253,7 @@ def controls() -> list[tuple[str, bool]]:
         ("an id named TWICE in the log is NOT a fault - the log repeats an id across its tiers",
          not faults(["D9001", "D9001"], recs, [])),
         ("named_ids reads the D2552 TABLE ROW and the historical HEADING, and normalises both spellings",
-         named_ids("| D-9001 | OPEN | x |\n## 2026-09-27 - D9002 does a thing\n", 
+         named_ids("| D-9001 | OPEN | x |\n## 2026-09-27 - D9002 does a thing\n",
                    [r"^\|\s*(D-?\d+[a-z]?)\s*\|", r"^#{1,4}[^\n]*?\b(D-?\d+[a-z]?)\b"]) == ["D9001", "D9002"]),
         # BUG-989: the third surface is the BARE PARAGRAPH entry ('D-3134 (ACTIVE ...): **...**'), which neither
         # the table row nor the heading pattern could see. The new pattern matches a line-START D-id followed by a
@@ -240,6 +301,23 @@ def controls() -> list[tuple[str, bool]]:
                                 {"pattern": r"\b(?<!R-)D-?\d{3,4}[a-z]?\b", "allow_ids": []}))),
         ("an absent citation block is quiet (the join is report-only and optional), not a crash",
          not citation_problems([{"id": "D-9001", "title": "cites D-9999"}], {})),
+        # BUG-1108 follow-on: the BUG-/T- citation joins' known-answer controls - a token that resolves to a
+        # canonical bug heading / task id is quiet, a phantom fires, and the BUG- vs T- grammars never cross.
+        ("a record that cites a MINTED bug id is quiet (BUG-1108 BUG-family)",
+         not _registry_citation_problems([{"id": "D-9001", "decision": "see BUG-9001"}],
+                                         r"\bBUG-\d+\b", {"BUG-9001"}, "bug heading")),
+        ("a record that cites a PHANTOM bug id fires (BUG-1108 BUG-family)",
+         bool(_registry_citation_problems([{"id": "D-9001", "decision": "see BUG-9999"}],
+                                          r"\bBUG-\d+\b", {"BUG-9001"}, "bug heading"))),
+        ("a record that cites a MINTED task id is quiet (BUG-1108 T-family)",
+         not _registry_citation_problems([{"id": "D-9001", "decision": "see T-101"}],
+                                         r"\bT-\d+\b", {"T-101"}, "task id")),
+        ("a record that cites a PHANTOM task id fires (BUG-1108 T-family)",
+         bool(_registry_citation_problems([{"id": "D-9001", "decision": "see T-999"}],
+                                          r"\bT-\d+\b", {"T-101"}, "task id"))),
+        ("a BUG- token never matches the T- grammar and vice versa (BUG-1108, no cross-family false positive)",
+         not _registry_citation_problems([{"id": "D-9001", "decision": "see BUG-9001"}],
+                                         r"\bT-\d+\b", {"T-101"}, "task id")),
     ]
 
 
@@ -299,7 +377,8 @@ def main(argv: list[str]) -> int:
                + " TOP-LEVEL record(s), " + str(len(pinned)) + " pinned legacy orphan(s), 0 fault(s); "
                + str(absent) + " record(s) carry no log entry (the log is a TIERED face of the registry - its own "
                "header - so that direction is DECLARED, never asserted)")
-    # BUG-1108: the register's INTERNAL citation join (report-only first - see citation_problems).
+    # BUG-1108: the register's INTERNAL citation joins. The D- family is FATAL (report_only false, owner-ruled);
+    # the BUG-/T- families are REPORT-ONLY (bug_task_report_only) until the owner rules their dangling set.
     citation = (yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}).get("citation") or {}
     cited = citation_problems(records, citation)
     if cited:
@@ -310,7 +389,20 @@ def main(argv: list[str]) -> int:
             print("  - " + problem)
         if not report_only:
             return 1
-        summary += "; " + str(len(cited)) + " dangling citation(s) REPORTED (report-only, owner-gated)"
+        summary += "; " + str(len(cited)) + " dangling D-citation(s)"
+    bug_task_report_only = bool(citation.get("bug_task_report_only", True))
+    for family, fam_cited in (("BUG", bug_citation_problems(records, citation)),
+                              ("T", task_citation_problems(records, citation))):
+        if not fam_cited:
+            continue
+        label = "REPORT" if bug_task_report_only else "FAIL"
+        print(label + " " + NAME + " " + family + " citation: " + str(len(fam_cited)) + " dangling " + family
+              + "-token(s) inside record fields (report-only, owner-gated):")
+        for problem in fam_cited:
+            print("  - " + problem)
+        if not bug_task_report_only:
+            return 1
+        summary += "; " + str(len(fam_cited)) + " dangling " + family + "-citation(s) REPORTED"
     print(summary)
     return 0
 

@@ -257,6 +257,16 @@ citation:
   # known-non-record ids a citation may legitimately rest on. The list may only SHRINK (D-405).
   allow_ids: [D-0000, D-9999, D-271, D-272, D-275, D637]
   report_only: false
+  # BUG-/T- FAMILIES (BUG-1108 follow-on, "one grammar wide"): a BUG- or T- token cited INSIDE a record must
+  # resolve to a canonical bug heading (governance/buglog.md) or a canonical task id (config/task_register.yaml).
+  # The D- family flipped to FATAL only after the owner ruled each of its dangling tokens (D-2949/D-2951); the
+  # BUG-/T- families stay REPORT-ONLY (bug_task_report_only) until the owner rules THEIR dangling set, then the
+  # flag flips to false the same way. One bug-heading grammar, one home: scripts/bug_status.py HEADER_RE (BUG-428).
+  bug_pattern: '\bBUG-\d+\b'
+  bug_register: governance/buglog.md
+  task_pattern: '\bT-\d+\b'
+  task_register: config/task_register.yaml
+  bug_task_report_only: true
   why: >-
     A D-token cited INSIDE a record that names no minted top-level record is a declaration that does not resolve
     (D-3034): a forward-reference the author pre-wrote but never landed, a real decision never minted, or a stale

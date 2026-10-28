@@ -67,7 +67,38 @@ capabilities:
     check: python3 scripts/check_rail_registry.py --selftest
     receipt: config/rail_registry.yaml
     cost_tier: T0
-    owns: [config/rail_registry.yaml]
+    # D-3214 (OWNER'S WORD, 2026-10-28): THE RAIL BUCKET. The owner approved the DIRECTORY-LEVEL ownership rule,
+    # applied here mechanically: a `scripts/check_*` or `scripts/audit_*` that NO declared capability names in its own
+    # entrypoint/check/receipt is a rail that nobody owns - and an UNREGISTERED rail is a rail-registry concern by
+    # definition, because this capability's whole subject is the fact "this rail is a rail" (D-2665). The entries are
+    # enumerated, one per line, NOT folded into a `scripts/` prefix: a prefix would claim every artifact in the directory
+    # and a declaration that every path in a tree is owned owns nothing in particular (D-3034).
+    owns:
+    - config/rail_registry.yaml
+    - scripts/audit_e2e_cohesion.py
+    - scripts/audit_false_convergence.py
+    - scripts/audit_final_chain.py
+    - scripts/audit_flag_consumers.py
+    - scripts/audit_form_axis.py
+    - scripts/audit_full_corpus_labels.py
+    - scripts/audit_human_verification.py
+    - scripts/audit_menu_rescope_cohort.py
+    - scripts/audit_sidecar_commit.py
+    - scripts/check_anchor_axis_consistency.py
+    - scripts/check_config_defaults.py
+    - scripts/check_delete_target.py
+    - scripts/check_depth_load_bearing.py
+    - scripts/check_encoding_homes.py
+    - scripts/check_human_instruments.py
+    - scripts/check_menu_reclass_gate.py
+    - scripts/check_register_divergence.py
+    - scripts/check_serving_gate.py
+    - scripts/check_session_plan.py
+    - scripts/check_silent_repair.py
+    - scripts/check_stale_toolcall_rows.py
+    - scripts/check_store_authority.py
+    - scripts/check_store_columns.py
+    - scripts/check_undeclared_encoding.py
   - id: governance_faces
     kind: script
     entrypoint: python3 scripts/gov_sync.py --apply
@@ -263,7 +294,11 @@ capabilities:
     check: python3 scripts/verify_handoffs.py
     receipt: config/handoffs.yaml#journal
     cost_tier: T1
-    owns: [pipeline/stage4_merge.py]
+    # D-3214: `stage4_merged_call.py` is stage4's own call path - MEASURED: it is 1,245 lines and `pipeline/stage4_merge.py`
+    # names it. It belongs to the stage that runs it, so the rule assigns it to that stage's capability and to nothing else.
+    owns:
+    - pipeline/stage4_merge.py
+    - pipeline/stage4_merged_call.py
   - id: pipeline_verify
     kind: recipe
     entrypoint: just stage5
@@ -635,6 +670,95 @@ unrouted:
   #: BUG-992 RETIRED FROM THIS BLOCK 2026-10-28 (D-3212; D-3038: what we reject we REGISTER, we do not
   #: silently delete). It read `BUG-992: bug_is_a_finding`. RETIRED 2026-10-28 with the other nine: its evidence names an artifact an owning capability holds, so the override excused a route that EXISTS.
   #: [historical comment] : SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
+  #: ─── D-3214 (OWNER'S WORD, 2026-10-28): THE THREE APPROVED DISPOSITION CLASSES, APPLIED BY MEASUREMENT ───
+  #: The owner approved (1) the 52 open bugs whose text names NO repo artifact, (2) the DIRECTORY-LEVEL ownership
+  #: rule, and (3) the split of the 12 absent_path citations into a CITATION DEFECT (the file exists under another
+  #: extension) and a NON-RESOLVING citation (out-of-repo home, scratch/archive evidence, a path that never was).
+  #: Every entry below was computed from the reading AFTER the ownership rule landed - never from the worklist
+  #: written before it - because an override for an item the graph now routes is fault (vii) INERT (D-3212).
+  #: THE REASON IS CLASS-DEPENDENT AND THAT IS DELIBERATE: a BUG takes `bug_is_a_finding` (the bugs-side vocabulary
+  #: for "this is a FINDING, not a work item"); a TASK is a work item by definition and therefore takes its OWN
+  #: mover's reason from `dispositions.tasks` - lending a task the bug reason would be a category error dressed as
+  #: a shortcut. Nothing here ASSIGNS ownership: the items below stay OPEN and stay counted as work where they are
+  #: work; what is declared is only that their route is not MISSING (D-2941 - ownership is the owner's word).
+  BUG-151: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-159: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-160: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-169: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-182: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-222: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-223: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-224: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-228: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-237: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-242: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-253: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-260: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-266: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-267: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-280: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-281: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-287: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-288: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join); bare token(s) that resolve to ZERO or MANY tracked files, named not guessed: book.md
+  BUG-289: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-290: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-293: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-294: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-296: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-298: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-314: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/anchor1_frozen_20260920.json
+  BUG-316: route_graph_incomplete   # the citation does not resolve (other): config/goose/config.yaml, config/taxonomy_v5.yaml
+  BUG-317: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-318: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-334: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-336: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-354: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-366: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join); bare token(s) that resolve to ZERO or MANY tracked files, named not guessed: labels.md
+  BUG-391: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/ABSTENTION_ROBUSTNESS_20260923.json
+  BUG-417: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/MODEL_STORE_RECLAIM_A2_CORRECTED_20260923.md
+  BUG-420: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/ANCHOR4_DEPTH_PREDICTION_KEY_20260924.json
+  BUG-426: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/ruler_sheet_key_20260917.json
+  BUG-427: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-451: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-452: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-456: route_graph_incomplete   # the citation does not resolve (scratch_or_archive): archive/session_20260923/scratch/backup/s4_rolling/checkpoint.slot1..6.json
+  BUG-464: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-466: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/ANCHOR4_MANIFEST_20260924.json
+  BUG-477: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-594: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-595: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-638: route_graph_incomplete   # the citation does not resolve (wrong_extension): governance/METRICS.json - the same file EXISTS as governance/METRICS.jsonl
+  BUG-640: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-648: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-700: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-701: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-704: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-705: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-723: route_graph_incomplete   # the citation does not resolve (scratch_or_archive): archive/superseded_runs/20261012T090055Z/superseded_rows.json
+  BUG-743: route_graph_incomplete   # the citation does not resolve (wrong_extension): governance/r5_reviews.json - the same file EXISTS as governance/r5_reviews.jsonl
+  BUG-768: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-789: route_graph_incomplete   # the citation does not resolve (out_of_repo): Support/oMLX/config.json
+  BUG-793: route_graph_incomplete   # the citation does not resolve (out_of_repo): omlx/model_settings.json
+  BUG-795: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-800: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: governance/normalise_corpus_names_plan_20261015.json
+  BUG-806: bug_is_a_finding   # cites only a one-shot report/plan/scratch - no capability can own one: temp/prefill_bench_20261015.json, temp/prefill_bench_20261015.py
+  BUG-829: route_graph_incomplete   # the citation does not resolve (other): config/zed/settings.json
+  BUG-1024: route_graph_incomplete   # the citation does not resolve (out_of_repo): Support/oMLX/config.json, omlx/settings.json
+  BUG-1033: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-1052: route_graph_incomplete   # the citation does not resolve (out_of_repo): omlx/model_settings.json, omlx/model_settings.py
+  BUG-1054: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-1056: route_graph_incomplete   # the citation does not resolve (scratch_or_archive): tmp/x.sh
+  BUG-1058: bug_is_a_finding   # names no repo artifact at all (prose cannot be routed by a join)
+  BUG-1064: route_graph_incomplete   # the citation does not resolve (wrong_extension): governance/model_eval_checkpoint.json - the same file EXISTS as governance/model_eval_checkpoint.jsonl
+  T-112: route_graph_incomplete   # names no repo artifact at all (prose cannot be routed by a join)
+  T-127: route_graph_incomplete   # cites only a one-shot report/plan/scratch - no capability can own one: governance/INTAKE_ASSESSMENT_20261014.md
+  T-128: route_graph_incomplete   # cites only a one-shot report/plan/scratch - no capability can own one: governance/INTAKE_ASSESSMENT_20261014.md
+  T-145: route_graph_incomplete   # cites only a one-shot report/plan/scratch - no capability can own one: governance/NLI_ANCESTOR_VERDICT_20261015.md
+  T-155: route_graph_incomplete   # names no repo artifact at all (prose cannot be routed by a join)
+  T-170: route_graph_incomplete   # cites only a one-shot report/plan/scratch - no capability can own one: governance/ABSTENTION_CALIBRATION_20260923.json, governance/INTAKE_ASSESSMENT_20261014.md
+  T-190: route_graph_incomplete   # names no repo artifact at all (prose cannot be routed by a join)
+  T-193: route_graph_incomplete   # names no repo artifact at all (prose cannot be routed by a join)
+  T-201: route_graph_incomplete   # cites only a one-shot report/plan/scratch - no capability can own one: governance/evidence/MODEL_AVAILABILITY_FLINT_20261025.json, governance/evidence/MODEL_AVAILABILITY_FLINT_POSTSWAP_20261025.json
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
 #: SHRINK as good news. Clearing an item is a route declaration or an item edit - never a raised ceiling.
 routing_debt:
@@ -651,7 +775,7 @@ routing_debt:
   #: dispositioned, because one unrouted item is over a ceiling set at today's reading. That is the whole
   #: closure mechanism - the register stops being a pool of observations with no owner (D-3212).
   measured: '2026-10-28'
-  unrouted_open_tasks: 25
+  unrouted_open_tasks: 14
   #: RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080, and the raise is DISCLOSED rather than smuggled: two bugs
   #: (BUG-911, BUG-912) were appended to a register that is APPEND-ONLY, so their TITLES could not be made to name
   #: an artifact owned by `acquisition_lane` — and this file's own reason `bug_is_a_finding` says a bug routes only
@@ -666,7 +790,7 @@ routing_debt:
   #: this line is the current number, and it may only go down.
   #: 2026-10-23: debt 224 -> 221 (three per-item dispositions added: BUG-964, BUG-967 bug_is_a_finding;
   #: BUG-972 route_graph_incomplete) and the ceiling followed the measurement DOWN (D-2644/D-3023).
-  unrouted_open_bugs: 162
+  unrouted_open_bugs: 68
   #: BUG-1097 (2026-10-28): THE ANCHOR. Until this list existed the ceiling was a number nothing read in the
   #: OTHER direction: `check()` compared `debt > ceiling` and never looked at the ceiling itself, so this register
   #: could carry the receipt of a raise in PROSE ("RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080", above) and
@@ -687,6 +811,8 @@ routing_debt:
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 172, to: 171, decision: null, why: "LOWERED 172 -> 171 to the measured reading"}
     - {date: '2026-10-28', target: unrouted_open_bugs, frm: 171, to: 162, decision: null, why: "LOWERED 171 -> 162 to the measured reading"}
     - {date: '2026-10-28', target: unrouted_open_tasks, frm: 26, to: 25, decision: null, why: "LOWERED 26 -> 25 to the measured reading"}
+    - {date: '2026-10-28', target: unrouted_open_tasks, frm: 25, to: 14, decision: null, why: "LOWERED 25 -> 14 to the measured reading"}
+    - {date: '2026-10-28', target: unrouted_open_bugs, frm: 162, to: 68, decision: null, why: "LOWERED 162 -> 68 to the measured reading"}
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

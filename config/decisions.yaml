@@ -36059,3 +36059,114 @@ decisions:
   - config/task_register.yaml
   - config/config_defaults_census.json
   - governance/buglog.md
+- id: D-3214
+  date: '2026-10-28'
+  state: RESOLVED
+  category: ROUTE GRAPH / OWNERSHIP (D-3024, D-2941, D-2898, D-3212, D-2644, D-3034, D-3038, BUG-638, BUG-743, BUG-1064)
+  bugs:
+  - BUG-638
+  - BUG-743
+  - BUG-1064
+  title: THE OWNER-APPROVED DIRECTORY-LEVEL OWNERSHIP RULE IS ENACTED BY MEASUREMENT, NOT BY BUCKET - routing debt
+    falls 162 -> 68 (bugs) and 25 -> 14 (tasks), 25 artifacts get a real owner, 78 unrouted items get a DECLARED
+    reason, and the 82 items that remain are the OWNER'S WORD rather than a missing route
+  decision: '(1) THE RULE, as the owner approved it on 2026-10-28: `scripts/check_*` and `scripts/audit_*` that
+    no declared capability names belong to `rail_registry`; a `pipeline/` module belongs to the stage capability
+    that runs it by name; a `config/*.yaml` belongs to the capability whose own entrypoint/check/receipt names it;
+    a `governance/` artifact belongs to `governance_faces` when it is one of the four re-cut faces and to NOBODY
+    when it is a one-shot report; `temp/` is scratch, not an artifact; and `tools/ tests/ evals/ specs/ archive/
+    backups/` plus a root-level file stop the rule and stay the OWNER''S WORD. (2) IT WAS APPLIED AS AN ENUMERATION,
+    NEVER AS A WILDCARD, and that distinction is the whole of the act: claiming a `scripts/` PREFIX would have declared
+    that every path in the tree is owned, and a declaration that owns a directory owns nothing in particular (D-3034).
+    MEASURED: of 223 unowned artifacts the rule assigns 25 by name (24 check_/audit_ rails, 1 stage module), calls
+    45 one-shot reports or scratch, and STOPS on 153 - so the registry now carries 25 new `owns:` entries, one per
+    line, each a file that EXISTS. (3) THE REASONS ARE CLASS-DEPENDENT AND THE REGISTER''S OWN VOCABULARY IS THE
+    ONLY SOURCE: the 52 open bugs whose text names no repo artifact take `bug_is_a_finding` (Decision 1), and a
+    TASK never takes that reason - a task is a work item by definition, so it takes its own mover''s disposition
+    from `dispositions.tasks`. Lending a task the bug reason would have been a category error dressed as a shortcut,
+    and it WAS in the first draft of this act: 9 task rows were written with `bug_is_a_finding` and were re-derived
+    against `dispositions.tasks` before a byte was written. (4) THE 12 `absent_path` CITATIONS WERE SPLIT BY MEASUREMENT,
+    NOT CLOSED AS STALE (this refines Decision 3 as first framed): 3 are a WRONG EXTENSION on a file that EXISTS
+    - BUG-638 cites `governance/METRICS.json` where `governance/METRICS.jsonl` exists (the CRITICAL truncation 817
+    -> 70 lines), BUG-743 cites `governance/r5_reviews.json` where `.jsonl` exists, BUG-1064 cites `governance/model_eval_checkpoint.json`
+    where `.jsonl` exists - and declaring those STALE would have been a false declaration that also lost the correction;
+    4 name an OUT-OF-REPO home (BUG-1024/BUG-789 `Support/oMLX/config.json`, BUG-1052/BUG-793 `omlx/model_settings.*`);
+    3 name scratch or archive evidence (BUG-1056, BUG-456, BUG-723); 2 name a path that never was (BUG-316, BUG-829).
+    All 12 stay OPEN - a disposition is not a closure (D-3038) - and each carries a comment naming its sub-class,
+    so no future session has to re-derive which kind it is. (5) THE CEILING FOLLOWED THE READING DOWN through the
+    one act that may move it (D-2644): 162 -> 68 and 25 -> 14, recorded as two chained signed rows, taking the anchor
+    to 9 recorded acts. (6) WHAT THIS DOES NOT CLAIM: 82 open items still cite 153 artifacts the rule stops on,
+    and NOTHING was declared for them - inventing a reason there would have minted the answer the owner has not
+    given (D-2941), which is precisely the defect the escape exists to prevent. NO capability was declared, no report
+    was given a fabricated owner, and no item was closed.'
+  reason: 'The owner approved Decisions 1, 2 and 3 and then approved the directory-level mapping rule outright,
+    and asked for the next highest-leverage step in consequential order with a forensic audit before any serious
+    implementation. The highest-leverage fact on the board was that 187 of 265 open bugs and 25 of 63 open tasks
+    were counted as UNROUTED - routing debt sitting at its ceiling - while nobody had ever asked which of those
+    were a MISSING ROUTE and which were a DECLARED non-route. The order taken was: derive the mapping from the rail''s
+    own census rather than from a worklist written before it existed (so no override could be born INERT, fault
+    (vii)); write the ownership first because it changes what "unrouted" MEANS for every later item; re-measure;
+    compute the dispositions against that new reading; then let the ceiling follow the number down. Every act was
+    refused if it would have dropped an existing entry, claimed a path that does not exist, or used a reason the
+    registry does not declare - and the two register edits were verified against the parse of their own bytes before
+    being written (D-2648). The measuring instruments stayed in temp/ and assigned nothing: a rule-derived mapping
+    is the agent''s work, an ownership assignment is the owner''s word (D-2898/D-2941).'
+  rejected:
+  - option: Claim ownership by DIRECTORY PREFIX - give `rail_registry` `scripts/`, or `governance_faces` `governance/`
+      - and route everything in a tree at a stroke.
+    why: 'It would have "paid" 223 artifacts in three lines and every rail would have gone green, which is exactly
+      why it is refused: a prefix claims files it has never looked at, including the ones another capability already
+      owns (`governance/bug_status.json` is bug_census''s, and `config/rail_registry.yaml` is a rail the registry
+      itself declares). A declaration whose values are a directory declares no bytes (D-3034), and the reading it
+      produces would be indistinguishable from a real ownership graph - the false-green class this register exists
+      to refuse.'
+  - option: Make the RAIL resolve a citation whose extension is wrong (`governance/METRICS.json` -> the tracked
+      `.jsonl` with the same stem) so the three wrong-extension bugs ROUTE instead of carrying a reason.
+    why: 'It is a real defect and a general one - this tree writes `.json` indices beside `.jsonl` journals, so
+      the shape will recur - but it changes WHAT THE RAIL COUNTS, and that is a DECISION, not an edit: D-3212''s
+      own precedent, recorded and not taken. It is also the wrong FIRST move here, because a unique-stem match would
+      silently route any correctly-absent citation that happens to have a sibling file. The three instances are
+      paid honestly instead (a declared reason that NAMES the corrected path), and the class fix is left on the
+      record as the next act it would need.'
+  metrics:
+    bugs_debt_before: 162
+    bugs_debt_after: 68
+    tasks_debt_before: 25
+    tasks_debt_after: 14
+    unowned_artifacts_before: 223
+    artifacts_assigned_by_rule: 25
+    artifacts_declared_as_one_shot_report_or_scratch: 45
+    artifacts_held_for_owner_word: 153
+    unrouted_declarations_added: 78
+    items_held_for_owner_word: 82
+    absent_path_wrong_extension: 3
+    absent_path_out_of_repo: 4
+    absent_path_scratch_or_archive: 3
+    absent_path_other: 2
+    route_graph_controls: 33
+  evidence:
+  - 'BEFORE (scripts/resolve_route.py --check, DIGEST 83280f061f737152): bugs 265 open | routed 99 | unowned_artifact
+    102 | no_artifact_named 52 | absent_path 12; tasks 63 open | routed 38 | unowned 21 | no_artifact 4; debt tasks
+    25/25 bugs 162/162'
+  - 'the mapping was derived by temp/ownership_rule_proposal.py from the rail''s OWN outcome() (D-2642 - no second
+    copy of the token logic): 223 unowned artifacts -> assign 25, nones 45, owner 153, by verdict; the OWNER-WORD
+    remainder was printed row by row rather than collapsed into a number'
+  - 'AFTER the 25 ownership entries (DIGEST fad3be46fea3021b): routed 99 -> 124 (bugs), unowned 102 -> 77, debt
+    162 -> 137 - 25 paid by ownership alone, and the rail green with no fault'
+  - 'AFTER the 78 declared reasons (DIGEST 79cbed3dc4af097e): debt tasks 25 -> 14, bugs 137 -> 68, 0 faults'
+  - 'AFTER --rebaseline --set tasks=14 then --set bugs=68, run SEQUENTIALLY because a parallel pair was MEASURED
+    to collide on this file on 2026-10-28 (bugs persisted, tasks silently did not) (DIGEST bdd5ec081775a079): debt
+    tasks 14/14 bugs 68/68, ceiling anchor 7 -> 9 recorded acts'
+  - 'refusals, all seen before any byte was written: the apply step refuses a dropped `owns` entry, a capability
+    the rule did not name, an owned path that does not exist; the disposition step refuses a reason outside the
+    declared vocabulary, an entry for a closed item (STALE, fault v) and an entry for a routed item (INERT, fault
+    vii)'
+  - scripts/resolve_route.py --selftest -> 33/33 known-answer controls fire
+  - scripts/check_register_divergence.py -> 0 declared divergences, 862 ids carried, ceilings 0/39, rc 0
+  - scripts/check_config_defaults.py --check -> 574 sites over 661 modules, 300 shadowed-declared / 3 undeclared,
+    within the shrink-only ceiling, rc 0
+  - scripts/check_governance_faces.py -> faces agree with the register, 862 bug ids, rc 0
+  - scripts/check_bug_status.py -> the register equals its re-derivation, rc 0
+  files:
+  - config/capability_registry.yaml
+  - config/decisions_summary.json

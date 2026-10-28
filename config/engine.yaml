@@ -103,6 +103,9 @@ harnesses:
       #: MEASURED 2026-10-15 (harness_20261015a): the launcher's own banner lines reach the harness's stdout
       #: and must never be graded as an answer. Declared as a regex so the stripper is not a literal in code.
       stdout_noise_regex: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9:]+ - '
+    agent_loop_patient:  # the patient point on the agent_loop curve (T-212, 120s) - not a separate workstream
+      harness: null
+      why: 'the patient point (T-212, 120s prefill budget) is a calibration point on the agent_loop curve, not a separately deployed workstream (workstream_class: false) - when the patient loop runs it is agent_loop pi (one curve, one harness)'
     agent_probe:      # single-question delegation
       harness: null
       why: 'pipeline/oneshot_ask.py answers in 0.4 s; a harness is 70x-260x that for the same answer'

@@ -2083,7 +2083,8 @@ tasks:
     LOWERED behind each discharge (shrink-only, D-3023/D-2644) and never raised.'
 - id: T-178
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-28'
   mover: pipeline
   title: GIVE BUG-492 ITS HEADING - the most-cited rule in this repository (128 files, 53 justfile lines) is not an id
     the register can resolve, so promote the register's own recorded text or re-point the 128 citations
@@ -2096,7 +2097,9 @@ tasks:
     times across the repository - 92 files under scripts/, 14 under config/, 14 under governance/, 7 under pipeline/,
     and 53 mentions inside justfile - always as "a control nothing runs is a comment". The rule that most of this repository''s
     rails are JUSTIFIED BY cannot be read in the register that justifies it, and a reader following any of the 128 citations
-    arrives at nothing.'
+    arrives at nothing. CLOSED 2026-10-28 by the promote-as-CLOSED act: BUG-492''s own prose was promoted into a
+    ## BUG-492 heading (128 citations resolve in one act), and scripts/check_bug_recall.py no longer reports a
+    finding:BUG-492.'
   evidence: 'MEASURED 2026-10-16 by scripts/check_bug_recall.py (found by the `finding` trace class on its first live
     run, and reproduced independently): zero heading lines match BUG-492 at any hash depth; the fold carries BUG-491
     and BUG-493; the register holds 58 mention lines for the id, so its content survives as prose inside other entries.'

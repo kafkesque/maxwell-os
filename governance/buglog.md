@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 873 bugs (269 open / 604 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 12 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 874 bugs (268 open / 606 closed; highest OPEN = BUG-1108) · 63 open tasks (MUST 12 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1355 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 683 · ⚖ ratified 154 | closed: ✅ resolved 395 · ⚪ superseded 19 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1355, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 269 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 137 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 269 open.
+> Open BUGS by severity (population = the census's 268 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 43 · UNLABELLED 0 (BUG-757) of 268 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (64) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (63) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-217 | 🔴 MUST | 🔴 open | LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture an | READ 2026-10-27: `governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json` (0 |
 > | T-220 | 🔴 MUST | 🔴 open | RUN D-3205'S G4 - THE EMISSION GATE AT THE ROLE'S REAL CONTEXT SIZE (26,214 tokens), not at a 228-1000 token f | READ 2026-10-28: config/decisions.yaml#D-3205 states 'G4 THE EMISSION GATE HAS RUN AT THE  |
 >
-> _the face is a VIEW: 12 of 64 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 63 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -25632,3 +25632,15 @@ SYMPTOM: MEASURED 2026-10-28. The task register's own tally declared 64 open tas
 ROOT CAUSE: a CROSS-VOCABULARY leak. `CRITICAL` is a BUG severity token (config/gov_sync.yaml#severity_tokens), not a TASK priority (`task_priorities` = MUST/SHOULD/WORTH). T-197 carried `priority: CRITICAL`; two further done tasks (T-138, T-146) carried `priority: COULD`, a prose word the owner used for "install only when a specific job needs it". No reader compared a task's priority against the declared vocabulary, so the three values drifted into the register and one of them dropped a live task out of the count - the BUG-492 shape (a validation that never runs is a comment) applied to the census's own schema.
 
 FIX MEASURED AFTER (2026-10-28): (1) `task_faults` gains a FIFTH limb - `priority` must be in `d["task_priorities"]`, else a NAMED fault (an off-vocab value is silently dropped from the census); two known-answer controls (an off-vocab CRITICAL fires, an in-vocab MUST stays quiet) bring the selftest to 32. (2) The three off-vocab rows reclassified: T-197 `CRITICAL -> MUST` (an open pipeline task blocking a RED rail is unambiguously MUST), T-138/T-146 `COULD -> WORTH` (both done, owner-deferred; the lowest declared tier). (3) `gov_sync.py --apply` re-cut the faces: the register-truth line now reads "64 open tasks (MUST 12 / SHOULD 47 / WORTH 5)" whose buckets sum to 64, and the 4 faces equal their re-derivation.
+## BUG-492 (LOW — CLOSED 2026-10-28) — "a control nothing runs is a comment": the repository's most-cited rule was never given a heading, so its 128 citations resolved against nothing — promoted from prose into this heading, never re-writing history (C12/D-2642)
+
+**Status:** CLOSED (promoted-as-CLOSED 2026-10-28, owner sign-off). FOUND 2026-10-16 by scripts/check_bug_recall.py, then MEASURED.
+
+SYMPTOM: BUG-492 is cited 128 times across the repository (92 files under scripts/, 14 under config/, 14 under governance/, 7 under pipeline/, 53 mentions in the justfile) — always as the standing rule "a control nothing runs is a comment" (also recorded as "an invariant that no machine enforces is a comment", "a control never seen failing is not a control"). MEASURED: the register had NO heading for it at any hash depth, so the census fold skipped it (BUG-491 → BUG-493) and 128 citations resolved against nothing.
+
+RESOLUTION: this heading PROMOTES the register's own recorded prose into a resolvable heading, preserving the original wording and noting the promotion — never re-writing history (C12/D-2642). The rule is in force and load-bearing (cited by live D- records), so the promotion IS the fix. BUG-858 is closed and T-178 is discharged by this act.
+
+## BUG-858 (MED — FIXED 2026-10-28) — BUG-492's heading was promoted-as-CLOSED (T-178 discharged), so the 128 citations now resolve against the register's own text and `scripts/check_bug_recall.py` reports no `finding:BUG-492`
+
+**Status:** FIXED (2026-10-28) by the T-178 remedy's PREFERRED branch: the register's own recorded prose was promoted into a `## BUG-492` heading, preserving the original wording and noting the promotion (C12/D-2642, never re-writing history). MEASURED by the same reading that found it: `scripts/check_bug_recall.py` now reads 874 findings and reports no `finding:BUG-492`, and the census carries BUG-492 as CLOSED (the fold no longer skips BUG-491 → BUG-493). 128 citations resolve in one act.
+

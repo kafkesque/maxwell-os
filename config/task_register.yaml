@@ -3373,7 +3373,8 @@ tasks:
     code: patching it locally vs upstreaming is a DECISION with its own row, never an edit (C21/C22).
 - id: T-219
   priority: SHOULD
-  state: open
+  state: done
+  closed: 2026-10-28
   mover: pipeline
   title: >-
     GIVE config/model_assignments.yaml'S harness_roles CLASS AND MODE A READER - `class: agent_probe`, `mode:
@@ -3404,6 +3405,16 @@ tasks:
     gets switched off, BUG-492). The refusal must NAME the payable class and the prefill bill that makes the loop
     unpayable, so the remedy is a route rather than a shrug (D-3100). NOT this task: re-pointing any model, and not
     the T-187/T-214 fixtures - this is the READER for annotations that already exist.
+  outcome_20261028: >-
+    DISCHARGED AT THE ONLY RESOLUTION POINT, which is what made it a control rather than a report:
+    `pipeline/subagent_recipe.py#role_model(role, cls)` now carries the class, `role_class(role)` reads the declared
+    one, and BOTH call sites that resolve a role to a model (`resolve()` and `render()`) pass it - so a recipe that
+    names an annotated role without a `run_class:` is REFUSED, which is the one act that used to be possible and
+    unpayable. MEASURED live outside the controls: AGENT_EDIT_LONG_CONTEXT -> agent_loop REFUSED naming 'agent_probe'
+    and quoting the 124.83 s prefill bill; -> agent_loop_patient REFUSED (the second loop class, not just the first);
+    -> agent_probe resolves to gpt-oss-20b-MXFP4-Q8. `--selftest` 5/5 -> 8/8: the live pair plus the inverse (a role
+    that declares no class is never refused, so the guard cannot become noise on every honest caller). No model was
+    re-pointed and no fixture was run - this task was the reader, exactly as its gate said.
 
 - id: T-220
   priority: MUST

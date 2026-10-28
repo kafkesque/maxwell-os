@@ -7,6 +7,13 @@ triple: what the answer must CONTAIN (a shape the grader can read), WHICH AXIS m
 config/model_assignments.yaml#harness_roles, never a model name typed here), and a DONE CHECK: a deterministic
 command whose exit code says whether the loop finished.
 
+T-219 (BUG-1090/D-3210) added the FOURTH term, because the model alone was half a declaration: a role that declares
+`class:` + `mode:` + `not_a_loop:` is resolved HERE WITH ITS CLASS, and a recipe that names such a role must say
+which class it is running it in (`run_class:`) or be REFUSED. MEASURED 2026-10-28: `AGENT_EDIT_LONG_CONTEXT` is
+gpt-oss-20b at the 600 s `agent_probe` class because a 26,214-token turn costs 124.83 s of prefill - more than any
+loop class pays - so the same role is payable as a one-shot and unpayable as a loop. That difference used to live
+only in prose; now it is a refusal that names the class that pays.
+
 THE ONE RULE, ENFORCED HERE AND NOT MERELY WRITTEN DOWN: a loop may run with no human only when its done_check is
 a command that RESOLVES. An LLM judging an LLM is not a verifier (R5), so a recipe that declares human_free: true
 while its done_check is null is REFUSED, loudly (C16) - and the refusal NAMES what is missing, so the recipe
@@ -59,13 +66,50 @@ def declared_shapes() -> list[str]:
     return sorted(((_yaml(ENGINE).get("fanout") or {}).get("answer_shapes") or {}).keys())
 
 
-def role_model(role: str) -> str:
-    """The model ONE axis resolves to. An unknown role is FATAL: a recipe must not name a model of its own."""
-    roles = _yaml(ASSIGNMENTS).get("harness_roles") or {}
+def _harness_roles() -> dict[str, Any]:
+    """`harness_roles` from its one home, or FATAL (C12/C16: a role set that cannot be read refuses nothing)."""
+    roles = _yaml(ASSIGNMENTS).get("harness_roles")
+    if not isinstance(roles, dict) or not roles:
+        raise SystemExit("FATAL: config/model_assignments.yaml#harness_roles is absent or malformed - a role "
+                         "reader with nothing to read cannot refuse a caller (C12/C16)")
+    return roles
+
+
+def role_class(role: str) -> "str | None":
+    """The BUDGET CLASS a role is declared to run as, or None when its declaration makes no such claim (T-219).
+
+    T-219 (BUG-1090/D-3210): `class:`, `mode:` and `not_a_loop:` sat beside the model as annotations NO READER
+    resolved, so a role's re-bind was enforced as a MODEL and unenforced as a BUDGET - and any caller could run a
+    26,214-token role as an interactive loop that no served model can pay. A declaration whose subject is absent is
+    an assertion, not a control (D-3034); this is the reader that gives it a subject.
+    """
+    spec = _harness_roles().get(role)
+    declared = spec.get("class") if isinstance(spec, dict) else None
+    return str(declared) if declared else None
+
+
+def role_model(role: str, cls: "str | None" = None) -> str:
+    """The model ONE axis resolves to. An unknown role is FATAL: a recipe must not name a model of its own.
+
+    AND SO IS A CLASS THE ROLE'S OWN DECLARATION FORBIDS. A role that declares `class: agent_probe` (with `mode:
+    oneshot`) is payable ONLY there; asking it for another class - or for no class at all - is REFUSED, and the
+    refusal names the class that pays the bill and quotes the measured reason. A role that declares no class is
+    never refused: a guard that fires on every honest caller is noise, and noise is how a rail gets switched off
+    (BUG-492). Known answers are the live pair in `--selftest` (T-219's gate).
+    """
+    roles = _harness_roles()
     spec = roles.get(role)
     if not isinstance(spec, dict) or not spec.get("model"):
         raise SystemExit(f"FATAL: role {role!r} is not a model-bearing role in "
                          f"config/model_assignments.yaml#harness_roles (declared: {sorted(roles)})")
+    declared = role_class(role)
+    if declared and cls != declared:
+        asked = repr(cls) if cls else "no class at all"
+        raise SystemExit(f"REFUSED: role {role!r} runs as class {declared!r} (mode {spec.get('mode')!r}) and was "
+                         f"asked for {asked}. {spec.get('not_a_loop') or ''} A role's class is not decoration - it "
+                         f"is the budget that PAYS the role's prefill bill, so the model and the class are two "
+                         f"halves of ONE declaration (T-219/D-3210/BUG-1090). Run it as {declared!r}, or re-bind "
+                         f"the role by decision.")
     return str(spec["model"])
 
 
@@ -92,14 +136,18 @@ def resolve(name: str, spec: dict[str, Any]) -> dict[str, Any]:
     human_free = bool(spec.get("human_free"))
     done = spec.get("done_check") or ""
     model = ""
+    run_class = spec.get("run_class")
     if spec.get("model_role"):
-        model = role_model(str(spec["model_role"]))
+        # T-219: the class travels WITH the resolution, so a recipe cannot name a role and leave its budget
+        # unstated - the one act that used to be possible and unpayable.
+        model = role_model(str(spec["model_role"]), str(run_class) if run_class else None)
     if human_free and not done:
         raise SystemExit(f"REFUSED: recipe {name!r} declares human_free: true with NO done_check. An LLM judging "
                          f"an LLM is not a verifier (R5). Owed: {spec.get('owed') or 'a deterministic decider'}")
     if done:
         check_command(str(done))
     return {"shape": shape or None, "model_role": spec.get("model_role"), "model": model or None,
+            "run_class": run_class or None,
             "human_free": human_free, "done_check": done or None, "owed": spec.get("owed") or None}
 
 
@@ -112,7 +160,8 @@ def render(name: str, spec: dict[str, Any], values: dict[str, str], stamp: str) 
     if unresolved:
         raise SystemExit(f"FATAL: recipe {name!r} left {unresolved} unset - pass them with --set key=value "
                          "(a template with a hole is a prompt with a hole)")
-    task = {"id": name, "model": values.get("model") or spec.get("model_role") and role_model(str(spec["model_role"])) or "",
+    task = {"id": name, "model": values.get("model") or spec.get("model_role")
+            and role_model(str(spec["model_role"]), str(spec["run_class"]) if spec.get("run_class") else None) or "",
             "question": question, "mode": spec.get("mode", "oneshot"),
             "max_tokens": int(spec.get("max_tokens", 600)), "files": [values.get("target", "")] if values.get("target") else []}
     if spec.get("shape"):
@@ -151,9 +200,34 @@ def selftest() -> int:
         except SystemExit as exc:
             if want not in str(exc):
                 bad.append(f"{label}: refused for the wrong reason: {exc}")
+    # ── T-219's GATE: the LIVE pair, plus the inverse that keeps the guard from firing on every honest caller ──
+    # (1) the annotated role asked for a LOOP class must be REFUSED - this is the BUG-1090 defect itself: a
+    #     26,214-token role run as an interactive loop is unpayable by ANY served model, and until this reader
+    #     existed nothing refused it.
+    try:
+        role_model("AGENT_EDIT_LONG_CONTEXT", "agent_loop")
+        bad.append("T-219: the annotated role was ACCEPTED as agent_loop - the class is decoration again")
+    except SystemExit as exc:
+        if "agent_probe" not in str(exc):
+            bad.append(f"T-219: refused for the wrong reason (it must NAME the payable class): {exc}")
+    # (2) the SAME role asked for the class it declares must be ALLOWED - a guard that cannot pass a lawful
+    #     request is a wall, not a guard.
+    try:
+        if role_model("AGENT_EDIT_LONG_CONTEXT", "agent_probe") != "gpt-oss-20b-MXFP4-Q8":
+            bad.append("T-219: the lawful class resolved to the wrong model")
+    except SystemExit as exc:
+        bad.append(f"T-219: the role's OWN declared class was refused: {exc}")
+    # (3) a role that declares NO class is never refused, whatever it is asked for (the inverse).
+    try:
+        role_model("AGENT_LOOP_SHORT")
+        role_model("AGENT_LOOP_SHORT", "agent_probe")
+    except SystemExit as exc:
+        bad.append(f"T-219: an unannotated role was refused - a guard that fires on every honest caller is noise: "
+                   f"{exc}")
+    total = 5 + 3
     for problem in bad:
         print(f"  FAIL control: {problem}")
-    print(f"{'OK' if not bad else 'FAILED'} subagent-recipe controls: {5 - len(bad)}/5 known-answer")
+    print(f"{'OK' if not bad else 'FAILED'} subagent-recipe controls: {total - len(bad)}/{total} known-answer")
     return 1 if bad else 0
 
 

@@ -11,7 +11,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1339 decisions (census stamp 364cba76791368a6, 2026-10-28) · 861 bugs (265 open / 596 closed; highest OPEN = BUG-1077) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1339 decisions (census stamp 364cba76791368a6, 2026-10-28) · 861 bugs (265 open / 596 closed; highest OPEN = BUG-1077) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1339 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 391 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1339, D-2987/BUG-765)
 >
@@ -22,7 +22,7 @@
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (64) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (63) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -39,7 +39,7 @@
 > | T-220 | 🔴 MUST | 🔴 open | RUN D-3205'S G4 - THE EMISSION GATE AT THE ROLE'S REAL CONTEXT SIZE (26,214 tokens), not at a 228-1000 token f | READ 2026-10-28: config/decisions.yaml#D-3205 states 'G4 THE EMISSION GATE HAS RUN AT THE  |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 64 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 63 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >

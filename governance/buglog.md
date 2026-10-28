@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1344 decisions (census stamp 09ae8ad3705efa9b, 2026-10-28) · 866 bugs (267 open / 599 closed; highest OPEN = BUG-1102) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1345 decisions (census stamp aacb726315ff9e06, 2026-10-28) · 867 bugs (267 open / 600 closed; highest OPEN = BUG-1103) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1344 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 677 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1344, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1345 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 678 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1345, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 61 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
+> Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25380,3 +25380,39 @@ CRITICAL:** nothing in the pipeline deletes model bytes without a human naming t
 `config/delete_safety.yaml#roots` without a verdict from `scripts/check_delete_target.py` in the same invocation, or
 (B) records that verdict inside the delete receipt and refuses when it is absent — with a decision naming which of
 the two the owner chose. A model-store sweep that deletes bytes with NO verdict row beside it re-opens this bug.
+
+## BUG-1102 (HIGH, FIXED 2026-10-28) — THE DELETER ASKS THE FOUR AXES: `pipeline/safe_delete.py` now runs `scripts/check_delete_target.py` read-only before any copy or delete, refuses unless SAFE_TO_DELETE, and verifies its own backup before deleting (D-3219)
+
+**FIXED BY:** D-3219 (state ACTIVE — the owner approved "gate the deleter" in-session). The code is `pipeline/safe_delete.py`; the rail consulted is `scripts/check_delete_target.py`; the roots read are `config/delete_safety.yaml`.
+
+**THE DEFECT (as originally measured).** `scripts/check_delete_target.py` answers four irreversibility axes — SERVED / REFERENCED / SHARED / IN FLIGHT — built from two real incidents (BUG-1050, BUG-1057). `pipeline/safe_delete.py` asked ONE question, a different one: `is_protected()` tests a `PROTECTED_TREES` prefix over pipeline output, so a model path under `~/.omlx/models` (or a symlink farm) passed and the four axes were never asked. The rail's only invoker was the `delete-check` recipe (justfile:328) — an operator sequence, not a gate.
+
+**THE FIX (two limbs).**
+1. **GATE.** `_is_model_bytes()` tests the path's REALPATH against `config/delete_safety.yaml#model_roots + storage_roots` (so a pipeline path that is a SYMLINK into a model root is still caught). When true, `delete_rail_gate()` runs the rail read-only via subprocess and REFUSES unless exit 0. Exit 2 (a four-axis refusal), 3 (engine unreachable — fail-closed) and 4 (the rail could not run) all REFUSE. Placed BEFORE the backup, so a refused deletion never copies 15 GB of a served model first. The gate is NON-BYPASSABLE: `--maxwell-confirmed` records the owner's INTENT, but cannot make a SERVED model safe to delete.
+2. **VERIFY THE BACKUP (found by the R5 reviewer, same irreversible-loss class).** `shutil.copytree/copy2` was never verified, so a short backup could be followed by an irreversible delete. `_verify_backup()` compares file count and total bytes and REFUSES a mismatch. **LIMIT, stated in the code:** a stat-level equality, not a content hash — a 15 GB model copy would double the pre-flight cost for a failure `shutil.copy2` does not produce.
+
+**THE MEASUREMENT.** selftest **7/7** known-answer controls (a model path gates true; a non-model path gates false and never invokes the rail; the gate exposes no bypass parameter; a matching backup verifies; a short backup is refused). R5 code review by **gpt-oss-20b-MXFP4-Q8** (deep tier, D-3168) **APPROVED** the change (sha256_16 `34caf302e1cc786a`, rc 0). End-to-end: a served model (`MiniCPM5-2B-MLX`) is **REFUSED before any backup** (`backup/deletions` 16 → 16, rc 1); a non-model throwaway path still backs up and deletes (rc 0), so pipeline-output behaviour is unchanged. Deterministic layers: syntax PASS, lint PASS (ruff), c11_c12 PASS.
+
+**WHAT IT DOES NOT DO (named, not hidden).** It does not route raw `rm -rf` of model bytes through `safe_delete.py` — "are model deletions sanctioned ONLY through this path?" is a separate question, recorded here rather than silently answered. It does not hash the backup (the LIMIT is in the code).
+
+**RE-OPEN CONDITION.** Any deletion path that reaches model bytes without passing `delete_rail_gate()` — e.g. a raw `rm -rf` in a shell or a script — re-opens this class.
+
+## BUG-1103 (MED, OPEN 2026-10-28) — THE GOVERNED WRITER IS R5-UNREVIEWABLE: `scripts/recompute_decision_summary.py` is 119,095 chars and gpt-oss-20b produces NO parseable verdict on it, at ANY tested output budget, so every future change to it is drift-unchecked
+
+**FOUND BY:** the manual R5 review of the D-3218 code (the owner ran `r5_review_gate.py --file scripts/recompute_decision_summary.py`). It returned `INDECISIVE(SIZE_GUARD)`, exit 2.
+
+**THE MEASUREMENTS (each read).**
+1. **SIZE GUARD.** The file is **119,095 chars**; `config/r5_review_gate.yaml#tiers.deep.max_source_chars` is **100,000**, so the gate refuses before any model call (`source_chars: 119095 > max_source_chars: 100000`, `verdict: INDECISIVE(SIZE_GUARD)`).
+2. **THE CAP IS STALE, NOT THE FILE.** The 100,000 anchor was measured on the OLD deep reviewer (32K context: 98,664 chars returned a verdict; 152,853 crashed). D-3168 promoted **gpt-oss-20b (131,072-token context)** to the deep tier on 2026-10-27 and the cap was NOT re-anchored. So the guard that blocks this file was calibrated for a model that no longer reviews the deep tier.
+3. **BUT gpt-oss CANNOT PARSE A VERDICT ON IT EITHER (measured).** Running the reviewer directly (bypassing the gate's size guard) on the 131K-context model returns **UNPARSED** at **2,600 tokens** (raw 12,113 chars of reasoning prose, no verdict JSON) AND at **8,000 tokens** (raw 39,155 chars, no verdict JSON). The failure is the model's REASONING VERBOSITY on a large orchestrator, not its context window: it never reaches the `{verdict: ...}` JSON that `extract_verdict` parses.
+
+**WHY THAT IS A BUG AND NOT A LIMIT NOTE.** `scripts/recompute_decision_summary.py` is the **writer of record** for `config/decisions.yaml`, `config/decisions_summary.json` AND `config/decisions_policy.yaml` — the file that orders every in-place edit of the decision registry (D-3218). R5 is the drift/slop check (D-2962/D-367). A writer that cannot be R5-reviewed means **every future change to it lands with deterministic layers + selftest only, never an R5 verdict** — the exact drift the OS exists to refuse, on its most load-bearing governed file.
+
+**WHY IT MATTERS FOR D-3218 SPECIFICALLY.** The D-3218 `--shrink-pins` route was committed with a 40/40 selftest and a mutation entry (`rail_mutations#the_pin_shrink_licence_is_load_bearing`) — real deterministic coverage — but the LLM R5 verdict the previous session TRIED for (with the wrong reviewer, gemma) never landed. The coverage is deterministic-only; the R5 gap is real and now named.
+
+**THE FIX (three options, the third recommended).**
+- **(A) Split the monolith.** `recompute_decision_summary.py` is 1,971 lines carrying `--mint`, `--check`, `--canonicalise-states`, `--set-state`, `--shrink-pins`, `--selftest`. Splitting into reviewable modules (<60K chars each) is the CORRECT architectural fix — but it is a large, risky refactor of the decision-mint writer and must be its own sitting, not a rush. It also changes `writer_of_record` in `config/artifact_ownership.yaml`.
+- **(B) Raise the cap.** Would need a NEW measurement proving gpt-oss parses a verdict at the higher size — and measurement (3) already REFUTES that at 119K. So (B) is dead for this file.
+- **(C) RECOMMENDED: keep the guard, record the gap, and split as a NAMED task.** The size guard is doing its job (refusing a verdict that would never exist, D-2956/C16). The honest state is: deterministic coverage (layers + selftest + mutation) for this one file, R5 unavailable until the split. Do NOT raise the cap and do NOT send the oversized source.
+
+**RE-OPEN / CLOSE CONDITION.** CLOSED when the writer is split into modules each under the deep-tier source cap AND each passes `r5_review_gate.py` (deep tier, gpt-oss) — at which point `writer_of_record` is updated to the new entrypoint and this bug closes with the split's receipt.

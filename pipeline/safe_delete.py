@@ -22,6 +22,7 @@ Usage:
 
 import argparse
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -79,6 +80,102 @@ def is_protected(path):
     return False
 
 
+def _delete_safety_roots():
+    """Read the model + storage roots from config/delete_safety.yaml (C12, fail-closed).
+
+    BUG-1102: `scripts/check_delete_target.py` is the ONLY instrument that knows whether model bytes are
+    SERVED, REFERENCED, SHARED or IN FLIGHT. This helper names the roots that decide whether a path IS model
+    bytes, so the four-axis gate is applied where it is relevant and pipeline output (which the rail does not
+    cover) is left to `is_protected()`.
+
+    An unreadable config is a REFUSAL, never a smaller search space (D-2644/BUG-1083): a deleter that cannot
+    read its own gate would fail OPEN, which is the exact direction this bug is about.
+    """
+    cfg_path = ROOT / "config" / "delete_safety.yaml"
+    try:
+        cfg = _yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+        roots = list(cfg["model_roots"]) + list(cfg["storage_roots"])
+    except Exception as exc:  # C16: say it AND refuse, never a silent skip
+        raise SystemExit(
+            f"FAIL-CLOSED (safe_delete): cannot read {cfg_path} ({exc}) - "
+            "the four-axis delete gate cannot be evaluated, so nothing is deleted"
+        ) from None
+    return [Path(str(r)).expanduser().resolve() for r in roots]
+
+
+def _is_model_bytes(path):
+    """True when the path's REALPATH lies under a declared model/storage root (BUG-1102).
+
+    The test uses the realpath, so a pipeline path that is a SYMLINK into a model root is still caught:
+    deleting it would delete the model bytes it resolves to.
+    """
+    real = Path(path).resolve()
+    for root in _delete_safety_roots():
+        if real == root or root in real.parents:
+            return True
+    return False
+
+
+def delete_rail_gate(path):
+    """Run the four-axis rail read-only and refuse unless it says SAFE_TO_DELETE (BUG-1102).
+
+    Returns (safe: bool, detail: str). This function NEVER deletes and NEVER mutates the target.
+    The gate is NON-BYPASSABLE: an owner's `--maxwell-confirmed` word records INTENT, but it cannot make a
+    SERVED model safe to delete, so the four axes are asked regardless of that word.
+
+    Exit codes are the rail's own (scripts/check_delete_target.py):
+      0 SAFE_TO_DELETE | 2 REFUSE | 3 UNDETERMINED (fail-closed) | 4 usage/config error
+    """
+    if not _is_model_bytes(path):
+        return True, "not model bytes (the four axes do not apply; pipeline output keeps is_protected)"
+    rail = ROOT / "scripts" / "check_delete_target.py"
+    if not rail.exists():
+        return False, f"FAIL-CLOSED: the delete rail is missing at {rail}"
+    proc = subprocess.run(
+        [sys.executable, str(rail), str(path)],
+        capture_output=True, text=True, cwd=str(ROOT),
+    )
+    if proc.returncode == 0:
+        return True, "SAFE_TO_DELETE (served/referenced/shared/in-flight all clear)"
+    if proc.returncode == 2:
+        return False, "REFUSE (the four axes: something still serves, links to, shares or is downloading these bytes)"
+    if proc.returncode == 3:
+        return False, "UNDETERMINED (fail-closed: the engine is unreachable, so 'still advertised' cannot be ruled out)"
+    return False, f"USAGE/CONFIG ERROR rc={proc.returncode} (the delete guard could not run, so nothing is deleted)"
+
+
+def _tree_stats(path):
+    """(file_count, total_bytes) for a file or a directory (recursive, stat only — no read)."""
+    path = Path(path)
+    if path.is_file():
+        return 1, path.stat().st_size
+    count = 0
+    total = 0
+    for f in path.rglob("*"):
+        if f.is_file():
+            count += 1
+            total += f.stat().st_size
+    return count, total
+
+
+def _verify_backup(src, dest):
+    """Prove the backup holds the same file count and bytes as the source (R5 concern, BUG-1102b).
+
+    Returns (ok: bool, detail: str). A backup that is NOT verified is not a backup: the deletion it
+    protects is irreversible, so a short copy must REFUSE the deletion rather than proceed on hope.
+    LIMIT (stated, not hidden): this is a cheap stat-level equality, not a content hash — it catches
+    truncation, a missing file and a failed copy; it does not catch silent bit-rot inside an equally
+    sized file. A hash is deliberately not paid for here because a 15 GB model copy would double the
+    pre-flight cost for a failure mode that `shutil.copy2` does not produce.
+    """
+    src_count, src_bytes = _tree_stats(src)
+    dst_count, dst_bytes = _tree_stats(dest)
+    if (src_count, src_bytes) != (dst_count, dst_bytes):
+        return False, (f"backup MISMATCH: source {src_count} file(s)/{src_bytes} B vs "
+                       f"backup {dst_count} file(s)/{dst_bytes} B")
+    return True, f"{dst_count} file(s) / {dst_bytes} B verified"
+
+
 def backup_then_delete(path, reason, no_confirm=False, maxwell_confirmed=None):
     """Backup then delete the target path."""
     path = Path(path)
@@ -91,6 +188,16 @@ def backup_then_delete(path, reason, no_confirm=False, maxwell_confirmed=None):
     if is_protected_path and not maxwell_confirmed:
         print(f"🔒 PROTECTED: {path} is inside a pipeline output tree.")
         print('   Use --maxwell-confirmed "<reason from DECISION-LOG>" to proceed.')
+        sys.exit(1)
+
+    # BUG-1102 GATE (read-only): the four irreversibility axes, asked BEFORE any copy or delete.
+    # Placed ahead of the backup so a REFUSED deletion never copies 15 GB of a served model first.
+    # Non-bypassable: --maxwell-confirmed records intent, but cannot make a SERVED model safe to delete.
+    rail_safe, rail_detail = delete_rail_gate(path)
+    if not rail_safe:
+        print(f"⛔ REFUSING (four-axis delete gate): {path}")
+        print(f"   {rail_detail}")
+        print("   Read the full verdict, nothing is deleted:  python3 scripts/check_delete_target.py <path>")
         sys.exit(1)
 
     # FREE-SPACE PRE-FLIGHT (BUG-261, 2026-09-17): this function COPIES the target into
@@ -146,6 +253,15 @@ def backup_then_delete(path, reason, no_confirm=False, maxwell_confirmed=None):
         print(f"  ❌ Backup failed: {e}")
         sys.exit(1)
 
+    # VERIFY THE BACKUP before anything is deleted (R5 concern 2026-10-28, BUG-1102b): a backup
+    # that is not verified is not a backup, and the deletion it protects is irreversible.
+    ok, verify_detail = _verify_backup(path, dest)
+    if not ok:
+        print(f"  ❌ {verify_detail}")
+        print("  ⛔ REFUSING to delete: the backup does not match the source. Nothing was deleted.")
+        sys.exit(1)
+    print(f"  ✅ Backup verified: {verify_detail}")
+
     # Confirmation
     if maxwell_confirmed:
         confirmed = True
@@ -191,6 +307,65 @@ def list_pending():
         print(f"  {b.name}  |  {size}  |  {items} items")
 
 
+def selftest():
+    """Known-answer controls for the BUG-1102 four-axis gate (nothing is deleted, 0 model calls)."""
+    import inspect
+
+    failures: list[str] = []
+
+    def check(name, cond, detail=""):
+        if cond:
+            print(f"  PASS {name}")
+        else:
+            failures.append(name)
+            print(f"  FAIL {name} {detail}")
+
+    # A. the gate config is readable and declares at least one root (a deleter that cannot read its own
+    #    gate would fail OPEN - the exact direction BUG-1102 is about).
+    roots = _delete_safety_roots()
+    check("the delete-safety config declares >= 1 model/storage root", len(roots) >= 1, f"roots={len(roots)}")
+
+    # B. a path under the FIRST declared root reads as MODEL BYTES (so the four axes will be asked).
+    probe_under = roots[0] / "__selftest_probe__"
+    check("a path under the first declared root reads as model bytes", _is_model_bytes(probe_under) is True)
+
+    # C. a non-model path is NOT gated as model bytes, and the rail is never invoked (0 model calls).
+    probe_out = ROOT / "temp" / "__selftest_not_model__"
+    check("a non-model path is not gated as model bytes", _is_model_bytes(probe_out) is False)
+    safe, detail = delete_rail_gate(probe_out)
+    check("a non-model path passes the gate WITHOUT invoking the rail",
+          safe is True and "not model bytes" in detail, detail)
+
+    # D. the gate is NON-BYPASSABLE: delete_rail_gate exposes no parameter that could skip the four axes.
+    params = list(inspect.signature(delete_rail_gate).parameters)
+    check("the gate exposes no bypass parameter (an owner word cannot skip the four axes)",
+          params == ["path"], f"params={params}")
+
+    # E. the BACKUP is VERIFIED, and a SHORT backup is refused (R5 finding 2026-10-28, BUG-1102b).
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as td:
+        src = Path(td) / "src"
+        src.mkdir()
+        (src / "a.txt").write_text("hello", encoding="utf-8")
+        (src / "b.txt").write_text("world", encoding="utf-8")
+        good = Path(td) / "good"
+        shutil.copytree(src, good)
+        ok_good, _ = _verify_backup(src, good)
+        check("a matching backup verifies", ok_good is True)
+        short = Path(td) / "short"
+        shutil.copytree(src, short)
+        (short / "b.txt").unlink()
+        ok_short, detail_short = _verify_backup(src, short)
+        check("a short backup is REFUSED (never delete on hope)", ok_short is False, detail_short)
+
+    if failures:
+        print(f"FAIL safe_delete selftest: {len(failures)} control(s) failed: {', '.join(failures)}")
+        return 1
+    print("ok safe_delete selftest: 7/7 controls")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Safe deletion tool for Maxwell OS pipeline output."
@@ -208,8 +383,14 @@ def main():
     parser.add_argument(
         "--list-pending", action="store_true", help="List all deletion backups"
     )
+    parser.add_argument(
+        "--selftest", action="store_true", help="Run the BUG-1102 four-axis gate known-answer controls"
+    )
 
     args = parser.parse_args()
+
+    if args.selftest:
+        sys.exit(selftest())
 
     if args.list_pending:
         list_pending()

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**267 open** / 599 closed of 866 ids.
+**267 open** / 600 closed of 867 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 **DIVERGENT 0** open id(s) whose OWN last paragraph claims a
@@ -277,4 +277,4 @@ closure that no header event records (BUG-481). They stay counted OPEN - the hea
 | BUG-1076 | (MED, OPEN 2026-10-27) - "unverifiable" is ONE word for a harmless duplicate id and for a role model that cannot be reached, and nothing | 1 |
 | BUG-1077 | (MED, OPEN 2026-10-27) - THE RECEIPT LEDGER HAS NO WRITER: `governance/calibration_receipts.jsonl` is declared append-only, 36 rows rest on | 1 |
 | BUG-1101 | (MED, OPEN 2026-10-28) — `RATIFIED` IS A DECISION STATE WHOSE MEANING NO FILE DECLARES: 38 of its 153 records carry the word "owner" | 1 |
-| BUG-1102 | (HIGH, OPEN 2026-10-28) — THE ONLY THING THAT KNOWS WHICH MODEL BYTES ARE STILL SERVED IS A RAIL `pipeline/safe_delete.py` NEVER CONSULTS: | 1 |
+| BUG-1103 | (MED, OPEN 2026-10-28) — THE GOVERNED WRITER IS R5-UNREVIEWABLE: `scripts/recompute_decision_summary.py` is 119,095 chars and gpt-oss-20b | 1 |

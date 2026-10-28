@@ -36506,3 +36506,85 @@ decisions:
   - 'no receipt caches these bytes: config/handoffs.yaml declares no artifact for config/decisions_policy.yaml,
     so the receipt of a pin shrink is write_guard''s mutation journal row plus the two declared readers, and the
     route PRINTS both instead of promising them in prose'
+- id: D-3219
+  date: '2026-10-28'
+  state: ACTIVE
+  category: GOVERNANCE / DELETION SAFETY (BUG-1102, BUG-1102b, R-D410, D-3034, D-3100, BUG-1050, BUG-1057)
+  bugs:
+  - BUG-1102
+  title: THE DELETER ASKS THE FOUR AXES - pipeline/safe_delete.py now runs scripts/check_delete_target.py read-only
+    before any copy or delete and REFUSES unless SAFE_TO_DELETE, and it VERIFIES its own backup before deleting;
+    "check, then delete" is a GATE, not an operator sequence
+  decision: '(1) THE DEFECT, MEASURED (BUG-1102). scripts/check_delete_target.py answers the four irreversibility
+    axes -
+
+    SERVED / REFERENCED / SHARED / IN FLIGHT - and was built FROM two real incidents (BUG-1050, BUG-1057). But
+
+    pipeline/safe_delete.py asked ONE question, and a different one: is_protected() tests a PROTECTED_TREES prefix
+
+    over pipeline output, so a model path under ~/.omlx/models passed that test and the four axes were never asked.
+
+    The only invoker of the rail was the `delete-check` recipe - an operator sequence, not a gate.
+
+
+    (2) THE FIX, IN TWO LIMBS. (a) GATE: safe_delete.py computes _is_model_bytes() on the REALPATH (so a pipeline
+
+    path that is a symlink into a model root is still caught) and, when true, runs the rail read-only via subprocess
+
+    and refuses unless exit 0. Exit 2 (a four-axis refusal), 3 (engine unreachable - fail-closed) and 4 (the rail
+
+    could not run) all REFUSE. Placed BEFORE the backup so a refused deletion never copies 15 GB of a served model
+
+    first. (b) VERIFY THE BACKUP (BUG-1102b, found by the R5 reviewer): shutil.copytree/copy2 was never verified,
+    so
+
+    a short backup could be followed by an irreversible delete. _verify_backup() compares file count and total bytes
+
+    and REFUSES a mismatch. The limit is stated in the code: a stat-level equality, not a content hash, because
+    a
+
+    15 GB model copy would double the pre-flight cost for a failure shutil.copy2 does not produce.
+
+
+    (3) WHY THE GATE IS NON-BYPASSABLE. --maxwell-confirmed records the owner''s INTENT to delete pipeline output;
+
+    it cannot make a SERVED model safe to delete, so the four axes are asked regardless of that word. The selftest
+
+    proves the signature exposes no bypass parameter.
+
+
+    (4) THE MEASUREMENT. selftest 7/7 known-answer controls (a model path gates true, a non-model path gates false
+
+    and never invokes the rail, the gate has no bypass, a matching backup verifies, a short backup is refused);
+
+    R5 code review by gpt-oss-20b-MXFP4-Q8 (deep tier, D-3168) APPROVED the change (sha256_16 34caf302e1cc786a);
+
+    end-to-end a served model (MiniCPM5-2B-MLX) is REFUSED before any backup (backup/deletions 16 -> 16) and a
+
+    non-model throwaway path still backs up and deletes (rc 0), so pipeline output behaviour is unchanged.
+
+
+    (5) WHAT IT DOES NOT DO. It does not route raw `rm -rf` of model bytes through safe_delete.py - that broader
+
+    question (are model deletions sanctioned only through this path?) is named, not silently answered. It does not
+
+    hash the backup (the LIMIT is in the code). It does not change check_delete_target.py or delete_safety.yaml.'
+  reason: 'Recorded FIRST, before the code edit''s governance faces were synced, because it changes what a deletion
+    may do: a policy change smuggled in as a bugfix is the drift this registry refuses (D-3038). State is ACTIVE,
+    not RATIFIED, because the owner approved "gate the deleter" in-session and the change is applied and R5-approved;
+    BUG-1101''s RATIFIED verdict is still owed, so the unambiguous in-force spelling is used (D-3034).'
+  files:
+  - pipeline/safe_delete.py
+  - scripts/check_delete_target.py
+  - config/delete_safety.yaml
+  evidence:
+  - 'BUG-1102 as measured: safe_delete.py asks is_protected() (a PROTECTED_TREES prefix over pipeline output) and
+    never the four axes; the rail''s only invoker was the `delete-check` recipe (justfile:328).'
+  - 'selftest 7/7: python3 pipeline/safe_delete.py --selftest (5 gate controls + 2 backup-verification controls).'
+  - 'R5 APPROVE: scripts/r5_review_gate.py --file pipeline/safe_delete.py -> VERDICT APPROVE, reviewer gpt-oss-20b-MXFP4-Q8,
+    sha256_16 34caf302e1cc786a, rc 0 (governance/r5_review_gate.jsonl append-only).'
+  - 'end-to-end refusal: python3 pipeline/safe_delete.py ~/.omlx/models/MiniCPM5-2B-MLX --maxwell-confirmed ...
+    -> "REFUSING (four-axis delete gate)" rc 1, backup/deletions 16 -> 16 (nothing copied, nothing deleted).'
+  - 'regression: a non-model throwaway path (/tmp/__sd_probe__) still creates a verified backup and deletes, rc
+    0.'
+  - 'deterministic layers: syntax PASS, lint PASS (ruff All checks passed), c11_c12 PASS (r5_review_gate --no-llm).'

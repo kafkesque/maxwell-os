@@ -36684,3 +36684,77 @@ decisions:
     link count 1); same for gemma-4-E4B-it-MLX-4bit; refs/ empty, snapshots/<hash> absent, blobs/ pruned (D-3185).'
   - measured sparse manifests and deep identity digests recorded in the decision body; the other four pins unchanged
     and still green in the same run.
+- id: D-3222
+  date: '2026-10-28'
+  state: RATIFIED
+  category: GOVERNANCE / STATE VOCABULARY (BUG-1101, D-3034, D-3038, D-2941, D-3216, D-3217, D-3218)
+  bugs:
+  - BUG-1101
+  title: A STATE'S MEANING GETS A HOME - config/decisions_policy.yaml#state_vocabulary gains a `meanings` clause
+    declaring RATIFIED an in-force-and-applied STRUCTURAL claim, never an authorship claim, so a face that prints
+    "⚖ ratified 153" states applied in-force decisions and not owner acts; the 38 records with no "owner" word are
+    reconciled as correct rather than reclassified
+  decision: '(1) THE DEFECT, MEASURED (BUG-1101). state_vocabulary declares WHICH spellings are canonical and gov_sync.yaml#state_glyphs
+    declares which SIGN each state prints, and NEITHER declared what the word MEANS - the BUG-483 class one level
+    up. Measured on the register today: 153 records are RATIFIED; 38 of them contain the string "owner" NOWHERE
+    in their payload; and where the word is used with its plain meaning the record says so explicitly - D-2879 and
+    D-2880 read "Owner review ROUND 3 / ROUND 4 ... ratified", and their decision bodies carry "from the OWNER''S
+    OWN WORDS". So one state token carried two facts - the owner ratified this, and a sitting ruled it and applied
+    it - and the face printed them as one bucket ("in effect: 🟢 active 676 · ⚖ ratified 153"). Nothing was RED (every
+    rail reads the token correctly, the census is exact); what was false is the INFERENCE the word invited. This
+    is a declaration bug, not a checker bug. (2) THE OWNER''S CHOICE, AND ITS SCOPE. The bug recorded two exits:
+    (A) RATIFIED means ONLY the owner''s word, so 38 records reclassify to ACTIVE through the governed route; (B)
+    RATIFIED means "in force and applied" and the owner''s own acts get a distinguishing marker. The owner chose
+    B, in the SIMPLIFIED form this record applies: the meaning is declared once (a `meanings` clause), and the distinguishing
+    marker is NOT a new field or fourth state - it is the PAYLOAD that already carries provenance (D-2879/D-2880
+    title and decision bodies name the owner''s own words), so no new value, sign, bucket, glyph or census key is
+    owed. The chosen declaration is exactly one sentence of meaning: "The decision is in force and its act has been
+    applied to the register/tree it rules over - a claim about force and application, never about who applied it."
+    (3) THE RECONCILIATION, BOTH DIRECTIONS. Direction 1 - "no record carries it that the declared meaning excludes":
+    the declared meaning is structural, so it excludes NO record on an authorship axis; all 153 RATIFIED records
+    are in force (RATIFIED is in config/decisions_policy.yaml#graph.in_force_states, measured) and applied (every
+    RATIFIED record entered the register through the governed --apply route), so 0 of the 153 are excluded and the
+    38 that carry no "owner" word are INCLUDED, not excluded - they are applied in-force decisions, and the state
+    makes no claim about who applied them. Direction 2 - "no record the declared meaning includes lacks it": the
+    records that DO carry an owner word (115 of 153, the D-2879/D-2880 "OWNER''S OWN WORDS" class first) all carry
+    RATIFIED, so no owner act sits mislabelled outside the state. Both directions therefore hold against the baseline
+    the close is checked against (38 of 153), and NO reclassification is owed - option A is the rejected branch,
+    and the structural reading makes the 38 correct as they stand. (4) WHY THIS IS A DECLARATION AND NOT A WRITE
+    TO THE REGISTRY. The 153 records, the census and every rail already agree; the defect was that a READER could
+    not join the token to a meaning. The fix is therefore one new block in the rules file (append_only: cells ADDED,
+    none edited), performed through scripts/lib/write_guard.write_document with a backup and a journal receipt -
+    the same route D-3218 clause (6) used for a block the writer could not yet write for itself, and the MUTATION_JOURNAL
+    row is the receipt. (5) WHAT THIS DOES NOT DO. It does not add a distinguishing-marker field or a fourth in-force
+    state (the simplified B relies on payload provenance, and a field nothing reads is bloat, C19); it does not
+    reclassify any of the 38 (or the 115); it does not move D-3218/D-3219/D-3220/D-3221 from ACTIVE to RATIFIED
+    - those records carried "BUG-1101''s RATIFIED verdict is still owed" when minted, and whether to now re-derive
+    their state from the declared meaning is a separate, later act this record names rather than smuggles in; it
+    does not change gov_sync.yaml#state_glyphs or the face''s bucket arithmetic (⚖ and its count stay; only the
+    reading of the word changes).'
+  reason: 'The register could not be told to agree with a meaning that had no home; the meaning had to be declared
+    where a reader can FAIL on its absence, which is state_vocabulary - the block that already declares a state''s
+    spelling and its route. The alternatives were both worse: leave the ambiguity (a state word two readers translate
+    differently is the drift this register exists to refuse, and D-3216/D-3217 - minted RATIFIED by an agent sitting
+    with no owner word - are instances of the ambiguity, not exceptions to it), or reclassify 38 records to ACTIVE
+    (option A), which would preserve an authorship reading the owner chose to retire. State is RATIFIED because
+    the act is in force and applied, and the owner''s choice of option B is provenance carried in this record''s
+    own payload - the structural meaning this record declares is the very meaning its state satisfies.'
+  files:
+  - config/decisions_policy.yaml
+  - config/decisions.yaml
+  - config/gov_sync.yaml
+  evidence:
+  - 'the baseline, read from config/decisions.yaml at 2026-10-28 and not from memory: 153 records state RATIFIED;
+    38 carry the string "owner" nowhere in their full payload (state excluded), 115 carry it'
+  - 'the 38 owner-absent RATIFIED ids, in full: D300, D316, D318, D-361, D-364, D-365, D-367, D-2814, D-2816, D-2819,
+    D-2821, D-2822, D-2842, D-2843, D-2858, D-2863, D-2868, D-2885, D-2887, D-2890, D-2893, D-2896, D-2899, D-2905,
+    D-2907, D-2918, D-2919, D-2920, D-2921, D-2922, D-2925, D-2956, D-2962, D-3014, D-3021, D-3022, D-3216, D-3217'
+  - 'direction 1 measured: every one of the 153 RATIFIED records carries a state in in_force_states [ACTIVE, RESOLVED,
+    RATIFIED]; the owner-act class D-2879/D-2880 carries "OWNER''S OWN WORDS" in its decision body and state RATIFIED,
+    so the 115 owner-bearing and the 38 owner-absent records agree with one structural meaning'
+  - 'the write receipt: config/decisions_policy.yaml written through scripts/lib/write_guard.write_document (writer
+    scripts/recompute_decision_summary.py, backup=True, journal=True), pre_sha16 9387b54ddce04ec7 -> post_sha16
+    29e4e404995f087d, row appended to governance/MUTATION_JOURNAL.jsonl'
+  - 'the declaration now parses: config/decisions_policy.yaml#state_vocabulary.meanings.RATIFIED loads and reads
+    "in force and applied ... never about who applied it", and state_vocabulary keys are canonical, canonicalisation_route,
+    transition_route, legacy_non_canonical_ids, canonicalised, why, meanings'

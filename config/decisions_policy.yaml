@@ -269,6 +269,18 @@ state_vocabulary:
     spelling_problems() fails on any non-canonical spelling that is NOT pinned, and fails on a pin that no longer
     describes anything. Both directions are live: the pin is empty and a SECOND spelling is still refused the
     moment it is written, so the rule is now universal rather than a five-record exemption.
+  # BUG-1101 (D-3222): a state's SPELLING (canonical above) and its SIGN (gov_sync.yaml#state_glyphs) are both
+  # declared, but its MEANING had NO home - the BUG-483 class one level up. RATIFIED is the one that bit: 153
+  # records carried it, 38 of them with the word "owner" nowhere in their payload, so the face's "⚖ ratified 153"
+  # invited two readings (the owner ratified this / this sitting ruled and applied it). The owner chose option B:
+  # RATIFIED is a STRUCTURAL claim, never an authorship claim. Declared here so a reader joins the word to what it
+  # MEANS, not only to what it spells.
+  meanings:
+    RATIFIED: >-
+      The decision is in force and its act has been applied to the register/tree it rules over - a claim about
+      force and application, never about who applied it: whether the owner ratified it (D-2879/D-2880 "Owner review
+      ROUND n ... ratified") or a sitting ruled and applied it is provenance carried in the payload, not part of
+      what the state means. A reader counting "⚖ ratified" is counting applied in-force decisions, not owner acts.
 
 # -------------------------------------------------------------------------------------------------------------
 # LOG HEADER (BUG-588). The human log's header may POINT at the census; it may never RESTATE a count.

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 869,
-  "open_n": 267,
-  "closed_n": 602,
+  "open_n": 266,
+  "closed_n": 603,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "divergent_n": 0,
@@ -2657,15 +2657,6 @@
       ]
     },
     {
-      "id": "BUG-1101",
-      "title": "(MED, OPEN 2026-10-28) \u2014 `RATIFIED` IS A DECISION STATE WHOSE MEANING NO FILE DECLARES: 38 of its 153 records carry the word \"owner\"",
-      "events": 1,
-      "artifacts": [
-        "config/decisions_policy.yaml",
-        "config/gov_sync.yaml"
-      ]
-    },
-    {
       "id": "BUG-1103",
       "title": "(MED, OPEN 2026-10-28) \u2014 THE GOVERNED WRITER IS R5-UNREVIEWABLE: `scripts/recompute_decision_summary.py` is 119,095 chars and gpt-oss-20b",
       "events": 1,
@@ -3281,6 +3272,7 @@
     "BUG-1098",
     "BUG-1099",
     "BUG-1100",
+    "BUG-1101",
     "BUG-1102",
     "BUG-1104",
     "BUG-1105"

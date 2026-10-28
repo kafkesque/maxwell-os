@@ -36588,3 +36588,50 @@ decisions:
   - 'regression: a non-model throwaway path (/tmp/__sd_probe__) still creates a verified backup and deletes, rc
     0.'
   - 'deterministic layers: syntax PASS, lint PASS (ruff All checks passed), c11_c12 PASS (r5_review_gate --no-llm).'
+- id: D-3220
+  date: '2026-10-28'
+  state: ACTIVE
+  category: GOVERNANCE / MINT INTEGRITY (BUG-1104, D-2660, D-3034, D-3216, D-3038)
+  bugs:
+  - BUG-1104
+  title: THE MINT GATE GAINS A LINEAGE CLAUSE - a new decision citing a bug an in-force decision already owns is
+    REFUSED unless it explicitly supersedes that owner in a `supersedes:` field, so the register can no longer be
+    made to disagree with itself about who owns a bug
+  decision: '(1) THE DEFECT, MEASURED (BUG-1104). scripts/recompute_decision_summary.py#mint_validate ran four clauses
+    before a byte was written - the id is the next-free id, the cited bugs EXIST in governance/bug_status.json,
+    the payload NAMES at least one cited bug, the cited FILES exist, and the record is not a whole-payload clone
+    - and NONE of them asked whether some in-force decision (ACTIVE / RESOLVED / RATIFIED, config/decisions_policy.yaml#graph.in_force_states)
+    already OWNS a cited bug. Measured on the register today: BUG-630 is cited by 11 RATIFIED records, BUG-527 by
+    D-2674 (RATIFIED) plus D-2675/D-2676 (ACTIVE) - multi-owner bugs are already common, and a NEW one could be
+    added with no check and every rail green. That is the D-2646/D-328 class (two homes for one fact) aimed at the
+    OWNERSHIP axis: a bug is a claim that is either OPEN or OWNED, and two in-force owners is the register disagreeing
+    with itself (D-3034). (2) THE FIX, ONE ESCAPE. A fifth clause is added: for each cited bug, collect the in-force
+    decisions that own it, and REFUSE unless the new record explicitly supersedes them in a `supersedes:` field
+    - the reverse of `superseded_by`, a shape D2104 already carries, so no new shape is introduced - and each named
+    owner must RESOLVE to a record (a link to nothing is silence, D-3034/D-3216). A mint naming no owner when an
+    owner stands is refused; a mint naming the owner is accepted, and the supersession is COMPLETED by the existing
+    `--set-state <old> SUPERSEDED --superseded-by <new>` route (D-3216) - this clause only opens the door, it does
+    not walk the old record through it. (3) THE CLAUSE IS FORWARD-ONLY. It refuses the new record; it never rewrites
+    the measured past (the 11-owner BUG-630 stays as measured - history is corrected beside itself, never rewritten,
+    D-3034/D-3214). (4) THE MEASUREMENT. Eight known-answer controls cover the three states that matter: an in-force
+    owner is refused, the escape naming that owner is accepted (scalar AND list form), a supersedes naming no record
+    is refused, a non-in-force owner is tolerated, a bug no one owns is accepted, naming the WRONG owner does not
+    satisfy the cited bug, and two owned bugs require BOTH owners named. The full mint selftest is 48/48. (5) WHAT
+    THIS ACT DOES NOT DO. It does not retire any existing multi-owner bug (that is a separate audit and a POLICY
+    question of which owner stands); it does not change --set-state, --superseded-by or the successor_field; it
+    does not mint a new field shape (supersedes is pre-existing); and it does not reclassify anything.'
+  reason: 'Recorded FIRST, before the governance faces were synced, because it changes what the decision MINT may
+    accept: a policy change smuggled in as a bugfix is the drift this registry refuses (D-3038). State is ACTIVE,
+    not RATIFIED, because the owner ordered the anti-self-sabotage audit in-session and the change is applied and
+    control-covered; BUG-1101''s RATIFIED verdict is still owed, so the unambiguous in-force spelling is used (D-3034).'
+  files:
+  - scripts/recompute_decision_summary.py
+  evidence:
+  - 'BUG-1104 as measured: mint_validate''s four clauses check existence/naming/existence/clone, never ownership;
+    BUG-630 is cited by 11 RATIFIED records in the live register.'
+  - 'red loop: python3 scripts/recompute_decision_summary.py --selftest -> 48/48 known-answer controls fire, including
+    the 8 lineage controls (refuse an owned bug, accept the named-owner escape in scalar and list form, refuse a
+    supersedes naming nothing, tolerate a non-in-force owner, demand the RIGHT owner and BOTH owners).'
+  - 'deterministic layers: syntax PASS, the writer re-derives cleanly (--check rc 0), ruff reports only the 4 PRE-EXISTING
+    issues (I001 import block + 3x B905 zip) already present in the 119,095-char monolith before this change - none
+    introduced by this act.'

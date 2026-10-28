@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1345 decisions (census stamp aacb726315ff9e06, 2026-10-28) · 867 bugs (267 open / 600 closed; highest OPEN = BUG-1103) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1346 decisions (census stamp bf55c1d45b79f0dd, 2026-10-28) · 868 bugs (267 open / 601 closed; highest OPEN = BUG-1103) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1345 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 678 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1345, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1346 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 679 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1346, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
@@ -25416,3 +25416,57 @@ the two the owner chose. A model-store sweep that deletes bytes with NO verdict 
 - **(C) RECOMMENDED: keep the guard, record the gap, and split as a NAMED task.** The size guard is doing its job (refusing a verdict that would never exist, D-2956/C16). The honest state is: deterministic coverage (layers + selftest + mutation) for this one file, R5 unavailable until the split. Do NOT raise the cap and do NOT send the oversized source.
 
 **RE-OPEN / CLOSE CONDITION.** CLOSED when the writer is split into modules each under the deep-tier source cap AND each passes `r5_review_gate.py` (deep tier, gpt-oss) — at which point `writer_of_record` is updated to the new entrypoint and this bug closes with the split's receipt.
+
+## BUG-1104 (MED, OPEN 2026-10-28) — THE MINT GATE ASKS WHETHER A CITED BUG EXISTS, NEVER WHETHER A LIVE DECISION ALREADY OWNS IT: a second in-force owner can be minted silently, so the register can disagree with itself about who owns a bug
+
+**FOUND BY:** the owner-ordered audit of duplicate/unowned bug ownership (anti-self-sabotage). Cross-referencing every
+decision's `bugs:` field against `governance/bug_status.json` showed many OPEN bugs already cited by in-force
+decisions — e.g. **BUG-630 is cited by 11 RATIFIED records**, BUG-527 by D-2674 (RATIFIED) plus D-2675/D-2676
+(ACTIVE) — and the question became: what STOPS a new decision from minting a SECOND in-force owner for one of them?
+
+**THE MEASUREMENT (each read).**
+1. `scripts/recompute_decision_summary.py#mint_validate` runs four clauses before a byte is written: the id is the
+   next-free id, the cited bugs EXIST in `governance/bug_status.json`, the payload NAMES at least one cited bug, the
+   cited FILES exist, and the record is not a whole-payload clone. None of them asks whether some in-force decision
+   (ACTIVE / RESOLVED / RATIFIED, `config/decisions_policy.yaml#graph.in_force_states`) already owns a cited bug.
+2. So a record can be minted that cites a bug an in-force decision already owns, and every rail stays green: the
+   register then holds TWO in-force owners for one bug — the same fact claimed twice, with no home that answers
+   "who actually owns BUG-N" (D-3034).
+3. The measured register carries many such multi-owner bugs already. The defect is not that they exist; it is that
+   a NEW one can be ADDED silently, forward, with no check.
+
+**WHY THAT IS A BUG AND NOT A DESIGN NOTE.** A bug is a claim that is either OPEN (nobody owns the fix) or OWNED
+(an in-force decision does). Two in-force owners is the register disagreeing with itself — the D-2646/D-328 class
+(two homes for one fact) aimed at the OWNERSHIP axis rather than the count axis. The mint gate is the one moment the
+writer can refuse a second owner; every later reader can only report the disagreement it was allowed to author.
+
+**THE FIX (one escape, declared).** Add a LINEAGE clause to `mint_validate`: for each cited bug, collect the
+in-force decisions that own it; refuse unless the new record EXPLICITLY supersedes them in a `supersedes:` field
+(the reverse of `superseded_by`, a shape D2104 already carries), and each name must RESOLVE to a record. A mint that
+names no owner when an owner stands is refused; a mint that names the owner is accepted (the supersession is
+completed by the existing `--set-state <old> SUPERSEDED --superseded-by <new>` route). The clause is FORWARD-ONLY:
+it refuses the new record, it never rewrites the measured past.
+
+**WHY MED AND NOT HIGH:** no rail is currently wrong, no byte is at risk, and the check is forward-only. **WHY NOT
+LOW:** it is the one integrity check the mint writer can enforce that no later reader can, and "the register
+disagrees with itself about ownership" is exactly the drift this OS exists to refuse.
+
+**RE-OPEN/CLOSE CONDITION.** CLOSED when `mint_validate` refuses a record that cites a bug owned by an in-force
+decision unless the record's `supersedes:` names that owner (and resolves), with known-answer controls that SEE it
+fire and accept. A mint that lands a second in-force owner for a bug with no `supersedes:` re-opens this bug.
+
+## BUG-1104 (MED — FIXED 2026-10-28) — THE MINT GATE NOW CARRIES A LINEAGE CLAUSE: a record citing a bug an in-force decision already owns is REFUSED unless it names that owner in `supersedes:` (and the name resolves)
+
+**FIXED BY:** D-3220 (state ACTIVE — minted this sitting through the governed `--mint` route: `merged 1 record(s): D-3220 - total=1346, stamp bf55c1d45b79f0dd`). The code is `scripts/recompute_decision_summary.py#mint_validate` CLAUSE 5; the policy read is `config/decisions_policy.yaml#graph.in_force_states` (ACTIVE / RESOLVED / RATIFIED). This entry replaces the proposal above with what was actually built and measured; nothing from the discovery is retracted.
+
+**THE FIX (one escape, declared, FORWARD-ONLY).** `mint_validate` now runs a FIFTH clause after the existing four (next-free id, cited bugs exist, payload names a bug, cited files exist, not a whole-payload clone). `lineage_problems(record, decisions)` collects, for each cited bug, the in-force decisions that own it (state ∈ `graph.in_force_states`); any owner NOT named in the record's `supersedes:` field is a refusal. The escape is explicit supersession: the `supersedes:` field (a scalar or a list — the reverse of `superseded_by`, a shape D2104 already carries, so NO new record shape was introduced) must name the in-force owner(s) it replaces, and each name must RESOLVE to a record in the registry (a name that resolves to nothing is refused as "a supersession link that resolves to nothing"). It never rewrites the measured past (BUG-630's 11 RATIFIED owners are untouched) — it only refuses a NEW silent second owner.
+
+**THE MEASUREMENT (each read).**
+1. **Selftest 48/48** known-answer controls fire — 8 NEW lineage controls added on top of the prior 40, on a MINIATURE fixture (not the live register, so a control's answer never moves with the data): an in-force owner is refused; the same mint naming that owner in `supersedes:` is accepted; a scalar `supersedes:` accepts the same way; a `supersedes:` naming no record is refused; a non-in-force owner is tolerated; an unowned bug is accepted; naming the owner of a DIFFERENT bug does not satisfy the cited bug; two owned bugs require BOTH owners named.
+2. **Targeted suite green:** `pytest tests/test_decision_summary_sync.py` — **5 passed** in 9.65s.
+3. **The mint route itself was exercised end-to-end:** D-3220 was minted THROUGH the gate it now guards (`--mint` preview → `--apply`), producing total=1346 and regenerating `config/decisions_summary.json`.
+4. **No new ruff findings introduced.** The writer carries 4 PRE-EXISTING findings (I001 import order at line 64; 3× B905 `zip()` without `strict=` at 379/722/1668), present byte-identically in HEAD (line numbers shifted by the added code, findings unchanged).
+
+**R5 STATUS (honest, not claimed).** The full-file R5 verdict is UNAVAILABLE for this writer — it is 119,095 chars and gpt-oss produces no parseable verdict on it at any budget (BUG-1103, still OPEN, option C recorded). The lineage change is therefore covered by DETERMINISTIC layers only: syntax PASS, c11_c12 PASS, lint carries the 4 pre-existing findings above, and the 48/48 selftest + 5 targeted tests. This is exactly the "deterministic coverage for this one file, R5 unavailable until the split" state BUG-1103 option C declares; no scratch-review shortcut was taken (a scratch reviewer would be the BUG-1100 shape).
+
+**RE-OPEN CONDITION.** A mint that lands a second in-force owner for a bug with no `supersedes:` — i.e. a record that cites an owned bug and passes without naming the owner — re-opens this bug.

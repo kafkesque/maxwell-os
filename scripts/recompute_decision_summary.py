@@ -1344,6 +1344,10 @@ MINT_REQUIRED: tuple[str, ...] = ("id", "state", "category", "title", "decision"
 # and its receipt is a PREFIX rule, BUG-539) and it never counts it. Existence of a cited FILE is checked on
 # the machine that mints: a citation is a claim about the tree NOW, and the mint is the moment it is authored.
 MINT_BUGS_KEY: str = "bugs"
+#: The FORWARD supersession pointer a mint may carry (the reverse of `superseded_by`, which a SUPERSEDED record
+#: carries to name its replacement). D2104 already carries one `supersedes:` key, so the field is an ESTABLISHED
+#: shape, not a new one - the lineage rail below reads it as the ONLY escape from "one bug, one in-force owner".
+SUPERSEDES_KEY: str = "supersedes"
 MINT_PAYLOAD_KEYS: tuple[str, ...] = ("title", "decision", "rationale", "measured", "description", "verification")
 MINT_CLONE_PREFIX: int = 200
 BUG_REGISTER: Path = ROOT / "governance" / "bug_status.json"
@@ -1394,6 +1398,60 @@ def _bug_list(record: dict) -> list[str]:
     """Return the cited bugs as a list of strings - anything else is NOT a list and is reported as such."""
     bugs = record.get(MINT_BUGS_KEY)
     return [str(b) for b in bugs] if isinstance(bugs, list) else []
+
+
+def _supersedes_list(record: dict) -> list[str]:
+    """The in-force owners this record EXPLICITLY supersedes - a scalar or a list (D2104 carries one key)."""
+    val = record.get(SUPERSEDES_KEY)
+    if val is None:
+        return []
+    return [str(v) for v in val] if isinstance(val, list) else [str(val)]
+
+
+def in_force_states() -> list[str]:
+    """The states a citing site may REST on, read from the policy's ONE home (C12/D-2682), never re-typed."""
+    return [str(s).strip().upper() for s in (graph_rules().get("in_force_states") or [])]
+
+
+def lineage_problems(record: dict, decisions: list) -> list[str]:
+    """Every way a mint would SELF-SABOTAGE the lineage: cite a bug an in-force decision already owns, without
+    explicitly superseding that owner (the anti-self-sabotage rail).
+
+    WHY. MEASURED 2026-10-28: mint_validate checked that a cited bug EXISTS and that the payload NAMES it, but
+    never asked whether some LIVE decision already owns it - so a second in-force owner for one bug could be
+    minted with no notice, and the register would then disagree with itself about who owns the bug (D-3034: two
+    owners is the same fact claimed twice). The measured register carries many such multi-owner bugs (e.g. BUG-630
+    is cited by 11 RATIFIED records); the defect is not that they exist, it is that a NEW one can be ADDED silently.
+    The ONLY escape is EXPLICIT supersession: the new record names the in-force owner(s) it replaces in a
+    `supersedes:` field, and each name must RESOLVE to a record (a link to nothing is silence, D-3034/D-3216).
+    This clause is FORWARD-ONLY: it refuses the new record, it never rewrites the measured past.
+    """
+    problems: list[str] = []
+    bugs = [b for b in _bug_list(record) if b.strip()]
+    supersedes = {normalized_id({"id": s}) for s in _supersedes_list(record)}
+    index = {normalized_id(r): r for r in decisions if isinstance(r, dict)}
+    for s in _supersedes_list(record):
+        if normalized_id({"id": s}) not in index:
+            problems.append(SUPERSEDES_KEY + " " + s + " names no record in this registry - a supersession link "
+                            "that resolves to nothing answers 'what it replaced' with silence (D-3034/D-3216)")
+    force = in_force_states()
+    owners: dict[str, list[str]] = {b: [] for b in bugs}
+    for d in decisions:
+        if not isinstance(d, dict):
+            continue
+        if str(d.get("state") or "").strip().upper() not in force:
+            continue
+        for b in _bug_list(d):
+            if b in owners:
+                owners[b].append(str(d.get("id")))
+    for b in bugs:
+        still = sorted({o for o in owners[b] if normalized_id({"id": o}) not in supersedes})
+        if still:
+            problems.append(b + " is already OWNED by in-force decision(s) " + ", ".join(still)
+                            + " - a second in-force owner is the register disagreeing with itself; name the "
+                            "owner(s) it replaces in `" + SUPERSEDES_KEY + ":` or do not mint a new owner "
+                            "(anti-self-sabotage)")
+    return problems
 
 
 def mint_validate(record: dict, decisions: list, allow_gap: bool = False) -> list[str]:
@@ -1468,6 +1526,11 @@ def mint_validate(record: dict, decisions: list, allow_gap: bool = False) -> lis
             problems.append("is a WHOLE-PAYLOAD CLONE of " + str(other.get("id")) + " (same files, same bugs, same "
                             "payload opening) - that is the BUG-550 signature, not a coincidence (D-2660)")
             break
+    # CLAUSE 5 - LINEAGE. A bug may be OWNED by at most ONE in-force decision at a time; a mint that cites a bug
+    # an in-force decision already owns is the register disagreeing with itself, unless it EXPLICITLY supersedes
+    # that owner (a `supersedes:` field naming it, which must resolve). Checked LAST so the other clauses' defects
+    # are reported first and a lineage refusal is never masked by an earlier one.
+    problems += lineage_problems(record, decisions)
     return problems
 
 
@@ -1670,6 +1733,58 @@ def state_controls() -> list[tuple[str, bool]]:
     ]
 
 
+def lineage_controls() -> list[tuple[str, bool]]:
+    """Known-answer controls for the anti-self-sabotage LINEAGE clause (mint_validate CLAUSE 5).
+
+    The fixture is a MINIATURE registry, not the live one: the live register carries real multi-owner bugs
+    (BUG-630 -> 11 RATIFIED owners), so a control that borrowed the live set could only be satisfied by naming
+    every owner it happens to hold today - a control whose answer moves with the data is not a control. The three
+    fixture owners are chosen to cover the three states that matter: an in-force owner (refused), a second
+    in-force owner of a DIFFERENT bug (the escape must name the RIGHT owner), and a non-in-force owner (tolerated).
+    """
+    owners = [
+        {"id": "D-9001", "state": "ACTIVE", "bugs": ["BUG-9001"]},
+        {"id": "D-9002", "state": "RESOLVED", "bugs": ["BUG-9002"]},
+        {"id": "D-9003", "state": "SUPERSEDED", "bugs": ["BUG-9003"]},
+    ]
+    base = {
+        "id": "D-9004",
+        "state": "ACTIVE",
+        "category": "GOVERNANCE / RULES",
+        "title": "control record",
+        "decision": "a control payload naming the cited bug",
+        "bugs": ["BUG-9001"],
+        "files": ["scripts/recompute_decision_summary.py"],
+    }
+
+    def rec(**kw) -> dict:
+        b = dict(base)
+        b.update(kw)
+        return b
+
+    def fires(record: dict) -> bool:
+        return bool(lineage_problems(dict(record), owners))
+
+    return [
+        ("a mint citing a bug an IN-FORCE decision owns is REFUSED (anti-self-sabotage)",
+         fires(rec())),
+        ("the SAME mint naming that owner in `supersedes:` is ACCEPTED",
+         not fires(rec(supersedes=["D-9001"]))),
+        ("a scalar `supersedes:` naming the owner is ACCEPTED the same way",
+         not fires(rec(supersedes="D-9001"))),
+        ("a `supersedes:` naming a record that does NOT exist is REFUSED (a link to nothing)",
+         fires(rec(supersedes=["D-9999"]))),
+        ("a mint citing a bug owned by a NON-in-force decision is ACCEPTED (no owner stands)",
+         not fires(rec(bugs=["BUG-9003"]))),
+        ("a mint citing a bug NO decision owns is ACCEPTED",
+         not fires(rec(bugs=["BUG-9004"]))),
+        ("naming the owner of a DIFFERENT bug does not satisfy the cited bug's owner (the escape must be RIGHT)",
+         fires(rec(bugs=["BUG-9002"], supersedes=["D-9001"]))),
+        ("a mint citing TWO owned bugs must name BOTH owners",
+         fires(rec(bugs=["BUG-9001", "BUG-9002"], supersedes=["D-9001"]))),
+    ]
+
+
 def pin_controls() -> list[tuple[str, bool]]:
     """Known-answer controls for the PIN-SHRINK route (D-3218/BUG-1100); each is SEEN to accept or refuse.
 
@@ -1746,7 +1861,7 @@ def pin_controls() -> list[tuple[str, bool]]:
 
 def mint_selftest() -> int:
     """Run the mint gate's known-answer controls; return 1 if any control did NOT fire."""
-    rows = mint_controls() + state_controls() + pin_controls()
+    rows = mint_controls() + lineage_controls() + state_controls() + pin_controls()
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
     failed = [n for n, ok in rows if not ok]

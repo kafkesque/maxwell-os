@@ -33198,6 +33198,7 @@ decisions:
   created: '2026-10-27'
 - id: D-3170
   state: SUPERSEDED
+  superseded_by: D-3171
   category: MODEL PORTFOLIO / DECODE ACCELERATION
   title: 'Speculative decoding on M1 Max: native MTP is M5-TensorOps-only and REFUSED here; the M1-eligible path
     is mlx_lm draft+verify with a tokenizer-IDENTICAL draft (Qwen3.8-1.0B-A0.6B), and speculative decoding does
@@ -33226,6 +33227,7 @@ decisions:
   created: '2026-10-27'
 - id: D-3171
   state: SUPERSEDED
+  superseded_by: D-3175
   category: MODEL PORTFOLIO / DECODE ACCELERATION
   title: 'Speculative decoding for Qwen3.8-27B on M1 Max is REFUTED by measurement (BUG-1040): the hybrid ArraysCache
     cannot be rewound, so no draft+verify; the measured lever is prompt-cache reuse and the real bottleneck is PREFILL'
@@ -36170,3 +36172,233 @@ decisions:
   files:
   - config/capability_registry.yaml
   - config/decisions_summary.json
+- id: D-3215
+  date: '2026-10-28'
+  state: REJECTED
+  category: ROUTE GRAPH / OWNERSHIP (D-2941, D-2898, D-3034, D-3038, D-2644, D-3212, D-3214, BUG-1048, BUG-263)
+  bugs:
+  - BUG-1048
+  - BUG-263
+  title: 'A `config_layer` CAPABILITY IS NOT DECLARED - the owner HELD it (2026-10-28) on a measured reason and
+    not on taste: an all-config bucket would own 123 files and route the SAME 41 items as owning 30, so 93 of them
+    declare nothing, and the 41 routings it would make land on a desk that cannot fix them while a SHRINK-ONLY ceiling
+    locked the reading in'
+  decision: '(1) THE WORD AND WHAT IT REFUSES. On 2026-10-28 the owner answered the one-word gate with `hold config_layer`.
+    NO capability named config_layer is declared, at ANY of the three scopes that were measured and shown BEFORE
+    the word was asked: H1 MINIMAL (3 artifacts - scripts/check_config_defaults.py, config/derivations.yaml, config/config_defaults_census.json),
+    H2 CITED (H1 plus every unowned config yaml any open item cites = 30), H3 ALL (123 = every unowned config yaml
+    in the tree). Naming all three is the point of this clause: a later session proposing only the "honest" minimal
+    scope must not read this record as having approved it. (2) THE ARITHMETIC, taken from the route rail''s OWN
+    reader and not from a second copy of it (D-2642 - both simulators import resolve_route.world()/outcome()): config
+    yaml tracked 140, owned 19, UNOWNED 121, of which 27 are cited by an open item; H1 owns 3 and routes 1 item,
+    H2 owns 30 and routes 41, H3 owns 123 and routes 41. The marginal 93 files of H3 route ZERO items - D-3034''s
+    residual-bucket failure measured one size larger, because a declaration that owns a directory owns nothing in
+    particular and here it owns 93 files that route nothing at all. (3) WHY EVEN THE HONEST SCOPE IS REFUSED RATHER
+    THAN GRANTED. H1''s one item is T-113, and T-113''s evidence names config/config_defaults_census.json - the
+    census of a rail that ALREADY has a home, because rail_registry owns scripts/check_config_defaults.py. Minting
+    a 28th capability to route one item whose instrument is already owned is a naming fix, not an ownership gap,
+    and T-113''s real repair (pay the 71 keys BUG-758/D-2982 revealed, by module, the ceiling lowering per wave)
+    already sits on a mover''s lane. (4) THE CEILING IS WHY THE REFUSAL IS THE SAFE SIDE. Routing debt may only
+    SHRINK (D-2644), so approving the bucket would ratify 68 -> 27 (bugs) on 41 routings that land on the wrong
+    desk, MEASURED against the register''s own text: BUG-1048 (R5 review coverage silently depends on FILE LENGTH,
+    cites config/hardware_profile.yaml) and BUG-263 (the S2 cross-family relabel produces NOTHING under gpt-oss,
+    cites config/pipeline_config.yaml) would both be filed to a config-defaults rail that can fix neither - and
+    undoing that needs a decision plus a citation, which is paying twice for one mistake. Under HOLD the debt stays
+    at 68/68 (bugs) and 14/14 (tasks), which a ceiling permits: a ceiling is a maximum, never a reading to be matched.
+    (5) WHAT DOES NOT CHANGE. The 82 items that were held were held for the owner''s word; they stay held BY that
+    word and no longer by a missing route. No item is closed, no disposition is edited, and no reason is invented
+    for the 41 (a disposition is not a closure, D-3038). Measured: the hold changes NO byte of config/capability_registry.yaml,
+    which is itself the evidence that the bucket was not load-bearing - nothing that was green went red for want
+    of it. This record does NOT weaken D-3214: that owner-approved rule gives a config file to the capability whose
+    own entrypoint, check or receipt NAMES it, one file at a time, and refusing the wildcard IS that rule rather
+    than an exception to it. (6) WHAT IS REGISTERED AS UNSPENT (D-3038). A second, smaller proposal was placed on
+    the same desk and the owner spent no word on it: `approve rail-family` - join each config/<stem>.yaml to the
+    capability that already owns scripts/(check|audit)_<stem>.py by stem, which is 7 files over 1 capability (encoding_homes,
+    register_divergence, serving_gate, silent_repair, store_authority, store_columns, undeclared_encoding), routes
+    exactly 1 item (BUG-525) and declares 0 inert files. Silence is neither consent nor refusal (D-2941/D-2645),
+    so it stays UNSPENT and needs its own word; it is written down here so that it survives temp/ being swept, because
+    temp/ is scratch by D-3214''s own rule. (7) RE-OPEN CONDITION, the accepted-negative idiom this repository already
+    uses for BUG-390 and BUG-864: this re-opens only on a capability proposal whose OWN entrypoint, check and receipt
+    NAME the config files it would own - a real family of the shape rail_registry''s 25 named entries have - never
+    on a directory claimed whole; or on a material change in the census of unowned config artifacts cited by open
+    items. A rejection WITH a door is a decision; a rejection without one is a silence wearing the same clothes.'
+  reason: 'The owner asked for the one-word gate to be explained noob-proof, for both options in plain mechanics,
+    and for a senior recommendation - then answered it himself in one word. Everything before that word was measured
+    rather than argued: the three scopes came from the route rail''s own outcome(), and the 41 routings were enumerated
+    item by item instead of summarised. Two numbers in the same day''s owner brief were MISPRINTED and were corrected
+    in the brief''s own section 6 rather than silently rewritten (D-3034): the "27 unowned config yaml" is the count
+    CITED by open items rather than the 121 unowned in the tree, and "9 items routed" is 41 at cited scope and 1
+    at the honest scope, the 9 being unreproducible against the live reading. The recommendation delivered was HOLD
+    on four grounds - the bucket is the fault and not the fix, 41 wrong-desk routings would be ratified by an irreversible
+    ceiling, the honest scope buys exactly one item, and the real gap is a missing capability FAMILY rather than
+    a missing route - and the owner took it. The alternative readings that were refused are named here so that no
+    future session has to re-derive why: a bucket is not an owner (D-3034), and an agent may not sign for ownership
+    (D-2941).'
+  files:
+  - config/capability_registry.yaml
+  - config/decisions_policy.yaml
+  - scripts/resolve_route.py
+  - temp/config_layer_sim.py
+  - temp/config_layer_sim.json
+  - temp/rail_family_sim.py
+  - temp/rail_family_sim.json
+  - temp/GATE_config_layer_20261028.md
+  evidence:
+  - 'temp/config_layer_sim.py -> temp/config_layer_sim.json: unowned_config_yaml_total 121 (140 tracked, 19 owned);
+    cited by an open item 27; H1_minimal owns 3 -> newly_routed 1 (T-113) / still_unrouted 163; H2_cited owns 30
+    -> newly_routed 41 / still_unrouted 123; H3_all owns 123 -> newly_routed 41 / still_unrouted 123 - the SAME
+    41'
+  - 'temp/rail_family_sim.py -> temp/rail_family_sim.json: 7 config files resolvable to rail_registry by stem (encoding_homes,
+    register_divergence, serving_gate, silent_repair, store_authority, store_columns, undeclared_encoding), 114
+    unresolved, 1 item newly routed (BUG-525), 0 inert declarations - THE UNSPENT PROPOSAL of clause (6)'
+  - 'the rail itself, unchanged before and after the word: scripts/resolve_route.py --check green with routing debt
+    tasks 14/14 and bugs 68/68 - the measure a bucket would have moved and the hold does not'
+  - 'the instruments above are SCRATCH by D-3214''s own rule (temp/ is not an artifact), so every number they produced
+    is quoted in clauses (2) and (6): this record re-reads without them'
+  - 'the two items named in clause (4) were read out of the live register, not recalled: BUG-1048 (MED, OPEN 2026-10-27)
+    and BUG-263 (MED, OPEN 2026-10-25, divergence adjudicated) both carry their config artifact in their own evidence
+    text'
+  - 'D-3214 was read before this record was written: the owner-approved rule is per-file by CITATION, so the hold
+    is that rule applied, never a reversal of it'
+- id: D-3216
+  date: '2026-10-28'
+  state: RATIFIED
+  category: GOVERNANCE / DECISION REGISTRY (BUG-1099, D-2645, D-2644, D-2642, D-2972, D-3034, D-3035, D-2644)
+  bugs:
+  - BUG-1099
+  title: 'A SUPERSESSION IS A LINK THE TRANSITION MUST CARRY - `--set-state <D> SUPERSEDED` now REQUIRES `--superseded-by
+    <D>` in the same governed write, and a SUPERSEDED record that names a RESOLVABLE successor is a VOICE rather
+    than the silence D-2645 forbids: BUG-1099''s two red rails are one root and get one fix'
+  decision: '(1) THE CONTRACT, and the defect it closes. BUG-1099 MEASURED that `--set-state <D-id> SUPERSEDED --because
+    <D-id>` splices the state ALONE, while reconcile requires every SUPERSEDED record to carry a `superseded_by`
+    that RESOLVES and calls the pin list the only escape - and that pin list may only SHRINK (D-2645). The two obligations
+    are therefore JOINTLY UNSATISFIABLE for any record retired after the 2026-09-27 pin measurement, which is exactly
+    what happened twice (D-3170, D-3171). The fix is not a bigger pin (that is corruption by tool) and not a hand-edit
+    of an append_only registry (that is an illegitimate write even when the fact is right - and it was already legitimately
+    authored ONCE, by the route, without the link). The fix is that the TRANSITION CARRIES its successor. `set_state_plan`
+    gains a successor and REFUSES: a SUPERSEDED target with no successor (a retirement that names no replacement
+    is the BUG-1099 shape itself); a successor on a transition to any other state (a link that no state reads is
+    a declaration with no referent, D-3034); a successor that is not an existing record id; a successor that IS
+    the target (a self-link is a chain that goes nowhere); and a record that ALREADY carries a successor that differs
+    (one supersession, one link - a second link silently makes the first false). (2) THE GUARANTEE IS EXTENDED,
+    NOT WEAKENED, AND IT IS STILL PROVEN RATHER THAN ASSERTED. The splice now moves TWO DECLARED CELLS of ONE record,
+    and it re-proves the same four facts it proves today plus one: the line arithmetic is exactly one line REPLACED
+    and one line INSERTED; the registry ID SET did not move; NO other record changed by any key; NO other key of
+    the target moved (the allowed diff is exactly {state, superseded_by}); the record COUNT did not move; and the
+    record PARSES BACK carrying the successor it was given. A cell this route cannot read is still a cell it refuses
+    to rewrite (C16). (3) WHY NO CHAIN-WALK RULE IS ADDED, and this is a measured argument rather than an omission:
+    a middle link (D-3170 -> D-3171, where D-3171 is itself SUPERSEDED) is LEGAL because reconcile tests EVERY superseded
+    record INDEPENDENTLY - D-3171 must itself carry a resolvable successor - so the chain is forced complete by
+    the rule that already exists, and a walk to a terminal would add a second way to say the same thing (D-2642).
+    (4) THE SECOND RAIL SPEAKS THE SAME FACT. check_revoked_references fails a SUPERSEDED record that is not pinned
+    with "new debt may not be declared by silence (D-2645)" - its own words. A record that CARRIES a resolvable
+    successor is not silent: it has spoken, in the field the policy already declares (config/decisions_policy.yaml#graph.successor_field).
+    So the rail accepts a resolvable successor as a VOICE for the SUPERSEDED state. ARCHIVED keeps the pin requirement
+    in full, because it has no successor field and its declaration is a different fact. A PINNED record that later
+    names a successor becomes a STALE pin and the rail says so - which is not a new rule but the rule reconcile.supersession_stale_pins
+    has applied since BUG-542 ("now names a successor"), and a shrink needs no citation (D-2644). (5) ONE HOME FOR
+    THE PREDICATE (D-2642). successor_resolves() is added to scripts/reconcile.py, which already owns the successor
+    vocabulary, and BOTH rails call it; neither re-implements it, and no third copy is created in a new module -
+    a new file under scripts/ would itself be an UNOWNED artifact, which is a cost this act refuses to pay for a
+    six-line predicate. (6) THE REPAIR THIS RECORD ORDERS AND SPEAKS, which is the licence the in-place route demanded
+    before it would move a receipted region (D-2972): D-3170 -> D-3171 (D-3170 declared mlx_lm draft+verify as the
+    M1-eligible route and gave a command before that command had ever run; D-3171 IS the measurement that ran it
+    and refuted it, so the successor is a fact already written down, not a judgement made here) and D-3171 -> D-3175
+    (D-3171''s structural verdict - "no draft+verify, the hybrid cache cannot be rewound" - is REMOVED by D-3175''s
+    measured upstream-PR-1821 arm, while D-3175 KEEPS the verdict that survives: 1.7-3.8x SLOWER decode and native
+    MTP at 1.54x, with D-3177 carrying the MTP numbers). Both repair links are stated with their SCOPE, because
+    a supersession replaces a VERDICT and never re-runs a measurement: what D-3171 measured about prefill and prompt-cache
+    reuse is not un-measured by D-3175, and what D-3175 corrects is the impossibility claim. (7) WHAT THIS DOES
+    NOT DO: it does not touch the 12 pinned supersession ids or the 24 revocation legacy ids - both stay exactly
+    as measured on 2026-09-27, and D-2645''s shrink-only rule is respected by adding NOTHING to either; it re-decides
+    nothing that D-3170, D-3171, D-3175 or D-3177 measured; it does not make a state transition possible without
+    a licence (`--because <D-id>` is still refused first, before any no-op branch); and it does not close BUG-1099
+    until the two repairs are applied and both rails are re-run green.'
+  reason: 'BUG-1099 was logged as a CLASS rather than an instance once the population was counted: the whole set
+    of SUPERSEDED records naming no resolvable successor is exactly TWO ids, both created after the pin measurement,
+    and both rails that fail on them are red for that one root. Two remedies were explicitly REFUSED before this
+    one was taken: growing a shrink-only pin list (that would make a receipted measurement describe a reality it
+    no longer describes), and hand-editing the append_only registry (a correct FACT written by an illegitimate route
+    is still an illegitimate write, and the next session could not tell it apart from drift). What remained is the
+    only structural answer: make the governed transition incapable of producing the defect again, then repair the
+    two instances through that same governed path, so the repair is itself an instance of the rule rather than an
+    exception to it. The work is ordered decision-first because it changes a governed WRITER''s contract - a contract
+    change smuggled in as a bugfix is the drift this registry exists to refuse (D-3038).'
+  files:
+  - scripts/recompute_decision_summary.py
+  - scripts/check_revoked_references.py
+  - scripts/reconcile.py
+  - config/decisions_policy.yaml
+  - config/decisions.yaml
+  - governance/buglog.md
+  evidence:
+  - 'the two red rails, read at 2026-10-28 before this record: FAIL check-revoked-references: D-3170 is SUPERSEDED
+    and is NOT in legacy_debt_ids - new debt may not be declared by silence (D-2645); FAIL reconcile: decision_supersession_complete:
+    2 SUPERSEDED record(s) name no RESOLVABLE successor [D-3170, D-3171]'
+  - 'the population was COUNTED, not assumed: the only SUPERSEDED records whose superseded_by does not resolve are
+    D-3170 and D-3171, and no record on disk carries a superseded_by at all - so clause (4)''s stale-pin branch
+    cannot fire on the 12 pins today, measured rather than hoped'
+  - 'config/decisions_policy.yaml#graph declares successor_field superseded_by and supersession_state SUPERSEDED
+    already, so this act adds NO new vocabulary: it makes the declared field WRITABLE by the one route allowed to
+    move a state'
+  - 'in_force_states is [ACTIVE, RESOLVED, RATIFIED] and not_in_force_states includes SUPERSEDED and REJECTED, read
+    from the policy before this record was minted - so a RATIFIED licence is in force and a REJECTED refusal is
+    not '
+- id: D-3217
+  date: '2026-10-28'
+  state: RATIFIED
+  category: GOVERNANCE / DECISION REGISTRY (BUG-1099, D-3216, D-2645, D-2644, BUG-542, BUG-575)
+  bugs:
+  - BUG-1099
+  title: FOUR REVOCATION PINS SHRINK 24 -> 20 because each one's debt is already paid by a LINK - the voice branch
+    of BUG-1099/D-3216 exposed them the moment the first fault stopped hiding the second, and D-3216's own clause
+    (7) snapshot is corrected here in the open rather than left to rot
+  decision: '(1) THE MEASUREMENT THAT FORCED THIS ACT. With clause (4) of D-3216 in force, check_revoked_references
+    stopped at its STALE branch instead of its missing-declaration branch and reported: "legacy_debt_ids lists [''D2100'',
+    ''D2253'', ''D2294'', ''D2296''], which is no longer a blockless SUPERSEDED/ARCHIVED record". Each of the four
+    CARRIES a RESOLVABLE successor - D2100 -> D2094, D2253 -> D2362, D2294 -> D2298, D2296 -> D2298 - so each pin
+    is a declaration whose debt is already PAID by a link, and D-2645 says such a list may only SHRINK. This was
+    not a new defect introduced by the fix: the rail fails closed on its FIRST fault (SystemExit), so for as long
+    as D-3170 was the first fault these four were never reached. Stopping the first fault is what made the second
+    visible, which is the ladder doctrine (BUG-573) rather than a surprise. (2) THE SHRINK, exactly. legacy_debt_ids
+    goes 24 -> 20 by REMOVING those four ids and nothing else. No id is added, no record is re-pinned, no record''s
+    state or link is touched, and the list still pins BY IDENTITY and never by a count. (3) THE CORRECTION OF D-3216
+    CLAUSE (7), stated in the open because a governed registry may not be quietly rewritten (D-3034/D-3214''s own
+    precedent): that clause asserted the 24 revocation pins "stay exactly as measured on 2026-09-27", and the measurement
+    in (1) falsified that SNAPSHOT within the same sitting. What clause (7) MEANT - that no pin is GROWN and no
+    debt is laundered by tool - is untouched and is the rule that survives: the 12 supersession pins are unchanged,
+    nothing was added to either list, and this act moves in the one direction D-2645 already requires. A snapshot
+    that the same sitting''s own measurement outdates is corrected where a reader can see it, never edited out of
+    the record that made it. (4) WHY THE STRICT BRANCH IS KEPT rather than relaxed to avoid this work. The cheapest
+    way to keep the 24 alive would have been to add a pinned record to seen_legacy whether or not it speaks - which
+    is the same corruption-by-tool that BUG-1099 refused twice (a bigger pin, a hand-edit). A pin that outlives
+    its subject is the BUG-542 shape reconcile already fails for the supersession pin list; relaxing the revocation
+    list to escape it would have made two rails disagree about one rule. (5) A NAMED LIMITATION, not hidden. Because
+    a supersession carries ONE link and a differing successor is refused, a WRONG link is not repairable by the
+    governed route. That strictness is deliberate - a repairable link is a laundering door, since any session could
+    re-point a retirement at nothing - and the escape for a genuinely mistaken link is a NEW decision declaring
+    the correction, for which no route exists yet. It is written down here so the next session inherits a constraint
+    instead of discovering it as a surprise. (6) WHAT WAS NOT DONE. Nothing was re-decided: the four records already
+    carried their successors before this act wrote a byte, and the only thing removed is the duplicate declaration
+    that said so a second time.'
+  reason: 'This act exists because the honest implementation of D-3216 produced a finding that the licence could
+    not have predicted: the licence''s own clause (7) named a number it expected to stay fixed, and the fix moved
+    it. The alternatives were both forms of drift - leave the rail red (a permanent red teaches a session to read
+    red as normal, which is the failure the ladder exists to prevent), or relax the branch that found the debt (corruption
+    by tool, refused twice in BUG-1099). So the licence came first, by mint, and the policy edit follows it, so
+    the governed list moves under a record that names the act and its arithmetic rather than in a maintenance commit
+    nobody reads.'
+  files:
+  - config/decisions_policy.yaml
+  - scripts/check_revoked_references.py
+  - config/decisions.yaml
+  evidence:
+  - 'the rail, before this act: FAIL check-revoked-references: legacy_debt_ids lists [''D2100'', ''D2253'', ''D2294'',
+    ''D2296''], which is no longer a blockless SUPERSEDED/ARCHIVED record - the list may only shrink (D-2645)'
+  - 'the four, read out of config/decisions.yaml after the act and not from memory: D2100 SUPERSEDED -> D2094, D2253
+    SUPERSEDED -> D2362, D2294 SUPERSEDED -> D2298, D2296 SUPERSEDED -> D2298 - all four links were authored by
+    earlier sittings and all four RESOLVE'
+  - 'the reason they were invisible until now: check_revoked_references raises SystemExit on its FIRST fault, so
+    the missing-declaration fault at D-3170 short-circuited the stale-pin scan that would have reported these four'
+  - 'no other reader consumes legacy_debt_ids: measured by grepping the tree - only scripts/check_revoked_references.py
+    reads it, and the "24" in governance/SESSION-HANDOFF-2026-09-26.md is a dated handoff, not a live declaration'

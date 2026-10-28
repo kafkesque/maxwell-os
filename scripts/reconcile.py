@@ -240,9 +240,37 @@ def _token(rec: dict) -> str:
     return str(rec.get("id") or "").strip().replace("D-", "D").upper()
 
 
+def record_token(record: dict) -> str:
+    """The PUBLIC spelling of the id comparison, for another rail that must build the same set (D-2642/C21).
+
+    check_revoked_references has to recognise that a successor RESOLVES, and 'resolves' is defined once, here.
+    Publishing this one-liner is cheaper than letting a second rail invent its own token rule and cheaper than a
+    shared module that would itself be a new unowned artifact under scripts/ (D-3216 clause 5).
+    """
+    return _token(record)
+
+
 def _pinned(rules: dict, key: str) -> list[str]:
     """A pin list, in the order the policy declares it - the order the stale report reads in."""
     return [str(x) for x in (rules.get(key) or [])]
+
+
+def successor_resolves(record: dict, rules: dict, known: "set[str]") -> bool:
+    """True when a record SPEAKS a successor AND that successor RESOLVES (D-3216/BUG-1099, one home, D-2642).
+
+    This is the ONE implementation of "a retirement has named its replacement": supersession_gaps asks it for the
+    verdict on every SUPERSEDED record, supersession_stale_pins asks it for the pin that outlived its subject, and
+    check_revoked_references asks it to tell a VOICE apart from the silence its own failure message forbids. Two
+    copies of this predicate would drift apart exactly as the writer and the reader did in BUG-1099.
+
+    FAIL-CLOSED on shape: a successor that is not a scalar is not a link (BUG-626), so it does not resolve; an
+    absent or blank one is silence, not a link.
+    """
+    field = str(rules.get("successor_field") or "superseded_by")
+    raw = record.get(field)
+    if not isinstance(raw, str) or not raw.strip():
+        return False
+    return bool(_resolves_citation(_citation_token(raw), known))
 
 
 def supersession_gaps(recs: list[dict], rules: dict) -> list[str]:
@@ -251,7 +279,6 @@ def supersession_gaps(recs: list[dict], rules: dict) -> list[str]:
     'What replaced X' must be answerable by a machine, so a retirement must carry its successor as a LINK. The
     pinned ids are the debt measured before the rule: pinned BY IDENTITY so the list can only SHRINK (D-2645).
     """
-    field = str(rules.get("successor_field") or "superseded_by")
     state_word = str(rules.get("supersession_state") or "SUPERSEDED")
     pinned = {_citation_token(x) for x in _pinned(rules, "pinned_supersession_ids")}
     known = {_token(r) for r in recs}
@@ -259,11 +286,7 @@ def supersession_gaps(recs: list[dict], rules: dict) -> list[str]:
     for r in recs:
         if _norm_state(r) != state_word or _token(r) in pinned:
             continue
-        raw = r.get(field)
-        if raw is not None and not isinstance(raw, str):  # BUG-626: successor must be scalar-or-absent
-            gaps.append(str(r.get("id")))
-            continue
-        if not _resolves_citation(_citation_token(raw), known):
+        if not successor_resolves(r, rules, known):
             gaps.append(str(r.get("id")))
     return gaps
 
@@ -274,7 +297,6 @@ def supersession_stale_pins(recs: list[dict], rules: dict) -> list[str]:
     The idiom is config/decisions_policy.yaml#revocation.legacy_debt_ids: a listed id that now carries a
     declaration, or no longer exists, is a STALE declaration and fails the rail.
     """
-    field = str(rules.get("successor_field") or "superseded_by")
     state_word = str(rules.get("supersession_state") or "SUPERSEDED")
     by = {_token(r): r for r in recs}
     known = set(by)
@@ -285,7 +307,7 @@ def supersession_stale_pins(recs: list[dict], rules: dict) -> list[str]:
             stale.append(x + " (no such record)")
         elif _norm_state(rec) != state_word:
             stale.append(x + " (state is now " + _norm_state(rec) + ")")
-        elif _resolves_citation(_citation_token(rec.get(field)), known):
+        elif successor_resolves(rec, rules, known):
             stale.append(x + " (now names a successor)")
     return stale
 

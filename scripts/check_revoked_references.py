@@ -48,6 +48,13 @@ EXIT_UNRESOLVABLE = 2
 FIXTURE_TOKEN = "fixture_revoked_token_zz"
 FIXTURE_IDS = ("D-9199", "D-9198")   # BUG-523: inside reserved_fixture_ids, never live-space
 
+#: The ONE home of "a retirement has named its replacement" (D-2642/D-3216). This rail used to demand a PIN for
+#: every SUPERSEDED record and called the rest silence - while reconcile demanded a LINK and the pin list may only
+#: SHRINK (D-2645), so the two rails were jointly unsatisfiable for any record retired after 2026-09-27 (BUG-1099).
+#: A record that CARRIES a resolvable successor is not silent: it has spoken, and both rails now read that one fact.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from reconcile import record_token, successor_resolves  # noqa: E402
+
 
 def load_yaml(path: Path) -> Any:
     """Load a YAML document or FAIL CLOSED (C16): a rail may not read its own subject leniently."""
@@ -165,6 +172,11 @@ def revoked_subject(policy: dict) -> tuple[list[str], dict[str, str]]:
     The revocation is declared with PREFIXED SCALAR KEYS (audit F2, MEASURED 2026-09-25): none of the 780
     records carries a mapping-shaped value, so a prefixed key adds no new shape to a governed registry and
     remains greppable without parsing YAML.
+
+    A SUPERSEDED record that CARRIES a RESOLVABLE successor is a VOICE and needs no pin (D-3216/BUG-1099): this
+    rail's own failure message forbids debt declared by SILENCE, and a record naming its replacement has spoken.
+    ARCHIVED keeps the pin requirement in full - it carries no successor field, so its declaration is a different
+    fact - and a pinned record that later names a successor becomes a STALE pin, because the list may only shrink.
     """
     data = load_yaml(DECISIONS)
     rules = declared(policy, "revocation", "config/decisions_policy.yaml")
@@ -176,7 +188,10 @@ def revoked_subject(policy: dict) -> tuple[list[str], dict[str, str]]:
     tokens: list[str] = []
     provenance: dict[str, str] = {}
     seen_legacy: set[str] = set()
-    for record in declared(data, "decisions", "config/decisions.yaml") or []:
+    graph_rules = declared(policy, "graph", "config/decisions_policy.yaml")
+    records = [r for r in (declared(data, "decisions", "config/decisions.yaml") or []) if isinstance(r, dict)]
+    known = {record_token(r) for r in records}
+    for record in records:
         rid = str(record.get("id") or "").strip()
         state = str(record.get("state") or "").strip().upper()
         fields = {str(f): record.get(prefix + str(f)) for f in required}
@@ -215,8 +230,14 @@ def revoked_subject(policy: dict) -> tuple[list[str], dict[str, str]]:
             tokens.append(rid)
             provenance[rid] = rid
         elif state in legacy_states:
-            if rid in legacy_ids:
+            speaks = successor_resolves(record, graph_rules, known)
+            if rid in legacy_ids and not speaks:
                 seen_legacy.add(rid)
+            elif speaks:
+                # A VOICE, not silence: the record has named the record that replaced it, in the field the policy
+                # already declares. A PIN alongside it would then be a declaration that outlived its subject, and
+                # the stale branch below says so - the list may only SHRINK (D-2645).
+                pass
             else:
                 raise SystemExit(
                     f"FAIL {PREFIX}: {rid} is {state} and is NOT in legacy_debt_ids - new debt may not "

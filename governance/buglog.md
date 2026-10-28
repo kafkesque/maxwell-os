@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1340 decisions (census stamp 89662d732596d36f, 2026-10-28) · 863 bugs (266 open / 597 closed; highest OPEN = BUG-1099) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1343 decisions (census stamp 12c956463e15a3ee, 2026-10-28) · 864 bugs (266 open / 598 closed; highest OPEN = BUG-1100) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1340 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 151 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 13 — the DECLARED buckets sum to the whole register (1340, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1343 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 676 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1343, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 266 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 135 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 266 open.
 >
@@ -25072,3 +25072,129 @@ THE FIX THIS BUG PROPOSES (not yet applied — it changes a governed writer's co
 
 STATE: OPEN. Nothing was changed to write this entry. The registry, the policy and both rails are exactly as they
 were; this is the discovery, its measurement, and the refused remedies.
+
+## BUG-1099 (MED — CLOSED 2026-10-28) — THE TRANSITION NOW CARRIES ITS SUCCESSOR: both red rails are green, the two legacy records were repaired THROUGH the governed route, and the voice rule immediately exposed four redundant pins
+
+**Closed by D-3216 (the contract) and D-3217 (the pin shrink it forced).** This entry replaces the proposal in the
+entry above with what was actually built and measured. Nothing from the discovery is retracted; the entry above
+stays as the finding.
+
+**1. THE CONTRACT, BUILT (D-3216).** `scripts/recompute_decision_summary.py --set-state` now takes
+`--superseded-by <D-id>` and splices the LINK in the SAME governed write as the state, so there is no instant at
+which the registry holds a retirement whose replacement cannot be named. It REFUSES, before a byte moves: a
+transition to `SUPERSEDED` with no successor (the defect itself); a successor on any other state (a link no reader
+consults); a successor that names no record; a successor that IS the target; and a successor that would silently
+REPLACE one already written ("one supersession, one successor"). The guarantee it proves was extended, not
+weakened: exactly ONE line REPLACED and at most ONE line INSERTED, with the head and tail compared as REGIONS (a
+zip would re-align after an insertion and hide a moved line), the registry ID SET unmoved, no other record changed
+by any key, no key of the target moved outside `{state, superseded_by}`, the record count unmoved, and the record
+must READ BACK the successor it was given.
+
+**2. THE SECOND HOLE THIS FOUND, AND IT WAS OURS.** MEASURED while building the route: `D-3170` and `D-3171`
+ALREADY read `SUPERSEDED`, so the existing "a transition that moves nothing is a stale declaration (D-405)" clause
+would have refused the only two records the fix exists to repair — prevention for the future, unrepairable past. So
+`link_only_repair()` was added: a record already in the supersession state that carries NO link may be given one,
+and the splice must then prove that the state cell was rewritten without changing, distinguishing a real link-only
+repair from a splice that quietly failed to move the state. Both are known-answer controls.
+
+**3. THE REPAIR, THROUGH THAT ROUTE (not by hand, not by pin).**
+`--set-state D-3170 SUPERSEDED --superseded-by D-3171 --because D-3216` : PRE 2,178,944 B -> POST 2,178,968 B, a
+delta of exactly **24 bytes = the one inserted line** `  superseded_by: D-3171`.
+`--set-state D-3171 SUPERSEDED --superseded-by D-3175 --because D-3216` : 2,178,968 -> 2,178,992, the same 24-byte
+delta. Stamp `2a2fd4ca2304fcb1 -> ea0aec41b90cc1fe -> f8cd4995afae6433`, census re-derived from the bytes on disk
+in each invocation. The successor in both cases is a FACT ALREADY ON DISK (D-3171 is the measurement that refuted
+D-3170; D-3175 removes D-3171's impossibility claim by measurement) — this bug wrote no verdict, it wrote a LINK.
+
+**4. THE READER SPEAKS THE SAME FACT (D-3216 clause 4).** `scripts/check_revoked_references.py` now accepts a
+RESOLVABLE successor as a VOICE for `SUPERSEDED` — its own failure message forbids debt declared by SILENCE, and a
+record that names its replacement has spoken. `ARCHIVED` keeps the pin requirement in full (it has no successor
+field). The predicate has ONE home: `reconcile.successor_resolves()`, called by both rails; `supersession_gaps()`
+and `supersession_stale_pins()` were refactored onto it rather than a second copy being made (D-2642).
+
+**5. THE FOURTH FINDING — a rail that fails on its FIRST fault hides the rest.** With the voice branch in force the
+rail stopped at its STALE branch instead of its missing-declaration branch: `legacy_debt_ids` listed `D2100`,
+`D2253`, `D2294`, `D2296`, each of which CARRIES a resolvable successor (`D2100 -> D2094`, `D2253 -> D2362`,
+`D2294 -> D2298`, `D2296 -> D2298`). Those four were invisible for as long as D-3170 raised first. They are exactly
+the four the policy's own 2026-09-25 note recorded as "4 carry superseded_by". **D-3217** shrinks the list
+24 -> 20: nothing added, no id re-pinned, no record touched, and the dated measurement above the list is left as
+measured with the change recorded beside it. D-3216's own clause (7) snapshot ("the 24 stay exactly as measured") is
+corrected THERE, in the open, rather than quietly rewritten — a snapshot the same sitting's measurement outdates is
+corrected where a reader can see it.
+
+**6. RECEIPTS (all re-run after the last write).**
+- `python3 scripts/reconcile.py --check` -> rc 0, "13 declared object(s) agree with reality", supersession gaps
+  2 -> 0, stale pins 0.
+- `python3 scripts/check_revoked_references.py` -> rc 0, "8 revoked token(s) named by no live file (789 of 792
+  declared file(s) scanned)".
+- `python3 scripts/recompute_decision_summary.py --selftest` -> **33/33** controls fire, six of them new: SUPERSEDED
+  without a successor refused; unknown successor refused; self-link refused; successor on a non-supersession state
+  refused; a differing successor already on the record refused; a valid supersession accepted AND read back; the
+  link-only repair accepted; a replay of it refused as a stale no-op.
+- `python3 scripts/recompute_decision_summary.py --check` -> registry records-only, 1,343 decisions, stamp
+  `12c956463e15a3ee`, census describing those exact bytes.
+
+**7. NAMED, NOT HIDDEN — two limitations this fix creates or exposes.**
+(a) **A WRONG link is not repairable by this route**, because a differing successor is refused. That strictness is
+deliberate — a re-pointable link is a laundering door any session could walk through — and the escape for a
+genuinely mistaken link is a NEW decision declaring the correction, for which no route exists yet. Inherited as a
+constraint, not discovered as a surprise.
+(b) **`config/decisions_policy.yaml` has NO entry in `config/artifact_ownership.yaml` and no writer route at all**
+(the canonicalise route PRINTS its pin-shrink obligation and never writes it). The 24 -> 20 shrink therefore had to
+be a byte-splice from a scratch script, run through `write_guard.write_document` (tempfile -> fsync -> os.replace,
+backup `backups/decisions_policy.PRE_shrink_legacy_pins_D3217_20261028T105849Z.yaml`, journal receipt
+`e61ba3c668af8833 -> 1824fc5a78301789`) and named as itself in that receipt rather than borrowing a declared
+writer's name. Logged as **BUG-1100** below: a governed rules file that no rail says who may write.
+
+**8. THE DELEGATED REVIEW WAS NON-SUBSTANTIVE, AND THAT IS RECORDED.** R5 review was delegated to
+`gemma-4-E4B-it-MLX-4bit` (journal `DJ-20261028T105434Z-d589`, wall 73.0 s, declared may-write none). It returned
+3 PASS / 1 FAIL whose own sentence states the OPPOSITE of its verdict, and its explanations invert the code (it
+reads `insert` as false on the legacy path, where it is true; it reads `seen_legacy.add` as firing when a record
+speaks, where the code fires it when it does NOT). Recorded as a FAILED sample: no defect found and **no approval
+given**. The verification that stands is mechanical — the 33 known-answer controls and the byte arithmetic in §3,
+where the preview's delta is exactly the inserted line and nothing else.
+
+**RE-OPEN CONDITION:** a state transition that produces `SUPERSEDED` with no resolvable successor (a change that
+kills the writer's refusal or the reader's voice rule), or a pin list that GROWS, or a supersession chain whose
+middle record is itself `SUPERSEDED` without a link (reconcile checks every superseded record independently, so
+that fires as a new gap rather than as silence).
+
+STATE: CLOSED.
+
+## BUG-1100 (MED, OPEN 2026-10-28) — `config/decisions_policy.yaml` IS A GOVERNED RULES FILE THAT NO RAIL SAYS WHO MAY WRITE: it has no `artifact_ownership` entry, no mutability, no writer of record — and the one act that had to change it was done by a scratch script
+
+**FOUND BY:** the D-3217 pin shrink, which needed to move `legacy_debt_ids` and had to stop and ask who owns the
+file. The answer, measured: **nobody is declared.**
+
+**THE MEASUREMENT.** `config/artifact_ownership.yaml` is walked for every artifact that declares
+`mutability`/`writer_of_record`. `config/decisions.yaml` is there (`append_only`,
+`scripts/recompute_decision_summary.py`), `config/decisions_summary.json` is there (`derived_regenerable`, same
+writer). `config/decisions_policy.yaml` — the file that declares the revocation ontology, the succession rules,
+the pin lists, the state vocabulary AND the routes that may edit an append-only registry — **is absent from the
+list entirely**. Consequences, each measured rather than argued:
+1. `write_guard --audit` cannot join the file to a declared writer, so no guard debt is owed and none is checked.
+2. The `--canonicalise-states` route PRINTS "OWED (SAME sitting): shrink config/decisions_policy.yaml#
+   state_vocabulary.legacy_non_canonical_ids to []" and then has **no writer to do it** — a printed obligation with
+   no route, which is the BUG-376 shape (an obligation discharged in prose and by nobody) waiting to recur.
+3. The one act that did have to change the file today (24 -> 20 pins) was performed by
+   `temp/shrink_legacy_pins_D3217.py`, a scratch script. It went through `write_guard.write_document` with a
+   backup, a journal receipt and byte-exact post-verification, and it named ITSELF as the writer — honest, but
+   not a governed writer of record, and `temp/` is scratch by D-3214's own rule, so the tool that edited a live
+   rules file is not an artifact anyone can re-run.
+
+**WHY IT IS A BUG AND NOT A TASTE.** Every route in this repository that may move bytes inside a governed file is
+required to NAME the decision that ordered it (D-2972). A file whose writer is undeclared is the same defect one
+level up: the act can be ordered by a decision and still have no sanctioned hand. The registry's own largest class
+is "a declaration and the world diverged and nothing compared them"; here the declaration is MISSING rather than
+wrong, which no comparator reads.
+
+**THE FIX THIS BUG PROPOSES (not applied — it adds a declared writer, which is an ownership statement and not an
+agent's to make):** add a `config/decisions_policy.yaml` entry to `config/artifact_ownership.yaml` declaring
+`mutability: append_only` for its MEASURED blocks with a declared writer route for a pin SHRINK (the only mutation
+any rail asks for), and give that route the same three obligations every in-place edit carries: a licence
+(`--because`), a refusal when the shrink would ADD an id, and a re-cut receipt. Until then the file is written by
+whoever needs it, which is how a rules file quietly becomes folklore.
+
+**RE-OPEN/CLOSE CONDITION:** closed when the policy file declares a mutability and a writer of record and the
+pin-shrink route exists as a script in `scripts/`; the next pin shrink after that is performed through it.
+
+STATE: OPEN.

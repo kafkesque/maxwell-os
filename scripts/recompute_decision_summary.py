@@ -230,6 +230,12 @@ CANONICALISE_FLAG: str = "--canonicalise-states"
 #: it splices exactly ONE cell, and it prints the act and the obligation it leaves. Declared in
 #: config/decisions_policy.yaml#state_vocabulary.transition_route, read by this module, never remembered (C12).
 SET_STATE_FLAG: str = "--set-state"
+#: The SUPERSESSION LINK, and the reason it is a FLAG on the transition rather than a second act (BUG-1099/D-3216):
+#: MEASURED 2026-10-28 that `--set-state <D> SUPERSEDED` spliced the state ALONE while reconcile demanded a
+#: RESOLVABLE `superseded_by` and the only escape - the pin list - may only SHRINK (D-2645). The two obligations
+#: were jointly unsatisfiable for any record retired after the 2026-09-27 pin measurement, and an append_only
+#: registry cannot be repaired by a later act. So the link moves in the SAME governed write as the state.
+SUPERSEDOR_FLAG: str = "--superseded-by"
 ID_LINE_RE = re.compile(r"^- id: (D-?\d+[a-z]?)$")
 
 
@@ -504,13 +510,90 @@ def policy_states(kind: str) -> list:
     return list((doc.get("revocation") or {}).get("whole_record_states") or [])
 
 
-def state_target_problems(decisions: list, target: str, state: str) -> list:
+def graph_rules() -> dict:
+    """config/decisions_policy.yaml#graph - the ONE home of the supersession vocabulary (C12/D-2642).
+
+    Read, never re-typed: this module already refuses to hold a second copy of a STATE vocabulary (policy_states),
+    and BUG-1099 is what a writer and a reader holding two halves of one fact on their own terms costs - the writer
+    moved a state, the reader demanded a link, and nothing joined the two.
+    """
+    return dict((yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}).get("graph") or {})
+
+
+def successor_field() -> str:
+    """The field a retirement names its replacement in, read from the policy (D-2642/D-3216)."""
+    return str(graph_rules().get("successor_field") or "superseded_by")
+
+
+def supersession_state() -> str:
+    """The state word whose transitions MUST carry a successor, read from the policy (BUG-1099/D-3216)."""
+    return str(graph_rules().get("supersession_state") or "SUPERSEDED").strip().upper()
+
+
+def successor_problems(decisions: list, target: str, state: str, successor: str) -> list:
+    """Every reason a supersession LINK may not be written - asked BEFORE the state cell moves (D-3216/BUG-1099).
+
+    Five clauses, each one a way a retirement can lie: the state that carries a link must carry one (a SUPERSEDED
+    record naming no successor IS BUG-1099, and no later act can supply it); no other state may carry a link (a
+    field no reader consults is a declaration with no referent, D-3034); the successor must EXIST (a link to
+    nothing answers "what replaced it" with silence); it must not be the record itself (a self-link is a chain that
+    goes nowhere); and it must not silently REPLACE a link already written (one supersession, one successor - a
+    second link makes the first false without saying so).
+    """
+    index = {normalized_id(r): r for r in decisions if isinstance(r, dict)}
+    key = normalized_id({"id": target})
+    record = index.get(key) or {}
+    field = successor_field()
+    want = str(state).strip().upper()
+    link = str(successor or "").strip()
+    if want == supersession_state():
+        if not link:
+            return [target + ": a transition to " + want + " must CARRY its successor (" + SUPERSEDOR_FLAG
+                    + " <D-id>) - a retirement that names no replacement is the BUG-1099 defect, and an "
+                    "append_only registry has no later act that could supply one (D-3216)"]
+    elif link:
+        return [SUPERSEDOR_FLAG + " is the SUPERSESSION link and " + target + " moves to " + want + ", a state "
+                "that reads no successor - a link no state consults is a declaration with no referent (D-3034)"]
+    else:
+        return []
+    successor_key = normalized_id({"id": link})
+    if successor_key not in index:
+        return [target + ": the successor " + link + " names no record in this registry - a link that resolves to "
+                "nothing answers 'what replaced it' with silence (D-3034/D-3216)"]
+    if successor_key == key:
+        return [target + ": the successor is the record itself - a supersession pointing at its own subject is a "
+                "chain that goes nowhere (D-3216)"]
+    current = str(record.get(field) or "").strip()
+    if current and normalized_id({"id": current}) != successor_key:
+        return [target + ": already carries " + field + " " + current + " and this transition would write "
+                + str(index[successor_key].get("id")) + " - one supersession, one successor; a second link makes "
+                "the first false without saying so (D-3216)"]
+    return []
+
+
+def link_only_repair(record: dict, state: str, successor: str) -> bool:
+    """True when a transition moves NO state word but writes the MISSING successor (D-3216 legacy discharge).
+
+    MEASURED 2026-10-28 while building this route: D-3170 and D-3171 already READ the supersession state, so the
+    "a transition that moves nothing is a stale declaration (D-405)" clause would refuse the only two records this
+    fix exists to repair - the defect would be prevented for the future and left unrepairable in the past. It is
+    NOT a transition that moves nothing: the LINK is what moves, and it is the cell the reader was missing.
+    """
+    want = str(state).strip().upper()
+    if want != supersession_state() or not str(successor or "").strip():
+        return False
+    return (str(record.get("state") or "").strip().upper() == want
+            and not str(record.get(successor_field()) or "").strip())
+
+
+def state_target_problems(decisions: list, target: str, state: str, successor: str = "") -> list:
     """Every reason a requested STATE TRANSITION may not be made - asked of the RECORD before a byte moves.
 
     Four clauses, each one a defect this registry has carried: the record must exist (a transition of nothing is
     a sentence); the requested state must be in the canonical vocabulary (an undeclared state word is the BUG-483
-    defect); the state must actually CHANGE (a transition that moves nothing is a stale declaration, D-405); and
-    the new value must be a state some reader CLASSIFIES, so it cannot enter the register silently (D-2645).
+    defect); the state must actually CHANGE - unless the one cell being written is the missing successor link
+    (D-3216, link_only_repair) - (a transition that moves nothing is a stale declaration, D-405); and the new value
+    must be a state some reader CLASSIFIES, so it cannot enter the register silently (D-2645).
     """
     problems: list = []
     index = {normalized_id(r): r for r in decisions if isinstance(r, dict)}
@@ -522,7 +605,7 @@ def state_target_problems(decisions: list, target: str, state: str) -> list:
         return [want + " is not in the declared state vocabulary - an undeclared state word would be counted "
                        "while saying nothing (BUG-483/C12)"]
     now = str(record.get("state") or "").strip()
-    if now == want:
+    if now == want and not link_only_repair(record, want, successor):
         problems.append(target + ": already reads " + want + " - a transition that moves nothing is a stale "
                         "declaration, and a stale declaration is a fault (D-405)")
     classified = policy_states("graph") + policy_states("whole")
@@ -547,22 +630,36 @@ def licence_names_target(because: str, target: str) -> bool:
     return bool(record) and target in payload_text(record)
 
 
-def set_state_plan(text: str, target: str, state: str) -> tuple:
-    """Return (would-be registry text, problems): ONE state cell replaced by BYTE SPLICE (D-3035/M2).
+def set_state_plan(text: str, target: str, state: str, successor: str = "") -> tuple:
+    """Return (would-be registry text, problems): ONE transition, its DECLARED cells, replaced by BYTE SPLICE.
 
     THE DIFF IS THE PROOF, the same reasoning as the canonicalisation route: re-emitting the registry would make
     every line a new byte, while the only write an append_only artifact tolerates is one whose touched cells can
-    be COUNTED. This plan moves exactly one line, refuses a block whose state cell is not unique, refuses a cell
-    that does not parse back to the record's own state (a cell this route cannot read is not one it may rewrite,
-    C16), and proves afterwards that no key but that one moved and that its declared postcondition holds.
+    be COUNTED. A transition now moves TWO cells of ONE record when it carries a successor (D-3216/BUG-1099) and
+    one when it does not, so this plan proves the same facts as before, plus one: exactly ONE line is REPLACED and
+    at most ONE line is INSERTED; the registry ID SET did not move; NO other record changed by any key; NO key of
+    the target moved outside the declared cells ({state} or {state, <successor field>}); and the record PARSES BACK
+    carrying the successor it was given, and a SUPERSEDED record always reads one. A cell this route cannot read
+    is still a cell it refuses to rewrite (C16).
     """
     data = yaml.safe_load(text) or {}
     decisions = [r for r in (data.get("decisions") or []) if isinstance(r, dict)]
     want = str(state).strip().upper()
-    problems = state_target_problems(decisions, target, want)
+    problems = state_target_problems(decisions, target, want, successor)
     if problems:
         return text, problems
+    problems = successor_problems(decisions, target, want, successor)
+    if problems:
+        return text, problems
+    field = successor_field()
     key = normalized_id({"id": target})
+    index = {normalized_id(r): r for r in decisions}
+    link = str(successor or "").strip()
+    link_key = normalized_id({"id": link}) if link else ""
+    link_id = str(index[link_key].get("id")).strip() if link_key in index else ""
+    #: A record that ALREADY carries the very successor it is being given must not be handed a second copy of it:
+    #: the state cell still moves, the link does not (C21 - one fact, one place, however often the act is replayed).
+    insert = bool(link_key) and normalized_id({"id": str(index[key].get(field) or "")}) != link_key
     lines = text.split(chr(10))
     starts = [i for i, ln in enumerate(lines) if ln.startswith("- id: ")]
     block = None
@@ -584,48 +681,99 @@ def set_state_plan(text: str, target: str, state: str) -> tuple:
         raw = yaml.safe_load(lines[cell][len("  state: "):].strip())
     except yaml.YAMLError as exc:
         return text, [target + ": the state cell does not parse (" + type(exc).__name__ + ") (C16)"]
-    index = {normalized_id(r): r for r in decisions}
     if str(raw) != str(index[key].get("state")):
         return text, [target + ": the state line parses to " + repr(raw) + " but the record reads "
                       + repr(index[key].get("state")) + " - refusing to rewrite a cell that does not match the "
                       "record (C16)"]
-    out = list(lines)
-    out[cell] = "  state: " + want
-    touched = sum(1 for a, b in zip(lines, out) if a != b)
-    if len(out) != len(lines) or touched != 1:
-        return text, ["the splice moved " + str(touched) + " line(s), not the ONE named cell - an edit that "
-                      "changes a line it did not declare is not a transition (C16)"]
+    if insert:
+        # ONE line REPLACED, ONE line INSERTED, and the two untouched regions compared as REGIONS rather than by a
+        # zip that a shift would silently re-align (which is how a moved line hides from a diff). The state cell is
+        # rewritten in every case and must CHANGE exactly when the transition declared a state change - so the
+        # LINK-ONLY repair (an already-SUPERSEDED record given its missing successor, D-3216) is distinguishable
+        # from a splice that quietly failed to move the state.
+        out = lines[:cell] + ["  state: " + want, "  " + field + ": " + link_id] + lines[cell + 1:]
+        state_changed = out[cell] != lines[cell]
+        if (len(out) != len(lines) + 1 or out[:cell] != lines[:cell] or out[cell + 2:] != lines[cell + 1:]
+                or state_changed != (str(raw).strip().upper() != want)):
+            return text, ["the splice did not move exactly one REPLACED cell and one INSERTED link line, in the "
+                          "one record it declared - an edit that changes a line it did not declare is not a "
+                          "transition (C16)"]
+    else:
+        out = list(lines)
+        out[cell] = "  state: " + want
+        touched = sum(1 for a, b in zip(lines, out) if a != b)
+        if len(out) != len(lines) or touched != 1:
+            return text, ["the splice moved " + str(touched) + " line(s), not the ONE named cell - an edit that "
+                          "changes a line it did not declare is not a transition (C16)"]
     new_text = chr(10).join(out)
     post = [r for r in ((yaml.safe_load(new_text) or {}).get("decisions") or []) if isinstance(r, dict)]
     pre_index = {normalized_id(r): r for r in decisions}
     post_index = {normalized_id(r): r for r in post}
     if set(pre_index) != set(post_index):
         return text, ["the splice moved the registry ID SET - a transition may touch a state, never a record (C21)"]
+    declared_cells = {"state", field} if insert else {"state"}
     for ident in sorted(post_index):
-        before = {k: v for k, v in pre_index[ident].items() if k != "state"}
-        after = {k: v for k, v in post_index[ident].items() if k != "state"}
+        if ident == key:
+            before = {k: v for k, v in pre_index[ident].items() if k not in declared_cells}
+            after = {k: v for k, v in post_index[ident].items() if k not in declared_cells}
+            moved = ("the splice moved a key OTHER than the declared cells " + str(sorted(declared_cells))
+                     + " - a transition edits its own governed values and nothing else (D-2655/D-3216)")
+        else:
+            before, after = pre_index[ident], post_index[ident]
+            moved = ("the splice moved a key of a record it did NOT declare - a transition edits one record "
+                     "(D-2655)")
         if before != after:
-            return text, [ident + ": the splice moved a key OTHER than state - a transition edits ONE governed "
-                                  "value (D-2655)"]
+            return text, [ident + ": " + moved]
     if str(post_index[key].get("state")) != want:
         return text, [target + ": the splice did not produce " + want + " - a route that cannot reach its own "
                                "declared postcondition is not a route (C16)"]
+    if want == supersession_state() and not str(post_index[key].get(field) or "").strip():
+        return text, [target + ": the splice produced " + want + " with no " + field + " - the exact defect this "
+                               "route exists to make impossible (BUG-1099/D-3216)"]
+    if insert and normalized_id({"id": str(post_index[key].get(field) or "")}) != link_key:
+        return text, [target + ": the record does not read back the successor this plan was given (" + link_id
+                      + ") - a write that cannot be read back is not a write (C16)"]
     return new_text, []
 
 
+def _take_successor(rest: list) -> tuple:
+    """Peel the supersession LINK out of a `--set-state` argument tail (BUG-1099/D-3216).
+
+    The link is taken out BEFORE the licence is read, because that route refuses every token it does not declare -
+    so a link left in the tail would be refused as a typo rather than read as a supersession. Arity and repetition
+    are refused HERE, so a half-written link can never reach the splice that would write it.
+    """
+    extra = list(rest)
+    if SUPERSEDOR_FLAG not in extra:
+        return "", extra
+    at = extra.index(SUPERSEDOR_FLAG)
+    if at + 1 >= len(extra) or str(extra[at + 1]).startswith("--"):
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + SUPERSEDOR_FLAG + " needs a <D-id> - a link with no "
+                         "referent is the BUG-1099 defect wearing a flag (D-3216)")
+    link = str(extra[at + 1])
+    del extra[at:at + 2]
+    if SUPERSEDOR_FLAG in extra:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + SUPERSEDOR_FLAG + " given twice - one supersession, one "
+                         "successor, and a second link would make the first false without saying so (D-3216)")
+    return link, extra
+
+
 def set_state_main(argv: list) -> int:
-    """--set-state <D-id> <STATE> --because <D-id> [--apply]: ONE declared state transition, with its licence.
+    """`--set-state <D-id> <STATE> [--superseded-by <D-id>] --because <D-id> [--apply]`: ONE declared transition.
 
     THE DECLARED SEQUENCE (the three obligations the canonicalisation route carries, D-2972): the splice; the
     obligation PRINTED, because the registry receipt must be re-cut in the same sitting (the splice moved bytes
-    INSIDE the receipted region by construction); and the act NAMED so a reader can join it. The licence is
-    checked FIRST - before any no-op branch - so nothing-to-do can never be the door a licence walks past.
+    INSIDE the receipted region by construction); and the act NAMED so a reader can join it. A transition to the
+    supersession state CARRIES its successor in the same write (D-3216), so there is never a moment when the
+    registry holds a retirement whose replacement cannot be named. The licence is checked FIRST - before any no-op
+    branch - so nothing-to-do can never be the door a licence walks past.
     """
     tokens = list(argv[2:])   # argv[0] is this script and argv[1] is the flag (main reads sys.argv whole)
     if len(tokens) < 2:
-        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + SET_STATE_FLAG + " <D-id> <STATE> --because "
-                         "<D-id> [--apply]")
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + SET_STATE_FLAG + " <D-id> <STATE> ["
+                         + SUPERSEDOR_FLAG + " <D-id>] --because <D-id> [--apply]")
     target, state, rest = tokens[0], tokens[1], tokens[2:]
+    successor, rest = _take_successor(rest)
     # in_place_licence reads argv[1:], i.e. its caller's own argv with the script name at position 0, so the
     # licence is asked with a two-token head: [script-name slot, flag] - then the licence's own tokens.
     because, apply_now = in_place_licence([WRITER, SET_STATE_FLAG] + rest, SET_STATE_FLAG)
@@ -634,7 +782,7 @@ def set_state_main(argv: list) -> int:
                          "payload - an ordering decision must speak the record it moves, or one order would "
                          "cover any record (D-2972/D-3035)")
     text = DECISIONS_YAML.read_text(encoding="utf-8")
-    new_text, problems = set_state_plan(text, target, state)
+    new_text, problems = set_state_plan(text, target, state, successor)
     if problems:
         raise SystemExit("FAIL-CLOSED (" + WRITER + "): refusing to move " + target + ": " + "; ".join(problems))
     pre_data = yaml.safe_load(text) or {}
@@ -653,7 +801,9 @@ def set_state_main(argv: list) -> int:
         raise SystemExit("FAIL-CLOSED (" + WRITER + "): the spliced registry does not re-derive cleanly: "
                          + "; ".join(map(str, shape)))
     print("PRE  " + str(len(text.encode("utf-8"))) + " B sha256 " + hashlib.sha256(text.encode("utf-8")).hexdigest())
-    print("SPLICE " + target + " -> " + str(state).strip().upper() + " (licence " + because + ")")
+    print("SPLICE " + target + " -> " + str(state).strip().upper()
+          + (" (successor " + successor + ")" if str(successor or "").strip() else "")
+          + " (licence " + because + ")")
     print("POST " + str(len(new_text.encode("utf-8"))) + " B sha256 "
           + hashlib.sha256(new_text.encode("utf-8")).hexdigest() + " - stamp " + pre_stamp + " -> " + post_stamp
           + " (it MOVES: a state is part of the content stamp)")
@@ -1168,6 +1318,13 @@ def state_controls() -> list[tuple[str, bool]]:
             "- id: D-9002\n  state: ACTIVE\n  category: X\n  title: control\n  decision: control\n")
     twice = ("schema_version: '1'\ndecisions:\n"
              "- id: D-9001\n  state: PROPOSED\n  state: PROPOSED\n  category: X\n")
+    carrying = ("schema_version: '1'\ndecisions:\n"
+                "- id: D-9001\n  state: PLANNED\n  superseded_by: D-9003\n  category: X\n"
+                "- id: D-9002\n  state: ACTIVE\n  category: X\n"
+                "- id: D-9003\n  state: RESOLVED\n  category: X\n")
+    linking = ("schema_version: '1'\ndecisions:\n"
+               "- id: D-9001\n  state: SUPERSEDED\n  category: X\n"
+               "- id: D-9002\n  state: ACTIVE\n  category: X\n")
     decisions = [{"id": "D-9001", "state": "PROPOSED"}, {"id": "D-9002", "state": "ACTIVE"}]
 
     def refuses(problems) -> bool:
@@ -1184,6 +1341,32 @@ def state_controls() -> list[tuple[str, bool]]:
                 and [r for r in (yaml.safe_load(new_text) or {})["decisions"] if r["id"] == "D-9002"][0]["state"]
                 == "ACTIVE")
 
+    def carries_its_successor() -> bool:
+        """BUG-1099/D-3216: the accepted supersession must move ONE replaced line and ONE inserted link, and the
+        record must READ BACK the successor it was given - a write nobody can read back is not a write."""
+        new_text, problems = set_state_plan(text, "D-9001", "SUPERSEDED", "D-9002")
+        if problems:
+            return False
+        post = {r["id"]: r for r in (yaml.safe_load(new_text) or {})["decisions"]}
+        return (len(new_text.split(chr(10))) == len(text.split(chr(10))) + 1
+                and post["D-9001"].get("state") == "SUPERSEDED"
+                and post["D-9001"].get(successor_field()) == "D-9002"
+                and post["D-9002"].get("state") == "ACTIVE"
+                and "  " + successor_field() + ": D-9002" in new_text)
+
+    def link_only_repair_moves_the_link_and_not_the_state() -> bool:
+        """D-3216 legacy discharge: a record ALREADY reading SUPERSEDED gets its missing successor, and the state
+        cell is rewritten in place without changing - so the repair is provable and not a silent no-op."""
+        new_text, problems = set_state_plan(linking, "D-9001", "SUPERSEDED", "D-9002")
+        if problems:
+            return False
+        post = {r["id"]: r for r in (yaml.safe_load(new_text) or {})["decisions"]}
+        return (len(new_text.split(chr(10))) == len(linking.split(chr(10))) + 1
+                and post["D-9001"].get("state") == "SUPERSEDED"
+                and post["D-9001"].get(successor_field()) == "D-9002"
+                and post["D-9002"].get("state") == "ACTIVE")
+
+
     return [
         ("a_state_word_not_in_the_declared_vocabulary_is_REFUSED",
          lambda: refuses(state_target_problems(decisions, "D-9001", "BANANA"))),
@@ -1199,6 +1382,24 @@ def state_controls() -> list[tuple[str, bool]]:
          moves_exactly_one_line),
         ("every_state_the_vocabulary_declares_is_classified_by_the_policy_so_none_can_enter_silently",
          lambda: all(s in (policy_states("graph") + policy_states("whole")) for s in STATES)),
+        ("a_transition_to_the_SUPERSESSION_state_WITHOUT_a_successor_is_REFUSED_that_is_the_BUG-1099_defect",
+         lambda: refuses(set_state_plan(text, "D-9001", "SUPERSEDED")[1])),
+        ("a_successor_naming_no_record_is_REFUSED_rather_than_written_as_a_link_to_nothing",
+         lambda: refuses(set_state_plan(text, "D-9001", "SUPERSEDED", "D-9999")[1])),
+        ("a_SELF_LINK_supersession_is_REFUSED_a_chain_that_goes_nowhere",
+         lambda: refuses(set_state_plan(text, "D-9001", "SUPERSEDED", "D-9001")[1])),
+        ("a_successor_on_a_transition_to_a_state_that_reads_none_is_REFUSED_a_link_no_reader_consults",
+         lambda: refuses(set_state_plan(text, "D-9001", "RATIFIED", "D-9002")[1])),
+        ("a_record_already_carrying_a_DIFFERENT_successor_is_REFUSED_one_supersession_one_link",
+         lambda: refuses(set_state_plan(carrying, "D-9001", "SUPERSEDED", "D-9002")[1])),
+        ("a_supersession_WITH_its_successor_is_ACCEPTED_and_the_record_READS_BACK_the_link",
+         carries_its_successor),
+        ("an_ALREADY_superseded_record_given_its_MISSING_successor_is_ACCEPTED_as_a_LINK_ONLY_repair",
+         link_only_repair_moves_the_link_and_not_the_state),
+        ("an_ALREADY_superseded_record_given_the_SAME_successor_again_is_REFUSED_as_a_stale_no_op",
+         lambda: refuses(set_state_plan(linking, "D-9001", "SUPERSEDED", "D-9002")[1]) is False
+         and refuses(set_state_plan(
+             set_state_plan(linking, "D-9001", "SUPERSEDED", "D-9002")[0], "D-9001", "SUPERSEDED", "D-9002")[1])),
     ]
 
 

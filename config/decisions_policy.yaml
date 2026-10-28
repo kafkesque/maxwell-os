@@ -46,20 +46,24 @@ revocation:
   - D2085
   - D2087
   - D2091
-  - D2100
   - D2195
   - D2196
   - D2204
   - D2223
   - D2224
-  - D2253
   - D2293
-  - D2294
-  - D2296
   - D2317
   - D2318
   - D2430
   - D2582
+  legacy_debt_shrunk: >-
+    SHRUNK 2026-10-28 by D-3217: 24 -> 20. The four ids removed - D2100 -> D2094, D2253 -> D2362, D2294 -> D2298,
+    D2296 -> D2298 - are exactly the "4 carry superseded_by" the measurement above recorded on 2026-09-25. Once a
+    retirement NAMES a resolvable successor it is no longer silent, so its pin outlived its subject and D-2645 says
+    the list may only shrink (D-3216 clause 4). Nothing was added, no id was re-pinned, and the list still pins BY
+    IDENTITY and never by a count. The measurement above is left as it was measured: history is corrected beside
+    itself, never rewritten (D-3034/D-3214).
+
   legacy_debt_measured: >-
     MEASURED 2026-09-25: 16 SUPERSEDED + 8 ARCHIVED = 24 records, 0 carrying a reason or evidence (4 carry a
     date, 4 carry superseded_by). They are NOT backfilled: a reason reconstructed by a tool is not evidence, and

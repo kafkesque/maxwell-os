@@ -25529,3 +25529,16 @@ fire and accept. A mint that lands a second in-force owner for a bug with no `su
 4. **The declaration loads:** `config/decisions_policy.yaml#state_vocabulary.meanings.RATIFIED` parses and reads "in force and applied … never about who applied it"; `state_vocabulary` keys are now canonical, canonicalisation_route, transition_route, legacy_non_canonical_ids, canonicalised, why, meanings.
 
 **RE-OPEN CONDITION.** A reader (or the face) again reading "⚖ ratified N" as an OWNER act — i.e. a claim that the RATIFIED state asserts authorship rather than force-and-application — re-opens this bug; likewise any later act that edits or removes `state_vocabulary.meanings.RATIFIED` without a decision that supersedes D-3222.
+
+## BUG-832 (MED - OPEN 2026-10-28) — OWNER WORD ON THE BRAIN: keep deepseek until governance is fully fixed, then re-decide the local switch
+
+**OWNER WORD 2026-10-28 (GATE 3 resolved, direction (b)).** The owner ruled: KEEP deepseek (the measured,
+ceilinged opt-in) as the session brain until governance is fully fixed, then re-decide the local switch.
+This supersedes remedy #2's "execute D-295 literally" branch for the current window: the brain is now an
+explicit owner-approved opt-in, not a silent violation of the closed BUG-243 rationale. The switch-back gate
+is FOUR conditions held simultaneously: (a) a local candidate GREEN on `long_context_reasoning_16k`
+(non-zero, non-slop), (b) T-187 two-step loop PASS, (c) the gemma drift eval (20 class + 20 summ + 10
+code-review ground-truth), AND (d) governance fully fixed. Consequence: the gemma drift eval and the
+gpt-oss long-context score move from BLOCKING to OWED (parked until governance is fixed). The cloud ceiling
+(D-3101, shrink-only per the 2026-10-18 owner word) is now in direct tension with a retained deepseek brain;
+that tension is FLAGGED here for the owner's next word, not resolved by an agent.

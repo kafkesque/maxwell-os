@@ -1999,7 +1999,7 @@
     {
       "id": "BUG-832",
       "title": "(MED - OPEN 2026-10-15) \u2014 the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change",
-      "events": 3,
+      "events": 4,
       "artifacts": [
         "DECISION-LOG.md",
         "config/agent_context.yaml",

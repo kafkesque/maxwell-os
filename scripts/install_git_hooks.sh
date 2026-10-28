@@ -23,7 +23,7 @@ mkdir -p "$(dirname "$hook")"
 render_hook() {
 cat <<'HOOK'
 #!/usr/bin/env bash
-# BUG-1000 - the four rails below shell a bare `python3`, so the interpreter they get is decided by PATH ORDER.
+# BUG-1000 - the rails below shell a bare `python3`, so the interpreter they get is decided by PATH ORDER.
 # MEASURED 2026-10-25: with PATH=/usr/bin:/bin the FIRST rail died on `No module named 'yaml'` and the commit
 # was refused for the WRONG reason. This prelude prepends the directory of the interpreter the repository already
 # PINNED (config/pipeline_config.yaml#run.python_bin) and PROVES it can import what the rails need; if it cannot,
@@ -46,6 +46,10 @@ python3 scripts/verify_recalibration_pins.py --staged || exit 1
 # deletes is caught by check_rail_registry.py - this hook lives outside the synced tree (BUG-500), where no diff
 # and no backup would show it.
 python3 scripts/check_declaration_consumers.py --staged || exit 1
+# RAIL 6 - refuse a commit that lands a deep-tier file with no cross-family reviewer APPROVE (R5, BUG-1106).
+# The LLM call is a PRE-STEP the agent runs (python3 scripts/r5_review_gate.py --file <rel>); this rail only
+# VERIFIES the verdict exists in governance/r5_reviews.jsonl, so a commit never blocks on a model being served.
+python3 scripts/check_r5_verdicts.py --staged || exit 1
 # RAIL 4 - refuse a commit whose staged paths are outside the session plan. Never bypass with --no-verify.
 exec python3 scripts/check_session_plan.py --staged
 HOOK
@@ -64,5 +68,10 @@ fi
 
 render_hook > "$hook"
 chmod +x "$hook"
+# SELF-VERIFY (R5, world-acting script): the hook is a derived artifact living OUTSIDE the synced tree (BUG-500),
+# so a silent partial write or a lost exec bit would disarm the commit boundary with no diff and no backup to show
+# it. Re-derive and byte-compare the just-written hook, and prove the exec bit, before announcing success.
+render_hook | cmp -s - "$hook" || { echo "FAIL install-git-hooks: the hook write does not equal its re-derivation - a partial write would silently disarm the commit boundary"; exit 1; }
+[ -x "$hook" ] || { echo "FAIL install-git-hooks: the hook is not executable - git silently skips a hook it may not execute (D-2687)"; exit 1; }
 echo "installed $hook"
 python3 scripts/check_session_plan.py --staged

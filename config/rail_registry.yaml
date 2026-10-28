@@ -356,6 +356,12 @@ guards:
   #: deleted branch protects nothing - rail class (i), BUG-492.
   scripts/check_commit_scope_guard.py: fatal
   scripts/check_commit_scope_guard.py --selftest: fatal
+  #: BUG-1106 (option a): the R5 COMMIT RAIL. The SELFTEST line is fatal (a control nothing runs is a comment,
+  #: BUG-492). Its LIVE reading is the commit-boundary line (scripts/check_r5_verdicts.py --staged, pinned in
+  #: commit_boundary.must_contain and rendered by scripts/install_git_hooks.sh), which is fatal BY DESIGN: a
+  #: staged deep-tier file with no cross-family APPROVE REFUSES the commit, never warns - that refusal is the
+  #: whole point of BUG-1106, so its class may not drift to tri_state (loud, not fatal).
+  scripts/check_r5_verdicts.py --selftest: fatal
   scripts/measure_extension_cost.py --selftest: fatal
 
 #: T-207 phase-1(a) / D-2665: THE INVARIANT PARTITION. The guards/writers/dormant sections above answer "is every
@@ -447,6 +453,7 @@ families:
   F6:
     - pipeline/subagent_fanout.py
     - scripts/check_extraction_recall.py
+    - scripts/check_r5_verdicts.py
     - scripts/check_verification_sequence.py
     - scripts/r5_review_gate.py
     - scripts/resolve_route.py
@@ -525,11 +532,12 @@ families:
     - scripts/validate_depth_domain_contract.py
 commit_boundary:
   path: git-path:hooks/pre-commit
-  why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'
+  why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); the rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'
   must_contain:
   - 'python3 scripts/check_repo_integrity.py'
   - 'python3 scripts/verify_recalibration_pins.py --staged'
   - 'python3 scripts/check_declaration_consumers.py --staged'
+  - 'python3 scripts/check_r5_verdicts.py --staged'
   - 'python3 scripts/check_session_plan.py --staged'
 # --- 2026-10-15: THE EIGHT STRAYS (T-164/BUG-837) - deleted, and here is WHY they are not moved. ---
 # An earlier landing (6688938) appended EIGHT guard declarations at COLUMN 0 after the `commit_boundary:` mapping.

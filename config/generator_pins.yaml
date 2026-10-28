@@ -26,7 +26,9 @@
 # `identity_sha256` wherever the snapshot is symlinked (the blob basename is the content digest).
 
 schema_version: '1'
-decided: D-3124            # re-minted probe_phi4mini via kind omlx_dir (option B, D-3124); the rail never writes this file (D-382)
+decided: D-3221            # re-minted generator_s2 + reviewer_r5 via kind omlx_dir (BUG-1105, D-3221) after D-3181/D-3185
+                           # deleted their HF blob farms; prior re-mint D-3124 moved probe_phi4mini the same way. The
+                           # rail never writes this file (D-382) - a pin is re-minted by a DECISION, never a quiet re-hash.
 
 hf_cache: "~/.cache/huggingface/hub"
 ollama_manifests: "~/.ollama/models/manifests"
@@ -36,34 +38,29 @@ pins:
 - name: generator_s2
   role: "S2 convergent FB extraction (JSON) - the heaviest LLM stage; R5 generator"
   served_as: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
-  kind: hf_repo
-  repo: lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
-  rev: bbecedefd826819d2c6b6465e88ca7b9b8ad3407
-  alias_snapshots: [main]   # MEASURED 2026-09-26: this repo carries snapshots/<commit> (14 files, ALL symlinked
-  #   = content-addressed) AND a snapshots/main dir beside it (34 files, 0 symlinks) whose extras are the
-  #   downloader's own bookkeeping (.cache/huggingface/**, CACHEDIR.TAG; 5,842 B). Pinning `main` would bind
-  #   that bookkeeping as if it were weights; the COMMIT is pinned and the alias is DECLARED, so the rail
-  #   checks the alias still holds the same payload. An alias is not a second home: it is the same object,
-  #   and only a disagreement is a fault.
-  resolved_commit: bbecedefd826819d2c6b6465e88ca7b9b8ad3407
-  file_count: 14
-  bytes: 17190793452
-  sparse_sha256: 07bdad28f403c33c30ea383e9fd7f870ddad5e685f87fdb7a9d735324479deb9
-  identity_sha256: de38c442825a14103942e99e5a0bb9f0758a352308ec205b376319804565e0a9
+  kind: omlx_dir
+  dir: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit   # D-3221 re-mint (BUG-1105): the SERVED copy is snapshots/main (REAL
+  #   files, link count 1), not the content-addressed commit snapshot. D-3181/D-3185 deleted the redundant HF blob
+  #   farm (`hf cache rm bbecedefd8…`) because the engine serves `main` (readlink -f ~/.omlx/models/<name> ->
+  #   snapshots/main), and the pin was never carried to the served copy, so `rev: <commit>` stopped resolving. A
+  #   real-file dir is NOT content-addressed, so identity_sha256 is DEEP-ONLY and not a daily-checked fact: the
+  #   daily check enforces the sparse manifest below; --pin --deep re-verifies content on demand (deep identity
+  #   sha256 5153f72ac38198bcfd5a656b62f334a724c6f75bcfe4acc0c19f97204f9ca963 recorded in D-3221).
+  file_count: 34
+  bytes: 17190799294
+  sparse_sha256: 3dac46b22cd23f0d853da937bab77c5101f700c442cbee5df2390209add38ba0
 
 - name: reviewer_r5
-  role: "R5 code review + classification sanity (generator != verifier)"
+  role: "R5 code review + classification sanity (generator != verifier) - FAST tier (deep tier is classifier_s4)"
   served_as: gemma-4-E4B-it-MLX-4bit
-  kind: hf_repo
-  repo: lmstudio-community/gemma-4-E4B-it-MLX-4bit
-  rev: ce713a0013bb7090305edfb8e3773a07ccae35c1
-  alias_snapshots: [main]   # MEASURED 2026-09-26: pinning the COMMIT (11 files, all symlinked); the aliased
-  #   snapshots/main holds 25 files / 0 symlinks and 3,187 B of harness metadata. See generator_s2.
-  resolved_commit: ce713a0013bb7090305edfb8e3773a07ccae35c1
-  file_count: 11
-  bytes: 6861844944
-  sparse_sha256: 608d8505b6c98846e8ef9e0a1aaf4456a8fd64325b500462f912333ff80f9735
-  identity_sha256: 8810e0c719f5c24280f8fadf7328fb33dc0327750d5312bbfc1b3271c45cadd3
+  kind: omlx_dir
+  dir: gemma-4-E4B-it-MLX-4bit   # D-3221 re-mint (BUG-1105): same shape as generator_s2 — the served copy is
+  #   snapshots/main (REAL files, link count 1); D-3181/D-3185 removed the HF blob farm (`hf cache rm ce713a00…`).
+  #   identity_sha256 is DEEP-ONLY (deep sha256 92192d035127f2b14f5bb297d6c3bdde245473085595a4914fe793540f73165b
+  #   recorded in D-3221); the daily check enforces the sparse manifest below.
+  file_count: 25
+  bytes: 6861848131
+  sparse_sha256: 2f1dbdeed6c99a69419e75fa0b74510ebb389c8ab7d5f83558a571d02f4adf6f
 
 - name: classifier_s4
   role: "S4 depth/domain classifier (OMLX, long context) - D2249"

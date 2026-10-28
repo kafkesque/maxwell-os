@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1346 decisions (census stamp bf55c1d45b79f0dd, 2026-10-28) · 868 bugs (267 open / 601 closed; highest OPEN = BUG-1103) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1347 decisions (census stamp 7f5db778945817cc, 2026-10-28) · 869 bugs (267 open / 602 closed; highest OPEN = BUG-1103) · 63 open tasks (MUST 11 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1346 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 679 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1346, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1347 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 680 · ⚖ ratified 153 | closed: ✅ resolved 392 · ⚪ superseded 18 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1347, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 267 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 29 · 🟧 HIGH 60 · 🟨 MED 136 · 🟩 LOW 42 · UNLABELLED 0 (BUG-757) of 267 open.
 >
@@ -25470,3 +25470,46 @@ fire and accept. A mint that lands a second in-force owner for a bug with no `su
 **R5 STATUS (honest, not claimed).** The full-file R5 verdict is UNAVAILABLE for this writer — it is 119,095 chars and gpt-oss produces no parseable verdict on it at any budget (BUG-1103, still OPEN, option C recorded). The lineage change is therefore covered by DETERMINISTIC layers only: syntax PASS, c11_c12 PASS, lint carries the 4 pre-existing findings above, and the 48/48 selftest + 5 targeted tests. This is exactly the "deterministic coverage for this one file, R5 unavailable until the split" state BUG-1103 option C declares; no scratch-review shortcut was taken (a scratch reviewer would be the BUG-1100 shape).
 
 **RE-OPEN CONDITION.** A mint that lands a second in-force owner for a bug with no `supersedes:` — i.e. a record that cites an owned bug and passes without naming the owner — re-opens this bug.
+
+## BUG-1105 (MED, OPEN 2026-10-28) — THE TWO HEAVIEST GENERATOR PINS POINT AT REVISIONS THAT WERE DELETED UNDER D-3181/D-3185, AND WERE NEVER RE-MINTED TO THE SERVED COPY: the generator-identity rail fails CLOSED on the generator and the fast-tier R5 reviewer
+
+1. **THE READING.** `python3 scripts/verify_generator_pins.py` returns rc 1 with 2 BROKEN DECLARATION:
+   `RED generator_s2: revision 'bbecedefd826819d2c6b6465e88ca7b9b8ad3407' is neither a snapshot nor a ref on disk`
+   and `RED reviewer_r5: revision 'ce713a0013bb7090305edfb8e3773a07ccae35c1' is neither a snapshot nor a ref on disk`.
+   The two pins that fail are the S2 generator (Qwen3-Coder-30B-A3B-Instruct-MLX-4bit) and the fast-tier R5
+   reviewer (gemma-4-E4B-it-MLX-4bit) — the heaviest and the verifier, respectively.
+
+2. **WHY THE REVISIONS ARE GONE — THE MOVE WAS UNDER A DECISION, AND THE PIN WAS NOT CARRIED WITH IT.** The two pins
+   were minted 2026-09-26 to declare the COMMIT (the content-addressed `snapshots/<hash>` symlink farm) with
+   `alias_snapshots: [main]` beside it. On 2026-10-27, D-3181 (RESOLVED) ruled that the HF blob symlink farm is a
+   REDUNDANT copy — the engine actually serves `snapshots/main` (real files, `~/.omlx/models/<name>` → `snapshots/main`)
+   — and authorised `hf cache rm bbecedefd8… ce713a00…` of the copy the engine does NOT read, leaving `snapshots/main`
+   untouched. D-3185 (RESOLVED) recorded the execution: `refs/` emptied (mtime Oct 27 12:19), `snapshots/<hash>` gone,
+   `blobs/` pruned, and gemma "still serves because its snapshot holds REAL files (link count 1), not blob symlinks".
+   The pins still declare `rev: <commit>` + `alias_snapshots: [main]`, so the commit-named snapshot and ref the rail
+   resolves against no longer exist. The pin was not re-minted when its bytes moved — the BUG-391 class (a fact that
+   changed with nothing declaring it) applied to the generator-identity register itself.
+
+3. **THE CONSEQUENCE.** The generator-identity rail is BLIND for the two heaviest models: it cannot say which bytes
+   produced the numbers for the S2 generator or the fast-tier R5 reviewer. That is a fail-CLOSED declaration (C16),
+   not a data-corruption — but it is exactly the failure this rail was built to catch (BUG-538), and it has sat red
+   since the deletion. Recorded as one of the 6 "pinned pre-existing reds" in D-3211/D-3213.
+
+4. **THE FIX SHAPE (not yet applied).** Re-mint the two pins to the SERVED copy. The served copy is `snapshots/main`,
+   real files (link count 1), so content-addressing is gone and `identity_sha256` is deep-only — the same shape as
+   `probe_phi4mini` after D-3124 (which re-minted it `hf_repo` → `omlx_dir` when D-3035 deleted the HF snapshot as
+   redundant-by-content with the served copy). A re-mint is a DECISION (D-382/BUG-535), never a quiet re-hash.
+
+## BUG-1105 (MED — FIXED 2026-10-28) — THE TWO HEAVIEST GENERATOR PINS ARE RE-MINTED TO THE SERVED COPY: generator_s2 and reviewer_r5 now declare the REAL-FILE `omlx_dir` the engine serves, and the rail is GREEN again
+
+**FIXED BY:** D-3221 (state ACTIVE — minted this sitting through the governed `--mint` route: `merged 1 record(s): D-3221 - total=1347, stamp 7f5db778945817cc`). The code is `config/generator_pins.yaml`; the reading is `scripts/verify_generator_pins.py`. This entry replaces the proposal above with what was actually built and measured; nothing from the discovery is retracted.
+
+**THE FIX (the D-3124 shape, applied to the two heaviest pins).** `generator_s2` and `reviewer_r5` were `kind: hf_repo` pinned to a content-addressed commit snapshot that D-3181/D-3185 deleted as a redundant copy. Both are now `kind: omlx_dir` pointing at the served `~/.omlx/models/<name>` (which resolves to `snapshots/main`, real files, link count 1) — the same re-mint D-3124 did for `probe_phi4mini`. Because a real-file dir is not content-addressed, `identity_sha256` is DEEP-ONLY and no longer a daily-checked fact; the daily check enforces the sparse manifest, and `--pin --deep` re-verifies content on demand.
+
+**THE MEASUREMENT (each read).**
+1. **RED before:** `verify_generator_pins.py` rc 1, 2 BROKEN DECLARATION — `generator_s2 revision 'bbecedefd…' is neither a snapshot nor a ref on disk` and the same for `reviewer_r5 revision 'ce713a00…'`.
+2. **GREEN after:** `verify_generator_pins.py` → `ok generator pins: 6 declared, 0 BROKEN DECLARATION, 0 MOVED (sparse)`, rc 0.
+3. **The moved referent is the served copy, not the bytes:** `readlink -f ~/.omlx/models/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` → `…/snapshots/main` (real files); `refs/` empty, `snapshots/<hash>` absent, `blobs/` pruned — all the D-3185 receipts. The weights are the same ones D-3185 proved still serve.
+4. **New sparse manifests:** generator_s2 34 files / 17,190,799,294 B / `3dac46b2…`; reviewer_r5 25 files / 6,861,848,131 B / `2f1dbdeed6…`. Deep identity digests (for the record): `5153f72a…` and `92192d035…`. file_count grew 14→34 / 11→25 because the served dir now binds the downloader's bookkeeping the old commit snapshot excluded — an over-binding that is now the only honest measurement, since only the served copy remains.
+
+**RE-OPEN CONDITION.** The rail returning 2 BROKEN DECLARATION (or any pin whose `rev`/`dir` names no referent) again — i.e. the generator identity moving with nothing re-minted — re-opens this bug.

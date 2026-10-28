@@ -36635,3 +36635,52 @@ decisions:
   - 'deterministic layers: syntax PASS, the writer re-derives cleanly (--check rc 0), ruff reports only the 4 PRE-EXISTING
     issues (I001 import block + 3x B905 zip) already present in the 119,095-char monolith before this change - none
     introduced by this act.'
+- id: D-3221
+  date: '2026-10-28'
+  state: ACTIVE
+  category: GENERATOR IDENTITY / PIN RE-MINT (BUG-1105, D-3181, D-3185, D-3124, D-382, BUG-538)
+  bugs:
+  - BUG-1105
+  title: THE TWO HEAVIEST GENERATOR PINS ARE RE-MINTED TO THE SERVED COPY - generator_s2 and reviewer_r5 move from
+    a content-addressed `hf_repo` commit (deleted under D-3181/D-3185) to the REAL-FILE `omlx_dir` the engine actually
+    serves, so the generator-identity rail can again say which bytes produced the numbers
+  decision: '(1) THE DEFECT, MEASURED (BUG-1105). config/generator_pins.yaml declared generator_s2 (rev bbecedefd826819d2c6b6465e88ca7b9b8ad3407)
+    and reviewer_r5 (rev ce713a0013bb7090305edfb8e3773a07ccae35c1) as `kind: hf_repo` with `alias_snapshots: [main]`,
+    pinned to the content-addressed `snapshots/<commit>` symlink farm measured 2026-09-26. On 2026-10-27 D-3181
+    (RESOLVED) ruled the HF blob farm is a REDUNDANT copy - the engine serves `snapshots/main` (real files; `~/.omlx/models/<name>`
+    -> `snapshots/main`) - and authorised `hf cache rm bbecedefd8… ce713a00…` of the copy the engine does NOT read;
+    D-3185 recorded the execution (refs/ emptied, snapshots/<hash> gone, blobs pruned). The pins were never carried
+    to the served copy, so `resolve_snapshot` found neither a snapshot nor a ref and the rail failed CLOSED: 2 BROKEN
+    DECLARATION (rc 1). The bytes did not change - the served copy is the same weights D-3185 proved still serve
+    (gemma link count 1) - only the declaration''s referent moved and nothing was re-minted. (2) THE FIX, IN THE
+    ESTABLISHED SHAPE (D-3124). Both pins re-mint to `kind: omlx_dir`, `dir: <served name>`, because the served
+    copy is now a REAL-FILE directory (link count 1), not a content-addressed snapshot - exactly the shape D-3124
+    used when D-3035 deleted probe_phi4mini''s HF snapshot as redundant-by-content with the served copy. A real-file
+    dir means `identity_sha256` is DEEP-ONLY and is NOT a daily-checked fact: the daily check enforces the sparse
+    manifest (file_count/bytes/sparse_sha256), and --pin --deep re-verifies content on demand. The measured sparse
+    manifests are generator_s2 34 files / 17,190,799,294 B / 3dac46b22cd23f0d853da937bab77c5101f700c442cbee5df2390209add38ba0
+    and reviewer_r5 25 files / 6,861,848,131 B / 2f1dbdeed6c99a69419e75fa0b74510ebb389c8ab7d5f83558a571d02f4adf6f;
+    the deep identity digests (for the record, not daily-checked) are 5153f72ac38198bcfd5a656b62f334a724c6f75bcfe4acc0c19f97204f9ca963
+    and 92192d035127f2b14f5bb297d6c3bdde245473085595a4914fe793540f73165b. The file_count grew 14->34 and 11->25
+    because the served dir now binds the downloader''s bookkeeping (.cache/huggingface/**, README, .gitattributes)
+    the old commit snapshot excluded - an over-binding the 2026-09-26 comment named and, now that only the served
+    copy remains, the honest measurement. (3) WHAT THIS DOES NOT DO. It does not change WHICH model is the generator
+    or the reviewer (generator stays Qwen3-Coder, reviewer stays gemma-4-E4B); it does not re-mint classifier_s4/probe_phi4mini/
+    nli_verifier_s5/embeddings_bge_m3 (all already green); it does not re-label the reviewer_r5 role beyond a note
+    that it is the FAST tier (the deep tier is classifier_s4, gpt-oss, D-3168) - the gpt-oss-vs-gemma R5 verification
+    is a separate audit. It re-mints the two broken pins BY DECISION (D-382/BUG-535), never by a quiet re-hash.'
+  reason: The rail that proves which bytes produced the numbers had been blind for the generator and the fast-tier
+    verifier since the 2026-10-27 disk-hygiene sitting, and was sitting in the "pinned pre-existing red" list rather
+    than being fixed. The fix is a pin re-mint, and a pin re-mint is a DECISION - the same route D-3124 walked for
+    probe_phi4mini - so the move is recorded with its measurements rather than smuggled in as a config touch-up.
+  files:
+  - config/generator_pins.yaml
+  evidence:
+  - 'RED before: verify_generator_pins.py rc 1, 2 BROKEN DECLARATION - generator_s2 revision bbecedefd… and reviewer_r5
+    ce713a00… "neither a snapshot nor a ref on disk".'
+  - 'GREEN after: verify_generator_pins.py -> "ok generator pins: 6 declared, 0 BROKEN DECLARATION, 0 MOVED (sparse)",
+    rc 0.'
+  - 'served shape: readlink -f ~/.omlx/models/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit -> …/snapshots/main (real files,
+    link count 1); same for gemma-4-E4B-it-MLX-4bit; refs/ empty, snapshots/<hash> absent, blobs/ pruned (D-3185).'
+  - measured sparse manifests and deep identity digests recorded in the decision body; the other four pins unchanged
+    and still green in the same run.

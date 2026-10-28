@@ -65,7 +65,7 @@ def _cfg() -> dict[str, Any]:
     """Load the delete-safety config; a missing file is a usage error, never a silent default."""
     if not CFG_PATH.is_file():
         raise SystemExit(f"FAIL: missing {CFG_PATH} — the rail has no declared roots (C12)")
-    with CFG_PATH.open() as fh:
+    with CFG_PATH.open(encoding="utf-8") as fh:   # declared: the config register is UTF-8 by this repo's contract
         return yaml.safe_load(fh) or {}
 
 

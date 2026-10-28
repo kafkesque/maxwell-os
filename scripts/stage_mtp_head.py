@@ -116,7 +116,10 @@ def build(cfg: dict[str, Any], force: bool) -> dict[str, Any]:
         shutil.rmtree(out)
     out.mkdir(parents=True)
 
-    index = json.loads((base / "model.safetensors.index.json").read_text())
+    # encoding declared (D-2644): the safetensors index and config.json are JSON, and RFC 8259 defines JSON as
+    # UTF-8 - so this is the ARTIFACT's contract, not this machine's locale (BUG-511 class: a written byte that
+    # differs per platform breaks every sha256 pin).
+    index = json.loads((base / "model.safetensors.index.json").read_text(encoding="utf-8"))
     weight_map = dict(index["weight_map"])
     shard_names = sorted(set(weight_map.values()))
     head_shard = f"model-{len(shard_names) + 1:05d}-of-{len(shard_names) + 1:05d}.safetensors"
@@ -135,17 +138,17 @@ def build(cfg: dict[str, Any], force: bool) -> dict[str, Any]:
         if key != "__metadata__":
             weight_map[key] = head_shard
     index["weight_map"] = weight_map
-    (out / "model.safetensors.index.json").write_text(json.dumps(index, indent=1))
+    (out / "model.safetensors.index.json").write_text(json.dumps(index, indent=1), encoding="utf-8")
 
     # NOT named `config` (BUG-1083): the config-defaults census resolves a RECEIVER BY NAME, so a local called
     # `config` holding a Hugging Face checkpoint's own config.json was counted as a Maxwell config receiver and
     # its keys (`text_config`, `mtp_num_hidden_layers`) were reported as UNDECLARED config defaults. They are
     # neither - they belong to the model's own artifact. The name now says which document is being read.
-    model_config = json.loads((base / "config.json").read_text())
+    model_config = json.loads((base / "config.json").read_text(encoding="utf-8"))
     text_cfg = model_config.get("text_config", model_config)
     if int(text_cfg.get("mtp_num_hidden_layers", 0)) < 1:
         raise SystemExit("stage_mtp_head: base config does not declare an MTP head")
-    (out / "config.json").write_text(json.dumps(model_config, indent=4))
+    (out / "config.json").write_text(json.dumps(model_config, indent=4), encoding="utf-8")
     return {
         "out_dir": str(out),
         "head_shard": head_shard,

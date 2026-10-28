@@ -101,7 +101,19 @@ def sources_under(roots: list[str]) -> dict[str, str]:
         for path in sorted(d.rglob("*.py")):
             if "__pycache__" in path.parts:
                 continue
-            out[path.relative_to(ROOT).as_posix()] = path.read_text(encoding="utf-8", errors="replace")
+            rel = path.relative_to(ROOT).as_posix()
+            try:
+                out[rel] = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError as exc:
+                # D-2646/D-2442: SOURCE text is UTF-8 by contract (the interpreter and ruff both require it), so
+                # this read is STRICT like its sibling `load_artifact` below - the rail that decides whether silent
+                # repairs are allowed may not itself repair a byte. It paid the class, not the instance: a named
+                # refusal instead of `errors="replace"`, because a repaired byte could hide a rival definition and
+                # a bare UnicodeDecodeError would name no artifact (C16).
+                raise SystemExit("FAIL " + PREFIX + ": " + rel + " is not valid UTF-8 (first bad byte at offset "
+                                 + str(exc.start) + ") - source text is UTF-8 by contract, and this rail may not "
+                                 "read it through a repair (D-2646: the one decode home is "
+                                 "scripts/lib/artifact_encoding.py)") from exc
     return out
 
 

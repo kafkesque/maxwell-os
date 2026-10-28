@@ -1146,7 +1146,7 @@ tasks:
     that reading. THE TIMING IS THE ONE WORD: the flap needs a moment when no long run depends on the pool, and which
     moment that is is the human call the pipeline must ask for before it flips anything.'
 - id: T-138
-  priority: COULD
+  priority: WORTH
   state: done
   closed: '2026-10-16'
   owner_word: 'DEFERRED 2026-10-16 (COULD: install a harness only when a specific job needs it, C28) - not approved and
@@ -1313,7 +1313,7 @@ tasks:
     90.7 s (289.14 tok/s), FAILING the agent_loop bill, so Edge0 (same class) would not fit either. Deferral CONFIRMED by
     measurement - agent_loop needs a DIFFERENT class, not this model_type.'
 - id: T-146
-  priority: COULD
+  priority: WORTH
   state: done
   closed: '2026-10-15'
   mover: owner
@@ -2500,7 +2500,7 @@ tasks:
     stamped; 565 tests pass; R5 gate APPROVE on the home AND on stage5. ORIGINAL GATE: a control asserts the
     ordering invariant on a fixture and the S5 checkpoint invalidation is accepted in the same commit.
 - id: T-197
-  priority: CRITICAL
+  priority: MUST
   state: open
   mover: pipeline
   title: 'CLOSE THE 14 OWNER-CERTIFIED EXTRACTION GAPS: make one certified concept land as a SERVABLE (PASS) row, not a quarantine'

@@ -11,7 +11,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 872 bugs (269 open / 603 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 11 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 873 bugs (269 open / 604 closed; highest OPEN = BUG-1108) · 64 open tasks (MUST 12 / SHOULD 47 / WORTH 5; OWNER-moved 0, pipeline-moved 64; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1355 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 683 · ⚖ ratified 154 | closed: ✅ resolved 395 · ⚪ superseded 19 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1355, D-2987/BUG-765)
 >
@@ -33,11 +33,11 @@
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
+> | T-197 | 🔴 MUST | 🔴 open | CLOSE THE 14 OWNER-CERTIFIED EXTRACTION GAPS: make one certified concept land as a SERVABLE (PASS) row, not a  | MEASURED 2026-10-24. (a) The 14 missing concepts are NAMED in governance/EXTRACTION_RECALL |
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
 > | T-214 | 🔴 MUST | 🔴 open | BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since  | READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gp |
 > | T-217 | 🔴 MUST | 🔴 open | LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture an | READ 2026-10-27: `governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json` (0 |
 > | T-220 | 🔴 MUST | 🔴 open | RUN D-3205'S G4 - THE EMISSION GATE AT THE ROLE'S REAL CONTEXT SIZE (26,214 tokens), not at a 228-1000 token f | READ 2026-10-28: config/decisions.yaml#D-3205 states 'G4 THE EMISSION GATE HAS RUN AT THE  |
-> | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
 > _the face is a VIEW: 12 of 64 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >

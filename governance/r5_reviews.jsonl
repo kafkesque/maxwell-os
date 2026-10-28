@@ -194,3 +194,4 @@
 {"generated": "2026-10-28T17:36:54", "verdict": "APPROVE", "concerns": [], "confidence": 0.99, "reviewer": "gpt-oss-20b-MXFP4-Q8", "file": "scripts/check_decision_membership.py", "sha256_16": "88ebc06143017d56"}
 {"generated": "2026-10-28T19:16:44", "verdict": "APPROVE", "concerns": [], "confidence": 0.99, "reviewer": "gpt-oss-20b-MXFP4-Q8", "file": "scripts/check_decision_membership.py", "sha256_16": "e61289d9f0fdc95b"}
 {"generated": "2026-10-28T19:19:34", "verdict": "APPROVE", "concerns": [], "confidence": 0.99, "reviewer": "gpt-oss-20b-MXFP4-Q8", "file": "scripts/check_decision_membership.py", "sha256_16": "4450be3056bdfdab"}
+{"generated": "2026-10-28T19:34:42", "verdict": "APPROVE", "concerns": [], "confidence": 0.99, "reviewer": "gpt-oss-20b-MXFP4-Q8", "file": "scripts/gov_sync.py", "sha256_16": "fa80b3857ca62df4"}

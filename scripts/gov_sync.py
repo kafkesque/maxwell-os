@@ -99,7 +99,7 @@ def gate_names_owner(gate: str, token: str) -> bool:
 def task_faults(tasks: list, d: dict) -> list[str]:
     """D-2985: the task register must obey its OWN declared schema (PURE - no I/O, so the oracle is testable).
 
-    Four limbs, each with the failure it prevents:
+    Five limbs, each with the failure it prevents:
       (1) a standing RULE is not a task: an `R-` id must be `state: rule` and is never counted as open work
           (MEASURED: R-1 sat at rank #1 of the MUST list in every face, because a rule never closes);
       (2) WHO must act is DECLARED, not inferred: `mover` is REQUIRED and must be one of the declared movers
@@ -108,9 +108,14 @@ def task_faults(tasks: list, d: dict) -> list[str]:
           may not carry a gate that names the owner (the two fields would disagree);
       (4) a count a register owns has ONE home: a measured count in `title`/`why` is a restatement that goes
           stale (BUG-588/D-2692), and a count in `evidence` must carry its date (D-2660: a citation is a
-          claim about the tree at the MOMENT OF MINT).
+          claim about the tree at the MOMENT OF MINT);
+      (5) a task's PRIORITY is declared in the same vocabulary as the face that counts it: `priority` must be
+          one of `task_priorities`, because an off-vocab value (e.g. the bug-severity token CRITICAL on T-197)
+          is silently DROPPED from the MUST/SHOULD/WORTH census - the register-truth line then declares
+          "64 open tasks (MUST 11 / SHOULD 47 / WORTH 5)" whose buckets sum to 63 (measured 2026-10-28).
     """
     states, movers = set(d["task_states"]), set(d["task_movers"])
+    priorities = set(d["task_priorities"])
     token = str(d["owner_gate_token"]).lower()
     out: list[str] = []
     seen: set[str] = set()
@@ -122,8 +127,12 @@ def task_faults(tasks: list, d: dict) -> list[str]:
         if tid in seen:
             out.append(f"{tid} is declared twice in the same register - one task, one home (D-2642)")
         seen.add(tid)
-        st, mv = str(t.get("state", "")), str(t.get("mover", ""))
+        st, mv, pri = str(t.get("state", "")), str(t.get("mover", "")), str(t.get("priority", ""))
         gate = str(t.get("gate", "none")).strip().lower()
+        if pri and pri not in priorities:
+            out.append(f"{tid}: priority {pri!r} is not one of {sorted(priorities)} - a task's priority is "
+                       f"DECLARED in config/gov_sync.yaml#task_priorities (one vocabulary, one home), and an "
+                       f"off-vocab value is silently DROPPED from the MUST/SHOULD/WORTH census (D-2985)")
         if st not in states:
             out.append(f"{tid}: state {st!r} is not one of {sorted(states)} - a task's state is DECLARED "
                        f"(gatehood is mover: owner, not a state of its own)")
@@ -748,6 +757,12 @@ def selftest() -> int:
          task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t"},
                       {**base, "id": "T-2", "state": "open", "mover": "owner", "title": "sign", "gate": "the owner word"},
                       {**base, "id": "R-1", "state": "rule", "mover": "pipeline", "title": "r"}], d) == []),
+        ("a task whose priority is outside the declared vocabulary must fire (T-197's CRITICAL is a bug-severity token)",
+         any("off-vocab value" in f for f in task_faults([{**base, "id": "T-1", "priority": "CRITICAL",
+                                                          "state": "open", "mover": "pipeline", "title": "t"}], d))),
+        ("a task whose priority IS in the vocabulary stays quiet",
+         not any("off-vocab value" in f for f in task_faults([{**base, "id": "T-1", "priority": "MUST",
+                                                              "state": "open", "mover": "pipeline", "title": "t"}], d))),
         ("a standing RULE registered as an open task must fire",
          any("STANDING RULE" in f for f in task_faults([{**base, "id": "R-1", "state": "open", "mover": "pipeline", "title": "r"}], d))),
         ("an entry that does not say WHO must move it must fire",

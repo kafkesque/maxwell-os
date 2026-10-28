@@ -2,6 +2,46 @@ schema_version: '1'
 authority: D-2981
 updated: '2026-10-28'
 tasks:
+- id: T-1
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: ADOPT llmfit's 5-level confidence vocabulary in the resolver
+  why: Replace the binary MEASURED/PREDICTED with the five levels measured_local / measured_community / calibrated / estimated / unsupported, so a calibration row tells the user HOW MUCH to trust it rather than only whether it was measured. Highest-leverage owed item (D-3178, governance/CALIBRATION_ROLE_MARKET_20261027.md section 5).
+  source:
+  - D-3178
+- id: T-2
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: CURATE the model portfolio to fit the 40.4 GiB budget
+  why: The plan role's 15.2 GB MTP4 model pushes 43.7 GiB over the line. Drop analyze from gpt-oss (11.2 GB) or accept and record the plan-switch cold-load cost (5.8-7.2 s/load, MEASURED). (D-3178, note section 5).
+  source:
+  - D-3178
+- id: T-3
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: MEASURE the 3 UNMEASURED candidates or mark them permanently out
+  why: Ornith-35B-REAP-19B, gemma-4-E4B, Phi-4-mini (D-3178, note section 5).
+  source:
+  - D-3178
+- id: T-4
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: SPLIT detect() behind a HardwareProbe protocol; add a Linux detector only when a second host exists
+  why: psutil + nvidia-smi; no speculative code (C19). (D-3178, note section 5).
+  source:
+  - D-3178
+- id: T-5
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: RUN the resolver at engine boot (or on just health) so a fresh install calibrates itself
+  why: The literal 'at first use' requirement (D-3178, note section 5).
+  source:
+  - D-3178
 - id: T-101
   priority: MUST
   state: open
@@ -3476,3 +3516,14 @@ tasks:
     Each split module sits under the deep-tier source cap AND passes scripts/r5_review_gate.py (deep tier,
     gpt-oss-20b-MXFP4-Q8); writer_of_record in config/artifact_ownership.yaml is then updated to the new
     entrypoint. The split is its own sitting (BUG-1103), never a rush.
+
+- id: T-311
+  priority: SHOULD
+  state: done
+  mover: pipeline
+  closed: '2026-09-04'
+  title: 'DETERMINISTIC empty-raw repair: copy discipline -> discipline_raw'
+  why: D2540 step 1, part of the BUG-215 repair. Script scripts/fix_bug311_discipline_raw.py, gemma-approved 2026-09-04 (R5 generator != verifier).
+  source:
+  - D2540
+  - BUG-215

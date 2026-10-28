@@ -13,7 +13,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 874 bugs (267 open / 607 closed; highest OPEN = BUG-1108) · 63 open tasks (MUST 12 / SHOULD 46 / WORTH 5; OWNER-moved 0, pipeline-moved 63; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1355 decisions (census stamp 6c9df8e6257d0a85, 2026-10-28) · 951 bugs (267 open / 684 closed; highest OPEN = BUG-1108) · 68 open tasks (MUST 13 / SHOULD 50 / WORTH 5; OWNER-moved 0, pipeline-moved 68; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **82** of 1355 — 🔴 open 33 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 16 · 📅 planned 6 | in effect: 🟢 active 683 · ⚖ ratified 154 | closed: ✅ resolved 395 · ⚪ superseded 19 · ⚪ archived 8 · ⛔ rejected 14 — the DECLARED buckets sum to the whole register (1355, D-2987/BUG-765)
 >
@@ -24,10 +24,11 @@
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 >
-> **PIPELINE LANE (63) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (68) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
+> | T-1 | 🔴 MUST | 🔴 open | ADOPT llmfit's 5-level confidence vocabulary in the resolver |  |
 > | T-101 | 🔴 MUST | 🔴 open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candida |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
@@ -39,9 +40,8 @@
 > | T-207 | 🔴 MUST | 🔴 open | EXECUTE governance consolidation PHASE-1-ONLY — rearrange the rail surface into ~12 invariant rails and collap | Five couplings measured 2026-10-26 (BUG-1030): rail_registry ladder source-of-truth transa |
 > | T-214 | 🔴 MUST | 🔴 open | BUILD THE DEPENDENT-CHAIN FIXTURE - the only instrument that can answer the orchestrator question, owed since  | READ 2026-10-27: config/model_assignments.yaml#harness_roles declares AGENT_LOOP_SHORT (gp |
 > | T-217 | 🔴 MUST | 🔴 open | LAND THE GUARD WHERE A CALLER ACTUALLY USES IT - take the measured detection+retry shape out of the fixture an | READ 2026-10-27: `governance/evidence/HARMONY_RED_LOOP_20261027_clean_guard_NUDGE.json` (0 |
-> | T-220 | 🔴 MUST | 🔴 open | RUN D-3205'S G4 - THE EMISSION GATE AT THE ROLE'S REAL CONTEXT SIZE (26,214 tokens), not at a 228-1000 token f | READ 2026-10-28: config/decisions.yaml#D-3205 states 'G4 THE EMISSION GATE HAS RUN AT THE  |
 >
-> _the face is a VIEW: 12 of 63 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 68 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
